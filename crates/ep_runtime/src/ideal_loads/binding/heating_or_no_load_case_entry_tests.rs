@@ -29,14 +29,15 @@ fn cp430_adapter_accepts_only_the_cp429_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp430_is_preserved_at_index_120_in_current_124_snapshot_binding() {
+fn cp430_is_preserved_at_index_120_in_current_125_snapshot_binding() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 124);
+    assert_eq!(fields.len(), 125);
     assert!(fields[119].contains(
         "calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment"
     ));
     assert!(fields[120].contains("calculation_heating_or_no_load_case_entry"));
+    assert!(fields[124].contains("calculation_heating_operating_mode_deadband_assignment"));
 }

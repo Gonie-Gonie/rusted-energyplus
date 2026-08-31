@@ -303,7 +303,7 @@ fn assert_schema_and_binding_cardinalities() {
     assert_eq!(snapshot.matches("Option<bool>").count(), 4);
     assert_eq!(snapshot.matches("Option<").count() - 122 - 4, 2);
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
-    assert_eq!(binding.matches("    pub calculation_").count(), 124);
+    assert_eq!(binding.matches("    pub calculation_").count(), 125);
 }
 
 fn array<'a>(lifecycle: &'a Value, field: &str) -> &'a Vec<Value> {

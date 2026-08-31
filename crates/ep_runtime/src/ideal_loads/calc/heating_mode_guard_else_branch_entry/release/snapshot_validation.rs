@@ -21,7 +21,7 @@ pub(super) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
         )
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     let predecessor = predecessor_cp432_snapshot(snapshot);
     let predecessor_route =
         crate::ideal_loads::calc::heating_operating_mode_heat_assignment_snapshot_route(
@@ -34,7 +34,7 @@ pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     prefix_and_local_shape_match(snapshot, predecessor, route).then_some(route)
 }
 
-pub(super) fn retained_route_matches_snapshot_bounded(
+pub(in crate::ideal_loads::calc) fn retained_route_matches_snapshot_bounded(
     snapshot: Snapshot,
     route: Route,
 ) -> bool {
@@ -55,6 +55,55 @@ pub(super) fn retained_route_matches_prior_snapshot_bounded(
     route: Route,
 ) -> bool {
     retained_route_matches_snapshot_bounded(snapshot, route)
+}
+
+pub(super) fn committed_prefix_and_local_route_shape_match(
+    snapshot: Snapshot,
+    predecessor: Predecessor,
+    predecessor_route: PredecessorRoute,
+    route: Route,
+) -> bool {
+    let entered = predecessor_route.predecessor_heating_mode_guard_false_fallthrough;
+    let predecessor_route_shape = route.logical_index == predecessor_route.logical_index
+        && route.predecessor_active == predecessor_route.predecessor_active
+        && route.predecessor_assignment_executed
+            == predecessor_route.predecessor_assignment_executed
+        && route.predecessor_entered == predecessor_route.predecessor_entered
+        && route.predecessor_total_output_assignment_executed
+            == predecessor_route.predecessor_total_output_assignment_executed
+        && route.predecessor_heating_or_no_load_case_entered
+            == predecessor_route.predecessor_heating_or_no_load_case_entered
+        && route.predecessor_heating_mode_guard_evaluated
+            == predecessor_route.predecessor_heating_mode_guard_evaluated
+        && route.predecessor_sensible_comparison_satisfied
+            == predecessor_route.predecessor_sensible_comparison_satisfied
+        && route.predecessor_single_cool_blocked == predecessor_route.predecessor_single_cool_blocked
+        && route.predecessor_heating_operating_mode_body_entered
+            == predecessor_route.predecessor_heating_operating_mode_body_entered
+        && route.predecessor_heating_mode_guard_false_fallthrough
+            == predecessor_route.predecessor_heating_mode_guard_false_fallthrough
+        && route.assignment_executed == predecessor_route.assignment_executed
+        && route.entered == entered;
+    predecessor_route_shape
+        && snapshot.source == SOURCE
+        && snapshot.first_excluded_source == EXCLUDED
+        && snapshot.source_order == ORDER
+        && snapshot.system == predecessor.system
+        && snapshot.parent_call_ordinal == predecessor.parent_call_ordinal
+        && snapshot.controlled_zone == predecessor.controlled_zone
+        && snapshot.heating_mode_guard_else_branch_entered == entered
+        && same(
+            snapshot.resulting_supply_humidity_ratio,
+            predecessor.resulting_supply_humidity_ratio,
+        )
+        && same(
+            snapshot.resulting_supply_enthalpy_j_per_kg,
+            predecessor.resulting_supply_enthalpy_j_per_kg,
+        )
+        && same(
+            snapshot.resulting_supply_temperature_c,
+            predecessor.resulting_supply_temperature_c,
+        )
 }
 
 pub(super) fn prefix_and_local_shape_match(

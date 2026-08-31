@@ -119,6 +119,7 @@ use super::super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     PurchasedAirCalcHeatingModeGuardSnapshot,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
     PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
     PurchasedAirInitSnapshot,
@@ -491,8 +492,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_operating_mode_heat_assignment:
         PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
     /// Source-ordered heating-mode guard else-branch-entry snapshot.
-    pub calculation_heating_mode_guard_else_branch_entry:
-        PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
+    pub calculation_heating_mode_guard_else_branch_entry: PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
+    /// Source-ordered heating operating-mode Deadband assignment snapshot.
+    pub calculation_heating_operating_mode_deadband_assignment: PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

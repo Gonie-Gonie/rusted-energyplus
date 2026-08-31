@@ -12,7 +12,7 @@ fn cp426_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_two_
 }
 
 #[test]
-fn cp426_snapshot_schema_is_exactly_287_104_2_1_and_binding_is_124() {
+fn cp426_snapshot_schema_is_exactly_287_104_2_1_and_binding_is_125() {
     let source = include_str!(
         "calc/cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment.rs"
     );
@@ -37,7 +37,7 @@ fn cp426_snapshot_schema_is_exactly_287_104_2_1_and_binding_is_124() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        124
+        125
     );
 }
 

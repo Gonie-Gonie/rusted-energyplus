@@ -32,6 +32,16 @@ pub(in crate::ideal_loads::calc) use transition::{
     advance_heating_mode_guard_else_branch_entry_state_with_validated_route,
     heating_mode_guard_else_branch_entry_route_from_committed_predecessor,
 };
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    heating_mode_guard_else_branch_entry_committed_latest_route,
+    heating_mode_guard_else_branch_entry_retained_route_matches_snapshot_bounded,
+    heating_mode_guard_else_branch_entry_snapshot_route,
+};
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::{
+    cp433_all_snapshots_for_successor_tests, cp433_fixture_unit_for_successor_tests,
+};
 /// EnergyPlus structural heating-mode guard else-branch entry represented by CP433.
 pub const PURCHASED_AIR_CALC_HEATING_MODE_GUARD_ELSE_BRANCH_ENTRY_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2350";

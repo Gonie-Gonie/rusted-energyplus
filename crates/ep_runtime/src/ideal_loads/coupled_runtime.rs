@@ -273,6 +273,8 @@ use super::{
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcHeatingModeGuardElseBranchEntryError,
     PurchasedAirCalcHeatingModeGuardElseBranchEntryLifecycleSummary,
     PurchasedAirCalcHeatingModeGuardError, PurchasedAirCalcHeatingModeGuardLifecycleSummary,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentError,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentLifecycleSummary,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentError,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentLifecycleSummary,
     PurchasedAirCalcHeatingOrNoLoadCaseEntryError,
@@ -402,6 +404,7 @@ use super::{
     purchased_air_calc_entry_lifecycle_summary,
     purchased_air_calc_heating_mode_guard_else_branch_entry_lifecycle_summary,
     purchased_air_calc_heating_mode_guard_lifecycle_summary,
+    purchased_air_calc_heating_operating_mode_deadband_assignment_lifecycle_summary,
     purchased_air_calc_heating_operating_mode_heat_assignment_lifecycle_summary,
     purchased_air_calc_heating_or_no_load_case_entry_lifecycle_summary,
     purchased_air_calc_minimum_oa_prefix_lifecycle_summary, purchased_air_init_lifecycle_summary,
@@ -527,6 +530,7 @@ pub(in crate::ideal_loads) mod cooling_zero_supply_mass_flow_supply_temperature_
 pub(in crate::ideal_loads) mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_validation;
 pub(in crate::ideal_loads) mod heating_mode_guard_else_branch_entry_validation;
 pub(in crate::ideal_loads) mod heating_mode_guard_validation;
+pub(in crate::ideal_loads) mod heating_operating_mode_deadband_assignment_validation;
 pub(in crate::ideal_loads) mod heating_operating_mode_heat_assignment_validation;
 pub(in crate::ideal_loads) mod heating_or_no_load_case_entry_validation;
 mod minimum_oa_validation;
@@ -968,6 +972,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded heating-mode-guard else-branch-entry lifecycle report.
     pub calc_heating_mode_guard_else_branch_entry_lifecycle:
         PurchasedAirCalcHeatingModeGuardElseBranchEntryLifecycleSummary,
+    /// Persistent bounded heating operating-mode Deadband-assignment lifecycle report.
+    pub calc_heating_operating_mode_deadband_assignment_lifecycle:
+        PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -1462,6 +1469,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final heating-mode-guard else-branch-entry summary could not resolve the bound unit.
     CalcHeatingModeGuardElseBranchEntryLifecycle(
         PurchasedAirCalcHeatingModeGuardElseBranchEntryError,
+    ),
+    /// Final heating operating-mode Deadband-assignment summary could not resolve the bound unit.
+    CalcHeatingOperatingModeDeadbandAssignmentLifecycle(
+        PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -2588,6 +2599,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A heating operating-mode Deadband-assignment lifecycle invariant did not match the run.
+    CalcHeatingOperatingModeDeadbandAssignmentLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -3213,6 +3233,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A heating operating-mode Deadband-assignment snapshot did not match its release call.
+    UnexpectedCalculationHeatingOperatingModeDeadbandAssignment {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -3763,6 +3788,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcHeatingModeGuardElseBranchEntryLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir heating-mode-guard else-branch-entry lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcHeatingOperatingModeDeadbandAssignmentLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir heating operating-mode Deadband-assignment lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -4764,6 +4793,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir heating-mode-guard else-branch-entry lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcHeatingOperatingModeDeadbandAssignmentLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir heating operating-mode Deadband-assignment lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -5481,6 +5518,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::UnexpectedCalculationHeatingModeGuardElseBranchEntry { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its heating-mode-guard else-branch entry"
+            ),
+            Self::UnexpectedCalculationHeatingOperatingModeDeadbandAssignment { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its heating operating-mode Deadband assignment"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -7107,6 +7148,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                     UnexpectedCalculationHeatingModeGuardElseBranchEntry { timestep_index },
             );
         }
+        if !heating_operating_mode_deadband_assignment_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationHeatingOperatingModeDeadbandAssignment { timestep_index },
+            );
+        }
     }
     let init_lifecycle = purchased_air_init_lifecycle_summary(
         &purchased_air_runtime_state,
@@ -7160,6 +7211,12 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         .iter()
         .filter(|output| {
             output.coupling.purchased_air.calculation.mode == IdealLoadsSensibleMode::Heating
+        })
+        .count();
+    let numerical_deadband_count = timestep_outputs
+        .iter()
+        .filter(|output| {
+            output.coupling.purchased_air.calculation.mode == IdealLoadsSensibleMode::Deadband
         })
         .count();
     cooling_entry_validation::validate_lifecycle(
@@ -9145,6 +9202,23 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_heating_operating_mode_deadband_assignment_lifecycle =
+        purchased_air_calc_heating_operating_mode_deadband_assignment_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcHeatingOperatingModeDeadbandAssignmentLifecycle,
+        )?;
+    heating_operating_mode_deadband_assignment_validation::validate_lifecycle(
+        &calc_heating_operating_mode_deadband_assignment_lifecycle,
+        &calc_heating_mode_guard_else_branch_entry_lifecycle,
+        timestep_outputs.len(),
+        numerical_deadband_count,
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -9331,6 +9405,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_heating_mode_guard_lifecycle,
             calc_heating_operating_mode_heat_assignment_lifecycle,
             calc_heating_mode_guard_else_branch_entry_lifecycle,
+            calc_heating_operating_mode_deadband_assignment_lifecycle,
         },
         state,
         results,

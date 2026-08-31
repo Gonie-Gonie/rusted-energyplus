@@ -215,7 +215,18 @@ fn assert_schema_and_binding_cardinalities() {
     assert_eq!(snapshot.matches("Option<bool>").count(), 2);
     assert_eq!(snapshot.matches("Option<").count() - 94 - 2, 1);
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
-    assert_eq!(binding.matches("    pub calculation_").count(), 124);
+    assert_eq!(binding.matches("    pub calculation_").count(), 125);
+    let historical_audit = include_str!(
+        "../../../../scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1"
+    );
+    assert!(
+        historical_audit
+            .contains("non_direct_runtime_rejects_cp316_through_cp434_lifecycle_evidence")
+    );
+    assert!(
+        !historical_audit
+            .contains("non_direct_runtime_rejects_cp316_through_cp433_lifecycle_evidence")
+    );
     let core_tests = include_str!(
         "../../../ep_runtime/src/ideal_loads/calc/cooling_supply_mass_flow_positive_guard_else_branch_entry/tests.rs"
     );

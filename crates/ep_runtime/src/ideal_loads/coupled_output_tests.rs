@@ -226,6 +226,8 @@ mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture;
 mod heating_mode_guard_else_branch_entry_fixture;
 #[path = "coupled_output_tests/heating_mode_guard_fixture.rs"]
 mod heating_mode_guard_fixture;
+#[path = "coupled_output_tests/heating_operating_mode_deadband_assignment_fixture.rs"]
+mod heating_operating_mode_deadband_assignment_fixture;
 #[path = "coupled_output_tests/heating_operating_mode_heat_assignment_fixture.rs"]
 mod heating_operating_mode_heat_assignment_fixture;
 #[path = "coupled_output_tests/heating_or_no_load_case_entry_fixture.rs"]
@@ -346,6 +348,7 @@ use heating_or_no_load_case_entry_fixture::calculation_heating_or_no_load_case_e
 use heating_mode_guard_fixture::calculation_heating_mode_guard_snapshot;
 use heating_mode_guard_else_branch_entry_fixture::calculation_heating_mode_guard_else_branch_entry_snapshot;
 use heating_operating_mode_heat_assignment_fixture::calculation_heating_operating_mode_heat_assignment_snapshot;
+use heating_operating_mode_deadband_assignment_fixture::calculation_heating_operating_mode_deadband_assignment_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization,
@@ -591,6 +594,27 @@ fn cp433_else_entry_mutation_cannot_change_the_unchanged_numerical_coupling_outp
     assert_ne!(
         mutated.calculation_heating_mode_guard_else_branch_entry,
         original.calculation_heating_mode_guard_else_branch_entry,
+    );
+    assert_eq!(mutated.coupling, original.coupling);
+}
+
+#[test]
+fn cp434_assignment_mutation_cannot_change_the_unchanged_numerical_coupling_output() {
+    let system = test_system();
+    let original = scaled_output(&system, 2, 1.0);
+    let mut mutated = original;
+    let assigned = original
+        .calculation_heating_operating_mode_deadband_assignment
+        .assigned_heating_operating_mode_deadband;
+    mutated
+        .calculation_heating_operating_mode_deadband_assignment
+        .assigned_heating_operating_mode_deadband = match assigned {
+        Some(_) => None,
+        None => Some(IdealLoadsSensibleMode::Deadband),
+    };
+    assert_ne!(
+        mutated.calculation_heating_operating_mode_deadband_assignment,
+        original.calculation_heating_operating_mode_deadband_assignment,
     );
     assert_eq!(mutated.coupling, original.coupling);
 }
@@ -1869,6 +1893,10 @@ pub(in crate::ideal_loads) fn scaled_output(
         calculation_heating_mode_guard_else_branch_entry_snapshot(
             calculation_heating_operating_mode_heat_assignment,
         );
+    let calculation_heating_operating_mode_deadband_assignment =
+        calculation_heating_operating_mode_deadband_assignment_snapshot(
+            calculation_heating_mode_guard_else_branch_entry,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -2015,6 +2043,7 @@ pub(in crate::ideal_loads) fn scaled_output(
         calculation_heating_mode_guard,
         calculation_heating_operating_mode_heat_assignment,
         calculation_heating_mode_guard_else_branch_entry,
+        calculation_heating_operating_mode_deadband_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

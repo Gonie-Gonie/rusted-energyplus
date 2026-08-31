@@ -1,5 +1,6 @@
 //! CP433 boundary, exhaustive route, forgery, overflow, and bounded-path tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::transition::{
@@ -12,9 +13,14 @@ use super::PurchasedAirCalcHeatingModeGuardElseBranchEntryRuntimeState as State;
 use crate::ideal_loads::calc::{
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentRetainedRoute as PredecessorRoute,
     cp432_all_snapshots_for_successor_tests,
+    cp432_fixture_unit_for_successor_tests,
     heating_operating_mode_heat_assignment_snapshot_route as predecessor_route,
 };
-use crate::ideal_loads::PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot as Predecessor;
+use crate::ideal_loads::{
+    PurchasedAirCalcCoolingMixedAirCallSnapshot as Cp329Snapshot,
+    PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot as Predecessor,
+    PurchasedAirUnitRuntimeState,
+};
 
 #[test]
 fn cp433_boundary_maps_structural_2350_and_excludes_deadband_assignment_2351() {
@@ -246,7 +252,7 @@ fn cp433_hot_release_and_retained_validation_are_bounded() {
 }
 
 #[test]
-fn cp433_subtree_is_eleven_files_and_each_core_file_is_bounded() {
+fn cp433_subtree_is_thirteen_files_and_each_core_file_is_bounded() {
     let files = [
         include_str!("../heating_mode_guard_else_branch_entry.rs"),
         include_str!("release.rs"),
@@ -260,8 +266,10 @@ fn cp433_subtree_is_eleven_files_and_each_core_file_is_bounded() {
         include_str!("tests/schema_prefix.rs"),
         include_str!("transition/accounting.rs"),
         include_str!("transition/snapshot.rs"),
+        include_str!("release/committed.rs"),
+        include_str!("tests/committed_seal.rs"),
     ];
-    assert_eq!(files.len() - 1, 11);
+    assert_eq!(files.len() - 1, 13);
     assert!(files.into_iter().all(|source| source.lines().count() <= 500));
 }
 
@@ -315,4 +323,39 @@ fn is_public_logical_index(index: usize) -> bool {
 
 fn assert_bits(left: Option<f64>, right: Option<f64>) {
     assert_eq!(left.map(f64::to_bits), right.map(f64::to_bits));
+}
+
+pub(in crate::ideal_loads::calc) fn cp433_all_snapshots_for_successor_tests() -> Vec<
+    super::PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
+> {
+    cp432_all_snapshots_for_successor_tests()
+        .into_iter()
+        .map(|predecessor| {
+            let predecessor_route = predecessor_route_for(predecessor);
+            let route = successor_route(predecessor, predecessor_route).expect("CP433 route");
+            advance_validated(
+                &mut State::new(predecessor.system),
+                predecessor,
+                predecessor_route,
+                route,
+            )
+            .expect("CP433")
+        })
+        .collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp433_fixture_unit_for_successor_tests() -> (
+    PurchasedAirUnitRuntimeState,
+    super::PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
+    Route,
+    Option<Cp329Snapshot>,
+) {
+    let (mut unit, predecessor, predecessor_route, owner) =
+        cp432_fixture_unit_for_successor_tests();
+    let route = successor_route(predecessor, predecessor_route).expect("CP433 route");
+    let mut state = State::new(predecessor.system);
+    let snapshot = advance_validated(&mut state, predecessor, predecessor_route, route)
+        .expect("CP433");
+    unit.calc_heating_mode_guard_else_branch_entry = state;
+    (unit, snapshot, route, owner)
 }

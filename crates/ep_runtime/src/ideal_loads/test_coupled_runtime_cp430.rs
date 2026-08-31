@@ -29,7 +29,7 @@ fn cp430_conceptual_contract_is_one_public_entry_and_no_numerical_feed() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        124
+        125
     );
     let binding = include_str!("binding.rs");
     let cp430 = binding

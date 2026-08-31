@@ -137,6 +137,7 @@ use super::{
     PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError,
     PurchasedAirCalcHeatingModeGuardElseBranchEntryError as HeatingModeGuardElseBranchEntryError,
     PurchasedAirCalcHeatingModeGuardError as HeatingModeGuardError,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentError as HeatingOperatingModeDeadbandAssignmentError,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentError as HeatingOperatingModeHeatAssignmentError,
     PurchasedAirCalcHeatingOrNoLoadCaseEntryError as HeatingOrNoLoadCaseEntryError,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirHardSizeLegacyContext,
@@ -275,6 +276,7 @@ mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment;
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment;
 mod heating_mode_guard;
 mod heating_mode_guard_else_branch_entry;
+mod heating_operating_mode_deadband_assignment;
 mod heating_operating_mode_heat_assignment;
 mod heating_or_no_load_case_entry;
 mod scheduled_output;
@@ -352,6 +354,7 @@ use cooling_zero_supply_mass_flow_total_output_positive_zero_assignment::advance
 use heating_or_no_load_case_entry::advance_heating_or_no_load_case_entry;
 use heating_mode_guard::advance_heating_mode_guard;
 use heating_mode_guard_else_branch_entry::advance_heating_mode_guard_else_branch_entry;
+use heating_operating_mode_deadband_assignment::advance_heating_operating_mode_deadband_assignment;
 use heating_operating_mode_heat_assignment::advance_heating_operating_mode_heat_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment;
@@ -1363,6 +1366,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationHeatingOperatingModeHeatAssignment(HeatingOperatingModeHeatAssignmentError),
     /// The bounded heating-mode guard else-branch entry rejected its release state.
     CalculationHeatingModeGuardElseBranchEntry(HeatingModeGuardElseBranchEntryError),
+    /// The bounded heating operating-mode Deadband assignment rejected its release state.
+    CalculationHeatingOperatingModeDeadbandAssignment(HeatingOperatingModeDeadbandAssignmentError),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -2336,6 +2341,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_heating_operating_mode_heat_assignment,
         )?;
+    let calculation_heating_operating_mode_deadband_assignment =
+        advance_heating_operating_mode_deadband_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_heating_mode_guard_else_branch_entry,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -2501,6 +2512,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_heating_mode_guard,
         calculation_heating_operating_mode_heat_assignment,
         calculation_heating_mode_guard_else_branch_entry,
+        calculation_heating_operating_mode_deadband_assignment,
         coupling,
     })
 }

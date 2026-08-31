@@ -318,7 +318,7 @@ impl PurchasedAirUnitRuntimeState {
             calc_heating_operating_mode_heat_assignment:
                 PurchasedAirCalcHeatingOperatingModeHeatAssignmentRuntimeState::new(system),
             calc_heating_mode_guard_else_branch_entry:
-                PurchasedAirCalcHeatingModeGuardElseBranchEntryRuntimeState::new(system),
+                PurchasedAirCalcHeatingModeGuardElseBranchEntryRuntimeState::new(system), calc_heating_operating_mode_deadband_assignment: PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
