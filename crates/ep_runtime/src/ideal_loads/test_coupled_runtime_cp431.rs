@@ -29,7 +29,7 @@ fn cp431_conceptual_contract_is_exactly_three_active_variants_and_no_numerical_f
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        125
+        126
     );
     let binding = include_str!("binding.rs");
     let cp430 = binding

@@ -57,6 +57,38 @@ pub(super) fn retained_route_matches_prior_snapshot_bounded(
     retained_route_matches_snapshot_bounded(snapshot, route)
 }
 
+pub(super) fn committed_prefix_and_local_route_shape_match(
+    snapshot: Snapshot,
+    predecessor: Predecessor,
+    predecessor_route: PredecessorRoute,
+    route: Route,
+) -> bool {
+    let assignment = predecessor_route.entered;
+    let route_shape = route.logical_index == predecessor_route.logical_index
+        && route.predecessor_active == predecessor_route.predecessor_active
+        && route.predecessor_assignment_executed
+            == predecessor_route.predecessor_assignment_executed
+        && route.predecessor_entered == predecessor_route.predecessor_entered
+        && route.predecessor_total_output_assignment_executed
+            == predecessor_route.predecessor_total_output_assignment_executed
+        && route.predecessor_heating_or_no_load_case_entered
+            == predecessor_route.predecessor_heating_or_no_load_case_entered
+        && route.predecessor_heating_mode_guard_evaluated
+            == predecessor_route.predecessor_heating_mode_guard_evaluated
+        && route.predecessor_sensible_comparison_satisfied
+            == predecessor_route.predecessor_sensible_comparison_satisfied
+        && route.predecessor_single_cool_blocked == predecessor_route.predecessor_single_cool_blocked
+        && route.predecessor_heating_operating_mode_body_entered
+            == predecessor_route.predecessor_heating_operating_mode_body_entered
+        && route.predecessor_heating_mode_guard_false_fallthrough
+            == predecessor_route.predecessor_heating_mode_guard_false_fallthrough
+        && route.predecessor_heating_operating_mode_heat_assignment_executed
+            == predecessor_route.assignment_executed
+        && route.predecessor_heating_mode_guard_else_branch_entered == predecessor_route.entered
+        && route.assignment_executed == assignment;
+    route_shape && local_shape_is_exact(snapshot, predecessor, route)
+}
+
 pub(super) fn prefix_and_local_shape_match(
     snapshot: Snapshot,
     predecessor: Predecessor,

@@ -1,5 +1,4 @@
 //! Source-ordered output of one model-bound schedule sample.
-
 use super::super::{
     DirectZonePurchasedAirCouplingOutput, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
     PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot,
@@ -121,16 +120,15 @@ use super::super::{
     PurchasedAirCalcHeatingModeGuardSnapshot,
     PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
-    PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
-    PurchasedAirInitSnapshot,
+    PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
-use super::DirectZonePurchasedAirScheduleSnapshot;
-
 /// Output from one successful model-bound schedule sample and CP300 call.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Fully resolved current schedule values.
-    pub schedules: DirectZonePurchasedAirScheduleSnapshot,
+    pub schedules: super::DirectZonePurchasedAirScheduleSnapshot,
     /// Persistent initialization snapshot consumed by this Calc call.
     pub initialization: PurchasedAirInitSnapshot,
     /// Source-ordered `CalcPurchAirLoads` entry-prefix snapshot.
@@ -495,6 +493,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_mode_guard_else_branch_entry: PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     /// Source-ordered heating operating-mode Deadband assignment snapshot.
     pub calculation_heating_operating_mode_deadband_assignment: PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
+    /// Source-ordered heating outdoor-air maximum-flow guard snapshot.
+    pub calculation_heating_outdoor_air_maximum_flow_guard: PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

@@ -4,6 +4,9 @@ use std::collections::BTreeSet;
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp435_assertions.rs"]
+mod cp435_assertions;
+
 const CP433_KEY: &str = "purchased_air_calc_heating_mode_guard_else_branch_entry_lifecycle";
 const CP434_KEY: &str = "purchased_air_calc_heating_operating_mode_deadband_assignment_lifecycle";
 const ORDER: [&str; 1] = ["assign-local-operating-mode-deadband"];
@@ -236,6 +239,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP434_KEY));
+    cp435_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -244,6 +248,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP434_KEY].is_null(),
         "non-direct runtime must not publish CP434 evidence"
     );
+    cp435_assertions::assert_non_direct(runtime);
 }
 
 fn assert_actual_json_key_set(
@@ -296,11 +301,12 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(calculation_fields.len(), 125);
+    assert_eq!(calculation_fields.len(), 126);
     assert!(calculation_fields[123].contains("calculation_heating_mode_guard_else_branch_entry"));
     assert!(
         calculation_fields[124].contains("calculation_heating_operating_mode_deadband_assignment")
     );
+    assert!(calculation_fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
 }
 
 fn array<'a>(lifecycle: &'a Value, field: &str) -> &'a Vec<Value> {

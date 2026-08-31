@@ -140,6 +140,7 @@ use super::{
     PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentError as HeatingOperatingModeDeadbandAssignmentError,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentError as HeatingOperatingModeHeatAssignmentError,
     PurchasedAirCalcHeatingOrNoLoadCaseEntryError as HeatingOrNoLoadCaseEntryError,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardError as HeatingOutdoorAirMaximumFlowGuardError,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirHardSizeLegacyContext,
     PurchasedAirInitCallContext, PurchasedAirInitError, PurchasedAirInitManagerPlan,
     PurchasedAirInitManagerPlanError, PurchasedAirInitTopologyPlan,
@@ -279,6 +280,7 @@ mod heating_mode_guard_else_branch_entry;
 mod heating_operating_mode_deadband_assignment;
 mod heating_operating_mode_heat_assignment;
 mod heating_or_no_load_case_entry;
+mod heating_outdoor_air_maximum_flow_guard;
 mod scheduled_output;
 
 use cooling_constant_shr_supply_humidity_ratio_minimum_limit::advance_cooling_constant_shr_supply_humidity_ratio_minimum_limit;
@@ -356,6 +358,7 @@ use heating_mode_guard::advance_heating_mode_guard;
 use heating_mode_guard_else_branch_entry::advance_heating_mode_guard_else_branch_entry;
 use heating_operating_mode_deadband_assignment::advance_heating_operating_mode_deadband_assignment;
 use heating_operating_mode_heat_assignment::advance_heating_operating_mode_heat_assignment;
+use heating_outdoor_air_maximum_flow_guard::advance_heating_outdoor_air_maximum_flow_guard;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit;
@@ -1368,6 +1371,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationHeatingModeGuardElseBranchEntry(HeatingModeGuardElseBranchEntryError),
     /// The bounded heating operating-mode Deadband assignment rejected its release state.
     CalculationHeatingOperatingModeDeadbandAssignment(HeatingOperatingModeDeadbandAssignmentError),
+    /// The bounded heating outdoor-air maximum-flow guard rejected its release state.
+    CalculationHeatingOutdoorAirMaximumFlowGuard(HeatingOutdoorAirMaximumFlowGuardError),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -2347,6 +2352,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_heating_mode_guard_else_branch_entry,
         )?;
+    let calculation_heating_outdoor_air_maximum_flow_guard =
+        advance_heating_outdoor_air_maximum_flow_guard(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_heating_operating_mode_deadband_assignment,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -2513,6 +2524,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_heating_operating_mode_heat_assignment,
         calculation_heating_mode_guard_else_branch_entry,
         calculation_heating_operating_mode_deadband_assignment,
+        calculation_heating_outdoor_air_maximum_flow_guard,
         coupling,
     })
 }

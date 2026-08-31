@@ -20,6 +20,7 @@ pub use release::{
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
+    heating_operating_mode_deadband_assignment_committed_latest_route,
     heating_operating_mode_deadband_assignment_retained_route_matches_snapshot_bounded,
     heating_operating_mode_deadband_assignment_snapshot_route,
 };
@@ -32,7 +33,9 @@ pub(in crate::ideal_loads) use release::{
 pub use state::PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentRuntimeState;
 #[cfg(test)]
 #[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use tests::cp434_all_snapshots_for_successor_tests;
+pub(in crate::ideal_loads::calc) use tests::{
+    cp434_all_snapshots_for_successor_tests, cp434_fixture_unit_for_successor_tests,
+};
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use transition::{
     PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentRetainedRoute,

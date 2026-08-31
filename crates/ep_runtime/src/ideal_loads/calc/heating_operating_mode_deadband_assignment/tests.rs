@@ -1,5 +1,6 @@
 //! CP434 boundary, exhaustive route, forgery, overflow, and bounded-path tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentRuntimeState as State;
@@ -11,11 +12,13 @@ use super::transition::{
 };
 use crate::ideal_loads::calc::{
     PurchasedAirCalcHeatingModeGuardElseBranchEntryRetainedRoute as PredecessorRoute,
-    cp433_all_snapshots_for_successor_tests,
+    cp433_all_snapshots_for_successor_tests, cp433_fixture_unit_for_successor_tests,
     heating_mode_guard_else_branch_entry_snapshot_route as predecessor_route,
 };
 use crate::ideal_loads::{
-    IdealLoadsSensibleMode, PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot as Predecessor,
+    IdealLoadsSensibleMode, PurchasedAirCalcCoolingMixedAirCallSnapshot as Cp329Snapshot,
+    PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot as Predecessor,
+    PurchasedAirUnitRuntimeState,
 };
 
 #[test]
@@ -275,14 +278,16 @@ fn cp434_subtree_is_exactly_eleven_files_and_each_core_file_is_bounded() {
         include_str!("tests.rs"),
         include_str!("transition.rs"),
         include_str!("release/error.rs"),
+        include_str!("release/committed.rs"),
         include_str!("release/prefix.rs"),
         include_str!("release/runtime_validation.rs"),
         include_str!("release/snapshot_validation.rs"),
         include_str!("tests/schema_prefix.rs"),
+        include_str!("tests/committed_seal.rs"),
         include_str!("transition/accounting.rs"),
         include_str!("transition/snapshot.rs"),
     ];
-    assert_eq!(files.len() - 1, 11);
+    assert_eq!(files.len() - 1, 13);
     assert!(
         files
             .into_iter()
@@ -299,6 +304,22 @@ pub(in crate::ideal_loads::calc) fn cp434_all_snapshots_for_successor_tests()
         .into_iter()
         .map(|predecessor| advance(&mut state, predecessor).expect("CP434 snapshot"))
         .collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp434_fixture_unit_for_successor_tests() -> (
+    PurchasedAirUnitRuntimeState,
+    super::PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
+    Route,
+    Option<Cp329Snapshot>,
+) {
+    let (mut unit, predecessor, predecessor_route, owner) =
+        cp433_fixture_unit_for_successor_tests();
+    let route = successor_route(predecessor, predecessor_route).expect("CP434 route");
+    let mut state = State::new(predecessor.system);
+    let snapshot = advance_validated(&mut state, predecessor, predecessor_route, route)
+        .expect("CP434");
+    unit.calc_heating_operating_mode_deadband_assignment = state;
+    (unit, snapshot, route, owner)
 }
 
 fn active_predecessor() -> Predecessor {

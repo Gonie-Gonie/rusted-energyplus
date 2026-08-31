@@ -374,7 +374,7 @@ $cp340BindingIntervalCode = [regex]::Replace(
 )
     $cp340BindingIntervalCode = [regex]::Replace(
         $cp340BindingIntervalCode,
-        '(?s)(?:let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;|let calculation_heating_operating_mode_deadband_assignment =\s*advance_heating_operating_mode_deadband_assignment\([^;]+?\)\?;)',
+        '(?s)(?:let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;|let calculation_heating_operating_mode_deadband_assignment =\s*advance_heating_operating_mode_deadband_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_guard =\s*advance_heating_outdoor_air_maximum_flow_guard\([^;]+?\)\?;)',
         ''
     )
     if ($cp340BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
@@ -432,7 +432,7 @@ Assert-Contains -Path $cp340DirectAssertions -Pattern '3 \* evaluations \+ expec
 Assert-Contains -Path $cp340DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle' -Description "direct-run CP339 evidence"
 Assert-Contains -Path $cp340DirectAssertions -Pattern 'purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle' -Description "direct-run CP321 evidence"
 Assert-Contains -Path $cp340NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle' -Description "non-direct CP340 null evidence"
-Assert-Contains -Path $cp340PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp434_lifecycle_evidence' -Description "non-direct CP340 through CP363 evidence rejection"
+Assert-Contains -Path $cp340PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp435_lifecycle_evidence' -Description "non-direct CP340 through CP363 evidence rejection"
 Assert-NotContains -Path $cp340Pipeline -Pattern 'latest_numerical|numerical_supply|final_supply|complete_direct_zone_purchased_air_coupling|sized_' -Description "CP340 pipeline excludes numerical and sized-limit operands"
 
 # Exactly two algorithm addenda, two capability addenda, and six targets.
@@ -611,11 +611,11 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP340 after CP339 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 372' -Description "CP340 cumulative inventory total through CP403"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 373' -Description "CP340 cumulative inventory total through CP403"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard\.ps1"' -Description "CP340 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard\.ps1::dot_sources' -Description "CP340 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 372 \|' -Description "CP340 generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 373 \|' -Description "CP340 generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP340 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 132 \|' -Description "CP340 generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 133 \|' -Description "CP340 generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP340 generated uncalled script count"
-Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'; Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_operating_mode_deadband_assignment' -Description 'audited CP340 through CP434 helper whitelist'
+Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'; Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_operating_mode_deadband_assignment' -Description 'audited CP340 through CP435 helper whitelist'
