@@ -121,11 +121,13 @@ use super::super::{
     PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
     PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
 /// Output from one successful model-bound schedule sample and CP300 call.
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[rustfmt::skip]
 pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Fully resolved current schedule values.
     pub schedules: super::DirectZonePurchasedAirScheduleSnapshot,
@@ -473,17 +475,13 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment:
         PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentSnapshot,
     /// Source-ordered zero-flow supply-temperature mixed-air assignment snapshot.
-    pub calculation_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment:
-        PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentSnapshot,
+    pub calculation_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment: PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentSnapshot,
     /// Source-ordered zero-flow sensible-output positive-zero assignment snapshot.
-    pub calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment:
-        PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentSnapshot,
+    pub calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment: PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentSnapshot,
     /// Source-ordered zero-flow total-output positive-zero assignment snapshot.
-    pub calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment:
-        PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
+    pub calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment: PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     /// Source-ordered Heating-or-no-load case-entry snapshot.
-    pub calculation_heating_or_no_load_case_entry:
-        PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
+    pub calculation_heating_or_no_load_case_entry: PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
     /// Source-ordered heating-mode guard snapshot.
     pub calculation_heating_mode_guard: PurchasedAirCalcHeatingModeGuardSnapshot,
     /// Source-ordered heating operating-mode Heat assignment snapshot.
@@ -495,6 +493,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_operating_mode_deadband_assignment: PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
     /// Source-ordered heating outdoor-air maximum-flow guard snapshot.
     pub calculation_heating_outdoor_air_maximum_flow_guard: PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    /// Source-ordered heating maximum-flow-body volume-flow assignment snapshot.
+    pub calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment: PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

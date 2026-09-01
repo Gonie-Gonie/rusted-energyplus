@@ -29,9 +29,9 @@ fn cp424_adapter_accepts_only_the_cp423_snapshot() {
 }
 
 #[test]
-fn cp424_is_preserved_before_cp425_in_current_126_snapshot_binding() {
+fn cp424_is_preserved_before_cp425_in_current_127_snapshot_binding() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 126);
+    assert_eq!(source.matches("    pub calculation_").count(), 127);
     let cp424 = source
         .find("calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry")
         .expect("CP424 scheduled binding field");

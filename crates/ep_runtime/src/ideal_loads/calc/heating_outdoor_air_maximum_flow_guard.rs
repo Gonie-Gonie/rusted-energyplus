@@ -20,6 +20,7 @@ pub use release::{
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
+    heating_outdoor_air_maximum_flow_guard_committed_latest_route,
     heating_outdoor_air_maximum_flow_guard_retained_route_matches_snapshot_bounded,
     heating_outdoor_air_maximum_flow_guard_snapshot_route,
 };
@@ -30,9 +31,7 @@ pub(in crate::ideal_loads) use release::{
     private_heating_outdoor_air_maximum_flow_guard_characterization,
 };
 pub use state::PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardRuntimeState;
-#[cfg(test)]
-#[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use tests::cp435_all_snapshots_for_successor_tests;
+#[cfg(test)] #[allow(unused_imports)] #[rustfmt::skip] pub(in crate::ideal_loads::calc) use tests::{cp435_all_snapshots_for_successor_tests, cp435_fixture_unit_for_successor_tests};
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use transition::{
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardRetainedRoute,

@@ -36,6 +36,7 @@ mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp
 #[rustfmt::skip] mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment; #[rustfmt::skip] mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment; #[rustfmt::skip] mod cooling_supply_mass_flow_positive_guard_else_branch_entry; #[rustfmt::skip] mod cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment; #[rustfmt::skip] mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment; #[rustfmt::skip] mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment; #[rustfmt::skip] mod cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment; #[rustfmt::skip] mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment; #[rustfmt::skip] mod heating_or_no_load_case_entry; #[rustfmt::skip] mod heating_mode_guard; #[rustfmt::skip] mod heating_operating_mode_heat_assignment; #[rustfmt::skip] mod heating_mode_guard_else_branch_entry; #[rustfmt::skip] mod heating_operating_mode_deadband_assignment;
 
 #[rustfmt::skip] mod heating_outdoor_air_maximum_flow_guard;
+#[rustfmt::skip] mod heating_outdoor_air_maximum_flow_body_volume_flow_assignment;
 use ep_model::IdealLoadsAirSystemId;
 
 use super::PurchasedAirRuntimeState;

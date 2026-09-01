@@ -162,6 +162,8 @@ mod coupled_runtime_tests_cp433;
 mod coupled_runtime_tests_cp434;
 #[path = "test_coupled_runtime_cp435.rs"]
 mod coupled_runtime_tests_cp435;
+#[path = "test_coupled_runtime_cp436.rs"]
+mod coupled_runtime_tests_cp436;
 
 use crate::{
     ideal_loads::{
@@ -1850,6 +1852,57 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         simulation.summary.actual_coupled_source_order,
         DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER
     );
+    {
+        let predecessor = &simulation
+            .summary
+            .calc_heating_outdoor_air_maximum_flow_guard_lifecycle
+            .state;
+        let cp436 = &simulation
+            .summary
+            .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle;
+        let state = &cp436.state;
+        assert_eq!(
+            cp436.source,
+            crate::ideal_loads::PURCHASED_AIR_CALC_HEATING_OUTDOOR_AIR_MAXIMUM_FLOW_BODY_VOLUME_FLOW_ASSIGNMENT_SOURCE
+        );
+        assert_eq!(state.transition_count, required_steps);
+        assert_eq!(state.transition_count, predecessor.transition_count);
+        assert_eq!(
+            state.predecessor_route_counts,
+            predecessor.predecessor_route_counts
+        );
+        assert_eq!(state.inactive_transition_count, required_steps);
+        assert_eq!(state.outdoor_air_volume_flow_assignment_count, 0);
+        assert_eq!(state.source_site_execution_count, 0);
+        assert_eq!(state.cp435_outdoor_air_mass_flow_rate_owned_read_count, 0);
+        assert_eq!(
+            state.outdoor_air_mass_flow_rate_for_volume_flow_division_read_count,
+            0
+        );
+        assert_eq!(state.begin_environment_standard_air_density_owner_count, 0);
+        assert_eq!(
+            state.standard_air_density_for_volume_flow_division_read_count,
+            0
+        );
+        assert_eq!(
+            state.outdoor_air_mass_flow_rate_standard_air_density_division_count,
+            0
+        );
+        assert_eq!(
+            state.local_outdoor_air_volume_flow_rate_assignment_write_count,
+            0
+        );
+        let latest = state.latest.expect("latest exact-release CP436 snapshot");
+        assert!(!latest.heating_outdoor_air_maximum_flow_body_volume_flow_assignment_executed);
+        assert!(!latest.cp435_retained_outdoor_air_mass_flow_rate_owned_read);
+        assert!(!latest.begin_environment_standard_air_density_owned_read);
+        assert!(!latest.local_outdoor_air_volume_flow_rate_assignment_performed);
+        assert!(
+            latest
+                .assigned_outdoor_air_volume_flow_rate_m3_per_s
+                .is_none()
+        );
+    }
     let lifecycle = simulation.summary.init_lifecycle;
     assert_eq!(lifecycle.source, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE);
     assert!(lifecycle.flags.state_machine_used);

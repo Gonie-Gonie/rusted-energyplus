@@ -1,5 +1,6 @@
 //! CP435 boundary, exhaustive guard, forgery, overflow, and bounded-path tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use ep_model::IdealLoadsLimit;
@@ -202,22 +203,24 @@ fn cp435_public_release_seals_cp311_cache_and_rejects_body_before_mutation() {
 }
 
 #[test]
-fn cp435_topology_is_11_files_one_nested_test_and_every_file_is_bounded() {
+fn cp435_topology_includes_successor_seal_and_every_file_is_bounded() {
     let files = [
         include_str!("../heating_outdoor_air_maximum_flow_guard.rs"),
         include_str!("release.rs"),
         include_str!("release/error.rs"),
+        include_str!("release/committed.rs"),
         include_str!("release/prefix.rs"),
         include_str!("release/runtime_validation.rs"),
         include_str!("release/snapshot_validation.rs"),
         include_str!("state.rs"),
         include_str!("tests.rs"),
         include_str!("tests/schema_prefix.rs"),
+        include_str!("tests/committed_seal.rs"),
         include_str!("transition.rs"),
         include_str!("transition/accounting.rs"),
         include_str!("transition/snapshot.rs"),
     ];
-    assert_eq!(files.len() - 1, 11);
+    assert_eq!(files.len() - 1, 13);
     assert!(files.into_iter().all(|source| source.lines().count() <= 500));
 }
 
@@ -232,6 +235,32 @@ pub(in crate::ideal_loads::calc) fn cp435_all_snapshots_for_successor_tests(
             advance(&mut state, predecessor, limit, outdoor, maximum).expect("CP435 snapshot")
         })
         .collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp435_fixture_unit_for_successor_tests() -> (
+    crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    Route,
+    Option<crate::ideal_loads::PurchasedAirCalcCoolingMixedAirCallSnapshot>,
+) {
+    let (mut unit, predecessor, predecessor_route, owner) =
+        crate::ideal_loads::calc::cp434_fixture_unit_for_successor_tests();
+    let limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+    let route = successor_route(predecessor, predecessor_route, limit, 0.0, 0.0)
+        .expect("CP435 route");
+    let mut state = State::new(predecessor.system);
+    let snapshot = advance_validated(
+        &mut state,
+        predecessor,
+        predecessor_route,
+        limit,
+        0.0,
+        0.0,
+        route,
+    )
+    .expect("CP435");
+    unit.calc_heating_outdoor_air_maximum_flow_guard = state;
+    (unit, snapshot, route, owner)
 }
 
 fn route_cases() -> Vec<(Predecessor, IdealLoadsLimit, f64, f64)> {

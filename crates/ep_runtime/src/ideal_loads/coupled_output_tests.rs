@@ -232,6 +232,8 @@ mod heating_operating_mode_deadband_assignment_fixture;
 mod heating_operating_mode_heat_assignment_fixture;
 #[path = "coupled_output_tests/heating_or_no_load_case_entry_fixture.rs"]
 mod heating_or_no_load_case_entry_fixture;
+#[path = "coupled_output_tests/heating_outdoor_air_maximum_flow_body_volume_flow_assignment_fixture.rs"]
+mod heating_outdoor_air_maximum_flow_body_volume_flow_assignment_fixture;
 #[path = "coupled_output_tests/heating_outdoor_air_maximum_flow_guard_fixture.rs"]
 mod heating_outdoor_air_maximum_flow_guard_fixture;
 
@@ -352,6 +354,7 @@ use heating_mode_guard_else_branch_entry_fixture::calculation_heating_mode_guard
 use heating_operating_mode_heat_assignment_fixture::calculation_heating_operating_mode_heat_assignment_snapshot;
 use heating_operating_mode_deadband_assignment_fixture::calculation_heating_operating_mode_deadband_assignment_snapshot;
 use heating_outdoor_air_maximum_flow_guard_fixture::calculation_heating_outdoor_air_maximum_flow_guard_snapshot;
+use heating_outdoor_air_maximum_flow_body_volume_flow_assignment_fixture::calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization,
@@ -633,6 +636,21 @@ fn cp435_guard_mutation_cannot_change_the_unchanged_numerical_coupling_output() 
     assert_ne!(
         mutated.calculation_heating_outdoor_air_maximum_flow_guard,
         original.calculation_heating_outdoor_air_maximum_flow_guard,
+    );
+    assert_eq!(mutated.coupling, original.coupling);
+}
+
+#[test]
+fn cp436_assignment_mutation_cannot_change_the_unchanged_numerical_coupling_output() {
+    let system = test_system();
+    let original = scaled_output(&system, 2, 1.0);
+    let mut mutated = original;
+    mutated
+        .calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .heating_outdoor_air_maximum_flow_body_volume_flow_assignment_executed ^= true;
+    assert_ne!(
+        mutated.calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
+        original.calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
     );
     assert_eq!(mutated.coupling, original.coupling);
 }
@@ -1924,6 +1942,14 @@ pub(in crate::ideal_loads) fn scaled_output(
                 .unwrap_or(0.0),
             0.0,
         );
+    let initialization = initialized_snapshot(system);
+    let calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment =
+        calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_snapshot(
+            calculation_heating_outdoor_air_maximum_flow_guard,
+            initialization
+                .standard_air_density_kg_per_m3
+                .expect("CP436 standard-air-density fixture"),
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1933,7 +1959,7 @@ pub(in crate::ideal_loads) fn scaled_output(
             overall_availability: 1.0,
             unit_available: true,
         },
-        initialization: initialized_snapshot(system),
+        initialization,
         calculation_entry,
         calculation_minimum_outdoor_air,
         calculation_cooling_entry_gate: calculation_cooling_entry_gate_snapshot(
@@ -2072,6 +2098,7 @@ pub(in crate::ideal_loads) fn scaled_output(
         calculation_heating_mode_guard_else_branch_entry,
         calculation_heating_operating_mode_deadband_assignment,
         calculation_heating_outdoor_air_maximum_flow_guard,
+        calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

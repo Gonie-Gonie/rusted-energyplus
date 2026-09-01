@@ -321,6 +321,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcHeatingModeGuardElseBranchEntryRuntimeState::new(system), calc_heating_operating_mode_deadband_assignment: PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentRuntimeState::new(system),
             calc_heating_outdoor_air_maximum_flow_guard:
                 PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardRuntimeState::new(system),
+            calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment:
+                PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

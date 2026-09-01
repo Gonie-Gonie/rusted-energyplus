@@ -598,11 +598,11 @@ $postCp339BeforeNumericalCodeForCp331 = [regex]::Replace(
 )
 $postCp339BeforeNumericalCodeForCp331 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp331,
-    '(?s)(?:let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;|let calculation_heating_operating_mode_deadband_assignment =\s*advance_heating_operating_mode_deadband_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_guard =\s*advance_heating_outdoor_air_maximum_flow_guard\([^;]+?\)\?;)',
+    '(?s)(?:let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;|let calculation_heating_operating_mode_deadband_assignment =\s*advance_heating_operating_mode_deadband_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_guard =\s*advance_heating_outdoor_air_maximum_flow_guard\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment =\s*advance_heating_outdoor_air_maximum_flow_body_volume_flow_assignment\([^;]+?\)\?;)',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp331 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No helper other than the audited CP340 through CP435 releases may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 through CP436 releases may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation independently reconstructs CP331 from the CP330 route and
@@ -838,4 +838,4 @@ if (
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment\.ps1"' -Description "CP331 audit script inventory entry"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment\.ps1::dot_sources' -Description "CP331 main-audit callee evidence"
-Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'; Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_operating_mode_deadband_assignment' -Description 'audited CP340 through CP435 helper whitelist'
+Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'; Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_operating_mode_deadband_assignment' -Description 'audited CP340 through CP436 helper whitelist'

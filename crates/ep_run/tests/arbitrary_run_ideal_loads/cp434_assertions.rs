@@ -301,12 +301,16 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(calculation_fields.len(), 126);
+    assert_eq!(calculation_fields.len(), 127);
     assert!(calculation_fields[123].contains("calculation_heating_mode_guard_else_branch_entry"));
     assert!(
         calculation_fields[124].contains("calculation_heating_operating_mode_deadband_assignment")
     );
     assert!(calculation_fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
+    assert!(
+        calculation_fields[126]
+            .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")
+    );
 }
 
 fn array<'a>(lifecycle: &'a Value, field: &str) -> &'a Vec<Value> {
