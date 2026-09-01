@@ -1,5 +1,6 @@
 //! CP436 boundary, exhaustive assignment, density, forgery, and topology tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use ep_model::IdealLoadsLimit;

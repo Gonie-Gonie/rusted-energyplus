@@ -34,7 +34,7 @@ fn cp424_conceptual_contract_has_59_outcomes_58_inactive_one_entry_and_one_site(
 }
 
 #[test]
-fn cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_127() {
+fn cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_128() {
     let source = include_str!("calc/cooling_supply_mass_flow_positive_guard_else_branch_entry.rs");
     let snapshot = source
         .split_once(
@@ -57,7 +57,7 @@ fn cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_127() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        127
+        128
     );
 }
 
@@ -126,7 +126,7 @@ fn cp424_integration_roots_stay_within_historical_caps() {
     let witnesses = include_str!("init/state/witnesses.rs");
     let calc = include_str!("calc.rs");
     assert!(state.lines().filter(|line| !line.trim().is_empty()).count() <= 380);
-    assert!(witnesses.lines().count() <= 273);
+    assert!(witnesses.lines().count() <= 274);
     assert!(calc.lines().count() <= 99);
 }
 

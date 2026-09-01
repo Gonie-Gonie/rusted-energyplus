@@ -323,6 +323,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardRuntimeState::new(system),
             calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment:
                 PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentRuntimeState::new(system),
+            calc_heating_outdoor_air_maximum_flow_first_warning_guard:
+                PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

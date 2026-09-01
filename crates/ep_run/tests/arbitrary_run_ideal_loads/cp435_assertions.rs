@@ -422,12 +422,15 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 127);
+    assert_eq!(fields.len(), 128);
     assert!(fields[124].contains("calculation_heating_operating_mode_deadband_assignment"));
     assert!(fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")
+    );
+    assert!(
+        fields[127].contains("calculation_heating_outdoor_air_maximum_flow_first_warning_guard")
     );
 }
 

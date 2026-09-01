@@ -28,12 +28,12 @@ fn cp434_adapter_accepts_only_the_cp433_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp434_historical_124_to_125_transition_is_preserved_in_current_127_snapshot_binding() {
+fn cp434_historical_124_to_125_transition_is_preserved_in_current_128_snapshot_binding() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 127);
+    assert_eq!(fields.len(), 128);
     assert!(fields[122].contains("calculation_heating_operating_mode_heat_assignment"));
     assert!(fields[123].contains("calculation_heating_mode_guard_else_branch_entry"));
     assert!(fields[124].contains("calculation_heating_operating_mode_deadband_assignment"));

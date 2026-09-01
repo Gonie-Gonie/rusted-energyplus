@@ -29,7 +29,7 @@ fn cp430_conceptual_contract_is_one_public_entry_and_no_numerical_feed() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        127
+        128
     );
     let binding = include_str!("binding.rs");
     let cp430 = binding
@@ -88,6 +88,6 @@ fn cp430_integration_roots_stay_within_historical_caps() {
     let witnesses = include_str!("init/state/witnesses.rs");
     let calc = include_str!("calc.rs");
     assert!(state.lines().filter(|line| !line.trim().is_empty()).count() <= 380);
-    assert!(witnesses.lines().count() <= 273);
+    assert!(witnesses.lines().count() <= 274);
     assert!(calc.lines().count() <= 99);
 }

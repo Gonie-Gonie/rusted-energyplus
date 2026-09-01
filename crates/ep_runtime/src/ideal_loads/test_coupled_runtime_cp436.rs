@@ -37,11 +37,14 @@ fn cp436_contract_locks_exhaustive_routes_current_schema_and_binding() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 127);
+    assert_eq!(fields.len(), 128);
     assert!(fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")
+    );
+    assert!(
+        fields[127].contains("calculation_heating_outdoor_air_maximum_flow_first_warning_guard")
     );
 }
 
@@ -73,10 +76,13 @@ fn cp436_is_ordered_after_cp435_and_does_not_feed_numerics() {
     let cp436 = binding
         .find("let calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment =")
         .expect("CP436 binding");
+    let cp437 = binding
+        .find("let calculation_heating_outdoor_air_maximum_flow_first_warning_guard =")
+        .expect("CP437 binding");
     let coupling = binding
         .find("let coupling = complete_direct_zone_purchased_air_coupling(")
         .expect("numerical coupling");
-    assert!(cp435 < cp436 && cp436 < coupling);
+    assert!(cp435 < cp436 && cp436 < cp437 && cp437 < coupling);
     assert!(!binding[cp436..coupling].contains("DirectZonePurchasedAirCouplingInput {"));
     assert!(!binding[cp436..coupling].contains("standard_air_density_kg_per_m3:"));
     let validator = include_str!(

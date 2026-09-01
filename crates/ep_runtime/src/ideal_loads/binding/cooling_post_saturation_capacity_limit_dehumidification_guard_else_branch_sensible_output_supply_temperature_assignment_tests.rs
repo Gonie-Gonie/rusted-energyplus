@@ -31,7 +31,7 @@ fn cp423_adapter_accepts_only_the_cp422_snapshot() {
 }
 
 #[test]
-fn cp423_is_preserved_before_cp424_in_the_current_127_snapshot_binding() {
+fn cp423_is_preserved_before_cp424_in_the_current_128_snapshot_binding() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 127);
+    assert_eq!(source.matches("    pub calculation_").count(), 128);
 }

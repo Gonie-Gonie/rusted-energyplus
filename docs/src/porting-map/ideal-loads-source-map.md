@@ -25624,3 +25624,59 @@ CP436 preserves CP435's 64 routes one-for-one. The 61 routes outside the maximum
 Same-call sealed CP435 is the sole immediate predecessor and route authority. Its retained outdoor-air mass-flow operand owns the division numerator, while the bit-validated BeginEnvironment standard-air-density cache owns a finite positive denominator. Caller duplicates, live environment/OA/Node/diagnostic services, inferred values, and the unchanged numerical DTO are forbidden substitutes. The snapshot preserves CP435's first 382 nonterminal fields, renames terminal W/H/T as predecessor-CP435 evidence, appends an exact 14-field read/calculation/assignment/terminal-owner block, and re-emits final W/H/T: 402 unique Rust fields, 140 `Option<f64>`, eight optional comparison bools, and six optional enums. JSON preserves CP435's first 512 nonterminal keys and appends an exact 30-key tail for 542 unique keys with 140 adjacent IEEE sidecars. W/H/T remains 37/42/57.
 
 Binding becomes CP435-to-CP436-to-unchanged-numerical at index 126 and current count 127. CP436 does not consume, reconcile with, feed, replace, or mutate any numerical, coupling-input, or output DTO; direct coupled and pipeline validation instead require zero public assignments and density reads. No support, readiness, capability, routine, algorithm, numerical-conformance, source-map, psychrometrics-map, output/status/conformance, or Roadmap promotion is added. Counts remain 32 algorithms and 293 routines split 58 state-mapped plus 235 source-mapped with 170 required; inventory becomes 374 total, 240 public, 134 internal, zero unused, zero unreachable, with 238 development commands.
+
+## CP437 heating outdoor-air maximum-flow first-warning guard
+
+CP437 supersedes only CP436's physical-line-2364 executable exclusion by
+mapping the exact pinned condition
+`if (PurchAir.OAFlowMaxHeatOutputError < 1) {`. Physical executable line
+2365, `++PurchAir.OAFlowMaxHeatOutputError;`, is the first excluded
+executable statement. CP437 owns exactly three dependency-ordered textual
+sites: `read-state-owned-outdoor-air-flow-maximum-heating-output-error-count`,
+`compare-outdoor-air-flow-maximum-heating-output-error-count-less-than-one`,
+and
+`enter-heating-outdoor-air-maximum-flow-first-warning-branch-if-satisfied`.
+It performs no counter increment, warning or recurring-warning call, warning
+index effect, clamp, outdoor-air mass-flow mutation, or later body operation.
+
+The 61 CP436 outcomes outside the volume-flow assignment remain one-for-one
+inactive. Each of the three private CP436 assignment outcomes is characterized
+with state-owned counter values zero and one, producing six guard evaluations,
+three first-warning branch entries, and three false fallthroughs. Exact
+accounting is T437=67, Z437=61, G437=6, B437=3, F437=3, and S437=15: both the
+read and comparison sites execute six times and the branch-entry site executes
+three times. Public/private becomes 20/47, with active public/private 0/6.
+Exactly six width-36 arrays retain predecessor, inherited CP435
+false-fallthrough, inherited CP435 body-entry, CP436 volume-flow assignment,
+local guard-false-fallthrough, and local first-warning-entry routes.
+
+Same-call sealed CP436 is the sole immediate predecessor and route authority.
+The persistent Rust-owned
+`outdoor_air_flow_maximum_heating_output_error_count`, initialized to zero, is
+the sole guard operand owner. Private characterization seeds only zero or one
+in a fresh CP437 state; caller duplicate counters, warning services, live
+PurchasedAir state, inferred values, and numerical DTO inputs are forbidden.
+Exact public release performs no guard evaluation because CP436 admits zero
+public assignments. The pure transition reads once, compares with exact
+integer `< 1`, and records only branch entry or false fallthrough without
+mutating the counter.
+
+The snapshot preserves CP436's first 399 nonterminal fields, renames terminal
+W/H/T as predecessor-CP436 evidence, appends an exact 11-field guard,
+retained-owner, state-owner/read/operand, comparison, and outcome block, then
+re-emits final W/H/T. It has 416 unique Rust fields, 143 `Option<f64>`
+carriers, nine `Option<bool>` comparison carriers, six optional enums, and one
+`Option<usize>` counter operand. JSON preserves CP436's first 536 nonterminal
+keys and appends an exact 23-key tail for 559 unique keys with 143 adjacent
+IEEE sidecars. W/H/T remains 37/42/57.
+
+Binding becomes CP436-to-CP437-to-unchanged-numerical at index 127 and current
+count 128. CP437 does not consume, reconcile with, feed, replace, or mutate any
+numerical, coupling-input, or output DTO; direct coupled and pipeline
+validation require zero public guard evaluations and state-owned counter
+reads. No support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion is added. Counts remain 32
+algorithms and 293 routines split 58 state-mapped plus 235 source-mapped with
+170 required; inventory becomes 375 total, 240 public, 135 internal, zero
+unused, zero unreachable, with 238 development commands.

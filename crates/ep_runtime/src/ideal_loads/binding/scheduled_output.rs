@@ -1,4 +1,5 @@
 //! Source-ordered output of one model-bound schedule sample.
+#[rustfmt::skip]
 use super::super::{
     DirectZonePurchasedAirCouplingOutput, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
     PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot,
@@ -118,11 +119,7 @@ use super::super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     PurchasedAirCalcHeatingModeGuardSnapshot,
-    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
-    PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
-    PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
-    PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot,
-    PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
 /// Output from one successful model-bound schedule sample and CP300 call.
@@ -495,6 +492,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_outdoor_air_maximum_flow_guard: PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     /// Source-ordered heating maximum-flow-body volume-flow assignment snapshot.
     pub calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment: PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot,
+    /// Source-ordered heating maximum-flow first-warning guard snapshot.
+    pub calculation_heating_outdoor_air_maximum_flow_first_warning_guard: PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

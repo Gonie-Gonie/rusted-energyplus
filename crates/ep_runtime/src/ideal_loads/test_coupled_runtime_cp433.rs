@@ -31,7 +31,7 @@ fn cp433_contract_locks_61_transitions_two_entries_and_current_binding() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        127
+        128
     );
 }
 

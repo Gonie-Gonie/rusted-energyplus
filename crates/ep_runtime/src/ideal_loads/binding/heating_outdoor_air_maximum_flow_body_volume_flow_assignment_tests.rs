@@ -29,12 +29,12 @@ fn cp436_adapter_accepts_only_the_cp435_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp436_extends_current_scheduled_binding_from_126_to_127_snapshots() {
+fn cp436_remains_index_126_in_current_128_snapshot_binding() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 127);
+    assert_eq!(fields.len(), 128);
     assert!(fields[124].contains("calculation_heating_operating_mode_deadband_assignment"));
     assert!(fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
     assert!(

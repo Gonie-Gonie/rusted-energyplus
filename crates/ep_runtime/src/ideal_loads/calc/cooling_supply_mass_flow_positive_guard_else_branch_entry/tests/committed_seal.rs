@@ -19,123 +19,136 @@ fn cp424_committed_route_seal_accepts_entry_inactive_guard_false_and_assignment_
 fn cp424_committed_route_seal_rejects_route_count_ordinal_latest_witness_and_identity_forgery() {
     for predecessor in representative_predecessors() {
         let (unit, snapshot, route) = cp424_fixture_unit_for_successor_tests(predecessor);
-        let mut cases = Vec::new();
-
-        let mut logical = unit.clone();
-        logical
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest_route
-            .as_mut()
-            .expect("route")
-            .logical_index = (route.logical_index + 1) % 36;
-        cases.push((logical, snapshot));
-        let mut active = unit.clone();
-        active
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest_route
-            .as_mut()
-            .expect("route")
-            .active ^= true;
-        cases.push((active, snapshot));
-        let mut assignment = unit.clone();
-        assignment
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest_route
-            .as_mut()
-            .expect("route")
-            .assignment_executed ^= true;
-        cases.push((assignment, snapshot));
-        let mut entered = unit.clone();
-        entered
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest_route
-            .as_mut()
-            .expect("route")
-            .entered ^= true;
-        cases.push((entered, snapshot));
-        let mut count = unit.clone();
-        count
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .transition_count += 1;
-        cases.push((count, snapshot));
-        let mut ordinal = unit.clone();
-        ordinal
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest_transition_ordinal = Some(0);
-        cases.push((ordinal, snapshot));
-        let mut route_count = unit.clone();
-        route_count
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .predecessor_route_counts[route.logical_index] += 1;
-        cases.push((route_count, snapshot));
-        let mut entry_count = unit.clone();
-        entry_count
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .positive_supply_mass_flow_guard_else_branch_entry_route_counts
-            [route.logical_index] += 1;
-        cases.push((entry_count, snapshot));
-        let mut site_count = unit.clone();
-        site_count
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .source_site_execution_count += 1;
-        cases.push((site_count, snapshot));
-
-        let mut witness_system = snapshot;
-        witness_system.system =
-            ep_model::IdealLoadsAirSystemId(witness_system.system.0.wrapping_add(1));
-        cases.push((unit.clone(), witness_system));
-        let mut witness_zone = snapshot;
-        witness_zone.controlled_zone =
-            ep_model::ZoneId(witness_zone.controlled_zone.0.wrapping_add(1));
-        cases.push((unit.clone(), witness_zone));
-        let mut witness_ordinal = snapshot;
-        witness_ordinal.parent_call_ordinal = witness_ordinal.parent_call_ordinal.wrapping_add(1);
-        cases.push((unit.clone(), witness_ordinal));
-
-        let mut latest_system = unit.clone();
-        latest_system
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest
-            .as_mut()
-            .expect("latest")
-            .system = ep_model::IdealLoadsAirSystemId(snapshot.system.0.wrapping_add(1));
-        let coordinated = latest_system
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest
-            .expect("latest");
-        cases.push((latest_system, coordinated));
-        let mut latest_zone = unit.clone();
-        latest_zone
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest
-            .as_mut()
-            .expect("latest")
-            .controlled_zone = ep_model::ZoneId(snapshot.controlled_zone.0.wrapping_add(1));
-        let coordinated = latest_zone
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest
-            .expect("latest");
-        cases.push((latest_zone, coordinated));
-        let mut latest_ordinal = unit.clone();
-        latest_ordinal
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest
-            .as_mut()
-            .expect("latest")
-            .parent_call_ordinal = snapshot.parent_call_ordinal.wrapping_add(1);
-        let coordinated = latest_ordinal
-            .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-            .latest
-            .expect("latest");
-        cases.push((latest_ordinal, coordinated));
-
-        for (case_index, (forged, witness)) in cases.into_iter().enumerate() {
-            assert!(
-                committed(&forged, witness).is_none(),
-                "route {route:?} case {case_index}",
+        let forgeries: [Cp424Forgery; 15] = [
+            |forged, _, route| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .logical_index = (route.logical_index + 1) % 36;
+            },
+            |forged, _, _| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .active ^= true;
+            },
+            |forged, _, _| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .assignment_executed ^= true;
+            },
+            |forged, _, _| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .entered ^= true;
+            },
+            |forged, _, _| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .transition_count += 1;
+            },
+            |forged, _, _| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest_transition_ordinal = Some(0);
+            },
+            |forged, _, route| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .predecessor_route_counts[route.logical_index] += 1;
+            },
+            |forged, _, route| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .positive_supply_mass_flow_guard_else_branch_entry_route_counts
+                    [route.logical_index] += 1;
+            },
+            |forged, _, _| {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .source_site_execution_count += 1;
+            },
+            |_, witness, _| {
+                witness.system =
+                    ep_model::IdealLoadsAirSystemId(witness.system.0.wrapping_add(1));
+            },
+            |_, witness, _| {
+                witness.controlled_zone =
+                    ep_model::ZoneId(witness.controlled_zone.0.wrapping_add(1));
+            },
+            |_, witness, _| {
+                witness.parent_call_ordinal = witness.parent_call_ordinal.wrapping_add(1);
+            },
+            |forged, witness, _| {
+                witness.system =
+                    ep_model::IdealLoadsAirSystemId(witness.system.0.wrapping_add(1));
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest
+                    .as_mut()
+                    .expect("latest")
+                    .system = witness.system;
+            },
+            |forged, witness, _| {
+                witness.controlled_zone =
+                    ep_model::ZoneId(witness.controlled_zone.0.wrapping_add(1));
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest
+                    .as_mut()
+                    .expect("latest")
+                    .controlled_zone = witness.controlled_zone;
+            },
+            |forged, witness, _| {
+                witness.parent_call_ordinal = witness.parent_call_ordinal.wrapping_add(1);
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .latest
+                    .as_mut()
+                    .expect("latest")
+                    .parent_call_ordinal = witness.parent_call_ordinal;
+            },
+        ];
+        for (case_index, forgery) in forgeries.into_iter().enumerate() {
+            assert_cp424_committed_rejects_forgery(
+                &unit, snapshot, route, case_index, forgery,
             );
         }
     }
+}
+
+type Cp424Snapshot = super::super::PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntrySnapshot;
+type Cp424Forgery = fn(
+    &mut crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    &mut Cp424Snapshot,
+    Route,
+);
+
+#[inline(never)]
+fn assert_cp424_committed_rejects_forgery(
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    witness: Cp424Snapshot,
+    route: Route,
+    case_index: usize,
+    forgery: Cp424Forgery,
+) {
+    let mut forged = unit.clone();
+    let mut forged_witness = witness;
+    forgery(&mut forged, &mut forged_witness, route);
+    assert!(
+        committed(&forged, forged_witness).is_none(),
+        "route {route:?} case {case_index}",
+    );
 }
 
 #[test]

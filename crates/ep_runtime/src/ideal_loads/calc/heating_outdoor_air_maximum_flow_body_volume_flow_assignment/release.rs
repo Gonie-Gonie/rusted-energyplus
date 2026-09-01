@@ -18,11 +18,13 @@ use crate::ideal_loads::{
     heating_outdoor_air_maximum_flow_guard_snapshots_match_bit_exact,
 };
 
+mod committed;
 mod error;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
+pub(in crate::ideal_loads::calc) use committed::heating_outdoor_air_maximum_flow_body_volume_flow_assignment_committed_latest_route;
 pub use error::PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentError;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact};
