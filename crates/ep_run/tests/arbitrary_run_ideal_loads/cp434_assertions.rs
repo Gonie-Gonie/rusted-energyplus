@@ -301,7 +301,7 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(calculation_fields.len(), 128);
+    assert_eq!(calculation_fields.len(), 129);
     assert!(calculation_fields[123].contains("calculation_heating_mode_guard_else_branch_entry"));
     assert!(
         calculation_fields[124].contains("calculation_heating_operating_mode_deadband_assignment")
@@ -314,6 +314,11 @@ fn assert_schema_and_binding_cardinalities() {
     assert!(
         calculation_fields[127]
             .contains("calculation_heating_outdoor_air_maximum_flow_first_warning_guard")
+    );
+    assert!(
+        calculation_fields[128].contains(
+            "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"
+        )
     );
 }
 

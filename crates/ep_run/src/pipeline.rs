@@ -145,6 +145,7 @@ use ep_runtime::{
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentLifecycleSummary,
     PurchasedAirCalcHeatingOrNoLoadCaseEntryLifecycleSummary,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentLifecycleSummary,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementLifecycleSummary,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardLifecycleSummary,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardLifecycleSummary,
     PurchasedAirCalcMinimumOaPrefixLifecycleSummary, PurchasedAirHardSizeField,
@@ -304,6 +305,7 @@ mod purchased_air_heating_operating_mode_deadband_assignment;
 mod purchased_air_heating_operating_mode_heat_assignment;
 mod purchased_air_heating_or_no_load_case_entry;
 mod purchased_air_heating_outdoor_air_maximum_flow_body_volume_flow_assignment;
+mod purchased_air_heating_outdoor_air_maximum_flow_first_warning_counter_increment;
 mod purchased_air_heating_outdoor_air_maximum_flow_first_warning_guard;
 mod purchased_air_heating_outdoor_air_maximum_flow_guard;
 mod purchased_air_minimum_oa;
@@ -807,6 +809,10 @@ struct RustRuntimeResult {
         >,
     purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle:
         Option<PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardLifecycleSummary>,
+    purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle:
+        Option<
+            PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementLifecycleSummary,
+        >,
 }
 
 struct PreparedRuntimeInputs {
@@ -2355,6 +2361,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle
                 .as_ref()
                 .map(purchased_air_heating_outdoor_air_maximum_flow_first_warning_guard::lifecycle_json),
+            "purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle": result
+                .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle
+                .as_ref()
+                .map(purchased_air_heating_outdoor_air_maximum_flow_first_warning_counter_increment::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -3411,6 +3421,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle: None,
+                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -4107,6 +4118,12 @@ fn execute_rust_runtime(
                         .summary
                         .calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle,
                 );
+            let purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle =
+                Some(
+                    simulation
+                        .summary
+                        .calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle,
+                );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -4250,6 +4267,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle,
+                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -4444,6 +4462,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle: None,
+                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -4636,6 +4655,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle: None,
+                purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -6291,6 +6311,16 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_heating_outdoor_air_maximum_flow_first_warning_counter_increment::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle
+                .as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -6673,6 +6703,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -8607,7 +8640,7 @@ mod tests {
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp316_through_cp437_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp316_through_cp438_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
@@ -8846,6 +8879,7 @@ mod tests {
             purchased_air_calc_heating_outdoor_air_maximum_flow_guard_lifecycle: None,
             purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle: None,
             purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle: None,
+            purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle: None,
         };
         assert!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None)
@@ -11479,10 +11513,34 @@ mod tests {
         );
         result.purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle =
             None;
+        result
+            .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle =
+            Some(
+                ep_runtime::PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementLifecycleSummary {
+                    source: ep_runtime::
+                        PURCHASED_AIR_CALC_HEATING_OUTDOOR_AIR_MAXIMUM_FLOW_FIRST_WARNING_COUNTER_INCREMENT_SOURCE,
+                    first_excluded_source: ep_runtime::
+                        PURCHASED_AIR_CALC_HEATING_OUTDOOR_AIR_MAXIMUM_FLOW_FIRST_WARNING_COUNTER_INCREMENT_FIRST_EXCLUDED_SOURCE,
+                    state: ep_runtime::
+                        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementRuntimeState::new(
+                            IdealLoadsAirSystemId(0),
+                        ),
+                },
+            );
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+        result
+            .purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle =
+            None;
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp437_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp438_lifecycle_evidence() {
         let source = include_str!("pipeline.rs");
         let predicate = source
             .split_once("} else if result.purchased_air_init_lifecycle.is_some()")
@@ -11492,20 +11550,20 @@ mod tests {
             .map(|(predicate, _)| predicate)
             .expect("non-direct lifecycle rejection predicate");
         assert!(predicate.contains(
-            "purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle"
+            "purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle"
         ));
         let coverage = source
-            .split_once("fn non_direct_runtime_rejects_cp316_through_cp437_lifecycle_evidence()")
+            .split_once("fn non_direct_runtime_rejects_cp316_through_cp438_lifecycle_evidence()")
             .and_then(|(_, tail)| {
-                tail.split_once("fn non_direct_runtime_rejects_cp437_lifecycle_evidence()")
+                tail.split_once("fn non_direct_runtime_rejects_cp438_lifecycle_evidence()")
             })
             .map(|(coverage, _)| coverage)
-            .expect("CP437 non-direct rejection coverage");
+            .expect("CP438 non-direct rejection coverage");
         assert!(coverage.contains(
-            "purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle"
+            "purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle"
         ));
         assert!(coverage.contains(
-            "PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardLifecycleSummary"
+            "PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementLifecycleSummary"
         ));
         assert!(coverage.contains("validate_runtime_demand_provenance"));
     }

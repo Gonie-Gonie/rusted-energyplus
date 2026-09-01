@@ -28,12 +28,12 @@ fn cp437_adapter_accepts_only_the_cp436_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp437_extends_current_scheduled_binding_from_127_to_128_snapshots() {
+fn cp437_remains_index_127_in_current_129_snapshot_binding() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 128);
+    assert_eq!(fields.len(), 129);
     assert!(fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
     assert!(
         fields[126]
@@ -41,5 +41,10 @@ fn cp437_extends_current_scheduled_binding_from_127_to_128_snapshots() {
     );
     assert!(
         fields[127].contains("calculation_heating_outdoor_air_maximum_flow_first_warning_guard")
+    );
+    assert!(
+        fields[128].contains(
+            "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"
+        )
     );
 }

@@ -119,7 +119,7 @@ use super::super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     PurchasedAirCalcHeatingModeGuardSnapshot,
-    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
 /// Output from one successful model-bound schedule sample and CP300 call.
@@ -482,8 +482,7 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered heating-mode guard snapshot.
     pub calculation_heating_mode_guard: PurchasedAirCalcHeatingModeGuardSnapshot,
     /// Source-ordered heating operating-mode Heat assignment snapshot.
-    pub calculation_heating_operating_mode_heat_assignment:
-        PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
+    pub calculation_heating_operating_mode_heat_assignment: PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot,
     /// Source-ordered heating-mode guard else-branch-entry snapshot.
     pub calculation_heating_mode_guard_else_branch_entry: PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     /// Source-ordered heating operating-mode Deadband assignment snapshot.
@@ -494,6 +493,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment: PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot,
     /// Source-ordered heating maximum-flow first-warning guard snapshot.
     pub calculation_heating_outdoor_air_maximum_flow_first_warning_guard: PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot,
+    /// Source-ordered heating maximum-flow first-warning counter-increment snapshot.
+    pub calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment: PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

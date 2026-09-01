@@ -24485,3 +24485,61 @@ output/status/conformance, or Roadmap promotion is added. Counts remain 32
 algorithms and 293 routines split 58 state-mapped plus 235 source-mapped with
 170 required; inventory becomes 375 total, 240 public, 135 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP438 heating outdoor-air maximum-flow first-warning counter increment
+
+CP438 supersedes only CP437's physical-line-2365 executable exclusion by
+mapping exact pinned source
+`++PurchAir.OAFlowMaxHeatOutputError;`. Physical executable line 2366,
+`ShowWarningError(state,`, begins the first excluded call, which continues
+through line 2370. CP438 owns exactly one textual source site,
+`increment-state-owned-outdoor-air-flow-maximum-heating-output-error-count`.
+That site performs the retained counter's read-modify-write without
+re-evaluating the CP437 guard. CP438 performs no warning or recurring-warning
+call, warning-index effect, clamp, outdoor-air mass-flow mutation, numerical
+DTO operation, or later first-warning-body operation.
+
+CP438 preserves CP437's 67 outcomes one-for-one. The 61 outcomes outside the
+CP436 volume-flow assignment and the three CP437 guard-false outcomes execute
+no CP438 site. The three private CP437 first-warning-entry outcomes each
+increment the same source-owned counter from exactly zero to exactly one, so
+T438=67, Z438=64, I438=3, and S438=3. Public/private remains 20/47, with active
+public/private 0/3. Exactly seven width-36 arrays retain predecessor, inherited
+CP435 false-fallthrough, inherited CP435 body-entry, CP436 volume-flow
+assignment, CP437 guard-false-fallthrough, CP437 first-warning-entry, and local
+counter-increment routes; the local increment array exactly aliases the CP437
+first-warning-entry evidence.
+
+Same-call sealed CP437 is the sole immediate predecessor and route authority.
+The persistent
+`outdoor_air_flow_maximum_heating_output_error_count` in CP437 runtime state
+remains the single canonical owner: CP438 transactionally mutates that owner
+rather than creating a duplicate counter. Each active predecessor already
+proves `before = Some(0)` and CP438 records an assigned result of `Some(1)`.
+The three active outcomes are alternative fresh route characterizations, not
+three sequential increments of one owner. Caller duplicates, warning services,
+live PurchasedAir state, inferred values, and numerical DTO inputs are
+forbidden substitutes. Exact public release performs no increment because
+CP437 admits zero public first-warning entries. Rust checks its bounded update
+transactionally, but claims only the source-reachable unsigned `{0, 1}` slice,
+not negative source state or general signed-overflow equivalence.
+
+The snapshot preserves CP437's first 413 nonterminal fields, renames terminal
+W/H/T as predecessor-CP437 evidence, appends an exact seven-field execution,
+retained-owner, and increment block, then re-emits final W/H/T. Its exact
+13-field tail yields 426 unique Rust fields, 146 `Option<f64>` carriers, nine
+`Option<bool>` comparison carriers, six optional enums, and two
+`Option<usize>` counter carriers. JSON preserves CP437's first 553 nonterminal
+keys and appends an exact 19-key tail for 572 unique keys with 146 adjacent
+IEEE sidecars. W/H/T remains 37/42/57.
+
+Binding becomes CP437-to-CP438-to-unchanged-numerical at index 128 and current
+count 129. CP438 does not consume, reconcile with, feed, replace, or mutate any
+numerical, coupling-input, or output DTO; direct coupled and pipeline
+validation require zero public increment sites and counter-owner mutations.
+No support, readiness, capability, routine, algorithm, numerical-conformance,
+source-map, psychrometrics-map, output/status/conformance, or Roadmap promotion
+is added. Counts remain 32 algorithms and 293 routines split 58 state-mapped
+plus 235 source-mapped with 170 required; inventory becomes 376 total, 240
+public, 136 internal, zero unused, zero unreachable, with 238 development
+commands.

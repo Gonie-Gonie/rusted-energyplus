@@ -25,12 +25,12 @@ fn cp432_adapter_accepts_only_the_cp431_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp432_is_preserved_at_index_122_in_current_128_snapshot_binding() {
+fn cp432_is_preserved_at_index_122_in_current_129_snapshot_binding() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 128);
+    assert_eq!(fields.len(), 129);
     assert!(fields[121].contains("calculation_heating_mode_guard"));
     assert!(fields[122].contains("calculation_heating_operating_mode_heat_assignment"));
     assert!(fields[124].contains("calculation_heating_operating_mode_deadband_assignment"));

@@ -234,6 +234,8 @@ mod heating_operating_mode_heat_assignment_fixture;
 mod heating_or_no_load_case_entry_fixture;
 #[path = "coupled_output_tests/heating_outdoor_air_maximum_flow_body_volume_flow_assignment_fixture.rs"]
 mod heating_outdoor_air_maximum_flow_body_volume_flow_assignment_fixture;
+#[path = "coupled_output_tests/heating_outdoor_air_maximum_flow_first_warning_counter_increment_fixture.rs"]
+mod heating_outdoor_air_maximum_flow_first_warning_counter_increment_fixture;
 #[path = "coupled_output_tests/heating_outdoor_air_maximum_flow_first_warning_guard_fixture.rs"]
 mod heating_outdoor_air_maximum_flow_first_warning_guard_fixture;
 #[path = "coupled_output_tests/heating_outdoor_air_maximum_flow_guard_fixture.rs"]
@@ -358,6 +360,7 @@ use heating_operating_mode_deadband_assignment_fixture::calculation_heating_oper
 use heating_outdoor_air_maximum_flow_guard_fixture::calculation_heating_outdoor_air_maximum_flow_guard_snapshot;
 use heating_outdoor_air_maximum_flow_body_volume_flow_assignment_fixture::calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_snapshot;
 use heating_outdoor_air_maximum_flow_first_warning_guard_fixture::calculation_heating_outdoor_air_maximum_flow_first_warning_guard_snapshot;
+use heating_outdoor_air_maximum_flow_first_warning_counter_increment_fixture::calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization,
@@ -430,6 +433,16 @@ fn cp424_marker_mutation_cannot_change_the_unchanged_numerical_coupling_output()
     assert_ne!(
         mutated.calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry,
         original.calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry,
+    );
+    assert_eq!(mutated.coupling, original.coupling);
+
+    let mut mutated = original;
+    mutated
+        .calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment
+        .heating_outdoor_air_maximum_flow_first_warning_counter_increment_executed ^= true;
+    assert_ne!(
+        mutated.calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment,
+        original.calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment,
     );
     assert_eq!(mutated.coupling, original.coupling);
 }
@@ -1972,6 +1985,10 @@ pub(in crate::ideal_loads) fn scaled_output(
         calculation_heating_outdoor_air_maximum_flow_first_warning_guard_snapshot(
             calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
         );
+    let calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment =
+        calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment_snapshot(
+            calculation_heating_outdoor_air_maximum_flow_first_warning_guard,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -2122,6 +2139,7 @@ pub(in crate::ideal_loads) fn scaled_output(
         calculation_heating_outdoor_air_maximum_flow_guard,
         calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
         calculation_heating_outdoor_air_maximum_flow_first_warning_guard,
+        calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

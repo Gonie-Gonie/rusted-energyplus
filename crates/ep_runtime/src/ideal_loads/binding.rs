@@ -141,6 +141,7 @@ use super::{
     PurchasedAirCalcHeatingOperatingModeHeatAssignmentError as HeatingOperatingModeHeatAssignmentError,
     PurchasedAirCalcHeatingOrNoLoadCaseEntryError as HeatingOrNoLoadCaseEntryError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentError as HeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentError,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError as HeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardError as HeatingOutdoorAirMaximumFlowFirstWarningGuardError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardError as HeatingOutdoorAirMaximumFlowGuardError,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirHardSizeLegacyContext,
@@ -283,6 +284,7 @@ mod heating_operating_mode_deadband_assignment;
 mod heating_operating_mode_heat_assignment;
 mod heating_or_no_load_case_entry;
 mod heating_outdoor_air_maximum_flow_body_volume_flow_assignment;
+mod heating_outdoor_air_maximum_flow_first_warning_counter_increment;
 mod heating_outdoor_air_maximum_flow_first_warning_guard;
 mod heating_outdoor_air_maximum_flow_guard;
 mod scheduled_output;
@@ -363,6 +365,7 @@ use heating_mode_guard_else_branch_entry::advance_heating_mode_guard_else_branch
 use heating_operating_mode_deadband_assignment::advance_heating_operating_mode_deadband_assignment;
 use heating_operating_mode_heat_assignment::advance_heating_operating_mode_heat_assignment;
 use heating_outdoor_air_maximum_flow_body_volume_flow_assignment::advance_heating_outdoor_air_maximum_flow_body_volume_flow_assignment;
+use heating_outdoor_air_maximum_flow_first_warning_counter_increment::advance_heating_outdoor_air_maximum_flow_first_warning_counter_increment;
 use heating_outdoor_air_maximum_flow_first_warning_guard::advance_heating_outdoor_air_maximum_flow_first_warning_guard;
 use heating_outdoor_air_maximum_flow_guard::advance_heating_outdoor_air_maximum_flow_guard;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment;
@@ -1387,6 +1390,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationHeatingOutdoorAirMaximumFlowFirstWarningGuard(
         HeatingOutdoorAirMaximumFlowFirstWarningGuardError,
     ),
+    /// The bounded heating maximum-flow first-warning counter increment rejected its release state.
+    CalculationHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrement(
+        HeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError,
+    ),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -2384,6 +2391,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
         )?;
+    let calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment =
+        advance_heating_outdoor_air_maximum_flow_first_warning_counter_increment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_heating_outdoor_air_maximum_flow_first_warning_guard,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -2553,6 +2566,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_heating_outdoor_air_maximum_flow_guard,
         calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment,
         calculation_heating_outdoor_air_maximum_flow_first_warning_guard,
+        calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment,
         coupling,
     })
 }

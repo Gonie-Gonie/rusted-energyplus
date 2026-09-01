@@ -1,5 +1,8 @@
 //! CP437 heating maximum-flow first-warning-guard assertions.
 
+#[path = "cp438_assertions.rs"]
+mod cp438_assertions;
+
 use std::collections::BTreeSet;
 
 use serde_json::{Map, Value, json};
@@ -218,6 +221,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP437_KEY));
+    cp438_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -226,6 +230,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP437_KEY].is_null(),
         "non-direct runtime must not publish CP437 evidence"
     );
+    cp438_assertions::assert_non_direct(runtime);
 }
 
 fn assert_public_skip_shape(latest: &Map<String, Value>) {
@@ -300,13 +305,18 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 128);
+    assert_eq!(fields.len(), 129);
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")
     );
     assert!(
         fields[127].contains("calculation_heating_outdoor_air_maximum_flow_first_warning_guard")
+    );
+    assert!(
+        fields[128].contains(
+            "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"
+        )
     );
 }
 

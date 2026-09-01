@@ -20,6 +20,7 @@ pub use release::{
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
+    heating_outdoor_air_maximum_flow_first_warning_guard_committed_latest_route_and_outdoor_air_flow_maximum_heating_output_error_count,
     heating_outdoor_air_maximum_flow_first_warning_guard_retained_route_matches_snapshot_bounded,
     heating_outdoor_air_maximum_flow_first_warning_guard_snapshot_route,
 };

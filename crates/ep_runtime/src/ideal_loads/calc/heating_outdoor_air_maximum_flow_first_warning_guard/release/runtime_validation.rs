@@ -20,7 +20,9 @@ pub(super) fn pending_state_is_consistent(
 ) -> bool {
     let state = &unit.calc_heating_outdoor_air_maximum_flow_first_warning_guard;
     state.system == unit.system
-        && state.outdoor_air_flow_maximum_heating_output_error_count == 0
+        && canonical_counter_is_bounded(
+            state.outdoor_air_flow_maximum_heating_output_error_count,
+        )
         && state_counts_are_consistent(state)
         && latest_is_consistent(state, witness)
         && state.transition_count.checked_add(1)
@@ -39,7 +41,9 @@ pub(super) fn post_transition_state_is_consistent(
     state
         .latest
         .is_some_and(|latest| snapshots_match_bit_exact(latest, snapshot))
-        && state.outdoor_air_flow_maximum_heating_output_error_count == 0
+        && canonical_counter_is_bounded(
+            state.outdoor_air_flow_maximum_heating_output_error_count,
+        )
         && state.latest_route == Some(route)
         && state.latest_transition_ordinal == Some(state.transition_count)
         && retained_route_matches_snapshot_bounded(snapshot, route)
@@ -165,4 +169,21 @@ fn checked_sum(values: &[usize]) -> Option<usize> {
     values
         .iter()
         .try_fold(0usize, |sum, value| sum.checked_add(*value))
+}
+
+fn canonical_counter_is_bounded(counter: usize) -> bool {
+    counter <= 1
+}
+
+#[cfg(test)]
+mod tests {
+    use super::canonical_counter_is_bounded;
+
+    #[test]
+    fn canonical_counter_accepts_only_pre_and_post_cp438_values() {
+        assert!(canonical_counter_is_bounded(0));
+        assert!(canonical_counter_is_bounded(1));
+        assert!(!canonical_counter_is_bounded(2));
+        assert!(!canonical_counter_is_bounded(usize::MAX));
+    }
 }

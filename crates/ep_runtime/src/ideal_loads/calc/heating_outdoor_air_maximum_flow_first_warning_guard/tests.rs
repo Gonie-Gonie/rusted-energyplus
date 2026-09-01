@@ -1,5 +1,6 @@
 //! CP437 boundary, exhaustive guard, state-ownership, forgery, and topology tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardRuntimeState as State;

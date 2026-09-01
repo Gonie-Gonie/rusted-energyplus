@@ -37,7 +37,7 @@ fn cp437_contract_locks_exhaustive_routes_current_schema_and_binding() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 128);
+    assert_eq!(fields.len(), 129);
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")
@@ -77,10 +77,13 @@ fn cp437_is_ordered_after_cp436_and_does_not_feed_numerics() {
     let cp437 = binding
         .find("let calculation_heating_outdoor_air_maximum_flow_first_warning_guard =")
         .expect("CP437 binding");
+    let cp438 = binding
+        .find("let calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment =")
+        .expect("CP438 binding");
     let coupling = binding
         .find("let coupling = complete_direct_zone_purchased_air_coupling(")
         .expect("numerical coupling");
-    assert!(cp436 < cp437 && cp437 < coupling);
+    assert!(cp436 < cp437 && cp437 < cp438 && cp438 < coupling);
     assert!(!binding[cp437..coupling].contains("DirectZonePurchasedAirCouplingInput {"));
     assert!(
         !binding[cp437..coupling].contains("outdoor_air_flow_maximum_heating_output_error_count:")
