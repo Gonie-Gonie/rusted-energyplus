@@ -597,11 +597,11 @@ $postCp339BeforeNumericalCodeForCp330 = [regex]::Replace(
 )
 $postCp339BeforeNumericalCodeForCp330 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp330,
-    '(?s)(?:let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;|let calculation_heating_operating_mode_deadband_assignment =\s*advance_heating_operating_mode_deadband_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_guard =\s*advance_heating_outdoor_air_maximum_flow_guard\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment =\s*advance_heating_outdoor_air_maximum_flow_body_volume_flow_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_first_warning_guard =\s*advance_heating_outdoor_air_maximum_flow_first_warning_guard\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment =\s*advance_heating_outdoor_air_maximum_flow_first_warning_counter_increment\([^;]+?\)\?;)',
+    '(?s)(?:let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;|let calculation_heating_operating_mode_deadband_assignment =\s*advance_heating_operating_mode_deadband_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_guard =\s*advance_heating_outdoor_air_maximum_flow_guard\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment =\s*advance_heating_outdoor_air_maximum_flow_body_volume_flow_assignment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_first_warning_guard =\s*advance_heating_outdoor_air_maximum_flow_first_warning_guard\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment =\s*advance_heating_outdoor_air_maximum_flow_first_warning_counter_increment\([^;]+?\)\?;|let calculation_heating_outdoor_air_maximum_flow_first_warning_call =\s*advance_heating_outdoor_air_maximum_flow_first_warning_call\([^;]+?\)\?;)',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp330 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No helper other than the audited CP340 through CP438 releases may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 through CP439 releases may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation reconstructs CP330 only from CP329 and retains exact bits.
@@ -844,4 +844,4 @@ if (
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard\.ps1"' -Description "CP330 audit script inventory entry"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard\.ps1::dot_sources' -Description "CP330 main-audit callee evidence"
-Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'; Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_operating_mode_deadband_assignment' -Description 'audited CP340 through CP438 helper whitelist'
+Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'; Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_operating_mode_deadband_assignment' -Description 'audited CP340 through CP439 helper whitelist'

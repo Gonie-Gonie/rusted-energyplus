@@ -20,11 +20,13 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError;
+pub(in crate::ideal_loads::calc) use committed::heating_outdoor_air_maximum_flow_first_warning_counter_increment_committed_latest_route_and_outdoor_air_flow_maximum_heating_output_error_count;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{
     prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact,

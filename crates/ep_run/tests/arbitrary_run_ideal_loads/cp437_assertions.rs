@@ -305,7 +305,7 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 129);
+    assert_eq!(fields.len(), 130);
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")

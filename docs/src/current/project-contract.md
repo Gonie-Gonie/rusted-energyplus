@@ -24543,3 +24543,65 @@ is added. Counts remain 32 algorithms and 293 routines split 58 state-mapped
 plus 235 source-mapped with 170 required; inventory becomes 376 total, 240
 public, 136 internal, zero unused, zero unreachable, with 238 development
 commands.
+
+## CP439 heating outdoor-air maximum-flow first-warning call
+
+CP439 supersedes only CP438's physical-lines-2366-through-2370 executable
+exclusion by mapping the complete pinned `ShowWarningError` call. The call is:
+
+```cpp
+ShowWarningError(state,
+                 EnergyPlus::format("{} \"{}\" Requested outdoor air flow rate = {:.5T} [m3/s] exceeds limit.",
+                                    PurchAir.cObjectName,
+                                    PurchAir.Name,
+                                    OAVolFlowRate));
+```
+
+Physical executable line 2371, `ShowContinueError(`, is the first excluded
+call and continues beyond this checkpoint. CP439 owns exactly one textual
+source site,
+`reach-heating-outdoor-air-maximum-flow-first-warning-call-site`. The pure
+characterization records only that the complete call site is reached; it does
+not install a warning sink, render or compare the dynamic message, replay the
+CP437 guard, mutate the CP438 counter, create warning-index state, execute a
+recurring-warning call, clamp outdoor-air flow, mutate outdoor-air mass flow,
+or perform any later first-warning-body operation.
+
+CP439 preserves CP438's 67 outcomes one-for-one. The 64 inactive CP438
+outcomes execute no CP439 site. The three private CP438 counter-increment
+outcomes each reach the call site once with the same canonical retained
+warning counter already equal to exactly one, so T439=67, Z439=64, C439=3,
+and S439=3. Public/private remains 20/47, with active public/private 0/3.
+Exactly eight width-36 arrays retain predecessor, inherited CP435
+false-fallthrough, inherited CP435 body-entry, CP436 volume-flow assignment,
+CP437 guard-false-fallthrough, CP437 first-warning-entry, CP438 counter
+increment, and local warning-call routes; the local route exactly aliases the
+CP438 increment evidence.
+
+Same-call sealed CP438 is the sole immediate predecessor and route authority.
+Its committed latest snapshot, private witness, completion evidence, bounded
+accounting, and canonical state-owned counter prove every active route and the
+exact retained value one. Caller duplicates, inferred values, global warning
+registries, callback or diagnostic services, mutable PurchasedAir state,
+message strings, warning indexes, and numerical DTO inputs are forbidden
+substitutes. Exact public release records no call-site reach because CP438
+admits zero public increments. The three active outcomes are alternative
+fresh route characterizations, not three warning emissions in one lifecycle.
+
+The snapshot preserves all 426 CP438 fields verbatim and appends only
+`heating_outdoor_air_maximum_flow_first_warning_call_site_reached`, yielding
+427 unique Rust fields. Its option classes remain exactly 146 `Option<f64>`,
+nine `Option<bool>`, six optional enums, and two `Option<usize>` carriers.
+JSON preserves all 572 CP438 keys and appends the same marker for 573 unique
+keys with 146 adjacent IEEE sidecars. W/H/T remains 37/42/57.
+
+Binding becomes CP438-to-CP439-to-unchanged-numerical at index 129 and current
+count 130. CP439 does not consume, reconcile with, feed, replace, or mutate any
+numerical, coupling-input, or output DTO; direct coupled and pipeline
+validation require zero public call sites and reject non-direct evidence. No
+support, readiness, capability, routine, algorithm, numerical-conformance,
+source-map, psychrometrics-map, output/status/conformance, or Roadmap
+promotion is added. Counts remain 32 algorithms and 293 routines split 58
+state-mapped plus 235 source-mapped with 170 required; inventory becomes 377
+total, 240 public, 137 internal, zero unused, zero unreachable, with 238
+development commands.

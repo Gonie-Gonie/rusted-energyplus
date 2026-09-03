@@ -31,50 +31,58 @@ fn cp435_committed_seal_is_retained_constant_time_and_owner_lazy() {
 
 #[test]
 fn cp435_committed_seal_rejects_latest_witness_route_and_accounting_forgeries() {
-    let (unit, snapshot, _, owner) = cp435_fixture_unit_for_successor_tests();
-    let mut cases = Vec::new();
-
+    let (mut unit, snapshot, _, owner) = cp435_fixture_unit_for_successor_tests();
     let mut witness = snapshot;
     witness.maximum_heating_flow_body_entered ^= true;
-    cases.push((unit.clone(), witness));
+    assert!(committed(&unit, witness, owner).is_none(), "forgery 0");
 
-    let mut latest = unit.clone();
-    latest
+    unit
         .calc_heating_outdoor_air_maximum_flow_guard
         .latest
         .as_mut()
         .expect("latest")
         .heating_outdoor_air_maximum_flow_guard_false_fallthrough ^= true;
-    cases.push((latest, snapshot));
+    assert!(committed(&unit, snapshot, owner).is_none(), "forgery 1");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_guard
+        .latest
+        .as_mut()
+        .expect("latest")
+        .heating_outdoor_air_maximum_flow_guard_false_fallthrough ^= true;
 
-    let mut route = unit.clone();
-    route
+    unit
         .calc_heating_outdoor_air_maximum_flow_guard
         .latest_route
         .as_mut()
         .expect("route")
         .body_entered ^= true;
-    cases.push((route, snapshot));
+    assert!(committed(&unit, snapshot, owner).is_none(), "forgery 2");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_guard
+        .latest_route
+        .as_mut()
+        .expect("route")
+        .body_entered ^= true;
 
-    let mut accounting = unit.clone();
-    accounting
+    unit
         .calc_heating_outdoor_air_maximum_flow_guard
         .source_site_execution_count += 1;
-    cases.push((accounting, snapshot));
-
-    let mut ordinal = unit.clone();
-    ordinal
+    assert!(committed(&unit, snapshot, owner).is_none(), "forgery 3");
+    unit
         .calc_heating_outdoor_air_maximum_flow_guard
-        .latest_transition_ordinal = Some(0);
-    cases.push((ordinal, snapshot));
+        .source_site_execution_count -= 1;
 
-    let mut predecessor = unit.clone();
-    predecessor
+    let ordinal = unit
+        .calc_heating_outdoor_air_maximum_flow_guard
+        .latest_transition_ordinal;
+    unit.calc_heating_outdoor_air_maximum_flow_guard
+        .latest_transition_ordinal = Some(0);
+    assert!(committed(&unit, snapshot, owner).is_none(), "forgery 4");
+    unit.calc_heating_outdoor_air_maximum_flow_guard
+        .latest_transition_ordinal = ordinal;
+
+    unit
         .calc_heating_operating_mode_deadband_assignment
         .predecessor_route_counts[1] += 1;
-    cases.push((predecessor, snapshot));
-
-    for (index, (forged, witness)) in cases.into_iter().enumerate() {
-        assert!(committed(&forged, witness, owner).is_none(), "forgery {index}");
-    }
+    assert!(committed(&unit, snapshot, owner).is_none(), "forgery 5");
 }
