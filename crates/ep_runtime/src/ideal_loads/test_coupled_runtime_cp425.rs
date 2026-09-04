@@ -34,7 +34,7 @@ fn cp425_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_two_
 }
 
 #[test]
-fn cp425_snapshot_schema_is_exactly_275_99_2_1_and_current_binding_is_130() {
+fn cp425_snapshot_schema_is_exactly_275_99_2_1_and_current_binding_is_131() {
     let source =
         include_str!("calc/cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment.rs");
     let snapshot = source
@@ -62,7 +62,7 @@ fn cp425_snapshot_schema_is_exactly_275_99_2_1_and_current_binding_is_130() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        130
+        131
     );
 }
 
@@ -154,7 +154,7 @@ fn cp425_integration_roots_stay_within_historical_caps() {
     let witnesses = include_str!("init/state/witnesses.rs");
     let calc = include_str!("calc.rs");
     assert!(state.lines().filter(|line| !line.trim().is_empty()).count() <= 380);
-    assert!(witnesses.lines().count() <= 276);
+    assert!(witnesses.lines().count() <= 277);
     assert!(calc.lines().count() <= 99);
 }
 

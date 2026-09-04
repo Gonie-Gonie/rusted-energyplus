@@ -30,13 +30,13 @@ fn cp429_adapter_accepts_only_the_cp428_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp429_historical_119_to_120_transition_is_preserved_before_cp430_in_current_130_snapshot_binding()
+fn cp429_historical_119_to_120_transition_is_preserved_before_cp430_in_current_131_snapshot_binding()
  {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 130);
+    assert_eq!(fields.len(), 131);
     assert!(fields[119].contains(
         "calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment"
     ));

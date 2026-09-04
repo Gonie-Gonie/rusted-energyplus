@@ -170,6 +170,8 @@ mod coupled_runtime_tests_cp437;
 mod coupled_runtime_tests_cp438;
 #[path = "test_coupled_runtime_cp439.rs"]
 mod coupled_runtime_tests_cp439;
+#[path = "test_coupled_runtime_cp440.rs"]
+mod coupled_runtime_tests_cp440;
 
 use crate::{
     ideal_loads::{
@@ -2057,6 +2059,46 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         );
         let latest = state.latest.expect("latest exact-release CP439 snapshot");
         assert!(!latest.heating_outdoor_air_maximum_flow_first_warning_call_site_reached);
+    }
+    {
+        let predecessor = &simulation
+            .summary
+            .calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle
+            .state;
+        let cp440 = &simulation
+            .summary
+            .calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle;
+        let state = &cp440.state;
+        assert_eq!(
+            cp440.source,
+            crate::ideal_loads::PURCHASED_AIR_CALC_HEATING_OUTDOOR_AIR_MAXIMUM_FLOW_CONTINUE_WARNING_CALL_SOURCE
+        );
+        assert_eq!(state.transition_count, required_steps);
+        assert_eq!(state.transition_count, predecessor.transition_count);
+        assert_eq!(
+            state.predecessor_route_counts,
+            predecessor.predecessor_route_counts
+        );
+        assert_eq!(
+            state.predecessor_first_warning_call_route_counts,
+            predecessor.heating_outdoor_air_maximum_flow_first_warning_call_route_counts
+        );
+        assert_eq!(state.inactive_transition_count, required_steps);
+        assert_eq!(
+            state.heating_outdoor_air_maximum_flow_continue_warning_call_site_count,
+            0
+        );
+        assert_eq!(state.source_site_execution_count, 0);
+        assert_eq!(
+            state.cp439_outdoor_air_flow_maximum_heating_output_error_count_state_owner_count,
+            0
+        );
+        assert_eq!(
+            state.unchanged_outdoor_air_flow_maximum_heating_output_error_count_preservation_count,
+            0
+        );
+        let latest = state.latest.expect("latest exact-release CP440 snapshot");
+        assert!(!latest.heating_outdoor_air_maximum_flow_continue_warning_call_site_reached);
     }
     let lifecycle = simulation.summary.init_lifecycle;
     assert_eq!(lifecycle.source, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE);

@@ -29,7 +29,7 @@ fn cp434_contract_locks_exhaustive_routes_current_schema_and_binding() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        130
+        131
     );
 }
 

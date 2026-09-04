@@ -18,12 +18,14 @@ use crate::ideal_loads::{
     heating_outdoor_air_maximum_flow_first_warning_counter_increment_snapshots_match_bit_exact,
 };
 
+mod committed;
 mod error;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallError;
+pub(in crate::ideal_loads::calc) use committed::heating_outdoor_air_maximum_flow_first_warning_call_committed_latest_route;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 pub(in crate::ideal_loads::calc) use snapshot_validation::{
     retained_route_matches_snapshot_bounded as heating_outdoor_air_maximum_flow_first_warning_call_retained_route_matches_snapshot_bounded,

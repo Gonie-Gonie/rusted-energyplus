@@ -29,11 +29,11 @@ fn cp426_adapter_accepts_only_the_cp425_snapshot() {
 }
 
 #[test]
-fn cp426_is_preserved_before_cp427_in_current_130_snapshot_binding() {
+fn cp426_is_preserved_before_cp427_in_current_131_snapshot_binding() {
     assert_eq!(
         include_str!("scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        130
+        131
     );
 }

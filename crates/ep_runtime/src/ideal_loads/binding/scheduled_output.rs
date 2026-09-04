@@ -1,9 +1,7 @@
 //! Source-ordered output of one model-bound schedule sample.
-#[rustfmt::skip]
-use super::super::{
+#[rustfmt::skip] use super::super::{
     DirectZonePurchasedAirCouplingOutput, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
-    PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot,
-    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot,
+    PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitSnapshot,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitSnapshot,
     PurchasedAirCalcCoolingConstantSupplyHumidityRatioAssignmentSnapshot,
@@ -119,7 +117,7 @@ use super::super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     PurchasedAirCalcHeatingModeGuardSnapshot,
-    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
 /// Output from one successful model-bound schedule sample and CP300 call.
@@ -495,6 +493,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment: PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot,
     /// Source-ordered heating maximum-flow first-warning call-site snapshot.
     pub calculation_heating_outdoor_air_maximum_flow_first_warning_call: PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallSnapshot,
+    /// Source-ordered heating maximum-flow continue-warning call-site snapshot.
+    pub calculation_heating_outdoor_air_maximum_flow_continue_warning_call: PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

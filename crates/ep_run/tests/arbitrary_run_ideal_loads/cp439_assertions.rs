@@ -1,5 +1,8 @@
 //! CP439 heating maximum-flow first-warning call-site assertions.
 
+#[path = "cp440_assertions.rs"]
+mod cp440_assertions;
+
 use std::collections::BTreeSet;
 
 use serde_json::{Map, Value, json};
@@ -146,6 +149,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     assert_eq!(latest[MARKER], json!(false));
     assert_schema_and_binding_cardinalities();
     assert!(!results.to_string().contains(CP439_KEY));
+    cp440_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -154,6 +158,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP439_KEY].is_null(),
         "non-direct runtime must not publish CP439 evidence"
     );
+    cp440_assertions::assert_non_direct(runtime);
 }
 
 fn assert_actual_json_key_set(
@@ -208,7 +213,7 @@ fn assert_schema_and_binding_cardinalities() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 130);
+    assert_eq!(fields.len(), 131);
     assert!(
         fields[128].contains(
             "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"

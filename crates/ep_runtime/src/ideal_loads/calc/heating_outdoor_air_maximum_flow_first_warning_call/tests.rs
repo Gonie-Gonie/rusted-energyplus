@@ -1,6 +1,7 @@
 //! CP439 boundary, exhaustive call-site, prefix, and no-service tests.
 
 mod schema_prefix;
+mod committed_seal;
 
 use super::transition::{
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallRetainedRoute as Route,
@@ -160,7 +161,7 @@ fn cp439_transition_contains_no_sink_format_service_or_counter_mutation() {
 }
 
 #[test]
-fn cp439_subtree_is_twelve_files_and_every_file_is_bounded() {
+fn cp439_sealed_subtree_is_fourteen_files_and_every_file_is_bounded() {
     let files = [
         include_str!("../heating_outdoor_air_maximum_flow_first_warning_call.rs"),
         include_str!("release.rs"),
@@ -168,14 +169,16 @@ fn cp439_subtree_is_twelve_files_and_every_file_is_bounded() {
         include_str!("tests.rs"),
         include_str!("transition.rs"),
         include_str!("release/error.rs"),
+        include_str!("release/committed.rs"),
         include_str!("release/prefix.rs"),
         include_str!("release/runtime_validation.rs"),
         include_str!("release/snapshot_validation.rs"),
         include_str!("tests/schema_prefix.rs"),
+        include_str!("tests/committed_seal.rs"),
         include_str!("transition/accounting.rs"),
         include_str!("transition/snapshot.rs"),
     ];
-    assert_eq!(files.len(), 12);
+    assert_eq!(files.len(), 14);
     assert!(files.into_iter().all(|source| source.lines().count() <= 500));
 }
 

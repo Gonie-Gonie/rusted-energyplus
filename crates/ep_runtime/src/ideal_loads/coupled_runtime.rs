@@ -281,6 +281,8 @@ use super::{
     PurchasedAirCalcHeatingOrNoLoadCaseEntryLifecycleSummary,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentLifecycleSummary,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallError,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycleSummary,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallLifecycleSummary,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError,
@@ -418,6 +420,7 @@ use super::{
     purchased_air_calc_heating_operating_mode_heat_assignment_lifecycle_summary,
     purchased_air_calc_heating_or_no_load_case_entry_lifecycle_summary,
     purchased_air_calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment_lifecycle_summary,
+    purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle_summary,
     purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle_summary,
     purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle_summary,
     purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle_summary,
@@ -549,6 +552,7 @@ pub(in crate::ideal_loads) mod heating_operating_mode_deadband_assignment_valida
 pub(in crate::ideal_loads) mod heating_operating_mode_heat_assignment_validation;
 pub(in crate::ideal_loads) mod heating_or_no_load_case_entry_validation;
 pub(in crate::ideal_loads) mod heating_outdoor_air_maximum_flow_body_volume_flow_assignment_validation;
+pub(in crate::ideal_loads) mod heating_outdoor_air_maximum_flow_continue_warning_call_validation;
 pub(in crate::ideal_loads) mod heating_outdoor_air_maximum_flow_first_warning_call_validation;
 pub(in crate::ideal_loads) mod heating_outdoor_air_maximum_flow_first_warning_counter_increment_validation;
 pub(in crate::ideal_loads) mod heating_outdoor_air_maximum_flow_first_warning_guard_validation;
@@ -1010,6 +1014,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded heating outdoor-air maximum-flow first-warning call-site lifecycle report.
     pub calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle:
         PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallLifecycleSummary,
+    /// Persistent bounded heating outdoor-air maximum-flow continue-warning call-site lifecycle report.
+    pub calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle:
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -1528,6 +1535,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final heating outdoor-air maximum-flow first-warning call-site summary could not resolve the bound unit.
     CalcHeatingOutdoorAirMaximumFlowFirstWarningCallLifecycle(
         PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallError,
+    ),
+    /// Final heating outdoor-air maximum-flow continue-warning call-site summary could not resolve the bound unit.
+    CalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycle(
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -2708,6 +2719,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A heating outdoor-air maximum-flow continue-warning call-site lifecycle invariant did not match the run.
+    CalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -3363,6 +3383,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A heating outdoor-air maximum-flow continue-warning call-site snapshot did not match its release call.
+    UnexpectedCalculationHeatingOutdoorAirMaximumFlowContinueWarningCall {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -3937,6 +3962,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcHeatingOutdoorAirMaximumFlowFirstWarningCallLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir heating outdoor-air maximum-flow first-warning call-site lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir heating outdoor-air maximum-flow continue-warning call-site lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -4986,6 +5015,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir heating outdoor-air maximum-flow first-warning call-site lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir heating outdoor-air maximum-flow continue-warning call-site lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -5727,6 +5764,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::UnexpectedCalculationHeatingOutdoorAirMaximumFlowFirstWarningCall { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its heating outdoor-air maximum-flow first-warning call site"
+            ),
+            Self::UnexpectedCalculationHeatingOutdoorAirMaximumFlowContinueWarningCall { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its heating outdoor-air maximum-flow continue-warning call site"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -7411,6 +7452,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationHeatingOutdoorAirMaximumFlowFirstWarningCall { timestep_index },
+            );
+        }
+        if !heating_outdoor_air_maximum_flow_continue_warning_call_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationHeatingOutdoorAirMaximumFlowContinueWarningCall { timestep_index },
             );
         }
     }
@@ -9556,6 +9607,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle =
+        purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcHeatingOutdoorAirMaximumFlowContinueWarningCallLifecycle,
+        )?;
+    heating_outdoor_air_maximum_flow_continue_warning_call_validation::validate_lifecycle(
+        &calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle,
+        &calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -9748,6 +9815,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_heating_outdoor_air_maximum_flow_first_warning_guard_lifecycle,
             calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment_lifecycle,
             calc_heating_outdoor_air_maximum_flow_first_warning_call_lifecycle,
+            calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle,
         },
         state,
         results,

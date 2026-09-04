@@ -12,9 +12,9 @@ pub use release::{
     advance_direct_no_oa_calc_heating_outdoor_air_maximum_flow_first_warning_call,
     heating_outdoor_air_maximum_flow_first_warning_call_predecessor_cp438_snapshot,
 };
-#[allow(unused_imports)]
+#[allow(unused_imports)] #[rustfmt::skip]
 pub(in crate::ideal_loads::calc) use release::{
-    heating_outdoor_air_maximum_flow_first_warning_call_retained_route_matches_snapshot_bounded,
+    heating_outdoor_air_maximum_flow_first_warning_call_committed_latest_route, heating_outdoor_air_maximum_flow_first_warning_call_retained_route_matches_snapshot_bounded,
     heating_outdoor_air_maximum_flow_first_warning_call_snapshot_route,
 };
 #[allow(unused_imports)]
