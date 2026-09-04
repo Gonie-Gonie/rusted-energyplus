@@ -331,6 +331,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallRuntimeState::new(system),
             calc_heating_outdoor_air_maximum_flow_continue_warning_call:
                 PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallRuntimeState::new(system),
+            calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call:
+                PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningTimestampCallRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

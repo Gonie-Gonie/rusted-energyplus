@@ -29,7 +29,7 @@ fn cp421_does_not_feed_the_numerical_coupling_input() {
 }
 
 #[test]
-fn cp421_is_preserved_before_cp422_in_the_current_131_snapshot_binding() {
+fn cp421_is_preserved_before_cp422_in_the_current_132_snapshot_binding() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 131);
+    assert_eq!(source.matches("    pub calculation_").count(), 132);
 }

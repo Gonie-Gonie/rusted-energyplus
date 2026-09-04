@@ -117,11 +117,10 @@
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     PurchasedAirCalcHeatingModeGuardSnapshot,
-    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
+    PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot, PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot, PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningTimestampCallSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot, PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
-/// Output from one successful model-bound schedule sample and CP300 call.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[doc = "Output from one successful model-bound schedule sample and CP300 call."] #[derive(Clone, Copy, Debug, PartialEq)]
 #[rustfmt::skip]
 pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     #[doc = "Fully resolved current schedule values."] pub schedules: super::DirectZonePurchasedAirScheduleSnapshot,
@@ -495,6 +494,7 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_heating_outdoor_air_maximum_flow_first_warning_call: PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallSnapshot,
     /// Source-ordered heating maximum-flow continue-warning call-site snapshot.
     pub calculation_heating_outdoor_air_maximum_flow_continue_warning_call: PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallSnapshot,
-    /// Predictor, PurchasedAir, and feedback result from CP300.
-    pub coupling: DirectZonePurchasedAirCouplingOutput,
+    /// Source-ordered heating maximum-flow continue-warning timestamp call-site snapshot.
+    pub calculation_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call: PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningTimestampCallSnapshot,
+    #[doc = "Predictor, PurchasedAir, and feedback result from CP300."] pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

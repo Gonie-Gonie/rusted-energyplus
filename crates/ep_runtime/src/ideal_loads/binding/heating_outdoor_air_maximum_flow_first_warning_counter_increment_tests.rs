@@ -29,12 +29,12 @@ fn cp438_adapter_accepts_only_the_cp437_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp438_historical_128_to_129_transition_is_preserved_in_current_131_snapshot_binding() {
+fn cp438_historical_128_to_129_transition_is_preserved_in_current_132_snapshot_binding() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 131);
+    assert_eq!(fields.len(), 132);
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")

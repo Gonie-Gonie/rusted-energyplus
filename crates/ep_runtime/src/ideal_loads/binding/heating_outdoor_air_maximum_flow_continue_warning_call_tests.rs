@@ -33,7 +33,7 @@ fn cp440_extends_current_scheduled_binding_from_130_to_131_snapshots() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 131);
+    assert_eq!(fields.len(), 132);
     assert!(
         fields[128].contains(
             "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"

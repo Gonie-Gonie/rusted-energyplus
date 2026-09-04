@@ -37,7 +37,7 @@ fn cp437_contract_locks_exhaustive_routes_current_schema_and_binding() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 131);
+    assert_eq!(fields.len(), 132);
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")

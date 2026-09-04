@@ -34,50 +34,66 @@ fn cp436_committed_seal_is_retained_constant_time_and_owner_lazy() {
 
 #[test]
 fn cp436_committed_seal_rejects_latest_witness_route_and_accounting_forgeries() {
-    let (unit, snapshot, _, owner) = cp436_fixture_unit_for_successor_tests();
+    let (mut unit, snapshot, _, owner) = cp436_fixture_unit_for_successor_tests();
     let mut witness = snapshot;
     witness.heating_outdoor_air_maximum_flow_body_volume_flow_assignment_executed ^= true;
     assert!(committed(&unit, witness, owner).is_none(), "witness forgery");
 
-    let mut forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
         .latest
         .as_mut()
         .expect("latest")
         .local_outdoor_air_volume_flow_rate_assignment_performed ^= true;
-    assert!(committed(&forged, snapshot, owner).is_none(), "latest forgery");
+    assert!(committed(&unit, snapshot, owner).is_none(), "latest forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .latest
+        .as_mut()
+        .expect("latest")
+        .local_outdoor_air_volume_flow_rate_assignment_performed ^= true;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
         .latest_route
         .as_mut()
         .expect("route")
         .assignment_executed ^= true;
-    assert!(committed(&forged, snapshot, owner).is_none(), "route forgery");
+    assert!(committed(&unit, snapshot, owner).is_none(), "route forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .latest_route
+        .as_mut()
+        .expect("route")
+        .assignment_executed ^= true;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
         .source_site_execution_count += 1;
     assert!(
-        committed(&forged, snapshot, owner).is_none(),
+        committed(&unit, snapshot, owner).is_none(),
         "accounting forgery"
     );
+    unit
+        .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .source_site_execution_count -= 1;
 
-    forged = unit.clone();
-    forged
+    let ordinal = unit
+        .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .latest_transition_ordinal;
+    unit
         .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
         .latest_transition_ordinal = Some(0);
-    assert!(committed(&forged, snapshot, owner).is_none(), "ordinal forgery");
+    assert!(committed(&unit, snapshot, owner).is_none(), "ordinal forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .latest_transition_ordinal = ordinal;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_guard
         .predecessor_route_counts[1] += 1;
     assert!(
-        committed(&forged, snapshot, owner).is_none(),
+        committed(&unit, snapshot, owner).is_none(),
         "predecessor forgery"
     );
 }

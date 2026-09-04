@@ -37,68 +37,91 @@ fn cp437_committed_seal_is_retained_constant_time_counter_exact_and_owner_lazy()
 
 #[test]
 fn cp437_committed_seal_rejects_latest_witness_route_accounting_and_counter_forgeries() {
-    let (unit, snapshot, _, owner) = cp437_fixture_unit_for_successor_tests();
+    let (mut unit, snapshot, _, owner) = cp437_fixture_unit_for_successor_tests();
     let mut witness = snapshot;
     witness.heating_outdoor_air_maximum_flow_first_warning_branch_entered ^= true;
     assert!(committed(&unit, witness, owner).is_none(), "witness forgery");
 
-    let mut forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_guard
         .latest
         .as_mut()
         .expect("latest")
         .outdoor_air_flow_maximum_heating_output_error_count_read ^= true;
-    assert!(committed(&forged, snapshot, owner).is_none(), "latest forgery");
+    assert!(committed(&unit, snapshot, owner).is_none(), "latest forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .latest
+        .as_mut()
+        .expect("latest")
+        .outdoor_air_flow_maximum_heating_output_error_count_read ^= true;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_guard
         .latest_route
         .as_mut()
         .expect("route")
         .first_warning_branch_entered ^= true;
-    assert!(committed(&forged, snapshot, owner).is_none(), "route forgery");
+    assert!(committed(&unit, snapshot, owner).is_none(), "route forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .latest_route
+        .as_mut()
+        .expect("route")
+        .first_warning_branch_entered ^= true;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_guard
         .source_site_execution_count += 1;
     assert!(
-        committed(&forged, snapshot, owner).is_none(),
+        committed(&unit, snapshot, owner).is_none(),
         "accounting forgery"
     );
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .source_site_execution_count -= 1;
 
-    forged = unit.clone();
-    forged
+    let ordinal = unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .latest_transition_ordinal;
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_guard
         .latest_transition_ordinal = Some(0);
-    assert!(committed(&forged, snapshot, owner).is_none(), "ordinal forgery");
+    assert!(committed(&unit, snapshot, owner).is_none(), "ordinal forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .latest_transition_ordinal = ordinal;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
         .predecessor_route_counts[1] += 1;
     assert!(
-        committed(&forged, snapshot, owner).is_none(),
+        committed(&unit, snapshot, owner).is_none(),
         "predecessor forgery"
     );
+    unit
+        .calc_heating_outdoor_air_maximum_flow_body_volume_flow_assignment
+        .predecessor_route_counts[1] -= 1;
 
-    forged = unit.clone();
-    forged
+    let counter = unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .outdoor_air_flow_maximum_heating_output_error_count;
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_guard
         .outdoor_air_flow_maximum_heating_output_error_count = 1;
     assert!(
-        committed(&forged, snapshot, owner).is_none(),
+        committed(&unit, snapshot, owner).is_none(),
         "latest-owner counter mismatch"
     );
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_guard
+        .outdoor_air_flow_maximum_heating_output_error_count = counter;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_guard
         .outdoor_air_flow_maximum_heating_output_error_count = usize::MAX;
     assert!(
-        committed(&forged, snapshot, owner).is_none(),
+        committed(&unit, snapshot, owner).is_none(),
         "out-of-range counter"
     );
 }

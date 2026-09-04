@@ -28404,3 +28404,67 @@ output/status/conformance, or Roadmap promotion is added. Counts remain 32
 algorithms and 293 routines split 58 state-mapped plus 235 source-mapped with
 170 required; inventory becomes 378 total, 240 public, 138 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP441 heating outdoor-air maximum-flow continue-warning timestamp call
+
+CP441 supersedes only CP440's physical-line-2374 executable exclusion by
+mapping the exact pinned timestamp call:
+
+```cpp
+ShowContinueErrorTimeStamp(state, "");
+```
+
+Physical structural/control line 2375, `} else {`, is the first excluded
+lexical boundary and the next structural checkpoint candidate. Physical
+executable lines 2376 through 2381 contain the first excluded executable call,
+`ShowRecurringWarningErrorAtEnd`; that recurring-warning call, its warning-
+index effects, line-2383 outdoor-air mass-flow clamp, and every later body
+effect remain excluded. CP441 owns exactly one textual source site,
+`reach-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call-site`.
+The pure characterization records only that the timestamp call site is
+reached. It does not invoke a timestamp or warning service, install a sink,
+render or compare timestamp text, read clock, environment, message, or warning-
+index state, replay the CP437 guard, mutate the CP438 counter, execute the
+recurring-warning call, clamp outdoor-air flow, or mutate PurchasedAir state.
+
+CP441 preserves CP440's 67 outcomes one-for-one. The 64 inactive CP440
+outcomes execute no CP441 site. The three private CP440 continue-warning-call
+outcomes each reach the timestamp call once with the same canonical retained
+warning counter already equal to exactly one, so T441=67, Z441=64, C441=3,
+and S441=3. Public/private remains 20/47, with active public/private 0/3.
+Exactly ten width-36 arrays retain predecessor, inherited CP435 false-
+fallthrough, inherited CP435 body-entry, CP436 volume-flow assignment, CP437
+guard-false-fallthrough, CP437 first-warning-entry, CP438 counter increment,
+CP439 first-warning-call, CP440 continue-warning-call, and local timestamp-call
+routes. The local timestamp route exactly aliases CP440 continue-warning-call
+evidence.
+
+Same-call sealed CP440 is the sole immediate predecessor and route authority.
+Its committed latest snapshot, private witness, completion evidence, bounded
+accounting, retained CP439 first-warning call, retained CP440 continue-warning
+call, and canonical counter prove every active route. Caller duplicates,
+inferred markers, time providers, global warning registries, callback or
+diagnostic services, mutable PurchasedAir state, warning indexes, and numerical
+DTO inputs are forbidden substitutes. Exact public release records no
+timestamp-call-site reach because CP440 admits zero public continue-warning
+calls. The three active outcomes are alternative fresh route
+characterizations, not three timestamp emissions in one lifecycle.
+
+The snapshot preserves all 428 CP440 fields verbatim and appends only
+`heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_site_reached`,
+yielding 429 unique Rust fields. Its option classes remain exactly 146
+`Option<f64>`, nine `Option<bool>`, six optional enums, and two `Option<usize>`
+carriers because the new marker is a plain `bool`. JSON preserves all 574
+CP440 keys and appends the same marker for 575 unique keys with 146 adjacent
+IEEE sidecars. W/H/T remains 37/42/57.
+
+Binding becomes CP440-to-CP441-to-unchanged-numerical at index 131 and current
+count 132. CP441 does not consume, reconcile with, feed, replace, or mutate any
+numerical, coupling-input, or output DTO; direct coupled and pipeline
+validation require zero public timestamp call sites and reject non-direct
+evidence. No support, readiness, capability, routine, algorithm, numerical-
+conformance, source-map, psychrometrics-map, output/status/conformance, or
+Roadmap promotion is added. Counts remain 32 algorithms and 293 routines split
+58 state-mapped plus 235 source-mapped with 170 required; inventory becomes
+379 total, 240 public, 139 internal, zero unused, zero unreachable, with 238
+development commands.

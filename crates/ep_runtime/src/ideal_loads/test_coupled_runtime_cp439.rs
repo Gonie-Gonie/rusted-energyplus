@@ -49,7 +49,7 @@ fn cp439_contract_locks_routes_schema_json_and_current_binding() {
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 131);
+    assert_eq!(fields.len(), 132);
     assert!(
         fields[128].contains(
             "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"

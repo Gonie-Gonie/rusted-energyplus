@@ -31,39 +31,50 @@ fn cp439_committed_seal_is_retained_constant_time_and_active_call_exact() {
 
 #[test]
 fn cp439_committed_seal_rejects_witness_route_and_accounting_forgeries() {
-    let (unit, snapshot, _) = cp439_fixture_unit_for_successor_tests();
+    let (mut unit, snapshot, _) = cp439_fixture_unit_for_successor_tests();
 
     let mut witness = snapshot;
     witness.heating_outdoor_air_maximum_flow_first_warning_call_site_reached ^= true;
     assert!(committed(&unit, witness).is_none(), "witness forgery");
 
-    let mut forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_call
         .latest
         .as_mut()
         .expect("latest")
         .heating_outdoor_air_maximum_flow_first_warning_call_site_reached ^= true;
-    assert!(committed(&forged, snapshot).is_none(), "latest forgery");
+    assert!(committed(&unit, snapshot).is_none(), "latest forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_call
+        .latest
+        .as_mut()
+        .expect("latest")
+        .heating_outdoor_air_maximum_flow_first_warning_call_site_reached ^= true;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_call
         .latest_route
         .as_mut()
         .expect("route")
         .first_warning_call_site_reached ^= true;
-    assert!(committed(&forged, snapshot).is_none(), "route forgery");
+    assert!(committed(&unit, snapshot).is_none(), "route forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_call
+        .latest_route
+        .as_mut()
+        .expect("route")
+        .first_warning_call_site_reached ^= true;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_call
         .source_site_execution_count += 1;
-    assert!(committed(&forged, snapshot).is_none(), "accounting forgery");
+    assert!(committed(&unit, snapshot).is_none(), "accounting forgery");
+    unit
+        .calc_heating_outdoor_air_maximum_flow_first_warning_call
+        .source_site_execution_count -= 1;
 
-    forged = unit.clone();
-    forged
+    unit
         .calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment
         .predecessor_route_counts[1] += 1;
-    assert!(committed(&forged, snapshot).is_none(), "predecessor forgery");
+    assert!(committed(&unit, snapshot).is_none(), "predecessor forgery");
 }

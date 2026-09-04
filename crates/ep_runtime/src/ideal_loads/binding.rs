@@ -142,6 +142,7 @@ use super::{
     PurchasedAirCalcHeatingOrNoLoadCaseEntryError as HeatingOrNoLoadCaseEntryError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentError as HeatingOutdoorAirMaximumFlowBodyVolumeFlowAssignmentError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallError as HeatingOutdoorAirMaximumFlowContinueWarningCallError,
+    PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningTimestampCallError as HeatingOutdoorAirMaximumFlowContinueWarningTimestampCallError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallError as HeatingOutdoorAirMaximumFlowFirstWarningCallError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError as HeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementError,
     PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardError as HeatingOutdoorAirMaximumFlowFirstWarningGuardError,
@@ -287,6 +288,7 @@ mod heating_operating_mode_heat_assignment;
 mod heating_or_no_load_case_entry;
 mod heating_outdoor_air_maximum_flow_body_volume_flow_assignment;
 mod heating_outdoor_air_maximum_flow_continue_warning_call;
+mod heating_outdoor_air_maximum_flow_continue_warning_timestamp_call;
 mod heating_outdoor_air_maximum_flow_first_warning_call;
 mod heating_outdoor_air_maximum_flow_first_warning_counter_increment;
 mod heating_outdoor_air_maximum_flow_first_warning_guard;
@@ -370,6 +372,7 @@ use heating_operating_mode_deadband_assignment::advance_heating_operating_mode_d
 use heating_operating_mode_heat_assignment::advance_heating_operating_mode_heat_assignment;
 use heating_outdoor_air_maximum_flow_body_volume_flow_assignment::advance_heating_outdoor_air_maximum_flow_body_volume_flow_assignment;
 use heating_outdoor_air_maximum_flow_continue_warning_call::advance_heating_outdoor_air_maximum_flow_continue_warning_call;
+use heating_outdoor_air_maximum_flow_continue_warning_timestamp_call::advance_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call;
 use heating_outdoor_air_maximum_flow_first_warning_call::advance_heating_outdoor_air_maximum_flow_first_warning_call;
 use heating_outdoor_air_maximum_flow_first_warning_counter_increment::advance_heating_outdoor_air_maximum_flow_first_warning_counter_increment;
 use heating_outdoor_air_maximum_flow_first_warning_guard::advance_heating_outdoor_air_maximum_flow_first_warning_guard;
@@ -1408,6 +1411,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationHeatingOutdoorAirMaximumFlowContinueWarningCall(
         HeatingOutdoorAirMaximumFlowContinueWarningCallError,
     ),
+    /// The bounded heating maximum-flow continue-warning timestamp call site rejected its release state.
+    CalculationHeatingOutdoorAirMaximumFlowContinueWarningTimestampCall(
+        HeatingOutdoorAirMaximumFlowContinueWarningTimestampCallError,
+    ),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -2423,6 +2430,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_heating_outdoor_air_maximum_flow_first_warning_call,
         )?;
+    let calculation_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call =
+        advance_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_heating_outdoor_air_maximum_flow_continue_warning_call,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -2595,6 +2608,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment,
         calculation_heating_outdoor_air_maximum_flow_first_warning_call,
         calculation_heating_outdoor_air_maximum_flow_continue_warning_call,
+        calculation_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call,
         coupling,
     })
 }
