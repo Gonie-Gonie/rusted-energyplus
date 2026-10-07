@@ -488,8 +488,8 @@ Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -
 # Bounded claims are checked against canonical algorithm/capability IDs.
 
 Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern $cp343PsychrometricsSourceHash -Description "psychrometrics locked raw source"
-Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern 'bounded `PurchasedAirManager\.cc` physical-line-2201 direct lifecycle' -Description "bounded CP343 PsyTdbFnHW integration"
-Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern 'broader downstream IdealLoads inverse replacement beyond bounded CP343 physical line 2201' -Description "psychrometrics broader downstream nonclaim"
+Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern 'bounded physical-line-2201 direct lifecycle' -Description "bounded CP343 PsyTdbFnHW integration"
+Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern 'do not establish broader outdoor-air inverse, full\s+purchased-air caller/state, or HVAC assembly parity' -Description "psychrometrics broader downstream nonclaim"
 
 # Historical audits must explicitly admit only the CP343 binding call and
 # carry the renamed non-direct firewall and cumulative inventory.
