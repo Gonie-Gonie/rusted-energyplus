@@ -1,11 +1,12 @@
-# CLK-01 source and unit evidence — production review pending
+# CLK-01 source, unit and consumed clock evidence
 
 The selected source is EnergyPlus 26.1.0 commit
 `6f2e40d10250a105b49966baa24d843711e61048`. The three CLK-01 contracts pin full
 file bytes, selected source ranges, input identities and tolerances before any
 Rust/reference comparison. The final selected helper/calendar unit comparison
-passed 71,358 checks with zero mismatches. No CLK-01 gate is closed by this report;
-production invocation and native clock/ESO evidence remain a separate review.
+passed 71,358 checks with zero mismatches. The separate final production report
+and independent review bind all 11 actual cases and close the selected consumed
+clock scope; unit rows alone do not establish physical invocation.
 
 The production input set remains the 15 CON cases: ordinary weather RunPeriod,
 explicit 2013, one zone, one selected weather environment, no sizing execution,
@@ -110,7 +111,7 @@ build owner; linking only energypluslib would omit its private ABI/math options.
 Raw helper/calendar requests, original-body extraction and preparation hashes
 are written to `.runtime/porting/CLK-01/preparation`. Native compilation,
 stateful reference runs and selected calendar comparisons have now completed.
-Production comparison remains pending.
+Production comparison subsequently completed for all 11 selected actual cases.
 
 The pure fallback compiled and dispatched the original pure bodies successfully.
 The initial preparation comparison then matched 1,912 existing Rust helper calls
@@ -145,6 +146,17 @@ day's date/weekday/ordinals. It never clones the original global arrays in Rust.
 ## Original-first native and committed unit execution
 
 The compact final unit receipt is [source-reference.json](source-reference.json).
+
+The subsequent normal CLI matrix completed all 15 prepared cases and 11 actual
+cases: A24H/A72H/Aannual plus each B limit variant24H/72H. The actual runs observed
+36,960 ordered physical zone invocations with no missing clock event or calendar
+mismatch. All 22 Full/Summary CLI executions completed without oracle/fixture
+answers; selected-output CSV, meter CSV and complete result series match between
+Full and Summary. The final [comparison-report.json](comparison-report.json)
+binds the source/unit/native/build/input/command/artifact hash chains and retains
+the distinct preparation and physics scopes. B annual physics, original weather
+producer/global history, warmup/handoff/adaptive system order and full reporting
+remain subsequent card obligations.
 The original core receipt is
 `.runtime/porting/reference-energyplus-26.1.0/native-core-build.json`; the matching
 driver's actual configure, compile/link, flag inheritance, archived source/binary
@@ -188,5 +200,6 @@ Raw commands, input identities, stdout/stderr and execution receipts are under
 The report is `committed-unit/comparison/unit-comparison.json` with SHA
 9ca1197b98c06ad572fc571c2d0118fc3f2113b251da62ffef38f6f8213f55fc.
 The unit runner executes no zone physics: prepared zone rows, including B annual,
-do not imply actual invocation or physical equivalence. All card gates and the
-separate production/native pre-report/ESO review remain pending here.
+do not imply actual invocation or physical equivalence. The subsequent separate
+production/native pre-report/ESO evidence is bound by comparison-report.json;
+unit completion alone does not update a gate.

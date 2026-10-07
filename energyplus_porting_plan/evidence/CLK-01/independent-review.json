@@ -1,0 +1,34 @@
+{
+  "card": "CLK-01",
+  "status": "pass",
+  "reviewer": "/root/git_relationship_audit",
+  "method": "Independent read-only audit of linked original C++ calendar fields, ordered native callbacks, ESO intervals, normal CLI outputs and artifact hashes; no builds or scientific runs were repeated.",
+  "report": {
+    "path": "energyplus_porting_plan/evidence/CLK-01/comparison-report.json",
+    "sha256": "2930d45340831494c2fb3b919ba2e4c7e64b77ebf063060eda458b1fe423ae34"
+  },
+  "observed": {
+    "actual_cases": 11,
+    "actual_zone_invocations": 36960,
+    "normal_full_summary_cli_invocations": 22,
+    "clock_omissions": 0,
+    "clock_mismatches": 0,
+    "full_summary_complete_series_csv_meters_equal": true,
+    "oracle_or_fixture_answers_used": false,
+    "summary_observer_artifacts_present": false,
+    "prepared_cases": 15,
+    "prepared_daily_rows": 1845,
+    "prepared_rows_are_physics": false,
+    "verified_direct_and_nested_hash_references": 759,
+    "verified_distinct_artifacts": 354,
+    "preserved_raw_system_clock_divergent_callbacks": 1155,
+    "actual_B8_launcher_exit_code": 0
+  },
+  "limits": [
+    "Current consumed calendar and canonical zone interval only.",
+    "B annual physics was not executed for this card.",
+    "No new PSY proof or whole-physics equivalence is claimed.",
+    "Native raw system clock, annual post-report year mutation and TMY record year remain separate observations.",
+    "Mutable global weather history, warmup, handoff, adaptive system sequencing and complete reporting remain subsequent card obligations."
+  ]
+}

@@ -58,16 +58,16 @@ SCH-03의 조회 날짜와 CLK-03의 EPW record index 분리 검증
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+구현 커밋: `fe57a35751652c7fe7734a5b88ae475c36fc7b3b` (고정 Rust producer); C++ wrapper의 namespace 보완은 `e8b7d578`.
+시험 명령: `evidence/CLK-01/source-review.md`의 원본-first 단위 명령과 `comparison-report.json`이 연결하는 일반 CLI Full/Summary 명령·receipt.
+증거 경로: `evidence/CLK-01/{source-reference,comparison-report,independent-review}.json`; raw는 `.runtime/porting/CLK-01/`.
+최대오차/RMSE/상태 불일치: 대응 helper 1,912개 모두 0/0; 단위 71,358 checks, 실제 zone 호출 36,960회의 불일치·누락 모두 0.
+추가 검토할 helper: 원본-only mutable helper 1,168개는 Rust helper 통과로 계산하지 않음. Today/Tomorrow와 reset/handoff는 CLK-03, 보고 mutation은 SYS-04에서 검증.
 
 ## 착수 시 확인한 범위
 
@@ -106,8 +106,13 @@ clock artifact를 생성하지 않는다. 원본의 monthly weekday 배열은 C+
 원본 공개 API의 15개 실행은 모두 종료 코드 0이며, 각 입력에서 pre-report와
 post-report callback이 24H 96회, 72H 288회, annual 35,040회씩 순서대로
 기록되었다. raw 증거는 `.runtime/porting/CLK-01/native-api-first/`에 보존한다.
-이 관찰만으로 Rust 단위·연결·생산 gate를 완료 처리하지 않는다. 전체 원본
-C++ core와 genuine-state 단위시험, Rust 대응 비교와 생산 실행은 진행 중이다.
+공개 API 관찰에 이어 genuine-state C++ 단위시험과 Rust 대응 비교를 완료했다.
+15개 준비 달력의 1,845일·180개 monthly-array projection과 12개 연간 month
+start가 정확히 일치한다. 실제 실행은 A 24H/72H/annual 및 B의 4가지 limit
+각각 24H/72H인 11개 사례이며, Full/Summary 22회에서 총 36,960회 zone 호출을
+원본 calendar/native callback/ESO interval과 비교해 불일치와 누락이 없었다.
+전체 series·선정 출력 CSV·meter CSV가 Full/Summary 간 일치하고, 일반 Summary는
+clock/PSY observer artifact를 만들지 않았다. 독립 해시·상태 검토도 통과했다.
 
 연간 준비 row는 `physics_executed=false`이다. B의 연간 물리 실행, Tomorrow
 handoff/EPW cursor, DatesShouldBeReset, warmup 및 adaptive system 호출 순서는

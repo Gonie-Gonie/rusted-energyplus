@@ -1,0 +1,195 @@
+{
+  "schema": "clk01-production-case.v1",
+  "case_id": "B-NOLIMIT-72H",
+  "mode": "actual",
+  "binary": {
+    "path": ".runtime/porting/CLK-01/committed-build/fe57a357/eplus-rs.exe",
+    "sha256": "0c07c92d3ef37abd20dfa99d01cb9b678deac664377f402e80e9343a620a1ab0"
+  },
+  "checker": {
+    "path": ".runtime/porting/CLK-01/production/fe57a357/source/check_clk01_production.8b219b3040e5.py",
+    "sha256": "8b219b3040e566983656e57cf6d60d8cd635f8900d1679feeddb569cff45621e"
+  },
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-01\\committed-build\\fe57a357\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-01\\production\\fe57a357\\B-NOLIMIT-72H\\actual\\full",
+        "--porting-scope",
+        "B",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 140.754,
+      "stdout": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/cli-full-stdout.log",
+        "sha256": "7aaf95726b184dda1a6267d455d6502ab4a76f241cfc35d3c7015db2b11dd089"
+      },
+      "stderr": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/cli-full-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "executed_checker": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/source/check_clk01_production.8b219b3040e5.py",
+        "sha256": "8b219b3040e566983656e57cf6d60d8cd635f8900d1679feeddb569cff45621e"
+      },
+      "repository_head": "e8b7d578a14709868f48caf31ec6b4e1366c6246"
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-01\\committed-build\\fe57a357\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-01\\production\\fe57a357\\B-NOLIMIT-72H\\actual\\summary",
+        "--porting-scope",
+        "B",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 111.909,
+      "stdout": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/cli-summary-stdout.log",
+        "sha256": "559d7d2500a5098b8378d9b55d1f823aa11441d83c874ad3f65d1c3e8a6b8cda"
+      },
+      "stderr": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/cli-summary-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "executed_checker": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/source/check_clk01_production.8b219b3040e5.py",
+        "sha256": "8b219b3040e566983656e57cf6d60d8cd635f8900d1679feeddb569cff45621e"
+      },
+      "repository_head": "e8b7d578a14709868f48caf31ec6b4e1366c6246"
+    }
+  ],
+  "input": {
+    "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+    "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "prepared_daily_count": 3,
+  "prepared_calendar_mismatches": 0,
+  "prepared_calendar": {
+    "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/summary/porting_scope.json",
+    "sha256": "98496cbe23a2126e758d476146057a565b1c3cefd9d35b3a1c66bb4e339a7a7c"
+  },
+  "native_reference": {
+    "receipt": {
+      "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-72H/receipt.json",
+      "sha256": "939c4b4cb89d93bd76e9eaf5ec56a78433f9436d51cbda3793b3bea7fec76438"
+    },
+    "raw_callbacks": {
+      "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-72H/clock-callbacks.jsonl",
+      "sha256": "c059b41ecd05443013f7dbb6e53112a9ae58e7b3a878d2dc1b4f2e5914173ecf"
+    },
+    "eso": {
+      "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-72H/eplusout.eso",
+      "sha256": "196df4bc99d6e00ccdd77b30264299ed7f4e790d4a72ec4f59b1ea9d0dba83e4"
+    },
+    "verified_zone_count": 288,
+    "raw_system_clock_is_canonical_zone_clock": false,
+    "first_weather_record_year": 1991,
+    "last_weather_record_year": 2004,
+    "final_before_report_calendar_year": 2013,
+    "final_after_report_calendar_year": 2013
+  },
+  "summary_clock_artifact_absent": true,
+  "physics_executed": true,
+  "automatic_gate_updates": false,
+  "clock_trace": {
+    "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/full/clock-calls.json",
+    "sha256": "781246a119cfa26f805a4bea7665cf5796f931c86f0b296ab72b833f3ad2876b"
+  },
+  "actual_zone_invocations": 288,
+  "actual_clock_mismatches": 0,
+  "full_summary_numerical_equality": {
+    "selected-outputs.csv": {
+      "full": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/full/results/selected-outputs.csv",
+        "sha256": "40a8761fd1550eb806e039df96f5756f21e4fd74f1a447b49644c0070664b1d2"
+      },
+      "summary": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/summary/results/selected-outputs.csv",
+        "sha256": "40a8761fd1550eb806e039df96f5756f21e4fd74f1a447b49644c0070664b1d2"
+      },
+      "equal": true
+    },
+    "meters.csv": {
+      "full": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/full/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "summary": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/summary/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "equal": true
+    },
+    "result-store.json": {
+      "full": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/full/results/result-store.json",
+        "sha256": "dd59cafecbd2ade3c6faf8da169b2cb35de675190858d2aa08821918c5530ab6"
+      },
+      "summary": {
+        "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/summary/results/result-store.json",
+        "sha256": "dd59cafecbd2ade3c6faf8da169b2cb35de675190858d2aa08821918c5530ab6"
+      },
+      "equal": true
+    }
+  },
+  "actual_runtime_summary": {
+    "path": ".runtime/porting/CLK-01/production/fe57a357/B-NOLIMIT-72H/actual/full/run-summary.json",
+    "sha256": "3e27ea83268fdab8c64c2874db577e6b8a237e77ccc8848f049c8fdbdb4ea778"
+  },
+  "checks_passed": true,
+  "boundary": "Current consumed calendar and canonical zone interval only; raw native system clock, reporting mutation, Tomorrow/cursor, SYS/warmup and whole physics parity remain separate.",
+  "implementation_commit": "fe57a35751652c7fe7734a5b88ae475c36fc7b3b",
+  "crates_tree": "fb236dcdaa5d18d6f6d24078216548c06586ff43",
+  "build_receipt": {
+    "path": "energyplus_porting_plan/evidence/CLK-01/build-receipt.json",
+    "sha256": "3c4ba86c9267f0c4601ffcc4bd5f2fb547ae804144b4c88d4921bb6f10372283"
+  },
+  "original_cpp_calendar": {
+    "path": ".runtime/porting/CLK-01/committed-unit/original-calendar/calendar-results.json",
+    "sha256": "2b6aedc524b6d0ebc5cc40b5e53a05e14b17cce288f6c01fd94f422a5d82b0bd"
+  },
+  "original_cpp_reference": {
+    "path": ".runtime/porting/CLK-01/committed-unit/original-calendar/calendar-reference.json",
+    "sha256": "1ae54255e12d49d9ae0a3e9801999b47595e5a6829023f35bda205fbc85e9101"
+  },
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+      "sha256": "6cd7fa8294ff5b28cfec3feb0f6efa765b9b66c1ea0495974cd61262255c9412"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+      "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-tolerances.json",
+      "sha256": "33190899639f89d05bee694f7cbcc193f2bc6b827b11aebdfdbf151bf9e0b4a3"
+    }
+  ]
+}

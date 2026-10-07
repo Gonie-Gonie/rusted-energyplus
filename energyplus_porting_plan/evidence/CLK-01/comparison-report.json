@@ -1,0 +1,202 @@
+{
+  "schema": "clk01-reviewed-comparison-report.v1",
+  "status": "pass",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "implementation_commit": "fe57a35751652c7fe7734a5b88ae475c36fc7b3b",
+  "crates_tree": "fb236dcdaa5d18d6f6d24078216548c06586ff43",
+  "scope": "Current consumed civil calendar, day type and canonical zone interval for fixed ordinary 2013 single-weather-RunPeriod inputs.",
+  "source_reference": {
+    "path": "energyplus_porting_plan/evidence/CLK-01/source-reference.json",
+    "sha256": "880aeeea6a828247a90c55d39de51a643c4d1f87d31beff61c34b35e06a27fc3"
+  },
+  "rust_build": {
+    "path": "energyplus_porting_plan/evidence/CLK-01/build-receipt.json",
+    "sha256": "3c4ba86c9267f0c4601ffcc4bd5f2fb547ae804144b4c88d4921bb6f10372283"
+  },
+  "unit_comparison": {
+    "path": ".runtime/porting/CLK-01/committed-unit/comparison/unit-comparison.json",
+    "sha256": "9ca1197b98c06ad572fc571c2d0118fc3f2113b251da62ffef38f6f8213f55fc"
+  },
+  "focused_checks": {
+    "path": "energyplus_porting_plan/evidence/CLK-01/initial-checks.json",
+    "sha256": "1fcad2bdd0cb2764e801565deff2207744ec2ba22c4bc39b695727a7bac75fa6"
+  },
+  "focused_working_tree_tested_source_equal_to_committed_source": true,
+  "focused_tests_represented_as_post_commit_rerun": false,
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+      "sha256": "6cd7fa8294ff5b28cfec3feb0f6efa765b9b66c1ea0495974cd61262255c9412"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+      "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-tolerances.json",
+      "sha256": "33190899639f89d05bee694f7cbcc193f2bc6b827b11aebdfdbf151bf9e0b4a3"
+    }
+  ],
+  "prepared": {
+    "case_count": 15,
+    "daily_rows": 1845,
+    "calendar_mismatches": 0,
+    "physics_executed": false,
+    "artifacts": [
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/A-24H-prepared.json",
+        "sha256": "6fb778e2d8f1fc703076ca234f4d453430cb82bc03da9bdbb5c19f8ecf6cf5fa"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/A-72H-prepared.json",
+        "sha256": "3db961e7c37e33c8f0da5883b3f6f77b8adeb69d3699432bf0556a1183c20b0b"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/A-ANNUAL-prepared.json",
+        "sha256": "ffa72206cf87ed1b2db4c09905ffb7c49c0298706a24e65aeb686d03a4f563b5"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-NOLIMIT-24H-prepared.json",
+        "sha256": "c005f4cba403ca5995a898bcb770c0c609127211c868c8d142283b6204ef56f3"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-NOLIMIT-72H-prepared.json",
+        "sha256": "c34e95858fd05cd9af77b99ae101c4071915b9b3bc9a3c8617eb7878d9432ddf"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-NOLIMIT-ANNUAL-prepared.json",
+        "sha256": "c7f349b15389f855670bb644b9f480cd432ce03e69bf5be627cd4adbf123e2dc"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-FLOW-24H-prepared.json",
+        "sha256": "50bf9ab6b824f1d9fbc9dad968cfa5f4181723d33a3d346b1bcaaa629ea91931"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-FLOW-72H-prepared.json",
+        "sha256": "a690615192604901f17cc55891b8a27fac964395d53a30b42060ae8d32137ba3"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-FLOW-ANNUAL-prepared.json",
+        "sha256": "4514befd98653c461a310a7943c26c12000f32fc6c3c4723ea89c9086a878aad"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-CAPACITY-24H-prepared.json",
+        "sha256": "396471526195229ea55d23356741519feb26427b4ed9c9a3b81610c196fa0a2d"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-CAPACITY-72H-prepared.json",
+        "sha256": "43b98c70b212ba4c92f9bd9fdcafd3fcb187ea0e3f9548fc7511bfdd63963602"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-CAPACITY-ANNUAL-prepared.json",
+        "sha256": "d4fd8cf13df64f895cf4e4c3d63e9c12064006c874016828a885a0cbab189985"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-BOTH-24H-prepared.json",
+        "sha256": "c96980fe8bde36ab0a53a41b289a942399d40948f3b45fdcd7a8b35d6aa0d941"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-BOTH-72H-prepared.json",
+        "sha256": "2719b655cb84005a0d50c8bb4db9da95ba7352344bd144d0e100cf799bbc64d4"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-BOTH-ANNUAL-prepared.json",
+        "sha256": "e4979a47605557c485c8ee386e7e80fb28896cb24e1017b910dbf005ceda1167"
+      }
+    ]
+  },
+  "actual": {
+    "case_count": 11,
+    "actual_zone_invocations": 36960,
+    "clock_mismatches": 0,
+    "omitted_clock_invocations": 0,
+    "normal_cli_invocations": 22,
+    "full_summary_selected_outputs_meters_complete_series_equal": true,
+    "summary_clock_and_kernel_artifacts_absent": true,
+    "oracle_fixture_results_supplied_to_production": false,
+    "artifacts": [
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/A-24H-actual.json",
+        "sha256": "e161c0f7a45722bcf51284f3471a9c86767aa55709aed364a7f9f2fed12e88d6"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/A-72H-actual.json",
+        "sha256": "b8ab26f380ed9e41067c5a4b6516ebac7151d4354a746337a08eb82a17ba042e"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/A-ANNUAL-actual.json",
+        "sha256": "15e681339a6b4c1fe6b431b70697796dd0eb2a83564516fc562e79ecffbb475f"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-NOLIMIT-24H-actual.json",
+        "sha256": "3a87b1c3cb38d6b88f5c8e17a449c26ae178608949c62343b51ff6d8a1eda971"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-NOLIMIT-72H-actual.json",
+        "sha256": "bf5da2ec6c22546222dffc0f5818d9b409af38b8c37460c14eafd6773cf25941"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-FLOW-24H-actual.json",
+        "sha256": "8ce6aa898b087dc982cff73348a59dab27051178b16eb8981a8bb6c1c7da36fe"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-FLOW-72H-actual.json",
+        "sha256": "e72aff3a5128d66716fafb6c4bf6d027dbff9bf555d9893b660468da1e6f42a2"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-CAPACITY-24H-actual.json",
+        "sha256": "6d7ea13fc5f847c5381f41d7aa991ba212eb607500b6a11466ef30d0e8ffe327"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-CAPACITY-72H-actual.json",
+        "sha256": "aee4c69dba2f9382dfa52ad116054273c98f95528f75825b6715ea9a31eb69c8"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-BOTH-24H-actual.json",
+        "sha256": "ed22ba74b1ecd77d07af21faffd9c728db5026522185e7c8c8cda4cff4cc4405"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-01/production/B-BOTH-72H-actual.json",
+        "sha256": "322b025598ad94a143409ec5b1e9f22299992eac7e5661cc571c311630dc94fb"
+      }
+    ]
+  },
+  "metrics": {
+    "unit_typed_state_order_identity_checks": 71358,
+    "unit_mismatch_count": 0,
+    "eligible_helper_calls": 1912,
+    "paired_daily_rows": 1845,
+    "monthly_entries": 180,
+    "max_absolute_error": 0,
+    "rmse": 0,
+    "timestamp_id_type_array_order_mismatches": 0
+  },
+  "scientific_review": {
+    "original_sources": "All 17 source pins and 36 body ranges independently reviewed; selected original parser and genuine state before/after fields observed.",
+    "native_build": "Same GCC13.2 ABI, O0 test reference, original later assertion enable and Werror, no extra warning waiver or source patch; existing 639 core compile command rows and library bytes preserved.",
+    "calendar_representation": "Rust existing scalar/calendar implementations and actual consumed annual month-start projection; no original mutable global array clone claim.",
+    "production_observer": "One existing physical zone hook per real step including zero-kernel steps; copied existing axes with real loop operands; default observer disabled; numerical output equality verified.",
+    "phase": "Original pre-report after-Weather/before-heat-balance callback; canonical ESO zone intervals. Raw API system clock and post-report year mutation retained separately.",
+    "native_environment": "Original A ordinal3/B ordinal1 from parsed inactive DesignDay counts; Rust materialized index and null source ordinal keep distinct provenance."
+  },
+  "unpaired_source_diagnostics_are_not_Rust_helper_passes": true,
+  "excluded_claims": [
+    "B annual building/HVAC physics execution",
+    "Whole EnergyPlus physics equivalence",
+    "Tomorrow/EPW cursor/reset producer and warmup handoff",
+    "Adaptive accepted/retry system order",
+    "Native mutable global-array identity or Begin/End flag parity",
+    "Post-report CalendarYear mutation and full report serialization",
+    "Active DST/holiday, multi-year, sizing and actual-weather production inputs"
+  ],
+  "remaining_obligations": [
+    "CLK-03 weather producer/cursor/reset state",
+    "SCH-03 schedule value/day lookup",
+    "SYS warmup, handoff, accepted system order, reports and annual B integration"
+  ],
+  "report_builder": {
+    "path": ".runtime/porting/CLK-01/production/create_final_report.py",
+    "sha256": "ae413493e29e74ed21679d18f4af226c536e47461f26fe1c9ea7dc134f75a9d4"
+  },
+  "automatic_gate_updates": false
+}
