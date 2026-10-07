@@ -8,6 +8,7 @@ python tools/porting/prepare_con01.py --check
 python tools/porting/trace_con01.py
 python tools/porting/trace_con01.py --rust-cli target/debug/eplus-rs.exe
 python tools/porting/trace_con01.py --unit-settings --rust-cli target/debug/eplus-rs.exe
+python tools/porting/check_con01_admission.py
 ```
 
 `prepare_con01.py` verifies original byte hashes before creating 15 pinned IDFs,
@@ -72,6 +73,15 @@ geometry, psychrometrics, CTF coefficients/history, heat-balance numerics,
 predictor/corrector, IdealLoads, adaptive timestep acceptance, or annual results;
 those retain their own card gates. A zero-delivery output sample cannot identify
 Off versus deadband without the later internal-state contract.
+
+`check_con01_admission.py` runs all 15 frozen IDFs through the real bounded Rust
+dry-run entrypoint, validates controls, hard limits, calendar frames and all
+declared prepared schedule values, and saves a compact matrix with command/log/
+trace hashes. It also creates three separately patched negative inputs (latent
+gains, OA, Autosize), then requires RunBlocked/unsupported exit 4 and specific scope violations.
+Their IDFs, source hashes and patch metadata are retained for direct CLI replay.
+The full annual prepared arrays and logs remain under `.runtime`; 72H/annual
+EnergyPlus simulation and Rust numerical comparison remain unexecuted.
 
 The runner records implementation artifacts and reference DLL hashes as well as
 the repository revision. Evidence created from an uncommitted working tree is
