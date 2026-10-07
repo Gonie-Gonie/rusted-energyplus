@@ -172,7 +172,7 @@ def run_case(case: dict, original: dict, native_root: Path, binary: Path, output
         commands.append(execute(command, directory, "cli-" + level, source, review))
         run = read(directory / level / "run-summary.json")
         require(run["status"] == "success" and run["exit_code"] == 0 and run["oracle"] is None
-                and run["config"]["compare_oracle"] is False and run["config"]["oracle_baseline"] is None
+                and run["config"]["compare_oracle"] is False and run["config"]["oracle_baseline"] is False
                 and run["config"]["dry_run"] is (not actual), "CLI execution/oracle/dry configuration differs")
         if actual:
             require(run["oracle_status"] == "not-requested" and run["rust_runtime"]["samples"] == len(original["days"]) * 24,

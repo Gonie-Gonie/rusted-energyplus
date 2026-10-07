@@ -66,7 +66,7 @@ json array_values(ObjexxFCL::Array1D_int const &values)
     return out;
 }
 
-json weather_input_state(EnergyPlusData const &state)
+json weather_input_state(EnergyPlus::EnergyPlusData const &state)
 {
     return {{"day_of_week", state.dataEnvrn->DayOfWeek},
             {"leap_year_add", state.dataWeather->LeapYearAdd},
@@ -86,7 +86,7 @@ json run_helpers(json const &request)
     json results = json::array();
     std::map<int, json> previous;
 #ifndef CLK01_PURE_ONLY
-    EnergyPlusData state;
+    EnergyPlus::EnergyPlusData state;
     state.init_constant_state(state);
 #endif
     for (auto const &call : request.at("calls")) {
@@ -170,7 +170,7 @@ json run_calendar_case(json const &item)
 {
     // processInput uses the original IDF parser, validation, maps and short-cut
     // buffers. No unit-test common object/default injection is used here.
-    EnergyPlusData state;
+    EnergyPlus::EnergyPlusData state;
     state.init_constant_state(state);
     auto error_stream = std::make_unique<std::ostringstream>();
     auto *error_text = error_stream.get();

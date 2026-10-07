@@ -85,7 +85,7 @@
     "sha256": "6f09948b48a7a992d5b3bcdb89a2fc91fde9ec86abe17177faab233188f85dac"
   },
   "original_reference_driver": {
-    "path": "tools/porting/clk01_reference.cpp",
+    "path": ".runtime/porting/CLK-01/preparation/source/clk01_reference.f6f0c5b30f6b.cpp",
     "sha256": "f6f0c5b30f6ba2cfc1e584fa3606f56ed89e334e9d189b96bd667140c91d7cd1"
   },
   "initial_loader_failure": {
@@ -107,5 +107,25 @@
     "pre_native_binding_extension_sha256": "681855fc658ca5e32bb70307e3a7bf249a74e8f2003da9660aa6e8d083e15503",
     "archived_executed_python_source_available": false,
     "note": "Launcher evolved after the original pure dispatch to add output preservation and native build receipt checks; compiled original CPP body and requests stayed byte-exact. Actual CPP binary/source/build receipts are preserved."
+  },
+  "driver_source_phase_mapping": {
+    "initial_execution_binding": {
+      "historical_path": "tools/porting/clk01_reference.cpp",
+      "sha256": "f6f0c5b30f6ba2cfc1e584fa3606f56ed89e334e9d189b96bd667140c91d7cd1"
+    },
+    "initial_bytes_archive": {
+      "path": ".runtime/porting/CLK-01/preparation/source/clk01_reference.f6f0c5b30f6b.cpp",
+      "sha256": "f6f0c5b30f6ba2cfc1e584fa3606f56ed89e334e9d189b96bd667140c91d7cd1"
+    },
+    "archive_recovery": {
+      "method": "Exact committed blob fe57a357:tools/porting/clk01_reference.cpp; SHA verified against existing pure build and failed native preflight receipts",
+      "created_after_execution": true
+    },
+    "current_native_wrapper": {
+      "path": "tools/porting/clk01_reference.cpp",
+      "sha256": "8adda49a2c20196703559ff9cc3846877a6bb89e608018c5894b6ebaa9661346"
+    },
+    "change": "Only three native EnergyPlusData type names explicitly qualified; original algorithm bodies and all input/tolerance contracts unchanged",
+    "historical_raw_receipts_preserved": true
   }
 }
