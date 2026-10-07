@@ -922,7 +922,7 @@
           "artifacts": [
             {
               "path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json",
-              "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+              "sha256": "6fd423fc43645244edc47436e001749222ac11596e942dca699102a7cd127483"
             },
             {
               "path": "energyplus_porting_plan/evidence/PSY-01/source-compression-check.json",
@@ -977,11 +977,11 @@
             "artifacts": [
               {
                 "path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json",
-                "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+                "sha256": "6fd423fc43645244edc47436e001749222ac11596e942dca699102a7cd127483"
               },
               {
                 "path": "energyplus_porting_plan/evidence/PSY-01/source-fixture-probe.json",
-                "sha256": "b7f787ac3bf4cb98ba86b69d63d7a779f5d4f450cb6d66f01cb614e135515a4e"
+                "sha256": "f8ff8a4a750e17982989bccfea63b20737d6282cc3f13ca5e3b16bb33bdd8f28"
               },
               {
                 "path": "energyplus_porting_plan/evidence/PSY-01/committed-checks.json",
@@ -1000,7 +1000,7 @@
               },
               {
                 "path": "energyplus_porting_plan/evidence/PSY-01/comparison-report.json",
-                "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1"
+                "sha256": "3c5395a18acb35ebe5bc6f94b1f49dab7898a26a5eeadf97339373d3c72c28d2"
               },
               {
                 "path": "energyplus_porting_plan/evidence/PSY-01/production/A-24H.json",
@@ -1061,7 +1061,7 @@
           },
           "report": {
             "path": "energyplus_porting_plan/evidence/PSY-01/comparison-report.json",
-            "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1"
+            "sha256": "3c5395a18acb35ebe5bc6f94b1f49dab7898a26a5eeadf97339373d3c72c28d2"
           }
         }
       },

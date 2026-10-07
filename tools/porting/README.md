@@ -161,6 +161,43 @@ remain unit-only coverage. Raw arrays/logs and compiled tools remain `.runtime`;
 compact source receipts live in `evidence/PSY-01`. This workflow does not update
 cards or gates and does not certify downstream ZON-02/HVAC-04/05 physics.
 
+# Reproduce the complete original C++ reference core
+
+The fourth pinned tool is WinLibs GCC 13.2/UCRT/POSIX/SEH. Its exact archive and
+compiler hashes are recorded in `reference_tools.json`. The setup helper verifies
+the existing publisher receipt without inventing an installation performed by
+that helper. The earlier PSY execution retains its exact three-tool manifest in
+an archived snapshot; adding GCC does not relabel that historical execution.
+
+```powershell
+python -B tools/porting/setup_reference_tools.py --check
+python -B tools/porting/build_original_reference.py --check
+```
+
+The builder verifies the source directory's own official upstream Git HEAD and
+every present blob against the locked EnergyPlus commit. It rejects inherited
+parent-repository metadata and scientific source edits. The original source
+archive lacked its own Git metadata; metadata was initialized and fetched from
+the pinned official commit, then its index/HEAD was aligned using `reset --mixed`.
+Original scientific file bytes were preserved. The two absent GLFW Git metadata
+files are explicitly allowed; missing scientific files are rejected.
+
+A fresh reproduction uses short, distinct directories under `.runtime`:
+
+```powershell
+python -B tools/porting/build_original_reference.py --build-dir .runtime/ep261-repro --output-dir .runtime/porting/reference-energyplus-26.1.0/reproduction-fresh --jobs 6
+```
+
+This is an explicitly disclosed test reference: RelWithDebInfo with C++ `-O0 -g
+-DNDEBUG`, original target `-UNDEBUG` and `-Werror`, `-ffp-contract=off`, BigObj,
+non-debug libstdc++ containers, and process-local UTF-8 Python settings. No source
+patch or additional warning waiver is used. The earlier default optimized build
+failed and is not represented as passing. The read-only `--check` verifies actual
+macro/flag/source/artifact receipts and the built DLL version and genuine state
+lifecycle; it never reruns CMake/Ninja. Compilation emits fresh commands, logs,
+source preservation, actual macro options, version/state smoke and artifact hashes.
+Neither operation changes a porting gate or certifies simulation physics.
+
 # CLK-01 calendar and actual clock observations
 
 ```powershell

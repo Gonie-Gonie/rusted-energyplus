@@ -1,0 +1,104 @@
+{
+  "schema": "psy01-historical-tool-manifest-metadata-correction.v1",
+  "reason": "A new GCC reference compiler must not invalidate or relabel the earlier LLVM/PSY execution provenance.",
+  "historical_manifest": {
+    "path": ".runtime/porting/PSY-01/source/reference_tools.087f7498faf6.json",
+    "sha256": "087f7498faf6bedea61aaf4c819e9563218f58d7e558d35e5c30358a7f46d77c"
+  },
+  "current_manifest": {
+    "path": ".runtime/porting/PSY-01/source/proof-history/reference_tools.d1fc7e41bfd4.json",
+    "sha256": "d1fc7e41bfd4597c9f4957871ec3e8d7f987d1a6376243bff93e889826184355",
+    "historical_path": "tools/porting/reference_tools.json"
+  },
+  "changes": [
+    {
+      "before": {
+        "sha256": "afa0f237142be053bda4ecca92d2e58c0d29c649b3bdd2b8416a6733353450bf",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/source-reference-preparation.json"
+      },
+      "after": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/source-reference-preparation.f5da5a6fc027.json",
+        "sha256": "f5da5a6fc027fb124e829696fae812edf0861dd43b8cd0cde6b2b202aecf802e",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/source-reference-preparation.json"
+      },
+      "preserved_previous_receipt": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/source-reference-preparation.afa0f237142b.json",
+        "sha256": "afa0f237142be053bda4ecca92d2e58c0d29c649b3bdd2b8416a6733353450bf"
+      }
+    },
+    {
+      "before": {
+        "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json"
+      },
+      "after": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/source-reference.6fd423fc4364.json",
+        "sha256": "6fd423fc43645244edc47436e001749222ac11596e942dca699102a7cd127483",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json"
+      },
+      "preserved_previous_receipt": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/source-reference.e2abc73a9c34.json",
+        "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+      }
+    },
+    {
+      "before": {
+        "sha256": "b7f787ac3bf4cb98ba86b69d63d7a779f5d4f450cb6d66f01cb614e135515a4e",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/source-fixture-probe.json"
+      },
+      "after": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/source-fixture-probe.f8ff8a4a750e.json",
+        "sha256": "f8ff8a4a750e17982989bccfea63b20737d6282cc3f13ca5e3b16bb33bdd8f28",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/source-fixture-probe.json"
+      },
+      "preserved_previous_receipt": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/source-fixture-probe.b7f787ac3bf4.json",
+        "sha256": "b7f787ac3bf4cb98ba86b69d63d7a779f5d4f450cb6d66f01cb614e135515a4e"
+      }
+    },
+    {
+      "before": {
+        "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/comparison-report.json"
+      },
+      "after": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/comparison-report.3c5395a18acb.json",
+        "sha256": "3c5395a18acb35ebe5bc6f94b1f49dab7898a26a5eeadf97339373d3c72c28d2",
+        "historical_path": "energyplus_porting_plan/evidence/PSY-01/comparison-report.json"
+      },
+      "preserved_previous_receipt": {
+        "path": ".runtime/porting/PSY-01/source/proof-history/comparison-report.f9adb68df0a6.json",
+        "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1"
+      }
+    }
+  ],
+  "plan_before": {
+    "path": ".runtime/porting/PSY-01/source/proof-history/plan.a896fa7032a5.json",
+    "sha256": "a896fa7032a56caffce23dbc549b51a74fd34f62f7b6916fcb46c6a1efce5b1a",
+    "historical_path": "energyplus_porting_plan/plan.json"
+  },
+  "plan_after": {
+    "path": ".runtime/porting/PSY-01/source/proof-history/plan.b81628c8e182.json",
+    "sha256": "b81628c8e1825a7fea77b790aa02763d32be6055eabeb701067d3a2b499522c0",
+    "historical_path": "energyplus_porting_plan/plan.json"
+  },
+  "all_old_compact_receipts_archived": true,
+  "raw_execution_receipts_changed": false,
+  "scientific_sources_inputs_results_tolerances_gates_changed": false,
+  "migration_script": {
+    "path": ".runtime/porting/PSY-01/source/migrate_tool_manifest.py",
+    "sha256": "2c13c427833ee9f624424f5fea66cec15a546beaabe86dc72b0cc8374c32d929"
+  },
+  "metadata_review_correction": {
+    "reason": "Historical identities and reviewed snapshots are explicitly archived instead of being mistaken for current mutable files.",
+    "prior_receipt": {
+      "path": ".runtime/porting/PSY-01/source/proof-history/historical-tool-manifest.760ae8c903f4.json",
+      "sha256": "760ae8c903f45e4277fb06cb5929f4535762185ca78febce919dc736fc3cd0ba"
+    },
+    "correction_script": {
+      "path": ".runtime/porting/PSY-01/source/fix_manifest_migration_history.py",
+      "sha256": "64ecc496f043b7585322236ee63981a063ff999cbfcb89b7d7d91aece157eaac"
+    },
+    "scientific_data_or_execution_changed": false
+  }
+}

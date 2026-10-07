@@ -84,7 +84,7 @@
     },
     "receipt": {
       "path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json",
-      "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+      "sha256": "6fd423fc43645244edc47436e001749222ac11596e942dca699102a7cd127483"
     }
   },
   "production": {
@@ -265,5 +265,13 @@
     "Post-run validation may invoke no kernel at a timestep; kernel-bearing subsets are reported without inventing calls"
   ],
   "checks_passed": true,
-  "gates_updated_by_this_report": false
+  "gates_updated_by_this_report": false,
+  "metadata_correction": {
+    "reason": "Update only dependent compact receipt digests after their historical manifest archive pointer correction. Original raw execution receipts and all numerical results remain unchanged.",
+    "prior_receipt": {
+      "path": ".runtime/porting/PSY-01/source/proof-history/comparison-report.f9adb68df0a6.json",
+      "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1"
+    },
+    "new_execution_performed": false
+  }
 }

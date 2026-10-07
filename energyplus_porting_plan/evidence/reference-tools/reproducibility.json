@@ -1,0 +1,28 @@
+{
+  "schema": "reviewed-original-reference-tools.v1",
+  "checks_passed": true,
+  "raw_validation": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/reproducibility-validation-final/validation-receipt.json",
+    "sha256": "dee00a748561b06a6a2cb7f5cf07cd75f964a56d8aa5bee1d83c978310aae333"
+  },
+  "archived_executed_tool_sources": [
+    {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/reproducibility-validation-final/source/reference_tools.json",
+      "sha256": "d1fc7e41bfd4597c9f4957871ec3e8d7f987d1a6376243bff93e889826184355"
+    },
+    {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/reproducibility-validation-final/source/setup_reference_tools.py",
+      "sha256": "f79e7105f879839932beb7db00ddd4fa99ec62cba765ecec9d365471b42ab20e"
+    },
+    {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/reproducibility-validation-final/source/build_original_reference.py",
+      "sha256": "17e308ce7e5b5c41155ea55a77aff7e2d4542bbd477b34ae8c4a477e9437f692"
+    }
+  ],
+  "same_upstream_core_reference": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "independent_review": "Source/Git/blob/tool pins, historical publisher adoption, bounded fresh directories before writes, disclosed O0/assertion/Werror/no-contract/BigObj configuration and strict read-only builder check reviewed. No material blocker.",
+  "scientific_source_or_result_or_gate_changed": false
+}

@@ -58,8 +58,9 @@
       "sha256": "a8b7a614eeadd9105f814be3701a7f312cda4cea51751b75b408c16100c94e85"
     },
     "tool_manifest": {
-      "path": "tools/porting/reference_tools.json",
-      "sha256": "087f7498faf6bedea61aaf4c819e9563218f58d7e558d35e5c30358a7f46d77c"
+      "path": ".runtime/porting/PSY-01/source/reference_tools.087f7498faf6.json",
+      "sha256": "087f7498faf6bedea61aaf4c819e9563218f58d7e558d35e5c30358a7f46d77c",
+      "historical_path": "tools/porting/reference_tools.json"
     },
     "source": {
       "path": "tools/porting/psy01_reference.cpp",
@@ -610,5 +611,17 @@
     "warning aggregation/I/O excluded",
     "unit IEEE probes don't expand A/B admitted inputs",
     "downstream ZON-02/HVAC-04/05 numerical gates require their actual same-tuple/call-order traces"
-  ]
+  ],
+  "metadata_correction": {
+    "reason": "Preserve the exact three-tool manifest used by the historical execution after appending a separately selected GCC tool. No execution, source, input, result, precision, gate or scientific claim changed.",
+    "prior_receipt": {
+      "path": ".runtime/porting/PSY-01/source/proof-history/source-reference-preparation.afa0f237142b.json",
+      "sha256": "afa0f237142be053bda4ecca92d2e58c0d29c649b3bdd2b8416a6733353450bf"
+    },
+    "historical_manifest": {
+      "path": ".runtime/porting/PSY-01/source/reference_tools.087f7498faf6.json",
+      "sha256": "087f7498faf6bedea61aaf4c819e9563218f58d7e558d35e5c30358a7f46d77c"
+    },
+    "new_manifest_used_for_historical_execution": false
+  }
 }

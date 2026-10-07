@@ -261,7 +261,7 @@
     "existing_unit_artifacts_checked_unchanged": 14,
     "unit_receipt": {
       "path": "energyplus_porting_plan/evidence/PSY-01/source-reference-preparation.json",
-      "sha256": "afa0f237142be053bda4ecca92d2e58c0d29c649b3bdd2b8416a6733353450bf"
+      "sha256": "f5da5a6fc027fb124e829696fae812edf0861dd43b8cd0cde6b2b202aecf802e"
     }
   },
   "interpretation": "W .024 makes the original H-to-T return slightly above 22 C; the original min returns exactly 22 C. W .020 remains slightly below 22 C after that same min. This distinguishes zero and positive sensible temperature difference for the branch-provoking fixture.",
@@ -269,5 +269,13 @@
     "No source saturation helper executed; no supersaturation margin certified",
     "No physical zone/HVAC gate comparison; clamp classification only"
   ],
-  "probe_scaffolding_correction": "Initial standalone probe compilation returned 1 because min was qualified as EnergyPlus::min. Original EnergyPlus.hh aliases ObjexxFCL::min globally; the runtime-only probe was corrected to ObjexxFCL::min and compiled with exit 0. No original function body or persistent wrapper was changed."
+  "probe_scaffolding_correction": "Initial standalone probe compilation returned 1 because min was qualified as EnergyPlus::min. Original EnergyPlus.hh aliases ObjexxFCL::min globally; the runtime-only probe was corrected to ObjexxFCL::min and compiled with exit 0. No original function body or persistent wrapper was changed.",
+  "metadata_correction": {
+    "reason": "Update only dependent compact receipt digests after their historical manifest archive pointer correction. Original raw execution receipts and all numerical results remain unchanged.",
+    "prior_receipt": {
+      "path": ".runtime/porting/PSY-01/source/proof-history/source-fixture-probe.b7f787ac3bf4.json",
+      "sha256": "b7f787ac3bf4cb98ba86b69d63d7a779f5d4f450cb6d66f01cb614e135515a4e"
+    },
+    "new_execution_performed": false
+  }
 }
