@@ -10,8 +10,9 @@
 ## 읽을 원본 코드
 
 파일: `src/EnergyPlus/SurfaceGeometry.cc`  
-심벌: `ProcessSurfaceVertices; CalcSurfaceCentroid`  
-대상 블록: 대상 불투명 평면의 기하 계산 블록. 호출되는 Vectors 보조 함수는 해당 계산만 동봉.  
+심벌: `GetVertices`의 불투명 표면 기하 계산, `CalcSurfaceCentroid`, `ProcessSurfaceVertices`
+
+대상 블록: 원본에서 실제 값을 만드는 `GetVertices`의 Newell 법선·면적·방위·경사 및 외향 법선 저장, `CalcSurfaceCentroid`의 중심점 저장. `ProcessSurfaceVertices`는 이미 계산된 기하값의 후속 소비·형상·scratch 수명 문맥이다. 호출되는 Vectors 보조 함수와 ObjexxFCL `cen`은 해당 계산만 동봉한다.
 함께 읽을 선언/호출자: SurfaceGeometry.hh; Vectors.hh/.cc의 실제 호출 보조 함수만  
 출처: https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/SurfaceGeometry.cc
 
@@ -68,3 +69,15 @@ CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## 범위 보완 기록 — 검증 진행 중
+
+원래 카드의 심벌 목록에는 면적·법선·방위·경사의 실제 생산자인 `GetVertices`
+계산 블록이 빠져 있었다. 고정 원본에서는 중심점 저장도
+`ProcessSurfaceVertices` 호출보다 먼저 실행된다. 원본 행구간·직접 helper·
+초기화 및 상태 수명 계약을 별도로 고정한 뒤 수치 비교한다.
+
+단위 진단 입력은 생산 CON 범위를 확장하지 않는다. 기존 GEO-01 기록에는
+법선과 중심점이 없어 새 원본 관측이 필요하다. 높이 소비값은 중심점의 Z이며,
+`ProcessSurfaceVertices`의 표면 모서리 높이와 구분한다. 이후 SRC-04·SRC-05의
+전체 계산식과 시간 상태 동등성은 각 후속 카드에서 검증한다.

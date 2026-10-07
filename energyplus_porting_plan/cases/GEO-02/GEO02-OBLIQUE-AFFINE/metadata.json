@@ -1,0 +1,812 @@
+{
+  "schema": "geo02-idf-metadata.v1",
+  "case_id": "GEO02-OBLIQUE-AFFINE",
+  "base_input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/cases/GEO-02/GEO02-OBLIQUE-AFFINE/input.idf",
+    "sha256": "33daf832b6caa2f9f07cbb85d8332ab8a75b9bc7367f0a10ca463715b8fe5775"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "patches": [
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "name": "Zn001:Wall001",
+      "before_fields": [
+        "Zn001:Wall001",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "0",
+        "0",
+        "4.572000",
+        "0",
+        "0",
+        "0",
+        "15.24000",
+        "0",
+        "0",
+        "15.24000",
+        "0",
+        "4.572000"
+      ],
+      "after_fields": [
+        "Zn001:Wall001",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "0.0",
+        "1.143",
+        "4.572",
+        "0.0",
+        "0.0",
+        "0.0",
+        "15.24",
+        "0.0",
+        "3.048",
+        "15.24",
+        "1.143",
+        "7.62"
+      ]
+    },
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "name": "Zn001:Wall002",
+      "before_fields": [
+        "Zn001:Wall002",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "15.24000",
+        "0",
+        "4.572000",
+        "15.24000",
+        "0",
+        "0",
+        "15.24000",
+        "15.24000",
+        "0",
+        "15.24000",
+        "15.24000",
+        "4.572000"
+      ],
+      "after_fields": [
+        "Zn001:Wall002",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "15.24",
+        "1.143",
+        "7.62",
+        "15.24",
+        "0.0",
+        "3.048",
+        "20.955",
+        "15.24",
+        "3.048",
+        "20.955",
+        "16.383",
+        "7.62"
+      ]
+    },
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "name": "Zn001:Wall003",
+      "before_fields": [
+        "Zn001:Wall003",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "15.24000",
+        "15.24000",
+        "4.572000",
+        "15.24000",
+        "15.24000",
+        "0",
+        "0",
+        "15.24000",
+        "0",
+        "0",
+        "15.24000",
+        "4.572000"
+      ],
+      "after_fields": [
+        "Zn001:Wall003",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "20.955",
+        "16.383",
+        "7.62",
+        "20.955",
+        "15.24",
+        "3.048",
+        "5.715",
+        "15.24",
+        "0.0",
+        "5.715",
+        "16.383",
+        "4.572"
+      ]
+    },
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "name": "Zn001:Wall004",
+      "before_fields": [
+        "Zn001:Wall004",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "0",
+        "15.24000",
+        "4.572000",
+        "0",
+        "15.24000",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "4.572000"
+      ],
+      "after_fields": [
+        "Zn001:Wall004",
+        "Wall",
+        "R13WALL",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0.5000000",
+        "4",
+        "5.715",
+        "16.383",
+        "4.572",
+        "5.715",
+        "15.24",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "1.143",
+        "4.572"
+      ]
+    },
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "name": "Zn001:Flr001",
+      "before_fields": [
+        "Zn001:Flr001",
+        "Floor",
+        "FLOOR",
+        "ZONE ONE",
+        "",
+        "Adiabatic",
+        "",
+        "NoSun",
+        "NoWind",
+        "1.000000",
+        "4",
+        "15.24000",
+        "0.000000",
+        "0.0",
+        "0.000000",
+        "0.000000",
+        "0.0",
+        "0.000000",
+        "15.24000",
+        "0.0",
+        "15.24000",
+        "15.24000",
+        "0.0"
+      ],
+      "after_fields": [
+        "Zn001:Flr001",
+        "Floor",
+        "FLOOR",
+        "ZONE ONE",
+        "",
+        "Adiabatic",
+        "",
+        "NoSun",
+        "NoWind",
+        "1.000000",
+        "4",
+        "15.24",
+        "0.0",
+        "3.048",
+        "0.0",
+        "0.0",
+        "0.0",
+        "5.715",
+        "15.24",
+        "0.0",
+        "20.955",
+        "15.24",
+        "3.048"
+      ]
+    },
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "name": "Zn001:Roof001",
+      "before_fields": [
+        "Zn001:Roof001",
+        "Roof",
+        "ROOF31",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0",
+        "4",
+        "0.000000",
+        "15.24000",
+        "4.572",
+        "0.000000",
+        "0.000000",
+        "4.572",
+        "15.24000",
+        "0.000000",
+        "4.572",
+        "15.24000",
+        "15.24000",
+        "4.572"
+      ],
+      "after_fields": [
+        "Zn001:Roof001",
+        "Roof",
+        "ROOF31",
+        "ZONE ONE",
+        "",
+        "Outdoors",
+        "",
+        "SunExposed",
+        "WindExposed",
+        "0",
+        "4",
+        "5.715",
+        "16.383",
+        "4.572",
+        "0.0",
+        "1.143",
+        "4.572",
+        "15.24",
+        "1.143",
+        "7.62",
+        "20.955",
+        "16.383",
+        "7.62"
+      ]
+    }
+  ],
+  "input_generation": "input-only orientation-preserving affine box shear",
+  "only_detailed_vertex_fields_changed": true,
+  "physical_scope_expansion": false,
+  "geometry_input": {
+    "building_raw_north_axis_deg": 0.0,
+    "appendix_g_rotation_deg": 0,
+    "rules": {
+      "starting_vertex_position": "UpperLeftCorner",
+      "vertex_entry_direction": "CounterClockWise",
+      "coordinate_system": "World"
+    },
+    "zones": [
+      {
+        "name": "ZONE ONE",
+        "source_order": 0,
+        "relative_north_deg": 0.0,
+        "origin_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "surfaces": [
+      {
+        "name": "Zn001:Wall001",
+        "canonical_name": "ZN001:WALL001",
+        "zone_name": "ZONE ONE",
+        "class": "Wall",
+        "source_order": 0,
+        "declared_number_of_vertices": 4,
+        "input_vertices_m": [
+          [
+            0.0,
+            1.143,
+            4.572
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            15.24,
+            0.0,
+            3.048
+          ],
+          [
+            15.24,
+            1.143,
+            7.62
+          ]
+        ],
+        "input_vertex_bits": [
+          [
+            "0000000000000000",
+            "3ff249ba5e353f7d",
+            "401249ba5e353f7d"
+          ],
+          [
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000"
+          ],
+          [
+            "402e7ae147ae147b",
+            "0000000000000000",
+            "4008624dd2f1a9fc"
+          ],
+          [
+            "402e7ae147ae147b",
+            "3ff249ba5e353f7d",
+            "401e7ae147ae147b"
+          ]
+        ],
+        "input_vertex_lexemes": [
+          [
+            "0.0",
+            "1.143",
+            "4.572"
+          ],
+          [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+          [
+            "15.24",
+            "0.0",
+            "3.048"
+          ],
+          [
+            "15.24",
+            "1.143",
+            "7.62"
+          ]
+        ]
+      },
+      {
+        "name": "Zn001:Wall002",
+        "canonical_name": "ZN001:WALL002",
+        "zone_name": "ZONE ONE",
+        "class": "Wall",
+        "source_order": 1,
+        "declared_number_of_vertices": 4,
+        "input_vertices_m": [
+          [
+            15.24,
+            1.143,
+            7.62
+          ],
+          [
+            15.24,
+            0.0,
+            3.048
+          ],
+          [
+            20.955,
+            15.24,
+            3.048
+          ],
+          [
+            20.955,
+            16.383,
+            7.62
+          ]
+        ],
+        "input_vertex_bits": [
+          [
+            "402e7ae147ae147b",
+            "3ff249ba5e353f7d",
+            "401e7ae147ae147b"
+          ],
+          [
+            "402e7ae147ae147b",
+            "0000000000000000",
+            "4008624dd2f1a9fc"
+          ],
+          [
+            "4034f47ae147ae14",
+            "402e7ae147ae147b",
+            "4008624dd2f1a9fc"
+          ],
+          [
+            "4034f47ae147ae14",
+            "4030620c49ba5e35",
+            "401e7ae147ae147b"
+          ]
+        ],
+        "input_vertex_lexemes": [
+          [
+            "15.24",
+            "1.143",
+            "7.62"
+          ],
+          [
+            "15.24",
+            "0.0",
+            "3.048"
+          ],
+          [
+            "20.955",
+            "15.24",
+            "3.048"
+          ],
+          [
+            "20.955",
+            "16.383",
+            "7.62"
+          ]
+        ]
+      },
+      {
+        "name": "Zn001:Wall003",
+        "canonical_name": "ZN001:WALL003",
+        "zone_name": "ZONE ONE",
+        "class": "Wall",
+        "source_order": 2,
+        "declared_number_of_vertices": 4,
+        "input_vertices_m": [
+          [
+            20.955,
+            16.383,
+            7.62
+          ],
+          [
+            20.955,
+            15.24,
+            3.048
+          ],
+          [
+            5.715,
+            15.24,
+            0.0
+          ],
+          [
+            5.715,
+            16.383,
+            4.572
+          ]
+        ],
+        "input_vertex_bits": [
+          [
+            "4034f47ae147ae14",
+            "4030620c49ba5e35",
+            "401e7ae147ae147b"
+          ],
+          [
+            "4034f47ae147ae14",
+            "402e7ae147ae147b",
+            "4008624dd2f1a9fc"
+          ],
+          [
+            "4016dc28f5c28f5c",
+            "402e7ae147ae147b",
+            "0000000000000000"
+          ],
+          [
+            "4016dc28f5c28f5c",
+            "4030620c49ba5e35",
+            "401249ba5e353f7d"
+          ]
+        ],
+        "input_vertex_lexemes": [
+          [
+            "20.955",
+            "16.383",
+            "7.62"
+          ],
+          [
+            "20.955",
+            "15.24",
+            "3.048"
+          ],
+          [
+            "5.715",
+            "15.24",
+            "0.0"
+          ],
+          [
+            "5.715",
+            "16.383",
+            "4.572"
+          ]
+        ]
+      },
+      {
+        "name": "Zn001:Wall004",
+        "canonical_name": "ZN001:WALL004",
+        "zone_name": "ZONE ONE",
+        "class": "Wall",
+        "source_order": 3,
+        "declared_number_of_vertices": 4,
+        "input_vertices_m": [
+          [
+            5.715,
+            16.383,
+            4.572
+          ],
+          [
+            5.715,
+            15.24,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.143,
+            4.572
+          ]
+        ],
+        "input_vertex_bits": [
+          [
+            "4016dc28f5c28f5c",
+            "4030620c49ba5e35",
+            "401249ba5e353f7d"
+          ],
+          [
+            "4016dc28f5c28f5c",
+            "402e7ae147ae147b",
+            "0000000000000000"
+          ],
+          [
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000"
+          ],
+          [
+            "0000000000000000",
+            "3ff249ba5e353f7d",
+            "401249ba5e353f7d"
+          ]
+        ],
+        "input_vertex_lexemes": [
+          [
+            "5.715",
+            "16.383",
+            "4.572"
+          ],
+          [
+            "5.715",
+            "15.24",
+            "0.0"
+          ],
+          [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+          [
+            "0.0",
+            "1.143",
+            "4.572"
+          ]
+        ]
+      },
+      {
+        "name": "Zn001:Flr001",
+        "canonical_name": "ZN001:FLR001",
+        "zone_name": "ZONE ONE",
+        "class": "Floor",
+        "source_order": 4,
+        "declared_number_of_vertices": 4,
+        "input_vertices_m": [
+          [
+            15.24,
+            0.0,
+            3.048
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            5.715,
+            15.24,
+            0.0
+          ],
+          [
+            20.955,
+            15.24,
+            3.048
+          ]
+        ],
+        "input_vertex_bits": [
+          [
+            "402e7ae147ae147b",
+            "0000000000000000",
+            "4008624dd2f1a9fc"
+          ],
+          [
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000"
+          ],
+          [
+            "4016dc28f5c28f5c",
+            "402e7ae147ae147b",
+            "0000000000000000"
+          ],
+          [
+            "4034f47ae147ae14",
+            "402e7ae147ae147b",
+            "4008624dd2f1a9fc"
+          ]
+        ],
+        "input_vertex_lexemes": [
+          [
+            "15.24",
+            "0.0",
+            "3.048"
+          ],
+          [
+            "0.0",
+            "0.0",
+            "0.0"
+          ],
+          [
+            "5.715",
+            "15.24",
+            "0.0"
+          ],
+          [
+            "20.955",
+            "15.24",
+            "3.048"
+          ]
+        ]
+      },
+      {
+        "name": "Zn001:Roof001",
+        "canonical_name": "ZN001:ROOF001",
+        "zone_name": "ZONE ONE",
+        "class": "Roof",
+        "source_order": 5,
+        "declared_number_of_vertices": 4,
+        "input_vertices_m": [
+          [
+            5.715,
+            16.383,
+            4.572
+          ],
+          [
+            0.0,
+            1.143,
+            4.572
+          ],
+          [
+            15.24,
+            1.143,
+            7.62
+          ],
+          [
+            20.955,
+            16.383,
+            7.62
+          ]
+        ],
+        "input_vertex_bits": [
+          [
+            "4016dc28f5c28f5c",
+            "4030620c49ba5e35",
+            "401249ba5e353f7d"
+          ],
+          [
+            "0000000000000000",
+            "3ff249ba5e353f7d",
+            "401249ba5e353f7d"
+          ],
+          [
+            "402e7ae147ae147b",
+            "3ff249ba5e353f7d",
+            "401e7ae147ae147b"
+          ],
+          [
+            "4034f47ae147ae14",
+            "4030620c49ba5e35",
+            "401e7ae147ae147b"
+          ]
+        ],
+        "input_vertex_lexemes": [
+          [
+            "5.715",
+            "16.383",
+            "4.572"
+          ],
+          [
+            "0.0",
+            "1.143",
+            "4.572"
+          ],
+          [
+            "15.24",
+            "1.143",
+            "7.62"
+          ],
+          [
+            "20.955",
+            "16.383",
+            "7.62"
+          ]
+        ]
+      }
+    ]
+  }
+}

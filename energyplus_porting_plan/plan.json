@@ -1227,8 +1227,8 @@
       "group": "01 입력·기하",
       "title": "면적·방위·경사·중심점",
       "source": "SurfaceGeometry.cc",
-      "symbols": "ProcessSurfaceVertices; CalcSurfaceCentroid",
-      "block": "대상 불투명 평면의 기하 계산 블록. 호출되는 Vectors 보조 함수는 해당 계산만 동봉.",
+      "symbols": "GetVertices (opaque surface geometry); CalcSurfaceCentroid; ProcessSurfaceVertices",
+      "block": "GetVertices의 Newell 법선·면적·방위·경사·외향 법선 저장과 CalcSurfaceCentroid의 중심점 저장. ProcessSurfaceVertices는 기하 소비·형상·scratch 수명 문맥이며 직접 Vectors helper와 ObjexxFCL cen만 동봉.",
       "dependencies": [
         "GEO-01"
       ],

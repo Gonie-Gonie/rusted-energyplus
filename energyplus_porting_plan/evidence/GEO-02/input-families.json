@@ -1,0 +1,27 @@
+{
+  "schema": "geo02-input-family-preparation.v1",
+  "status": "pass",
+  "scope": "Existing parsed geometry identity within two families; no new GEO02 numerical output or physical execution",
+  "raw_result": {
+    "path": ".runtime/porting/GEO-02/input-family-01/stdout.log",
+    "sha256": "b3a8aae1e1b753d7755e05ede0e7404654b41d66208376ba3f21cb2fd37f24de"
+  },
+  "actual_command_receipt": {
+    "path": ".runtime/porting/GEO-02/input-family-01/receipt.json",
+    "sha256": "de781729cc5bb979d7577ddb79369a25292c8c66a91c90cc4eba7d706d5ab08f"
+  },
+  "executed_tool": {
+    "historical_path": "tools/porting/check_geo02_input_families.py",
+    "archive": {
+      "path": ".runtime/porting/GEO-02/input-family-01/source/tools/porting/check_geo02_input_families.py",
+      "sha256": "886b93667896f6bcfbec35eb2c03882ef3a8b1a274e1e42b32591856a6f4743e"
+    }
+  },
+  "families": {
+    "A": "6353cfd84c1f7d557768fdd7e6de2a8b7d92f953762587e96a5ff78160c9951e",
+    "B": "9b6966f0031c3fff700f8457757a5a400a95e29b2781907f809945282c362274"
+  },
+  "case_count": 7,
+  "missing_fields_inferred": false,
+  "gates_updated": false
+}

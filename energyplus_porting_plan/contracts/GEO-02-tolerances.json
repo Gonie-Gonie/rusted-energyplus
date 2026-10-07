@@ -1,0 +1,89 @@
+{
+  "schema": "geo02-tolerances.v1",
+  "card": "GEO-02",
+  "status": "draft-before-independent-review",
+  "frozen_before_numerical_comparison": true,
+  "profiles": {
+    "area_m2": {
+      "unit": "m2",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact",
+      "angle_wrapping": "forbidden"
+    },
+    "newell_area_vector_m2": {
+      "unit": "m2",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact",
+      "angle_wrapping": "forbidden"
+    },
+    "centroid_m": {
+      "unit": "m",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact",
+      "angle_wrapping": "forbidden"
+    },
+    "normals_and_lcs": {
+      "unit": "1",
+      "absolute_tolerance": 1e-12,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact",
+      "angle_wrapping": "forbidden"
+    },
+    "trig": {
+      "unit": "1",
+      "absolute_tolerance": 1e-12,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact",
+      "angle_wrapping": "forbidden"
+    },
+    "angles_deg": {
+      "unit": "deg",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact",
+      "angle_wrapping": "forbidden"
+    }
+  },
+  "cen_precision": {
+    "output_bits": "exact unchanged-header cen3 observation",
+    "input_bits": "exact",
+    "class_and_zero_sign": "exact",
+    "numeric_tolerance_used": false,
+    "floating_environment": "read actual GNU x64 x87 control word/PC/RC and MXCSR rounding before/after calls and initialization; no control writes; select source-compatible product precision from actual PC observation rather than LDBL_MANT_DIG assumption"
+  },
+  "exact_metadata": [
+    "input bits",
+    "canonical names and own-ID bindings",
+    "surface class and vertex cardinality/order",
+    "source phases",
+    "first/final retained field bits",
+    "inactive geometry corrections",
+    "actual observed flags"
+  ],
+  "source_only_unpaired": [
+    "unsafe native warning/centroid retention and scratch history",
+    "native-only globals/shape/shading buffers",
+    "no fabricated Rust error messages or source counters"
+  ],
+  "exclusions": [
+    "tolerance widening after failures",
+    "whole SRC04/SRC05/physics/GEO03 closure",
+    "old GEO01 observations relabeled as new missing-field evidence"
+  ],
+  "gates_updated": false
+}

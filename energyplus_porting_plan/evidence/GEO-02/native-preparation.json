@@ -1,0 +1,295 @@
+{
+  "schema": "geo02-native-preparation.v1",
+  "status": "native-built-independently-reviewed-original-first-pending",
+  "completed_utc": "2026-10-07T19:38:53.284288+00:00",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-02/native-preparation-02/advance_receipt.py",
+    "sha256": "58bf11f2ff6013ca0ed23aa7f8f8e618632458e048dc64961c5ea6eb1e142778"
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-cases.json",
+      "sha256": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-tolerances.json",
+      "sha256": "3876a34a85f84dc459d1fec406106c0166ef0ff1dd6942beb0d3a7fbcb19a0e1"
+    }
+  },
+  "independent_contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/independent-contract-review.json",
+    "sha256": "1072cc42f9266df5d14625f9a1dc63e2f04e51f8250a97678ea5c4a2e7c4f380"
+  },
+  "initial_native_static_review": {
+    "path": ".runtime/porting/GEO-02/independent-native-source-review-01/review.json",
+    "sha256": "2819db1a591a35a4b465736236c8e326d66d23a8936c8ca1bc2560a214403137"
+  },
+  "final_native_build_review": {
+    "path": ".runtime/porting/GEO-02/independent-native-build-review-01/final-review.json",
+    "sha256": "fe2b0ec8d57b67a581fd665c356842f08a6c3c1b98638921bd15e9cf5dac763b"
+  },
+  "native_driver_build": {
+    "path": ".runtime/porting/GEO-02/native-build-04/native-driver-build.json",
+    "sha256": "0d379727492d2064c988d9fe2ce29342706f4480aa142f749b1635dba2ba071b"
+  },
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "source_count_correction": {
+    "path": ".runtime/porting/GEO-02/native-count-correction-01/count-correction.json",
+    "sha256": "d33597743479a6e5a6f223e89b247b32f56bf8c3dfc77e4726740d449db50209"
+  },
+  "binaries": {
+    "initializer": {
+      "path": ".runtime/porting/GEO-02/native-build-04/geo02_reference.exe",
+      "sha256": "c156d4f9ade6513a62cca3de914a284393747bc3f473c42d3ac2e4d9c9798376"
+    },
+    "helper": {
+      "path": ".runtime/porting/GEO-02/native-build-04/geo02_reference_helper.exe",
+      "sha256": "c4b6f40a63c74edbde5ef75f86f3ca7dc6f4c7a767092eea0118189379f8fbed"
+    }
+  },
+  "source_initializer_fragment": {
+    "artifact": {
+      "path": ".runtime/porting/GEO-02/native-build-04/source/geo02_setup273-289.inc",
+      "sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+    },
+    "source_range": {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CosBldgRelNorth",
+      "start": 273,
+      "end": 289,
+      "role": "verbatim-test-only-initialization-fragment",
+      "helpers": [
+        "std::cos",
+        "std::sin"
+      ],
+      "range_sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+    },
+    "whole_SetupZoneGeometry_claimed": false
+  },
+  "preserved_attempts": [
+    {
+      "attempt": 1,
+      "reason": "Nonexistent EnergyPlus::Vector alias; wrapper qualification corrected only.",
+      "commands": {
+        "configure": {
+          "path": ".runtime/porting/GEO-02/native-build-01/configure-command.json",
+          "sha256": "b0e5b04c73532d7ee92ce2ef3ec5a357976171cd95649234dd061443fc255926"
+        },
+        "build": {
+          "path": ".runtime/porting/GEO-02/native-build-01/build-command.json",
+          "sha256": "8f65e98d41e145fd8f5ff8fe98e04cebf56403f19a88a08b7746e65f599513bf"
+        }
+      },
+      "source_archives": [
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/clk01_reference.cmake",
+          "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo01_reference.cmake",
+          "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo01_reference.py",
+          "sha256": "d798dbaf977854e26273678e19b6cfb40e2712dacfbe76bd3016a0eb1eb77383"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_reference.cmake",
+          "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_reference.cpp",
+          "sha256": "24554b2db13d98cb82d406452595dd83e420fd6b7394562a04e10c9d412b3bde"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_reference.py",
+          "sha256": "7d102c76dcb80fa7fd811e2f6480c5651e945b6f8311ac633d28874894fad637"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_reference_fields.hh",
+          "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_reference_helper.cpp",
+          "sha256": "69aebc68ab67ef11168cd202a5de5f7e3d13313116ce1df2d1f91ae87e31d4cf"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_reference_native.py",
+          "sha256": "43831d7835c6f096f2e70281f6a809ef1630b649d1397fedce1849711df32a24"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/geo02_setup273-289.inc",
+          "sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/psy02_reachability.cmake",
+          "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-01/source/psy02_reference.cmake",
+          "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490"
+        }
+      ],
+      "scientific_source_or_contract_changed": false,
+      "numerical_execution": false
+    },
+    {
+      "attempt": 2,
+      "reason": "Preserved retry guard included own changed fragment path; accounting separated own two targets from unchanged original/prior-card targets.",
+      "commands": {
+        "configure": {
+          "path": ".runtime/porting/GEO-02/native-build-02/configure-command.json",
+          "sha256": "accca592692926b4a86c3bb6c75a83fc9354c2a35e5c1bd77ad342316f8ad60b"
+        }
+      },
+      "source_archives": [
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/clk01_reference.cmake",
+          "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo01_reference.cmake",
+          "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo01_reference.py",
+          "sha256": "d798dbaf977854e26273678e19b6cfb40e2712dacfbe76bd3016a0eb1eb77383"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_reference.cmake",
+          "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_reference.cpp",
+          "sha256": "24554b2db13d98cb82d406452595dd83e420fd6b7394562a04e10c9d412b3bde"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_reference.py",
+          "sha256": "7d102c76dcb80fa7fd811e2f6480c5651e945b6f8311ac633d28874894fad637"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_reference_fields.hh",
+          "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_reference_helper.cpp",
+          "sha256": "5fec180898e75cf0ed805c933916c933f69842f06d0269661e3e62707a68d6bf"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_reference_native.py",
+          "sha256": "43831d7835c6f096f2e70281f6a809ef1630b649d1397fedce1849711df32a24"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/geo02_setup273-289.inc",
+          "sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/psy02_reachability.cmake",
+          "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-02/source/psy02_reference.cmake",
+          "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490"
+        }
+      ],
+      "scientific_source_or_contract_changed": false,
+      "numerical_execution": false
+    },
+    {
+      "attempt": 3,
+      "reason": "Public C API EnergyPlusData alias ambiguous with actual class; two wrapper qualifications corrected only.",
+      "commands": {
+        "configure": {
+          "path": ".runtime/porting/GEO-02/native-build-03/configure-command.json",
+          "sha256": "6f5c86767c796dc889909ea1787030003c35d767787756559677513192f48a52"
+        },
+        "build": {
+          "path": ".runtime/porting/GEO-02/native-build-03/build-command.json",
+          "sha256": "34547b2b90ea755b784aada4875ca6d4d3929c5724a1399726280b0e5602093d"
+        }
+      },
+      "source_archives": [
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/clk01_reference.cmake",
+          "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo01_reference.cmake",
+          "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo01_reference.py",
+          "sha256": "d798dbaf977854e26273678e19b6cfb40e2712dacfbe76bd3016a0eb1eb77383"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_reference.cmake",
+          "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_reference.cpp",
+          "sha256": "24554b2db13d98cb82d406452595dd83e420fd6b7394562a04e10c9d412b3bde"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_reference.py",
+          "sha256": "7d102c76dcb80fa7fd811e2f6480c5651e945b6f8311ac633d28874894fad637"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_reference_fields.hh",
+          "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_reference_helper.cpp",
+          "sha256": "5fec180898e75cf0ed805c933916c933f69842f06d0269661e3e62707a68d6bf"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_reference_native.py",
+          "sha256": "510ddb8b13400d505635751f4e03c488b0ef8d37f4b27ec9c4a8f35146c849af"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/geo02_setup273-289.inc",
+          "sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/psy02_reachability.cmake",
+          "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+        },
+        {
+          "path": ".runtime/porting/GEO-02/native-build-03/source/psy02_reference.cmake",
+          "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490"
+        }
+      ],
+      "scientific_source_or_contract_changed": false,
+      "numerical_execution": false
+    }
+  ],
+  "native_build_exit_code": 0,
+  "source_assertions_enabled": true,
+  "source_Werror_preserved": true,
+  "fp_contract": "off",
+  "source_preserving_configuration": "GNU13.2 RelWithDebInfo explicit O0 reference; original project options and directory/target definitions",
+  "unchanged_original_compile_rows": 643,
+  "unchanged_original_and_prior_card_compile_rows": 648,
+  "known_count_bookkeeping_error_in_build04_corrected_separately": true,
+  "original_numerical_executions": false,
+  "helper_kernel_input_identity_observed": false,
+  "ambient_FP_environment_observed": false,
+  "Rust_comparison_executed": false,
+  "gates_updated": false,
+  "limitations": [
+    "Build/static review does not prove numerical or state lifecycle equivalence.",
+    "Valid helper original retained-input bits and inactive geometry predicates remain actual-execution prerequisites.",
+    "Negative ordinary input rejection and unsafe prepared-helper retention are distinct proofs.",
+    "No SRC04/SRC05/GEO03 or whole-simulation gate claim."
+  ],
+  "historical_preparation_snapshot": {
+    "path": ".runtime/porting/GEO-02/native-preparation-01/native-preparation.json",
+    "sha256": "0f217d4c14ea416feecbe33291c2daecdb3fe797d6f0a99e061f9631704ab59a"
+  }
+}

@@ -1,0 +1,619 @@
+{
+  "schema": "geo02-source-contract.v1",
+  "card": "GEO-02",
+  "status": "draft-before-independent-review",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "sha256": "359720562a1122716bf842f23a54a9967d6bdaeea2e5c31638b8002e31f7160e"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "sha256": "6094403cb5858a65d75750c4d4af84246725e29d0e85ba48b27cdd508d988578"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.hh",
+      "sha256": "4676182160691660e12947d26c8f5ec6caed08bbdab714330703b04eebbe8ea9"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "sha256": "c29f615d16c616171f35cf13191c5d7917aecddbdad85b83653477e35dccfc98"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.cc",
+      "sha256": "c80eaefe852c5deebdb5f6eab35a58b0d7500d887218cbcdeaacb8573e4044ff"
+    },
+    {
+      "path": "src/EnergyPlus/SolarShading.cc",
+      "sha256": "4db77542aec7802473455feae3b9743b4f977d529e75b0b605c86a2ce47de29c"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/ConvectionCoefficients.cc",
+      "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61"
+    },
+    {
+      "path": "src/EnergyPlus/ConvectionCoefficients.hh",
+      "sha256": "a15faad35aad82250cb34b38574efb1d1331c1f2cd0f33b44d024dbd3ab456bf"
+    },
+    {
+      "path": "src/EnergyPlus/CMakeLists.txt",
+      "sha256": "9eeb0425b05e336d897337258035b5fc49b8f8849c7b0f3efb671fb02c0ec43c"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.hh",
+      "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "SetupZoneGeometry",
+      "start": 251,
+      "end": 355,
+      "role": "initialization-order",
+      "helpers": [],
+      "range_sha256": "e72b8779f728b164a410236c5ca16fdd84843502f792225125b9727cf5450f26"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CosBldgRelNorth",
+      "start": 273,
+      "end": 289,
+      "role": "verbatim-test-only-initialization-fragment",
+      "helpers": [
+        "std::cos",
+        "std::sin"
+      ],
+      "range_sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CalcSurfaceCentroid",
+      "start": 2589,
+      "end": 2593,
+      "role": "centroid-caller-before-ProcessSurfaceVertices",
+      "helpers": [
+        "CalcSurfaceCentroid"
+      ],
+      "range_sha256": "983ec810820970ff23b38f189ac38cfe98fc26181751a8e238cdbf777a092125"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "checkPopCoincidentVertex",
+      "start": 9115,
+      "end": 9167,
+      "role": "ordinary-negative-input-coincident-pop-prerequisite",
+      "helpers": [
+        "Vectors::VecLength"
+      ],
+      "range_sha256": "4ba31669a0432ff36df4722c728243ab99e38be312d32311fafc6ad3e654034e"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetVertices",
+      "start": 9169,
+      "end": 9485,
+      "role": "selected-primary-opaque-quad-producer-with-inactive-corrections",
+      "helpers": [
+        "Vectors::CreateNewellSurfaceNormalVector",
+        "Vectors::CreateNewellAreaVector",
+        "Vectors::VecLength",
+        "Vectors::DetermineAzimuthAndTilt",
+        "Convect::GetSurfConvOrientation",
+        "TransformVertsByAspect"
+      ],
+      "range_sha256": "64d78d9499193e9aebc7163ff3e77827bd38ea4912bebb5704c939eec139a5a8"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "ProcessSurfaceVertices",
+      "start": 12846,
+      "end": 12985,
+      "role": "selected-base-surface-preamble-and-shape",
+      "helpers": [
+        "Vectors::CalcCoPlanarNess",
+        "Vectors::VecLength",
+        "isRectangle"
+      ],
+      "range_sha256": "091501dc28c28d61868b663c2e3966ff547ba1e29692cbc4e4e16f59d4fedfd0"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CalcCoordinateTransformation",
+      "start": 13324,
+      "end": 13369,
+      "role": "selected-base-surface-transfer-and-processed-flag",
+      "helpers": [
+        "CalcCoordinateTransformation"
+      ],
+      "range_sha256": "5939f13f623a59d5b4e9ce7c0f9e9c1a462c3d91d0d17e00337d0e2d56811241"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CalcCoordinateTransformation",
+      "start": 13398,
+      "end": 13447,
+      "role": "selected-base-surface-local-origin",
+      "helpers": [
+        "magnitude_squared",
+        "dot"
+      ],
+      "range_sha256": "79ea717c07a3210d5a17d376340f38bda9009b0169743b16d70d19eca0cee443"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CalcSurfaceCentroid",
+      "start": 14505,
+      "end": 14654,
+      "role": "selected-quad-centroid-and-source-only-degenerate-retention",
+      "helpers": [
+        "cen",
+        "Vectors::AreaPolygon"
+      ],
+      "range_sha256": "03d43161125f255e4d97242afbbec6b03510c133db91ee07f54212e3b55c8e85"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "isRectangle",
+      "start": 15364,
+      "end": 15394,
+      "role": "selected-quad-shape-predicate",
+      "helpers": [
+        "Vectors::VecLength",
+        "Vectors::VecNormalize",
+        "dot"
+      ],
+      "range_sha256": "7b1ac1fbe34bb28d85247efd19a469d8ac8757c83e982f61114e70ba904d74fa"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "TransformVertsByAspect",
+      "start": 14391,
+      "end": 14474,
+      "role": "absent-aspect-prerequisite",
+      "helpers": [],
+      "range_sha256": "84f8db597b779eeed2b423a0592d94a68b5346023f2761bd4c9d328849a70061"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "ProcessSurfaceVertices",
+      "start": 373,
+      "end": 378,
+      "role": "declaration",
+      "helpers": [],
+      "range_sha256": "b0b17df727d6d194bef365bed66a5ca4a5fa611ea79d76033bc1627fe2c7feb2"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "CalcSurfaceCentroid",
+      "start": 412,
+      "end": 432,
+      "role": "declarations",
+      "helpers": [],
+      "range_sha256": "0339d51ac8daeaa47496466223222bea6c61b2de8b98fb79a533e71a2e85a862"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "ProcessSurfaceVerticesOneTimeFlag",
+      "start": 442,
+      "end": 495,
+      "role": "true-defaults-and-scratch-owner",
+      "helpers": [],
+      "range_sha256": "26703a99aa5ef90c59fa43803048e8032d8e283c3117e5dfb8c5d7591becc26c"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "clear_state",
+      "start": 509,
+      "end": 535,
+      "role": "clear-state-flags-and-deallocation-no-Triangle-reset",
+      "helpers": [],
+      "range_sha256": "4bd86d18aab1c3dbfbead4fbeeb4f20885bc77f68e608b1a2929e172259cb5dd"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "symbol": "Area",
+      "start": 712,
+      "end": 748,
+      "role": "owned-output-fields",
+      "helpers": [],
+      "range_sha256": "1d13fe65dda45ed8f9e5fe476835c2ca2260ad5476e5d4510786c6cb2ed9b105"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "symbol": "SurfaceData",
+      "start": 830,
+      "end": 841,
+      "role": "surface-constructor-defaults",
+      "helpers": [],
+      "range_sha256": "138507ca47a052ca68a397b3aa651a0380b7aa5987a0c17027df89161b9c1a20"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "symbol": "DegToRad",
+      "start": 575,
+      "end": 591,
+      "role": "numeric-constants",
+      "helpers": [],
+      "range_sha256": "13b80cae973724003c83dc7f822eb4ef4f254df16a9f604c6ad7b01504a34c95"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "AreaPolygon",
+      "start": 106,
+      "end": 136,
+      "role": "ordered-cross-sum-area",
+      "helpers": [
+        "cross",
+        "dot",
+        "VecNormalize"
+      ],
+      "range_sha256": "c6964adb1b42382b52fd7b6d07b10e5d7980148cbb42c850af5760a64d426711"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "VecSquaredLength",
+      "start": 138,
+      "end": 150,
+      "role": "ordered-unfused-length-square",
+      "helpers": [],
+      "range_sha256": "baab0068335dc16e806a90be386256a2dfaf4fe0467423f8b974c5dac31bab33"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "VecLength",
+      "start": 152,
+      "end": 164,
+      "role": "length",
+      "helpers": [
+        "VecSquaredLength",
+        "std::sqrt"
+      ],
+      "range_sha256": "9c1a7f6e57f61d1b5d87cc1abde16de2219800e0b9e0a9a937736dc4736df2c7"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "VecNormalize",
+      "start": 184,
+      "end": 208,
+      "role": "exact-zero-normalization",
+      "helpers": [
+        "VecLength"
+      ],
+      "range_sha256": "147c5f531b8c8f4f5861b24bdf4a1c0f28487d2391cdcd4d06081273fd2e3167"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "DetermineAzimuthAndTilt",
+      "start": 224,
+      "end": 285,
+      "role": "normal-and-horizontal-branch-angles",
+      "helpers": [
+        "VecNormalize",
+        "cross",
+        "dot",
+        "mod",
+        "std::atan2",
+        "std::acos"
+      ],
+      "range_sha256": "c3be1c52cfadebfabc222f80bd00ff6edef13023037e166bec63ffb0552ff4ba"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "PlaneEquation",
+      "start": 287,
+      "end": 327,
+      "role": "coplanarity-prerequisite-and-zero-normal-diagnostic",
+      "helpers": [
+        "VecLength",
+        "dot"
+      ],
+      "range_sha256": "d8073f889b8ba5b3c1f9f77be82eb2d27d51368dbc1721da0616cdd50f8125e0"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "Pt2Plane",
+      "start": 329,
+      "end": 345,
+      "role": "coplanarity-distance",
+      "helpers": [],
+      "range_sha256": "5269df8122bd00613739f0eba29130dda9928c79a9e10e11a78d112ac00e8018"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "CreateNewellAreaVector",
+      "start": 347,
+      "end": 370,
+      "role": "ordered-fan-area-vector",
+      "helpers": [
+        "cross"
+      ],
+      "range_sha256": "3f2cca0997d7f6fd80e8276776a3c89d226564adf3160f529d2dfc03d425bcb3"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "CreateNewellSurfaceNormalVector",
+      "start": 372,
+      "end": 417,
+      "role": "cyclic-normal-separate-from-area-vector",
+      "helpers": [
+        "VecNormalize"
+      ],
+      "range_sha256": "cca4b0da34c23731052be570affdcfa569d714eb241d9476fbab063d9b883fc5"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "CalcCoPlanarNess",
+      "start": 445,
+      "end": 486,
+      "role": "coplanarity-predicate",
+      "helpers": [
+        "PlaneEquation",
+        "Pt2Plane"
+      ],
+      "range_sha256": "a72c26e91ce22c77262bee9c9ef932095db4b993971d2a3d370d59ecf3e9bcde"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.hh",
+      "symbol": "AreaPolygon",
+      "start": 76,
+      "end": 115,
+      "role": "declarations",
+      "helpers": [],
+      "range_sha256": "10d7d327bcbb64466896db030a3c34c99f8918233dbad211cd302a3ce5fd3a15"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator +=",
+      "start": 238,
+      "end": 247,
+      "role": "ordered-component-add",
+      "helpers": [],
+      "range_sha256": "3a2b70add829258e17e761bd3fcf51fdd3dcdc419c91d9a09dda82e05a9c0e12"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator *=",
+      "start": 419,
+      "end": 440,
+      "role": "scalar-multiply-and-reciprocal-division",
+      "helpers": [],
+      "range_sha256": "fa9c77fbac6e3300b040c5a4d2f13619e24ae51616410848474b83977841dd71"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "magnitude_squared",
+      "start": 617,
+      "end": 622,
+      "role": "ordered-component-magnitude-square",
+      "helpers": [],
+      "range_sha256": "b60a124e9924e37b3ba422d82645797a0f868afaad795f7077f025d81dc85a4c"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "magnitude_squared",
+      "start": 1150,
+      "end": 1157,
+      "role": "magnitude-square-forwarder",
+      "helpers": [
+        "Vector3::magnitude_squared"
+      ],
+      "range_sha256": "b81c9a23dc997c6a11f3abfdd85a660e74a5bc25a968e486097aecead6b49ea4"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator -",
+      "start": 1435,
+      "end": 1442,
+      "role": "ordered-component-vector-subtraction",
+      "helpers": [],
+      "range_sha256": "6c48ab195f4d5e8a25750033bb61b2c20def79edda3fb3dc0230e6a832077faf"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator *",
+      "start": 1471,
+      "end": 1487,
+      "role": "scalar-vector-multiplication",
+      "helpers": [],
+      "range_sha256": "550ac57642602a0fece5eb42316179ddef1d85656f0a593024a3fb6a88d55e8c"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "cen",
+      "start": 1683,
+      "end": 1695,
+      "role": "binary64-sum-then-extended-product-cast",
+      "helpers": [],
+      "range_sha256": "29d340825df98656c1181e6f679c097cb0847101ae10f7fd6cead131f3453378"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "dot",
+      "start": 1728,
+      "end": 1748,
+      "role": "ordered-dot-and-cross",
+      "helpers": [],
+      "range_sha256": "8a91d21d43d4a123453141a3365751afdf25f9eb756880fa74ca6926614421f3"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "symbol": "mod",
+      "start": 725,
+      "end": 732,
+      "role": "double-mod-is-fmod",
+      "helpers": [],
+      "range_sha256": "a3a31544e3926ebfe1ca7cdb114a47f318e4e15f1625dffa02ecd35a30f77e27"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.cc",
+      "symbol": "Centroid",
+      "start": 594,
+      "end": 659,
+      "role": "SRC05-height-operand-context-only",
+      "helpers": [],
+      "range_sha256": "1ce95320e0a15416138eb7811ae8e5de6e99db7de044425f05a8646abaf5cca5"
+    },
+    {
+      "path": "src/EnergyPlus/SolarShading.cc",
+      "symbol": "OutNormVec",
+      "start": 2708,
+      "end": 2718,
+      "role": "current-SOLCOS-incidence-operand-context-only",
+      "helpers": [],
+      "range_sha256": "380c6f9e97b882b1a98ddd07d6f2b927e3027e5d7feb619490840837a26664f8"
+    },
+    {
+      "path": "src/EnergyPlus/SolarShading.cc",
+      "symbol": "SurfSunCosTheta",
+      "start": 5095,
+      "end": 5111,
+      "role": "shadowing-SUNCOS-incidence-operand-context-only",
+      "helpers": [],
+      "range_sha256": "ca028451f39d1eb4063d43f09870969ae1cf080d206451df84bf1aa00769f064"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "SetupZoneGeometry",
+      "start": 1815,
+      "end": 1823,
+      "role": "input-initialization-caller",
+      "helpers": [],
+      "range_sha256": "797274f1ace445f64bb35feb0d0259208765a427d3e7c0c686c971ee7785944c"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "BeginZoneTimestepBeforeInitHeatBalance",
+      "start": 147,
+      "end": 198,
+      "role": "public-callback-after-geometry",
+      "helpers": [],
+      "range_sha256": "28559b95d4808475145055151bff07cb22ae6af0da2985220ea6d71f44163f31"
+    },
+    {
+      "path": "src/EnergyPlus/ConvectionCoefficients.cc",
+      "symbol": "GetSurfConvOrientation",
+      "start": 6596,
+      "end": 6614,
+      "role": "source-orientation-field-context-unpaired",
+      "helpers": [],
+      "range_sha256": "15dfb6ccdb7d791062529845961c3b7ef3e836a14f7c3832cb1387c9aff85870"
+    },
+    {
+      "path": "src/EnergyPlus/ConvectionCoefficients.hh",
+      "symbol": "GetSurfConvOrientation",
+      "start": 745,
+      "end": 745,
+      "role": "orientation-declaration",
+      "helpers": [],
+      "range_sha256": "8ec9f67766c16b4b4d5bc065cecf897d2deaf7331dfadb61eec51878d2c03936"
+    },
+    {
+      "path": "src/EnergyPlus/CMakeLists.txt",
+      "symbol": "EP_psych_errors",
+      "start": 25,
+      "end": 45,
+      "role": "same-directory-and-target-definitions",
+      "helpers": [],
+      "range_sha256": "0ff1e44c4e3297eb76be103e9f15039061d8a016cfe95ee2769b75864a3b2ac6"
+    }
+  ],
+  "primary_producers": [
+    "SurfaceGeometry::GetVertices selected opaque planar quad geometry",
+    "SurfaceGeometry::CalcSurfaceCentroid selected quad centroid"
+  ],
+  "card_name_correction": "ProcessSurfaceVertices consumes existing geometry and produces shape/shading coordinates; it is not the primary area/normal/angle producer",
+  "call_order": [
+    "SetupZoneGeometry source trig initialization",
+    "GetSurfaceData -> GetVertices",
+    "GetSurfaceData -> CalcSurfaceCentroid",
+    "SetupZoneGeometry deallocates zone trig arrays",
+    "SetupZoneGeometry -> ProcessSurfaceVertices"
+  ],
+  "geometry_fields": [
+    "NewellAreaVector",
+    "NewellSurfaceNormalVector",
+    "GrossArea",
+    "Area",
+    "NetAreaShadowCalc",
+    "Azimuth",
+    "Tilt",
+    "lcsx/lcsy/lcsz",
+    "SinAzim/CosAzim/SinTilt/CosTilt",
+    "OutNormVec",
+    "Centroid"
+  ],
+  "normal_policy": "Newell cyclic normalized vector is separate from independently component-snapped OutNormVec; source snap order +1, -1, zero at strict1e-6 without renormalization",
+  "centroid_policy": "Quad123/134 area fractions against own GrossArea; >1.05 switches124/234 with own recomputed total; <=0 warns and continues retaining prior centroid",
+  "cen_precision_policy": "Original cen3 sums each component in T=f64; third is long double initialized from DOUBLE 1.0/3.0; one extended multiplication then T cast. Unchanged whole-header outputs are authoritative; no copied cen numerical implementation",
+  "valid_helper_input_boundary": "raw World/UpperLeft/CounterClockWise/AppG0 quads with finite positive geometric zero only; actual original post-GetVertices ordered vertex bits MUST equal raw request bits before any Rust baseline or numerical comparison. Rust independently stores its own request bits. Any failure requires an independently executed compiler route at unchanged inputs/tolerances, never native-output injection",
+  "valid_helper_inactive_predicates": [
+    "Sides remains four",
+    "zero coincident/degenerate cleanup counters",
+    "absent/inactive aspect transform",
+    "no roof/floor automatic reversal",
+    "same retained vertex order/bits",
+    "ProcessSurfaceVertices second call early-return retains first-call owned fields"
+  ],
+  "state_contract": {
+    "constructor": "actual fresh EnergyPlusData and newly allocated real SurfaceData defaults; quantities/normals/centroid zero and VerticesProcessedfalse; ProcessOneTime true, X/Y/Zpsv unallocated; Triangle arrays declaredsize3",
+    "clear_state": "ProcessOneTime true and X/Y/Zpsv deallocated; Triangle1/2 are not reset by selected clear_state body; no invented default or reset element values",
+    "unwritten_buffer_policy": "nondebug Vector3 default construction can leave components uninitialized: observe only allocation/dimensions for Triangle or Vertex buffers before actual source assignments; never read unwritten element values or assume zero. Written buffers may be copied after actual producer calls",
+    "native_only_unpaired": [
+      "true global maxcounter",
+      "scratch arrays and Triangle buffers",
+      "source shape/shade arrays/local shifts",
+      "oneTime/processed lifecycle without matching Rust global"
+    ],
+    "retention": "read-only first initialized / first physical / final weather / before stateDelete field snapshots; no observer recomputation"
+  },
+  "references": {
+    "native_initializer": "same-GCC original dynamic API parses unchanged IDFs; DLL owns state; const reads only",
+    "valid_helper": "same-GCC genuine core state, declared input allocations/GGR/class/vertices; byte-exact source Setup273-289 fragment, original GetVertices->ownedSurface->CalcSurfaceCentroid->ProcessSurfaceVertices twice; not whole Setup or original parser admission",
+    "unsafe_helper": "genuine PlaneEquation/normalizer/area and CalcSurfaceCentroid only; explicitly bypass GetVertices/Process, source-only diagnostics",
+    "invalid_native_input": "two input-only A24 wall-vertex patches execute ordinary original API in fresh lifetimes; preserve actual nonzero exit, geometry error logs and only available constructor/phase snapshots. No successful-field or physical-hook fabrication, no error-message parity claim; separate from unsafe prepared helper warning/centroid retention",
+    "native_core_build": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+    },
+    "ABI": "actual inherited project_options/project_fp_options/project_warnings and original directory+target definitions, GCC13/O0 assertions/Werror/no contraction; same compiler-owned state",
+    "precision_observation": "read-only sizeof types, FLT/DBL/LDBL_MANT_DIG, FE rounding, GNU x64 fstcw x87 control word including PC24/53/64/reserved and RC, and stmxcsr rounding mode. Capture before/after unchanged-header cen and initialized/final centroid lifetimes. Never write control state or infer actual x87 precision solely from LDBL_MANT_DIG. Optional third literal diagnostic labeled replica, not original private-local state"
+  },
+  "consumer_scope": "pair actual geometry operands used for centroid-height and current/period normal-angle consumers; no SRC04 solar-clock or SRC05 lapse/wind physics closure",
+  "excluded": [
+    "CON input expansion",
+    "triangle/5+ production",
+    "fenestration/net subtraction/multipliers",
+    "IntMass/shading/air-boundary/complex window branches",
+    "active aspect/AppendixG transformations",
+    "roof/floor automatic reorientation",
+    "whole physics or GEO03 volume closure"
+  ],
+  "comparison_run": false,
+  "gates_updated": false
+}

@@ -1,0 +1,8321 @@
+{
+  "schema": "geo02-helper-cases.v1",
+  "cases": [
+    {
+      "case_id": "ROOF-HORIZONTAL",
+      "kind": "valid_quad",
+      "surface_class": "Roof",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          0,
+          2
+        ],
+        [
+          3,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "horizontal positive normal",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "4000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "4000000000000000",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "FLOOR-HORIZONTAL",
+      "kind": "valid_quad",
+      "surface_class": "Floor",
+      "vertices_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          3,
+          2,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "horizontal negative normal",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "4000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "4000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "WALL-VERTICAL",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "vertical negative-Y normal",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "WALL-REVERSED",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          0,
+          2
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "reversed-wall normal, no roof/floor repair",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "ROOF-SLOPED",
+      "kind": "valid_quad",
+      "surface_class": "Roof",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2.0
+        ],
+        [
+          3,
+          0,
+          2.6
+        ],
+        [
+          3,
+          2,
+          2.8000000000000003
+        ],
+        [
+          0,
+          2,
+          2.2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "nonzero oblique normal",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "4004cccccccccccd"
+        ],
+        [
+          "4008000000000000",
+          "4000000000000000",
+          "4006666666666667"
+        ],
+        [
+          "0000000000000000",
+          "4000000000000000",
+          "400199999999999a"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "WALL-TRAPEZOID",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "unequal triangle areas, convex centroid weighting",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4010000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "WALL-TRANSLATED-TRAPEZOID",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          3.125,
+          -4.75,
+          3.5
+        ],
+        [
+          3.125,
+          -4.75,
+          1.5
+        ],
+        [
+          7.125,
+          -4.75,
+          1.5
+        ],
+        [
+          5.125,
+          -4.75,
+          3.5
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "nonzero centroid XYZ",
+      "input_vertex_bits": [
+        [
+          "4009000000000000",
+          "c013000000000000",
+          "400c000000000000"
+        ],
+        [
+          "4009000000000000",
+          "c013000000000000",
+          "3ff8000000000000"
+        ],
+        [
+          "401c800000000000",
+          "c013000000000000",
+          "3ff8000000000000"
+        ],
+        [
+          "4014800000000000",
+          "c013000000000000",
+          "400c000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "WALL-NEGATIVE-Z",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          -2
+        ],
+        [
+          0,
+          0,
+          -4
+        ],
+        [
+          4,
+          0,
+          -4
+        ],
+        [
+          2,
+          0,
+          -2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source negative-Z centroid warning diagnostic",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "c000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "c010000000000000"
+        ],
+        [
+          "4010000000000000",
+          "0000000000000000",
+          "c010000000000000"
+        ],
+        [
+          "4000000000000000",
+          "0000000000000000",
+          "c000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "QUAD-CONCAVE-ALTERNATE",
+      "kind": "valid_quad",
+      "surface_class": "Roof",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0.5,
+          0.5,
+          2
+        ],
+        [
+          3,
+          0,
+          2
+        ],
+        [
+          0,
+          3,
+          2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source >1.05 alternate split candidate, diagnostic only",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "3fe0000000000000",
+          "3fe0000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "4008000000000000",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "AZ180-BELOW",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          1e-08,
+          0
+        ],
+        [
+          3,
+          1e-08,
+          2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source angle cleanup strict-threshold candidate",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3e45798ee2308c3a",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3e45798ee2308c3a",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "AZ180-ABOVE",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          1e-07,
+          0
+        ],
+        [
+          3,
+          1e-07,
+          2
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source angle cleanup strict-threshold candidate",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3e7ad7f29abcaf48",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3e7ad7f29abcaf48",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "AZ360-BELOW",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          1e-05,
+          2
+        ],
+        [
+          3,
+          1e-05,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source angle cleanup strict-threshold candidate",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3ee4f8b588e368f1",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3ee4f8b588e368f1",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "AZ360-ABOVE",
+      "kind": "valid_quad",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          0.0001,
+          2
+        ],
+        [
+          3,
+          0.0001,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source angle cleanup strict-threshold candidate",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3f1a36e2eb1c432d",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "3f1a36e2eb1c432d",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "HORIZONTAL-EPS-BELOW",
+      "kind": "valid_quad",
+      "surface_class": "Roof",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2.0
+        ],
+        [
+          3,
+          0,
+          2.00000003
+        ],
+        [
+          3,
+          2,
+          2.00000003
+        ],
+        [
+          0,
+          2,
+          2.0
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source near-horizontal epsilon branch candidate",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "400000000406caca"
+        ],
+        [
+          "4008000000000000",
+          "4000000000000000",
+          "400000000406caca"
+        ],
+        [
+          "0000000000000000",
+          "4000000000000000",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "HORIZONTAL-EPS-ABOVE",
+      "kind": "valid_quad",
+      "surface_class": "Roof",
+      "vertices_m": [
+        [
+          0,
+          0,
+          2.0
+        ],
+        [
+          3,
+          0,
+          2.00000006
+        ],
+        [
+          3,
+          2,
+          2.00000006
+        ],
+        [
+          0,
+          2,
+          2.0
+        ]
+      ],
+      "initial_centroid_m": [
+        0,
+        0,
+        0
+      ],
+      "branch_intent": "source near-horizontal epsilon branch candidate",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "4000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "40000000080d9595"
+        ],
+        [
+          "4008000000000000",
+          "4000000000000000",
+          "40000000080d9595"
+        ],
+        [
+          "0000000000000000",
+          "4000000000000000",
+          "4000000000000000"
+        ]
+      ],
+      "required_kernel_input_identity": "original post-GetVertices ordered bits and Rust own stored input bits must equal input_vertex_bits before numerical comparison"
+    },
+    {
+      "case_id": "DEGENERATE-COLLINEAR",
+      "kind": "source_only_degenerate",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "initial_centroid_m": [
+        17,
+        -23,
+        31
+      ],
+      "branch_intent": "PlaneEquation exact-zero error and CalcSurfaceCentroid zeroGross warning/retention; not full parser rejection",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "3ff0000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "4008000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ]
+      ]
+    },
+    {
+      "case_id": "DEGENERATE-COINCIDENT",
+      "kind": "source_only_degenerate",
+      "surface_class": "Wall",
+      "vertices_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "initial_centroid_m": [
+        17,
+        -23,
+        31
+      ],
+      "branch_intent": "PlaneEquation exact-zero error and CalcSurfaceCentroid zeroGross warning/retention; not full parser rejection",
+      "input_vertex_bits": [
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ],
+        [
+          "0000000000000000",
+          "0000000000000000",
+          "0000000000000000"
+        ]
+      ]
+    }
+  ],
+  "cen_calls": [
+    {
+      "case_id": "CEN-000",
+      "x_operands": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-001",
+      "x_operands": [
+        -0.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "8000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-002",
+      "x_operands": [
+        5e-324,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "0000000000000001",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-003",
+      "x_operands": [
+        -5e-324,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "8000000000000001",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-004",
+      "x_operands": [
+        2.2250738585072014e-308,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "0010000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-005",
+      "x_operands": [
+        -2.2250738585072014e-308,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "8010000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-006",
+      "x_operands": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ff0000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-007",
+      "x_operands": [
+        2.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-008",
+      "x_operands": [
+        3.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4008000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-009",
+      "x_operands": [
+        4.572,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "401249ba5e353f7d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-010",
+      "x_operands": [
+        15.24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "402e7ae147ae147b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-011",
+      "x_operands": [
+        -3759883246314.033,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c28b5b540ad75044",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-012",
+      "x_operands": [
+        1.1320977536873079e+19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43e3a38622d66fe4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-013",
+      "x_operands": [
+        2.0055187135969819e+37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "47ae2cfa2282ba3b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-014",
+      "x_operands": [
+        -9.082346741497531e+25,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c552c8278230518f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-015",
+      "x_operands": [
+        2.646954166418641e-49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35d8c2322ec9b2ec",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-016",
+      "x_operands": [
+        -1.3885009163344282e+44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c918e7aefbb71a89",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-017",
+      "x_operands": [
+        -1.9261983017527947e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5327306452ff6fc",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-018",
+      "x_operands": [
+        2.5296136376330594e+37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "47b307dbd0a59611",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-019",
+      "x_operands": [
+        1.1663187036567534e-50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "359174720e59797d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-020",
+      "x_operands": [
+        -1.4977949756222904e-57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b422cdba3aaa34cf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-021",
+      "x_operands": [
+        6.791055859036184e-26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ab5046dc407b366",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-022",
+      "x_operands": [
+        -6.195373893998412e-39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b800dd8ba30fa580",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-023",
+      "x_operands": [
+        -8.087098792993308,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c0202c983686dacb",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-024",
+      "x_operands": [
+        1.8442495653330558e-16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3caa9414777805be",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-025",
+      "x_operands": [
+        -8.693130525359786e+22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c4b2688e354a5a35",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-026",
+      "x_operands": [
+        -2.4382525773268734e+34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c712c89af772e3c1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-027",
+      "x_operands": [
+        2.2532298354291267e+53,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4b02d1e1eed0d646",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-028",
+      "x_operands": [
+        3.2188099554221907e-50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35a81603cf24266a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-029",
+      "x_operands": [
+        -6.5229062589248295e-31,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9aa75c5ec32b4a6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-030",
+      "x_operands": [
+        -2.1603724310620385e+26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c56656754d4d384f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-031",
+      "x_operands": [
+        -5.16309497299929e-42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b75cc903f06e51ff",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-032",
+      "x_operands": [
+        8.823800992971823e+41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "48a4422a031d129c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-033",
+      "x_operands": [
+        5.1048286664702025e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "389b24552d7e0fb9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-034",
+      "x_operands": [
+        -2.845058207150971e-09,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "be287059629c3de6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-035",
+      "x_operands": [
+        1.6635394659805928e-59,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "33babb6788d0bc1d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-036",
+      "x_operands": [
+        -2.410400105271586e-29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9fe8e321027ba25",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-037",
+      "x_operands": [
+        -7.272458002158006e+33,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c6f668f5328fdc11",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-038",
+      "x_operands": [
+        3.9461949038889306e+57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4be41e064f4de7e9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-039",
+      "x_operands": [
+        1127806203783577.5,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "431006ef609ba666",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-040",
+      "x_operands": [
+        5.578912488462523e+36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4790c9d67d2bc8aa",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-041",
+      "x_operands": [
+        6.879762249823495e+19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "440dd6120940f5bb",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-042",
+      "x_operands": [
+        -1.9850029948503312e-58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b3f3efa496f87a90",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-043",
+      "x_operands": [
+        1.9899832919864662e-23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b380eb332532e65",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-044",
+      "x_operands": [
+        -5.823410733770549e-58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b40d3e49c7c2b179",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-045",
+      "x_operands": [
+        1.3289975977454522e-54,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "34c04b2066784a5b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-046",
+      "x_operands": [
+        -3.733084427622641e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6810cba29f34c0f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-047",
+      "x_operands": [
+        -8.834058208328753e+22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c4b2b4f3da5c4957",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-048",
+      "x_operands": [
+        1.1223955293407144e+25,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "45229187abda4405",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-049",
+      "x_operands": [
+        -2.3500403658446668e-30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9c7d50db90651cd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-050",
+      "x_operands": [
+        -7.258196468225167e+22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c4aebd5a35858e2e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-051",
+      "x_operands": [
+        -2.4143986671747397e+43,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c8f1528ccc2cceb2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-052",
+      "x_operands": [
+        4.972604722411537e+53,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4b14c43db00f7baf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-053",
+      "x_operands": [
+        2.864711350871784e-26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3aa1bb50faf46e98",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-054",
+      "x_operands": [
+        -8.361932908196081e+27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5bb04d42b432045",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-055",
+      "x_operands": [
+        63.10220639365301,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "404f8d15195f1745",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-056",
+      "x_operands": [
+        3.269470973310346e-17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3c82d8e33616d82b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-057",
+      "x_operands": [
+        7.77911834101421e-13,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d6b5ece907f9f5b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-058",
+      "x_operands": [
+        -6486565829858981.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c3370b7f4c19d6a5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-059",
+      "x_operands": [
+        3.163782200993969e-40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "37bb8f7856b0ec48",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-060",
+      "x_operands": [
+        4.472407175495418e+31,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4681a3fa288f9f90",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-061",
+      "x_operands": [
+        8.504230168327615e+23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44e682b0c59564af",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-062",
+      "x_operands": [
+        8.091714574392419e+51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4ab5a093669e85a6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-063",
+      "x_operands": [
+        4.3613227245688914e-14,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d288d54151c112d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-064",
+      "x_operands": [
+        5.542021019810894e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3832dbc7fc89c24f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-065",
+      "x_operands": [
+        4.5951079718597484e+18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43cfe28d2d5fa20b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-066",
+      "x_operands": [
+        0.4835780669927709,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3fdef2f16bb2ff8f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-067",
+      "x_operands": [
+        3.912365884412392e-40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "37c10a6f094b99b0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-068",
+      "x_operands": [
+        358580787.5600969,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41b55f82338f6283",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-069",
+      "x_operands": [
+        -0.25604277981887724,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bfd06301416cbc86",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-070",
+      "x_operands": [
+        4.451842195806657e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3684551987af847f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-071",
+      "x_operands": [
+        -8.00864010997871e+44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c941f4bbe6a024b7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-072",
+      "x_operands": [
+        4.096751940539893e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35439e9a6f8ea93e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-073",
+      "x_operands": [
+        -4.470073946430079e-56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b47189751a043bec",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-074",
+      "x_operands": [
+        -4.7153570840587326e+27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5ae78e76775489b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-075",
+      "x_operands": [
+        9.56039853842857e+30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "465e2ad4146ee4ca",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-076",
+      "x_operands": [
+        -3.538759735250271e-32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b966f7c5ec604b83",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-077",
+      "x_operands": [
+        7.628254380525798e+53,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4b1fdb6961720bd4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-078",
+      "x_operands": [
+        1.027041640086626e-08,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3e460e389bce9ac3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-079",
+      "x_operands": [
+        -1.1782998515744306e-17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc6b2b74646bd736",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-080",
+      "x_operands": [
+        -1.821448077810886e+44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c92055d6f6800d18",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-081",
+      "x_operands": [
+        7.584692476824043e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "36262b8a6cc94b02",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-082",
+      "x_operands": [
+        -5.129337558674152e-31,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9a4ce9bd10a5914",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-083",
+      "x_operands": [
+        -1.74214374993489e-12,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bd7ea5eafe5088a6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-084",
+      "x_operands": [
+        -7.675426685975938e-27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ba8300e12ef4c037",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-085",
+      "x_operands": [
+        -3892430625104443.5,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c32ba84a4171c477",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-086",
+      "x_operands": [
+        -3.30293158237268e+20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c431e7bd0572da3f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-087",
+      "x_operands": [
+        4.6362858406078787e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "361b1a8fd81f504b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-088",
+      "x_operands": [
+        -7.490958892868418e+49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca49a0ab12241c2b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-089",
+      "x_operands": [
+        8.696813219919321e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "38dce66e33243ed3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-090",
+      "x_operands": [
+        8.53363390768459e+20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44472165e54ba26e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-091",
+      "x_operands": [
+        2.836874948952426e+34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4715dabfd5706eaa",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-092",
+      "x_operands": [
+        3.0496795217487016e+32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "46ae127932fa64f7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-093",
+      "x_operands": [
+        5395.494772213975,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "40b5137ea9644dfe",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-094",
+      "x_operands": [
+        -8.562965141417992e+37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c7d01aeaf1503ae5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-095",
+      "x_operands": [
+        -6.636370208501881e-45,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6c2f188704083d0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-096",
+      "x_operands": [
+        -3.92999395280972e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b616f98a8d54f6d7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-097",
+      "x_operands": [
+        1.605653999450627e+23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44c10022465d0afa",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-098",
+      "x_operands": [
+        -3.1950809371791544e+38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c7ee0be0a8124e6f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-099",
+      "x_operands": [
+        -32104461531665.2,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c2bd32e7067a1133",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-100",
+      "x_operands": [
+        3.355629106642104e+44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "492e18258776c9d1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-101",
+      "x_operands": [
+        1672603811.8193364,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41d8ec7a28f47002",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-102",
+      "x_operands": [
+        5.655637901634371e+49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a435945df7dd862",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-103",
+      "x_operands": [
+        -0.0022221166154134187,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf62341dc61d7b52",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-104",
+      "x_operands": [
+        -4.896852050415942e-16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bcc1a48c7fedd524",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-105",
+      "x_operands": [
+        -7.322095925729296e-45,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6c4e6a0a9dfc78e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-106",
+      "x_operands": [
+        -20597.575229253158,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c0d41d64d08e5b81",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-107",
+      "x_operands": [
+        1.5313890691210595e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "352d55e8ff258776",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-108",
+      "x_operands": [
+        2.8031107143883633e+20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "442e6431f4a4d1f8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-109",
+      "x_operands": [
+        -2.140360992096886e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b886c29de8f0e65b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-110",
+      "x_operands": [
+        0.048727842221498,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3fa8f2db117df157",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-111",
+      "x_operands": [
+        -1.0328333646602216e+26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5555bc638e3bf75",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-112",
+      "x_operands": [
+        -3.3844743839908652e-43,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b71e30c5f105054b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-113",
+      "x_operands": [
+        -150664048.02585986,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c1a1f5e6e00d3d81",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-114",
+      "x_operands": [
+        2.0084376871220437e+56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4ba061d0464667ba",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-115",
+      "x_operands": [
+        -8268296.754777421,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c15f8a82304e45f5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-116",
+      "x_operands": [
+        2.3272607216140994e+24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44fecd10e77d043e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-117",
+      "x_operands": [
+        3.5087879934101356e-15,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3cef9ab6da1931b6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-118",
+      "x_operands": [
+        -1.9636699746379165e+21,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c45a9cd94b7dae55",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-119",
+      "x_operands": [
+        -4.27051497733333e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b82d104953d86049",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-120",
+      "x_operands": [
+        4.114532201853855e+41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4892e49bfefce2c9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-121",
+      "x_operands": [
+        -63.349242326121924,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c04facb3f8f8894c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-122",
+      "x_operands": [
+        -1.415411469520625e-11,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bdaf200ee6beab5e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-123",
+      "x_operands": [
+        -1.330484768473838e+50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca56c24502a2c188",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-124",
+      "x_operands": [
+        -1579.6491248741538,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c098ae98b430e60b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-125",
+      "x_operands": [
+        -8.483347448438672e+33,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c6fa242e5fae6507",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-126",
+      "x_operands": [
+        -129610642672224.2,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c2dd78551432980d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-127",
+      "x_operands": [
+        1.3778509100847102e+51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a8d761c5d475e7d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-128",
+      "x_operands": [
+        -2.8915381768273172e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b88ebf8400e7ef81",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-129",
+      "x_operands": [
+        1.1227427953034789e-37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "38431a3c0cd1e01e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-130",
+      "x_operands": [
+        -4.627410954025534e-57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b43d0bf6740f845e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-131",
+      "x_operands": [
+        -1.0320987237742755e+52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cabb95e7f2214cd6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-132",
+      "x_operands": [
+        -6.618757589141829e+48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca121d6d6b92fbcf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-133",
+      "x_operands": [
+        5.684392826609924e+57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4becfa7a9172cdf8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-134",
+      "x_operands": [
+        -1.032615143474069e+17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c376edbccd9a5663",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-135",
+      "x_operands": [
+        774927351862081.9,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43060656ac469a0f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-136",
+      "x_operands": [
+        -0.007245582209148833,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf7dad8b2a0f74fb",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-137",
+      "x_operands": [
+        4.2171769532026103e-45,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "36b8136938bd34d2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-138",
+      "x_operands": [
+        -2.9634802240338184e-49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5dbb820176d3a3b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-139",
+      "x_operands": [
+        -4.1246762397999925e+21,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c46bf32c36540e8f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-140",
+      "x_operands": [
+        8.539239248769987e-17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3c989cd8b04ee552",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-141",
+      "x_operands": [
+        -6581760918363.023,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c297f1be160d6c18",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-142",
+      "x_operands": [
+        -1.869238256412815e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b605daeba57970c0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-143",
+      "x_operands": [
+        -1.1371039533899638e-15,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bcd47bf76635b221",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-144",
+      "x_operands": [
+        -4.89435808144465e-39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7faa5bd51db7105",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-145",
+      "x_operands": [
+        -6.751111411503239e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8a1f2917eca26a7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-146",
+      "x_operands": [
+        -3.3945954346183944e+57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cbe14e275c3efb2a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-147",
+      "x_operands": [
+        1.1829684262610113e-60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "337e6a51dae50c5c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-148",
+      "x_operands": [
+        -1.5312647896907053e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8b45a9fc3105144",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-149",
+      "x_operands": [
+        4.164101187566369e+27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "45aae8ed7366a0e6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-150",
+      "x_operands": [
+        1.1614467047337844e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "38aee0658c7a9427",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-151",
+      "x_operands": [
+        -1.8522907278212528e+24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c4f883ce1add88cf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-152",
+      "x_operands": [
+        12556068885.984432,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4207633340afe01e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-153",
+      "x_operands": [
+        1.010652731516181e-47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "362d8a9a0169785e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-154",
+      "x_operands": [
+        -2.1426878439430524e+44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c923375eba627d2e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-155",
+      "x_operands": [
+        -9.204155134830956e-55,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b4b6918ab4843254",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-156",
+      "x_operands": [
+        -1.2216690285090575e+50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca54e5c258cb2f30",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-157",
+      "x_operands": [
+        5.825731055888034e-45,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "36c0a128618b756e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-158",
+      "x_operands": [
+        -7.799696604179079e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8a4bc32cd30f804",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-159",
+      "x_operands": [
+        -9.37692818812381e-29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ba1db777ca7c18f4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-160",
+      "x_operands": [
+        -5.465919723378784e+25,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5469b44827a5dc5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-161",
+      "x_operands": [
+        7830500066.841856,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41fd2bbf2e2d783e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-162",
+      "x_operands": [
+        -1.207686496817206e-05,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bee953b7aeb4ed4e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-163",
+      "x_operands": [
+        1.625598942489116e+39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "48131bdbdf531714",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-164",
+      "x_operands": [
+        -1.3470328595497186e-08,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "be4ced6436bef43a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-165",
+      "x_operands": [
+        1453.1787159111886,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4096b4b7014dc752",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-166",
+      "x_operands": [
+        -1.6507598143643338e-30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9c0bd9e146cc85c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-167",
+      "x_operands": [
+        -2.290621552705921e+39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c81aed16a7e586cc",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-168",
+      "x_operands": [
+        5.468483302656098e-06,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ed6efbd3e907ec1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-169",
+      "x_operands": [
+        4.1051503721019353e-16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3cbd94aa73d2ce7c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-170",
+      "x_operands": [
+        2.541087712068659e-20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3bddfff7638974e0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-171",
+      "x_operands": [
+        -1.3377775840612534e+42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c8aeb6bffd9d5e09",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-172",
+      "x_operands": [
+        4.325872167862875e-12,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d93067fc31ac6f5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-173",
+      "x_operands": [
+        -7.538764094437394e+48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca14a2077e83ee38",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-174",
+      "x_operands": [
+        1.545121218080397e-51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35627fc8628a67e4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-175",
+      "x_operands": [
+        -8.842406154078446e-09,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "be42fd2a087c0a2b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-176",
+      "x_operands": [
+        -1.959123372816551e-55,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b493370bf3d518ff",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-177",
+      "x_operands": [
+        -110749902967.426,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c239c93568776d0e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-178",
+      "x_operands": [
+        -8.723096582747757e-40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7d2ff49f2750054",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-179",
+      "x_operands": [
+        4.7489084752343364e-57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "343dcf33a2737f54",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-180",
+      "x_operands": [
+        -6.1617875411078076e-15,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bcfbc00eaf56ccaa",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-181",
+      "x_operands": [
+        -2.165223281991546e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5d17d93a9480bb3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-182",
+      "x_operands": [
+        5.928978848053533e+16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "436a5477f3a61764",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-183",
+      "x_operands": [
+        -27435060463.002235,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c2198d0733bc024a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-184",
+      "x_operands": [
+        2.065402152849692e+36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4778dc83030ea8ce",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-185",
+      "x_operands": [
+        3.006001403378518e+39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4821aaed9f85461f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-186",
+      "x_operands": [
+        -146287.91970476005,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c101db7f5b8e2b53",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-187",
+      "x_operands": [
+        -5.179048120656996e-41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7920bdd845383c5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-188",
+      "x_operands": [
+        -2.8842814605677837e+38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c7eb1fa7b0c77582",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-189",
+      "x_operands": [
+        -1.8125984234258536e+48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9f3d7fb9719dbe9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-190",
+      "x_operands": [
+        2.014267270404921e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3672662af900321e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-191",
+      "x_operands": [
+        4.742640858098677e-55,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "34a74202014975fa",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-192",
+      "x_operands": [
+        -2.5375292341125532e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5d47f7cca8bd991",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-193",
+      "x_operands": [
+        -3138.1660012763905,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c0a88454fe1e8a62",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-194",
+      "x_operands": [
+        -2.9741626542137826e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8243db8dee06ff6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-195",
+      "x_operands": [
+        2.0084729014283712e-11,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3db615593fea92a9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-196",
+      "x_operands": [
+        1.5382889456656655e+60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c6ea208befccdcc",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-197",
+      "x_operands": [
+        2038.1670213606756,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "409fd8ab07a5c757",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-198",
+      "x_operands": [
+        -2.6565638845345894e+49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca322d4c7203b919",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-199",
+      "x_operands": [
+        3.394544383743056e+36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "47846e1fad7cd82b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-200",
+      "x_operands": [
+        -3.8329453686621937e+18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c3ca98adc0a34b5b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-201",
+      "x_operands": [
+        1.0314685549993924e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "38ab6bcfac81bb0d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-202",
+      "x_operands": [
+        -1.546698211714308e-23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bb32b2cc92a1db3b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-203",
+      "x_operands": [
+        -3.4374924571040052e+16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c35e87f3f40f364d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-204",
+      "x_operands": [
+        9.128038504522357e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "38de5546c0211b61",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-205",
+      "x_operands": [
+        -6.2627799154984406e+57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cbefed4f24a5a117",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-206",
+      "x_operands": [
+        -2.941749200437271e-53,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5068a84b88c4f95",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-207",
+      "x_operands": [
+        -1.668567430227483e-18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc3ec7963f88124a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-208",
+      "x_operands": [
+        -3.184022561942795e+54,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cb409f125266d0ee",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-209",
+      "x_operands": [
+        2.4894288250975146e+58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c0fba23f8f5e6cf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-210",
+      "x_operands": [
+        -5.7258679545282154e+23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c4de4fff83205ec2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-211",
+      "x_operands": [
+        1.8363780823771657e+21,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4458e3376217eeff",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-212",
+      "x_operands": [
+        1.3137997849788955e-22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b63da8449339ee2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-213",
+      "x_operands": [
+        1.1386002865757131e+17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "437948317c24015f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-214",
+      "x_operands": [
+        2.8210015735408963e+60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c7c16956acdfe9d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-215",
+      "x_operands": [
+        -6.448697703011639e-55,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b4af9fd388f46220",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-216",
+      "x_operands": [
+        1.9579534834697046e+43,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "48ec18629b7102e4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-217",
+      "x_operands": [
+        1.06792020363173e-13,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d3e0f2d1199d9e1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-218",
+      "x_operands": [
+        -1.825371083344394e+27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c59797a572d4b212",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-219",
+      "x_operands": [
+        1.7144122370102887e-49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35d00933a4b3dff6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-220",
+      "x_operands": [
+        -7.429429524667089e-59,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b3ddd8b99f6185c9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-221",
+      "x_operands": [
+        423071021.5120317,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41b9378d2d831482",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-222",
+      "x_operands": [
+        -2.3334276452107307e-11,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bdb9a803d1db722b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-223",
+      "x_operands": [
+        1.3428636304914823,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ff57c5e92ff2e0f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-224",
+      "x_operands": [
+        -2.9108222283443968e-18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc4ad8fc12f6b393",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-225",
+      "x_operands": [
+        9.902656982681038e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "362cf20c3565da34",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-226",
+      "x_operands": [
+        -1.6547144917725837e-41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7771037f63f1c80",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-227",
+      "x_operands": [
+        -3.5123582599099684e+56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cbaca62570f642b9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-228",
+      "x_operands": [
+        1.332609848322638e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "45c5878b8f28207c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-229",
+      "x_operands": [
+        -3.979006424693014e-07,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "be9ab3e18849ef3c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-230",
+      "x_operands": [
+        -1.1834711397723089e+29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5f7e667030133e2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-231",
+      "x_operands": [
+        1.9412860663240705e-24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b02c664393d8905",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-232",
+      "x_operands": [
+        -19807666.602313366,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c172e3db29a31357",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-233",
+      "x_operands": [
+        -1.9479486619053604e+40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c84c9f5e543c60b1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-234",
+      "x_operands": [
+        -6.637275383897095e-24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bb200c4643fa1430",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-235",
+      "x_operands": [
+        -1.1561934250906996e-30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9b7734cab4eec18",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-236",
+      "x_operands": [
+        -3.390071169110003e-19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc1903a9d3a077c0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-237",
+      "x_operands": [
+        -8.604599412843311e-32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b97bec6be8bcc72f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-238",
+      "x_operands": [
+        -5.291485713529803e-51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b57fad2da27b9561",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-239",
+      "x_operands": [
+        -1.2788215894785352e-40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7a647bc21601a0b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-240",
+      "x_operands": [
+        -9.398275903770725e-27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ba8744dd739b38ff",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-241",
+      "x_operands": [
+        6.122783815551615e+58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c238220ea31d14e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-242",
+      "x_operands": [
+        5097221773320.355,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "42928b285f60216c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-243",
+      "x_operands": [
+        -0.025666052921048337,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf9a4833a7a73a2e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-244",
+      "x_operands": [
+        3.1397901073594445e-09,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3e2af878b1d73fda",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-245",
+      "x_operands": [
+        2076048262072777.2,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "431d809e9cca2725",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-246",
+      "x_operands": [
+        6.908423771558369e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "49de409c63c8da2b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-247",
+      "x_operands": [
+        -6.641490634541743e+59,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cc5a7385f0c2a15f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-248",
+      "x_operands": [
+        -1.1437193932329643e-23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bb2ba747b81a93dd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-249",
+      "x_operands": [
+        1.6730186898342748e-06,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ebc118f80c1f1ba",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-250",
+      "x_operands": [
+        -2.2859310263957486e+18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c3bfb94228395cd9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-251",
+      "x_operands": [
+        6.989187216744004e+48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a1320f7f9e53820",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-252",
+      "x_operands": [
+        -4.0993805168286642e-47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b64df4cd3cfcfa50",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-253",
+      "x_operands": [
+        1.0936373671708746e+39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4809b61729b997a4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-254",
+      "x_operands": [
+        2.4789176879737134e+18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43c13371406d8d8b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-255",
+      "x_operands": [
+        -1.567431791027585e-50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5977534a09f5450",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-256",
+      "x_operands": [
+        0.24352740936136974,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3fcf2be7f9717ef8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-257",
+      "x_operands": [
+        -45.44842541643087,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c046b96601092205",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-258",
+      "x_operands": [
+        8.501497738750067e-61,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3375dbb389011101",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-259",
+      "x_operands": [
+        1.406729854893764e+38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "47da75286ab17363",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-260",
+      "x_operands": [
+        -9.586126801957682e-57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b44e1627eadea945",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-261",
+      "x_operands": [
+        1.0311006622276565e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "380c11b90d27e557",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-262",
+      "x_operands": [
+        4.659137896596828e-60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "339df2a1f4d41f5d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-263",
+      "x_operands": [
+        1.0882501812650232e-58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "33e5dc008197c023",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-264",
+      "x_operands": [
+        -6.36388244563588e-42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b761bd6b13a68763",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-265",
+      "x_operands": [
+        -1.9903217682180793e-19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc0d5f39199672ad",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-266",
+      "x_operands": [
+        -1.6839579563997452e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b881e82b6a7c5508",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-267",
+      "x_operands": [
+        4.070269774369575e-47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "364dbe57f658efa2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-268",
+      "x_operands": [
+        -4.315603936896898e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b544aaea3f81f6fd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-269",
+      "x_operands": [
+        -2.4809967987883976e-44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6e1b479e1fcea50",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-270",
+      "x_operands": [
+        -1.2995024682444232e+42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c8add5c9ff478784",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-271",
+      "x_operands": [
+        -5.491325769990477e+52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cae258a59ebe698b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-272",
+      "x_operands": [
+        0.01350585068849934,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3f8ba8f498181798",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-273",
+      "x_operands": [
+        -1.2133364755634738e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5c39a3df6b0c1b7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-274",
+      "x_operands": [
+        1.7518871783350794e+21,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4457be1462b32df4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-275",
+      "x_operands": [
+        -8.103435240714553e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9e1be21ee5db6af",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-276",
+      "x_operands": [
+        1.5676023396108673e+50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a5ad09f003d4602",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-277",
+      "x_operands": [
+        8.111343673840627e-60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "33aa11a061b0fc0e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-278",
+      "x_operands": [
+        -2.3191644894817985e-51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b56bc437ee215e76",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-279",
+      "x_operands": [
+        -6.253175022859252e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8354748a0f0414a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-280",
+      "x_operands": [
+        2.5739571162275868e+60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c79a0e16318b348",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-281",
+      "x_operands": [
+        1.79413750973571e-27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3a61c4add1c7502e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-282",
+      "x_operands": [
+        2.541725981526285e-24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b0895023ba9150e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-283",
+      "x_operands": [
+        6.953372733123272e+41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "489feda67e72c4a4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-284",
+      "x_operands": [
+        2.4117748326248978e+35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4747397be6f1882d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-285",
+      "x_operands": [
+        -6.191470416074466e-18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc5c8d991ca1c07d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-286",
+      "x_operands": [
+        -1.4427962553817523e+45,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9502c9f479d3cbd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-287",
+      "x_operands": [
+        8.964623060767858e-08,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3e7810712ac28984",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-288",
+      "x_operands": [
+        8.295082519595513e-32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "397aeb48f22bed97",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-289",
+      "x_operands": [
+        1.3265298096346554e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "36683bebeb9e3f8c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-290",
+      "x_operands": [
+        -1.494473818241968e+51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca8ff47bddd160f3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-291",
+      "x_operands": [
+        -6.081021180438982e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8a02a874fc89ef2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-292",
+      "x_operands": [
+        3.570340812032976e-56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "346c03a54630f34f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-293",
+      "x_operands": [
+        1.6702984406443066e+46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "498767e6dc3ba169",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-294",
+      "x_operands": [
+        -0.0018838832168153418,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf5edd943390ac6b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-295",
+      "x_operands": [
+        -1.0335047862219027e-56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b45037f205b7f7f3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-296",
+      "x_operands": [
+        90944798.75685447,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4195aed47b0704dc",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-297",
+      "x_operands": [
+        -9.008808368568354e+42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c8d9daa08901bdd5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-298",
+      "x_operands": [
+        -1.039264504154891e-06,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "beb16f9b681a6bee",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-299",
+      "x_operands": [
+        8.523028353084917e+16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4372ecc7dc5f64b9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-300",
+      "x_operands": [
+        1497940995.153576,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41d6523100c9d430",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-301",
+      "x_operands": [
+        -8.243190124658342e+33,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c6f966bafd0b4b98",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-302",
+      "x_operands": [
+        -1.1731185529942925e-54,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b4bcc3c8d54ebb0f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-303",
+      "x_operands": [
+        -1.904907701747701e-14,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bd157285cb5905b9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-304",
+      "x_operands": [
+        787595276015.8108,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4266ec0ac5ddf9f2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-305",
+      "x_operands": [
+        -2.2519379980277678e-29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9fc8bf4e5147e81",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-306",
+      "x_operands": [
+        -1.0754592475420656e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b876df5b6a69d63c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-307",
+      "x_operands": [
+        2.79327016356854e-59,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "33c6716c692f0a90",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-308",
+      "x_operands": [
+        1.2587684916509964e-54,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "34bedd6afa67f085",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-309",
+      "x_operands": [
+        1.4962915323023408e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "366b55dd3437be24",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-310",
+      "x_operands": [
+        4.5216431304263544e-21,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3bb55a54c4c4d858",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-311",
+      "x_operands": [
+        -1.9989463497557443e+37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c7ae13a948a047e8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-312",
+      "x_operands": [
+        -3.5546998829276955e-50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5aa9973c013fd67",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-313",
+      "x_operands": [
+        9.068953272326331e-61,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "337751339a7a635d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-314",
+      "x_operands": [
+        -1.225935089400283e-44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6d17f43ee0be0db",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-315",
+      "x_operands": [
+        1.512644589713298e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "49ba7eeed480a1da",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-316",
+      "x_operands": [
+        3.579063122003832e-41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3788f14311089619",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-317",
+      "x_operands": [
+        -7.234594955310199e+34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c72bdddc85262175",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-318",
+      "x_operands": [
+        -9.463678393168024e-05,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf18cef791649077",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-319",
+      "x_operands": [
+        5.362128789369367e-18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3c58ba7bfc42a497",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-320",
+      "x_operands": [
+        4.452866999575734e-12,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d93957b87bde41e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-321",
+      "x_operands": [
+        -7.452568306232217e-47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b65b3ad793e45856",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-322",
+      "x_operands": [
+        -4.463534349628342e+50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca731684c4134566",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-323",
+      "x_operands": [
+        -1.2462519962130106e-42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b73bcad7553efa6c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-324",
+      "x_operands": [
+        -9.576450428865945e+20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c449f4ff52579c98",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-325",
+      "x_operands": [
+        -3.119194697955652e+34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c7180786e1c515a1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-326",
+      "x_operands": [
+        -15445812.512187857,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c16d75e69063d7ca",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-327",
+      "x_operands": [
+        2.5846412474400787e+57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4bda5a3a7a85a2e5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-328",
+      "x_operands": [
+        -6645541.914348811,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c15959c97a84b0e0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-329",
+      "x_operands": [
+        -0.02261721879847434,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf9728f7dc438181",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-330",
+      "x_operands": [
+        -5.627618587765946e-16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bcc4468fdeaf46c2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-331",
+      "x_operands": [
+        -0.0003711039494401881,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf3852175385e8cf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-332",
+      "x_operands": [
+        173395313146.38177,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "42442f9540fd30de",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-333",
+      "x_operands": [
+        4.874138006100324e+49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a40acd389553d3f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-334",
+      "x_operands": [
+        -2.465731727531232e+24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c500511cada53885",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-335",
+      "x_operands": [
+        2.1170986430317468e-29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "39fad660bdc8f3b4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-336",
+      "x_operands": [
+        -4.686431374964962e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5e2eda80e5f0f53",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-337",
+      "x_operands": [
+        -5.041936722328121e-39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7fb736f2370058d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-338",
+      "x_operands": [
+        -7.726756239370436e+26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c583f9236c0a26c6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-339",
+      "x_operands": [
+        -3.0407884570596152e-05,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "beffe28dea95430b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-340",
+      "x_operands": [
+        7.135631425788555e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3624db836aebcb4d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-341",
+      "x_operands": [
+        9.251903074262193,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "402280f970936f9b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-342",
+      "x_operands": [
+        1.7836981854982693e-34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "38eda3035452cf84",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-343",
+      "x_operands": [
+        4.822942173030237e-17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3c8bcd68098f0b1b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-344",
+      "x_operands": [
+        6.9075002209438365e+41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "489fb7ba3ca7b3cd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-345",
+      "x_operands": [
+        4.240918308470394e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35444f59c89fafea",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-346",
+      "x_operands": [
+        9.552812079146846e+22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44b43a96fd722a35",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-347",
+      "x_operands": [
+        -0.0008271313545754369,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bf4b1a7b0f06e321",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-348",
+      "x_operands": [
+        9.04123599890097e+19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44139ae4e98a06a7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-349",
+      "x_operands": [
+        -2.94006226369313e+32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c6acfdc2b4d85b6a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-350",
+      "x_operands": [
+        -5467759.725735035,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c154db9bee72715c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-351",
+      "x_operands": [
+        7.654951444567406e+17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43a53f2b8e6542be",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-352",
+      "x_operands": [
+        -5.3766452684473447e-17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bc8efe872708e7bb",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-353",
+      "x_operands": [
+        1.646937148530831e+27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4595494206e078b4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-354",
+      "x_operands": [
+        -4.1363354377932545e-49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5e358471f6f1545",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-355",
+      "x_operands": [
+        -8517615818894.546,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c29efca5dc623a2f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-356",
+      "x_operands": [
+        3.224424488786917e-07,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3e95a384e327959b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-357",
+      "x_operands": [
+        -1.2931908837872614e+17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c37cb6f06957dc70",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-358",
+      "x_operands": [
+        2.3431290942969042e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "35367155f86c6fc8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-359",
+      "x_operands": [
+        -6.851945035372669e-06,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bedcbd384f504517",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-360",
+      "x_operands": [
+        -9.354661766040917e+35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c766854163c7405d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-361",
+      "x_operands": [
+        -5.211023408361399e-11,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bdcca5dd0be1799d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-362",
+      "x_operands": [
+        -8.055497438505885e-07,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "beab079e9ec77c2e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-363",
+      "x_operands": [
+        3.2665115981890905e-23,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b43beae8f0c3956",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-364",
+      "x_operands": [
+        1.1129965479707735e-14,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d090ffcff7eb4a4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-365",
+      "x_operands": [
+        -8.852133450359524e+40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c8704240ce23e0cd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-366",
+      "x_operands": [
+        9.059160878531855e-51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "358b1d8fd3c6344c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-367",
+      "x_operands": [
+        1.066100222481102e-08,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3e46e4f2ad2d2b24",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-368",
+      "x_operands": [
+        -3.2039191650578377e-55,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b49f6c87d6bd3872",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-369",
+      "x_operands": [
+        1240135025985.9067,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "42720bdcec541e82",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-370",
+      "x_operands": [
+        -1.6059994876276002e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b52ec3cc6f25563f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-371",
+      "x_operands": [
+        2.143798577851004e+45,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4958086672cf7353",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-372",
+      "x_operands": [
+        1.059574183497571e-58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "33e5488b51765975",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-373",
+      "x_operands": [
+        1.9615491115102597e-56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "345ec83840624887",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-374",
+      "x_operands": [
+        -2384542176782059.0,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c320f174facc4dd6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-375",
+      "x_operands": [
+        -1.3931830448055122e-30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9bc41d1e80a60cd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-376",
+      "x_operands": [
+        -1.766678741471642e-34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8ed5a9ecbc3e74c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-377",
+      "x_operands": [
+        -1.516676582521673e-57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b4230a691d403382",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-378",
+      "x_operands": [
+        -3.0016074600764145e-24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bb0d079ebfcc1365",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-379",
+      "x_operands": [
+        -1.292103288693373e+43,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c8e28a7017ddf203",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-380",
+      "x_operands": [
+        -9.705025708841498e+58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cc2eec07ec80a927",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-381",
+      "x_operands": [
+        -1.8953810401164156e-31,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b98ec11ad53d01b5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-382",
+      "x_operands": [
+        22.62221348604995,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "40369f49620db6f6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-383",
+      "x_operands": [
+        -8.871605980052675e-39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b808269b654cd01b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-384",
+      "x_operands": [
+        6.953286569567295e+49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a47c9c4c4472f7b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-385",
+      "x_operands": [
+        4.05001228524834e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "49d1bc3886211fe5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-386",
+      "x_operands": [
+        -5.6368895428886113e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b89df88955a2049a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-387",
+      "x_operands": [
+        -1.4366110717014574e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5c735af233d2613",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-388",
+      "x_operands": [
+        -3.322584648564822e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b67e598a67ceb89f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-389",
+      "x_operands": [
+        1.7984464380830134e+41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4880842093e0e22e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-390",
+      "x_operands": [
+        1.2020555299282051e-43,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "37057204e66e686a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-391",
+      "x_operands": [
+        1.831642938399218e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "45cd977f6541ee3a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-392",
+      "x_operands": [
+        5.670686340664573e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3620934fb0fba366",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-393",
+      "x_operands": [
+        -1.633354279733968e+30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c6349da6fe5e4da0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-394",
+      "x_operands": [
+        605425.4374053845,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "412279e2dff3993b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-395",
+      "x_operands": [
+        3.2603801796013596,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "400a1542341f50c9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-396",
+      "x_operands": [
+        -1.5514942819839244e+40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c846cc12a5ea7c28",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-397",
+      "x_operands": [
+        -1.2120899916691603e-29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9eebae9f01ba2d0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-398",
+      "x_operands": [
+        2.3399203552009903e+39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "481b817112632195",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-399",
+      "x_operands": [
+        145.53140714976024,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4062310149912296",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-400",
+      "x_operands": [
+        1538.5505437611907,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "40980a33c1be6553",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-401",
+      "x_operands": [
+        1.7910451681976874e-18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3c4084fc5fbc2d59",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-402",
+      "x_operands": [
+        -3.7928897126541975e-09,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "be304a538b252343",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-403",
+      "x_operands": [
+        -4.413440117557043e-20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bbea0d66f299d9c5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-404",
+      "x_operands": [
+        -128943.48934767846,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c0ff7af7d45e3b36",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-405",
+      "x_operands": [
+        -70484.12466291618,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c0f13541fe9e8ac0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-406",
+      "x_operands": [
+        4.712974262784534e+21,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "446fefb5043307d5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-407",
+      "x_operands": [
+        3.91423823922166e+19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4400f9ad6b34349a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-408",
+      "x_operands": [
+        3.832509244979062e-29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3a084a9a0e9a3a73",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-409",
+      "x_operands": [
+        -6139712.981075949,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c1576bd03ec9f2c7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-410",
+      "x_operands": [
+        -2598882.901006804,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c143d3f1735430e2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-411",
+      "x_operands": [
+        3.7714449811385593e+56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4baec32502a4e003",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-412",
+      "x_operands": [
+        1.3039381630219051e-11,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3dacac84ef9fc903",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-413",
+      "x_operands": [
+        1.604865187806002e-53,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "34f898305430d651",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-414",
+      "x_operands": [
+        -3.2390507714704805e-47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b647ab5d251d03bd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-415",
+      "x_operands": [
+        11216588819003.488,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "42a46721959476fa",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-416",
+      "x_operands": [
+        1.1351782015098235e-60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "337d2fc37c53a097",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-417",
+      "x_operands": [
+        -1.6676613479690774e-41,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b7773e6a1e7dc216",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-418",
+      "x_operands": [
+        -5.272406130201751e+55,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cb8133b815577c12",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-419",
+      "x_operands": [
+        -1.321242774144094e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6682331f3f4966a",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-420",
+      "x_operands": [
+        1.5884348666425332e+58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c043e82b477a5c6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-421",
+      "x_operands": [
+        3.257515479064216e-60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3394f041ae54fb0d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-422",
+      "x_operands": [
+        -8.082693694574262e+36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c79852ae442131bb",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-423",
+      "x_operands": [
+        -7.694524328155146e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b5526cbacce27d18",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-424",
+      "x_operands": [
+        9.49822902785667e-31,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "39b343c33183ffe2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-425",
+      "x_operands": [
+        8.521772065984422e+33,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "46fa427e29d9409d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-426",
+      "x_operands": [
+        993505986.886394,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41cd9bd96171755c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-427",
+      "x_operands": [
+        -2.828317720041144e-14,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bd1fd812202940b6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-428",
+      "x_operands": [
+        2.5372359300904767e-09,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3e25cb70d941ffb7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-429",
+      "x_operands": [
+        5.510503798429173e+52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4ae2690cb46a7188",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-430",
+      "x_operands": [
+        -6.227268266374307e+48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca110b217779c76b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-431",
+      "x_operands": [
+        -3.280983289483241e-11,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bdc20992cf418e25",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-432",
+      "x_operands": [
+        1.3102143600085234e+16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4347462a438a2479",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-433",
+      "x_operands": [
+        4.8698534138122603e+58,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c1f0851ade90e71",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-434",
+      "x_operands": [
+        2303428721291286.5,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43205de99565602d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-435",
+      "x_operands": [
+        -7.586433400881325e+46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9aa93bfb04801ad",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-436",
+      "x_operands": [
+        -3.792809734325609e-42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b755254768c15aee",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-437",
+      "x_operands": [
+        1.4069465421268229e+59,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4c3669f8baada3db",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-438",
+      "x_operands": [
+        -1.66462185567075e+34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c709a5c688736e5c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-439",
+      "x_operands": [
+        0.003066432279968667,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3f691ec64b739f80",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-440",
+      "x_operands": [
+        5.792921319527176e+50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a78c5e2598c98bf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-441",
+      "x_operands": [
+        -1.8121193052063128e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9bfbdd2f1924e4e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-442",
+      "x_operands": [
+        -2.047877714676653e-44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6dd3a710b8f3952",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-443",
+      "x_operands": [
+        -192761.81749763805,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c10787ce8a3c33a0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-444",
+      "x_operands": [
+        4.4149311965689984e-57,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "343bb68559dea3c7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-445",
+      "x_operands": [
+        -5.604623041537896e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9d88affee3d0f40",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-446",
+      "x_operands": [
+        -66096052987.32298,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c22ec74375f6a55e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-447",
+      "x_operands": [
+        -2.1247494796448752e-60,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b38b5091e537df94",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-448",
+      "x_operands": [
+        -2.249476587883132e-22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bb70ff1edaaed52b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-449",
+      "x_operands": [
+        -3.1697523010278636e+52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "cad52e14d289a241",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-450",
+      "x_operands": [
+        3.7443677482568633e-56,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "346d61356f860145",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-451",
+      "x_operands": [
+        -4.183401028745993e-42,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b75752bfdcfffc07",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-452",
+      "x_operands": [
+        -1.958998682573778e+52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "caca2e01a747e23f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-453",
+      "x_operands": [
+        -2.1738702959971493e+51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ca973db08dc0023b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-454",
+      "x_operands": [
+        -8.03182013072897e-46,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b692576845626cff",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-455",
+      "x_operands": [
+        -1.6552836590911404e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8b600a36f2077e6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-456",
+      "x_operands": [
+        1138659272.2040122,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "41d0f7a3f20d0e89",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-457",
+      "x_operands": [
+        3.186226173408461e-32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3964ae06bad396d4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-458",
+      "x_operands": [
+        1.080734434813797e+16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4343329c786b04f9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-459",
+      "x_operands": [
+        2.7424135818886447e+19,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "43f7c961a3a5ccb0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-460",
+      "x_operands": [
+        -191197235.16732147,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c1a6cae06655ab29",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-461",
+      "x_operands": [
+        4.2381309940882443e-44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "36ee3e8b52e8ea3f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-462",
+      "x_operands": [
+        -7.160203684584857e-16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bcc9cc1f4b66542b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-463",
+      "x_operands": [
+        -3.4140068436291607e-44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6e85cf88266f243",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-464",
+      "x_operands": [
+        -1.7080146544159738e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c9bdeb00aa58cf67",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-465",
+      "x_operands": [
+        -1.090882952034689e+25,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5220c11aaa14739",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-466",
+      "x_operands": [
+        -1.7127332538403756e+28,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5cbabb2deacebf7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-467",
+      "x_operands": [
+        -0.8614715683920586,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bfeb912cd295afe0",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-468",
+      "x_operands": [
+        31488.599783298323,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "40dec02662d97cbf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-469",
+      "x_operands": [
+        -31947995.302735828,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c17e77cdb4d80186",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-470",
+      "x_operands": [
+        1.615663651286255e+35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "473f1dd6398b1005",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-471",
+      "x_operands": [
+        1.8404185774912374e+34,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "470c5b2bdbf6a765",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-472",
+      "x_operands": [
+        -2.262666795383676e-13,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bd4fd81dc3d2336b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-473",
+      "x_operands": [
+        8.108078554541672e+44,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "49422dcf112e2dcd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-474",
+      "x_operands": [
+        5.361745912181954e-18,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3c58ba084492a2d6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-475",
+      "x_operands": [
+        18121420.05076797,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4171482cc0cff213",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-476",
+      "x_operands": [
+        1983643826758221.8,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "431c3074469e8937",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-477",
+      "x_operands": [
+        -8.529640242442277e-36,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8a6acf8eb5d19e5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-478",
+      "x_operands": [
+        4.683078054687323e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "382fdf129bdd7a96",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-479",
+      "x_operands": [
+        1.403699481063777e-16,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ca43abcad20a5e3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-480",
+      "x_operands": [
+        -6.199086266816181e-35,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b8d49999703ffc68",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-481",
+      "x_operands": [
+        -1777066.5060668923,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c13b1daa818d9990",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-482",
+      "x_operands": [
+        -45553337.20161178,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c185b8b5c99ce6a3",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-483",
+      "x_operands": [
+        1.5179537000958876e-12,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d7ab44176be17ae",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-484",
+      "x_operands": [
+        1.3353525374773204e-22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b642de519214001",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-485",
+      "x_operands": [
+        -87957.68524278236,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c0f5795af6c122c1",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-486",
+      "x_operands": [
+        2.1707777954124844e-06,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3ec235b5b6b430c4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-487",
+      "x_operands": [
+        3.9351468549148687e-38,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "382ac7fe2587e9a5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-488",
+      "x_operands": [
+        -2.6897701810882352e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b539c34c1b6e2f36",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-489",
+      "x_operands": [
+        5.442905549221895e+29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "461b7aca60e5fee8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-490",
+      "x_operands": [
+        42880153174.27946,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4223f7b66cac8f15",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-491",
+      "x_operands": [
+        1.2056357066212677e+17,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "437ac53edc22b34b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-492",
+      "x_operands": [
+        -2.3849010743211963e+25,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c533ba39768544ed",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-493",
+      "x_operands": [
+        3.980523484824034e-54,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "34d86689a7ecd524",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-494",
+      "x_operands": [
+        -2.361450893215322e+26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5686ab55e2ec58e",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-495",
+      "x_operands": [
+        -1.0845396008583278e-37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b84273d610983b85",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-496",
+      "x_operands": [
+        1.0265381757958467e+47,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "49b1fb2808a34ab2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-497",
+      "x_operands": [
+        4.4062796935325226e-13,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3d5f01a5d878e0a7",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-498",
+      "x_operands": [
+        -1.4586902183674323e-48,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b6010e1620a8d8a6",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-499",
+      "x_operands": [
+        -6.647660260508726e-52,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b54fd601fce56097",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-500",
+      "x_operands": [
+        3.022733622772691e+20,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "443062e2b57a6f96",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-501",
+      "x_operands": [
+        1.482863655836002e+49,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a244ad61eebbec9",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-502",
+      "x_operands": [
+        2.3691971674799534e-54,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "34cd0bd88808fbf4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-503",
+      "x_operands": [
+        15.059303592726343,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "402e1e5d0a5e9703",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-504",
+      "x_operands": [
+        2.2337645010629205e-51,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "356abe77e0d58aed",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-505",
+      "x_operands": [
+        8.065535205144735e-61,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3374bcbffe5b3ab8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-506",
+      "x_operands": [
+        6.626420304438606e-24,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "3b20058e35a422cd",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-507",
+      "x_operands": [
+        1.3083806695161149e-30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "39ba8980370e79c8",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-508",
+      "x_operands": [
+        1.0241705712356598e-39,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "37d64df115b1173b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-509",
+      "x_operands": [
+        8.7620309069986e+22,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "44b28de80e92dbd5",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-510",
+      "x_operands": [
+        -1.9102724585821164e+40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c84c11a57707ab22",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-511",
+      "x_operands": [
+        -1.6258539815761358e-30,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b9c07cf5508f2cf4",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-512",
+      "x_operands": [
+        -2.06141525777864e+32,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c6a453be63218fad",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-513",
+      "x_operands": [
+        1.9393446161206065e+43,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "48ebd406e99587f2",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-514",
+      "x_operands": [
+        -10085536.535530323,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c1633c941123107d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-515",
+      "x_operands": [
+        -1.0223781585673464e-10,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "bddc1a58c1f0e91d",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-516",
+      "x_operands": [
+        2.578964873069185e+50,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4a660eb7ce74ef8f",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-517",
+      "x_operands": [
+        -7.530189559979969e+27,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "c5b854d3aa020590",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-518",
+      "x_operands": [
+        -2.0797849684564206e-26,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "ba99bf1a0653659b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-519",
+      "x_operands": [
+        1.496781602507403e+40,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "4845fe444115c590",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-520",
+      "x_operands": [
+        -3.819412221111312e-53,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "b50d442320628a1b",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-521",
+      "x_operands": [
+        9.732250461817303e+37,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "47d24de87c5da9cf",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-522",
+      "x_operands": [
+        6.1657454766026504e+29,
+        0.0,
+        0.0
+      ],
+      "x_operand_bits": [
+        "461f210a0c4e815c",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "kind": "raw-significand-input"
+    },
+    {
+      "case_id": "CEN-ALL-NEGATIVE-ZERO",
+      "x_operands": [
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "x_operand_bits": [
+        "8000000000000000",
+        "8000000000000000",
+        "8000000000000000"
+      ],
+      "kind": "ordered-three-operand-boundary"
+    },
+    {
+      "case_id": "CEN-CANCELLATION-LEFT-LOSS",
+      "x_operands": [
+        1e+16,
+        1.0,
+        -1e+16
+      ],
+      "x_operand_bits": [
+        "4341c37937e08000",
+        "3ff0000000000000",
+        "c341c37937e08000"
+      ],
+      "kind": "ordered-three-operand-boundary"
+    },
+    {
+      "case_id": "CEN-CANCELLATION-LEFT-EXACT",
+      "x_operands": [
+        1e+16,
+        -1e+16,
+        1.0
+      ],
+      "x_operand_bits": [
+        "4341c37937e08000",
+        "c341c37937e08000",
+        "3ff0000000000000"
+      ],
+      "kind": "ordered-three-operand-boundary"
+    }
+  ]
+}

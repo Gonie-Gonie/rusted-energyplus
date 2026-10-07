@@ -1,0 +1,63 @@
+{
+  "schema": "geo02-independent-unit-tool-static-review.v1",
+  "status": "pass-before-Rust-baseline-and-numerical-comparison",
+  "completed_utc": "2026-10-07T19:38:50.011148+00:00",
+  "reviewed_source_archives": [
+    {
+      "historical_path": "tools/porting/check_geo02_units.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-unit-tool-review-01/reviewed-source/check_geo02_units.py",
+        "sha256": "e317c381a42aefba51ec15c2ddb9975dae1336f1a51b23c6b395818e83bf7c49"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_unit_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-unit-tool-review-01/reviewed-source/geo02_unit_provenance.py",
+        "sha256": "3f21fd6718d7b2bbf22bcf8da540ff59081005c29187756ebedb1c01710956ec"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/GEO-02/run_tuples.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-unit-tool-review-01/reviewed-source/run_tuples.py",
+        "sha256": "f1b83df5ea2b451d5c9291c934ee52b7d5ccd2284dec0732e626fc986273919d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/GEO-02/freeze_build.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-unit-tool-review-01/reviewed-source/freeze_build.py",
+        "sha256": "ccec1027d57874b3bf0f407de8154cc5e78d9a98639c31fa1c8c0a68228a0428"
+      }
+    }
+  ],
+  "actual_reader_actions": [
+    "Read and hash exact source bytes",
+    "Archive source bytes without importing them",
+    "Python ast.parse for syntax only"
+  ],
+  "static_review_findings": [
+    "Comparator reads retained actual observations only: no engines, Git, output writes, geometry formulas or angle wrapping.",
+    "Explicit actual same input bits are required before numerical comparison; typed recursive metadata preserves bool/int/float distinction and exact floating signed zero.",
+    "All sixteen required geometry fields are compared for each valid quad; baseline only existing three fields and missing cen remain explicit fail-incomplete. Two unsafe source-only cases stay unpaired.",
+    "Cen result bits are exact; actual original before/after and valid centroid-stage x87 precision modes must agree with Rust declared profile. Rounding and actual control-word decoding are checked, with only sticky exception bits excluded from control invariance.",
+    "Original driver core/binary/source archives, exact frozen Setup273-289 fragment and actual compile define are bound; no whole Setup/parser claim.",
+    "Rust archived binary/request/build/source snapshot/lock/toolchain are bound to exact two-path argv and original completion before actual execution. Final proof requires clean committed source and declared byte-exact or normalized line-ending precision.",
+    "Input-only launcher reads no original numeric result payload and passes only own frozen request to archived Rust binary.",
+    "Freezer resolved output is a strict child of GEO-02/builds, build cwd ROOT and successful exact Cargo argv are checked before output writes. Compiled bytes are archived separately from Git-normalized source identity."
+  ],
+  "nonblocking_precision_notes": [
+    "Source-only sides/counters/scratch-size checks use Python ordinary equality; pinned native serializers emit integers. These states are not claimed as paired Rust state."
+  ],
+  "remaining_scientific_requirements": [
+    "Actual native helper results and input identity, raw floating environment and states must be inspected after original execution.",
+    "No comparison or canonical geometry math correctness was established by this static review.",
+    "Normal invalid-input rejection and actual physical height/incidence consumption need separate subsequent evidence."
+  ],
+  "engine_executions": 0,
+  "Cargo_executions": 0,
+  "Git_executions": 0,
+  "scientific_checker_executions": 0,
+  "gates_updated": false
+}

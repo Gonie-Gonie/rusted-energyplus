@@ -1,0 +1,38 @@
+{
+  "schema": "geo02-preparation-checks.v1",
+  "status": "pass-preparation-only",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-02/checkpoint-verification-01/write_checkpoint_checks.py",
+    "sha256": "0b65c8ee9053982695c105adba038d75f1abb154aac377a258db53fa501b0010"
+  },
+  "commands": {
+    "passive_collector_tests": {
+      "path": ".runtime/porting/GEO-02/passive-collector-tests-01/receipt.json",
+      "sha256": "99023f7a5be055ea330edf2570dacb13a4ca748248d2d75689c1adaf448f85ec"
+    },
+    "plan_validation_and_16_negative_selftests": {
+      "path": ".runtime/porting/GEO-02/checkpoint-plan-01/receipt.json",
+      "sha256": "bfe882b26e392fe63136b698f4bdb11bd4e49aa58b14848bc145905a10a108bd"
+    },
+    "synchronized_document_views": {
+      "path": ".runtime/porting/GEO-02/checkpoint-views-01/receipt.json",
+      "sha256": "0ed2f7563da76c043a58e57b419582654b109606c626168452d2dc87668a01e2"
+    }
+  },
+  "input_families": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/input-families.json",
+    "sha256": "4a2d458cdee4e8906810fec0566e18d5b229d4eed6ea4353f1568e29387608f0"
+  },
+  "independent_frozen_contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/independent-contract-review.json",
+    "sha256": "1072cc42f9266df5d14625f9a1dc63e2f04e51f8250a97678ea5c4a2e7c4f380"
+  },
+  "passive_test_scope": "Copy actual operands and execution context, ordering, dictionary retention, truncation and nested disabled observer restoration. No geometry formula or original numerical comparison is executed.",
+  "baseline_adapter_scope": "Current existing public area/azimuth/tilt functions only; missing normals, centroid and source cen remain explicit.",
+  "canonical_geometry_math_implemented": false,
+  "Rust_scientific_baseline_executed": false,
+  "scientific_numerical_comparison_passed": false,
+  "Rust_production_geometry_consumer_proof_passed": false,
+  "all_four_card_gates_remain_pending": true,
+  "gates_updated": false
+}

@@ -1,0 +1,134 @@
+{
+  "schema": "geo02-independent-contract-review.v1",
+  "card": "GEO-02",
+  "status": "pass-before-scientific-execution",
+  "completed_utc": "2026-10-07T19:12:54.472564+00:00",
+  "reviewed_contracts": {
+    "source": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-contract-review-01/reviewed-contracts/GEO-02-source.json",
+        "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+      }
+    },
+    "cases": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-02-cases.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-contract-review-01/reviewed-contracts/GEO-02-cases.json",
+        "sha256": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435"
+      }
+    },
+    "tolerances": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-02-tolerances.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-contract-review-01/reviewed-contracts/GEO-02-tolerances.json",
+        "sha256": "3876a34a85f84dc459d1fec406106c0166ef0ff1dd6942beb0d3a7fbcb19a0e1"
+      }
+    },
+    "helper_request": {
+      "historical_path": "energyplus_porting_plan/cases/GEO-02/helper-request.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-contract-review-01/reviewed-contracts/helper-request.json",
+        "sha256": "1b685699dcb264e391a5474ef6d5f02310269e53d96c69683eecfc1079f88c5f"
+      }
+    }
+  },
+  "raw_input_source_checks": {
+    "path": ".runtime/porting/GEO-02/independent-contract-review-01/input-source-checks.json",
+    "sha256": "5c1247b342cb349105231c98fa5d9999e8b07b3e7373d08c4f772d07280ad1e4"
+  },
+  "executed_independent_reader": {
+    "path": ".runtime/porting/GEO-02/independent-contract-review-01/review_inputs.py",
+    "sha256": "0c28d90557b1d7da837f5b18e8c2ce1c69c4a79ac5f7e6190b16c068f7a42198"
+  },
+  "actual_review_command": [
+    "python",
+    "-B",
+    "-X",
+    "utf8",
+    ".runtime/porting/GEO-02/independent-contract-review-01/review_inputs.py"
+  ],
+  "review_method": "Read-only local pinned primary-source review and input/hash/type/lexical representation checks; no source math rewritten, no engines, builds, scientific comparators or Git invoked",
+  "original_source": {
+    "publisher": "https://github.com/NatLabRockies/EnergyPlus",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048",
+    "checked_local_files": 16,
+    "checked_selected_ranges": 46,
+    "publisher_identity": "Previously verified immutable source/core provenance reused; this review does not claim a fresh network or Git verification"
+  },
+  "input_checks": {
+    "checks": 6622,
+    "reference_occurrences_checked": 114,
+    "unique_files_hashed": 72,
+    "unique_IDFs_checked": 21,
+    "native_projection_count": 13,
+    "declared_patch_inputs_checked": 6,
+    "valid_helper_quad_count": 15,
+    "unsafe_source_only_quad_count": 2,
+    "cen_input_count": 526,
+    "fixed_seed_random_input_count": 512
+  },
+  "source_findings": [
+    "GetVertices creates Newell area/normal, gross/area/net-shadow area, angles/lcs/trig and independently snapped OutNormVec; CalcSurfaceCentroid precedes ProcessSurfaceVertices. Process shape/scratch fields are downstream native-only context.",
+    "Cyclic normalized Newell normal and ordered-fan Newell area vector are distinct. Strict component snap to +1/-1/+0 at 1e-6 does not renormalize; angles use raw normal.",
+    "Quad centroid uses source123/134 area fractions against own GrossArea, strict fraction sum>1.05 selects124/234 and own new total; <=0 warns/continues retaining prior centroid. Source-only unsafe helpers do not establish normal input-parser rejection.",
+    "cen third is long double initialized from binary64 1/3. Ordered f64 component sum then actual extended product/cast must be paired by exact output bits under observed x87 PC/RC, MXCSR and rounding metadata. LDBL_MANT_DIG alone does not establish effective product precision.",
+    "Valid direct helper identity is conditional on actual original post-GetVertices ordered bits equaling raw frozen request bits before Rust execution/comparison; positive geometric zeros avoid assumed World0 signed-zero identity. Rust must independently store the same input bits. Failed identity remains a frozen failure and may require genuine compiler adapter, never original-output seeding.",
+    "Real constructor/clear/processed-state observations are required; Triangle/Vertex allocation metadata is observable before writes, while nondebug default Vector3 element values must not be read. Original-only scratch/counters remain unpaired.",
+    "WeatherManager267-344 can change geometry orientation during execution only through the optional Site:VariableLocation orientation schedule. All21 distinct IDFs reviewed lack this object plus GeometryTransform/Compliance:Building/fenestration/shading detailed routes. This excludes that input branch; actual first/final retained-field equality remains to be observed."
+  ],
+  "supplemental_primary_source": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start": 267,
+      "end": 344,
+      "range_sha256": "b9762bf9f7887d6c54d4dc22fdb1253fc696bfbbc59921925669443b204a12dc",
+      "purpose": "absent Site:VariableLocation excludes runtime orientation rewrite"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+        "sha256": "c29f615d16c616171f35cf13191c5d7917aecddbdad85b83653477e35dccfc98"
+      },
+      "start": 73,
+      "end": 80,
+      "range_sha256": "b5e102ebc460ade8a34a44ae4ac15de720d94086587e953369013262ec606223",
+      "purpose": "nondebug default components are unwritten before producer assignment"
+    }
+  ],
+  "required_original_first_observations": [
+    "Same genuine GNU core/API/compiler/header definitions and exact extracted Setup273-289 fragment source binding; fragment/allocation preparation is not whole Setup or parser admission",
+    "Actual retained helper vertex bits/count/order, inactive coincident/degenerate/aspect/automatic repair predicates; source Process second call early-return state",
+    "Actual ambient x87 PC/RC and MXCSR/FE state before/after unchanged cen and original geometry initialization/final phases, without control writes",
+    "11 genuine valid native API inputs with fresh original normal/centroid/gross/net/trig fields; two separately ordinary invalid inputs with actual nonzero termination, no physical callbacks and preserved available states/error logs"
+  ],
+  "tolerance_review": {
+    "accepted": "Pre-frozen field profiles: area/centroid/angles atol1e-10, normal/lcs/trig atol1e-12; rtol1e-13. Exact finite classification and both-zero signs, no comparator angle wrapping. Cen scalar output bits exact; no tolerance widening.",
+    "physical_downstream_boundary": "Pair geometry operands actually consumed for centroid-height and solar/convection normal/angle; no complete SRC04 solar clock, SRC05 lapse/wind output, HVAC/SYS/wholephysics or GEO03 closure"
+  },
+  "historical_reuse": {
+    "input_families": {
+      "path": "energyplus_porting_plan/evidence/GEO-02/input-families.json",
+      "sha256": "4a2d458cdee4e8906810fec0566e18d5b229d4eed6ea4353f1568e29387608f0"
+    },
+    "GEO01_independent_review": {
+      "path": "energyplus_porting_plan/evidence/GEO-01/independent-review.json",
+      "sha256": "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
+    },
+    "GEO01_comparison": {
+      "path": "energyplus_porting_plan/evidence/GEO-01/comparison-report.json",
+      "sha256": "9479e6fdd18dc2e092381153e92b843a003952c88a6757495b13d1aae6058a49"
+    },
+    "precision": "Old37 original/diagnostic and old14 physical executions retain their actual paths/HEAD/status. Only already-observed inputs/coordinates/area/azimuth/tilt are reused; no missing normal/centroid/gross/net or height/incidence field is inferred.",
+    "fresh_physical_subset": "A24/A72/B-BOTH24 Full+Summary is adequate for bounded static initialization/actual consumer proof if all96/288/96 invocation contexts and real consumer coverage pass with no omissions. It does not establish new per-limit/B72/annual consumption."
+  },
+  "scientific_execution_performed_by_reviewer": false,
+  "scientific_comparison_pass_claimed": false,
+  "Rust_tests_or_builds_run": false,
+  "Git_invoked": false,
+  "gates_updated": false,
+  "remaining": "Original build/source/ABI/ambient-precision and actual-state proofs, independent Rust implementation review, paired numerical checks and actual production consumer coverage are pending."
+}

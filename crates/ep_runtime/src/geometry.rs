@@ -1,5 +1,7 @@
 //! Geometry summary and polygon helper functions.
 
+pub mod production_trace;
+
 use crate::first_zone::{SurfaceGeometrySummary, ZoneGeometrySummary};
 use ep_model::{AutoOrNumber, OutsideBoundaryCondition, Point3, SurfaceType, TypedModel, Zone};
 
