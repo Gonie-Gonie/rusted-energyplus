@@ -1,0 +1,132 @@
+{
+  "schema": "psy02-independent-final-review.v1",
+  "status": "pass",
+  "reviewed_comparison_report": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/comparison-report.json",
+    "sha256": "30ee7d439c84bb15fee7953dd11b4c42e0b334398407410f6739414f46537a67"
+  },
+  "implementation_commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+  "crates_tree": "00f67b59be61f53cafc3f473da8c95607df0fae3",
+  "build": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/build-receipt.json",
+    "sha256": "5030e0008ce58f05ce3f509b61fbf16f812d81d992afe3d35393acf9f4f268ac"
+  },
+  "independent_source_review": {
+    "path": ".runtime/porting/PSY-02/production-source-review/final/review.json",
+    "sha256": "b1a8f5f57a5350d328a6d040d61967d3d8546be0e1d2aa43c013fa95817b1376"
+  },
+  "independent_unit_and_compiled_source_review": {
+    "path": ".runtime/porting/PSY-02/independent-final-review/unit-source-review.json",
+    "sha256": "7ce36adaddde67be2aabed2a723aaba596f8be65aa5188d6a4c62a64318d818c"
+  },
+  "independent_production_data_review": {
+    "path": ".runtime/porting/PSY-02/independent-final-review/production-data-review.json",
+    "sha256": "b06333f0d1a4071873b8dda474dcdb075ea36f8bdeb51c52f2b9fc980a92bc5e"
+  },
+  "unit_proof": {
+    "fresh_Rust_processes": 3,
+    "paired_calls": 516,
+    "explicitly_unpaired_General_source_diagnostics": 5,
+    "non_NaN_results_cross_peer_bit_exact": 513,
+    "cache_before_after_rows_checked": 410,
+    "final_cache_rows_checked": 1187,
+    "scalar_snapshots_checked": 1032,
+    "own_from_call_bindings_checked": 7,
+    "unit_comparison_count": 33510,
+    "mismatches": 0,
+    "original_first_and_Rust_input_only_argv_checked": true
+  },
+  "compiled_source_provenance": {
+    "compiled_archives_sha_verified": 3635,
+    "compiled_bytes_exact_to_Git_blobs": 3634,
+    "only_EOL_canonicalization": [
+      {
+        "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+        "compiled_archive": {
+          "path": ".runtime/porting/PSY-02/committed-build/e7eec6e030a1/source/crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+          "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+        },
+        "compiled_CRLF_count": 1,
+        "Git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+        "Git_EOL_canonicalization_only": true
+      }
+    ],
+    "interpretation": "Archives pin actual compiler input bytes. One CRLF after a struct field at scheduled_output.rs494 is normalized to LF by Git attributes; no token or calculation change."
+  },
+  "production_proof": {
+    "case_count": 7,
+    "normal_CLI_processes": 14,
+    "ordered_roots_compared": 22895,
+    "actual_zone_invocations": 1056,
+    "mismatches": 0,
+    "omissions": 0,
+    "typed_input_order_context_cache_identity_and_own_hit_bits_checked": true,
+    "actual_and_original_scalar_state_continuity_checked": true,
+    "all_four_final_sorted_nondefault_cache_tables_checked": true,
+    "complete_reference_replay_and_immutable_binary_driver_core_contract_bindings_checked": true,
+    "Full_Summary_CSV_bytes_and_complete_typed_series_equal": true,
+    "Summary_optional_artifacts_absent": true,
+    "no_oracle_or_fixture_inputs": true,
+    "aggregate_statistics_independently_recomputed": true,
+    "selected_measured_errors_and_RMSE": {
+      "PsyWFnTdbRhPb.value": {
+        "count": 20783,
+        "max_absolute_error": 4.440892098500626e-16,
+        "sum_squared_error": 1.2494407319635892e-29,
+        "unit": "kg/kg",
+        "rmse": 2.451905405833003e-17
+      },
+      "PsyTwbFnTdbWPb.value": {
+        "count": 2112,
+        "max_absolute_error": 1.0436096431476471e-14,
+        "sum_squared_error": 7.19069817729494e-27,
+        "unit": "degC",
+        "rmse": 1.8451792967017515e-15
+      },
+      "final_caches.Psat.value": {
+        "count": 7400,
+        "max_absolute_error": 1.4551915228366852e-11,
+        "sum_squared_error": 2.276034953701392e-20,
+        "unit": "Pa",
+        "rmse": 1.7537739051563307e-12
+      },
+      "final_caches.TsatPb.value": {
+        "count": 268,
+        "max_absolute_error": 2.842170943040401e-14,
+        "sum_squared_error": 1.5953922947189743e-26,
+        "unit": "degC",
+        "rmse": 7.7155403722476e-15
+      },
+      "final_caches.Twb.value": {
+        "count": 984,
+        "max_absolute_error": 1.0436096431476471e-14,
+        "sum_squared_error": 3.544861990713325e-27,
+        "unit": "degC",
+        "rmse": 1.8980258225542265e-15
+      }
+    },
+    "numeric_policy": "Pre-frozen per-function/per-state tolerances. Production errors/RMSE can be nonzero; output/state IEEE bits are recorded but not claimed cross-peer bit-exact. Input/tag/identity bits and own cached-HIT return bits are exact."
+  },
+  "hash_review": {
+    "reference_occurrences_compared": 37494,
+    "unique_artifacts_hashed": 37019,
+    "reachable_JSON_artifacts": 193,
+    "mismatches": 0,
+    "memoization": "Each immutable path hashed once per audit; every reference occurrence SHA compared. Native core source/compiler/ABI proof was already independently reviewed; its frozen receipt is rehashed without repeating the entire-original-tree audit."
+  },
+  "original_HPb_reachability": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/native-reachability.json",
+    "sha256": "61822b8955edb6e8c9535e3ae5ce05a7932cd674aad3efc92f4aae0c90af6f65"
+  },
+  "scope_limits": [
+    "Actual root totals include preparation, validation and recomputation; they are not original EnergyPlus physical-producer call counts.",
+    "Actual observed kernel contexts are bound to copied real Rust zone intervals. Original manager/system ordering and raw native system clock are not claimed.",
+    "Twb and W/RH are observed outer production roots; Psat/TsatPb nested effects are retained by actual owning state and final tables rather than fabricated flattened calls.",
+    "Cached HPb is inactive under the exact15 audited original CON lifetimes including warmup and positive pressure with no-reset proof. This does not infer exact guard values/call counts, raw HPb absence, or behavior under other inputs.",
+    "Warning recurrence/message lifecycle and stats-OFF original local iteration counts are source-only observations, not fabricated Rust parity.",
+    "No new PSY01 closure, B annual Rust physics, HVAC05/CLK04/SYS/warmup, upstream normalization or full-physics conformance is claimed."
+  ],
+  "new_simulations_builds_or_kernel_calculations_executed_by_reviewer": false,
+  "readonly_review_commands": "Python metadata/numerical comparisons and Git object reads only. Existing raw scientific evidence was not changed.",
+  "gates_updated": false
+}

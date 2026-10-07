@@ -1,0 +1,361 @@
+{
+  "schema": "psy02-reviewed-comparison-report.v1",
+  "status": "pass",
+  "implementation_commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+  "crates_tree": "00f67b59be61f53cafc3f473da8c95607df0fae3",
+  "source_reference": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/source-original-preparation.json",
+    "sha256": "f618a353711c788d58a815e2a24ad6267219aaa6adce13c05e604fca7e370ade"
+  },
+  "build": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/build-receipt.json",
+    "sha256": "5030e0008ce58f05ce3f509b61fbf16f812d81d992afe3d35393acf9f4f268ac"
+  },
+  "unit_comparison": {
+    "path": ".runtime/porting/PSY-02/committed-units/e7eec6e030a1/comparison/comparison-report.json",
+    "sha256": "7121026bbb2d95edbb1f4bdf9c75f92c955978e6f37bc873392f3bf177a3f21e"
+  },
+  "paired_frozen_unit_calls": 516,
+  "source_only_General_calls": 5,
+  "original_warning_lifecycle_and_local_iteration_count_paired": false,
+  "initial_checks": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/initial-checks.json",
+    "sha256": "95dc451a40ff7a9c5a7ded6cc4163b0c71dccf240ac209ae1ae0c291cfadda3a"
+  },
+  "independent_production_source_review": {
+    "path": ".runtime/porting/PSY-02/production-source-review/final/review.json",
+    "sha256": "b1a8f5f57a5350d328a6d040d61967d3d8546be0e1d2aa43c013fa95817b1376"
+  },
+  "checker_negative_probes": {
+    "path": ".runtime/porting/PSY-02/checker-guard-probes-v2/receipt.json",
+    "sha256": "8e6b3d5ba49129ca58af431f493af666a6fc0385387c17cb48e26bff03df84bc"
+  },
+  "case_count": 7,
+  "normal_CLI_processes": 14,
+  "actual_zone_invocations": 1056,
+  "ordered_actual_kernel_roots": 22895,
+  "ordered_kernel_mismatches": 0,
+  "omitted_roots": 0,
+  "routine_counts": {
+    "PsyWFnTdbRhPb": 20783,
+    "PsyTwbFnTdbWPb": 2112
+  },
+  "context_scope_counts": {
+    "unbound": 6336,
+    "zone_timestep_execution": 1056,
+    "direct_zone_purchased_air_system_call": 14115,
+    "coupled_output_validation": 1388
+  },
+  "phase_counts": {
+    "pipeline": 3168,
+    "rust_runtime_setup": 3168,
+    "rust_runtime": 16559
+  },
+  "statistics": {
+    "PsyWFnTdbRhPb.value": {
+      "count": 20783,
+      "max_absolute_error": 4.440892098500626e-16,
+      "sum_squared_error": 1.2494407319635892e-29,
+      "unit": "kg/kg",
+      "rmse": 2.451905405833003e-17
+    },
+    "PsyWFnTdbRhPb.state_before.iconv_tol": {
+      "count": 20783,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "exact",
+      "rmse": 0.0
+    },
+    "PsyWFnTdbRhPb.state_before.last_patm": {
+      "count": 20783,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyWFnTdbRhPb.state_before.last_t_boil": {
+      "count": 20783,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 7.229752424169529e-26,
+      "unit": "degC",
+      "rmse": 1.8651234994433174e-15
+    },
+    "PsyWFnTdbRhPb.state_before.press_save": {
+      "count": 20783,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyWFnTdbRhPb.state_before.t_sat_save": {
+      "count": 20783,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 6.623907248959792e-26,
+      "unit": "degC",
+      "rmse": 1.7852662815339883e-15
+    },
+    "PsyWFnTdbRhPb.state_after.iconv_tol": {
+      "count": 20783,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "exact",
+      "rmse": 0.0
+    },
+    "PsyWFnTdbRhPb.state_after.last_patm": {
+      "count": 20783,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyWFnTdbRhPb.state_after.last_t_boil": {
+      "count": 20783,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 7.229752424169529e-26,
+      "unit": "degC",
+      "rmse": 1.8651234994433174e-15
+    },
+    "PsyWFnTdbRhPb.state_after.press_save": {
+      "count": 20783,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyWFnTdbRhPb.state_after.t_sat_save": {
+      "count": 20783,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 6.623907248959792e-26,
+      "unit": "degC",
+      "rmse": 1.7852662815339883e-15
+    },
+    "PsyTwbFnTdbWPb.value": {
+      "count": 2112,
+      "max_absolute_error": 1.0436096431476471e-14,
+      "sum_squared_error": 7.19069817729494e-27,
+      "unit": "degC",
+      "rmse": 1.8451792967017515e-15
+    },
+    "PsyTwbFnTdbWPb.state_before.iconv_tol": {
+      "count": 2112,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "exact",
+      "rmse": 0.0
+    },
+    "PsyTwbFnTdbWPb.state_before.last_patm": {
+      "count": 2112,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyTwbFnTdbWPb.state_before.last_t_boil": {
+      "count": 2112,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 3.6148762120847645e-26,
+      "unit": "degC",
+      "rmse": 4.1371356221067225e-15
+    },
+    "PsyTwbFnTdbWPb.state_before.press_save": {
+      "count": 2112,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyTwbFnTdbWPb.state_before.t_sat_save": {
+      "count": 2112,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 3.311953624479896e-26,
+      "unit": "degC",
+      "rmse": 3.9599998233279104e-15
+    },
+    "PsyTwbFnTdbWPb.cache_before.value": {
+      "count": 2112,
+      "max_absolute_error": 1.0436096431476471e-14,
+      "sum_squared_error": 3.6458361865816145e-27,
+      "unit": "degC",
+      "rmse": 1.3138676472172429e-15
+    },
+    "PsyTwbFnTdbWPb.state_after.iconv_tol": {
+      "count": 2112,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "exact",
+      "rmse": 0.0
+    },
+    "PsyTwbFnTdbWPb.state_after.last_patm": {
+      "count": 2112,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyTwbFnTdbWPb.state_after.last_t_boil": {
+      "count": 2112,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 3.6148762120847645e-26,
+      "unit": "degC",
+      "rmse": 4.1371356221067225e-15
+    },
+    "PsyTwbFnTdbWPb.state_after.press_save": {
+      "count": 2112,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "PsyTwbFnTdbWPb.state_after.t_sat_save": {
+      "count": 2112,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 3.311953624479896e-26,
+      "unit": "degC",
+      "rmse": 3.9599998233279104e-15
+    },
+    "PsyTwbFnTdbWPb.cache_after.value": {
+      "count": 2112,
+      "max_absolute_error": 1.0436096431476471e-14,
+      "sum_squared_error": 7.19069817729494e-27,
+      "unit": "degC",
+      "rmse": 1.8451792967017515e-15
+    },
+    "initial_state.iconv_tol": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "exact",
+      "rmse": 0.0
+    },
+    "initial_state.last_patm": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "initial_state.last_t_boil": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "degC",
+      "rmse": 0.0
+    },
+    "initial_state.press_save": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "initial_state.t_sat_save": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "degC",
+      "rmse": 0.0
+    },
+    "final_state.iconv_tol": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "exact",
+      "rmse": 0.0
+    },
+    "final_state.last_patm": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "final_state.last_t_boil": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "degC",
+      "rmse": 0.0
+    },
+    "final_state.press_save": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "Pa",
+      "rmse": 0.0
+    },
+    "final_state.t_sat_save": {
+      "count": 7,
+      "max_absolute_error": 0.0,
+      "sum_squared_error": 0.0,
+      "unit": "degC",
+      "rmse": 0.0
+    },
+    "final_caches.Psat.value": {
+      "count": 7400,
+      "max_absolute_error": 1.4551915228366852e-11,
+      "sum_squared_error": 2.276034953701392e-20,
+      "unit": "Pa",
+      "rmse": 1.7537739051563307e-12
+    },
+    "final_caches.TsatPb.value": {
+      "count": 268,
+      "max_absolute_error": 2.842170943040401e-14,
+      "sum_squared_error": 1.5953922947189743e-26,
+      "unit": "degC",
+      "rmse": 7.7155403722476e-15
+    },
+    "final_caches.Twb.value": {
+      "count": 984,
+      "max_absolute_error": 1.0436096431476471e-14,
+      "sum_squared_error": 3.544861990713325e-27,
+      "unit": "degC",
+      "rmse": 1.8980258225542265e-15
+    }
+  },
+  "cases": [
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/A-24H.json",
+      "sha256": "cc92214afb98ffd6406c7aabb00abaa600596082673250fcf1cb7363aa535de3"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/A-72H.json",
+      "sha256": "d8695a5e58f161f8676224c1c4794e15777bab84cefd840c479fd5c7df6e8e5d"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/B-NOLIMIT-24H.json",
+      "sha256": "5fce462ea98de6cc2242486f26d6ccff434d8d8e73f82c2e033c8c48897f466f"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/B-FLOW-24H.json",
+      "sha256": "60b74931371a4788f2819da1044f73ae176bc5e561042f222410f790cb4a77bc"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/B-CAPACITY-24H.json",
+      "sha256": "fbde511ff4eb97068029ee966c10e448edee42047e915afdbdb472e7beab1df4"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-24H.json",
+      "sha256": "b984416d2c1634a087fbab7dbcb306439bc3e3e16c8ddef3f3e19908662e2e92"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-72H.json",
+      "sha256": "8d2660bc206b5508b4c44c4d10f54093ed0a1f701e249bb1e91a3e85c04f730f"
+    }
+  ],
+  "original_HPb_reachability": {
+    "path": "energyplus_porting_plan/evidence/PSY-02/native-reachability.json",
+    "sha256": "61822b8955edb6e8c9535e3ae5ce05a7932cd674aad3efc92f4aae0c90af6f65"
+  },
+  "scope": "Selected inverse property functions and their directly consumed helpers; current CON 24/72-hour Rust execution with same-input original-kernel replay. Original CON15 runs separately prove cached HPb inactivity for those exact inputs including warmup under audited cache lifetime.",
+  "claim_limits": [
+    "Actual Rust scopes include validation and recomputation; routine totals are not native producer call counts.",
+    "Warmup/HVAC-05/CLK-04/SYS and full physics parity remain later obligations.",
+    "No B annual Rust physics proof or inactive HPb producer execution is claimed.",
+    "EP/original results were test peers only; no reference values or fixture demand supplied to production."
+  ],
+  "gates_updated": false,
+  "executed_aggregator": {
+    "path": ".runtime/porting/PSY-02/aggregate_production.py",
+    "sha256": "7eae108c9e1053550345b07d8fb84437bd9bea1106f44457d2590e6d09a2e1f1"
+  }
+}

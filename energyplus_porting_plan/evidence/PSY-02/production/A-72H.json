@@ -1,0 +1,269 @@
+{
+  "schema": "psy02-production-case.v1",
+  "case_id": "A-72H",
+  "scope": "A",
+  "implementation_commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+  "crates_tree": "00f67b59be61f53cafc3f473da8c95607df0fae3",
+  "binary": {
+    "path": ".runtime/porting/PSY-02/committed-build/e7eec6e030a1/eplus-rs.exe",
+    "sha256": "4e664a3ade885146783f33122b92e515fa1d96c73414eccd5da595bfb749e0cc"
+  },
+  "metadata": {
+    "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+    "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+    "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "checker": {
+    "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/source/check_psy02_production.9221e25cca62.py",
+    "sha256": "9221e25cca6262b7d1434f2042e10aa1f7f79169332e03422b0b966f3a1c659a"
+  },
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\committed-build\\e7eec6e030a1\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\production\\e7eec6e030a1\\A-72H\\full",
+        "--porting-scope",
+        "A",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 0.883,
+      "repository_head": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+      "stdout": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/cli-full-stdout.log",
+        "sha256": "95a326125342d7e6896e59eba2686cadd394057f21490dfcc5eea73b401ffaa6"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/cli-full-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "executed_checker": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/source/check_psy02_production.9221e25cca62.py",
+        "sha256": "9221e25cca6262b7d1434f2042e10aa1f7f79169332e03422b0b966f3a1c659a"
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\committed-build\\e7eec6e030a1\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\production\\e7eec6e030a1\\A-72H\\summary",
+        "--porting-scope",
+        "A",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 0.526,
+      "repository_head": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+      "stdout": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/cli-summary-stdout.log",
+        "sha256": "7522b41025fe3fb976d579f5f109adf5ad67b73f0ad4549bee21be7531859efe"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/cli-summary-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "executed_checker": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/source/check_psy02_production.9221e25cca62.py",
+        "sha256": "9221e25cca6262b7d1434f2042e10aa1f7f79169332e03422b0b966f3a1c659a"
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\psy02_reference.py",
+        "--production-trace",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\production\\e7eec6e030a1\\A-72H\\full\\psy02-calls.json",
+        "--driver-build",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\native-driver-replay-target-frozen\\native-driver-build.json",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-02\\production\\e7eec6e030a1\\A-72H\\replay"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 3.948,
+      "repository_head": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+      "stdout": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/original-replay-stdout.log",
+        "sha256": "05abd6ccecf60d7faf3cd49fbe3510bfbe1e27c708beabc7fbf77786b2968823"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/original-replay-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "executed_checker": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/source/check_psy02_production.9221e25cca62.py",
+        "sha256": "9221e25cca6262b7d1434f2042e10aa1f7f79169332e03422b0b966f3a1c659a"
+      }
+    }
+  ],
+  "original_driver_build": {
+    "path": ".runtime/porting/PSY-02/native-driver-replay-target-frozen/native-driver-build.json",
+    "sha256": "3e27752367bb8d8667ba2ef9c0e600898a0fab325875986779c8d4c6a75a7c78"
+  },
+  "expected_zone_invocations": 288,
+  "actual_interval_observations": {
+    "clock": {
+      "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/full/clock-calls.json",
+      "sha256": "51e6b1467af9cdd666ce6cb1c44aaff3c2bb256250922b08e7c81a059d08d0fb"
+    },
+    "actual_zone_invocations": 288,
+    "kernel_contexts_bound_to_actual_intervals": true,
+    "routine_counts": {
+      "PsyWFnTdbRhPb": 1440,
+      "PsyTwbFnTdbWPb": 576
+    },
+    "context_scope_counts": {
+      "unbound": 1728,
+      "zone_timestep_execution": 288
+    },
+    "phase_counts": {
+      "pipeline": 864,
+      "rust_runtime_setup": 864,
+      "rust_runtime": 288
+    },
+    "caller_counts": [
+      {
+        "routine": "PsyTwbFnTdbWPb",
+        "phase": "pipeline",
+        "scope": "unbound",
+        "file": "crates\\ep_runtime\\src\\weather.rs",
+        "line": 384,
+        "column": 34,
+        "root_count": 288
+      },
+      {
+        "routine": "PsyTwbFnTdbWPb",
+        "phase": "rust_runtime_setup",
+        "scope": "unbound",
+        "file": "crates\\ep_runtime\\src\\weather.rs",
+        "line": 384,
+        "column": 34,
+        "root_count": 288
+      },
+      {
+        "routine": "PsyWFnTdbRhPb",
+        "phase": "pipeline",
+        "scope": "unbound",
+        "file": "crates\\ep_runtime\\src\\weather.rs",
+        "line": 378,
+        "column": 46,
+        "root_count": 288
+      },
+      {
+        "routine": "PsyWFnTdbRhPb",
+        "phase": "pipeline",
+        "scope": "unbound",
+        "file": "crates\\ep_runtime\\src\\weather.rs",
+        "line": 384,
+        "column": 34,
+        "root_count": 288
+      },
+      {
+        "routine": "PsyWFnTdbRhPb",
+        "phase": "rust_runtime",
+        "scope": "zone_timestep_execution",
+        "file": "crates\\ep_runtime\\src\\heat_balance\\zone_air_correction.rs",
+        "line": 141,
+        "column": 17,
+        "root_count": 288
+      },
+      {
+        "routine": "PsyWFnTdbRhPb",
+        "phase": "rust_runtime_setup",
+        "scope": "unbound",
+        "file": "crates\\ep_runtime\\src\\weather.rs",
+        "line": 378,
+        "column": 46,
+        "root_count": 288
+      },
+      {
+        "routine": "PsyWFnTdbRhPb",
+        "phase": "rust_runtime_setup",
+        "scope": "unbound",
+        "file": "crates\\ep_runtime\\src\\weather.rs",
+        "line": 384,
+        "column": 34,
+        "root_count": 288
+      }
+    ],
+    "scope_count_interpretation": "Actual Rust scopes include validation/recomputation; these are not native producer call counts.",
+    "native_clock_or_manager_order_parity_claimed": false
+  },
+  "full_summary_equality": {
+    "selected-outputs.csv": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/full/results/selected-outputs.csv",
+        "sha256": "7866c1fb05f444bfa22775213f6aba12a308ce291834921e7ce5e96335f963f8"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/summary/results/selected-outputs.csv",
+        "sha256": "7866c1fb05f444bfa22775213f6aba12a308ce291834921e7ce5e96335f963f8"
+      },
+      "comparison": "byte-exact"
+    },
+    "meters.csv": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/full/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/summary/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "comparison": "byte-exact"
+    },
+    "result-store.json": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/full/results/result-store.json",
+        "sha256": "bbe6ec79ff778c69bfd5ab6a311a7138f1040445b367ee705a6856ebeed2b157"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/summary/results/result-store.json",
+        "sha256": "bbe6ec79ff778c69bfd5ab6a311a7138f1040445b367ee705a6856ebeed2b157"
+      },
+      "comparison": "complete-series-JSON"
+    }
+  },
+  "summary_observer_artifacts_absent": true,
+  "trace": {
+    "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/full/psy02-calls.json",
+    "sha256": "f0c8091bbdcafe928237b90f438ae48a1ce7a7643ac8d2ac8bb48e7e9b21b296"
+  },
+  "original_replay": {
+    "path": ".runtime/porting/PSY-02/production/e7eec6e030a1/A-72H/replay/comparison-report.json",
+    "sha256": "1f33dcb8d57d71b39ff48eb0b8887a9aab8fcb753fa40985605873be8ea953c0"
+  },
+  "status": "pass",
+  "claim": "Selected actual Rust kernel root replay. Upstream weather/HVAC/SYS and full physics remain pending their cards."
+}

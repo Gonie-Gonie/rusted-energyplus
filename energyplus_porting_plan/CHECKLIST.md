@@ -95,7 +95,7 @@ B에서는 그 의존성을 적용한다.
 | [ ] | [SCH-02](cards/SCH-02.md) | 분 단위 확장과 timestep 표 생성 | `ScheduleManager.cc` · `ProcessIntervalFields; DaySchedule::populateFromMinuteVals` | SCH-01, CLK-01 |
 | [ ] | [SCH-03](cards/SCH-03.md) | 현재 스케줄 조회·갱신 시점 | `ScheduleManager.cc` · `ScheduleConstant::getHrTsVal; ScheduleDetailed::getHrTsVal; UpdateScheduleVals` | SCH-02, CLK-01 |
 | [x] | [PSY-01](cards/PSY-01.md) | 기본 습공기 물성 | `Psychrometrics.hh` · `PsyCpAirFnW; PsyRhoAirFnPbTdbW; PsyHFnTdbW; PsyTdbFnHW` | CON-01 |
-| [ ] | [PSY-02](cards/PSY-02.md) | 포화·습구·습공기비 역산 | `Psychrometrics.cc` · `PsyTsatFnHPb; PsyWFnTdbRhPb; PsyWFnTdbH; PsyTwbFnTdbWPb` | PSY-01 |
+| [x] | [PSY-02](cards/PSY-02.md) | 포화·습구·습공기비 역산 | `Psychrometrics.cc` · `PsyTsatFnHPb; PsyWFnTdbRhPb; PsyWFnTdbH; PsyTwbFnTdbWPb` | PSY-01 |
 
 ### 04 CTF 계수 생성
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |

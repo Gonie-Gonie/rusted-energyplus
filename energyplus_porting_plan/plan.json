@@ -1662,14 +1662,944 @@
       "companion": "Psychrometrics.hh의 해당 wrapper 및 호출 상수",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Psychrometrics.cc",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyWFnTdbH",
+            "start_line": 962,
+            "end_line": 998,
+            "helpers": [],
+            "range_sha256": "e0b218f02e04d69006da337d9f8817fecc3ea0302aa7e92939c8e2e90ba826cc"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyWFnTdbRhPb",
+            "start_line": 1342,
+            "end_line": 1387,
+            "helpers": [
+              "PsyPsatFnTemp",
+              "PsyWFnTdbRhPb_error",
+              "ObjexxFCL::max"
+            ],
+            "range_sha256": "9e2d3cbd4fc80af4344d6a98ce2315eb972b2717bbdf3ac638f86d845f3287e3"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyTsatFnHPb",
+            "start_line": 1073,
+            "end_line": 1120,
+            "helpers": [
+              "PsyTsatFnHPb_raw"
+            ],
+            "range_sha256": "de90cd6ca1d79f766883531b6be1d81644a6179c945e6dae83777338574e66e0"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyTsatFnHPb_raw",
+            "start_line": 899,
+            "end_line": 1072,
+            "helpers": [
+              "F6",
+              "F7",
+              "PsyHFnTdbW",
+              "PsyWFnTdbTwbPb",
+              "ObjexxFCL::max",
+              "ObjexxFCL::min"
+            ],
+            "range_sha256": "34b2e141369752e0f73ff928f47652fb23e2acb6ecf4e68601658a047988be6a"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyTwbFnTdbWPb",
+            "start_line": 279,
+            "end_line": 345,
+            "helpers": [
+              "PsyTwbFnTdbWPb_raw"
+            ],
+            "range_sha256": "5450ae54cfbf7f78aaa77a5ea9e55238a336b4ce5e41b815068ad19c1b0ed7b9"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyTwbFnTdbWPb_raw",
+            "start_line": 347,
+            "end_line": 566,
+            "helpers": [
+              "PsyTsatFnPb",
+              "PsyPsatFnTemp",
+              "General::Iterate"
+            ],
+            "range_sha256": "d6bfe4e9445ecd5b3a15ac1fb612189a407e3558134113d44f72c7aa7d490b20"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyPsatFnTemp",
+            "start_line": 1000,
+            "end_line": 1071,
+            "helpers": [
+              "PsyPsatFnTemp_raw"
+            ],
+            "range_sha256": "0022822c207e2e6bb57ee650977cb62a1732549eb3b17e958528fbc5d96d15f5"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyPsatFnTemp_raw",
+            "start_line": 640,
+            "end_line": 784,
+            "helpers": [
+              "std::exp",
+              "std::log"
+            ],
+            "range_sha256": "397e8ebae1f583ee1548036d45864f4bfe8779f522f3e756ec30b81c24897d0d"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyTsatFnPb",
+            "start_line": 1488,
+            "end_line": 1525,
+            "helpers": [
+              "PsyTsatFnPb_raw"
+            ],
+            "range_sha256": "4179f8f19cfee058f379af2aa86733e93d021ef01ea82af9a05a83af40d08825"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyTsatFnPb_raw",
+            "start_line": 1264,
+            "end_line": 1450,
+            "helpers": [
+              "PsyPsatFnTemp",
+              "General::Iterate"
+            ],
+            "range_sha256": "1f65d45ce33ca93dc49ec26e21b3ec3b1e9c9ac833a08d6da764960555fce02f"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyWFnTdbTwbPb",
+            "start_line": 1408,
+            "end_line": 1460,
+            "helpers": [
+              "PsyPsatFnTemp",
+              "PsyWFnTdbRhPb"
+            ],
+            "range_sha256": "0b0be48910147c0a7654a1c8399095514b8e6ad49629d763ab3a71ed9e81682f"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "F6",
+            "start_line": 1600,
+            "end_line": 1603,
+            "helpers": [],
+            "range_sha256": "96ab763f6521f6f32dfa6e4052c18316af4482f88006dc9c42cce4fa5d2aceb5"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "F7",
+            "start_line": 1605,
+            "end_line": 1609,
+            "helpers": [],
+            "range_sha256": "0c1a37f5a1811c3be373389db61dfbf51d09c974b061daef3784f8c608f366b5"
+          },
+          {
+            "path": "src/EnergyPlus/EnergyPlus.hh",
+            "symbol": "using ObjexxFCL::max",
+            "start_line": 165,
+            "end_line": 166,
+            "helpers": [
+              "ObjexxFCL::min"
+            ],
+            "range_sha256": "ca7a1f3ec146fa9636410022bfda1ff19282fa3e0bf83615a21c6aca8a84f3e2"
+          },
+          {
+            "path": "src/EnergyPlus/General.cc",
+            "symbol": "Iterate",
+            "start_line": 918,
+            "end_line": 979,
+            "helpers": [],
+            "range_sha256": "f7ba941c6919fb4b75ac4bb2f758f08a9ad896e2a3f8bdf77b75f9a4dee056d0"
+          },
+          {
+            "path": "src/EnergyPlus/PsychCacheData.hh",
+            "symbol": "PsychrometricCacheData",
+            "start_line": 80,
+            "end_line": 201,
+            "helpers": [],
+            "range_sha256": "ea545ea881fadbd02d94218de5af13851da01c0b35bc9415ab28a2fa4a3d7b14"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsychrometricsData",
+            "start_line": 1702,
+            "end_line": 1735,
+            "helpers": [
+              "InitializePsychRoutines"
+            ],
+            "range_sha256": "c071a3e3b600f1641d06fbf51bba93743573881b43863c890d54ba3464255e8c"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "InitializePsychRoutines",
+            "start_line": 110,
+            "end_line": 134,
+            "helpers": [],
+            "range_sha256": "d5f82af56c939670da609d314846f42be482d6c52eef7262693d98b92027e114"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyWFnTdbH_error",
+            "start_line": 606,
+            "end_line": 638,
+            "helpers": [],
+            "range_sha256": "692bcf3c13daf88afdb162751e187773a64c3b2f0cd751d6cd8dc965fc3064ad"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyWFnTdbRhPb_error",
+            "start_line": 1228,
+            "end_line": 1262,
+            "helpers": [],
+            "range_sha256": "a112f86787cd9908b55096a87acab2f0c59952b738f3a4b5a0b7d0f2319b2044"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.cc",
+            "symbol": "PsyWFnTdbTwbPb_temperature_error",
+            "start_line": 786,
+            "end_line": 855,
+            "helpers": [],
+            "range_sha256": "3f02bcf9aa2c5cdc2c53f94a9f3443766386681d2d1c6dc32a9c84c0dd5b8a0c"
+          },
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "PsyWFnTdbRhPb",
+            "start_line": 2125,
+            "end_line": 2148,
+            "helpers": [
+              "PsyTwbFnTdbWPb"
+            ],
+            "range_sha256": "7be9f7a4703eefcc71827fbbec047220a58f8a1be5b285f24866db146806378f"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyWFnTdbH",
+            "start_line": 2191,
+            "end_line": 2330,
+            "helpers": [
+              "PsyTsatFnHPb",
+              "PsyWFnTdbRhPb"
+            ],
+            "range_sha256": "85b5f6c8ef320c1ff4e52e6a1abb356c754cc3a8a868b342bcf68751675feb02"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyWFnTdbRhPb",
+            "start_line": 2556,
+            "end_line": 2570,
+            "helpers": [],
+            "range_sha256": "0de6d34eb9a16db00963fa39535bb74b78dd94baa933126dabbe9c7bdeda1526"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyWFnTdbRhPb",
+            "start_line": 2610,
+            "end_line": 2632,
+            "helpers": [],
+            "range_sha256": "46cc41c0f0e5181339bc2219d59baa576f95a7f4ab706c74e5328620993d26a6"
+          },
+          {
+            "path": "src/EnergyPlus/api/func.cc",
+            "symbol": "PsyTwbFnTdbWPb",
+            "start_line": 207,
+            "end_line": 245,
+            "helpers": [
+              "PsyWFnTdbH",
+              "PsyPsatFnTemp",
+              "PsyTsatFnHPb"
+            ],
+            "range_sha256": "d62753b28e578e1c38147a49fe45d3c0159be78f0e46a4ec143f23ce27536b2f"
+          },
+          {
+            "path": "src/EnergyPlus/api/func.cc",
+            "symbol": "PsyWFnTdbRhPb",
+            "start_line": 273,
+            "end_line": 289,
+            "helpers": [
+              "PsyWFnTdbTwbPb"
+            ],
+            "range_sha256": "a767c745d526efbcbbc7b9e66d108006fe5eb9c233b1063e42c2868e54b4d9de"
+          }
+        ],
+        "additional_direct_helper_ranges": [
+          {
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+            "symbol": "min",
+            "start_line": 90,
+            "end_line": 96,
+            "helpers": [],
+            "range_sha256": "e9df9b39ae0aefa1fa2738bf1a676ddde126bd15f70765f28ae6b6dc127be0f9"
+          },
+          {
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+            "symbol": "max",
+            "start_line": 338,
+            "end_line": 344,
+            "helpers": [],
+            "range_sha256": "adac2895827d687dfeacca560aec41f77eb548a1d8c0a0d55b2950032928749a"
+          }
+        ],
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/contracts/PSY-02-cases.json",
+            "sha256": "9536841ec7d730afa788247b155531d5298833d7a2cecfdcb1e693a975d95d6b"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+            "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+            "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+            "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+            "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+            "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+            "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+            "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+            "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/source-original-preparation.json",
+              "sha256": "f618a353711c788d58a815e2a24ad6267219aaa6adce13c05e604fca7e370ade"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/native-reachability.json",
+              "sha256": "61822b8955edb6e8c9535e3ae5ce05a7932cd674aad3efc92f4aae0c90af6f65"
+            },
+            {
+              "path": ".runtime/porting/PSY-02/committed-units/e7eec6e030a1/comparison/comparison-report.json",
+              "sha256": "7121026bbb2d95edbb1f4bdf9c75f92c955978e6f37bc873392f3bf177a3f21e"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/A-24H.json",
+              "sha256": "cc92214afb98ffd6406c7aabb00abaa600596082673250fcf1cb7363aa535de3"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/A-72H.json",
+              "sha256": "d8695a5e58f161f8676224c1c4794e15777bab84cefd840c479fd5c7df6e8e5d"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/B-NOLIMIT-24H.json",
+              "sha256": "5fce462ea98de6cc2242486f26d6ccff434d8d8e73f82c2e033c8c48897f466f"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/B-FLOW-24H.json",
+              "sha256": "60b74931371a4788f2819da1044f73ae176bc5e561042f222410f790cb4a77bc"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/B-CAPACITY-24H.json",
+              "sha256": "fbde511ff4eb97068029ee966c10e448edee42047e915afdbdb472e7beab1df4"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-24H.json",
+              "sha256": "b984416d2c1634a087fbab7dbcb306439bc3e3e16c8ddef3f3e19908662e2e92"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-72H.json",
+              "sha256": "8d2660bc206b5508b4c44c4d10f54093ed0a1f701e249bb1e91a3e85c04f730f"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python -B tools/porting/psy02_reference.py --check; independent original 14-file/29-range source, frozen input/state/precision and native lifetime review",
+            "commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/contracts/PSY-02-source.json",
+                "sha256": "302f96b1309fdb81bff9c4a4e9190870d9cb3616b40ad71c509c86de63d81e13"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/PSY-02-cases.json",
+                "sha256": "9536841ec7d730afa788247b155531d5298833d7a2cecfdcb1e693a975d95d6b"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+                "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/independent-amended-contract-review.json",
+                "sha256": "dbacc53b88325cb7c0c82fb1202c39e43e64762d2e617573edbda83473ece8f2"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/source-review.md",
+                "sha256": "41c398572f4b884112e8ca4d1641bdf26dad133080e6550b893bd502082d20f6"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/source-original-preparation.json",
+                "sha256": "f618a353711c788d58a815e2a24ad6267219aaa6adce13c05e604fca7e370ade"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/native-reachability.json",
+                "sha256": "61822b8955edb6e8c9535e3ae5ce05a7932cd674aad3efc92f4aae0c90af6f65"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/independent-review.json",
+                "sha256": "1c6c6b081efead380af8f6aae56e8abd83955836ef9a25709ca91674fe613d6f"
+              }
+            ]
+          },
+          "unit_gate": {
+            "command": "python -B .runtime/porting/PSY-02/run_committed_units.py; python -B tools/porting/psy02_reference.py --compare-units --original-dir .runtime/porting/PSY-02/original-first --rust-dir .runtime/porting/PSY-02/committed-units/e7eec6e030a1 --output-dir .runtime/porting/PSY-02/committed-units/e7eec6e030a1/comparison",
+            "commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/PSY-02/committed-units/e7eec6e030a1/comparison/comparison-report.json",
+                "sha256": "7121026bbb2d95edbb1f4bdf9c75f92c955978e6f37bc873392f3bf177a3f21e"
+              },
+              {
+                "path": ".runtime/porting/PSY-02/committed-units/e7eec6e030a1/execution.json",
+                "sha256": "959d2be83f6ecf660a16f35e53e5489cfe2d998214c3c10022155004b018d2a8"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/build-receipt.json",
+                "sha256": "5030e0008ce58f05ce3f509b61fbf16f812d81d992afe3d35393acf9f4f268ac"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/source-unit-preparation.json",
+                "sha256": "e99886ac67f8dfef6eec2f1a024c6344f550a4637e976dc93abd77afe376d619"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/initial-checks.json",
+                "sha256": "95dc451a40ff7a9c5a7ded6cc4163b0c71dccf240ac209ae1ae0c291cfadda3a"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/independent-review.json",
+                "sha256": "1c6c6b081efead380af8f6aae56e8abd83955836ef9a25709ca91674fe613d6f"
+              }
+            ],
+            "scope": "516 paired numerical roots in three fresh lifetimes; five General::Iterate diagnostics explicitly unpaired. Four cache tables, first-writer inputs, saved scalar transitions and own-result chaining included. Warning lifecycle and local iteration counters are source-only."
+          },
+          "integration_gate": {
+            "command": "python -B tools/porting/check_psy02_production.py --case <each of A-24H,A-72H,B-NOLIMIT-24H,B-FLOW-24H,B-CAPACITY-24H,B-BOTH-24H,B-BOTH-72H> --original-driver-build .runtime/porting/PSY-02/native-driver-replay-target-frozen/native-driver-build.json; independent actual caller/phase/zone interval, ordered same-input replay, root cache before/after and all four final tables review",
+            "commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/A-24H.json",
+                "sha256": "cc92214afb98ffd6406c7aabb00abaa600596082673250fcf1cb7363aa535de3"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/A-72H.json",
+                "sha256": "d8695a5e58f161f8676224c1c4794e15777bab84cefd840c479fd5c7df6e8e5d"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-NOLIMIT-24H.json",
+                "sha256": "5fce462ea98de6cc2242486f26d6ccff434d8d8e73f82c2e033c8c48897f466f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-FLOW-24H.json",
+                "sha256": "60b74931371a4788f2819da1044f73ae176bc5e561042f222410f790cb4a77bc"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-CAPACITY-24H.json",
+                "sha256": "fbde511ff4eb97068029ee966c10e448edee42047e915afdbdb472e7beab1df4"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-24H.json",
+                "sha256": "b984416d2c1634a087fbab7dbcb306439bc3e3e16c8ddef3f3e19908662e2e92"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-72H.json",
+                "sha256": "8d2660bc206b5508b4c44c4d10f54093ed0a1f701e249bb1e91a3e85c04f730f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/comparison-report.json",
+                "sha256": "30ee7d439c84bb15fee7953dd11b4c42e0b334398407410f6739414f46537a67"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/independent-review.json",
+                "sha256": "1c6c6b081efead380af8f6aae56e8abd83955836ef9a25709ca91674fe613d6f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/build-receipt.json",
+                "sha256": "5030e0008ce58f05ce3f509b61fbf16f812d81d992afe3d35393acf9f4f268ac"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/native-reachability.json",
+                "sha256": "61822b8955edb6e8c9535e3ae5ce05a7932cd674aad3efc92f4aae0c90af6f65"
+              },
+              {
+                "path": ".runtime/porting/PSY-02/production-source-review/final/review.json",
+                "sha256": "b1a8f5f57a5350d328a6d040d61967d3d8546be0e1d2aa43c013fa95817b1376"
+              },
+              {
+                "path": ".runtime/porting/PSY-02/checker-guard-probes-v2/receipt.json",
+                "sha256": "8e6b3d5ba49129ca58af431f493af666a6fc0385387c17cb48e26bff03df84bc"
+              }
+            ],
+            "scope": "Current consumed property kernels at real weather/setup/zone/HVAC callers, including validation recomputations; this is not completion of downstream HVAC-05 saturation assembly or CLK-04 weather integration. Original cached HPb is inactive for the exact CON15 inputs under the audited lifetime."
+          },
+          "production_gate": {
+            "command": "python -B tools/porting/check_psy02_production.py --case <each of A-24H,A-72H,B-NOLIMIT-24H,B-FLOW-24H,B-CAPACITY-24H,B-BOTH-24H,B-BOTH-72H> --original-driver-build .runtime/porting/PSY-02/native-driver-replay-target-frozen/native-driver-build.json",
+            "commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/A-24H.json",
+                "sha256": "cc92214afb98ffd6406c7aabb00abaa600596082673250fcf1cb7363aa535de3"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/A-72H.json",
+                "sha256": "d8695a5e58f161f8676224c1c4794e15777bab84cefd840c479fd5c7df6e8e5d"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-NOLIMIT-24H.json",
+                "sha256": "5fce462ea98de6cc2242486f26d6ccff434d8d8e73f82c2e033c8c48897f466f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-FLOW-24H.json",
+                "sha256": "60b74931371a4788f2819da1044f73ae176bc5e561042f222410f790cb4a77bc"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-CAPACITY-24H.json",
+                "sha256": "fbde511ff4eb97068029ee966c10e448edee42047e915afdbdb472e7beab1df4"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-24H.json",
+                "sha256": "b984416d2c1634a087fbab7dbcb306439bc3e3e16c8ddef3f3e19908662e2e92"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/production/B-BOTH-72H.json",
+                "sha256": "8d2660bc206b5508b4c44c4d10f54093ed0a1f701e249bb1e91a3e85c04f730f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/comparison-report.json",
+                "sha256": "30ee7d439c84bb15fee7953dd11b4c42e0b334398407410f6739414f46537a67"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/independent-review.json",
+                "sha256": "1c6c6b081efead380af8f6aae56e8abd83955836ef9a25709ca91674fe613d6f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-02/build-receipt.json",
+                "sha256": "5030e0008ce58f05ce3f509b61fbf16f812d81d992afe3d35393acf9f4f268ac"
+              }
+            ],
+            "scope": "Seven ordinary Full/Summary CLI pairs for fixed CON24H/72H inputs, no oracle/fixture answers; selected property comparisons use actual Rust operands after production has completed.",
+            "command_repository_heads": [
+              "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a"
+            ]
+          }
+        },
+        "production": {
+          "rust_entrypoint": ".runtime/porting/PSY-02/committed-build/e7eec6e030a1/eplus-rs.exe run <frozen-IDF> --weather <pinned-EPW> --porting-scope A|B --mode compatibility --partial deny --trace-level full|summary",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "completed_actual_cases": [
+            "A-24H",
+            "A-72H",
+            "B-NOLIMIT-24H",
+            "B-FLOW-24H",
+            "B-CAPACITY-24H",
+            "B-BOTH-24H",
+            "B-BOTH-72H"
+          ],
+          "actual_zone_invocations": 1056,
+          "ordered_selected_kernel_roots": 22895,
+          "routine_counts_are_native_producer_counts": false,
+          "cached_HPb_actual_Rust_producer_calls": 0,
+          "cached_HPb_original_CON15_inactive_including_warmup": true,
+          "B_annual_Rust_physics_executed": false
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+            "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+          },
+          "report": {
+            "path": "energyplus_porting_plan/evidence/PSY-02/comparison-report.json",
+            "sha256": "30ee7d439c84bb15fee7953dd11b4c42e0b334398407410f6739414f46537a67"
+          }
+        },
+        "contracts": [
+          {
+            "path": "energyplus_porting_plan/contracts/PSY-02-source.json",
+            "sha256": "302f96b1309fdb81bff9c4a4e9190870d9cb3616b40ad71c509c86de63d81e13"
+          },
+          {
+            "path": "energyplus_porting_plan/contracts/PSY-02-cases.json",
+            "sha256": "9536841ec7d730afa788247b155531d5298833d7a2cecfdcb1e693a975d95d6b"
+          },
+          {
+            "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+            "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+          }
+        ],
+        "scope_metrics": {
+          "unit": {
+            "paired_calls": 516,
+            "unpaired_General_calls": 5,
+            "comparison_count": 33510,
+            "mismatch_count": 0,
+            "maximum_absolute_error": 0.0,
+            "rmse": 0.0
+          },
+          "production": {
+            "case_count": 7,
+            "normal_cli_invocations": 14,
+            "actual_zone_invocations": 1056,
+            "ordered_kernel_roots": 22895,
+            "mismatches": 0,
+            "omitted_roots": 0,
+            "statistics": {
+              "PsyWFnTdbRhPb.value": {
+                "count": 20783,
+                "max_absolute_error": 4.440892098500626e-16,
+                "sum_squared_error": 1.2494407319635892e-29,
+                "unit": "kg/kg",
+                "rmse": 2.451905405833003e-17
+              },
+              "PsyWFnTdbRhPb.state_before.iconv_tol": {
+                "count": 20783,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "exact",
+                "rmse": 0.0
+              },
+              "PsyWFnTdbRhPb.state_before.last_patm": {
+                "count": 20783,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyWFnTdbRhPb.state_before.last_t_boil": {
+                "count": 20783,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 7.229752424169529e-26,
+                "unit": "degC",
+                "rmse": 1.8651234994433174e-15
+              },
+              "PsyWFnTdbRhPb.state_before.press_save": {
+                "count": 20783,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyWFnTdbRhPb.state_before.t_sat_save": {
+                "count": 20783,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 6.623907248959792e-26,
+                "unit": "degC",
+                "rmse": 1.7852662815339883e-15
+              },
+              "PsyWFnTdbRhPb.state_after.iconv_tol": {
+                "count": 20783,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "exact",
+                "rmse": 0.0
+              },
+              "PsyWFnTdbRhPb.state_after.last_patm": {
+                "count": 20783,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyWFnTdbRhPb.state_after.last_t_boil": {
+                "count": 20783,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 7.229752424169529e-26,
+                "unit": "degC",
+                "rmse": 1.8651234994433174e-15
+              },
+              "PsyWFnTdbRhPb.state_after.press_save": {
+                "count": 20783,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyWFnTdbRhPb.state_after.t_sat_save": {
+                "count": 20783,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 6.623907248959792e-26,
+                "unit": "degC",
+                "rmse": 1.7852662815339883e-15
+              },
+              "PsyTwbFnTdbWPb.value": {
+                "count": 2112,
+                "max_absolute_error": 1.0436096431476471e-14,
+                "sum_squared_error": 7.19069817729494e-27,
+                "unit": "degC",
+                "rmse": 1.8451792967017515e-15
+              },
+              "PsyTwbFnTdbWPb.state_before.iconv_tol": {
+                "count": 2112,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "exact",
+                "rmse": 0.0
+              },
+              "PsyTwbFnTdbWPb.state_before.last_patm": {
+                "count": 2112,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyTwbFnTdbWPb.state_before.last_t_boil": {
+                "count": 2112,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 3.6148762120847645e-26,
+                "unit": "degC",
+                "rmse": 4.1371356221067225e-15
+              },
+              "PsyTwbFnTdbWPb.state_before.press_save": {
+                "count": 2112,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyTwbFnTdbWPb.state_before.t_sat_save": {
+                "count": 2112,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 3.311953624479896e-26,
+                "unit": "degC",
+                "rmse": 3.9599998233279104e-15
+              },
+              "PsyTwbFnTdbWPb.cache_before.value": {
+                "count": 2112,
+                "max_absolute_error": 1.0436096431476471e-14,
+                "sum_squared_error": 3.6458361865816145e-27,
+                "unit": "degC",
+                "rmse": 1.3138676472172429e-15
+              },
+              "PsyTwbFnTdbWPb.state_after.iconv_tol": {
+                "count": 2112,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "exact",
+                "rmse": 0.0
+              },
+              "PsyTwbFnTdbWPb.state_after.last_patm": {
+                "count": 2112,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyTwbFnTdbWPb.state_after.last_t_boil": {
+                "count": 2112,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 3.6148762120847645e-26,
+                "unit": "degC",
+                "rmse": 4.1371356221067225e-15
+              },
+              "PsyTwbFnTdbWPb.state_after.press_save": {
+                "count": 2112,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "PsyTwbFnTdbWPb.state_after.t_sat_save": {
+                "count": 2112,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 3.311953624479896e-26,
+                "unit": "degC",
+                "rmse": 3.9599998233279104e-15
+              },
+              "PsyTwbFnTdbWPb.cache_after.value": {
+                "count": 2112,
+                "max_absolute_error": 1.0436096431476471e-14,
+                "sum_squared_error": 7.19069817729494e-27,
+                "unit": "degC",
+                "rmse": 1.8451792967017515e-15
+              },
+              "initial_state.iconv_tol": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "exact",
+                "rmse": 0.0
+              },
+              "initial_state.last_patm": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "initial_state.last_t_boil": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "degC",
+                "rmse": 0.0
+              },
+              "initial_state.press_save": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "initial_state.t_sat_save": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "degC",
+                "rmse": 0.0
+              },
+              "final_state.iconv_tol": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "exact",
+                "rmse": 0.0
+              },
+              "final_state.last_patm": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "final_state.last_t_boil": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "degC",
+                "rmse": 0.0
+              },
+              "final_state.press_save": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "Pa",
+                "rmse": 0.0
+              },
+              "final_state.t_sat_save": {
+                "count": 7,
+                "max_absolute_error": 0.0,
+                "sum_squared_error": 0.0,
+                "unit": "degC",
+                "rmse": 0.0
+              },
+              "final_caches.Psat.value": {
+                "count": 7400,
+                "max_absolute_error": 1.4551915228366852e-11,
+                "sum_squared_error": 2.276034953701392e-20,
+                "unit": "Pa",
+                "rmse": 1.7537739051563307e-12
+              },
+              "final_caches.TsatPb.value": {
+                "count": 268,
+                "max_absolute_error": 2.842170943040401e-14,
+                "sum_squared_error": 1.5953922947189743e-26,
+                "unit": "degC",
+                "rmse": 7.7155403722476e-15
+              },
+              "final_caches.Twb.value": {
+                "count": 984,
+                "max_absolute_error": 1.0436096431476471e-14,
+                "sum_squared_error": 3.544861990713325e-27,
+                "unit": "degC",
+                "rmse": 1.8980258225542265e-15
+              }
+            }
+          }
+        },
+        "provenance": {
+          "rust_implementation_commit": "e7eec6e030a1cf51236a74a427bf0fa3c90ea65a",
+          "crates_tree": "00f67b59be61f53cafc3f473da8c95607df0fae3",
+          "original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+          "scientific_review": {
+            "path": "energyplus_porting_plan/evidence/PSY-02/independent-review.json",
+            "sha256": "1c6c6b081efead380af8f6aae56e8abd83955836ef9a25709ca91674fe613d6f"
+          },
+          "compiled_source_bytes": "Exact immutable build archives; scheduled_output.rs had one CRLF normalized by Git, with identical source tokens."
+        },
+        "limitations": [
+          "Actual Rust scopes include validation and recomputation; routine totals are not native producer call counts.",
+          "Warmup/HVAC-05/CLK-04/SYS and full physics parity remain later obligations.",
+          "No B annual Rust physics proof or inactive HPb producer execution is claimed.",
+          "EP/original results were test peers only; no reference values or fixture demand supplied to production.",
+          "ErrorManager warning recurrence, source-only iteration counters and the five unsupported General::Iterate Rust scalar calls are not paired passes.",
+          "Whole-building/HVAC physics, warmup and SYS integration are separate gates. Same-input selected-kernel replay does not establish upstream weather/heat-balance/HVAC operand equivalence."
+        ]
+      }
     },
     {
       "id": "CTF-01",
