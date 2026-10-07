@@ -185,10 +185,12 @@ $solar = "crates\ep_runtime\src\heat_balance\solar.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
 $state = "crates\ep_runtime\src\heat_balance\state.rs"
 $runPeriod = "crates\ep_runtime\src\heat_balance\run_period.rs"
+$runPeriodWeatherSampling = "crates\ep_runtime\src\heat_balance\run_period\weather_sampling.rs"
 $trace = "crates\ep_runtime\src\heat_balance\trace.rs"
 $summary = "crates\ep_runtime\src\heat_balance\summary.rs"
 $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
+$timestepPurchasedAir = "crates\ep_runtime\src\heat_balance\timestep\purchased_air.rs"
 $typedIds = "crates\ep_model\src\ids.rs"
 $calendarObjects = "crates\ep_model\src\objects\calendar.rs"
 $scheduleObjects = "crates\ep_model\src\objects\schedules.rs"
@@ -275,10 +277,12 @@ foreach ($entry in @(
         @($reports, "report ownership module"),
         @($state, "heat-balance state ownership module"),
         @($runPeriod, "run-period sampling ownership module"),
+        @($runPeriodWeatherSampling, "run-period timestep weather sampling module"),
         @($trace, "heat-balance trace ownership module"),
         @($summary, "heat-balance summary ownership module"),
         @($surfaceWeather, "surface weather ownership module"),
         @($timestep, "heat-balance timestep ownership module"),
+        @($timestepPurchasedAir, "direct Zone PurchasedAir timestep coupling module"),
         @($typedIds, "typed compact ID module"),
         @($calendarObjects, "typed calendar control module"),
         @($scheduleObjects, "typed compact schedule module"),
@@ -354,11 +358,13 @@ Assert-LineLimit -Path $solar -Limit 760 -Description "solar radiation ownership
 Assert-LineLimit -Path $reports -Limit 900 -Description "report ownership module"
 Assert-LineLimit -Path $state -Limit 980 -Description "heat-balance state ownership module"
 Assert-LineLimit -Path $runPeriod -Limit 920 -Description "run-period sampling ownership module"
+Assert-LineLimit -Path $runPeriodWeatherSampling -Limit 200 -Description "run-period timestep weather sampling module"
 Assert-LineLimit -Path $trace -Limit 800 -Description "heat-balance trace ownership module"
 Assert-LineLimit -Path $summary -Limit 160 -Description "heat-balance summary ownership module"
 Assert-LineLimit -Path $warmup -Limit 220 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 Assert-LineLimit -Path $timestep -Limit 800 -Description "heat-balance timestep ownership module"
+Assert-LineLimit -Path $timestepPurchasedAir -Limit 200 -Description "direct Zone PurchasedAir timestep coupling module"
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Description "HeatBalanceSurfaceManager module declaration"
@@ -1009,6 +1015,10 @@ Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulationSummary' -Descript
 Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulation' -Description "heat-balance simulation result owner"
 Assert-NotContains -Path $state -Pattern 'pub struct HeatBalanceSimulationSummary' -Description "state-owned simulation summary"
 Assert-Contains -Path $runPeriod -Pattern 'sample_heat_balance_run_period' -Description "run-period sampler owner"
+Assert-Contains -Path $runPeriod -Pattern 'mod weather_sampling;' -Description "run-period timestep weather sampling module ownership"
+Assert-Contains -Path $runPeriod -Pattern 'sample_run_period_weather\s*\(' -Description "run-period samples weather before advancing each timestep"
+Assert-Contains -Path $runPeriodWeatherSampling -Pattern 'pub\(super\) fn sample_run_period_weather' -Description "run-period timestep weather sampling implementation"
+Assert-Contains -Path $runPeriodWeatherSampling -Pattern 'heat_balance_weather_context_for_timestep\s*\(' -Description "run-period weather sampler consumes the precomputed timestep context"
 Assert-Contains -Path $runtime -Pattern 'sample_heat_balance_run_period' -Description "runtime delegates run-period sampling"
 Assert-Contains -Path $runtime -Pattern 'init_heat_balance_source_order_path' -Description "runtime enters InitHeatBalance source-order wrapper"
 Assert-Contains -Path $surfaceWeather -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface weather source owner"
@@ -1022,6 +1032,10 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_weather_record_is_rain
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_reference_temperature_c\s*\(' -Description "runtime-owned wet exterior reference temperature"
 Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep' -Description "heat-balance timestep advance owner"
 Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep_internal' -Description "heat-balance internal timestep advance owner"
+Assert-Contains -Path $timestep -Pattern 'mod purchased_air;' -Description "direct Zone PurchasedAir timestep coupling module ownership"
+Assert-Contains -Path $timestep -Pattern 'pub\(crate\) use purchased_air::advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air' -Description "direct Zone PurchasedAir timestep coupling retains its caller path"
+Assert-Contains -Path $timestepPurchasedAir -Pattern 'pub\(crate\) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air' -Description "direct Zone PurchasedAir timestep coupling implementation"
+Assert-Contains -Path $timestepPurchasedAir -Pattern 'advance_heat_balance_state_one_timestep_source_order_path\s*\(' -Description "direct Zone PurchasedAir timestep coupling enters the shared source-order executor"
 Assert-Contains -Path $timestep -Pattern 'manager::manage_heat_balance_source_order_path' -Description "timestep enters ManageHeatBalance source-order wrapper"
 Assert-Contains -Path $timestep -Pattern 'surface_manager::manage_surface_heat_balance_source_order_path' -Description "timestep enters ManageSurfaceHeatBalance source-order wrapper"
 Assert-Contains -Path $timestep -Pattern 'surface_manager::init_surface_heat_balance_source_order_path' -Description "timestep enters InitSurfaceHeatBalance source-order wrapper"

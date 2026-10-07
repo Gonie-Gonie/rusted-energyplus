@@ -29,7 +29,6 @@ use crate::heat_balance::inside_convection::{
     zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w,
     zone_air_heat_balance_surface_convection_rate_w,
 };
-use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
 use crate::heat_balance::reports::{
     heat_gain_rate_w, heat_loss_rate_w, zone_surface_report_conduction_rates_for_indices_w,
 };
@@ -44,10 +43,6 @@ use crate::heat_balance::surface_balance::{
     surface_inside_face_balance_equation_terms_w_per_m2,
 };
 use crate::heat_balance::surface_manager;
-use crate::heat_balance::surface_weather::{
-    energyplus_exterior_wet_reference_temperature_c,
-    energyplus_weather_record_is_rain_at_timestep_with_starting_values,
-};
 use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled;
 use crate::heat_balance::trace::{
     HeatBalanceCtfHistorySlotFirstSampleAccumulator, HeatBalanceRunPeriodSamples,
@@ -65,14 +60,15 @@ use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache}
 use crate::weather::{
     EpwRecord, HeatBalanceWeatherContext, WeatherTimestepSeries,
     energyplus_weather_atmospheric_pressure_for_context,
-    energyplus_weather_dry_bulb_at_timestep_with_starting_values,
-    energyplus_weather_horizontal_infrared_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
-    heat_balance_weather_context_for_timestep,
 };
 use ep_model::{FirstHourInterpolationStartingValues, SimulationModel};
 use std::collections::BTreeMap;
 use std::convert::Infallible;
+
+mod weather_sampling;
+
+use weather_sampling::{RunPeriodWeatherSample, sample_run_period_weather};
 
 pub(crate) fn sample_heat_balance_run_period(
     model: &SimulationModel,
@@ -218,64 +214,22 @@ where
             BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
         for substep in 1..=steps {
-            let weather_context = heat_balance_weather_context_for_timestep(
+            let RunPeriodWeatherSample {
+                weather_context,
+                timestep_outdoor_dry_bulb_c,
+                timestep_outdoor_wet_bulb_c,
+                timestep_horizontal_infrared_radiation_w_per_m2,
+                timestep_sky_temperature_c,
+                timestep_rain_status,
+            } = sample_run_period_weather(
+                weather_records,
                 weather_series,
                 hour_index,
+                outdoor_dry_bulb_c,
                 steps,
                 substep,
                 first_hour_interpolation_starting_values,
             );
-            let timestep_outdoor_dry_bulb_c = weather_context
-                .and_then(|context| context.sample.map(|sample| sample.dry_bulb_c))
-                .unwrap_or_else(|| {
-                    energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-                        weather_records,
-                        hour_index,
-                        outdoor_dry_bulb_c,
-                        steps,
-                        substep,
-                        first_hour_interpolation_starting_values,
-                    )
-                });
-            let timestep_outdoor_wet_bulb_c = weather_context
-                .map(|context| {
-                    energyplus_exterior_wet_reference_temperature_c(
-                        context,
-                        timestep_outdoor_dry_bulb_c,
-                    )
-                })
-                .unwrap_or(timestep_outdoor_dry_bulb_c);
-            let timestep_horizontal_infrared_radiation_w_per_m2 = weather_context
-                .and_then(|context| {
-                    context.records.get(context.record_index).map(|record| {
-                        energyplus_weather_horizontal_infrared_for_context(
-                            context,
-                            record.horizontal_infrared_radiation_wh_per_m2,
-                        )
-                    })
-                })
-                .unwrap_or(0.0);
-            let timestep_sky_temperature_c = horizontal_infrared_sky_temperature_c(
-                timestep_horizontal_infrared_radiation_w_per_m2,
-                timestep_outdoor_dry_bulb_c,
-            );
-            let timestep_rain_status = weather_context
-                .map(|context| {
-                    let is_raining = context
-                        .sample
-                        .map(|sample| sample.liquid_precipitation_depth_mm >= 0.8)
-                        .unwrap_or_else(|| {
-                            energyplus_weather_record_is_rain_at_timestep_with_starting_values(
-                                context.records,
-                                context.record_index,
-                                substep,
-                                steps,
-                                context.first_hour_interpolation_starting_values,
-                            )
-                        });
-                    if is_raining { 1.0 } else { 0.0 }
-                })
-                .unwrap_or(0.0);
             let timestep_output = step_driver(
                 &mut *state,
                 HeatBalanceStepInput {
