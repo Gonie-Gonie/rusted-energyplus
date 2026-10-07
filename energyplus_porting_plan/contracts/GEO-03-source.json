@@ -1,0 +1,862 @@
+{
+  "schema": "geo03-source-contract.v1",
+  "card": "GEO-03",
+  "status": "draft-before-independent-review",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_files": [
+    {
+      "path": "idd/Energy+.idd.in",
+      "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa"
+    },
+    {
+      "path": "src/EnergyPlus/DataVectorTypes.hh",
+      "sha256": "a04e92db8abe94a09101ece79e8f5329e066da836f19ad1cf5cecba299d5978d"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "sha256": "359720562a1122716bf842f23a54a9967d6bdaeea2e5c31638b8002e31f7160e"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "sha256": "6094403cb5858a65d75750c4d4af84246725e29d0e85ba48b27cdd508d988578"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.hh",
+      "sha256": "4676182160691660e12947d26c8f5ec6caed08bbdab714330703b04eebbe8ea9"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "sha256": "c29f615d16c616171f35cf13191c5d7917aecddbdad85b83653477e35dccfc98"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "SetupZoneGeometry",
+      "start": 251,
+      "end": 267,
+      "role": "caller-label-and-initialization-boundary",
+      "helpers": [],
+      "range_sha256": "bec3475da10596ba4c58d86c5812fbfaf1030a945ad6610218644b083ae81884"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "SetupZoneGeometry",
+      "start": 273,
+      "end": 289,
+      "role": "incoming-GEO01-trig-fragment",
+      "helpers": [
+        "std::sin",
+        "std::cos"
+      ],
+      "range_sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "ProcessSurfaceVertices",
+      "start": 350,
+      "end": 355,
+      "role": "incoming-GEO02-caller",
+      "helpers": [],
+      "range_sha256": "95fd3bac28087faaf76122b6d6151820edb3944ee7e4b1a2c5f63c8bab413279"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "geometricFloorArea",
+      "start": 376,
+      "end": 391,
+      "role": "normal-caller-geometric-area-producer",
+      "helpers": [],
+      "range_sha256": "b709ae0316d6e35efc20d787b02f03d7e59f45af2c5ea819cb2accd8099010bd"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "SetupZoneGeometry",
+      "start": 455,
+      "end": 546,
+      "role": "byte-exact-helper-height-caller-fragment",
+      "helpers": [
+        "minval",
+        "maxval",
+        "ShowWarningError",
+        "ShowContinueError"
+      ],
+      "range_sha256": "f36cb794194e9c2177797d4ce353e7a4e64af486ff973b3c16b175b0889c098b"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CalculateZoneVolume",
+      "start": 548,
+      "end": 548,
+      "role": "normal-initialization-caller",
+      "helpers": [],
+      "range_sha256": "12e05b6718b03826619c888d0b27147b71fee1cd17d70ad73d9802eaf959099a"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetSurfaceData",
+      "start": 2302,
+      "end": 2456,
+      "role": "normal-parser-floor-ceiling-and-space-area-preparation",
+      "helpers": [
+        "setSurfaceFirstLast"
+      ],
+      "range_sha256": "98fc300aeaea0d5f5d8c4fd0c956ba87cf34df3b4f5bfd45772c94074aa93b73"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "CalculateZoneVolume",
+      "start": 12010,
+      "end": 12322,
+      "role": "primary-volume-state-owner",
+      "helpers": [
+        "Vectors::CreateNewellAreaVector",
+        "Vectors::VecLength",
+        "areSurfaceHorizAndVert",
+        "areWallHeightSame",
+        "isEnclosedVolume",
+        "Vectors::CalcPolyhedronVolume",
+        "areFloorAndCeilingSame",
+        "areOppositeWallsSame"
+      ],
+      "range_sha256": "0c0d518a8f311391a383ff5256746da79a9d68a13813254096980282c4db33b6"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "isEnclosedVolume",
+      "start": 12325,
+      "end": 12350,
+      "role": "closed-firstpass-and-excluded-local-repair",
+      "helpers": [
+        "makeListOfUniqueVertices",
+        "edgesNotTwoForEnclosedVolumeTest",
+        "updateZonePolygonsForMissingColinearPoints",
+        "edgesInBoth"
+      ],
+      "range_sha256": "e97ca163a91b212acf570cccbdbaf32ac93a50ec151c70995a8f60bd8eb287b6"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "edgesInBoth",
+      "start": 12353,
+      "end": 12368,
+      "role": "source-only-open-zone-diagnostic-helper",
+      "helpers": [
+        "edgesEqualOnSameSurface"
+      ],
+      "range_sha256": "d492f92483da2a532e7d168e3aff1ed2c7b7291ff5ba5ccf5afc76da0b61a6aa"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "edgesEqualOnSameSurface",
+      "start": 12371,
+      "end": 12379,
+      "role": "source-only-exact-edge-intersection-helper",
+      "helpers": [],
+      "range_sha256": "f88151e532f87b3a07b38b047c90a8ce1c3aa121ff046d79963e447bb076547d"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "edgesNotTwoForEnclosedVolumeTest",
+      "start": 12382,
+      "end": 12448,
+      "role": "undirected-firstencounter-edge-multiplicity",
+      "helpers": [
+        "findIndexOfVertex"
+      ],
+      "range_sha256": "a4f171a189695c1aea459d68a7ef9308c4c885edaa4dfeb5fd4cc1b8a5103715"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "makeListOfUniqueVertices",
+      "start": 12451,
+      "end": 12478,
+      "role": "ordered-firstencounter-vertex-identity",
+      "helpers": [
+        "isAlmostEqual3dPt"
+      ],
+      "range_sha256": "fc99aef6a4ff52df16a46dcf5748dbb743dbb025a5015ada052d0d87a573499d"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "updateZonePolygonsForMissingColinearPoints",
+      "start": 12482,
+      "end": 12523,
+      "role": "excluded-active-collinear-repair-diagnostic",
+      "helpers": [
+        "isAlmostEqual3dPt",
+        "isPointOnLineBetweenPoints"
+      ],
+      "range_sha256": "ca0240ba38d4b09632aa3c6e22672afdb047454bbaf48e153db42a2dc14d0197"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "areFloorAndCeilingSame",
+      "start": 12526,
+      "end": 12577,
+      "role": "source-only-open-zone-fallback-predicate",
+      "helpers": [
+        "isAlmostEqual2dPt"
+      ],
+      "range_sha256": "46b48e52885bddbe0db5b5398bd77da25fdaf03f40c74b6e09a68cc4e3b39d4f"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "areWallHeightSame",
+      "start": 12580,
+      "end": 12611,
+      "role": "prepriority-always-evaluated-wall-height-predicate",
+      "helpers": [],
+      "range_sha256": "a7cf778e90fa037e7761e3ae700b7aa1320f92d2419f898b903502cea662ccf1"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "areSurfaceHorizAndVert",
+      "start": 12614,
+      "end": 12639,
+      "role": "prepriority-always-evaluated-incoming-tilt-predicate",
+      "helpers": [],
+      "range_sha256": "a6cda4f5cced11e6013a4f6b61160eaf2e631805e6d264a53da0c76f974fd05e"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "areOppositeWallsSame",
+      "start": 12643,
+      "end": 12680,
+      "role": "source-only-open-zone-fallback-owner",
+      "helpers": [
+        "listOfFacesFacingAzimuth",
+        "findPossibleOppositeFace",
+        "areCornersEquidistant"
+      ],
+      "range_sha256": "ae23aaef6831a1e67131c9c8f11b3e5a20a39137240512a06033a5aef4068422"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "listOfFacesFacingAzimuth",
+      "start": 12683,
+      "end": 12697,
+      "role": "source-only-opposite-wall-angle-helper",
+      "helpers": [
+        "General::rotAzmDiffDeg"
+      ],
+      "range_sha256": "bad80f854b344bcf2c309d6d7d21744fb24e7df5ccc0d3babef5a6eb19802c8d"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "findPossibleOppositeFace",
+      "start": 12700,
+      "end": 12721,
+      "role": "source-only-opposite-face-selection",
+      "helpers": [],
+      "range_sha256": "69d535702943141e584489573cbcb1c669e0271ff999c132374a05ba6bcb7ed0"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "areCornersEquidistant",
+      "start": 12724,
+      "end": 12751,
+      "role": "source-only-opposite-wall-distance-helper",
+      "helpers": [
+        "distance"
+      ],
+      "range_sha256": "405d31761538df0ef00d3998bec7485e91591ca246ca93afa0b970cbcba8416d"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "isAlmostEqual3dPt",
+      "start": 12754,
+      "end": 12760,
+      "role": "strict-axiswise-one-centimeter-vertex-identity",
+      "helpers": [],
+      "range_sha256": "559edadd230f83807288f7796d18e5307d342c1d1768643d897100d55e0d9047"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "isAlmostEqual2dPt",
+      "start": 12763,
+      "end": 12776,
+      "role": "source-only-two-2D-identity-overloads",
+      "helpers": [],
+      "range_sha256": "f5fd8423d608137abba56c4f771e77d366c57aa6c4bc36f38925f8f6d0690d8b"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "findIndexOfVertex",
+      "start": 12779,
+      "end": 12789,
+      "role": "ordered-approximate-vertex-index",
+      "helpers": [
+        "isAlmostEqual3dPt"
+      ],
+      "range_sha256": "488ce894762360726921b9ad707e98b5ba5dfa3b698bb59e7e1ff1c29edf3c6f"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "distance",
+      "start": 12792,
+      "end": 12797,
+      "role": "source-only-open-zone-distance-helper",
+      "helpers": [],
+      "range_sha256": "337966791f23afd246f7b9ec6921e0bc615ab8a7ea7533e8b29af1457b999d45"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "distanceFromPointToLine",
+      "start": 12799,
+      "end": 12809,
+      "role": "excluded-active-collinear-repair-distance",
+      "helpers": [],
+      "range_sha256": "ed4ee1b066fc40e55c2c6d94087f926e0707854dc8b4a4ca621880d27eaf900d"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "isPointOnLineBetweenPoints",
+      "start": 12812,
+      "end": 12823,
+      "role": "excluded-active-collinear-repair-predicate",
+      "helpers": [
+        "distanceFromPointToLine",
+        "distance"
+      ],
+      "range_sha256": "c4cb3b9af671214b82436d7b54ff7f032d0e7ee592092217ac38f7601e238eda"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "CalculateZoneVolume",
+      "start": 315,
+      "end": 374,
+      "role": "public-volume-and-direct-helper-declarations",
+      "helpers": [],
+      "range_sha256": "8d5a1a3afa954107919e343d97d5ab7009fce9c9875b88f3e7328298553e44bb"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "ErrCount5",
+      "start": 483,
+      "end": 488,
+      "role": "actual-source-warning-counter-default",
+      "helpers": [],
+      "range_sha256": "7376b76ee9fb88e298f3f9cc9127303c10de2b3107fb494bf6926a67b3f33b03"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "clear_state",
+      "start": 533,
+      "end": 542,
+      "role": "actual-source-warning-counter-reset",
+      "helpers": [],
+      "range_sha256": "ffaced1e21d9b118f72fa5342bb7aa3de6154f0d92c53ed62fffacf5a9bb0ff9"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "VecSquaredLength",
+      "start": 138,
+      "end": 150,
+      "role": "source-Newell-length-square-grouping",
+      "helpers": [],
+      "range_sha256": "baab0068335dc16e806a90be386256a2dfaf4fe0467423f8b974c5dac31bab33"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "CreateNewellAreaVector",
+      "start": 347,
+      "end": 370,
+      "role": "incoming-GEO02-fan-area-vector-owner",
+      "helpers": [
+        "cross"
+      ],
+      "range_sha256": "3f2cca0997d7f6fd80e8276776a3c89d226564adf3160f529d2dfc03d425bcb3"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "CalcPolyhedronVolume",
+      "start": 505,
+      "end": 529,
+      "role": "ordered-signed-pyramid-sum",
+      "helpers": [
+        "dot"
+      ],
+      "range_sha256": "f71ac1e24a0674318cf51eda4db0fe37fc7f587c9be3b803d6e3fff9ebbbc155"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.hh",
+      "symbol": "VectorsData",
+      "start": 126,
+      "end": 146,
+      "role": "volume-declaration-and-actual-origin-default-reset",
+      "helpers": [],
+      "range_sha256": "b77076fc43d2228ed4729ec328e6d29d045c4c73e7f5a33dca1019f887f747e6"
+    },
+    {
+      "path": "src/EnergyPlus/DataVectorTypes.hh",
+      "symbol": "Vector",
+      "start": 88,
+      "end": 90,
+      "role": "actual-Objexx-vector-alias-and-cross",
+      "helpers": [],
+      "range_sha256": "d4b7ae68a751663ca35b21bdad2aea0485456c4d399b5d73454ee8868fad8746"
+    },
+    {
+      "path": "src/EnergyPlus/DataVectorTypes.hh",
+      "symbol": "Polyhedron",
+      "start": 558,
+      "end": 577,
+      "role": "face-and-polyhedron-allocation-defaults",
+      "helpers": [],
+      "range_sha256": "41a92ba25fddcd0ea01bbc8cd4fa446f83179aa428d5e48ee195d2286d645a3f"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "ZoneSpaceData",
+      "start": 434,
+      "end": 449,
+      "role": "constructor-height-volume-auto-and-floor-zero",
+      "helpers": [],
+      "range_sha256": "9a5d7e244cc961051688b971cf3f847745d1666d4e445e9675e5da2fc9d26284"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "SpaceData",
+      "start": 451,
+      "end": 468,
+      "role": "constructor-source-only-space-fraction-defaults",
+      "helpers": [],
+      "range_sha256": "dcc404744f48367ea69a2110750dd48d890491e09388010555fd1910be8a64a9"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "ZoneData",
+      "start": 571,
+      "end": 615,
+      "role": "constructor-flags-areas-and-surface-range-defaults",
+      "helpers": [],
+      "range_sha256": "4c47a0d8623b04000a419d7c565fe32c1bcc9f0e9059c03f539a6da578677d87"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "ProcessZoneData",
+      "start": 2333,
+      "end": 2340,
+      "role": "numeric-input-write-no-entered-height-flag",
+      "helpers": [],
+      "range_sha256": "9bf8e380c886d97c155f245f4bf0c8fd984b50fc492af95d2984f5d60365856b"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetSpaceData",
+      "start": 2552,
+      "end": 2565,
+      "role": "normal-implicit-space-factory",
+      "helpers": [],
+      "range_sha256": "bcbef6b3e4e89550cc79bf5db759fa9ad828de8bd5e260eab7f5f2ea0f94b762"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "symbol": "OneCentimeter",
+      "start": 580,
+      "end": 584,
+      "role": "source-geometric-identity-thresholds",
+      "helpers": [],
+      "range_sha256": "44204452d946bbc973565f8d66de6888e588cc4503ab557727b375e65554d622"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "symbol": "AutoCalculate",
+      "start": 614,
+      "end": 614,
+      "role": "actual-auto-sentinel",
+      "helpers": [],
+      "range_sha256": "a23daf7d4767ffe4124aaf221734bf1ca659c38cde09bf2b1664e3e78d358434"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "symbol": "rotAzmDiffDeg",
+      "start": 1563,
+      "end": 1575,
+      "role": "source-only-opposite-wall-angle-difference",
+      "helpers": [],
+      "range_sha256": "db3328716215cfdfe5b51885ca383d0ca998735a87962e9ca877aadb7fcc87f2"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "predictSystemLoad",
+      "start": 3146,
+      "end": 3169,
+      "role": "connection-only-zone-volume-read-before-AirPowerCap",
+      "helpers": [],
+      "range_sha256": "4713c7cefc6f56035ec81d33553a8ad620ec369622a92b34d2d0e2756d8a4db0"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "AirPowerCap",
+      "start": 3902,
+      "end": 3910,
+      "role": "connection-only-corrector-volume-read",
+      "helpers": [],
+      "range_sha256": "45dd8037d1b4970371693f713d45ed3498e4a55afddf6a4620852adf7ee0f8e5"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator +=",
+      "start": 238,
+      "end": 247,
+      "role": "ordered-area-vector-component-add",
+      "helpers": [],
+      "range_sha256": "3a2b70add829258e17e761bd3fcf51fdd3dcdc419c91d9a09dda82e05a9c0e12"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator /=",
+      "start": 419,
+      "end": 447,
+      "role": "floating-scalar-reciprocal-division",
+      "helpers": [],
+      "range_sha256": "eec130f99600d8fb3caed65f59b0ab325d4273d7957f23f0ddcca005f0416374"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "operator -",
+      "start": 1435,
+      "end": 1442,
+      "role": "ordered-point-origin-subtraction",
+      "helpers": [],
+      "range_sha256": "6c48ab195f4d5e8a25750033bb61b2c20def79edda3fb3dc0230e6a832077faf"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "symbol": "dot",
+      "start": 1728,
+      "end": 1748,
+      "role": "ordered-dot-and-cross-products",
+      "helpers": [],
+      "range_sha256": "8a91d21d43d4a123453141a3365751afdf25f9eb756880fa74ca6926614421f3"
+    },
+    {
+      "path": "idd/Energy+.idd.in",
+      "symbol": "Zone",
+      "start": 9686,
+      "end": 9755,
+      "role": "input-positive-and-nonpositive-auto-domain",
+      "helpers": [],
+      "range_sha256": "3c01c4d08ac7adb1c05b8f135759e553ef6e2ad1cc4365a0cb1bf2fc2e90f7c5"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "AreaPolygon",
+      "start": 106,
+      "end": 136,
+      "role": "incoming-GEO02-source-only-reversed-route-ordered-cross-sum-area",
+      "helpers": [
+        "cross",
+        "dot",
+        "VecNormalize"
+      ],
+      "range_sha256": "c6964adb1b42382b52fd7b6d07b10e5d7980148cbb42c850af5760a64d426711"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "VecLength",
+      "start": 152,
+      "end": 164,
+      "role": "incoming-GEO02-source-only-reversed-route-length",
+      "helpers": [
+        "VecSquaredLength",
+        "std::sqrt"
+      ],
+      "range_sha256": "9c1a7f6e57f61d1b5d87cc1abde16de2219800e0b9e0a9a937736dc4736df2c7"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "VecNormalize",
+      "start": 184,
+      "end": 208,
+      "role": "incoming-GEO02-source-only-reversed-route-exact-zero-normalization",
+      "helpers": [
+        "VecLength"
+      ],
+      "range_sha256": "147c5f531b8c8f4f5861b24bdf4a1c0f28487d2391cdcd4d06081273fd2e3167"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "DetermineAzimuthAndTilt",
+      "start": 224,
+      "end": 285,
+      "role": "incoming-GEO02-source-only-reversed-route-normal-and-horizontal-branch-angles",
+      "helpers": [
+        "VecNormalize",
+        "cross",
+        "dot",
+        "mod",
+        "std::atan2",
+        "std::acos"
+      ],
+      "range_sha256": "c3be1c52cfadebfabc222f80bd00ff6edef13023037e166bec63ffb0552ff4ba"
+    },
+    {
+      "path": "src/EnergyPlus/Vectors.cc",
+      "symbol": "CreateNewellSurfaceNormalVector",
+      "start": 372,
+      "end": 417,
+      "role": "incoming-GEO02-source-only-reversed-route-cyclic-normal-separate-from-area-vector",
+      "helpers": [
+        "VecNormalize"
+      ],
+      "range_sha256": "cca4b0da34c23731052be570affdcfa569d714eb241d9476fbab063d9b883fc5"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetSurfaceData",
+      "start": 1407,
+      "end": 1436,
+      "role": "incoming-normal-face-order-documented-hierarchy",
+      "helpers": [],
+      "range_sha256": "c3b05d595de3daf36b9ddd351456693c5f7eff6399c4026c8a8aaecd7a1c9d1b"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetSurfaceData",
+      "start": 1504,
+      "end": 1530,
+      "role": "incoming-normal-base-face-class-and-stable-temporary-order",
+      "helpers": [],
+      "range_sha256": "179b319bb92bb9474ba68d137ff4fb497e20679d650b94fe542f3fc2663334fe"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetHTSurfaceData",
+      "start": 3830,
+      "end": 3867,
+      "role": "incoming-detailed-surface-module-order",
+      "helpers": [],
+      "range_sha256": "bd88e358e4eba8b4e293251c0d7aff4a6814de9be28745e1a31e5da13800421a"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetHTSurfaceData",
+      "start": 3887,
+      "end": 3936,
+      "role": "incoming-surface-instance-number-to-temporary-name-and-class-storage",
+      "helpers": [
+        "InputProcessor::getObjectItem"
+      ],
+      "range_sha256": "a4d8c5ebe3d1dc780d829fabe6c6fe66e7bb238318f4bf900adffc1fd235cfcd"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "createSpaceSurfaceLists",
+      "start": 3006,
+      "end": 3023,
+      "role": "incoming-final-surface-list-order",
+      "helpers": [],
+      "range_sha256": "e74b4089c5405d851d6b40df517dc54a2ba41bd02926834eb173d200b40145d7"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "setSurfaceFirstLast",
+      "start": 3025,
+      "end": 3077,
+      "role": "incoming-zone-space-range-production",
+      "helpers": [],
+      "range_sha256": "759d162714580787862aeccb916ffbe1b747dce736c50129346d76cd97d6cccb"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "BaseSurfIDs",
+      "start": 545,
+      "end": 558,
+      "role": "incoming-normal-Wall-Floor-Roof-class-order",
+      "helpers": [],
+      "range_sha256": "e4d4d4f2dc9733da768219cad54c37ea8b7f838639f9b81d8e56d7bab413598c"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "symbol": "getObjectItem",
+      "start": 932,
+      "end": 979,
+      "role": "incoming-instance-order-selection",
+      "helpers": [
+        "getJSONObjNum"
+      ],
+      "range_sha256": "0fe88e76d0fbb0e39f54227c59e417a1e6e3879cfac1f7c35c666d07409aa6e1"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "symbol": "getJSONObjNum",
+      "start": 1216,
+      "end": 1259,
+      "role": "incoming-IDF-ordinal-versus-epJSON-order",
+      "helpers": [],
+      "range_sha256": "6df0f929ad6fcdaefa4e4c4f50398039144fae670f3128e34dd937e39083957b"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "preserveIDFOrder",
+      "start": 93,
+      "end": 94,
+      "role": "actual-input-order-flag-defaults",
+      "helpers": [],
+      "range_sha256": "846a81d47cb72173a3816c7496439a79379e56c3886705e1af408d5592ac35e5"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "SpaceData",
+      "start": 483,
+      "end": 485,
+      "role": "actual-source-space-surface-range-defaults",
+      "helpers": [],
+      "range_sha256": "2035d6bdc8257dbf0a87634951bf68621c116a4f3814282e8fc2ad5cf17a061e"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "ZoneData",
+      "start": 698,
+      "end": 699,
+      "role": "actual-source-space-index-list-and-cardinality-defaults",
+      "helpers": [],
+      "range_sha256": "801c5e41a383b37353aa51e121e4eadc15aaddf7f86a57ab1ce3f668e89d0b2e"
+    }
+  ],
+  "primary_owner": "SurfaceGeometry::CalculateZoneVolume; selected initial-closed sixquad domain and original final-priority block",
+  "source_order": [
+    "GetSurfaceData sets zone/implicit-space FloorArea, CeilingArea and HasFloor/HasRoof",
+    "SetupZoneGeometry accumulates geometricFloorArea/geometricCeilingArea from actual incoming GEO02 areas",
+    "Setup455-546 sets ceilingHeightEntered iff height was already positive before auto assignment, then may write automatic height",
+    "CalculateZoneVolume always copies source-ordered base Wall/Floor/Roof faces and computes each Newell area vector",
+    "Always evaluate incoming-tilt horizontal/vertical predicate, wall maxZ predicate, and initial closure before positive-volume priority",
+    "Initial-closed branch uses CalcPolyhedronVolume ordered signed dot(AreaVector,FacePoints(2)-actualp0)/3.0",
+    "Final positive Volume retains current value; otherwise entered-height flag and positive selected floor area override calculated volume; otherwise calculated volume",
+    "Only then nonpositive result may fall back to10m3 with source warning; source-only unsupported domain here",
+    "Original auto Space volumes/fractions update after Zone; second Calculate call sees first-call positive numeric Volume, not a new lexical input"
+  ],
+  "priority": {
+    "selected_floor_area": "FloorArea>0 ? FloorArea : geometricFloorArea",
+    "selected_ceiling_area": "CeilingArea>0 ? CeilingArea : geometricCeilingArea",
+    "calculation_precedes_priority": true,
+    "positive_current_volume": "retained; positive enclosed CalcVolume can update original ErrCount5 if abs(Calc-current)/current>0.05",
+    "otherwise_entered_height_and_positive_floor": "selected floor * current CeilingHeight, even when enclosed CalcVolume exists",
+    "otherwise": "CalcVolume",
+    "nonpositive_postselection": "source fallback10 with warning; retained only as source-only diagnostic, not normal admitted geometry",
+    "height_flag": "actual constructorfalse -> Setup sets true only before autocalculated height is written. Never infer from finalpositiveheight."
+  },
+  "numerical_policy": {
+    "volume": "ordered ordinary binary64 signed pyramid terms and /3.0; no absolute value, bbox, source-centroid extended-third substitution or FMA regrouping",
+    "origin": "actual current VectorsData.p0, selected constructor zero; owned global FacePoints unchanged, no double Zone origin or convenience translation",
+    "face_order": "actual owner order preserved; native and Rust own IDs are separate. Direct same ordered request pairs use identical ordinal order; normal parser arrays retain own order and numeric volume profile.",
+    "normal_face_order": "actual GetSurfaceData class grouping Wall, Floor, Roof from BaseSurfIDs; stable SurfaceTmp ordinal within each class/Space. For selected ordinary IDFs with !isEpJSON and preserveIDFOrder, getObjectItem uses original saved idf_order. Native flags/actual ordered faces must be observed; never equate own IDs or assume Rust TypedModel alphabetical enumeration is the original volume order."
+  },
+  "references": {
+    "prepared_helper": "genuine same-GCC EnergyPlusData, one Zone and one implicit Space; original GetVertices valid routes, explicitly input-only prepared area read fields, byte-exact Setup455-546 height fragment once, original CalculateZoneVolume twice",
+    "height_fragment": {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "start": 455,
+      "end": 546,
+      "range_sha256": "f36cb794194e9c2177797d4ce353e7a4e64af486ff973b3c16b175b0889c098b",
+      "locals": {
+        "DetailedWWR": false,
+        "RoutineName": "SetUpZoneGeometry: "
+      },
+      "scope": "whole selected caller height loop, original expressions/branches/warning ordering; debug formatting branch inactive"
+    },
+    "prepared_helper_does_not_claim": "original parser admission, original area producer execution or internal CalcVolume/method-local trace",
+    "reversed_winding_diagnostic": "source-only declared reversed vertices with genuine original AreaPolygon/VecLength/CreateNewellAreaVector/CreateNewellSurfaceNormalVector/DetermineAzimuthAndTilt; explicitly bypass GetVertices automatic Roof/Floor reorientation. Incoming helper grouping/declarations are also pinned by the closed GEO02 source contract.",
+    "auxiliary_probes": "additional original public closure/tilt/wall-height/signed-volume helpers on the same actual owned vertices, explicitly not internal locals of CalculateZoneVolume",
+    "normal_native": "ordinary original API parses frozen12 IDFs:11 planned positive lifecycles plus one ordinary sixface duplicate-wall topology diagnostic with no predetermined native exit. Real area/height/flag/volume owners are copied where phases exist, without recomputation or fake successful fields.",
+    "native_core_build": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+    },
+    "ABI": "same verified GCC13/O0 original core; assertions/Werror/source floating-point options remain, no private state crosses installed MSVC DLL",
+    "incoming_GEO02_contract": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+    },
+    "normal_native_order_fields": [
+      "actual isEpJSON/preserveIDFOrder",
+      "actual AllSurfaceFirst..AllSurfaceLast ordered names/IDs/classes/vertices",
+      "actual within-class original input ordinal where available"
+    ],
+    "allocated_owner_defaults": "helper constructor snapshot may have empty owner arrays; capture actual allocated_owner_defaults after Zone/Space/Surface allocation, before names/indices/inputs/prepared reads/GetVertices. Observe no unwritten vertex element values.",
+    "normal_negative": "one ordinary A24 with Zn001:Wall004 vertices copied from Zn001:Wall003, preserving distinct names and six valid nondegenerate faces. Original may reject or fall back/continue. Record actual exit/callbacks/available phases; Rust normal configuredScope A rejection is separate and before physics."
+  },
+  "paired_projection": {
+    "Zone": [
+      "Volume",
+      "CeilingHeight",
+      "ceilingHeightEntered",
+      "FloorArea",
+      "geometricFloorArea",
+      "CeilingArea",
+      "geometricCeilingArea",
+      "UserEnteredFloorArea",
+      "HasFloor",
+      "HasRoof"
+    ],
+    "geometry": [
+      "canonical names, ownIDs, classes, cardinality/order, stored vertex input bits",
+      "initial closure before any repair",
+      "actual source signed volume helper observation",
+      "correct bounded normal class/instance volume face order by canonical name and source input ordinal; own IDs remain independent"
+    ],
+    "retention": [
+      "actual allocated_owner_defaults before declared field preparation",
+      "before/after/second Calculate states",
+      "firstinitialized/firstphysical/finalweather/final normal native state where available"
+    ]
+  },
+  "unpaired_source_only": [
+    "one implicit Space Volume/fracZoneVolume/fracZoneFloorArea allocation/history until a matching Rust owner is independently implemented",
+    "ErrCount5 and source warning/error IO/recurrent diagnostic counters",
+    "local Polyhedron/FacePoints allocation/deallocation and unobserved internal method/CalcVolume locals",
+    "original open-zone fallback methods and collinear repair",
+    "source defaults and unwritten Vector3 scratch elements: observe declarations/allocation only before assignments"
+  ],
+  "consumer_scope": {
+    "actual_Rust": "actual stored zone volume argument at heat_balance/initialization and air_manager weather-context capacity call; record arguments/context/caller before real consumer, no synthetic calls",
+    "native": "actual initialized/final Zone.Volume consumed by selected ZoneSpaceHeatBalanceData predictor/corrector source branches",
+    "claim": "volume operand connection only; not AirPowerCap J/(s K), complete rho/Cp/multiplier/dt parity, ZON02/SYS or whole physics"
+  },
+  "excluded": [
+    "general polyhedron certification from bbox or sixbox evidence",
+    "nonclosed/collinearrepair/selfintersection/duplicate/reversed production admission",
+    "multi-zone/multi-space/air-boundary/subsurface/shading/IntMass selection branches",
+    "source-only warnings/fallbacks relabeled native fatal or Rust diagnostic-text parity",
+    "new CON inputs or fresh B72/annual/per-limit Rust consumption",
+    "reference outputs supplied to Rust inputs or caches",
+    "normal topology diagnostic original exit/physical availability prescribed in advance"
+  ],
+  "comparison_run": false,
+  "gates_updated": false
+}

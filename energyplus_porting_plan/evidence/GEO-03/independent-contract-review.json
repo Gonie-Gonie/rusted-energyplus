@@ -1,0 +1,321 @@
+{
+  "schema": "geo03-independent-contract-review.v1",
+  "status": "pass-before-scientific-execution",
+  "review_completed_utc": "2026-10-07T21:49:39.097122+00:00",
+  "reviewed_contracts": {
+    "source": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-contract-review-01/source/GEO-03-source.json",
+        "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+      }
+    },
+    "cases": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-contract-review-01/source/GEO-03-cases.json",
+        "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+      }
+    },
+    "tolerances": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-contract-review-01/source/GEO-03-tolerances.json",
+        "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+      }
+    },
+    "helper_request": {
+      "historical_path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-contract-review-01/source/helper-request.json",
+        "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+      }
+    }
+  },
+  "executed_independent_reader": {
+    "path": ".runtime/porting/GEO-03/independent-contract-review-01/review_contracts.py",
+    "sha256": "9f761c87493939dd1508c17ade7a16ea822b514b8788ffb012044a70c1657ad2"
+  },
+  "original_source_file_count": 14,
+  "original_range_count": 68,
+  "reference_occurrences_verified": 89,
+  "distinct_files_hashed": 68,
+  "input_case_review": [
+    {
+      "case_id": "AUTO-UNIT",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-CUBOID",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-CUBOID-TRANSLATED",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-CUBOID-Z45",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-CUBOID-FACE-ORDER",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "WALL-Y1",
+        "WALL-Y0",
+        "WALL-X1",
+        "WALL-X0",
+        "ROOF",
+        "FLOOR"
+      ]
+    },
+    {
+      "case_id": "EXPLICIT-VOLUME",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "EXPLICIT-VOLUME-HEIGHT",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "EXPLICIT-VOLUME-HEIGHT-FLOOR",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-VOLUME-ENTERED-HEIGHT",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-VOLUME-ENTERED-HEIGHT-FLOOR",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "AUTO-VOLUME-ENTERED-FLOOR-AUTOHEIGHT",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "ZERO-HEIGHT-ZERO-VOLUME",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "NEGATIVE-HEIGHT-NEGATIVE-VOLUME",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "EXPLICIT-VOLUME-DIFF5-EQUAL",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "EXPLICIT-VOLUME-DIFF5-ABOVE",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "EXPLICIT-VOLUME-DIFF5-BELOW",
+      "kind": "closed_box",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "SOURCE-ONLY-MISSING-ROOF",
+      "kind": "source_only_nonclosed",
+      "face_count": 5,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "SOURCE-ONLY-REVERSED-WINDING",
+      "kind": "source_only_reversed_winding",
+      "face_count": 6,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1"
+      ]
+    },
+    {
+      "case_id": "SOURCE-ONLY-DUPLICATE-WALL",
+      "kind": "source_only_nonclosed",
+      "face_count": 7,
+      "ordered_input_face_names": [
+        "FLOOR",
+        "ROOF",
+        "WALL-X0",
+        "WALL-X1",
+        "WALL-Y0",
+        "WALL-Y1",
+        "WALL-X0-DUPLICATE"
+      ]
+    }
+  ],
+  "native_positive_cases": 11,
+  "native_topology_diagnostic_cases": 1,
+  "paired_closed_helpers": 16,
+  "source_only_helpers": 3,
+  "fresh_Rust_physical_plan": "3 Full/Summary pairs plus 1 Full topology rejection, not yet executed",
+  "independent_source_findings": [
+    "Source initializes geometric areas/entered-height flag before CalculateZoneVolume; a positive derived height does not establish lexical entry.",
+    "Geometry and source closure are evaluated before final positive-volume retention or entered-height*selected-floor priority.",
+    "CalcPolyhedronVolume retains ordered per-face dot(areaVector,point2-p0)/3.0 signed terms; no absolute value, bbox, FMA or regrouped final division.",
+    "Normal production face ordering is source Wall/Floor/Roof per Space plus conditional original IDF ordinal; own IDs remain separate and actual flags/order must be observed.",
+    "Fresh helper state, real allocated defaults and one height fragment followed by two volume calls distinguish preparation/history from lexical re-entry.",
+    "Prepared area/implicit-space reads are declared inputs, not reference-produced values; normal API executions independently observe real parser producers.",
+    "A genuine pre-repair unique-vertex/edgesNotTwo witness must be empty, in addition to final isEnclosedVolume, before pairing.",
+    "The ordinary duplicate-wall diagnostic has no predetermined native status or phase availability; Rust normal admission is separate.",
+    "Only actual stored volume→Rust capacity operand connection is planned; original AirPowerCap multiplier/dt/rho/Cp/ZON02/SYS parity remains unclaimed."
+  ],
+  "required_before_original_execution": [
+    "Successful unchanged-core same-GCC compile/link and archived driver/source/fragment identities independently reviewed",
+    "Root explicit original-first GO"
+  ],
+  "not_certified": [
+    "No native/Rust numerical result or actual branch coverage was executed by this review.",
+    "Six-prism coverage is not general-polyhedron support; unsupported correction/fallback/space/counter branches remain source-only.",
+    "Stimulus names around5% are inputs, not observed strict branch witnesses.",
+    "Prepared API state is not original parser admission; internal CalcVolume/method locals are not exposed.",
+    "Historical GEO02 geometry/input identities are reused without relabeling old HEAD/exit/physics proof."
+  ],
+  "scientific_execution_performed": false,
+  "gates_updated": false
+}

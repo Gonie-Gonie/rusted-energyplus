@@ -1,0 +1,83 @@
+{
+  "schema": "geo03-independent-native-source-review.v1",
+  "status": "pass-static-before-native-build",
+  "review_completed_utc": "2026-10-07T21:51:22.390741+00:00",
+  "reviewed_contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-contract-review.json",
+    "sha256": "3439f476b7476f6e88f4efeddf2c35abfd31586b4f9922762c0a36a8313ca20f"
+  },
+  "reviewed_source_archives": [
+    {
+      "historical_path": "tools/porting/geo03_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference.cpp",
+        "sha256": "303c82647526f16b2f0e35bc979c335dfb67cedc75414ce58dd9e708d5a7a917"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference_helper.cpp",
+        "sha256": "eb4ebc54b8aa7da7f068d60b2e984322bb4380cd9561059c7d3bf24f5cea3c4f"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference.cmake",
+        "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference_native.py",
+        "sha256": "ddaeadbbdb7d6a1c93fbf1de681fa028c8470c200b8ee4b90afb5881592cd0a8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo02_reference_fields.hh",
+        "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+      }
+    }
+  ],
+  "executed_archive_reader": {
+    "path": ".runtime/porting/GEO-03/independent-native-source-review-01/archive_review.py",
+    "sha256": "b9a610b52001054f3a61d26cf5f01e8cb7577190689f0584d8e4325f2c93d873"
+  },
+  "independent_findings": [
+    "Prepared helper constructs genuine original EnergyPlusData and real Zone/Space/Surface owners; constructor and allocated defaults are separate from declared input writes.",
+    "Unwritten Vertex/Vector scratch elements are never read merely because buffers are allocated; only assigned geometry is copied.",
+    "Input JSON scalar and vertex numbers are independently parsed and checked against authoritative input IEEE bits; paired GetVertices retained coordinates must match ordered raw request bits before pairing.",
+    "Original setup trig273-289 and height455-546 are byte-exact archived source fragments, explicitly not whole parser/Setup execution; declared area/floor read fields remain input preparation.",
+    "Whole genuine GetVertices handles the valid route. The reversed helper route explicitly bypasses source auto-reorientation and calls original prerequisite helpers only as unpaired diagnostics.",
+    "Genuine pre-repair makeListOfUniqueVertices/edgesNotTwo witness precedes isEnclosedVolume, with both initial and final empty witnesses required for closed16 pairing.",
+    "One height preparation precedes two whole original CalculateZoneVolume calls on the same fresh owned state; current positive Volume retention is separate from lexical input history.",
+    "Dynamic API observer uses opaque stateNew/energyplus/stateDelete and the exact verified same-GCC original API DLL; private snapshots are output-only and added volume probe calls remain zero.",
+    "Actual original surface indices/order and isEpJSON/preserveIDFOrder are copied; class-order/input-ordinal provenance is not replaced by native-answer-fed Rust IDs.",
+    "The ordinary duplicate-wall diagnostic retains actual exit/callbacks/null phases; no predetermined native exit or fabricated physical evidence is required.",
+    "Launcher resolved fresh directories, raw commands/logs, frozen contract/source/build review bindings and archived binaries preserve before-action provenance. Subset completion is distinct from full12 completion.",
+    "Historical linked target identities are separated from immutable binary archives, preserving owned retry history.",
+    "CMake appends only deferred GEO03 targets, reuses prior registration and both target/directory definitions, and links the helper to genuine original core; the dynamic observer links no duplicate private core.",
+    "Original source guard and prior643 core/650 previous compile rows, seven prior executables/core/API/Objexx identities are checked around build; actual successful flags/link products are still deferred evidence."
+  ],
+  "scope_limits": [
+    "Static source/AST/file observation only; no original numerical result or branch coverage.",
+    "No CMake/Ninja/Cargo/Git/CLI/comparer was run by this reviewer.",
+    "Successful actual native compile/link/ABI/core preservation receipt must receive a separate independent review before original execution.",
+    "No source-local CalcVolume/method value or internal helper call timing/count is fabricated from auxiliary probes.",
+    "Counters/implicit-space/scratch and unsupported fallback/correction behavior remain original-only unless a matching Rust owner is independently certified.",
+    "Root retains final explicit execution authorization; this record changes no gate."
+  ],
+  "gates_updated": false,
+  "original_numerical_execution_performed": false
+}

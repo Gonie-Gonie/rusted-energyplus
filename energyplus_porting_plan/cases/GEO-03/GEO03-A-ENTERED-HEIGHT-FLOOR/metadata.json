@@ -1,0 +1,23 @@
+{
+  "schema": "geo03-input-case.v1",
+  "case_id": "GEO03-A-ENTERED-HEIGHT-FLOOR",
+  "kind": "source-parser-diagnostic-not-CON",
+  "source_input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+  },
+  "patches": [
+    {
+      "object": "Zone",
+      "name": "ZONE ONE",
+      "fields": {
+        "ceiling_height": 6,
+        "volume": "autocalculate",
+        "floor_area": 300
+      }
+    }
+  ],
+  "unchanged_geometry": true,
+  "scope": null,
+  "original_outputs_supplied": false
+}

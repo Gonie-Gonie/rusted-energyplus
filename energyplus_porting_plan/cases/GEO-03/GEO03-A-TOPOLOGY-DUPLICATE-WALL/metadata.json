@@ -1,0 +1,40 @@
+{
+  "schema": "geo03-input-case.v1",
+  "case_id": "GEO03-A-TOPOLOGY-DUPLICATE-WALL",
+  "kind": "ordinary-topology-diagnostic-not-CON",
+  "source_input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+  },
+  "patches": [
+    {
+      "object": "BuildingSurface:Detailed",
+      "name": "Zn001:Wall004",
+      "field": "vertices",
+      "copy_from_object": "Zn001:Wall003",
+      "coordinate_tokens": [
+        "15.24000",
+        "15.24000",
+        "4.572000",
+        "15.24000",
+        "15.24000",
+        "0",
+        "0",
+        "15.24000",
+        "0",
+        "0",
+        "15.24000",
+        "4.572000"
+      ]
+    }
+  ],
+  "unchanged_zone_numeric_inputs": true,
+  "surface_count_unchanged": true,
+  "scope": null,
+  "configured_Rust_scope": "A",
+  "outcome_policy": {
+    "native": "observe actual original exit/callbacks/available phase states; successful fallback and nonzero original exit both retained without parity promise",
+    "Rust": "normal physical entry must reject unsupported topology before zone physics; a box result is not admissible fallback evidence"
+  },
+  "original_outputs_supplied": false
+}

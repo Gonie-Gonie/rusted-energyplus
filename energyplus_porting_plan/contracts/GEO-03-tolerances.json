@@ -1,0 +1,53 @@
+{
+  "schema": "geo03-tolerances.v1",
+  "card": "GEO-03",
+  "status": "draft-before-independent-review",
+  "frozen_before_numerical_comparison": true,
+  "profiles": {
+    "volume_m3": {
+      "unit": "m3",
+      "absolute_tolerance": 1e-09,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact"
+    },
+    "area_m2": {
+      "unit": "m2",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact"
+    },
+    "height_m": {
+      "unit": "m",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference)<=atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "both_zero_sign": "exact"
+    }
+  },
+  "exact_metadata": [
+    "ordered input vertex and prepared scalar bits",
+    "canonical case/surface/zone names and independent ownID bindings",
+    "typed booleans/array lengths/phase labels",
+    "actual entered-height flag before/after autoheight preparation",
+    "initial firstpass closure with no active correction",
+    "source field retention where paired",
+    "positive stored Volume argument bits handed to actual Rust consumers"
+  ],
+  "source_only_unpaired": [
+    "original warning/error/counter IO",
+    "implicit-space/global/scratch lifecycles without matching Rust state owner",
+    "unsupported topology fallback versus Rust failure classification"
+  ],
+  "exclusions": [
+    "postfailure widening",
+    "relative-area or generalpolyhedron admission from matching boundingboxes",
+    "AirPowerCap/rhoCp/systemdt/SRC/wholephysics outputs"
+  ],
+  "comparison_run": false,
+  "gates_updated": false
+}
