@@ -1,0 +1,112 @@
+{
+  "schema": "geo03-independent-native-source-amendment.v1",
+  "status": "pass-static-type-only-amendment-before-build-retry",
+  "review_completed_utc": "2026-10-07T21:57:55.430291+00:00",
+  "reviewed_prior_static_review": {
+    "path": ".runtime/porting/GEO-03/independent-native-source-review-01/review.json",
+    "sha256": "60483b1c4d55cb740782d951f72be349619a34c1ab0d503b1cc979c4ed9a09ca"
+  },
+  "reviewed_contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-contract-review.json",
+    "sha256": "3439f476b7476f6e88f4efeddf2c35abfd31586b4f9922762c0a36a8313ca20f"
+  },
+  "failed_actual_compile": {
+    "path": ".runtime/porting/GEO-03/native-build-01/build-command.json",
+    "sha256": "1c0db94eb1e23e8ae047d2c775f730eb1fa6faa5c75bcb0d63b8d2228c98ef78"
+  },
+  "failed_actual_exit_code": 1,
+  "failed_stdout": {
+    "path": ".runtime/porting/GEO-03/native-build-01/build-stdout.log",
+    "sha256": "46954b0ce6230dd85dce0f6dfe484f16b2b06e4baf509c5f84fbd28b0da4d17f"
+  },
+  "failed_stderr": {
+    "path": ".runtime/porting/GEO-03/native-build-01/build-stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_owner_amendment": {
+    "path": ".runtime/porting/GEO-03/native-compile-amendment-01/amendment.json",
+    "sha256": "7a55932a25f2eb2a43d1a38301fad0cd92c2d074a8747c369d5dfc25ba982cb9"
+  },
+  "before_helper": {
+    "historical_path": "tools/porting/geo03_reference_helper.cpp",
+    "archive": {
+      "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference_helper.cpp",
+      "sha256": "eb4ebc54b8aa7da7f068d60b2e984322bb4380cd9561059c7d3bf24f5cea3c4f"
+    }
+  },
+  "after_helper": {
+    "historical_path": "tools/porting/geo03_reference_helper.cpp",
+    "archive": {
+      "path": ".runtime/porting/GEO-03/independent-native-source-amendment-01/source/geo03_reference_helper.cpp",
+      "sha256": "67e2472f48749b6e40a981fee9ce04b5619567b6ae4e15932d6ee47eac818dc4"
+    }
+  },
+  "reviewed_source_archives": [
+    {
+      "historical_path": "tools/porting/geo03_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference.cpp",
+        "sha256": "303c82647526f16b2f0e35bc979c335dfb67cedc75414ce58dd9e708d5a7a917"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-amendment-01/source/geo03_reference_helper.cpp",
+        "sha256": "67e2472f48749b6e40a981fee9ce04b5619567b6ae4e15932d6ee47eac818dc4"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference.cmake",
+        "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo03_reference_native.py",
+        "sha256": "ddaeadbbdb7d6a1c93fbf1de681fa028c8470c200b8ee4b90afb5881592cd0a8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-native-source-review-01/source/geo02_reference_fields.hh",
+        "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+      }
+    }
+  ],
+  "executed_independent_reader": {
+    "path": ".runtime/porting/GEO-03/independent-native-source-amendment-01/review_amendment.py",
+    "sha256": "d811fccbe6e4f5977b565084e46c25baa06327d66471c1984713ec2d66e824e5"
+  },
+  "exact_lexical_changes": {
+    "genuine_EnergyPlus_namespace_type_qualifications": 5,
+    "explicit_JSON_to_std_string_bit_comparison_reads": 2,
+    "all_other_bytes_unchanged": true
+  },
+  "findings": [
+    "Actual build01 root errors were string-vs-JSON operator resolution and ambiguity with InputProcessor.hh's global forward declaration.",
+    "Five explicit EnergyPlus::EnergyPlusData names select the genuine existing core type, without any owner/call-order change.",
+    "Two .get<std::string>() operations only decode already-frozen authoritative IEEE string fields before the unchanged equality guards.",
+    "Every other helper byte is identical; source fragments, mathematics, branches, state writes, inputs and tolerances are unchanged.",
+    "Every other initially reviewed native source remains byte-identical.",
+    "Initial static60483 is historical and did not certify compilation; actual exit1/logs and earlier helper bytes remain preserved."
+  ],
+  "limitations": [
+    "Static amendment review does not assert successful compilation.",
+    "Fresh actual compile/link and full source/core/prior-product preservation review remain required before original-first numerics.",
+    "No build, engine, Git, numerical comparison or gate mutation was performed by this reviewer."
+  ],
+  "gates_updated": false,
+  "original_numerical_execution_performed": false
+}

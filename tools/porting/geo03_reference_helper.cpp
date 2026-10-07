@@ -57,7 +57,7 @@ void validate_request_inputs(json const &item)
         for (auto it = values.begin(); it != values.end(); ++it) {
             if (it.value().is_number()) {
                 ++numeric_count;
-                require(authoritative.contains(it.key()) && Geo02::bits(input_scalar(it.value())) == authoritative.at(it.key()),
+                require(authoritative.contains(it.key()) && Geo02::bits(input_scalar(it.value())) == authoritative.at(it.key()).get<std::string>(),
                         "Independently parsed scalar differs from frozen input bits");
             } else if (it.value().is_string()) {
                 input_scalar(it.value());
@@ -74,7 +74,7 @@ void validate_request_inputs(json const &item)
                     "Input coordinate cardinality differs");
             for (int j = 0; j < 3; ++j) {
                 double const value = input_scalar(face.at("vertices_m").at(i).at(j));
-                require(Geo02::bits(value) == face.at("input_vertex_bits").at(i).at(j), "Parsed vertex differs from frozen input bits");
+                require(Geo02::bits(value) == face.at("input_vertex_bits").at(i).at(j).get<std::string>(), "Parsed vertex differs from frozen input bits");
                 if (item.at("kind") == "closed_box")
                     require(value != 0.0 || !std::signbit(value), "Paired World helper requires positive geometric zero");
             }
@@ -87,14 +87,14 @@ void validate_request_inputs(json const &item)
     }
 }
 
-void original_trig_preparation(EnergyPlusData &state)
+void original_trig_preparation(EnergyPlus::EnergyPlusData &state)
 {
     // Existing immutable fragment273-289, included without byte changes.
     // Explicitly not the full SetupZoneGeometry or input parser.
 #include GEO03_TRIG_FRAGMENT
 }
 
-void original_height_preparation(EnergyPlusData &state)
+void original_height_preparation(EnergyPlus::EnergyPlusData &state)
 {
     bool const DetailedWWR = false; // Frozen input: debug reporting inactive.
     // Exact source caller declaration at SurfaceGeometry.cc267.
@@ -147,7 +147,7 @@ void reversed_geometry_prerequisites(DataSurfaces::SurfaceData &surface, json co
                                     surface.lcsx, surface.lcsy, surface.lcsz, surface.NewellSurfaceNormalVector);
 }
 
-void prepare_read_fields(EnergyPlusData &state, json const &item)
+void prepare_read_fields(EnergyPlus::EnergyPlusData &state, json const &item)
 {
     auto &zone = state.dataHeatBal->Zone(1);
     auto &space = state.dataHeatBal->space(1);
@@ -171,7 +171,7 @@ void prepare_read_fields(EnergyPlusData &state, json const &item)
     // original GetSurfaceData floor-area or implicit-space producer outputs.
 }
 
-json auxiliary_helpers(EnergyPlusData &state)
+json auxiliary_helpers(EnergyPlus::EnergyPlusData &state)
 {
     Vectors::Polyhedron poly;
     poly.NumSurfaceFaces = state.dataSurface->TotSurfaces;
@@ -209,7 +209,7 @@ json auxiliary_helpers(EnergyPlusData &state)
 
 json case_result(json const &item)
 {
-    auto state = std::make_unique<EnergyPlusData>();
+    auto state = std::make_unique<EnergyPlus::EnergyPlusData>();
     auto errors = std::make_unique<std::ostringstream>();
     auto *error_text = errors.get();
     state->files.err_stream = std::move(errors);
