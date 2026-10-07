@@ -1,0 +1,267 @@
+{
+  "schema": "geo03-unit-comparison.v1",
+  "status": "fail-incomplete",
+  "comparison_boundary": "current_public_zone_summary_baseline",
+  "tool": {
+    "path": "tools/porting/check_geo03_units.py",
+    "sha256": "4b8774e6f4ccb792b6446f4af7c13d8d6b29a43e67f36ba153b9a4a3b566214d"
+  },
+  "provenance_tool": {
+    "path": "tools/porting/geo03_provenance.py",
+    "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "input_request": {
+    "path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+    "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+  },
+  "original_first": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "native_output": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-results.json",
+    "sha256": "d167581320454b01108d626fd24085f93b613ebc733ce25c81d2f554975bb769"
+  },
+  "original_first_review": {
+    "path": ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+    "sha256": "bc6b46a46c1e6d34aab4e8b8f701e614728c1a53839beda43aa9bc2df5723f11"
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/GEO-03/rust-baseline-01/execution.json",
+    "sha256": "09fe61ff53fe6b5035559dcf12fb62714e7054e77c2d32672acceb294d909d91"
+  },
+  "Rust_command_receipt": {
+    "path": ".runtime/porting/GEO-03/rust-baseline-01/command/receipt.json",
+    "sha256": "119cd3e30346abaef6d3ea36ef6ffc3c314191495afc2a0b29c14332fd2b1a70"
+  },
+  "Rust_binary": {
+    "path": ".runtime/porting/GEO-03/builds/baseline-ffb0ef4e-01/geo03_tuples.exe",
+    "sha256": "8606496bebb6690ebc92f29128ab49fced914208e71eb978faf70659f5425c17"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/GEO-03/builds/baseline-ffb0ef4e-01/build-receipt.json",
+    "sha256": "7f0192f8aa2ab09bd5e5a64c541217a9f1e40ffe729dda614b6c5824f52468d0"
+  },
+  "source_worktree_clean": false,
+  "implementation_commit": null,
+  "available_Rust_source_count": 3647,
+  "source_inventory_scope": "Archived available-source inventory; compiler file selection unclaimed",
+  "actual_available_summary_fields": [
+    "floor_area_m2",
+    "volume_m3"
+  ],
+  "comparison_source_phase": "after_volume",
+  "missing_Zone_owner_fields": [
+    "ceiling_area_m2",
+    "ceiling_height_entered",
+    "ceiling_height_m",
+    "geometric_ceiling_area_m2",
+    "geometric_floor_area_m2",
+    "has_floor",
+    "has_roof",
+    "user_entered_floor_area_m2"
+  ],
+  "missing_mutable_owner_phases": [
+    "geometry_prepared",
+    "before_volume",
+    "after_volume",
+    "after_second_volume"
+  ],
+  "paired_closed_helper_count": 16,
+  "source_only_helper_count": 3,
+  "source_only_unpaired": [
+    {
+      "case_id": "SOURCE-ONLY-MISSING-ROOF",
+      "original_status": "unsupported_source_only",
+      "Rust_status": "unsupported_source_only",
+      "numerical_comparison_performed": false,
+      "original_diagnostics_retained_in": "original helper result/source_state",
+      "Rust_normal_parser_admission_or_rejection_claimed": false
+    },
+    {
+      "case_id": "SOURCE-ONLY-REVERSED-WINDING",
+      "original_status": "unsupported_source_only",
+      "Rust_status": "unsupported_source_only",
+      "numerical_comparison_performed": false,
+      "original_diagnostics_retained_in": "original helper result/source_state",
+      "Rust_normal_parser_admission_or_rejection_claimed": false
+    },
+    {
+      "case_id": "SOURCE-ONLY-DUPLICATE-WALL",
+      "original_status": "unsupported_source_only",
+      "Rust_status": "unsupported_source_only",
+      "numerical_comparison_performed": false,
+      "original_diagnostics_retained_in": "original helper result/source_state",
+      "Rust_normal_parser_admission_or_rejection_claimed": false
+    }
+  ],
+  "source_only_state_unpaired": [
+    "implicit Space",
+    "global counters",
+    "warning/error IO",
+    "source scratch allocations"
+  ],
+  "checks": 582,
+  "mismatch_count": 195,
+  "mismatch_categories": {
+    "missing_required_owner_observation": 192,
+    "numerical_tolerance": 3
+  },
+  "mismatch_examples": [
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/ceiling_height_m",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/ceiling_height_entered",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/user_entered_floor_area_m2",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/geometric_floor_area_m2",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/ceiling_area_m2",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/geometric_ceiling_area_m2",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/has_floor",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/Zone/has_roof",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/actual_mutable_owner_state/geometry_prepared",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/actual_mutable_owner_state/before_volume",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/actual_mutable_owner_state/after_volume",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-UNIT/actual_mutable_owner_state/after_second_volume",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-CUBOID/Zone/ceiling_height_m",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-CUBOID/Zone/ceiling_height_entered",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "missing_required_owner_observation",
+      "field": "AUTO-CUBOID/Zone/user_entered_floor_area_m2",
+      "actual": null,
+      "reference": null
+    },
+    {
+      "category": "numerical_tolerance",
+      "field": "AUTO-CUBOID-Z45/available_summary/volume_m3",
+      "actual": "4049000000000001",
+      "reference": "4038000000000000"
+    },
+    {
+      "category": "numerical_tolerance",
+      "field": "AUTO-VOLUME-ENTERED-HEIGHT/available_summary/volume_m3",
+      "actual": "3ff0000000000000",
+      "reference": "4000000000000000"
+    },
+    {
+      "category": "numerical_tolerance",
+      "field": "AUTO-VOLUME-ENTERED-HEIGHT-FLOOR/available_summary/volume_m3",
+      "actual": "3ff0000000000000",
+      "reference": "4018000000000000"
+    }
+  ],
+  "scalar_error_metrics": {
+    "m3": {
+      "count": 16,
+      "maximum_absolute_error": 26.000000000000007,
+      "rmse": 6.623820649745887
+    },
+    "m2": {
+      "count": 16,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "reference_outputs_supplied_to_Rust": false,
+  "physics_executed": false,
+  "gates_updated": false,
+  "claim_limits": [
+    "Prepared helper area fields are declared input state, not normal parser producer evidence.",
+    "The current public summary does not consume prepared area/Space groups or own mutable volume state.",
+    "Baseline comparison cannot pass completeness even if all available numerical outputs agree.",
+    "Original warnings/counters/implicit Space/scratch and unsupported-route fallback are unpaired.",
+    "No normal parser admission, AirPowerCap, ZON02/SYS or full physical equivalence is claimed."
+  ],
+  "baseline_comparison_command": {
+    "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/receipt.json",
+    "sha256": "9f4e909188a95849b4c09459372a745b4ad96b710030f2da2f9e93f7a3659c06"
+  },
+  "baseline_comparison_report": {
+    "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/stdout.log",
+    "sha256": "1554a5dc06abc41ec66590630e32ce1dd7b58d14892df3132f3da15b46cfef1b"
+  },
+  "actual_exit_code": 1,
+  "source_bytes_match_before_and_after": true,
+  "implementation_changes_authorized_after_observed_baseline": true
+}
