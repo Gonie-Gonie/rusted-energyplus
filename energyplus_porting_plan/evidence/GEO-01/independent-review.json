@@ -1,0 +1,160 @@
+{
+  "schema": "geo01-independent-final-review.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "reviewed_comparison_report": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/comparison-report.json",
+    "sha256": "9479e6fdd18dc2e092381153e92b843a003952c88a6757495b13d1aae6058a49"
+  },
+  "reviewed_snapshots": [
+    {
+      "historical_path": "energyplus_porting_plan/evidence/GEO-01/comparison-report.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-01/independent-final-review/reviewed-snapshots/comparison-report.json",
+        "sha256": "9479e6fdd18dc2e092381153e92b843a003952c88a6757495b13d1aae6058a49"
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/evidence/GEO-01/build-receipt.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-01/independent-final-review/reviewed-snapshots/build-receipt.json",
+        "sha256": "99640e4fc2a1c1d1daecd6d36106145e1bd1ca909cd0ad0dc6cc306221f9c40b"
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/evidence/GEO-01/committed-unit-equivalence.json",
+      "archive": {
+        "path": ".runtime/porting/GEO-01/independent-final-review/reviewed-snapshots/committed-unit-equivalence.json",
+        "sha256": "07d0c62bdd3339b824330283bb88be246cdb05a0669d2d34222289ca66e4e51e"
+      }
+    }
+  ],
+  "actual_independent_review_command": {
+    "path": ".runtime/porting/GEO-01/independent-final-review/production-command.json",
+    "sha256": "c69dbef8b939c464c66984cdfbe4b3b4555930962425b09d7feec5b13c150f55"
+  },
+  "raw_independent_review_output": {
+    "path": ".runtime/porting/GEO-01/independent-final-review/production-stdout.json",
+    "sha256": "b8fc63763cc1b62a47ff840575b1c66d429e764bb531eb0bcc2da54f8ef5edfd"
+  },
+  "initial_foundation_review_command": {
+    "path": ".runtime/porting/GEO-01/independent-final-review/foundation-command.json",
+    "sha256": "74ba517e2a5cddf4bed00b0c55a2fc1391c188e5a93ec77c96537eba36cc4448"
+  },
+  "executed_reviewer": {
+    "path": ".runtime/porting/GEO-01/independent-final-review/production.py",
+    "sha256": "4580f2c80f6c70ec36f11349bd1c9d76827e01fbe0f2cac2ebd03594f3610514"
+  },
+  "imported_metadata_reader": {
+    "path": ".runtime/porting/GEO-01/independent-final-review/foundation.py",
+    "sha256": "4ee03eef76efd25b8da184bd3b8a2dbff870744a58e6513bf583190afb701538"
+  },
+  "publication_script": {
+    "path": ".runtime/porting/GEO-01/independent-final-review/publish.py",
+    "sha256": "a841f31019ef25ebeefe2edef2ec4c9a43f01bd75200270958e833e36f602e4f"
+  },
+  "publication_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    ".runtime/porting/GEO-01/independent-final-review/publish.py"
+  ],
+  "review_method": "Read-only independent hashes/byte identity, exact typed command/output/context bindings, direct actual observed coordinate/consumer payload and IEEE bits, fixed error policy/metrics and Full/Summary output comparison. No geometry equation, expected-output input, engine, Cargo, Git or shared scientific comparator was invoked.",
+  "implementation_commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+  "crates_tree": "afa8eb1f2900443339ed5b8950aaec37024bc64c",
+  "binary": {
+    "path": ".runtime/porting/GEO-01/builds/committed-01/eplus-rs.exe",
+    "sha256": "a5094e5eab2f0ec0cd89911f4364bac6f9b195582b64667bd378139ecf0c9360"
+  },
+  "checked_reference_occurrences": 24164,
+  "unique_hashed_artifacts": 8515,
+  "source_and_unit_precision": {
+    "exact_old_new_source_pairs": 3637,
+    "binary_lock_toolchain_exact_byte_identity": true,
+    "compiled_vs_committed_exact_bodies": 3636,
+    "compiled_vs_committed_CRLF_only_bodies": 1,
+    "CRLF_owner": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+    "CRLF_line": 494,
+    "CRLF_precision": "Actual compiled CRLF bytes remain archived. LF-normalized SHA256 and Git blob SHA1 are independently verified; the only CRLF is source whitespace after a Rust field comma, outside a literal. Git HEAD membership for all source bodies is the Root actual frozen build audit, not a new Git call by this reviewer.",
+    "reused_unit_cases": 37,
+    "reused_unit_coordinates": 2664,
+    "reused_coordinate_maximum_absolute_error": 0.0,
+    "reused_coordinate_rmse": 0.0,
+    "reused_coordinate_signed_zero_mismatches": 0,
+    "historical_unit_HEAD": "ead2c1b34f67cdf83facc0d08678186ed1453fdf",
+    "historical_unit_exit4_count": 37,
+    "historical_unit_physics_executed": false,
+    "fresh_committed_unit_execution_claimed": false,
+    "unit_reuse_basis": "All compiled source and executable bytes match exactly; historical modified-source HEAD/exit4 and actual dry-run output provenance are retained. This is no new 37-case execution."
+  },
+  "actual_production": {
+    "cases": 7,
+    "normal_CLI_processes": 14,
+    "all_actual_exit_codes": 0,
+    "retained_Full_physical_zone_invocations": 1056,
+    "physical_clock_omissions": 0,
+    "ordered_invocation_operands_verified": true,
+    "zone_steps_per_hour": 4,
+    "zone_timestep_seconds": 900,
+    "Summary_physical_duration_matches": true,
+    "production_compile_coordinates": 504,
+    "maximum_production_coordinate_error": 0.0,
+    "production_coordinate_signed_zero_mismatches": 0,
+    "stored_consumer_scalars": 133,
+    "stored_consumer_projections": 7,
+    "actual_stored_consumer_bit_equal_counts": {
+      "connection_area_m2": 42,
+      "connection_azimuth_deg": 42,
+      "connection_tilt_deg": 42,
+      "connection_zone_volume_m3": 7
+    },
+    "connection_metrics": {
+      "connection_area_m2": {
+        "count": 42,
+        "maximum_absolute_error": 0.0,
+        "maximum_relative_error_nonzero_reference": 0.0,
+        "bit_equal_count": 42,
+        "rmse": 0.0
+      },
+      "connection_azimuth_deg": {
+        "count": 42,
+        "maximum_absolute_error": 0.0,
+        "maximum_relative_error_nonzero_reference": 0.0,
+        "bit_equal_count": 42,
+        "rmse": 0.0
+      },
+      "connection_tilt_deg": {
+        "count": 42,
+        "maximum_absolute_error": 0.0,
+        "maximum_relative_error_nonzero_reference": 0.0,
+        "bit_equal_count": 42,
+        "rmse": 0.0
+      },
+      "connection_zone_volume_m3": {
+        "count": 7,
+        "maximum_absolute_error": 0.0,
+        "maximum_relative_error_nonzero_reference": 0.0,
+        "bit_equal_count": 7,
+        "rmse": 0.0
+      }
+    },
+    "Full_Summary_selected_CSV_meter_CSV_result_series_exact": true,
+    "Full_Summary_remaining_config_and_runtime_metadata_exact": true,
+    "Summary_Full_observer_artifacts_absent": true,
+    "original_outputs_supplied_to_Rust": false,
+    "fixture_demand_injection_used": false,
+    "source_reference_snapshot": "actual original final_weather stored fields; compiled preparation compared separately"
+  },
+  "claim_limits": [
+    "GEO-01 bounded input-level coordinate transformation and selected-CON actual stored-field connections only.",
+    "Relative/angle/winding/corner/signed-zero diagnostics are actual compile-only unit evidence, not expanded CON admission or Rust physics execution.",
+    "Native IDs, MaxVerticesPerSurface and transient trig/scratch cache ownership have no paired Rust lifecycle. Source global/environment/system order is not inferred.",
+    "133 scalars represent seven final stored-field projections, not geometry-kernel call counts. Copied internal final timestep index is not equated with actual clock hook counts.",
+    "1056 retained Full hooks do not include the observer-free Summary runs. Raw EP system clock, warmup, adaptive system order and global year mutation parity are unclaimed.",
+    "GEO-02/GEO-03 algorithms, other shapes/controls, annual B Rust physics, HVAC and whole-building physics remain separate scientific gates."
+  ],
+  "scientific_engines_or_comparers_invoked": 0,
+  "source_or_original_raw_proof_mutations": 0,
+  "gates_updated": false
+}

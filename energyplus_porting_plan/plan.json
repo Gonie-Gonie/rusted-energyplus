@@ -330,14 +330,897 @@
       "companion": "SurfaceGeometry.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/SurfaceGeometry.cc",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "SetupZoneGeometry",
+            "description": "SetupZoneGeometry original trig cache and input caller",
+            "function_owner": "SetupZoneGeometry",
+            "start_line": 251,
+            "end_line": 311,
+            "helpers": [
+              "GetSurfaceData",
+              "std::cos",
+              "std::sin"
+            ],
+            "role": "selected",
+            "range_sha256": "466fc52684c10b6ac7cd8bb690a74d1c988eeccd5379c66a1c6a329e57528b8d"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "GetSurfaceData",
+            "description": "GetSurfaceData one-time control and GGR caller",
+            "function_owner": "GetSurfaceData",
+            "start_line": 1051,
+            "end_line": 1064,
+            "helpers": [
+              "GetGeometryParameters"
+            ],
+            "role": "selected-input-context",
+            "range_sha256": "44b54846186d76444c2263efaa04e67d83743137e4ce09b68fa97b1f6e576689"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "GetHTSurfaceData",
+            "description": "GetSurfaceData detailed surface input caller",
+            "function_owner": "GetSurfaceData",
+            "start_line": 1154,
+            "end_line": 1167,
+            "helpers": [
+              "GetHTSurfaceData"
+            ],
+            "role": "selected-input-context",
+            "range_sha256": "0756ae2c83480faa0330d7191cb6893b2cc7291529471130646ae685f459bfac"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "UpperLeftCorner",
+            "description": "GetGeometryParameters valid GGR branch",
+            "function_owner": "GetGeometryParameters",
+            "start_line": 3225,
+            "end_line": 3302,
+            "helpers": [
+              "InputProcessor::getObjectItem",
+              "Util::FindItem",
+              "Util::SameString"
+            ],
+            "role": "selected",
+            "range_sha256": "41089c3a773107cb5016f79124b2c1af84e60e196ed3f6bc641fcf59a9b5bb84"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "surfTemp",
+            "description": "GetHTSurfaceData Detailed parser and class",
+            "function_owner": "GetHTSurfaceData",
+            "start_line": 3888,
+            "end_line": 3936,
+            "helpers": [
+              "InputProcessor::getObjectItem"
+            ],
+            "role": "selected-input-context",
+            "range_sha256": "eabcbdc3006c065f38b75a6de4b214e79a590bdef0be1a1f90dcb4fbea00bb22"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "surfTemp",
+            "description": "GetHTSurfaceData construction and zone binding",
+            "function_owner": "GetHTSurfaceData",
+            "start_line": 3938,
+            "end_line": 3986,
+            "helpers": [
+              "Util::FindItemInList"
+            ],
+            "role": "selected-input-context",
+            "range_sha256": "4916c78b97e3232c5c3fef15267e4177fc5dae366dd3ec7476dd1b9b1d0a5658"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "GetVertices",
+            "description": "GetHTSurfaceData vertex count allocation and GetVertices",
+            "function_owner": "GetHTSurfaceData",
+            "start_line": 4294,
+            "end_line": 4348,
+            "helpers": [
+              "GetVertices",
+              "CheckConvexity"
+            ],
+            "role": "selected",
+            "range_sha256": "3d22e4e78a9a61abe9abf32a286d7d015b85018ea7502bb9dfed70dbf5b7b908"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "GetVertices",
+            "description": "GetVertices declaration, counter, copy, winding, corner and coordinates",
+            "function_owner": "GetVertices",
+            "start_line": 9169,
+            "end_line": 9314,
+            "helpers": [
+              "SetupZoneGeometry trig cache"
+            ],
+            "role": "selected",
+            "range_sha256": "143b6c2139987891b79211bb21021c53e1a0a027d84b714c5f897156146ddf96"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "checkPopCoincidentVertex",
+            "description": "checkPopCoincidentVertex inactive coincident removal",
+            "function_owner": "checkPopCoincidentVertex",
+            "start_line": 9115,
+            "end_line": 9167,
+            "helpers": [],
+            "role": "inactive-domain-guard",
+            "range_sha256": "4ba31669a0432ff36df4722c728243ab99e38be312d32311fafc6ad3e654034e"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "checkPopCoincidentVertex",
+            "description": "GetVertices downstream removal/orientation/aspect/geometry",
+            "function_owner": "GetVertices",
+            "start_line": 9316,
+            "end_line": 9485,
+            "helpers": [
+              "checkPopCoincidentVertex",
+              "ReverseAndRecalculate",
+              "TransformVertsByAspect",
+              "Vectors::CreateNewellSurfaceNormalVector",
+              "Vectors::CreateNewellAreaVector",
+              "Vectors::DetermineAzimuthAndTilt"
+            ],
+            "role": "downstream-original-context-not-GEO02-GEO03-closure",
+            "range_sha256": "2ce300ff19717e17f80b06f0236abb2a3184b24cc38200bf1e7df2c8cc04bb92"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "surfTemp",
+            "description": "GetSurfaceData final owned array relocation",
+            "function_owner": "GetSurfaceData",
+            "start_line": 1504,
+            "end_line": 1530,
+            "helpers": [],
+            "role": "immutable-array-relay",
+            "range_sha256": "179b319bb92bb9474ba68d137ff4fb497e20679d650b94fe542f3fc2663334fe"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "SurfaceTmp",
+            "description": "GetSurfaceData temporary array deallocation",
+            "function_owner": "GetSurfaceData",
+            "start_line": 1729,
+            "end_line": 1735,
+            "helpers": [],
+            "role": "state-lifetime-context",
+            "range_sha256": "e4bc339b71d7599f64391ca9963308d2baf4ba45f3e171c7b4506ed09a75d378"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "ProcessSurfaceVertices",
+            "description": "SetupZoneGeometry processed vertex consumer",
+            "function_owner": "SetupZoneGeometry",
+            "start_line": 343,
+            "end_line": 356,
+            "helpers": [
+              "ProcessSurfaceVertices"
+            ],
+            "role": "GEO02-GEO03-consumer-context-only",
+            "range_sha256": "3c4c815ef8f4db946f84e6ee53a6eb222a3895265fbd88653eef5bcb8c27064c"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "ProcessSurfaceVertices",
+            "description": "ProcessSurfaceVertices base-surface vertex readers",
+            "function_owner": "ProcessSurfaceVertices",
+            "start_line": 12899,
+            "end_line": 12977,
+            "helpers": [],
+            "role": "GEO02-GEO03-consumer-context-only",
+            "range_sha256": "cdf516644d77ff254649f33c646714d5998774f5467f1462061079fd4b6952f2"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.cc",
+            "symbol": "TransformVertsByAspect",
+            "description": "TransformVertsByAspect absent-object early return",
+            "function_owner": "TransformVertsByAspect",
+            "start_line": 14391,
+            "end_line": 14474,
+            "helpers": [],
+            "role": "inactive-domain-guard",
+            "range_sha256": "84f8db597b779eeed2b423a0592d94a68b5346023f2761bd4c9d328849a70061"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.hh",
+            "symbol": "GetGeometryParameters",
+            "description": "selected routine declarations",
+            "function_owner": "selected",
+            "start_line": 89,
+            "end_line": 130,
+            "helpers": [],
+            "role": "declarations",
+            "range_sha256": "90804c375d8f52ed1485c07e65a6a005d7db3f21fa93d6b68038fafb2da35abc"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.hh",
+            "symbol": "GetVertices",
+            "description": "GetVertices declaration",
+            "function_owner": "GetVertices",
+            "start_line": 278,
+            "end_line": 282,
+            "helpers": [],
+            "role": "declarations",
+            "range_sha256": "0cdf4cbbe0686d2a888201e58abb71cfe9a726f2075a4d98ff17045a75fc5d65"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.hh",
+            "symbol": "ProcessSurfaceVertices",
+            "description": "geometry initialization owner and flags",
+            "function_owner": "geometry",
+            "start_line": 442,
+            "end_line": 478,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "09a5b1ffc01b7b333136c20b6c8f3cf18e3e422b9eedb0c9c3fd6c481ba8b742"
+          },
+          {
+            "path": "src/EnergyPlus/SurfaceGeometry.hh",
+            "symbol": "ProcessSurfaceVertices",
+            "description": "geometry clear-state defaults",
+            "function_owner": "geometry",
+            "start_line": 509,
+            "end_line": 534,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "777a33519434d080a7dfd0d3701353b85d6cf21f12db5ca71d6b0d97eeae45c2"
+          },
+          {
+            "path": "src/EnergyPlus/DataSurfaces.hh",
+            "symbol": "UpperLeftCorner",
+            "description": "four corner enum constants",
+            "function_owner": "four",
+            "start_line": 304,
+            "end_line": 307,
+            "helpers": [],
+            "role": "constants",
+            "range_sha256": "b8bb135ba0c3e61c02cd3cd9386f45b45e623c9e55490fed7857ae92ea58753b"
+          },
+          {
+            "path": "src/EnergyPlus/DataSurfaces.hh",
+            "symbol": "SurfaceData",
+            "description": "owned surface name/class/sides/vertices",
+            "function_owner": "owned",
+            "start_line": 687,
+            "end_line": 746,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "81faac78809ef652d04ce4c7994d5644448de4065d3a56e888527d32dacd1797"
+          },
+          {
+            "path": "src/EnergyPlus/DataSurfaces.hh",
+            "symbol": "MaxVerticesPerSurface",
+            "description": "counter and geometry flags constructor defaults",
+            "function_owner": "counter",
+            "start_line": 1489,
+            "end_line": 1500,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "73b3b1375a6eb904237fe82e0a996bd8ff6b80f4ed6ee6a9dec6612711481162"
+          },
+          {
+            "path": "src/EnergyPlus/DataHeatBalance.hh",
+            "symbol": "RelNorth",
+            "description": "zone relative north and origin defaults",
+            "function_owner": "zone",
+            "start_line": 573,
+            "end_line": 581,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "35bf83de29367b04b50f7d2bae03f56741855bf03c53858941cbc687057b6b61"
+          },
+          {
+            "path": "src/EnergyPlus/DataHeatBalance.hh",
+            "symbol": "Volume",
+            "description": "actual selected zone Volume consumer field",
+            "function_owner": "actual",
+            "start_line": 438,
+            "end_line": 443,
+            "helpers": [],
+            "role": "GEO03-consumer-context-only",
+            "range_sha256": "f999dc9bee7828838df25eae3c2151d26db4b216b2fcc71b93ceb5170ef88cd7"
+          },
+          {
+            "path": "src/EnergyPlus/DataHeatBalance.hh",
+            "symbol": "BuildingAzimuth",
+            "description": "BuildingAzimuth",
+            "function_owner": "BuildingAzimuth",
+            "start_line": 1809,
+            "end_line": 1813,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "38d020f414247fb5b3c20d85997ae68243720e10f2364887949c75fe5b8414cf"
+          },
+          {
+            "path": "src/EnergyPlus/DataHeatBalance.hh",
+            "symbol": "BuildingRotationAppendixG",
+            "description": "BuildingRotationAppendixG",
+            "function_owner": "BuildingRotationAppendixG",
+            "start_line": 1837,
+            "end_line": 1840,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "a5f75e0db9b504de6b43fff7d1f99a86992f64bb8ca152bafbd291b619b31b74"
+          },
+          {
+            "path": "src/EnergyPlus/DataErrorTracking.hh",
+            "symbol": "TotalCoincidentVertices",
+            "description": "inactive geometry error counters",
+            "function_owner": "inactive",
+            "start_line": 214,
+            "end_line": 220,
+            "helpers": [],
+            "role": "state-contract",
+            "range_sha256": "848e80a3d28579f80e39f9dce1030364b24437559b54e478ad23234645405728"
+          },
+          {
+            "path": "src/EnergyPlus/DataGlobalConstants.hh",
+            "symbol": "DegToRad",
+            "description": "distance and angle constants",
+            "function_owner": "distance",
+            "start_line": 582,
+            "end_line": 591,
+            "helpers": [],
+            "role": "constants",
+            "range_sha256": "974f65f03054f0ce55cc99459c4886e6cba0bb5092cfd9799c3b8f387eb8e79b"
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "Building",
+            "description": "Building angle modulo prerequisite",
+            "function_owner": "Building",
+            "start_line": 559,
+            "end_line": 565,
+            "helpers": [],
+            "role": "CON01-prerequisite",
+            "range_sha256": "3ab5f476d7cf3361b57ae1c1a90b6b55126d882dfc3a7ee36fc6902b6d143550"
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "Zone",
+            "description": "Zone rotation and origin parsed input",
+            "function_owner": "Zone",
+            "start_line": 2311,
+            "end_line": 2326,
+            "helpers": [],
+            "role": "selected-input-context",
+            "range_sha256": "662c3dacc5b78823f90fa88b84e5f0180045ea977718caf00f02bde632ea3fa1"
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "SetupZoneGeometry",
+            "description": "SetupZoneGeometry initialization call",
+            "function_owner": "SetupZoneGeometry",
+            "start_line": 1815,
+            "end_line": 1823,
+            "helpers": [
+              "SetupZoneGeometry"
+            ],
+            "role": "selected-input-context",
+            "range_sha256": "797274f1ace445f64bb35feb0d0259208765a427d3e7c0c686c971ee7785944c"
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "geometry",
+            "description": "geometry input precedes before-init callback",
+            "function_owner": "geometry",
+            "start_line": 147,
+            "end_line": 198,
+            "helpers": [],
+            "role": "callback-phase-proof",
+            "range_sha256": "28559b95d4808475145055151bff07cb22ae6af0da2985220ea6d71f44163f31"
+          },
+          {
+            "path": "src/EnergyPlus/api/runtime.cc",
+            "symbol": "callbackBeginZoneTimeStepBeforeInitHeatBalance",
+            "description": "public native before-init callback",
+            "function_owner": "public",
+            "start_line": 187,
+            "end_line": 197,
+            "helpers": [],
+            "role": "opaque-public-API",
+            "range_sha256": "c7d25c26a2ad7734c258a444d04a1a50f5a8d77cfc3401ab3e8426927ff1f23b"
+          },
+          {
+            "path": "src/EnergyPlus/InputProcessing/InputProcessor.hh",
+            "symbol": "epJSON",
+            "description": "genuine parsed epJSON",
+            "function_owner": "genuine",
+            "start_line": 307,
+            "end_line": 319,
+            "helpers": [],
+            "role": "input-bit-observation",
+            "range_sha256": "8c61f154aa669e8a002c3eb8d842ebaa0e9fed685ee6c5688425b2b3c2818769"
+          },
+          {
+            "path": "src/EnergyPlus/CMakeLists.txt",
+            "symbol": "EP_psych_errors",
+            "description": "original directory compile definitions",
+            "function_owner": "original",
+            "start_line": 25,
+            "end_line": 45,
+            "helpers": [],
+            "role": "ABI-provenance",
+            "range_sha256": "0ff1e44c4e3297eb76be103e9f15039061d8a016cfe95ee2769b75864a3b2ac6"
+          }
+        ],
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+            "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+            "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+            "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+            "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+            "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+            "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+            "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+            "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-IGNORED-AXES/input.idf",
+            "sha256": "fabfd4f001c895c093949759e80ce89fb8069d3ad9412a66110a1a241f441bef"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-NEGATIVE-ZERO/input.idf",
+            "sha256": "a8e57055317c3191aed51157939efba50c0adb70a77d76e90543070adb681a44"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-X-NEGATIVE-ZERO/input.idf",
+            "sha256": "8fa36d8ef67d7b6b122ea83f598a022a59ce712274f9edafaff92991b7c5e457"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-ZERO/input.idf",
+            "sha256": "5db8bb9248d3ae31d343070dac422358850c46373a2fc8c8b555763304d77cc0"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-BUILDING90/input.idf",
+            "sha256": "d40a276f40bc0734602cd5b941899d137b356fd70dcda1d06f92acfad1e0c3d4"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-ZONE90/input.idf",
+            "sha256": "022ae9aee6887c9e895013aa66d4926e936567b1eab3837b87e3dad1406833d0"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-TRANSLATE/input.idf",
+            "sha256": "25363149402a4ebf5862d3fdb47e60e609f5bda2f7d66714736e888b722964d4"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-COMPOSED/input.idf",
+            "sha256": "356be7f04e181561b463e50b5793a9a26c781e78cff03075484cf556abb8136c"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-BUILDING-NEG450/input.idf",
+            "sha256": "3639e9dcc40e23fd83dfae9dd2f51eb9268bcea7a26a31d375b08c1b1bd4215e"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-BUILDING765/input.idf",
+            "sha256": "fe9dd05e0b505f7ac3254e1d78496497789e48db3ddb992b6f83246a1bc6c99e"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-ZONE450/input.idf",
+            "sha256": "1dabe968141a463efbc90ea7be39265d4a3f59d38c09fb18ed7a3c7841192736"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-NEAR-ZERO/input.idf",
+            "sha256": "6d5f30318f7e837c810589ccd29b5c23687f5017378293e275965a9cec4cd278"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-NEGATIVE-ZERO/input.idf",
+            "sha256": "581fe2b64da66d7880f9eb2068689ebcbffb5dec3f9cd60f8830895e8f01ad7b"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-UPPERLEFTCORNER-COUNTERCLOCKWISE/input.idf",
+            "sha256": "c5a4817d213e3a1e2f32788a4dfad0722424b95ad4b271ca50e03aedf129c9d4"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-UPPERLEFTCORNER-CLOCKWISE/input.idf",
+            "sha256": "cd78920d78cbef089adc587e6a3dff7f31cd45eed04425e0e744b91a5fce2b22"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-LOWERLEFTCORNER-COUNTERCLOCKWISE/input.idf",
+            "sha256": "469401540fbc67d3bcfb6c5bee4aa5190468f297c700c3ec0c9e051b9182a12d"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-LOWERLEFTCORNER-CLOCKWISE/input.idf",
+            "sha256": "ff163ab5fedd4dd7e1a5f0b4d29a0b4555a0adde353cb1fffec9c837770018b3"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-LOWERRIGHTCORNER-COUNTERCLOCKWISE/input.idf",
+            "sha256": "9b427a1a2b818a30dcfc4180e41986c62b847530e71270405d9951766eda1691"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-LOWERRIGHTCORNER-CLOCKWISE/input.idf",
+            "sha256": "c379312d05ca487209ee3d35acd5b2b848ce75e252a988efe4b306775496afad"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-UPPERRIGHTCORNER-COUNTERCLOCKWISE/input.idf",
+            "sha256": "d9114858d613ac4fbf9329261bc1990a3cb46c852bf8dba50c474d4103930d8f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/WORLD-UPPERRIGHTCORNER-CLOCKWISE/input.idf",
+            "sha256": "94c0f412796f319948bb8e2334d34365a71b19a73cb85310b5b554117f166731"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/GEO-01/RELATIVE-CW-LOWERRIGHT/input.idf",
+            "sha256": "6ea325eed2e153da271f34f7acd49af18a40a1558b340c28e5cd10cf7c0daa20"
+          },
+          {
+            "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+            "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": "energyplus_porting_plan/evidence/GEO-01/source-preparation.json",
+              "sha256": "5f25b57d8d1b6dc409f7f65f929f3ff4a445655cb363b2b3396e8c4a89e42030"
+            },
+            {
+              "path": ".runtime/porting/GEO-01/original-first/matrix.json",
+              "sha256": "f7e460dabd9eb9b2e3a5f8dfc15989d7fb8c8e9408f3c47bf400308c225764ab"
+            },
+            {
+              "path": ".runtime/porting/GEO-01/original-first-review/preparation-review.json",
+              "sha256": "968814926a26a7a60ab30972b119f784f4c9e1053e7cb221073fbb7de9bf3466"
+            },
+            {
+              "path": ".runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json",
+              "sha256": "d6ada5c659e2e5c9fbe77e2a245ad9965d7c7f4407166787ea466b1961be3c99"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python -B tools/porting/geo01_reference.py --check; independent original 12-file/35-range input/state/lifetime and frozen precision review",
+            "commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/contracts/GEO-01-source.json",
+                "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+                "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+                "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-contract-review.json",
+                "sha256": "ad32b6a3fb4dd89cddadb30060e6d27fbdfd9b56e3f04aa4cb28381328c5d8a5"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-native-review.json",
+                "sha256": "f442b7548e3c9ad2af75c6cd6459b010ed7334db56cea18af851fe1a18fe7832"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-observer-review.json",
+                "sha256": "8df28189219f7a85143a642f61c8f8658f212565cf1e01cfc18cba2823046a2e"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-correction-review.json",
+                "sha256": "1a8eaf62f16be93720608ed00b50c7c9b3a2bb3eaa6c6ac7745129a17c0e968f"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-production-policy-review.json",
+                "sha256": "b6b7f97f0a0d715f26d9d4a6f3f0bc0ef8562a5e3065074f37e22bfbe16f9eac"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/source-preparation.json",
+                "sha256": "5f25b57d8d1b6dc409f7f65f929f3ff4a445655cb363b2b3396e8c4a89e42030"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-review.json",
+                "sha256": "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
+              }
+            ]
+          },
+          "unit_gate": {
+            "command": "python -B tools/porting/check_geo01_units.py --rust-root .runtime/porting/GEO-01/rust-fixed-01 --original-matrix .runtime/porting/GEO-01/original-first/matrix.json --output-dir .runtime/porting/GEO-01/fixed-comparison-01; C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -B tools/porting/check_geo01_committed_equivalence.py --fixed-build .runtime/porting/GEO-01/builds/fixed-01/build-receipt.json --committed-build .runtime/porting/GEO-01/builds/committed-01/build-receipt.json --matrix .runtime/porting/GEO-01/rust-fixed-01/matrix.json --comparison .runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json --provenance .runtime/porting/GEO-01/rust-fixed-01-provenance-audit/provenance-audit.json --output-dir .runtime/porting/GEO-01/committed-unit-equivalence-01 --evidence energyplus_porting_plan/evidence/GEO-01/committed-unit-equivalence.json",
+            "commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json",
+                "sha256": "d6ada5c659e2e5c9fbe77e2a245ad9965d7c7f4407166787ea466b1961be3c99"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/committed-unit-equivalence.json",
+                "sha256": "07d0c62bdd3339b824330283bb88be246cdb05a0669d2d34222289ca66e4e51e"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/rust-fixed-01-provenance-audit/provenance-audit.json",
+                "sha256": "2ffb009dc4b480218a5d78a6d9f1e9f36dc817d1bbdc842fa22aaffdd76ec96b"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/build-receipt.json",
+                "sha256": "99640e4fc2a1c1d1daecd6d36106145e1bd1ca909cd0ad0dc6cc306221f9c40b"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/initial-checks.json",
+                "sha256": "8b16e2439b504c67a41eb028880bd7c97a2162ed7ecb682df36b6e5601de781e"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-review.json",
+                "sha256": "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
+              }
+            ],
+            "scope": "37 actual ordinary Full dry-run compile projections, 2664 coordinate scalars, actual parsed input bits, exact names/order/own-ID bindings and zero signs. Historical CLI exits remain 4. Same executable and all 3637 source bytes bind the scientific results to the committed implementation without new engine runs."
+          },
+          "integration_gate": {
+            "command": "python -B tools/porting/check_geo01_production.py --matrix .runtime/porting/GEO-01/production-3f9b8397/matrix.json; independent copied final-state and ordered physical-hook review",
+            "commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/comparison-report.json",
+                "sha256": "9479e6fdd18dc2e092381153e92b843a003952c88a6757495b13d1aae6058a49"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-review.json",
+                "sha256": "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/build-receipt.json",
+                "sha256": "99640e4fc2a1c1d1daecd6d36106145e1bd1ca909cd0ad0dc6cc306221f9c40b"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/production-comparison-01/comparison-report.json",
+                "sha256": "5435f5db6f6ea9dbb9a5852f2db0cb2a9604c919bf3cd66545de276328f10f3d"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/production-comparison-01/execution.json",
+                "sha256": "74cda628d9886ad9bec4babd5cd7fd19cf2e0fd6688e99e5bfff45262d2adf24"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/production-3f9b8397/matrix.json",
+                "sha256": "9aba94ac65a3be02b045bf9a9c79c532e253bfab64f62a904cec8b10372e2812"
+              }
+            ],
+            "scope": "Seven actual final-state projections: 133 stored area/azimuth/tilt/volume scalar fields, 504 actual compile-coordinate scalars and 1056 retained Full interval events. GEO02/GEO03 algorithm closure and native system-clock/warmup parity are excluded."
+          },
+          "production_gate": {
+            "command": "python -B tools/porting/check_geo01_production.py --matrix .runtime/porting/GEO-01/production-3f9b8397/matrix.json",
+            "commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/comparison-report.json",
+                "sha256": "9479e6fdd18dc2e092381153e92b843a003952c88a6757495b13d1aae6058a49"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/independent-review.json",
+                "sha256": "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/GEO-01/build-receipt.json",
+                "sha256": "99640e4fc2a1c1d1daecd6d36106145e1bd1ca909cd0ad0dc6cc306221f9c40b"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/production-comparison-01/comparison-report.json",
+                "sha256": "5435f5db6f6ea9dbb9a5852f2db0cb2a9604c919bf3cd66545de276328f10f3d"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/production-comparison-01/execution.json",
+                "sha256": "74cda628d9886ad9bec4babd5cd7fd19cf2e0fd6688e99e5bfff45262d2adf24"
+              },
+              {
+                "path": ".runtime/porting/GEO-01/production-3f9b8397/matrix.json",
+                "sha256": "9aba94ac65a3be02b045bf9a9c79c532e253bfab64f62a904cec8b10372e2812"
+              }
+            ],
+            "scope": "14 ordinary Full/Summary scoped successful physical executions for CON24/72H; input/weather only, no oracle/fixture answers, exact series/CSV and observer-free Summary invariance."
+          }
+        },
+        "production": {
+          "rust_entrypoint": ".runtime/porting/GEO-01/builds/committed-01/eplus-rs.exe run <frozen-IDF> --weather <pinned-EPW> --porting-scope A|B --mode compatibility --partial deny --trace-level full|summary",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "completed_actual_cases": [
+            "A-24H",
+            "A-72H",
+            "B-NOLIMIT-24H",
+            "B-FLOW-24H",
+            "B-CAPACITY-24H",
+            "B-BOTH-24H",
+            "B-BOTH-72H"
+          ],
+          "retained_Full_zone_invocations": 1056,
+          "stored_consumer_scalar_count": 133,
+          "scalar_fields_are_kernel_call_counts": false,
+          "B_annual_Rust_physics_executed": false
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+            "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+          },
+          "report": {
+            "path": "energyplus_porting_plan/evidence/GEO-01/comparison-report.json",
+            "sha256": "9479e6fdd18dc2e092381153e92b843a003952c88a6757495b13d1aae6058a49"
+          }
+        },
+        "contracts": [
+          {
+            "path": "energyplus_porting_plan/contracts/GEO-01-source.json",
+            "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739"
+          },
+          {
+            "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+            "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+          },
+          {
+            "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+            "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+          }
+        ],
+        "scope_metrics": {
+          "unit": {
+            "cases": 37,
+            "coordinate_scalars": 2664,
+            "mismatches": 0,
+            "metrics": {
+              "world_vertices_m": {
+                "maximum_absolute_error": 0.0,
+                "maximum_relative_error_nonzero_reference": 0.0,
+                "rmse": 0.0,
+                "count": 2664,
+                "signed_zero_mismatches": 0
+              }
+            }
+          },
+          "production": {
+            "cases": 7,
+            "normal_cli_invocations": 14,
+            "retained_Full_zone_invocations": 1056,
+            "compile_coordinate_scalars": 504,
+            "stored_consumer_scalars": 133,
+            "mismatches": 0,
+            "metrics": {
+              "connection_area_m2": {
+                "count": 42,
+                "maximum_absolute_error": 0.0,
+                "maximum_relative_error_nonzero_reference": 0.0,
+                "bit_equal_count": 42,
+                "rmse": 0.0
+              },
+              "connection_azimuth_deg": {
+                "count": 42,
+                "maximum_absolute_error": 0.0,
+                "maximum_relative_error_nonzero_reference": 0.0,
+                "bit_equal_count": 42,
+                "rmse": 0.0
+              },
+              "connection_tilt_deg": {
+                "count": 42,
+                "maximum_absolute_error": 0.0,
+                "maximum_relative_error_nonzero_reference": 0.0,
+                "bit_equal_count": 42,
+                "rmse": 0.0
+              },
+              "connection_zone_volume_m3": {
+                "count": 7,
+                "maximum_absolute_error": 0.0,
+                "maximum_relative_error_nonzero_reference": 0.0,
+                "bit_equal_count": 7,
+                "rmse": 0.0
+              }
+            }
+          }
+        },
+        "provenance": {
+          "rust_implementation_commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+          "crates_tree": "afa8eb1f2900443339ed5b8950aaec37024bc64c",
+          "original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+          "scientific_review": {
+            "path": "energyplus_porting_plan/evidence/GEO-01/independent-review.json",
+            "sha256": "9b57266ab1f1203ff97cdfb80942a1e9aa09fdaf09c727b7b4ad48a5a78dbc2d"
+          },
+          "compiled_source_precision": {
+            "source_count": 3637,
+            "exact_byte_matches": 3636,
+            "line_ending_only_differences": [
+              {
+                "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+                "compiled_archive": {
+                  "path": ".runtime/porting/GEO-01/rust-validation/committed-cli-01/source/crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+                  "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+                },
+                "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+                "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+                "difference": "preexisting working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+              }
+            ],
+            "all_other_content_exact": true,
+            "note": "source_worktree_clean follows Git status; exact bytes compiled remain independently archived, including any preexisting line endings"
+          },
+          "unit_execution_reuse": "Same archived executable and all 3637 exact archived source bytes; historical precommit HEAD and exit 4 unchanged. No fresh committed 37-case execution is claimed."
+        },
+        "limitations": [
+          "GEO-01 coordinate transformations and selected stored-field connections only.",
+          "Diagnostic Relative/rotation/winding cases are compile-only unit evidence and do not extend CON production admission.",
+          "Native IDs, MaxVerticesPerSurface and transient trig/scratch ownership have no Rust lifecycle peer.",
+          "133 scalar fields are seven final-state projections, not geometry kernel call counts.",
+          "1056 retained Full clock events exclude Summary observer-free runs; no native system-clock or warmup parity is inferred.",
+          "GEO-02/GEO-03 algorithms, whole physics, annual B Rust execution and SYS/warmup remain separate gates.",
+          "Original states are reference evidence only and were never supplied to ordinary Rust physics."
+        ]
+      }
     },
     {
       "id": "GEO-02",

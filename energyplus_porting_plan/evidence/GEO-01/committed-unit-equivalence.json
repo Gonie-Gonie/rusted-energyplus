@@ -1,0 +1,135 @@
+{
+  "schema": "geo01-committed-unit-equivalence.v1",
+  "status": "pass",
+  "card": "GEO-01",
+  "method": "reuse of preserved unit results through exact executable and source byte identity",
+  "command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    "tools/porting/check_geo01_committed_equivalence.py",
+    "--fixed-build",
+    ".runtime/porting/GEO-01/builds/fixed-01/build-receipt.json",
+    "--committed-build",
+    ".runtime/porting/GEO-01/builds/committed-01/build-receipt.json",
+    "--matrix",
+    ".runtime/porting/GEO-01/rust-fixed-01/matrix.json",
+    "--comparison",
+    ".runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json",
+    "--provenance",
+    ".runtime/porting/GEO-01/rust-fixed-01-provenance-audit/provenance-audit.json",
+    "--output-dir",
+    ".runtime/porting/GEO-01/committed-unit-equivalence-01",
+    "--evidence",
+    "energyplus_porting_plan/evidence/GEO-01/committed-unit-equivalence.json"
+  ],
+  "executed_checker": {
+    "path": ".runtime/porting/GEO-01/committed-unit-equivalence-01/check_geo01_committed_equivalence.py",
+    "sha256": "e8eac8964a2f69a4e86eb28d274941d50e6158e932b8a07561db30abf4d228c0"
+  },
+  "actual_exit_code": 0,
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-source.json",
+      "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+      "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+      "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+    }
+  },
+  "fixed_proofs": {
+    "matrix": {
+      "path": ".runtime/porting/GEO-01/rust-fixed-01/matrix.json",
+      "sha256": "64d4ebf57b90d2a51d889b8cf1cb21081d592e9d5e6f9495a5859376477613e5"
+    },
+    "mathematical_comparison": {
+      "path": ".runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json",
+      "sha256": "d6ada5c659e2e5c9fbe77e2a245ad9965d7c7f4407166787ea466b1961be3c99"
+    },
+    "producer_provenance": {
+      "path": ".runtime/porting/GEO-01/rust-fixed-01-provenance-audit/provenance-audit.json",
+      "sha256": "2ffb009dc4b480218a5d78a6d9f1e9f36dc817d1bbdc842fa22aaffdd76ec96b"
+    }
+  },
+  "builds": {
+    "fixed_modified_source": {
+      "path": ".runtime/porting/GEO-01/builds/fixed-01/build-receipt.json",
+      "sha256": "c7a901643ba23b18278db037b7e8a74315443bf1f851c71033ff83d8080030fe"
+    },
+    "committed_clean_source": {
+      "path": ".runtime/porting/GEO-01/builds/committed-01/build-receipt.json",
+      "sha256": "a0f3e0ff1089e393443431700380d2c7cde31c2362910e646bdf6acecd4473a3"
+    }
+  },
+  "binary": {
+    "path": ".runtime/porting/GEO-01/builds/committed-01/eplus-rs.exe",
+    "sha256": "a5094e5eab2f0ec0cd89911f4364bac6f9b195582b64667bd378139ecf0c9360"
+  },
+  "binary_exact_bytes_equal": true,
+  "implementation_commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+  "crates_tree": "afa8eb1f2900443339ed5b8950aaec37024bc64c",
+  "source_archive_count": 3637,
+  "source_archive_byte_matches": 3637,
+  "source_inventory_path_sha256": "7f67be08cbf1e1fd8edb6a6fb078654be0dc4f125c2aa0afadc44ab58ed1e619",
+  "cargo_lock_and_toolchain_bytes_equal": true,
+  "compiler_identities_equal": true,
+  "compiled_source_vs_committed_blobs": {
+    "source_count": 3637,
+    "exact_byte_matches": 3636,
+    "line_ending_only_differences": [
+      {
+        "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+        "compiled_archive": {
+          "path": ".runtime/porting/GEO-01/rust-validation/committed-cli-01/source/crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+          "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+        },
+        "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+        "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+        "difference": "preexisting working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+      }
+    ],
+    "all_other_content_exact": true,
+    "note": "source_worktree_clean follows Git status; exact bytes compiled remain independently archived, including any preexisting line endings"
+  },
+  "committed_blob_audit_basis": "Root-recorded build receipt; no Git invocation by this checker; CRLF archive normalization independently rehashed",
+  "historical_repository_head": "ead2c1b34f67cdf83facc0d08678186ed1453fdf",
+  "historical_source_worktree_clean": false,
+  "committed_source_worktree_clean": true,
+  "reused_unit_case_count": 37,
+  "reused_coordinate_count": 2664,
+  "reused_unit_metrics": {
+    "world_vertices_m": {
+      "maximum_absolute_error": 0.0,
+      "maximum_relative_error_nonzero_reference": 0.0,
+      "rmse": 0.0,
+      "count": 2664,
+      "signed_zero_mismatches": 0
+    }
+  },
+  "reused_unit_mismatch_count": 0,
+  "historical_unit_exit_codes": {
+    "4": 37
+  },
+  "historical_input_and_artifact_identity_checked": true,
+  "original_outputs_supplied_to_Rust": false,
+  "fresh_committed_unit_execution_claimed": false,
+  "new_unit_cli_runs": 0,
+  "new_numerical_comparisons": 0,
+  "physics_executed": false,
+  "runtime_admission_claimed": false,
+  "gates_updated": false,
+  "limitations": [
+    "historical Full dry-run outputs retain precommit HEAD and exit 4",
+    "this is executable/source equivalence, not a fresh committed 37-case execution",
+    "physical connection proofs use separate committed CLI runs",
+    "native-only state and GEO02/GEO03 algorithm closure remain outside this unit proof"
+  ],
+  "raw_equivalence_report": {
+    "path": ".runtime/porting/GEO-01/committed-unit-equivalence-01/equivalence-report.json",
+    "sha256": "07c0d5d261e62c9fdf45adf96dc518bc2df66b23746abbcd5bb6032c7ed4641f"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "geo01-committed-build-summary.v1",
+  "card": "GEO-01",
+  "raw_build": {
+    "path": ".runtime/porting/GEO-01/builds/committed-01/build-receipt.json",
+    "sha256": "a0f3e0ff1089e393443431700380d2c7cde31c2362910e646bdf6acecd4473a3"
+  },
+  "implementation_commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+  "crates_tree": "afa8eb1f2900443339ed5b8950aaec37024bc64c",
+  "binary": {
+    "path": ".runtime/porting/GEO-01/builds/committed-01/eplus-rs.exe",
+    "sha256": "a5094e5eab2f0ec0cd89911f4364bac6f9b195582b64667bd378139ecf0c9360"
+  },
+  "build_execution": {
+    "path": ".runtime/porting/GEO-01/rust-validation/committed-cli-01/receipt.json",
+    "sha256": "50acdafcf697bc916904f05be75be10a19601bcf658ea413f321904696970500"
+  },
+  "repository_head": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+  "source_worktree_clean": true,
+  "cargo_lock": {
+    "path": ".runtime/porting/GEO-01/builds/committed-01/Cargo.lock",
+    "sha256": "ebddfe56e3c0d242b920814be6c69b97c2f81bb99909dcbb27b75fead358df3a"
+  },
+  "toolchain": {
+    "path": ".runtime/porting/GEO-01/builds/committed-01/rust-toolchain.toml",
+    "sha256": "46329056a5a30ccfaab7df1dc7728f98398913aa959296697d037bdd0f050c61"
+  },
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)\nbinary: rustc\ncommit-hash: ac68faa20c58cbccd01ee7208bf3b6e93a7d7f96\ncommit-date: 2026-05-25\nhost: x86_64-pc-windows-gnu\nrelease: 1.96.0\nLLVM version: 22.1.2",
+  "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+  "compiled_source_vs_committed_blobs": {
+    "source_count": 3637,
+    "exact_byte_matches": 3636,
+    "line_ending_only_differences": [
+      {
+        "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+        "compiled_archive": {
+          "path": ".runtime/porting/GEO-01/rust-validation/committed-cli-01/source/crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+          "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+        },
+        "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+        "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+        "difference": "preexisting working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+      }
+    ],
+    "all_other_content_exact": true,
+    "note": "source_worktree_clean follows Git status; exact bytes compiled remain independently archived, including any preexisting line endings"
+  },
+  "archived_Rust_source_count": 3637,
+  "source_manifest_storage": "immutable raw build receipt; kept out of duplicate tracked source inventories",
+  "gates_updated": false,
+  "executed_launcher": {
+    "path": ".runtime/porting/GEO-01/record_committed_build.py",
+    "sha256": "992ae33a293724a7ceb3614b2db2a144f8c7e5cb04a774bb7bf2850ecf1a9b82"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "geo01-independent-production-policy-review.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "review_scope": "Static pre-production review of the final read-only production checker, unit producer auditor and amended committed-source build freezer. No physical or scientific comparison was executed by this reviewer.",
+  "reviewed_tool_archives": {
+    "path": ".runtime/porting/GEO-01/independent-production-policy-review/source-manifest.json",
+    "sha256": "d8c38e2d3bb9c6e25395ff45344dddf636d18401d2e0a7c3cd36f06fae562668"
+  },
+  "source_correction_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/independent-correction-review.json",
+    "sha256": "1a8eaf62f16be93720608ed00b50c7c9b3a2bb3eaa6c6ac7745129a17c0e968f"
+  },
+  "production_checker_sha256": "8953eeb9e147df882bbea80047b801b8f4a3f08f70ccf3731baeaf30b67d4590",
+  "unit_provenance_auditor_sha256": "eed6e0c975c43ebf9672280d34ae9d612fce35bbc4037d8a2592e8414875ecee",
+  "checks_reviewed": [
+    "Production requires the fixed seven CON cases, successful actual ordinary Full/Summary CLI commands, immutable archived executable/build/source inputs, exact frozen contracts and accepted original-first proof identities. Only argv path positions normalize equivalent relative/absolute spellings; all flags and cardinality remain exact.",
+    "Build evidence requires a clean committed source tree, actual successful canonical Cargo command, archived compiled source inventory, and explicit source-versus-committed-blob counts. Each CRLF-only difference binds its actual compiled archive and verifies LF-normalized SHA256 and Git blob SHA1; clean Git status is not equated with byte-exact source identity. The freezer performs the original Git batch comparison without source repair.",
+    "Actual Full clock observations must retain every ordered 96 or 288 physical Rust invocation: sequence, hour index, zone substep, four subdivisions, 900-second operand bits and actual calendar/environment indices are checked with exact JSON types. Prepared rows are not executed events; collecting-thread coverage and zero omissions remain explicit. Native source environment ordinal, system clock, warmup and global flag parity are unclaimed.",
+    "Compiled coordinates remain preparation evidence and use the unchanged preserved-input comparator. Physical connection evidence copies one successful final stored geometry projection: six surfaces times area/azimuth/tilt plus one zone volume, totaling 19 scalars per case. Scalar count is not a geometry-kernel invocation count; copied final internal timestep index is not equated with clock counts.",
+    "Own engine IDs are paired by case-insensitive names, with runtime/compiler IDs and zone ownership checked within Rust. Authoritative numerical bits match payloads. Selected-CON consumer comparisons use only the pre-frozen area/volume/azimuth/tilt profiles; no degree wrapping or geometry equation is introduced. A Autocalculate versus B declared positive volume provenance is explicit.",
+    "Full/Summary run metadata and result series use exact recursive JSON types/f64 bits; selected-output and meter CSVs compare by byte hashes. Intentional trace level, timing and path differences are separately accounted for. Summary must contain no Full observer artifacts. Runtime admission, no fixture demand, no oracle inputs and no conformance promotion are checked.",
+    "Unit producer audit permits only exact actual exit/status pairs 0/success or 4/unsupported with dry-run completed, no runtime/oracle/comparison, and a typed compiled projection. Empty staging directories are allowed while actual physical/oracle files are rejected. All actual output files and source archives are hashed; this remains provenance rather than numerical PASS.",
+    "The production checker imports only the read-only comparison function, suppresses Python bytecode and emits JSON to stdout; it invokes no engine, Git or writer and updates no gates. Its outer execution owner must archive the actual checker/helper bytes and bind the stdout receipt."
+  ],
+  "claim_limits": [
+    "Selected-CON stored-field connection only; diagnostic dry-run inputs do not expand production admission.",
+    "General GEO-02/GEO-03 algorithms, other geometry shapes/controls, native scratch counter/cache lifecycle, full physics, HVAC and adaptive system order remain unclaimed.",
+    "Actual production results and closure require separate final immutable receipts; this policy review makes no numerical PASS claim."
+  ],
+  "scientific_executions_performed_by_this_review": 0,
+  "source_or_raw_proof_mutations": 0,
+  "gates_updated": false
+}

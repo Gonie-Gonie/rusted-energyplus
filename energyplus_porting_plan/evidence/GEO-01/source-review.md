@@ -1,8 +1,9 @@
 # GEO-01 original source and preparation review
 
-Status: original-first source/input/state preparation and the 37-case Rust unit
-comparison passed. Selected physical connection comparisons and committed-source
-refresh are pending. This file does not set plan or card gates.
+Status: original-first source/input/state preparation, the 37-case Rust unit
+comparison, committed-source equivalence, and selected physical connection
+comparisons passed. The final comparison and independent review JSON records
+bind the completed evidence; this narrative does not itself set plan or card gates.
 
 The reference is the unchanged EnergyPlus 26.1.0 source at
 `6f2e40d10250a105b49966baa24d843711e61048`. The source contract pins complete

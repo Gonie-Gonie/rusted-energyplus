@@ -1,0 +1,811 @@
+{
+  "schema": "geo01-reviewed-comparison-report.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "implementation_commit": "3f9b83978f2abe0963365aa66f7968920dad90fb",
+  "crates_tree": "afa8eb1f2900443339ed5b8950aaec37024bc64c",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-source.json",
+      "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+      "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+      "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+    }
+  },
+  "source_reference": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/source-preparation.json",
+    "sha256": "5f25b57d8d1b6dc409f7f65f929f3ff4a445655cb363b2b3396e8c4a89e42030"
+  },
+  "build": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/build-receipt.json",
+    "sha256": "99640e4fc2a1c1d1daecd6d36106145e1bd1ca909cd0ad0dc6cc306221f9c40b"
+  },
+  "unit_comparison": {
+    "path": ".runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json",
+    "sha256": "d6ada5c659e2e5c9fbe77e2a245ad9965d7c7f4407166787ea466b1961be3c99"
+  },
+  "unit_equivalence": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/committed-unit-equivalence.json",
+    "sha256": "07d0c62bdd3339b824330283bb88be246cdb05a0669d2d34222289ca66e4e51e"
+  },
+  "unit_provenance": {
+    "path": ".runtime/porting/GEO-01/rust-fixed-01-provenance-audit/provenance-audit.json",
+    "sha256": "2ffb009dc4b480218a5d78a6d9f1e9f36dc817d1bbdc842fa22aaffdd76ec96b"
+  },
+  "initial_checks": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/initial-checks.json",
+    "sha256": "8b16e2439b504c67a41eb028880bd7c97a2162ed7ecb682df36b6e5601de781e"
+  },
+  "independent_static_reviews": [
+    {
+      "path": "energyplus_porting_plan/evidence/GEO-01/independent-contract-review.json",
+      "sha256": "ad32b6a3fb4dd89cddadb30060e6d27fbdfd9b56e3f04aa4cb28381328c5d8a5"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/GEO-01/independent-native-review.json",
+      "sha256": "f442b7548e3c9ad2af75c6cd6459b010ed7334db56cea18af851fe1a18fe7832"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/GEO-01/independent-observer-review.json",
+      "sha256": "8df28189219f7a85143a642f61c8f8658f212565cf1e01cfc18cba2823046a2e"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/GEO-01/independent-correction-review.json",
+      "sha256": "1a8eaf62f16be93720608ed00b50c7c9b3a2bb3eaa6c6ac7745129a17c0e968f"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/GEO-01/independent-production-policy-review.json",
+      "sha256": "b6b7f97f0a0d715f26d9d4a6f3f0bc0ef8562a5e3065074f37e22bfbe16f9eac"
+    }
+  ],
+  "raw_production_comparison": {
+    "path": ".runtime/porting/GEO-01/production-comparison-01/comparison-report.json",
+    "sha256": "5435f5db6f6ea9dbb9a5852f2db0cb2a9604c919bf3cd66545de276328f10f3d"
+  },
+  "production_comparison_execution": {
+    "path": ".runtime/porting/GEO-01/production-comparison-01/execution.json",
+    "sha256": "74cda628d9886ad9bec4babd5cd7fd19cf2e0fd6688e99e5bfff45262d2adf24"
+  },
+  "producer_matrix": {
+    "path": ".runtime/porting/GEO-01/production-3f9b8397/matrix.json",
+    "sha256": "9aba94ac65a3be02b045bf9a9c79c532e253bfab64f62a904cec8b10372e2812"
+  },
+  "original_first_matrix": {
+    "path": ".runtime/porting/GEO-01/original-first/matrix.json",
+    "sha256": "f7e460dabd9eb9b2e3a5f8dfc15989d7fb8c8e9408f3c47bf400308c225764ab"
+  },
+  "original_first_review": {
+    "path": ".runtime/porting/GEO-01/original-first-review/preparation-review.json",
+    "sha256": "968814926a26a7a60ab30972b119f784f4c9e1053e7cb221073fbb7de9bf3466"
+  },
+  "case_count": 7,
+  "normal_CLI_processes": 14,
+  "retained_Full_zone_invocations": 1056,
+  "stored_consumer_scalar_count": 133,
+  "coordinate_unit_cases": 37,
+  "coordinate_unit_count": 2664,
+  "production_compile_coordinate_count": 504,
+  "coordinate_unit_metrics": {
+    "world_vertices_m": {
+      "maximum_absolute_error": 0.0,
+      "maximum_relative_error_nonzero_reference": 0.0,
+      "rmse": 0.0,
+      "count": 2664,
+      "signed_zero_mismatches": 0
+    }
+  },
+  "connection_metrics": {
+    "connection_area_m2": {
+      "count": 42,
+      "maximum_absolute_error": 0.0,
+      "maximum_relative_error_nonzero_reference": 0.0,
+      "bit_equal_count": 42,
+      "rmse": 0.0
+    },
+    "connection_azimuth_deg": {
+      "count": 42,
+      "maximum_absolute_error": 0.0,
+      "maximum_relative_error_nonzero_reference": 0.0,
+      "bit_equal_count": 42,
+      "rmse": 0.0
+    },
+    "connection_tilt_deg": {
+      "count": 42,
+      "maximum_absolute_error": 0.0,
+      "maximum_relative_error_nonzero_reference": 0.0,
+      "bit_equal_count": 42,
+      "rmse": 0.0
+    },
+    "connection_zone_volume_m3": {
+      "count": 7,
+      "maximum_absolute_error": 0.0,
+      "maximum_relative_error_nonzero_reference": 0.0,
+      "bit_equal_count": 7,
+      "rmse": 0.0
+    }
+  },
+  "mismatch_count": 0,
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/full-execution.json",
+        "sha256": "f03f895de5d245c16babf7c9a2fcd5dec5f657934561c0a97edf291785c05210"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/summary-execution.json",
+        "sha256": "853fdb68c21a09d390b0c4cca4b6ab8cf805c708f848974774f66a5898a4a0f1"
+      },
+      "physical_zone_steps": 96,
+      "compile_preparation": {
+        "case_id": "A-24H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+          "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/A-24H/receipt.json",
+          "sha256": "7934860f2a26ff33409ec61af066a351009eaf7cc9b0fefb64aea3a10366715e"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/A-24H/native/geometry-observation.json",
+          "sha256": "087bda281f0bd45e9336ddbefa78faf55c3b67341c84ddcacdb43f8e69392f07"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/full/compiled-geometry.json",
+          "sha256": "85fefd6864e54f8426645f208f16aaddc8bb050aad6338acc50e28baf035c246"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/full/input/input-hashes.json",
+            "sha256": "4e085265207b5f3aaf2a0fba612989ce6d9909e24f7581d1a59fec80328b2cb5"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/full/input/original.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/full/input/converted.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/A-24H/full/geometry-consumers.json",
+          "sha256": "af86daca841193585169918359ce0d8848c2e4e5fe7bf6ff9c62de8e7905fcf6"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 96,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": "Autocalculate",
+            "policy": "existing runtime Autocalculate; actual stored volume paired only"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/full-execution.json",
+        "sha256": "862dd340093bf20a46168462091351ac0a0e97f4b811cb54dd88742de859f4c2"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/summary-execution.json",
+        "sha256": "3a861ab3898b428490e44029fa023f8410fd2ffffc7ba5b3e7d101d91bf9ff40"
+      },
+      "physical_zone_steps": 288,
+      "compile_preparation": {
+        "case_id": "A-72H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+          "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/A-72H/receipt.json",
+          "sha256": "f6d793e671cdab33504b5891cd980325272583eb049e18acd5fe97c272301dc2"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/A-72H/native/geometry-observation.json",
+          "sha256": "30681a10f8d6cf13d5669bff3a7dc099611b8f117f4051459ecb3f9c907ea2c2"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/full/compiled-geometry.json",
+          "sha256": "fd4222c5c2bad66875df50b3c2b3982727bd08bdb1719029c34fe1dec3a23e4f"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/full/input/input-hashes.json",
+            "sha256": "9f9b51e816bbd267d8cc6fc0e1ca429c745ac076d2b4d7d809668fd0d66bb445"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/full/input/original.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/full/input/converted.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/A-72H/full/geometry-consumers.json",
+          "sha256": "35f9de585e58efc3e7b454bdb81a3082af0465a062f0a364065d1717a401e54a"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 288,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": "Autocalculate",
+            "policy": "existing runtime Autocalculate; actual stored volume paired only"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "scope": "B",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/full-execution.json",
+        "sha256": "a469bb351e6deb8d70ef4601cfe1fd18e9ba98dd454a3eafefd76fe8e5c6c518"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/summary-execution.json",
+        "sha256": "25f24fe927a3faf6f0602ef387e9283470bf5a5f3cef5bfc977a6ed4245debe6"
+      },
+      "physical_zone_steps": 96,
+      "compile_preparation": {
+        "case_id": "B-NOLIMIT-24H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+          "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/B-NOLIMIT-24H/receipt.json",
+          "sha256": "1c40e4cc606e439f6bd7358e36e7abb8eb5a65dce9597954c5f8b4d44d0d42c3"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/B-NOLIMIT-24H/native/geometry-observation.json",
+          "sha256": "42321de3bf7b8f73555f4883b8865cb8123649b67d77f351ba02df522f7538f5"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/full/compiled-geometry.json",
+          "sha256": "1e854daa96b35ee2f9f39a2dcd35aeb3a7753f1ddbf089efc8845a1602a33bc1"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/full/input/input-hashes.json",
+            "sha256": "fd8924a9e0a6e8787b1e8d13862fb3321ca812433357c65cc3911a9584de8d81"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/full/input/original.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/full/input/converted.epJSON",
+            "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-NOLIMIT-24H/full/geometry-consumers.json",
+          "sha256": "30dc315c4f80052a3cf47055764185e8db4b06b7a75f8254fe155c40231f1d22"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 96,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": 1.0,
+            "policy": "declared numeric input; actual stored volume, not geometry-derived volume"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "scope": "B",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/full-execution.json",
+        "sha256": "c66b09bb57a94f14c002121825c8915df522840669608e7b51f4b78dbb90396b"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/summary-execution.json",
+        "sha256": "abb4b5eb9a6030ce3c79102b2526391c86da3edea9c4febceffc7b1465a3ebf8"
+      },
+      "physical_zone_steps": 96,
+      "compile_preparation": {
+        "case_id": "B-FLOW-24H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+          "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/B-FLOW-24H/receipt.json",
+          "sha256": "c18167336f638a450c516dbdd71e2b5bcb5b662b1b1668b4ef05eb9bbff094a9"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/B-FLOW-24H/native/geometry-observation.json",
+          "sha256": "ac8b0c3ec1bce3ca27a15366b4a176678debad498379c28c97134654ecf22a73"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/full/compiled-geometry.json",
+          "sha256": "e9242bf9672da6bc1533b277f41da43329c2d28d9a7ba8df90c41c2788573f53"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/full/input/input-hashes.json",
+            "sha256": "48e8f85d4022d5ec84f6e2b81f3c100ac484bc80ed2883a216a77ddb0d0c2028"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/full/input/original.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/full/input/converted.epJSON",
+            "sha256": "5a4d64ae7107fd32fff7234179e920912ef993284443d585a58eff60233cb7f4"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-FLOW-24H/full/geometry-consumers.json",
+          "sha256": "30dc315c4f80052a3cf47055764185e8db4b06b7a75f8254fe155c40231f1d22"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 96,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": 1.0,
+            "policy": "declared numeric input; actual stored volume, not geometry-derived volume"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "scope": "B",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/full-execution.json",
+        "sha256": "f93a5d8d622285ec7022a9a9144d8ae7741cfb73c1dfccfbd85bbabc162683ca"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/summary-execution.json",
+        "sha256": "910603539081b5bc66462341d4d83bf8abd8ca0715abfb0cec5a66c22b60bbea"
+      },
+      "physical_zone_steps": 96,
+      "compile_preparation": {
+        "case_id": "B-CAPACITY-24H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+          "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/B-CAPACITY-24H/receipt.json",
+          "sha256": "967f9985cc975fcebaf5090a00f45463b34876d9b3cf5fad0efda114ec972ae3"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/B-CAPACITY-24H/native/geometry-observation.json",
+          "sha256": "dd70539e4356c9ec4c9fbd6a4dc30cb274bd82a278a735a613b44814d599279c"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/full/compiled-geometry.json",
+          "sha256": "0c38db393a4ce2a499fa9b410421764a750e516e733955b5c961921216749ae0"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/full/input/input-hashes.json",
+            "sha256": "cef621363904da89aa8c70508b0a6bcce336720d7dd92f6b6b1a223c05008488"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/full/input/original.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/full/input/converted.epJSON",
+            "sha256": "dc079358dc1cd02b32696db3f5bec6a83baf25f3b20e71ac50d9f83465030817"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-CAPACITY-24H/full/geometry-consumers.json",
+          "sha256": "30dc315c4f80052a3cf47055764185e8db4b06b7a75f8254fe155c40231f1d22"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 96,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": 1.0,
+            "policy": "declared numeric input; actual stored volume, not geometry-derived volume"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/full-execution.json",
+        "sha256": "68dd88107c272dc81e9259134abf9eecd980e0d281fdf1f407582a222c4c20b2"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/summary-execution.json",
+        "sha256": "939c26ec4def3abc23e32a7b81e1a4730d5e5a6539d4f8232964edfaec32ce2c"
+      },
+      "physical_zone_steps": 96,
+      "compile_preparation": {
+        "case_id": "B-BOTH-24H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+          "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/B-BOTH-24H/receipt.json",
+          "sha256": "a8372d2178c1bf716c0865afd5abe9fbcbad089b98b3f87ea86cfe130a745906"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/B-BOTH-24H/native/geometry-observation.json",
+          "sha256": "79fcb47f47536f8f5ac6466a6f57597e571996fa6150e8b5f4bb9b9591555384"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/full/compiled-geometry.json",
+          "sha256": "95969b89ef49c4b60a6294de62f620b21b974c27aa1d00c78a6a8726116ad78f"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/full/input/input-hashes.json",
+            "sha256": "69eb31e80b5b3f7514c543d03f0988e282b0dd854c9df2043686e0f426a7f0a9"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/full/input/original.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/full/input/converted.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-24H/full/geometry-consumers.json",
+          "sha256": "30dc315c4f80052a3cf47055764185e8db4b06b7a75f8254fe155c40231f1d22"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 96,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": 1.0,
+            "policy": "declared numeric input; actual stored volume, not geometry-derived volume"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "scope": "B",
+      "full_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/full-execution.json",
+        "sha256": "cb088975e58510767e6f071aaca9756260d28c08ff7b2f8e2a873b940c73c5da"
+      },
+      "summary_execution": {
+        "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/summary-execution.json",
+        "sha256": "bbe42c380812aa9fc2e85f0d3bb5d89de9f8b3d0fbc124d551e6060b964ac278"
+      },
+      "physical_zone_steps": 288,
+      "compile_preparation": {
+        "case_id": "B-BOTH-72H",
+        "kind": "con-production-input",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+          "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "original_receipt": {
+          "path": ".runtime/porting/GEO-01/original-first/B-BOTH-72H/receipt.json",
+          "sha256": "1c82ac16630e0b6a4c909947de73e987eeda615ca8744b84d2fa9f2c1b255e5c"
+        },
+        "original_results": {
+          "path": ".runtime/porting/GEO-01/original-first/B-BOTH-72H/native/geometry-observation.json",
+          "sha256": "8972eab25bae190c5765bb63e5e4686f960f66b60a6284e5bc26ad0480817326"
+        },
+        "rust_compiled_geometry": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/full/compiled-geometry.json",
+          "sha256": "cda8540a4579edcb5b035c441dcfb6c801688232d62b85e9d398bf32ebdf2907"
+        },
+        "rust_input_files": {
+          "receipt": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/full/input/input-hashes.json",
+            "sha256": "d272d11e6f14f86a1f1add62d09ea3ec96a82930428faa683158abe602a04e50"
+          },
+          "source": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          "staged_original": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/full/input/original.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          "converted_epjson": {
+            "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/full/input/converted.epJSON",
+            "sha256": "9b4034052cd58aabe15e7470ed8305a6d97ff11c5a59dc332c271f8a85bf82d0"
+          }
+        },
+        "physics_executed": false,
+        "parsed_input_bits_equal": true,
+        "own_engine_ids_paired_by_name": true,
+        "coordinate_count": 72,
+        "mismatch_count": 0,
+        "coordinate_mismatch_count": 0,
+        "native_counter_before_after": [
+          4,
+          4
+        ],
+        "native_counter_Rust_lifecycle_peer": false
+      },
+      "physical_connection": {
+        "artifact": {
+          "path": ".runtime/porting/GEO-01/production-3f9b8397/B-BOTH-72H/full/geometry-consumers.json",
+          "sha256": "d316ae6a7908a83e383e8fbaf58b16512bbe0dcd7063ff1c79547a16378bad5a"
+        },
+        "native_snapshot": "final_weather",
+        "stored_consumer_scalar_count": 19,
+        "projection_count": 1,
+        "projection_interpretation": "one copied final-state geometry projection; scalar count is not kernel invocation count",
+        "own_engine_ids_bound_by_name": true,
+        "observed_timestep_index": 288,
+        "volume_policy": [
+          {
+            "zone_name": "ZONE ONE",
+            "input_declaration": 1.0,
+            "policy": "declared numeric input; actual stored volume, not geometry-derived volume"
+          }
+        ]
+      },
+      "Full_Summary": {
+        "summary_observer_artifacts_absent": true,
+        "comparison": "exact JSON types/f64 bits and byte hashes",
+        "RunSummary_compared": "all fields except artifacts/timing/input paths; config excludes intentional trace_level",
+        "input_paths_checked_separately": true,
+        "selected_outputs_csv_meters_csv_result_store_compared": true
+      },
+      "mismatch_count": 0
+    }
+  ],
+  "unit_runtime_admission_claimed": false,
+  "unit_execution_reuse": "Same archived executable and all 3637 exact archived source bytes; historical precommit HEAD and exit 4 unchanged. No fresh committed 37-case execution is claimed.",
+  "production": {
+    "oracle_inputs_used": false,
+    "fixture_inputs_used": false,
+    "Full_Summary_invariance_verified": true,
+    "Summary_geometry_observers_absent": true,
+    "stored_field_connection_only": true,
+    "GEO02_GEO03_algorithms_closed": false
+  },
+  "claim_limits": [
+    "GEO-01 coordinate transformations and selected stored-field connections only.",
+    "Diagnostic Relative/rotation/winding cases are compile-only unit evidence and do not extend CON production admission.",
+    "Native IDs, MaxVerticesPerSurface and transient trig/scratch ownership have no Rust lifecycle peer.",
+    "133 scalar fields are seven final-state projections, not geometry kernel call counts.",
+    "1056 retained Full clock events exclude Summary observer-free runs; no native system-clock or warmup parity is inferred.",
+    "GEO-02/GEO-03 algorithms, whole physics, annual B Rust execution and SYS/warmup remain separate gates.",
+    "Original states are reference evidence only and were never supplied to ordinary Rust physics."
+  ],
+  "gates_updated": false,
+  "executed_aggregator": {
+    "path": ".runtime/porting/GEO-01/aggregate_production.py",
+    "sha256": "e985dd49e5ba9aa78fa00ef6f691b0125ce46c23e858201bc3f68378cfe7ca18"
+  }
+}
