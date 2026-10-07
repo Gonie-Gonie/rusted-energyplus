@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -58,7 +59,7 @@ def owner_observations(output, zones, available, bindings, negative=False):
                 "Actual initializer ordering/name is malformed")
         name = row["zone_name"].upper()
         require(name in zones and integer(row["zone_id"], "actual owner ZoneId") == zones[name]["id"]
-                and row["phase"] == "rust_runtime_setup" and row["context"] is None,
+                and row["phase"] == "rust_runtime" and row["context"] is None,
                 "Actual initializer own ID/phase differs")
         caller(row, available, bindings, OWNER_CALLER)
         if negative:
@@ -119,9 +120,21 @@ def compare_initializer(case, output, artifact, zones, surfaces, source, frozen_
             scalar_token(face["tilt_deg"])
         diagnostic = value["diagnostics"]
         require(integer(diagnostic["initial_unique_vertex_count"], "actual unique vertices", 1) > 0
-                and diagnostic["initial_edges_not_used_twice"] == [] and diagnostic["initially_closed"] is True
-                and diagnostic["edges_winding_consistent"] is True and diagnostic["topology_rejection"] is None,
-                "Actual Rust automatic-volume topology required correction")
+                and type(diagnostic["initial_edges_not_used_twice"]) is list
+                and type(diagnostic["initially_closed"]) is bool and type(diagnostic["edges_winding_consistent"]) is bool
+                and (diagnostic["topology_rejection"] is None or type(diagnostic["topology_rejection"]) is str),
+                "Actual own topology diagnostic types differ")
+        declared = zones[observation["zone_name"].upper()]["declared_volume"]
+        if declared["kind"] == "AutoCalculate":
+            require(diagnostic["initial_edges_not_used_twice"] == [] and diagnostic["initially_closed"] is True
+                    and diagnostic["edges_winding_consistent"] is True and diagnostic["topology_rejection"] is None,
+                    "Actual Rust automatic-volume topology required correction")
+        else:
+            require(declared["kind"] == "Value" and math.isfinite(from_bits(declared["value_bits"]))
+                    and from_bits(declared["value_bits"]) > 0, "Selected entered volume is not finite positive")
+            comparison.metadata(scalar_token(value["zone"]["volume_m3"]), declared["value_bits"], label+"/entered_volume/actual_returned_bits")
+            comparison.metadata(scalar_token(native_zones[observation["zone_name"].upper()]["volume_m3"]),
+                                 declared["value_bits"], label+"/entered_volume/original_retained_bits")
         for field in ("floor_horizontal", "roof_horizontal", "walls_vertical", "same_wall_height", "volume_differs_by_more_than_five_percent"):
             require(type(diagnostic[field]) is bool, "Actual own local predicate is not boolean")
         require(diagnostic["signed_polyhedron_volume_m3"] is not None, "Actual Rust signed-volume observation missing")
@@ -322,6 +335,10 @@ def main():
         handoff = capacity_handoffs(case, full, volume_bits, clock, available, bindings, comparison)
         results.append({"case_id": case["id"], "actual_initializer_result_calls": len(observed["observations"]),
             "initializer_artifact": ref(full/"geo03-zone-volume.json"), "capacity_handoff": handoff,
+            "initializer_topology_observations": [{"sequence": row["sequence"], "zone_name": row["zone_name"],
+                "declared_volume": zones[row["zone_name"].upper()]["declared_volume"], "diagnostics": row["properties"]["diagnostics"],
+                "automatic_topology_admission_claimed": zones[row["zone_name"].upper()]["declared_volume"]["kind"] == "AutoCalculate",
+                "original_local_CalcVolume_or_method_inferred": False} for row in observed["observations"]],
             "Full_Summary": invariance(case["id"], full, summary, full_data, summary_data, comparison),
             "ten_fields_observed_at_actual_initializer_return": True, "ten_fields_retained_in_Rust_physical_state_claimed": False,
             "only_stored_volume_physically_handed_off": True, "ordinary_native_local_CalcVolume_or_method_compared": False})
@@ -343,6 +360,7 @@ def main():
             "Summary ordinary outputs prove observer independence, not direct ten-field Summary observation.",
             "Source-only Space/global ErrCount5/warning IO/scratch/fallback lifetimes remain unpaired.",
             "No original local CalcVolume/method is inferred from a selected entered/height-priority Volume.",
+            "Explicit positive entered Volume is preserved exactly; its own local topology diagnostics do not constitute automatic-volume admission.",
             "No AirPowerCap/rhoCp/multiplier/systemdt, ZON02/SYS or full physics equivalence is claimed.",
             "Only actual updater phase, selected caller and real zone/system context qualify capacity physical-update coverage."])
     print(json.dumps(report, indent=2, allow_nan=False))
