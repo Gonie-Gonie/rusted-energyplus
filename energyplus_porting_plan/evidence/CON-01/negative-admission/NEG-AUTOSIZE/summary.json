@@ -1,0 +1,55 @@
+{
+  "case_id": "NEG-AUTOSIZE",
+  "metadata": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/metadata.json",
+    "sha256": "784d2c699c6db33c089865d37bac13892b26c39545e9369998e18f1d80ad6bcd"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/input.idf",
+    "sha256": "919354f1d1bf295806688e6baed8a94eb9132b9c08902343b56ebc9052fb9d99"
+  },
+  "command_result": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+      "run",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\negative-admission\\NEG-AUTOSIZE\\input.idf",
+      "--weather",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\NEG-AUTOSIZE",
+      "--porting-scope",
+      "B",
+      "--dry-run",
+      "--keep-intermediate",
+      "--overwrite"
+    ],
+    "exit_code": 4,
+    "artifacts": [
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/command.json",
+        "sha256": "2653f4d4421c20c436eeeb5e659d3b815d8abd6edff55c8a165a10bd8db19a07"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/stdout.log",
+        "sha256": "26ab2bcb5c247d95a215a22957bf058cbffc7facadff250f850ae6f730720e6d"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/porting_scope.json",
+        "sha256": "febd79bc7d112c7cab38ae2ee0dd767f41f3d28168d22756824c76b80315b8ee"
+      }
+    ]
+  },
+  "violations": [
+    "direct IdealLoads binding failed: UnsupportedFeature { feature: NoOaSensibleNumericLimitSubset }",
+    "IdealLoads Autosize is outside hard-sized scope B",
+    "active IdealLoads limits must have nonnegative hard-sized numeric values"
+  ],
+  "errors": [],
+  "rejection_checks_passed": true,
+  "physics_executed": false,
+  "gate_status": "unreviewed"
+}

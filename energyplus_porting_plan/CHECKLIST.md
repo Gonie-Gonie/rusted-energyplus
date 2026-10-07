@@ -69,7 +69,7 @@ B에서는 그 의존성을 적용한다.
 ### 00 범위·계약
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [CON-01](cards/CON-01.md) | 대상 입력과 상태 경계 고정 | `HeatBalanceManager.cc` · `GetProjectControlData; GetHeatBalanceInput` | 없음 |
+| [x] | [CON-01](cards/CON-01.md) | 대상 입력과 상태 경계 고정 | `HeatBalanceManager.cc` · `GetProjectControlData; GetHeatBalanceInput` | 없음 |
 
 ### 01 입력·기하
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |

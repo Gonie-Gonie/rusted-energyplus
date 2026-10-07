@@ -1,0 +1,55 @@
+{
+  "case_id": "NEG-OUTDOOR-AIR",
+  "metadata": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/metadata.json",
+    "sha256": "881aea8cc4f960beb558b04c36d0a9a7660fd04659e352e4e9ab94ff3667afe6"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/input.idf",
+    "sha256": "6b1f5c6f05e3b041f91d36637b97f1872150e663bcae92d7802aea6426b10e26"
+  },
+  "command_result": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+      "run",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\negative-admission\\NEG-OUTDOOR-AIR\\input.idf",
+      "--weather",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\NEG-OUTDOOR-AIR",
+      "--porting-scope",
+      "B",
+      "--dry-run",
+      "--keep-intermediate",
+      "--overwrite"
+    ],
+    "exit_code": 4,
+    "artifacts": [
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/command.json",
+        "sha256": "a3dc5e6331befd38d13d159fbca2bd29c180b1d49060699f5812b61c217cad11"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/stdout.log",
+        "sha256": "ae7ce672644263be48f36bdbfeaa47aee9b9cfdd46fc43cf20bc4e59803e3c60"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/porting_scope.json",
+        "sha256": "8afd1c1853682d5b7b1e8e9dcf5956f935466c160b5c5325764b136af20dada7"
+      }
+    ]
+  },
+  "violations": [
+    "DesignSpecification:OutdoorAir is outside scope B",
+    "direct IdealLoads binding failed: UnsupportedBranch { branch: OutdoorAirSelected }",
+    "OA, DCV, economizer and heat recovery are outside no-OA scope B"
+  ],
+  "errors": [],
+  "rejection_checks_passed": true,
+  "physics_executed": false,
+  "gate_status": "unreviewed"
+}

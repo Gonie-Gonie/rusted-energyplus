@@ -1,0 +1,15 @@
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.75s
+     Running unittests src\lib.rs (target\debug\deps\ep_run-6a2e6fab1b844b6c.exe)
+
+running 8 tests
+test porting_scope::tests::default_controls_and_source_adjustments_are_observable ... ok
+test porting_scope::tests::weather_trace_uses_real_calendar_selection_and_zone_schedule_values ... ok
+test porting_scope::tests::latent_sources_are_blocked_inside_the_sensible_only_contract ... ok
+test porting_scope::tests::new_features_and_active_design_days_are_not_silently_ignored ... ok
+test porting_scope::tests::effective_calendar_branches_are_checked_after_weather_resolution ... ok
+test porting_scope::tests::scientific_algorithms_are_rejected_before_bounded_execution ... ok
+test porting_scope::tests::direct_sensible_limits_are_explicit_and_scope_a_rejects_conditioning ... ok
+test porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 762 filtered out; finished in 0.05s

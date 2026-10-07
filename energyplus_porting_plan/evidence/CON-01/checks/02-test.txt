@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.30s
+     Running unittests src\main.rs (target\debug\deps\eplus_rs-591b04cd3fa3a5b1.exe)
+
+running 9 tests
+test arbitrary_run_options_tests::a_flag_shaped_path_is_not_interpreted_as_scope_selection ... ok
+test arbitrary_run_options_tests::bounded_scope_is_preserved_separately_from_run_config ... ok
+test arbitrary_run_options_tests::bounded_scope_rejects_missing_invalid_and_repeated_selection ... ok
+test tests::arbitrary_run_compare_oracle_implies_baseline_and_both_output ... ok
+test tests::arbitrary_run_parser_defaults_to_compatibility ... ok
+test tests::arbitrary_run_parser_rejects_missing_output_dir ... ok
+test tests::arbitrary_run_parser_rejects_unknown_option ... ok
+test tests::arbitrary_run_parser_sets_c1_flags ... ok
+test tests::arbitrary_run_parser_sets_selected_trace_targets ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 167 filtered out; finished in 0.00s

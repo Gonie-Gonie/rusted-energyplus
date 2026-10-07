@@ -1,0 +1,2366 @@
+{
+  "schema_version": "con01-rust-admission-matrix.v1",
+  "implementation_commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+  "binary": {
+    "path": "target/debug/eplus-rs.exe",
+    "sha256": "31f96c2505a00eaaf14fd7cec18fe263a4ff5dc35f3535fb9b9ffafc699e8256"
+  },
+  "execution_harness": {
+    "path": "tools/porting/check_con01_admission.py",
+    "sha256": "7a4f9dc0e19e80b6f6ada5a9f850df61d36cf3737bc83265add4dbc94c3b0f77"
+  },
+  "execution_timestamp_utc": "2026-10-07T10:19:02.472017+00:00",
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/source-boundaries.json",
+      "sha256": "8b07ee7975deb10f9405749d70c47ffff78a685d097de83fbf71b86e1b849fea"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/state-contracts.json",
+      "sha256": "5fbe4f2369d8cb94b5bfae90c574da7d12efd50051df7235cee0d985ba2efcde"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698"
+    }
+  ],
+  "energyplus_pin": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "production_case_count": 15,
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\A-24H",
+          "--porting-scope",
+          "A",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/A-24H/command.json",
+            "sha256": "e8488f1082d7b3c5494cacb92db9406b008878d09a9b8569692599e9a4b7385c"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-24H/stdout.log",
+            "sha256": "2ac24c6d50079e8cff1b18edff1383928cf7ad64c9d04bb3cae2143b95193fd2"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-24H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-24H/porting_scope.json",
+            "sha256": "e11171546de7eadc848d8b0587185d920fdf413cd59d31e47f3a7affd581df8a"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 83,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "ALWAYSON",
+            "id": 0,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 1,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 1,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 24,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "limit_variant": null,
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\A-72H",
+          "--porting-scope",
+          "A",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/A-72H/command.json",
+            "sha256": "11141e2d512d1f7b9045e79238ad3e382e649213fec3ed9c1a3e2c4286e9c13d"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-72H/stdout.log",
+            "sha256": "cdf8a590165dbf3c339faf8cceb472c9d30ca1785030f0a4f70e9e8305b223a7"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-72H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-72H/porting_scope.json",
+            "sha256": "1799585dc29725c322ee1fd7939d70eb327308c5890e5b60d408bd1fb180cb11"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 83,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "ALWAYSON",
+            "id": 0,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 30,
+            "day_of_week": "Sunday",
+            "day_of_year": 181,
+            "day_type": "Sunday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 6,
+            "schedule_day_of_year": 182,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 2,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 7,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 72,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "scope": "A",
+      "duration": "ANNUAL",
+      "limit_variant": null,
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+        "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-ANNUAL\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\A-ANNUAL",
+          "--porting-scope",
+          "A",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/A-ANNUAL/command.json",
+            "sha256": "ff22e354d2352acf347ef01c2b1bb4ef68d952dd8016700d420e32c157d7ee08"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-ANNUAL/stdout.log",
+            "sha256": "00d9d27484b162b8b9933d3bc279580cda0d5f1ec6f7760d1d00df50a978535f"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-ANNUAL/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/A-ANNUAL/porting_scope.json",
+            "sha256": "9575c56c5f7dc22660437c2505983f558096f2ec57807e9ce38e88621db29822"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 83,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "ALWAYSON",
+            "id": 0,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 31,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 12,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 8760,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "NOLIMIT",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-NOLIMIT-24H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/command.json",
+            "sha256": "1b51094d3d8ecea9dfba21445d6338ddf142f76ac3213b3ce0bdb7abeb1e0753"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/stdout.log",
+            "sha256": "475864e357a1d0dd4630f7e222a64b116466ebe5c2e13d61b9dc6ff178dbee5d"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/porting_scope.json",
+            "sha256": "2bbf83fb45b3d2dadd187b1b52a6dd935bdfb3ad7f8ef01a36ddb708f2e83f50"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 1,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 1,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 24,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "NOLIMIT",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+        "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-NOLIMIT-72H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/command.json",
+            "sha256": "ab5d76385413e927cf2a7746a7cd5c78b7b14551ab96bcf5dc9affcbd03614a3"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/stdout.log",
+            "sha256": "bf8e6a16ec2d46f078ad67c15d032bf35a108be8502a8687e8ab4a60cfc116d8"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/porting_scope.json",
+            "sha256": "bcda5d63994c348045aeb4abb3e9697e97732318f328efca103ebcfb29edc2dc"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 30,
+            "day_of_week": "Sunday",
+            "day_of_year": 181,
+            "day_type": "Sunday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 6,
+            "schedule_day_of_year": 182,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 2,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 7,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 72,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "NOLIMIT",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+        "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-ANNUAL\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-NOLIMIT-ANNUAL",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/command.json",
+            "sha256": "b71a80716a4e683dcbf68f6f8296246902dfd92aa15740ce0cc7f88c6571a189"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/stdout.log",
+            "sha256": "4dd922b2eacd874cbe6e05458ab97f7c61fc621ecdcaf0aa8c9ce2837ba8b4e7"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/porting_scope.json",
+            "sha256": "3d84e186444b3a5f06279f93fdb159b1f57c0578fb6ba7d69457843bec366e3a"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 31,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 12,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 8760,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "FLOW",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-FLOW-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-FLOW-24H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/command.json",
+            "sha256": "11cf7c8547eefa18de04ab76cdee9cb3543239903359e6cd71621549321d4ea3"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/stdout.log",
+            "sha256": "8ce8be05c4c855cb90b53022e01cb80c44fff373ddf4e79d42d43d3a40166ae2"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/porting_scope.json",
+            "sha256": "e374a4ea13ae17cd3783a6250e9126e4e8ccdc7ce04a6e4a5276763610e904d9"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 1,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 1,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 24,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "FLOW",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+        "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-FLOW-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-FLOW-72H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/command.json",
+            "sha256": "1403c36b70beb64620a910080eea643d2972c62ae0f5bdb29c00f7c5861a2967"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/stdout.log",
+            "sha256": "b82c4b15e5bc20197a761c9187390ba12301c98272a7b1ad0847046c927571c7"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/porting_scope.json",
+            "sha256": "39da12efa6b4c10cffd9f74f5f8fe1d41ecd0961d86c43532458bf3a3aeb58b5"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 30,
+            "day_of_week": "Sunday",
+            "day_of_year": 181,
+            "day_type": "Sunday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 6,
+            "schedule_day_of_year": 182,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 2,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 7,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 72,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "FLOW",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+        "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-FLOW-ANNUAL\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-FLOW-ANNUAL",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/command.json",
+            "sha256": "7575aab7fddd0335592382e43562e9ea06e20af43e28a20fcc15107555306f86"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/stdout.log",
+            "sha256": "ba8310d2627e12be43baae28db9fbc91f0b699902aeb8cd8f301a932757d2783"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/porting_scope.json",
+            "sha256": "9f02668ea89d6d80982b69dcc7a5356a866f9940fb82b52b3347acf0b6edd80a"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 31,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 12,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 8760,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "CAPACITY",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-CAPACITY-24H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/command.json",
+            "sha256": "87b0a5fbddf7350e698b71e081afddc39c5fd10a893e7d14eb494451d4673ad3"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/stdout.log",
+            "sha256": "c984e9427f1a2ce9630de8f7c55ede1820d29fbfb804bed97c37700478d128a6"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/porting_scope.json",
+            "sha256": "bb7ec8aced5fde06d2e5416e6cbe0f643529c2ba2c062d9242970c03047360e5"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 1,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 1,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 24,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "CAPACITY",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+        "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-CAPACITY-72H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/command.json",
+            "sha256": "a31e670b5a7b64c56d663b0bddfa729725d140e2484ca1ff52b3c47e76c7b9c8"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/stdout.log",
+            "sha256": "593fd9f235ad8b83d12695203c8b64711d9e15ddfeeff3390ee0b4ed588b7566"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/porting_scope.json",
+            "sha256": "43189917bcf79b2b08b0cca3e74092cb6a44f3c3c40a17e6ec58a4ae95fe2dec"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 30,
+            "day_of_week": "Sunday",
+            "day_of_year": 181,
+            "day_type": "Sunday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 6,
+            "schedule_day_of_year": 182,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 2,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 7,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 72,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "CAPACITY",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+        "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-ANNUAL\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-CAPACITY-ANNUAL",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/command.json",
+            "sha256": "f9767027e28e1a8ebd9004ff36782b8d64b98ed9570597c5b6638385100c5d55"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/stdout.log",
+            "sha256": "239af840733298e3986f5051765b97eb63c685ab1a30088afe4e2c546af7b11f"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/porting_scope.json",
+            "sha256": "b9aeafc506f998c85f64b01e2657baf29847a0634e8f90a9f772bd276cc4921b"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 31,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 12,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 8760,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "BOTH",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-BOTH-24H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/command.json",
+            "sha256": "5677e868928dc7bc60af8ccbf334d44a6d871c97fc5b9e02bf1d42cdef54f313"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/stdout.log",
+            "sha256": "88abe937fb374ed77df32ca77f6258075e254297b3089a2a3aac0a51d216e06f"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/porting_scope.json",
+            "sha256": "6276f0bb51329fefff653c8afc82e05232831a1f55c0020df30b75dc708d1a25"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 96,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 1,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 1,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 24,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "BOTH",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-BOTH-72H",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/command.json",
+            "sha256": "f111e0846609f41d8cf4219cc67b47d4e955531f9aa8907f46c9cf2a5d18477b"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/stdout.log",
+            "sha256": "d57313f10fc53870941a2750e036cb744da4edb5bd52714799c4b5ad088463e7"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/porting_scope.json",
+            "sha256": "3d9609088525cdb78aca1598a6d6a14eedab6342df2704688ceae90b83a38c4f"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 288,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 30,
+            "day_of_week": "Sunday",
+            "day_of_year": 181,
+            "day_type": "Sunday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 6,
+            "schedule_day_of_year": 182,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 2,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 7,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 72,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "BOTH",
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+        "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-ANNUAL\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\B-BOTH-ANNUAL",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/command.json",
+            "sha256": "581eba71f0cda8b9bc624c182ad805945db81ff38e04dae62ffd33ada02ccbe8"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/stdout.log",
+            "sha256": "aa52446d20d6ce37d2743ee6b74150984b5715cc61a0da1750c68dcf6dd79a69"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/porting_scope.json",
+            "sha256": "ce5a594aa620bc6d259bf8cdbe70c00fd06dce3acda6d2aa86779e4a5fd6b9bf"
+          }
+        ]
+      },
+      "comparison": {
+        "checks": 112,
+        "errors": [],
+        "schedule_checks": [
+          {
+            "name": "COOLING SETPOINT",
+            "id": 0,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "HEATING SETPOINT",
+            "id": 1,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "ZONE CONTROL TYPE SCHEDULE",
+            "id": 2,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "CON-01 SYSTEM AVAILABILITY",
+            "id": 3,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          },
+          {
+            "name": "INTERNAL GAIN SCHEDULE",
+            "id": 4,
+            "samples": 35040,
+            "max_abs_error": 0.0,
+            "contract_atol": 1e-09,
+            "rtol": 0,
+            "basis": "pinned input schedule; 24H also compared independently with actual EP API"
+          }
+        ],
+        "calendar_frames": {
+          "first": {
+            "day_of_month": 1,
+            "day_of_week": "Tuesday",
+            "day_of_year": 1,
+            "day_type": "Tuesday",
+            "dst": false,
+            "end_minute": 15.0,
+            "hour": 1,
+            "month": 1,
+            "schedule_day_of_year": 1,
+            "year": 2013,
+            "zone_timestep": 1
+          },
+          "last": {
+            "day_of_month": 31,
+            "end_minute": 60.0,
+            "hour": 24,
+            "month": 12,
+            "year": 2013,
+            "zone_timestep": 4
+          }
+        },
+        "settings_compared": [
+          "building",
+          "geometry",
+          "heat_balance_algorithm",
+          "heat_balance_controls",
+          "ideal_loads",
+          "inside_convection",
+          "outside_convection",
+          "room_air_controls",
+          "room_air_model_type",
+          "run_periods",
+          "schedules",
+          "simulation_control",
+          "site_atmosphere",
+          "timesteps_per_hour",
+          "zone_air_controls",
+          "zone_air_heat_balance_algorithm"
+        ],
+        "checked_source_record_count": 8760,
+        "physics_executed": false
+      },
+      "admission_checks_passed": true,
+      "EP_physics_executed_in_this_admission_run": false,
+      "Rust_physics_executed": false,
+      "gate_status": "unreviewed"
+    }
+  ],
+  "negative_cases": [
+    {
+      "case_id": "NEG-LATENT",
+      "metadata": {
+        "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/metadata.json",
+        "sha256": "d970957fa3116cb8d8366f998429a6672f2a9302e69dfa41537f20abe202e49a"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/input.idf",
+        "sha256": "d45a27e41c9ddf016633d856708b64095cd5e2eaef8fae7706d9ba71207cad99"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\negative-admission\\NEG-LATENT\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\NEG-LATENT",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 4,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-LATENT/command.json",
+            "sha256": "6aa8cdac0bfbb159fbf632ddf5e4bf012b4319af411ef7e6b97729c62d48656a"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-LATENT/stdout.log",
+            "sha256": "9da5ae61bb9851be677cf8d1718171e885a4e11dabd7788f44736c4db6a451de"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-LATENT/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-LATENT/porting_scope.json",
+            "sha256": "96811e2a9f299952f06ca710e1804e877e214ad8badce1fa31157fd002a61c87"
+          }
+        ]
+      },
+      "violations": [
+        "OtherEquipment latent gains are outside the zero-latent-source scope"
+      ],
+      "errors": [],
+      "rejection_checks_passed": true,
+      "physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "NEG-OUTDOOR-AIR",
+      "metadata": {
+        "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/metadata.json",
+        "sha256": "881aea8cc4f960beb558b04c36d0a9a7660fd04659e352e4e9ab94ff3667afe6"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/input.idf",
+        "sha256": "6b1f5c6f05e3b041f91d36637b97f1872150e663bcae92d7802aea6426b10e26"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\negative-admission\\NEG-OUTDOOR-AIR\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\NEG-OUTDOOR-AIR",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 4,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/command.json",
+            "sha256": "a3dc5e6331befd38d13d159fbca2bd29c180b1d49060699f5812b61c217cad11"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/stdout.log",
+            "sha256": "ae7ce672644263be48f36bdbfeaa47aee9b9cfdd46fc43cf20bc4e59803e3c60"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/porting_scope.json",
+            "sha256": "8afd1c1853682d5b7b1e8e9dcf5956f935466c160b5c5325764b136af20dada7"
+          }
+        ]
+      },
+      "violations": [
+        "DesignSpecification:OutdoorAir is outside scope B",
+        "direct IdealLoads binding failed: UnsupportedBranch { branch: OutdoorAirSelected }",
+        "OA, DCV, economizer and heat recovery are outside no-OA scope B"
+      ],
+      "errors": [],
+      "rejection_checks_passed": true,
+      "physics_executed": false,
+      "gate_status": "unreviewed"
+    },
+    {
+      "case_id": "NEG-AUTOSIZE",
+      "metadata": {
+        "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/metadata.json",
+        "sha256": "784d2c699c6db33c089865d37bac13892b26c39545e9369998e18f1d80ad6bcd"
+      },
+      "input": {
+        "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/input.idf",
+        "sha256": "919354f1d1bf295806688e6baed8a94eb9132b9c08902343b56ebc9052fb9d99"
+      },
+      "command_result": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\negative-admission\\NEG-AUTOSIZE\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\NEG-AUTOSIZE",
+          "--porting-scope",
+          "B",
+          "--dry-run",
+          "--keep-intermediate",
+          "--overwrite"
+        ],
+        "exit_code": 4,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/command.json",
+            "sha256": "2653f4d4421c20c436eeeb5e659d3b815d8abd6edff55c8a165a10bd8db19a07"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/stdout.log",
+            "sha256": "26ab2bcb5c247d95a215a22957bf058cbffc7facadff250f850ae6f730720e6d"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/porting_scope.json",
+            "sha256": "febd79bc7d112c7cab38ae2ee0dd767f41f3d28168d22756824c76b80315b8ee"
+          }
+        ]
+      },
+      "violations": [
+        "direct IdealLoads binding failed: UnsupportedFeature { feature: NoOaSensibleNumericLimitSubset }",
+        "IdealLoads Autosize is outside hard-sized scope B",
+        "active IdealLoads limits must have nonnegative hard-sized numeric values"
+      ],
+      "errors": [],
+      "rejection_checks_passed": true,
+      "physics_executed": false,
+      "gate_status": "unreviewed"
+    }
+  ],
+  "passed": true,
+  "limitations": [
+    "Rust dry-run admission/settings/calendar/schedule preparation only; no numerical runtime execution",
+    "EP72H/annual physics not executed",
+    "physics gates remain unreviewed"
+  ]
+}

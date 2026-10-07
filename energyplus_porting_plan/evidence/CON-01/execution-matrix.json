@@ -1,0 +1,308 @@
+{
+  "schema_version": "con01-execution-matrix.v1",
+  "production_cases": true,
+  "case_count": 15,
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/summary.json",
+        "sha256": "2c6eb7a6d7b59166f853fedc8f04014f82ad33d3527c43c865f6af6b459a2c96"
+      },
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "A-24H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "limit_variant": null,
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "A-72H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "scope": "A",
+      "duration": "ANNUAL",
+      "limit_variant": null,
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "A-ANNUAL",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "NOLIMIT",
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/summary.json",
+        "sha256": "317765ad1b6b7d2b8c81dc037d35efe04e66d55c628000622e6db85fcda03e81"
+      },
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-NOLIMIT-24H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "NOLIMIT",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-NOLIMIT-72H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "NOLIMIT",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-NOLIMIT-ANNUAL",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "FLOW",
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+        "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08"
+      },
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-FLOW-24H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "FLOW",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-FLOW-72H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "FLOW",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-FLOW-ANNUAL",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "CAPACITY",
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+        "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d"
+      },
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-CAPACITY-24H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "CAPACITY",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-CAPACITY-72H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "CAPACITY",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-CAPACITY-ANNUAL",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "BOTH",
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+        "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef"
+      },
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-BOTH-24H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "BOTH",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-BOTH-72H",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "BOTH",
+      "reference_status": "not_run",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": null,
+      "rust_guard_evidence": {
+        "artifact": {
+          "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+          "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+        },
+        "case_id": "B-BOTH-ANNUAL",
+        "basis": "separate real Rust-only dry-run admission; no EP/Rust physical comparison implied"
+      }
+    }
+  ],
+  "automatic_gate_updates": false
+}

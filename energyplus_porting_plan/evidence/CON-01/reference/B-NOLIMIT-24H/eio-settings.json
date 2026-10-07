@@ -1,0 +1,164 @@
+{
+  "Program Version": [
+    [
+      "EnergyPlus",
+      "Version 26.1.0-6f2e40d102",
+      "YMD=2026.10.07 19:18"
+    ]
+  ],
+  "Site:Location": [
+    [
+      "Denver Centennial  Golden   Nr CO USA TMY3 WMO#=724666",
+      "39.74",
+      "-105.18",
+      "-7.00",
+      "1829.00",
+      "81198",
+      "0.9651"
+    ]
+  ],
+  "Building Information": [
+    [
+      "Rusted EnergyPlus IdealLoads Flow And Capacity Limit Diagnostic",
+      "0.000",
+      "Suburbs",
+      "4.00000E-002",
+      "0.40000",
+      "FullExterior",
+      "25",
+      "6"
+    ]
+  ],
+  "Inside Convection Algorithm": [
+    [
+      "TARP"
+    ]
+  ],
+  "Outside Convection Algorithm": [
+    [
+      "DOE-2"
+    ]
+  ],
+  "Zone Air Solution Algorithm": [
+    [
+      "ThirdOrderBackwardDifference",
+      "No",
+      "No"
+    ]
+  ],
+  "Zone Air Carbon Dioxide Balance Simulation": [
+    [
+      "No",
+      "N/A"
+    ]
+  ],
+  "Zone Air Generic Contaminant Balance Simulation": [
+    [
+      "No",
+      "N/A"
+    ]
+  ],
+  "Zone Air Mass Flow Balance Simulation": [
+    [
+      "No",
+      "N/A",
+      "N/A",
+      "N/A"
+    ]
+  ],
+  "HVACSystemRootFindingAlgorithm": [
+    [
+      "RegulaFalsi"
+    ]
+  ],
+  "Environment:Site Atmospheric Variation": [
+    [
+      "0.220",
+      "370.000",
+      "6.500000E-003"
+    ]
+  ],
+  "Surface Heat Transfer Algorithm": [
+    [
+      "CTF - ConductionTransferFunction",
+      "200",
+      "0.10",
+      "1000.0"
+    ]
+  ],
+  "Zone Information": [
+    [
+      "ZONE ONE",
+      "0.0",
+      "0.00",
+      "0.00",
+      "0.00",
+      "0.50",
+      "0.50",
+      "0.50",
+      "1",
+      "1",
+      "1",
+      "0.00",
+      "1.00",
+      "0.00",
+      "1.00",
+      "0.00",
+      "1.00",
+      "1.00",
+      "1.00",
+      "TARP",
+      "DOE-2",
+      "1.00",
+      "4.00",
+      "4.00",
+      "0.00",
+      "6",
+      "0",
+      "0",
+      "Yes"
+    ]
+  ],
+  "Environment": [
+    [
+      "RUN PERIOD 1",
+      "WeatherFileRunPeriod",
+      "01/01/2013",
+      "01/01/2013",
+      "Tuesday",
+      "1",
+      "Use RunPeriod Specified Day",
+      "Yes",
+      "Yes",
+      "No",
+      "Yes",
+      "Yes",
+      "Clark and Allen"
+    ]
+  ],
+  "Environment:Daylight Saving": [
+    [
+      "No",
+      ""
+    ]
+  ],
+  "Environment:WarmupDays": [
+    [
+      "6"
+    ]
+  ],
+  "Warmup Convergence Information": [
+    [
+      "ZONE ONE",
+      "RunPeriod: RUN PERIOD 1",
+      "0.4387849074",
+      "2.2582543123",
+      "Pass",
+      "Pass",
+      "5.2065692098E-002",
+      "0.2919718457",
+      "Pass",
+      "Pass"
+    ]
+  ]
+}

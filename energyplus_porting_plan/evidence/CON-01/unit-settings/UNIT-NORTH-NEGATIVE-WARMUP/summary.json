@@ -1,0 +1,758 @@
+{
+  "schema_version": "con01-reference-summary.v1",
+  "case_id": "UNIT-NORTH-NEGATIVE-WARMUP",
+  "reference_kind": "read-only EnergyPlus API observer trace",
+  "execution_timestamp_utc": "2026-10-07T10:18:52.431828+00:00",
+  "repository_revision": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+  "tested_artifact_hashes": [
+    {
+      "path": "tools/porting/trace_con01.py",
+      "sha256": "46fe3e9dbe8f86c34629982973b9cb106127e82dbce5946b1274888dcd9245af"
+    },
+    {
+      "path": "tools/porting/prepare_con01.py",
+      "sha256": "66c6c9f7d62608403eccd441f18e2edb86f7b2f88c4a69f7746b9a37d7c69f8e"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/source-boundaries.json",
+      "sha256": "8b07ee7975deb10f9405749d70c47ffff78a685d097de83fbf71b86e1b849fea"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/state-contracts.json",
+      "sha256": "5fbe4f2369d8cb94b5bfae90c574da7d12efd50051df7235cee0d985ba2efcde"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/energyplusapi.dll",
+      "sha256": "bbe6f66240d108df9f51a03b9beb968808a2173234253574d27a31605aec2aa2"
+    }
+  ],
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "energyplus_exit_code": 0,
+  "run_command": [
+    "EnergyPlusAPI.runtime.run_energyplus",
+    "-w",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+    "-d",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\unit-settings\\UNIT-NORTH-NEGATIVE-WARMUP",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\unit-settings\\UNIT-NORTH-NEGATIVE-WARMUP\\input.idf"
+  ],
+  "observer_policy": "variable requests/getters and callbacks; no actuators, HVAC override or physical-state setters",
+  "input": {
+    "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/input.idf",
+    "sha256": "4463bcc07733f98c7accb4f14c099eb86d843ef49e830bb296428de785d05b10"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "zone_steps_excluding_warmup": 96,
+  "system_steps_excluding_warmup": 101,
+  "callback_counts": {
+    "warmup": {
+      "begin_environment": 1,
+      "zone_before_init": 2880,
+      "zone_after_init": 2880,
+      "before_predictor": 2880,
+      "after_predictor_before_hvac": 3154,
+      "after_predictor_after_hvac": 3154,
+      "system_report": 3018,
+      "zone_report": 2880
+    },
+    "reporting": {
+      "warmup_complete": 1,
+      "zone_before_init": 96,
+      "zone_after_init": 96,
+      "before_predictor": 96,
+      "after_predictor_before_hvac": 106,
+      "after_predictor_after_hvac": 106,
+      "system_report": 101,
+      "zone_report": 96
+    }
+  },
+  "environments": [
+    {
+      "phase": "begin_environment",
+      "weather_year": 1999,
+      "civil_year": 2013,
+      "month": 1,
+      "day": 1,
+      "day_of_week": 3,
+      "day_of_year": 1,
+      "hour": 23,
+      "minutes": 60,
+      "current_time_hours": 24.0,
+      "zone_step_number": 4,
+      "zone_dt_hours": 0.25,
+      "canonical_zone_end_hours": 24.0,
+      "system_dt_hours": 0.25,
+      "environment": 3,
+      "kind_of_sim": 3,
+      "warmup": true
+    },
+    {
+      "phase": "warmup_complete",
+      "weather_year": 1999,
+      "civil_year": 2013,
+      "month": 1,
+      "day": 1,
+      "day_of_week": 3,
+      "day_of_year": 1,
+      "hour": 23,
+      "minutes": 60,
+      "current_time_hours": 24.0,
+      "zone_step_number": 4,
+      "zone_dt_hours": 0.25,
+      "canonical_zone_end_hours": 24.0,
+      "system_dt_hours": 0.25,
+      "environment": 3,
+      "kind_of_sim": 3,
+      "warmup": false
+    }
+  ],
+  "callback_order": {
+    "required_order": [
+      "zone_before_init",
+      "zone_after_init",
+      "before_predictor",
+      "after_predictor_before_hvac",
+      "after_predictor_after_hvac",
+      "system_report",
+      "zone_report"
+    ],
+    "distinct_zone_sequences": [
+      [
+        "zone_before_init",
+        "zone_after_init",
+        "before_predictor",
+        "after_predictor_before_hvac",
+        "after_predictor_after_hvac",
+        "after_predictor_before_hvac",
+        "after_predictor_after_hvac",
+        "system_report",
+        "after_predictor_before_hvac",
+        "after_predictor_after_hvac",
+        "system_report",
+        "zone_report"
+      ],
+      [
+        "zone_before_init",
+        "zone_after_init",
+        "before_predictor",
+        "after_predictor_before_hvac",
+        "after_predictor_after_hvac",
+        "system_report",
+        "zone_report"
+      ]
+    ]
+  },
+  "output_handle_count": 55,
+  "unavailable_output_handles": [],
+  "eio_settings": {
+    "building": {
+      "name": "Simple One Zone (Wireframe DXF)",
+      "effective_north_axis_deg": -90.0,
+      "terrain": "Suburbs",
+      "loads_convergence_tolerance": 0.04,
+      "temperature_convergence_tolerance": 0.004,
+      "solar_distribution": "MinimalShadowing",
+      "maximum_warmup_days": 30,
+      "minimum_warmup_days": 30
+    },
+    "inside_convection": "TARP",
+    "outside_convection": "DOE-2",
+    "zone_air_heat_balance_algorithm": "ThirdOrderBackwardDifference",
+    "program_version": [
+      "EnergyPlus",
+      "Version 26.1.0-6f2e40d102",
+      "YMD=2026.10.07 19:18"
+    ],
+    "heat_balance_algorithm": "CTF - ConductionTransferFunction",
+    "heat_balance_defaults": {
+      "maximum_surface_temperature_C": 200.0,
+      "minimum_convection_coefficient_W_m2_K": 0.1,
+      "maximum_convection_coefficient_W_m2_K": 1000.0
+    },
+    "site_atmosphere": {
+      "wind_speed_profile_exponent": 0.22,
+      "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+      "air_temperature_gradient_k_per_m": 0.0065
+    },
+    "unreported_controls": [
+      "simulation_control (weather-only verified by actual environments)",
+      "room_air_model_type (default; no room-air declarations)"
+    ]
+  },
+  "branches": {
+    "limit_variant": null,
+    "scope": "A",
+    "observed": {}
+  },
+  "raw_artifacts": [
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/callbacks.jsonl",
+      "sha256": "5bcb2c6f60e8a909f8f70fbd7e11dbf8c3c32351ca33159926d81e9157c73d8e"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/api_messages.log",
+      "sha256": "af2b99cc8ac69af8a22b736d06463da90623da98008bbf1954d3de975277573b"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/api_exchange_points.csv",
+      "sha256": "8091616aaf9d2689c7d2c1b877e68282c0be2643d145e12c6276529bdd593511"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.eio",
+      "sha256": "dc0e3f3e5dd374aa44a78ef3fa2883296f320516e8aecc1e1fe2002685eb76f9"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.err",
+      "sha256": "adbd06fd8ffa4928ede91d32c5f69916d9283a3c86fc3540b46971c2fb3849b8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.eso",
+      "sha256": "0934acb021d3fe95cec0953dc0beb609fd31310fe8ded493b5442b9d04f12b11"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.mtr",
+      "sha256": "b96fe6fe23cbb53c8f5772c9ff0e7542d7aa28dbaaf3091e87c330353c6bf65a"
+    }
+  ],
+  "evidence_artifacts": [
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/zone-trace.json",
+      "sha256": "9009727e9bfa61ae56a86bce0ad801bbbe2386b702c1513dcc9f9752c34eab92"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eio-settings.json",
+      "sha256": "b5ed01ffacd540c6176eceae58cf1e26ff0baba8f90dcd68d08405d6b79a59c2"
+    }
+  ],
+  "rust_bounded_dry_run": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+      "run",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\unit-settings\\UNIT-NORTH-NEGATIVE-WARMUP\\input.idf",
+      "--weather",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\unit-settings\\rust\\UNIT-NORTH-NEGATIVE-WARMUP",
+      "--porting-scope",
+      "A",
+      "--dry-run",
+      "--keep-intermediate",
+      "--overwrite"
+    ],
+    "exit_code": 0,
+    "errors": [],
+    "trace": {
+      "schema": "porting-scope.v1",
+      "scope": "A",
+      "admissible": true,
+      "violations": [],
+      "settings": {
+        "building": {
+          "effective_north_axis_deg": -90.0,
+          "loads_convergence_tolerance": 0.04,
+          "maximum_warmup_days": 30,
+          "minimum_warmup_days": 30,
+          "north_axis_deg": -450.0,
+          "solar_distribution": "MinimalShadowing",
+          "temperature_convergence_tolerance": 0.004,
+          "terrain": "Suburbs"
+        },
+        "geometry": {
+          "coordinate_system": "World",
+          "starting_vertex_position": "UpperLeftCorner",
+          "vertex_entry_direction": "CounterClockwise"
+        },
+        "heat_balance_algorithm": "ConductionTransferFunction",
+        "heat_balance_controls": {
+          "maximum_surface_convection_heat_transfer_coefficient_value": 1000.0,
+          "minimum_surface_convection_heat_transfer_coefficient_value": 0.1,
+          "surface_temperature_upper_limit": 200.0
+        },
+        "ideal_loads": [],
+        "inside_convection": "TARP",
+        "outside_convection": "DOE-2",
+        "room_air_controls": {
+          "air_temperature_coupling_strategy": "Direct",
+          "zone_name": ""
+        },
+        "room_air_model_type": "Mixing",
+        "run_periods": [
+          {
+            "apply_weekend_holiday_rule": false,
+            "begin_day_of_month": 1,
+            "begin_month": 1,
+            "begin_year": 2013,
+            "day_of_week_for_start_day": "Tuesday",
+            "end_day_of_month": 1,
+            "end_month": 1,
+            "end_year": 2013,
+            "first_hour_interpolation_starting_values": "Hour24",
+            "name": "RUN PERIOD 1",
+            "treat_weather_as_actual": false,
+            "use_weather_file_daylight_saving_period": true,
+            "use_weather_file_holidays_and_special_days": true,
+            "use_weather_file_rain_indicators": true,
+            "use_weather_file_snow_indicators": true
+          }
+        ],
+        "schedules": {
+          "compact": [],
+          "constant": [
+            {
+              "id": 0,
+              "name": "ALWAYSON",
+              "value": 1.0
+            }
+          ]
+        },
+        "simulation_control": {
+          "do_hvac_sizing_simulation_for_sizing_periods": false,
+          "do_plant_sizing_calculation": false,
+          "do_system_sizing_calculation": false,
+          "do_zone_sizing_calculation": false,
+          "maximum_number_of_hvac_sizing_simulation_passes": 1.0,
+          "run_simulation_for_sizing_periods": false,
+          "run_simulation_for_weather_file_run_periods": true
+        },
+        "site_atmosphere": {
+          "air_temperature_gradient_k_per_m": 0.0065,
+          "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+          "wind_speed_profile_exponent": 0.22
+        },
+        "timesteps_per_hour": 4,
+        "zone_air_controls": {
+          "do_space_heat_balance_for_simulation": false,
+          "do_space_heat_balance_for_sizing": false
+        },
+        "zone_air_heat_balance_algorithm": "ThirdOrderBackwardDifference"
+      },
+      "compile_defaults": [
+        {
+          "field": "daylighting_reference_point_coordinate_system",
+          "object_name": "GlobalGeometryRules 1",
+          "object_type": "GlobalGeometryRules",
+          "value": "Relative"
+        },
+        {
+          "field": "rectangular_surface_coordinate_system",
+          "object_name": "GlobalGeometryRules 1",
+          "object_type": "GlobalGeometryRules",
+          "value": "Relative"
+        },
+        {
+          "field": "first_hour_interpolation_starting_values",
+          "object_name": "Run Period 1",
+          "object_type": "RunPeriod",
+          "value": "Hour24"
+        },
+        {
+          "field": "treat_weather_as_actual",
+          "object_name": "Run Period 1",
+          "object_type": "RunPeriod",
+          "value": "No"
+        },
+        {
+          "field": "floor_area",
+          "object_name": "ZONE ONE",
+          "object_type": "Zone",
+          "value": "Autocalculate"
+        },
+        {
+          "field": "part_of_total_floor_area",
+          "object_name": "ZONE ONE",
+          "object_type": "Zone",
+          "value": "Yes"
+        },
+        {
+          "field": "power_per_floor_area",
+          "object_name": "Test 352 minus",
+          "object_type": "OtherEquipment",
+          "value": "0.0"
+        },
+        {
+          "field": "power_per_person",
+          "object_name": "Test 352 minus",
+          "object_type": "OtherEquipment",
+          "value": "0.0"
+        },
+        {
+          "field": "carbon_dioxide_generation_rate",
+          "object_name": "Test 352 minus",
+          "object_type": "OtherEquipment",
+          "value": "0.0"
+        },
+        {
+          "field": "power_per_floor_area",
+          "object_name": "Test 352a",
+          "object_type": "OtherEquipment",
+          "value": "0.0"
+        },
+        {
+          "field": "power_per_person",
+          "object_name": "Test 352a",
+          "object_type": "OtherEquipment",
+          "value": "0.0"
+        },
+        {
+          "field": "carbon_dioxide_generation_rate",
+          "object_name": "Test 352a",
+          "object_type": "OtherEquipment",
+          "value": "0.0"
+        }
+      ],
+      "object_counts": {
+        "Building": 1,
+        "BuildingSurface:Detailed": 6,
+        "Construction": 3,
+        "Exterior:Lights": 1,
+        "GlobalGeometryRules": 1,
+        "HeatBalanceAlgorithm": 1,
+        "Material": 1,
+        "Material:NoMass": 2,
+        "OtherEquipment": 2,
+        "Output:Constructions": 1,
+        "Output:Diagnostics": 1,
+        "Output:Meter:MeterFileOnly": 3,
+        "Output:Surfaces:Drawing": 1,
+        "Output:Table:SummaryReports": 1,
+        "Output:Variable": 55,
+        "Output:VariableDictionary": 1,
+        "OutputControl:Table:Style": 1,
+        "RunPeriod": 1,
+        "Schedule:Constant": 1,
+        "ScheduleTypeLimits": 2,
+        "SimulationControl": 1,
+        "Site:Location": 1,
+        "SizingPeriod:DesignDay": 2,
+        "SurfaceConvectionAlgorithm:Inside": 1,
+        "SurfaceConvectionAlgorithm:Outside": 1,
+        "Timestep": 1,
+        "Version": 1,
+        "Zone": 1,
+        "ZoneAirHeatBalanceAlgorithm": 1
+      },
+      "inactive_branches": [
+        "SizingPeriod:DesignDay (sizing-period execution disabled)",
+        "Exterior:Lights (external meter only; excluded from zone heat sources)"
+      ],
+      "environment": {
+        "active_dst_step_count": 0,
+        "active_special_day_count": 0,
+        "calendar_year": 2013,
+        "daylight_saving": {
+          "active": false,
+          "effective_source": "none",
+          "input_file_period_declared": false,
+          "run_period_uses_weather_file_period": true,
+          "weather_file_period_declared": false
+        },
+        "environment_ordinal_semantics": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+        "first": {
+          "day_of_month": 1,
+          "day_of_week": "Tuesday",
+          "day_of_year": 1,
+          "day_type": "Tuesday",
+          "dst": false,
+          "end_minute": 15.0,
+          "hour": 1,
+          "month": 1,
+          "schedule_day_of_year": 1,
+          "year": 2013,
+          "zone_timestep": 1
+        },
+        "first_weather_steps": [
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -6.0,
+            "humidity_ratio": 0.002431765074591631,
+            "pressure_pa": 81425.0,
+            "record_index": 0,
+            "relative_humidity_percent": 86.0,
+            "timestep": 1,
+            "wet_bulb_c": -6.668048597295327,
+            "wind_speed_m_per_s": 5.025
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -5.0,
+            "humidity_ratio": 0.0027216857379142134,
+            "pressure_pa": 81150.0,
+            "record_index": 0,
+            "relative_humidity_percent": 88.0,
+            "timestep": 2,
+            "wet_bulb_c": -5.604824449310754,
+            "wind_speed_m_per_s": 3.35
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -4.0,
+            "humidity_ratio": 0.0030428279547921495,
+            "pressure_pa": 80875.0,
+            "record_index": 0,
+            "relative_humidity_percent": 90.0,
+            "timestep": 3,
+            "wet_bulb_c": -4.531178417179012,
+            "wind_speed_m_per_s": 1.675
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -3.0,
+            "humidity_ratio": 0.003398246600468902,
+            "pressure_pa": 80600.0,
+            "record_index": 0,
+            "relative_humidity_percent": 92.0,
+            "timestep": 4,
+            "wet_bulb_c": -3.446833686481747,
+            "wind_speed_m_per_s": 0.0
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -3.0,
+            "humidity_ratio": 0.003259005330717878,
+            "pressure_pa": 80600.0,
+            "record_index": 1,
+            "relative_humidity_percent": 88.25,
+            "timestep": 1,
+            "wet_bulb_c": -3.658724570612697,
+            "wind_speed_m_per_s": 0.525
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -3.0,
+            "humidity_ratio": 0.0031198260516596093,
+            "pressure_pa": 80600.0,
+            "record_index": 1,
+            "relative_humidity_percent": 84.5,
+            "timestep": 2,
+            "wet_bulb_c": -3.872188101419903,
+            "wind_speed_m_per_s": 1.05
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -3.0,
+            "humidity_ratio": 0.0029807087219056046,
+            "pressure_pa": 80600.0,
+            "record_index": 1,
+            "relative_humidity_percent": 80.75,
+            "timestep": 3,
+            "wet_bulb_c": -4.087236360191947,
+            "wind_speed_m_per_s": 1.5750000000000002
+          },
+          {
+            "diffuse_horizontal_radiation_w_per_m2": 0.0,
+            "direct_normal_radiation_w_per_m2": 0.0,
+            "dry_bulb_c": -3.0,
+            "humidity_ratio": 0.002841653300104209,
+            "pressure_pa": 80600.0,
+            "record_index": 1,
+            "relative_humidity_percent": 77.0,
+            "timestep": 4,
+            "wet_bulb_c": -4.303881089987149,
+            "wind_speed_m_per_s": 2.1
+          }
+        ],
+        "hourly_samples": 24,
+        "last": {
+          "day_of_month": 1,
+          "end_minute": 60.0,
+          "hour": 24,
+          "month": 1,
+          "year": 2013,
+          "zone_timestep": 4
+        },
+        "resolved_start_day_of_week": "Tuesday",
+        "resolved_start_year": 2013,
+        "rust_materialized_environment_index": 1,
+        "schedule_values": [
+          {
+            "id": 0,
+            "name": "ALWAYSON",
+            "values": [
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        ],
+        "selected_source_record_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "source": "Rust production EPW/calendar/schedule preparation",
+        "source_start_record_index": 0,
+        "timesteps_per_hour": 4,
+        "trace_semantics": "prepared inputs only; weather/schedule numerical completion is gated by CLK/SCH cards",
+        "weather_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "weather_record_year": 1999,
+        "zone_timestep_samples": 96
+      },
+      "production": {
+        "admission_semantics": "input scope only; unfinished numerical cards remain unconfirmed",
+        "bounded_coverage_exemptions": [
+          "ZoneAirHeatBalanceAlgorithm"
+        ],
+        "calculation_input_source": "original input and EPW; Rust compiled state",
+        "conformance_claim": false,
+        "excluded_reports": [
+          "Exterior:Lights energy and nonselected meters"
+        ],
+        "fixture_inputs_used": false,
+        "oracle_inputs_used": false
+      }
+    },
+    "binary_sha256": "31f96c2505a00eaaf14fd7cec18fe263a4ff5dc35f3535fb9b9ffafc699e8256",
+    "trace_artifact": {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/porting_scope.json",
+      "sha256": "467a7e727618abde66b4381ae6f7f5dc4728dadb7240ffede43f75b363c11758"
+    },
+    "physics_executed": false,
+    "scope_guard_called_via_production_entrypoint": true
+  },
+  "errors": [],
+  "reference_checks_passed": true,
+  "gate_status": "unreviewed",
+  "timestamp_policy": {
+    "canonical_zone_end": "API hour + zone_step_number * zone_dt, checked exactly against 96 ESO accepted Timestep timestamps",
+    "raw_api_current_time": "preserved separately; at end-zone reporting with shortened system dt it equals canonical zone end + system dt (api/datatransfer.cc909-919)",
+    "weather_year": "EPW record year via API year(); civil_year via API calendar_year()"
+  },
+  "limitations": [
+    "CON-01 settings/environment/order evidence only; downstream numerical cards are unverified",
+    "no Rust numerical comparison performed",
+    "only this case duration was executed",
+    "API values at zone-report callback are instantaneous report fields; system raw samples retain adaptive dt and must be aggregated for system-variable Timestep comparison"
+  ]
+}

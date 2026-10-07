@@ -1,0 +1,53 @@
+{
+  "case_id": "NEG-LATENT",
+  "metadata": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/metadata.json",
+    "sha256": "d970957fa3116cb8d8366f998429a6672f2a9302e69dfa41537f20abe202e49a"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/input.idf",
+    "sha256": "d45a27e41c9ddf016633d856708b64095cd5e2eaef8fae7706d9ba71207cad99"
+  },
+  "command_result": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+      "run",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\negative-admission\\NEG-LATENT\\input.idf",
+      "--weather",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\admission\\NEG-LATENT",
+      "--porting-scope",
+      "B",
+      "--dry-run",
+      "--keep-intermediate",
+      "--overwrite"
+    ],
+    "exit_code": 4,
+    "artifacts": [
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-LATENT/command.json",
+        "sha256": "6aa8cdac0bfbb159fbf632ddf5e4bf012b4319af411ef7e6b97729c62d48656a"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-LATENT/stdout.log",
+        "sha256": "9da5ae61bb9851be677cf8d1718171e885a4e11dabd7788f44736c4db6a451de"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-LATENT/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".runtime/porting/CON-01/admission/NEG-LATENT/porting_scope.json",
+        "sha256": "96811e2a9f299952f06ca710e1804e877e214ad8badce1fa31157fd002a61c87"
+      }
+    ]
+  },
+  "violations": [
+    "OtherEquipment latent gains are outside the zero-latent-source scope"
+  ],
+  "errors": [],
+  "rejection_checks_passed": true,
+  "physics_executed": false,
+  "gate_status": "unreviewed"
+}

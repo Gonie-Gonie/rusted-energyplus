@@ -1,0 +1,36 @@
+{
+  "schema_version": "con01-execution-matrix.v1",
+  "production_cases": false,
+  "case_count": 2,
+  "cases": [
+    {
+      "case_id": "UNIT-NORTH-NEGATIVE-WARMUP",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/summary.json",
+        "sha256": "b4453a9bca70bbb2a17c6a72b6ef9e792f9152f0e095b3d46153459b36801dde"
+      }
+    },
+    {
+      "case_id": "UNIT-NORTH-POSITIVE-DEFAULT-WARMUP",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "reference_status": "checks_passed",
+      "rust_guard_status": "checks_passed",
+      "physics_comparison_status": "not_run",
+      "gate_status": "unreviewed",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/summary.json",
+        "sha256": "0ebd2f89cd97255adbbf85208b1272a8f1e506796fc7530c8f91834a7265a03d"
+      }
+    }
+  ],
+  "automatic_gate_updates": false
+}

@@ -1,0 +1,915 @@
+{
+  "schema_version": "con01-evidence-manifest.v1",
+  "implementation_commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+  "binary": {
+    "path": "target/debug/eplus-rs.exe",
+    "sha256": "31f96c2505a00eaaf14fd7cec18fe263a4ff5dc35f3535fb9b9ffafc699e8256"
+  },
+  "checked_in_artifacts": [
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/summary.json",
+      "sha256": "2c6eb7a6d7b59166f853fedc8f04014f82ad33d3527c43c865f6af6b459a2c96"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/zone-trace.json",
+      "sha256": "fde1194cc6528508d72657bed23d3f281894fe7ae7a732a3b06951289051d8a1"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/eio-settings.json",
+      "sha256": "437cc914de4cf55841b698bc7c1381a585951f4907e080fefe62428825971f5c"
+    },
+    {
+      "path": "tools/porting/trace_con01.py",
+      "sha256": "46fe3e9dbe8f86c34629982973b9cb106127e82dbce5946b1274888dcd9245af"
+    },
+    {
+      "path": "tools/porting/prepare_con01.py",
+      "sha256": "66c6c9f7d62608403eccd441f18e2edb86f7b2f88c4a69f7746b9a37d7c69f8e"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/source-boundaries.json",
+      "sha256": "8b07ee7975deb10f9405749d70c47ffff78a685d097de83fbf71b86e1b849fea"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/state-contracts.json",
+      "sha256": "5fbe4f2369d8cb94b5bfae90c574da7d12efd50051df7235cee0d985ba2efcde"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/output-tolerances.json",
+      "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+      "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/zone-trace.json",
+      "sha256": "c79209fd2631186111859dfa92584b789812d09de5a179a74ae796e748fe0890"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/eio-settings.json",
+      "sha256": "a57846bf360396208f14c62352cf9c62ca433c7391152ace986bceeb6d1faa88"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+      "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/zone-trace.json",
+      "sha256": "b73e70edf32f7678d96f17369fa4578f24f6ffc5a5017bc0c363096504a3b41a"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/eio-settings.json",
+      "sha256": "6c422f68ac27289ac383fa752de751b94827285d83c9595248a9e9690ad0b95d"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+      "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/zone-trace.json",
+      "sha256": "51ff21024baaaf6ec061d42b5abc4464e1b35fea7e84fd605dbb093e3b1e6b99"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/eio-settings.json",
+      "sha256": "e99e6a3b60752b1367983a4bc537cb92a3b7b9a1b115d969a99e66489f297de0"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/summary.json",
+      "sha256": "317765ad1b6b7d2b8c81dc037d35efe04e66d55c628000622e6db85fcda03e81"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/zone-trace.json",
+      "sha256": "c23e31232b82f8c59f2191447fe6252d7af46c60953a8c610f5e8bf942d714fe"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/eio-settings.json",
+      "sha256": "af066f01d8bf38fa5d9015e2707f2fa50ecc060861b9468846c77fc8d255d4da"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/summary.json",
+      "sha256": "b4453a9bca70bbb2a17c6a72b6ef9e792f9152f0e095b3d46153459b36801dde"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/input.idf",
+      "sha256": "4463bcc07733f98c7accb4f14c099eb86d843ef49e830bb296428de785d05b10"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/metadata.json",
+      "sha256": "53359b2fc6e5572619e02991da1c69357223d9f9d7a9717057db76239884221a"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/zone-trace.json",
+      "sha256": "9009727e9bfa61ae56a86bce0ad801bbbe2386b702c1513dcc9f9752c34eab92"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eio-settings.json",
+      "sha256": "b5ed01ffacd540c6176eceae58cf1e26ff0baba8f90dcd68d08405d6b79a59c2"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/summary.json",
+      "sha256": "0ebd2f89cd97255adbbf85208b1272a8f1e506796fc7530c8f91834a7265a03d"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/input.idf",
+      "sha256": "bd6cb059ee5ac4bf6e571987817af6d322503d074aec7ec3bbaddc0122f0c007"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/metadata.json",
+      "sha256": "b7de28514bee6df1fdde72d6aa98290111a760a094b7a40c5a715cd5d1b886ad"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/zone-trace.json",
+      "sha256": "09b38e8155cb41fcdb639a12ee8270fbd7da8530242649fe5dc5a9d9d174aabf"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/eio-settings.json",
+      "sha256": "365f7f3a14da8fdbac7fb1b08bc3c297874f2d7e4fcb7b33b444492adac64e4b"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/metadata.json",
+      "sha256": "d970957fa3116cb8d8366f998429a6672f2a9302e69dfa41537f20abe202e49a"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/input.idf",
+      "sha256": "d45a27e41c9ddf016633d856708b64095cd5e2eaef8fae7706d9ba71207cad99"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-LATENT/summary.json",
+      "sha256": "383205534701db184914fe3cdffc5732291fc7d6783c7950df3679710c4d3e7f"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/metadata.json",
+      "sha256": "881aea8cc4f960beb558b04c36d0a9a7660fd04659e352e4e9ab94ff3667afe6"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/input.idf",
+      "sha256": "6b1f5c6f05e3b041f91d36637b97f1872150e663bcae92d7802aea6426b10e26"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-OUTDOOR-AIR/summary.json",
+      "sha256": "7dbd3c3f6de97de59fb5941d11097cd5612e00193e47672783eab5f1085dfb7d"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/metadata.json",
+      "sha256": "784d2c699c6db33c089865d37bac13892b26c39545e9369998e18f1d80ad6bcd"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/input.idf",
+      "sha256": "919354f1d1bf295806688e6baed8a94eb9132b9c08902343b56ebc9052fb9d99"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/summary.json",
+      "sha256": "d870c5a859cb3f34db782518fa837eda7ff53d0627be65965de4d4d892bfd750"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/comparison-report.json",
+      "sha256": "526de54a1e0c215afaa9991fdffb7aeb3c1adeb37a2536610decb5985f0d3e79"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+      "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/execution-matrix.json",
+      "sha256": "d2969ae3940450f770d1aefe4e1ad45b5cba01fcf02aa27d98549183df85c9a1"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/execution-matrix.json",
+      "sha256": "e39145c87a88abdf65d78a0e5bee116ac01a43012fd4a2c2a2de61fa48b57e3f"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/build-receipt.json",
+      "sha256": "dbc0f373e6d511ecb43bfde118465580770d238ca2aabc4f6c1b6cb37d2b11a1"
+    },
+    {
+      "path": "tools/porting/check_con01_admission.py",
+      "sha256": "7a4f9dc0e19e80b6f6ada5a9f850df61d36cf3737bc83265add4dbc94c3b0f77"
+    },
+    {
+      "path": "tools/porting/README.md",
+      "sha256": "d1d1ca314fc860f0f8015cc0176dfd80fc2eab13eb0d574bb8ac664a1a3e8a34"
+    }
+  ],
+  "raw_runtime_artifacts": [
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/callbacks.jsonl",
+      "sha256": "4516443c25812b110338eadf56c032fd2d6d78846484b598c9ae938d6c1760a7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/api_messages.log",
+      "sha256": "bdef78a07a44a1cdda1f5816b70ebbd122867b5802f7b2003f13c62bcaeae16a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/api_exchange_points.csv",
+      "sha256": "8091616aaf9d2689c7d2c1b877e68282c0be2643d145e12c6276529bdd593511"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/eplusout.eio",
+      "sha256": "9d7b4cb341eced809d972c7f0caf018a4692fb7571c0878eb42dc5d7ebb0da9c"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/eplusout.err",
+      "sha256": "31023e69cb764f17544b913c74fba3c6218d366f52db838222979b76d4162004"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/eplusout.eso",
+      "sha256": "69738164f983bf4700f3c8e6c26cf5b70238d746f36d67eecde22f16981faf83"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/A-24H/eplusout.mtr",
+      "sha256": "b96fe6fe23cbb53c8f5772c9ff0e7542d7aa28dbaaf3091e87c330353c6bf65a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/A-24H/command.json",
+      "sha256": "262c2cf259c6e65e3870dec732d77167e338e296501b06de73ccf552ee66faa1"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/A-24H/stdout.log",
+      "sha256": "9a8f0ff9f523cb6b67a3a66eb60a8b356e9efec865305f34a879dbc46decd3f1"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/A-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/A-24H/porting_scope.json",
+      "sha256": "e11171546de7eadc848d8b0587185d920fdf413cd59d31e47f3a7affd581df8a"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/energyplusapi.dll",
+      "sha256": "bbe6f66240d108df9f51a03b9beb968808a2173234253574d27a31605aec2aa2"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/callbacks.jsonl",
+      "sha256": "0f5f358f2a2ca635075925162a90b2865b9bbab223aaa56e66428cf413664c6a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/api_messages.log",
+      "sha256": "7c79439c3519c5d741119e66596c98fa4e9dbfc39c4df7f857bc21e8dd69dae0"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/api_exchange_points.csv",
+      "sha256": "4b9dd786968f73e0f331cf7b13cc7db5f27bf115d25d5d95f5fe18166a3ba489"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.eio",
+      "sha256": "a5df8c4f25d2be7cb79dadee2fc4930daa160d30bb322b3ddfb06d0e1351cb1d"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.err",
+      "sha256": "ead5141affbc65217a502cc1a3a26127a6f2cad343822957597a0709dd731702"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-BOTH-24H/eplusout.eso",
+      "sha256": "3edad8e35ad4a7f13e6e76b20ac4159e72fe1a643fca17ab2863998284b53b87"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/command.json",
+      "sha256": "8d4223de7e51f40c49944cd6e77cb175274721cc12c7ef422df3cad6f6fe3715"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/stdout.log",
+      "sha256": "2ee0121d79e78d7efc38a5123a388d2aca360a8e20ade0665feaa3fbf561e947"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/porting_scope.json",
+      "sha256": "6276f0bb51329fefff653c8afc82e05232831a1f55c0020df30b75dc708d1a25"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/callbacks.jsonl",
+      "sha256": "d65acd5ba17a521aa695dcf9422275469a68609f0c215c3e822475bb13a2f4b9"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/api_messages.log",
+      "sha256": "652bc5490e9d98bb2f20ff09d9da1a41d048943b6783d139cc582474bdee500a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/api_exchange_points.csv",
+      "sha256": "4b9dd786968f73e0f331cf7b13cc7db5f27bf115d25d5d95f5fe18166a3ba489"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.eio",
+      "sha256": "c0339d86040a8e73fe9565692df7df7488f6681ca1d2abb991756b3969453124"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.err",
+      "sha256": "5010cb888fb39fb3980f7b0024b06001211c025316dd4ddb8c05ae36e504ef84"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-CAPACITY-24H/eplusout.eso",
+      "sha256": "a90bba31795bffd59b65f81ad979b191100ecfe79d1625bc17b40a15ab0ef7de"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/command.json",
+      "sha256": "c38f0c172dfc280dcfec0220c7250a7c7e290d8b358ff5060fe961541c3ad4e6"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/stdout.log",
+      "sha256": "5be91786fdca368674f79793d8d23cc863f1d47019921d917da4ae7c24c49646"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/porting_scope.json",
+      "sha256": "bb7ec8aced5fde06d2e5416e6cbe0f643529c2ba2c062d9242970c03047360e5"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/callbacks.jsonl",
+      "sha256": "1df0488fe5ca2457c01dfd529d7bd4f1d8ea344cbd08e5b3db52b820c559fb78"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/api_messages.log",
+      "sha256": "269ebf5f2d01d44a27bb4cce67606c5f1975741a8a6e4cd8410ffec1744fff76"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/api_exchange_points.csv",
+      "sha256": "4b9dd786968f73e0f331cf7b13cc7db5f27bf115d25d5d95f5fe18166a3ba489"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.eio",
+      "sha256": "edc9679274d78f79adeb5b978b03c4e5a68c4db9a63015e7286a0b85e6b5d636"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.err",
+      "sha256": "f6e9f34c9cce4100e5b6068652fb44dc36cf08a33fecef77aeb971f3db3abca7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-FLOW-24H/eplusout.eso",
+      "sha256": "598f35e0b6ea1188f093400e3f1f752a005df1be5a5883d28836a8a7573a4288"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/command.json",
+      "sha256": "c07bddaeec2ca27d6937d3677cf8639ed8f5be909c70e233f0e9b2339d00cd94"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/stdout.log",
+      "sha256": "db751ee584da88c47c95da6f31ad2fba7b74e6cd697b45f6e9c2dfe98035d2d7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/porting_scope.json",
+      "sha256": "e374a4ea13ae17cd3783a6250e9126e4e8ccdc7ce04a6e4a5276763610e904d9"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-NOLIMIT-24H/callbacks.jsonl",
+      "sha256": "c514918b049bcf0563ddbaa69283c27e1794417d07e9c78b93e9b704682792e8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-NOLIMIT-24H/api_messages.log",
+      "sha256": "afa70dbca088da03f59adf8dc38031a0b2a6636b5d45b3a4154ec35ad289d2d0"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-NOLIMIT-24H/api_exchange_points.csv",
+      "sha256": "4b9dd786968f73e0f331cf7b13cc7db5f27bf115d25d5d95f5fe18166a3ba489"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-NOLIMIT-24H/eplusout.eio",
+      "sha256": "c2c3f22f530ff1348a3604a4c1cb76170ba81502a8a625383ef220408d2a8d78"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-NOLIMIT-24H/eplusout.err",
+      "sha256": "b4125cc2f1d0ade0361c2069f2c00904a4d99d6afea7d8ba8edfabf5e1177551"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/B-NOLIMIT-24H/eplusout.eso",
+      "sha256": "b46d250c789b5289e965e312b7f098c442a3a1b73bfc1e60dc81623d2d635490"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/command.json",
+      "sha256": "d5d8845663a3b267e464d9b648c3be645b8ee3ec65b71524f59a9b50dbf31346"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/stdout.log",
+      "sha256": "515df4801b192918b83f20c7608161577465647f130069b02d34120b4abc21f3"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/porting_scope.json",
+      "sha256": "2bbf83fb45b3d2dadd187b1b52a6dd935bdfb3ad7f8ef01a36ddb708f2e83f50"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/callbacks.jsonl",
+      "sha256": "5bcb2c6f60e8a909f8f70fbd7e11dbf8c3c32351ca33159926d81e9157c73d8e"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/api_messages.log",
+      "sha256": "af2b99cc8ac69af8a22b736d06463da90623da98008bbf1954d3de975277573b"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/api_exchange_points.csv",
+      "sha256": "8091616aaf9d2689c7d2c1b877e68282c0be2643d145e12c6276529bdd593511"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.eio",
+      "sha256": "dc0e3f3e5dd374aa44a78ef3fa2883296f320516e8aecc1e1fe2002685eb76f9"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.err",
+      "sha256": "adbd06fd8ffa4928ede91d32c5f69916d9283a3c86fc3540b46971c2fb3849b8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.eso",
+      "sha256": "0934acb021d3fe95cec0953dc0beb609fd31310fe8ded493b5442b9d04f12b11"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/eplusout.mtr",
+      "sha256": "b96fe6fe23cbb53c8f5772c9ff0e7542d7aa28dbaaf3091e87c330353c6bf65a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/command.json",
+      "sha256": "13bdc32924a180854d53db472f7e870dcdcf8ca3e94b7add65990fded9cd01a8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/stdout.log",
+      "sha256": "10182cac40384e6f872c743e641d12205ae20baabd5e08ac0816ff643d94d171"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/porting_scope.json",
+      "sha256": "467a7e727618abde66b4381ae6f7f5dc4728dadb7240ffede43f75b363c11758"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/callbacks.jsonl",
+      "sha256": "4516443c25812b110338eadf56c032fd2d6d78846484b598c9ae938d6c1760a7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/api_messages.log",
+      "sha256": "48b560b75a0a3cc30d0208ac46717d69f0d1a79bea1b9234d5944b8201bc2d28"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/api_exchange_points.csv",
+      "sha256": "8091616aaf9d2689c7d2c1b877e68282c0be2643d145e12c6276529bdd593511"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/eplusout.eio",
+      "sha256": "11a35154f1e99bf76d6bcc6b781f0b11f2d0cc77a75c931d4e7b52c2d6a56b89"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/eplusout.err",
+      "sha256": "14decb221bf1d4f966b601543f1972d40e4b2d6a453bd2a7d79ae7aee45004bc"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/eplusout.eso",
+      "sha256": "69738164f983bf4700f3c8e6c26cf5b70238d746f36d67eecde22f16981faf83"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/eplusout.mtr",
+      "sha256": "b96fe6fe23cbb53c8f5772c9ff0e7542d7aa28dbaaf3091e87c330353c6bf65a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/command.json",
+      "sha256": "0b1a2539ffbd664bedc071e85fb23700d9dfd00851ceaa9f55c85a4885b2054a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/stdout.log",
+      "sha256": "9b8ea456e16c07aa6f674d5f513f0757967149e262966aa657fd9d4f0cbf8389"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/porting_scope.json",
+      "sha256": "b3ef691eb35c0e615712071cf202cb6ff2d9e24b8d1988eeeddeb383d382a3a5"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-24H/command.json",
+      "sha256": "e8488f1082d7b3c5494cacb92db9406b008878d09a9b8569692599e9a4b7385c"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-24H/stdout.log",
+      "sha256": "2ac24c6d50079e8cff1b18edff1383928cf7ad64c9d04bb3cae2143b95193fd2"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-24H/porting_scope.json",
+      "sha256": "e11171546de7eadc848d8b0587185d920fdf413cd59d31e47f3a7affd581df8a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-72H/command.json",
+      "sha256": "11141e2d512d1f7b9045e79238ad3e382e649213fec3ed9c1a3e2c4286e9c13d"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-72H/stdout.log",
+      "sha256": "cdf8a590165dbf3c339faf8cceb472c9d30ca1785030f0a4f70e9e8305b223a7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-72H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-72H/porting_scope.json",
+      "sha256": "1799585dc29725c322ee1fd7939d70eb327308c5890e5b60d408bd1fb180cb11"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-ANNUAL/command.json",
+      "sha256": "ff22e354d2352acf347ef01c2b1bb4ef68d952dd8016700d420e32c157d7ee08"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-ANNUAL/stdout.log",
+      "sha256": "00d9d27484b162b8b9933d3bc279580cda0d5f1ec6f7760d1d00df50a978535f"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-ANNUAL/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/A-ANNUAL/porting_scope.json",
+      "sha256": "9575c56c5f7dc22660437c2505983f558096f2ec57807e9ce38e88621db29822"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/command.json",
+      "sha256": "1b51094d3d8ecea9dfba21445d6338ddf142f76ac3213b3ce0bdb7abeb1e0753"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/stdout.log",
+      "sha256": "475864e357a1d0dd4630f7e222a64b116466ebe5c2e13d61b9dc6ff178dbee5d"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-24H/porting_scope.json",
+      "sha256": "2bbf83fb45b3d2dadd187b1b52a6dd935bdfb3ad7f8ef01a36ddb708f2e83f50"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/command.json",
+      "sha256": "ab5d76385413e927cf2a7746a7cd5c78b7b14551ab96bcf5dc9affcbd03614a3"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/stdout.log",
+      "sha256": "bf8e6a16ec2d46f078ad67c15d032bf35a108be8502a8687e8ab4a60cfc116d8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-72H/porting_scope.json",
+      "sha256": "bcda5d63994c348045aeb4abb3e9697e97732318f328efca103ebcfb29edc2dc"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/command.json",
+      "sha256": "b71a80716a4e683dcbf68f6f8296246902dfd92aa15740ce0cc7f88c6571a189"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/stdout.log",
+      "sha256": "4dd922b2eacd874cbe6e05458ab97f7c61fc621ecdcaf0aa8c9ce2837ba8b4e7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-NOLIMIT-ANNUAL/porting_scope.json",
+      "sha256": "3d84e186444b3a5f06279f93fdb159b1f57c0578fb6ba7d69457843bec366e3a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/command.json",
+      "sha256": "11cf7c8547eefa18de04ab76cdee9cb3543239903359e6cd71621549321d4ea3"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/stdout.log",
+      "sha256": "8ce8be05c4c855cb90b53022e01cb80c44fff373ddf4e79d42d43d3a40166ae2"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-24H/porting_scope.json",
+      "sha256": "e374a4ea13ae17cd3783a6250e9126e4e8ccdc7ce04a6e4a5276763610e904d9"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/command.json",
+      "sha256": "1403c36b70beb64620a910080eea643d2972c62ae0f5bdb29c00f7c5861a2967"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/stdout.log",
+      "sha256": "b82c4b15e5bc20197a761c9187390ba12301c98272a7b1ad0847046c927571c7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-72H/porting_scope.json",
+      "sha256": "39da12efa6b4c10cffd9f74f5f8fe1d41ecd0961d86c43532458bf3a3aeb58b5"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/command.json",
+      "sha256": "7575aab7fddd0335592382e43562e9ea06e20af43e28a20fcc15107555306f86"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/stdout.log",
+      "sha256": "ba8310d2627e12be43baae28db9fbc91f0b699902aeb8cd8f301a932757d2783"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-FLOW-ANNUAL/porting_scope.json",
+      "sha256": "9f02668ea89d6d80982b69dcc7a5356a866f9940fb82b52b3347acf0b6edd80a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/command.json",
+      "sha256": "87b0a5fbddf7350e698b71e081afddc39c5fd10a893e7d14eb494451d4673ad3"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/stdout.log",
+      "sha256": "c984e9427f1a2ce9630de8f7c55ede1820d29fbfb804bed97c37700478d128a6"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-24H/porting_scope.json",
+      "sha256": "bb7ec8aced5fde06d2e5416e6cbe0f643529c2ba2c062d9242970c03047360e5"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/command.json",
+      "sha256": "a31e670b5a7b64c56d663b0bddfa729725d140e2484ca1ff52b3c47e76c7b9c8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/stdout.log",
+      "sha256": "593fd9f235ad8b83d12695203c8b64711d9e15ddfeeff3390ee0b4ed588b7566"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-72H/porting_scope.json",
+      "sha256": "43189917bcf79b2b08b0cca3e74092cb6a44f3c3c40a17e6ec58a4ae95fe2dec"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/command.json",
+      "sha256": "f9767027e28e1a8ebd9004ff36782b8d64b98ed9570597c5b6638385100c5d55"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/stdout.log",
+      "sha256": "239af840733298e3986f5051765b97eb63c685ab1a30088afe4e2c546af7b11f"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-CAPACITY-ANNUAL/porting_scope.json",
+      "sha256": "b9aeafc506f998c85f64b01e2657baf29847a0634e8f90a9f772bd276cc4921b"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/command.json",
+      "sha256": "5677e868928dc7bc60af8ccbf334d44a6d871c97fc5b9e02bf1d42cdef54f313"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/stdout.log",
+      "sha256": "88abe937fb374ed77df32ca77f6258075e254297b3089a2a3aac0a51d216e06f"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-24H/porting_scope.json",
+      "sha256": "6276f0bb51329fefff653c8afc82e05232831a1f55c0020df30b75dc708d1a25"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/command.json",
+      "sha256": "f111e0846609f41d8cf4219cc67b47d4e955531f9aa8907f46c9cf2a5d18477b"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/stdout.log",
+      "sha256": "d57313f10fc53870941a2750e036cb744da4edb5bd52714799c4b5ad088463e7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-72H/porting_scope.json",
+      "sha256": "3d9609088525cdb78aca1598a6d6a14eedab6342df2704688ceae90b83a38c4f"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/command.json",
+      "sha256": "581eba71f0cda8b9bc624c182ad805945db81ff38e04dae62ffd33ada02ccbe8"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/stdout.log",
+      "sha256": "aa52446d20d6ce37d2743ee6b74150984b5715cc61a0da1750c68dcf6dd79a69"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/B-BOTH-ANNUAL/porting_scope.json",
+      "sha256": "ce5a594aa620bc6d259bf8cdbe70c00fd06dce3acda6d2aa86779e4a5fd6b9bf"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-LATENT/command.json",
+      "sha256": "6aa8cdac0bfbb159fbf632ddf5e4bf012b4319af411ef7e6b97729c62d48656a"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-LATENT/stdout.log",
+      "sha256": "9da5ae61bb9851be677cf8d1718171e885a4e11dabd7788f44736c4db6a451de"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-LATENT/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-LATENT/porting_scope.json",
+      "sha256": "96811e2a9f299952f06ca710e1804e877e214ad8badce1fa31157fd002a61c87"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/command.json",
+      "sha256": "a3dc5e6331befd38d13d159fbca2bd29c180b1d49060699f5812b61c217cad11"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/stdout.log",
+      "sha256": "ae7ce672644263be48f36bdbfeaa47aee9b9cfdd46fc43cf20bc4e59803e3c60"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-OUTDOOR-AIR/porting_scope.json",
+      "sha256": "8afd1c1853682d5b7b1e8e9dcf5956f935466c160b5c5325764b136af20dada7"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/command.json",
+      "sha256": "2653f4d4421c20c436eeeb5e659d3b815d8abd6edff55c8a165a10bd8db19a07"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/stdout.log",
+      "sha256": "26ab2bcb5c247d95a215a22957bf058cbffc7facadff250f850ae6f730720e6d"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".runtime/porting/CON-01/admission/NEG-AUTOSIZE/porting_scope.json",
+      "sha256": "febd79bc7d112c7cab38ae2ee0dd767f41f3d28168d22756824c76b80315b8ee"
+    }
+  ],
+  "report": {
+    "path": "energyplus_porting_plan/evidence/CON-01/comparison-report.json",
+    "sha256": "526de54a1e0c215afaa9991fdffb7aeb3c1adeb37a2536610decb5985f0d3e79"
+  },
+  "artifact_hash_verification": "every listed hash verified before manifest generation",
+  "card_gate_status": "unreviewed",
+  "automatic_gate_updates": false
+}

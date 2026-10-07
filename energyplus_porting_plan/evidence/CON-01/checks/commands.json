@@ -1,0 +1,105 @@
+{
+  "schema": "porting-command-results.v1",
+  "checks": [
+    {
+      "command": "cargo test -p ep_run porting_scope --lib",
+      "commit": "913c13a808688761dff22d45e42c4c73572da8ea",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/01-test.txt",
+          "sha256": "545ab79d723509f63c37fc0305e5b722cd19ffad332f7c017ddbb04b7514d4c9"
+        }
+      ]
+    },
+    {
+      "command": "cargo test -p ep_cli arbitrary_run --bin eplus-rs",
+      "commit": "913c13a808688761dff22d45e42c4c73572da8ea",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/02-test.txt",
+          "sha256": "904fb59e219a1e5bd53c86a290dc17173be1da72dfb9ac8311c1e301c25cfd07"
+        }
+      ]
+    },
+    {
+      "command": "cargo test -p ep_compiler --lib",
+      "commit": "913c13a808688761dff22d45e42c4c73572da8ea",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/03-test.txt",
+          "sha256": "b7c2b27a4d94e04ebf883cf4d749b7444c7f578c48330bdcb02eedb8ac911ec5"
+        }
+      ]
+    },
+    {
+      "command": "cargo clippy -p ep_run -p ep_cli -p ep_compiler --all-targets -- -D warnings",
+      "commit": "913c13a808688761dff22d45e42c4c73572da8ea",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/04-clippy.txt",
+          "sha256": "3fb0a997f94ebc201a285988ba7525f9aac30b184e73fbc1435f9a1d6114d6e1"
+        }
+      ]
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "commit": "913c13a808688761dff22d45e42c4c73572da8ea",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/05-fmt.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "command": "python tools/porting/prepare_con01.py --check",
+      "commit": "28fcd15937673110c9de5135874be1a24bb26aa4",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/06-prepare.txt",
+          "sha256": "ae5c93911d406dc6773b699cab7d2960373c062db0637e19ed99b9172c8a0016"
+        }
+      ]
+    },
+    {
+      "command": "cargo test -p ep_run porting_scope --lib",
+      "commit": "bbd92dad27cb81bbd593835639cfdf510af677fe",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/07-scope.txt",
+          "sha256": "1820c6a65e7bb7beb8e2a39062df72eb63d7a0e4ee4a310bcc31ae2c9ea2a7c2"
+        }
+      ]
+    },
+    {
+      "command": "cargo clippy -p ep_run -p ep_cli -p ep_compiler --all-targets -- -D warnings",
+      "commit": "bbd92dad27cb81bbd593835639cfdf510af677fe",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/08-clippy.txt",
+          "sha256": "ebab38576a0fa02927670a2a81ca0e04d43599d253a39b866df2133b8f172009"
+        }
+      ]
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "commit": "bbd92dad27cb81bbd593835639cfdf510af677fe",
+      "exit_code": 0,
+      "artifacts": [
+        {
+          "path": "energyplus_porting_plan/evidence/CON-01/checks/09-format.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "output_normalization": "UTF-8/LF; nonempty captured text ends with one newline; all output lines retained"
+}

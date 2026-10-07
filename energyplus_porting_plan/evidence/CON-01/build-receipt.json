@@ -1,0 +1,16 @@
+{
+  "schema": "porting-rust-build-receipt.v1",
+  "command": "cargo build -p ep_cli --bin eplus-rs",
+  "exit_code": 0,
+  "source_commit": "bbd92dad27cb81bbd593835639cfdf510af677fe",
+  "source_tree": "2105144271b47424f64f54fb40651bc33028c66e",
+  "rust_source_tree": "1caa7021316a82754f1c99d9431bc5310359482a",
+  "tracked_rust_worktree_clean": true,
+  "binary": {
+    "path": "target/debug/eplus-rs.exe",
+    "sha256": "31f96c2505a00eaaf14fd7cec18fe263a4ff5dc35f3535fb9b9ffafc699e8256"
+  },
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+  "timestamp_utc": "2026-10-07T10:17:02.514027+00:00"
+}

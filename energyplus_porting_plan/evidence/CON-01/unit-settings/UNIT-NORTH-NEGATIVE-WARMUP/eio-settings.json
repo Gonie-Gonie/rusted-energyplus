@@ -1,0 +1,205 @@
+{
+  "Program Version": [
+    [
+      "EnergyPlus",
+      "Version 26.1.0-6f2e40d102",
+      "YMD=2026.10.07 19:18"
+    ]
+  ],
+  "Site:Location": [
+    [
+      "Denver Centennial  Golden   Nr CO USA TMY3 WMO#=724666",
+      "39.74",
+      "-105.18",
+      "-7.00",
+      "1829.00",
+      "81198",
+      "0.9651"
+    ]
+  ],
+  "Building Information": [
+    [
+      "Simple One Zone (Wireframe DXF)",
+      "-90.000",
+      "Suburbs",
+      "4.00000E-002",
+      "4.00000E-003",
+      "MinimalShadowing",
+      "30",
+      "30"
+    ]
+  ],
+  "Inside Convection Algorithm": [
+    [
+      "TARP"
+    ]
+  ],
+  "Outside Convection Algorithm": [
+    [
+      "DOE-2"
+    ]
+  ],
+  "Zone Air Solution Algorithm": [
+    [
+      "ThirdOrderBackwardDifference",
+      "No",
+      "No"
+    ]
+  ],
+  "Zone Air Carbon Dioxide Balance Simulation": [
+    [
+      "No",
+      "N/A"
+    ]
+  ],
+  "Zone Air Generic Contaminant Balance Simulation": [
+    [
+      "No",
+      "N/A"
+    ]
+  ],
+  "Zone Air Mass Flow Balance Simulation": [
+    [
+      "No",
+      "N/A",
+      "N/A",
+      "N/A"
+    ]
+  ],
+  "HVACSystemRootFindingAlgorithm": [
+    [
+      "RegulaFalsi"
+    ]
+  ],
+  "Environment:Site Atmospheric Variation": [
+    [
+      "0.220",
+      "370.000",
+      "6.500000E-003"
+    ]
+  ],
+  "Surface Heat Transfer Algorithm": [
+    [
+      "CTF - ConductionTransferFunction",
+      "200",
+      "0.10",
+      "1000.0"
+    ]
+  ],
+  "Zone Information": [
+    [
+      "ZONE ONE",
+      "0.0",
+      "0.00",
+      "0.00",
+      "0.00",
+      "7.62",
+      "7.62",
+      "2.29",
+      "1",
+      "1",
+      "1",
+      "0.00",
+      "15.24",
+      "0.00",
+      "15.24",
+      "0.00",
+      "4.57",
+      "4.57",
+      "1061.88",
+      "TARP",
+      "DOE-2",
+      "232.26",
+      "278.71",
+      "278.71",
+      "0.00",
+      "6",
+      "0",
+      "0",
+      "Yes"
+    ]
+  ],
+  "Construction CTF": [
+    [
+      "R13WALL",
+      "1",
+      "1",
+      "1",
+      "0.250",
+      "0.4365",
+      "0.900",
+      "0.900",
+      "0.750",
+      "0.750",
+      "Rough"
+    ],
+    [
+      "FLOOR",
+      "2",
+      "1",
+      "5",
+      "0.250",
+      "17.04",
+      "0.900",
+      "0.900",
+      "0.650",
+      "0.650",
+      "MediumRough"
+    ],
+    [
+      "ROOF31",
+      "3",
+      "1",
+      "1",
+      "0.250",
+      "0.1833",
+      "0.900",
+      "0.900",
+      "0.750",
+      "0.750",
+      "Rough"
+    ]
+  ],
+  "Environment": [
+    [
+      "RUN PERIOD 1",
+      "WeatherFileRunPeriod",
+      "01/01/2013",
+      "01/01/2013",
+      "Tuesday",
+      "1",
+      "Use RunPeriod Specified Day",
+      "Yes",
+      "Yes",
+      "No",
+      "Yes",
+      "Yes",
+      "Clark and Allen"
+    ]
+  ],
+  "Environment:Daylight Saving": [
+    [
+      "No",
+      ""
+    ]
+  ],
+  "Environment:WarmupDays": [
+    [
+      "30"
+    ]
+  ],
+  "Warmup Convergence Information": [
+    [
+      "ZONE ONE",
+      "RunPeriod: RUN PERIOD 1",
+      "6.0911079410E-002",
+      "7.8612172240E-002",
+      "Pass",
+      "Pass",
+      "0.0000000000",
+      "0.0000000000",
+      "Pass",
+      "Pass"
+    ]
+  ]
+}

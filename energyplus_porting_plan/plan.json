@@ -27,16 +27,288 @@
       "rust_candidate": "specs/project_contract.toml; specs/capabilities.toml; ep_run 지원 판정",
       "assessment": "작업 관리 신규",
       "companion": "선정 객체의 epJSON schema + 대상 .hh의 실제 사용 필드만",
-      "excludes": "창호·차양기하·침기/AFN·Plant·EMS·autosizing·다중 설비는 기본 범위 밖. 본표는 전체 EP의 함수 전수 목록이 아니다.",
+      "excludes": "창호·차양기하·침기/AFN·Plant·EMS·HVAC 설비 autosizing·다중 설비는 기본 범위 밖. 본표는 전체 EP의 함수 전수 목록이 아니다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/HeatBalanceManager.cc",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "GetHeatBalanceInput",
+            "start_line": 243,
+            "end_line": 327,
+            "helpers": [
+              "GetProjectControlData",
+              "GetSiteAtmosphereData",
+              "GetWindowGlassSpectralData",
+              "GetMaterialData",
+              "GetHysteresisData",
+              "GetFrameAndDividerData",
+              "GetConstructData",
+              "GetBuildingData",
+              "GetVariableAbsorptanceSurfaceList",
+              "GetIncidentSolarMultiplier",
+              "GetScheduledSurfaceGains",
+              "CreateTCConstructions",
+              "CheckUsedConstructions",
+              "InitSolarViewFactors",
+              "ManageInternalHeatGains(InitOnly=true)"
+            ]
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "GetProjectControlData",
+            "start_line": 494,
+            "end_line": 1250,
+            "helpers": [
+              "InputProcessor::getObjectItem",
+              "mod",
+              "ShowWarningError",
+              "ShowSevereError"
+            ]
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "GetSiteAtmosphereData",
+            "start_line": 1252,
+            "end_line": 1317,
+            "helpers": [
+              "InputProcessor::getNumObjectsFound",
+              "InputProcessor::getObjectItem"
+            ]
+          }
+        ],
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+            "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+            "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+            "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+            "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+            "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+            "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+            "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+            "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+          },
+          {
+            "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/input.idf",
+            "sha256": "4463bcc07733f98c7accb4f14c099eb86d843ef49e830bb296428de785d05b10"
+          },
+          {
+            "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/input.idf",
+            "sha256": "bd6cb059ee5ac4bf6e571987817af6d322503d074aec7ec3bbaddc0122f0c007"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          }
+        ],
+        "reference": {
+          "kind": "ep-trace",
+          "artifacts": [
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/summary.json",
+              "sha256": "2c6eb7a6d7b59166f853fedc8f04014f82ad33d3527c43c865f6af6b459a2c96"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+              "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+              "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+              "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/summary.json",
+              "sha256": "317765ad1b6b7d2b8c81dc037d35efe04e66d55c628000622e6db85fcda03e81"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/summary.json",
+              "sha256": "b4453a9bca70bbb2a17c6a72b6ef9e792f9152f0e095b3d46153459b36801dde"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/summary.json",
+              "sha256": "0ebd2f89cd97255adbbf85208b1272a8f1e506796fc7530c8f91834a7265a03d"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python tools/porting/prepare_con01.py --check; review energyplus_porting_plan/evidence/CON-01/source-review.md",
+            "commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/source-review.md",
+                "sha256": "dcbb071d807968a31265cdfb5a6b98140737120defe11b74b7a50493f2597b6a"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/source-boundaries.json",
+                "sha256": "8b07ee7975deb10f9405749d70c47ffff78a685d097de83fbf71b86e1b849fea"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/state-contracts.json",
+                "sha256": "5fbe4f2369d8cb94b5bfae90c574da7d12efd50051df7235cee0d985ba2efcde"
+              }
+            ]
+          },
+          "unit_gate": {
+            "command": "python tools/porting/trace_con01.py --unit-settings --rust-cli target/debug/eplus-rs.exe",
+            "commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/summary.json",
+                "sha256": "b4453a9bca70bbb2a17c6a72b6ef9e792f9152f0e095b3d46153459b36801dde"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/summary.json",
+                "sha256": "0ebd2f89cd97255adbbf85208b1272a8f1e506796fc7530c8f91834a7265a03d"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/checks/commands.json",
+                "sha256": "d7f5a9b7fbd30408dc7e59e9ab5fb0f0c6d0e9aae4129ba7201e8002c7562eb4"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/checks/07-scope.txt",
+                "sha256": "1820c6a65e7bb7beb8e2a39062df72eb63d7a0e4ee4a310bcc31ae2c9ea2a7c2"
+              }
+            ]
+          },
+          "integration_gate": {
+            "command": "python tools/porting/trace_con01.py --rust-cli target/debug/eplus-rs.exe",
+            "commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/summary.json",
+                "sha256": "2c6eb7a6d7b59166f853fedc8f04014f82ad33d3527c43c865f6af6b459a2c96"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+                "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+                "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+                "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/summary.json",
+                "sha256": "317765ad1b6b7d2b8c81dc037d35efe04e66d55c628000622e6db85fcda03e81"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/comparison-report.json",
+                "sha256": "526de54a1e0c215afaa9991fdffb7aeb3c1adeb37a2536610decb5985f0d3e79"
+              }
+            ]
+          },
+          "production_gate": {
+            "command": "python tools/porting/check_con01_admission.py",
+            "commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+                "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/build-receipt.json",
+                "sha256": "dbc0f373e6d511ecb43bfde118465580770d238ca2aabc4f6c1b6cb37d2b11a1"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CON-01/evidence-manifest.json",
+                "sha256": "99a4400574ff435961542b0ff496df7654f954277374df6f4de974fd45acb00e"
+              }
+            ]
+          }
+        },
+        "production": {
+          "rust_entrypoint": "eplus-rs run --porting-scope A|B -> ep_run::run_bounded_porting",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "gate_semantics": "input admission/settings preparation only; CON-01 does not certify Rust numerical physics"
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/scope.json",
+            "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+          },
+          "report": {
+            "path": "energyplus_porting_plan/evidence/CON-01/comparison-report.json",
+            "sha256": "526de54a1e0c215afaa9991fdffb7aeb3c1adeb37a2536610decb5985f0d3e79"
+          }
+        }
+      },
+      "completion_note": "CON-01 입력·설정·상태 경계 검증 종료. 후속 열물리/연간 수치 계산 gate는 미확인."
     },
     {
       "id": "GEO-01",

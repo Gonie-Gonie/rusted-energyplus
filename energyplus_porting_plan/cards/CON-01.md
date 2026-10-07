@@ -85,13 +85,30 @@ scope.json, 입력 해시, 활성/비활성 분기표, typed state 계약, 출�
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+구현 커밋: `33e7806de97bf84cdbf17284b397dac1ed8d75ad`
+시험 명령: `trace_con01.py`, `check_con01_admission.py`; 정확한 argv/커밋은 증거 기록 참조.
+증거 경로: `../evidence/CON-01/`
+최대오차/RMSE/상태 불일치: 스케줄 max absolute error 0; 설정/시간/바인딩 불일치 0; 열물리 RMSE는 미측정.
+추가 검토할 helper: 위임된 GEO/CLK/SCH/PSY/CTF/SRC/RAD/SUR/ZON/HVAC/SYS 수치 본문.
+
+## 2026-10-07 종료 검토
+
+입력·설정 admission 경계의 A/B 네 gate를 종료한다.
+구현/실행 커밋: `33e7806de97bf84cdbf17284b397dac1ed8d75ad`; Rust 빌드 원본: `bbd92dad27cb81bbd593835639cfdf510af677fe`.
+증거: `../evidence/CON-01/comparison-report.json`, `source-review.md`,
+`checks/commands.json`, `evidence-manifest.json`.
+
+- Rust scope 9개, CLI 인자 9개, compiler 472개 통과; clippy/fmt 통과.
+- EP/Rust 설정 비교 7건×96 accepted zone steps, 설정/스케줄/시간 불일치 0.
+- 고정 생산 IDF 15개 실제 CLI admission 통과: 1,593 checks, 743,904 schedule samples, max absolute error 0.
+- latent/OA/Autosize 위반 3건은 정확히 exit 4로 사전 차단.
+- 추가 검토: 각 후속 카드의 수치/변경상태 helper.
+
+Rust 열물리 실행은 이 카드에서 검증하지 않았다.
+EP 72H/annual은 not_run이며, 준비된 입력을 실행 완료로 집계하지 않는다.
+CTF/표면/존/HVAC/adaptive timestep/warmup/연간 수치 gate는 각 후속 카드에 남아 있다.

@@ -1,0 +1,576 @@
+{
+  "schema_version": "con01-comparison-report.v1",
+  "implementation_commit": "33e7806de97bf84cdbf17284b397dac1ed8d75ad",
+  "rust_build_receipt": {
+    "path": "energyplus_porting_plan/evidence/CON-01/build-receipt.json",
+    "sha256": "dbc0f373e6d511ecb43bfde118465580770d238ca2aabc4f6c1b6cb37d2b11a1"
+  },
+  "compiled_rust_source_commit": "bbd92dad27cb81bbd593835639cfdf510af677fe",
+  "compiled_rust_tree": "1caa7021316a82754f1c99d9431bc5310359482a",
+  "binary": {
+    "path": "target/debug/eplus-rs.exe",
+    "sha256": "31f96c2505a00eaaf14fd7cec18fe263a4ff5dc35f3535fb9b9ffafc699e8256"
+  },
+  "energyplus_pin": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "comparison_timestamp_utc": "2026-10-07T10:23:13.017518+00:00",
+  "contract_scope": "CON-01 input admission, source defaults/settings, selected branch declarations, civil/schedule timing and callback-order observations only",
+  "paired_reference_results": [
+    {
+      "case_id": "A-24H",
+      "kind": "integration",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/A-24H/summary.json",
+        "sha256": "2c6eb7a6d7b59166f853fedc8f04014f82ad33d3527c43c865f6af6b459a2c96"
+      },
+      "zone_steps": 96,
+      "system_steps": 101,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": null,
+        "scope": "A",
+        "observed": {}
+      },
+      "native_environment_number": 3,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\reference\\rust\\A-24H",
+        "--porting-scope",
+        "A",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/A-24H/command.json",
+          "sha256": "262c2cf259c6e65e3870dec732d77167e338e296501b06de73ccf552ee66faa1"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/A-24H/stdout.log",
+          "sha256": "9a8f0ff9f523cb6b67a3a66eb60a8b356e9efec865305f34a879dbc46decd3f1"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/A-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/A-24H/porting_scope.json",
+          "sha256": "e11171546de7eadc848d8b0587185d920fdf413cd59d31e47f3a7affd581df8a"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "kind": "integration",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-BOTH-24H/summary.json",
+        "sha256": "2936881e1285c8230331164b1a798569cc94022d26874c6b904ea7f34c6fb7ef"
+      },
+      "zone_steps": 96,
+      "system_steps": 238,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": "BOTH",
+        "scope": "B",
+        "observed": {
+          "heating_system_steps": 72,
+          "cooling_system_steps": 105,
+          "zero_delivery_system_steps": 61,
+          "max_supply_sensible_heating_W": 120.00000000000006,
+          "max_supply_total_cooling_W": 120.00000000000014,
+          "max_supply_mass_flow_kg_s": 0.019301630402798035,
+          "max_supply_standard_volume_flow_m3_s": 0.02,
+          "max_outdoor_air_mass_flow_kg_s": 0.0,
+          "availability_off_zone_steps": 12,
+          "availability_on_zone_steps": 84,
+          "availability_off_system_steps": 39
+        },
+        "interpretation": "availability0 plus zero delivery observes declared Off intervals; other zero-delivery samples cannot identify Off vs deadband. Internal HVAC-03/SYS-06 phase gates remain unverified; this is not a C++ branch-state wrapper"
+      },
+      "native_environment_number": 1,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\reference\\rust\\B-BOTH-24H",
+        "--porting-scope",
+        "B",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/command.json",
+          "sha256": "8d4223de7e51f40c49944cd6e77cb175274721cc12c7ef422df3cad6f6fe3715"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/stdout.log",
+          "sha256": "2ee0121d79e78d7efc38a5123a388d2aca360a8e20ade0665feaa3fbf561e947"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-BOTH-24H/porting_scope.json",
+          "sha256": "6276f0bb51329fefff653c8afc82e05232831a1f55c0020df30b75dc708d1a25"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "kind": "integration",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-CAPACITY-24H/summary.json",
+        "sha256": "83e68bfbf6e049530005fcbf27d04f3d9b548b4ba8558f3234e752139f33e42d"
+      },
+      "zone_steps": 96,
+      "system_steps": 239,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": "CAPACITY",
+        "scope": "B",
+        "observed": {
+          "heating_system_steps": 73,
+          "cooling_system_steps": 106,
+          "zero_delivery_system_steps": 60,
+          "max_supply_sensible_heating_W": 120.00000000000006,
+          "max_supply_total_cooling_W": 120.0000000000002,
+          "max_supply_mass_flow_kg_s": 0.06132505913964871,
+          "max_supply_standard_volume_flow_m3_s": 0.06354391609400914,
+          "max_outdoor_air_mass_flow_kg_s": 0.0,
+          "availability_off_zone_steps": 12,
+          "availability_on_zone_steps": 84,
+          "availability_off_system_steps": 39
+        },
+        "interpretation": "availability0 plus zero delivery observes declared Off intervals; other zero-delivery samples cannot identify Off vs deadband. Internal HVAC-03/SYS-06 phase gates remain unverified; this is not a C++ branch-state wrapper"
+      },
+      "native_environment_number": 1,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\reference\\rust\\B-CAPACITY-24H",
+        "--porting-scope",
+        "B",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/command.json",
+          "sha256": "c38f0c172dfc280dcfec0220c7250a7c7e290d8b358ff5060fe961541c3ad4e6"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/stdout.log",
+          "sha256": "5be91786fdca368674f79793d8d23cc863f1d47019921d917da4ae7c24c49646"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-CAPACITY-24H/porting_scope.json",
+          "sha256": "bb7ec8aced5fde06d2e5416e6cbe0f643529c2ba2c062d9242970c03047360e5"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "kind": "integration",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-FLOW-24H/summary.json",
+        "sha256": "1878168515b53d73c025ccd7eaddb8606484a39d27087b15d92208710592cf08"
+      },
+      "zone_steps": 96,
+      "system_steps": 172,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": "FLOW",
+        "scope": "B",
+        "observed": {
+          "heating_system_steps": 63,
+          "cooling_system_steps": 66,
+          "zero_delivery_system_steps": 43,
+          "max_supply_sensible_heating_W": 624.2271808010529,
+          "max_supply_total_cooling_W": 431.06491808991086,
+          "max_supply_mass_flow_kg_s": 0.019301630402798035,
+          "max_supply_standard_volume_flow_m3_s": 0.02,
+          "max_outdoor_air_mass_flow_kg_s": 0.0,
+          "availability_off_zone_steps": 12,
+          "availability_on_zone_steps": 84,
+          "availability_off_system_steps": 42
+        },
+        "interpretation": "availability0 plus zero delivery observes declared Off intervals; other zero-delivery samples cannot identify Off vs deadband. Internal HVAC-03/SYS-06 phase gates remain unverified; this is not a C++ branch-state wrapper"
+      },
+      "native_environment_number": 1,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-FLOW-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\reference\\rust\\B-FLOW-24H",
+        "--porting-scope",
+        "B",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/command.json",
+          "sha256": "c07bddaeec2ca27d6937d3677cf8639ed8f5be909c70e233f0e9b2339d00cd94"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/stdout.log",
+          "sha256": "db751ee584da88c47c95da6f31ad2fba7b74e6cd697b45f6e9c2dfe98035d2d7"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-FLOW-24H/porting_scope.json",
+          "sha256": "e374a4ea13ae17cd3783a6250e9126e4e8ccdc7ce04a6e4a5276763610e904d9"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "kind": "integration",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/reference/B-NOLIMIT-24H/summary.json",
+        "sha256": "317765ad1b6b7d2b8c81dc037d35efe04e66d55c628000622e6db85fcda03e81"
+      },
+      "zone_steps": 96,
+      "system_steps": 153,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": "NOLIMIT",
+        "scope": "B",
+        "observed": {
+          "heating_system_steps": 57,
+          "cooling_system_steps": 53,
+          "zero_delivery_system_steps": 43,
+          "max_supply_sensible_heating_W": 661.0165111181391,
+          "max_supply_total_cooling_W": 599.6883693726728,
+          "max_supply_mass_flow_kg_s": 0.05401154826751085,
+          "max_supply_standard_volume_flow_m3_s": 0.05596578852704706,
+          "max_outdoor_air_mass_flow_kg_s": 0.0,
+          "availability_off_zone_steps": 12,
+          "availability_on_zone_steps": 84,
+          "availability_off_system_steps": 42
+        },
+        "interpretation": "availability0 plus zero delivery observes declared Off intervals; other zero-delivery samples cannot identify Off vs deadband. Internal HVAC-03/SYS-06 phase gates remain unverified; this is not a C++ branch-state wrapper"
+      },
+      "native_environment_number": 1,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\reference\\rust\\B-NOLIMIT-24H",
+        "--porting-scope",
+        "B",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/command.json",
+          "sha256": "d5d8845663a3b267e464d9b648c3be645b8ee3ec65b71524f59a9b50dbf31346"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/stdout.log",
+          "sha256": "515df4801b192918b83f20c7608161577465647f130069b02d34120b4abc21f3"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/reference/rust/B-NOLIMIT-24H/porting_scope.json",
+          "sha256": "2bbf83fb45b3d2dadd187b1b52a6dd935bdfb3ad7f8ef01a36ddb708f2e83f50"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    },
+    {
+      "case_id": "UNIT-NORTH-NEGATIVE-WARMUP",
+      "kind": "settings_unit",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/summary.json",
+        "sha256": "b4453a9bca70bbb2a17c6a72b6ef9e792f9152f0e095b3d46153459b36801dde"
+      },
+      "zone_steps": 96,
+      "system_steps": 101,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": null,
+        "scope": "A",
+        "observed": {}
+      },
+      "native_environment_number": 3,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\unit-settings\\UNIT-NORTH-NEGATIVE-WARMUP\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\unit-settings\\rust\\UNIT-NORTH-NEGATIVE-WARMUP",
+        "--porting-scope",
+        "A",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/command.json",
+          "sha256": "13bdc32924a180854d53db472f7e870dcdcf8ca3e94b7add65990fded9cd01a8"
+        },
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/stdout.log",
+          "sha256": "10182cac40384e6f872c743e641d12205ae20baabd5e08ac0816ff643d94d171"
+        },
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-NEGATIVE-WARMUP/porting_scope.json",
+          "sha256": "467a7e727618abde66b4381ae6f7f5dc4728dadb7240ffede43f75b363c11758"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    },
+    {
+      "case_id": "UNIT-NORTH-POSITIVE-DEFAULT-WARMUP",
+      "kind": "settings_unit",
+      "summary": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/summary.json",
+        "sha256": "0ebd2f89cd97255adbbf85208b1272a8f1e506796fc7530c8f91834a7265a03d"
+      },
+      "zone_steps": 96,
+      "system_steps": 101,
+      "energyplus_exit_code": 0,
+      "rust_exit_code": 0,
+      "settings_mismatch_count": 0,
+      "calendar_timestamp_mismatch_count": 0,
+      "schedule_mismatch_count": 0,
+      "effective_site_atmosphere": {
+        "wind_speed_profile_exponent": 0.22,
+        "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+        "air_temperature_gradient_k_per_m": 0.0065
+      },
+      "energyplus_program_version": [
+        "EnergyPlus",
+        "Version 26.1.0-6f2e40d102",
+        "YMD=2026.10.07 19:18"
+      ],
+      "branches": {
+        "limit_variant": null,
+        "scope": "A",
+        "observed": {}
+      },
+      "native_environment_number": 3,
+      "native_vs_rust_environment_policy": "Rust materialized index excludes disabled design-day definitions; compare EP native Envrn separately",
+      "rust_command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\evidence\\CON-01\\unit-settings\\UNIT-NORTH-POSITIVE-DEFAULT-WARMUP\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CON-01\\unit-settings\\rust\\UNIT-NORTH-POSITIVE-DEFAULT-WARMUP",
+        "--porting-scope",
+        "A",
+        "--dry-run",
+        "--keep-intermediate",
+        "--overwrite"
+      ],
+      "rust_command_log_trace_artifacts": [
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/command.json",
+          "sha256": "0b1a2539ffbd664bedc071e85fb23700d9dfd00851ceaa9f55c85a4885b2054a"
+        },
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/stdout.log",
+          "sha256": "9b8ea456e16c07aa6f674d5f513f0757967149e262966aa657fd9d4f0cbf8389"
+        },
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": ".runtime/porting/CON-01/unit-settings/rust/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/porting_scope.json",
+          "sha256": "b3ef691eb35c0e615712071cf202cb6ff2d9e24b8d1988eeeddeb383d382a3a5"
+        }
+      ],
+      "scope_guard_called_via_production_entrypoint": true,
+      "rust_physics_executed": false
+    }
+  ],
+  "rust_admission_matrix": {
+    "path": "energyplus_porting_plan/evidence/CON-01/rust-admission-matrix.json",
+    "sha256": "13b143d6fa14aec04c5b1da18e9f442e1369ae35389617fd8e3f4f483e595e4a"
+  },
+  "rust_admission_totals": {
+    "cases": 15,
+    "exit0_admissible_cases": 15,
+    "contract_checks": 1593,
+    "mismatch_count": 0,
+    "prepared_schedule_scalar_checks": 743904,
+    "schedule_max_abs_error": 0.0,
+    "negative_cases": 3,
+    "exit4_rejected_cases": 3
+  },
+  "comparison_policy": {
+    "controls_enums_counts_civil_timestamps": "exact",
+    "EP_name_identity": "case-insensitive canonical uppercase, preserving raw names/IDs",
+    "schedule_atol": 1e-09,
+    "schedule_rtol": 0,
+    "tolerances_relaxed": false,
+    "civil_weather_ordinal": "non-leap 2013 365-day year",
+    "schedule_ordinal": "EP always-leap 366-day lookup table"
+  },
+  "reference_execution": {
+    "integration_24H_cases": 5,
+    "settings_unit_24H_cases": 2,
+    "integration_72H_cases": 0,
+    "integration_annual_cases": 0
+  },
+  "numerical_exclusions": [
+    "No Rust physics executed; no Rust-vs-EP heat-balance/HVAC/CTF numerical comparison",
+    "72H/annual EP simulations were not run; their Rust dry runs only prepare/admit inputs",
+    "API end-zone system-variable snapshots are instantaneous report fields, not aggregated Timestep averages/sums",
+    "Availability0 plus zero delivery observes selected Off intervals; internal Heat/Cool/DeadBand/Off phase gates remain HVAC-03/SYS-06 obligations",
+    "Source helper numerical bodies and later geometry/weather/CTF/radiation/gains/reporting gates remain unconfirmed"
+  ],
+  "errors": [],
+  "checks_passed": true,
+  "card_gate_status": "unreviewed",
+  "automatic_gate_updates": false
+}

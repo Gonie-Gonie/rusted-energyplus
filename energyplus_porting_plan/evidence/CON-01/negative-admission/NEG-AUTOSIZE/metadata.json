@@ -1,0 +1,31 @@
+{
+  "schema_version": "con01-negative-case.v1",
+  "id": "NEG-AUTOSIZE",
+  "scope": "B",
+  "feature": "autosize",
+  "source": {
+    "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+    "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/evidence/CON-01/negative-admission/NEG-AUTOSIZE/input.idf",
+    "sha256": "919354f1d1bf295806688e6baed8a94eb9132b9c08902343b56ebc9052fb9d99"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "patches": [
+    {
+      "object_type": "ZoneHVAC:IdealLoadsAirSystem",
+      "object_name": "ZONE ONE IDEAL LOADS",
+      "field_index": 11,
+      "field": "maximum_heating_air_flow_rate",
+      "before": "0.02",
+      "after": "Autosize"
+    }
+  ],
+  "expected_admissible": false,
+  "expected_exit_code": 4,
+  "serialization": "UTF-8/LF; source objects retained in order, listed patches only, probe ID comment header"
+}
