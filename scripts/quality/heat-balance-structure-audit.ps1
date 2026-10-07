@@ -166,6 +166,7 @@ $heatBalanceMod = "crates\ep_runtime\src\heat_balance\mod.rs"
 $algorithm = "crates\ep_runtime\src\heat_balance\algorithm.rs"
 $manager = "crates\ep_runtime\src\heat_balance\manager.rs"
 $surfaceManager = "crates\ep_runtime\src\heat_balance\surface_manager.rs"
+$constructionCache = "crates\ep_runtime\src\heat_balance\surface_manager\construction_cache.rs"
 $surfaceBalance = "crates\ep_runtime\src\heat_balance\surface_balance.rs"
 $surfaceBoundary = "crates\ep_runtime\src\heat_balance\surface_boundary.rs"
 $surfaceLoop = "crates\ep_runtime\src\heat_balance\surface_loop.rs"
@@ -255,6 +256,7 @@ foreach ($entry in @(
         @($algorithm, "heat-balance algorithm selector module"),
         @($manager, "HeatBalanceManager source-order module"),
         @($surfaceManager, "HeatBalanceSurfaceManager source-order module"),
+        @($constructionCache, "construction thermal data cache module"),
         @($surfaceBalance, "surface balance ownership module"),
         @($surfaceBoundary, "surface boundary ownership module"),
         @($surfaceLoop, "surface loop ownership module"),
@@ -335,6 +337,7 @@ Assert-LineLimit -Path $algorithm -Limit 200 -Description "probe-agnostic heat-b
 Assert-LineLimit -Path $diagnosticProbe -Limit 800 -Description "heat-balance diagnostic selector module"
 Assert-LineLimit -Path $manager -Limit 180 -Description "HeatBalanceManager source-order module"
 Assert-LineLimit -Path $surfaceManager -Limit 400 -Description "HeatBalanceSurfaceManager source-order orchestration module"
+Assert-LineLimit -Path $constructionCache -Limit 400 -Description "construction thermal data cache module"
 Assert-LineLimit -Path $surfaceBalance -Limit 720 -Description "surface balance ownership module"
 Assert-LineLimit -Path $surfaceBoundary -Limit 280 -Description "surface boundary ownership module"
 Assert-LineLimit -Path $surfaceLoop -Limit 430 -Description "surface loop ownership module"
@@ -639,7 +642,9 @@ foreach ($surfaceCacheField in @(
     )) {
     Assert-Contains -Path $state -Pattern $surfaceCacheField -Description "precomputed surface cache field $surfaceCacheField"
 }
+Assert-Contains -Path $surfaceManager -Pattern 'mod construction_cache;' -Description "construction thermal data cache module ownership"
 Assert-Contains -Path $surfaceManager -Pattern 'pub\(crate\) struct ConstructionThermalData' -Description "construction thermal data cache entry"
+Assert-Contains -Path $constructionCache -Pattern 'pub\(crate\) struct ConstructionThermalDataCache' -Description "construction thermal data cache implementation"
 Assert-Contains -Path $initialization -Pattern 'construction_thermal_data' -Description "construction thermal data cached during heat-balance initialization"
 Assert-Contains -Path $initialization -Pattern 'construction_ctf_coefficients_by_name' -Description "CTF coefficient cache initialized by construction"
 Assert-Contains -Path $weather -Pattern 'pub struct WeatherTimestepSeries' -Description "precomputed weather timestep series"
