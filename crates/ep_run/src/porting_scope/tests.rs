@@ -88,6 +88,55 @@ fn default_controls_and_source_adjustments_are_observable() {
 }
 
 #[test]
+fn effective_site_atmosphere_uses_the_compiled_terrain_and_no_override() {
+    // Pinned GetProjectControlData terrain branches and the absent-object
+    // GetSiteAtmosphereData default; these are settings, not height physics.
+    for (terrain, exponent, height) in [
+        ("Country", 0.14, 270.0),
+        ("Suburbs", 0.22, 370.0),
+        ("Urban", 0.22, 370.0),
+        ("City", 0.33, 460.0),
+        ("Ocean", 0.10, 210.0),
+    ] {
+        let mut value = input(PortingScope::A);
+        value["Building"]["Building"]["terrain"] = json!(terrain);
+        let actual = trace(&value, PortingScope::A);
+        assert!(actual.admissible, "{terrain}: {:?}", actual.violations);
+        assert_eq!(
+            actual.settings["site_atmosphere"],
+            json!({
+                "wind_speed_profile_exponent": exponent,
+                "wind_speed_profile_boundary_layer_thickness_m": height,
+                "air_temperature_gradient_k_per_m": 0.0065,
+            })
+        );
+    }
+    let value = input(PortingScope::A);
+    assert_eq!(
+        trace(&value, PortingScope::A).settings["site_atmosphere"],
+        json!({
+            "wind_speed_profile_exponent": 0.22,
+            "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+            "air_temperature_gradient_k_per_m": 0.0065,
+        })
+    );
+    let mut value = value;
+    value["Site:HeightVariation"] = json!({"Override":{
+        "wind_speed_profile_exponent":0.22,
+        "wind_speed_profile_boundary_layer_thickness":370.0,
+        "air_temperature_gradient_coefficient":0.0065,
+    }});
+    let actual = trace(&value, PortingScope::A);
+    assert!(!actual.admissible);
+    assert!(
+        actual
+            .violations
+            .iter()
+            .any(|v| v.contains("Site:HeightVariation"))
+    );
+}
+
+#[test]
 fn scientific_algorithms_are_rejected_before_bounded_execution() {
     for (kind, field, setting, expected) in [
         (

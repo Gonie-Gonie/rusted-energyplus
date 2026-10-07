@@ -380,6 +380,26 @@
       ],
       "file_sha256": "2080fdb48dc3a03429f093dfe4f7ce2fffa01519b7783db250410ea8b1bfcd69",
       "range_sha256": "2d15c0245a35243edc609336028fd3e0afe78a58ce5e8c1680642411814a75eb"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "start_line": 2076,
+      "end_line": 2076,
+      "fields": [
+        "DayOfYear_Schedule = General::OrdinalDay(month,day,1)"
+      ],
+      "file_sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+      "range_sha256": "9e23f71b405d09d9832d778fed2d472a4ec85eb0a839d207b9f2713cad0c10da"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+      "start_line": 2516,
+      "end_line": 2529,
+      "fields": [
+        "schedule lookup uses always-leap 366-day ordinal, independent of civil/weather ordinal"
+      ],
+      "file_sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+      "range_sha256": "5ae88ecfd91d955ca509e659a6bd8d93d99b2fa98bcb4cc50a0087bb6822ac6f"
     }
   ],
   "comparison_policy": {

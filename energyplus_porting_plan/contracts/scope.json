@@ -17,6 +17,10 @@
     "effective_weather_holidays": 0,
     "weather_data_period_weekday": "Sunday",
     "weekday_policy": "RunPeriod explicit 2013 civil weekday overrides EPW header weekday",
+    "ordinal_policy": {
+      "civil_weather_day_of_year": "2013 non-leap 365-day calendar",
+      "schedule_day_of_year": "always-leap 366-day index; Jun30=182 while civil/weather=181 (WeatherManager.cc2076, ScheduleManager.cc2527)"
+    },
     "api_year_semantics": {
       "calendar_year": "civil simulation year (2013)",
       "year": "weather record year from EPW, not civil year"
@@ -117,7 +121,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
-        "sha256": "d1305cebb0a3302337799a196b73ccfef46346d7955ff2f5999018e01679c6eb"
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
       }
     },
     {
@@ -135,7 +139,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
-        "sha256": "854a93e14a934a4976746201f907a00841807aac90e4be3ee047c237eb25dad8"
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
       }
     },
     {
@@ -153,7 +157,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
-        "sha256": "2448e5b0db01ea695bfa737d3982783ce0900f201f2d14cd6b52c998453f6a18"
+        "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
       }
     },
     {
@@ -171,7 +175,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
-        "sha256": "4a8d02ffb8a2f2d24e54419a73a41fb96f54ae738173dc508a46609c2d9e8caa"
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
       }
     },
     {
@@ -189,7 +193,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
-        "sha256": "69215530bf1001a27bb763c9f9ff16d958d04013653519621a821c22d3ba4e64"
+        "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
       }
     },
     {
@@ -207,7 +211,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
-        "sha256": "fa702ec5fb3beea4b8508a41ad255be15eb2c1023618f8b67aab84f23eef448c"
+        "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
       }
     },
     {
@@ -225,7 +229,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
-        "sha256": "e8cae0275b90593a6e4c39604b9caa44cb5c613ea1f8d26e2e35747907c4b0cf"
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
       }
     },
     {
@@ -243,7 +247,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
-        "sha256": "0b48f8af8df49c749899bde417d7b31f96cf1a7db40437901c3a7d5ac5ce9fa8"
+        "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
       }
     },
     {
@@ -261,7 +265,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
-        "sha256": "01afbacfdb65af828c44fba99792ef7bddaa25a3ffa1473a60d2402c399b32dc"
+        "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
       }
     },
     {
@@ -279,7 +283,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
-        "sha256": "1315283ca8309d6f04aa55cd15bc26eda502488f872e97fce12267a506b37f74"
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
       }
     },
     {
@@ -297,7 +301,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
-        "sha256": "a8c15547bf841b6b16378f945b88f56168e4cf91fd93ab0c3b22610c2e14bc36"
+        "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
       }
     },
     {
@@ -315,7 +319,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
-        "sha256": "d2e8c7788d8e539bc8c0b67ed95050d527c86fdb2c22a1d2bd6d97c940afc619"
+        "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
       }
     },
     {
@@ -333,7 +337,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
-        "sha256": "6763bdac86b02b9d9cc41566e617e396c37eceb6f03c4000799f2c14b878f5a0"
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
       }
     },
     {
@@ -351,7 +355,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
-        "sha256": "4c3004217a1f98c0500c9279984304a6a3db12c5301573e867806c5e4b16e0f2"
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
       }
     },
     {
@@ -369,7 +373,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
-        "sha256": "a016a8903e0891f9cda12f6f6154f1e01425f820174d0627b4eb5490a82f6fa9"
+        "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
       }
     }
   ],
@@ -389,7 +393,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/metadata.json",
-        "sha256": "cfc81ac150852281b6b296f9129af2c6dd4d035ae9c5ea4b44c143ebfdd46c7f"
+        "sha256": "53359b2fc6e5572619e02991da1c69357223d9f9d7a9717057db76239884221a"
       }
     },
     {
@@ -407,7 +411,7 @@
       },
       "metadata": {
         "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/metadata.json",
-        "sha256": "4f5843d7b26da7f1a2057e15a0ef2758b597ea0ea9e5994ebe0657d3c2852a73"
+        "sha256": "b7de28514bee6df1fdde72d6aa98290111a760a094b7a40c5a715cd5d1b886ad"
       }
     }
   ]

@@ -184,7 +184,7 @@ def make_case(scope: str, period: str, variant: str | None) -> tuple[dict, bytes
                          "use_weather_rain": True, "use_weather_snow": True}],
         "space_heat_balance": {"sizing": False, "simulation": False},
         "contaminants": False, "zone_air_mass_flow_conservation": False,
-        "site_wind": {"exponent": 0.22, "boundary_layer_height_m": 370.0},
+        "site_atmosphere": {"wind_speed_profile_exponent": 0.22, "wind_speed_profile_boundary_layer_thickness_m": 370.0, "air_temperature_gradient_k_per_m": 0.0065},
         "loads_convergence_tolerance_units": "dimensionless normalized load difference (source IDF comment incorrectly labels W)",
         "ideal_loads": [] if scope == "A" else [{"name": "ZONE ONE IDEAL LOADS", "heating_limit": LIMITS[variant], "cooling_limit": LIMITS[variant],
                         "maximum_heating_volume_flow_m3_s": 0.02 if variant in ("FLOW", "BOTH") else None,
@@ -285,6 +285,8 @@ def state_contracts() -> dict:
         ("PurchasedAirManager.hh", 173, 186, ["MaxHeatMassFlowRate", "MaxCoolMassFlowRate", "SupplyAirMassFlowRate"]),
         ("PurchasedAirManager.hh", 259, 259, ["SupplyTemp"]),
         ("HeatBalanceManager.hh", 68, 86, ["PassFlag", "TestMaxTempValue", "TestMinTempValue", "TestMaxHeatLoadValue", "TestMaxCoolLoadValue"]),
+        ("WeatherManager.cc", 2076, 2076, ["DayOfYear_Schedule = General::OrdinalDay(month,day,1)"]),
+        ("ScheduleManager.cc", 2516, 2529, ["schedule lookup uses always-leap 366-day ordinal, independent of civil/weather ordinal"]),
     ]:
         path = EP_SOURCE / file
         raw = (ROOT / path).read_bytes()
@@ -398,6 +400,7 @@ def artifacts() -> dict[Path, bytes]:
              "calendar": {"civil_year": 2013, "time_steps_per_hour": 4, "nominal_zone_step_seconds": 900, "time_zone_hours": -7, "leap_year": False,
                           "weather_only": True, "design_day_declarations_inactive": True, "effective_dst": False, "effective_weather_holidays": 0,
                           "weather_data_period_weekday": "Sunday", "weekday_policy": "RunPeriod explicit 2013 civil weekday overrides EPW header weekday",
+                          "ordinal_policy": {"civil_weather_day_of_year": "2013 non-leap 365-day calendar", "schedule_day_of_year": "always-leap 366-day index; Jun30=182 while civil/weather=181 (WeatherManager.cc2076, ScheduleManager.cc2527)"},
                           "api_year_semantics": {"calendar_year": "civil simulation year (2013)", "year": "weather record year from EPW, not civil year"}},
              "scopes": {"A": {"zone_count": 1, "opaque_surfaces": 6, "hvac_count": 0, "allowed_thermal_features": ["Material", "Material:NoMass", "opaque CTF", "OtherEquipment", "TARP", "DOE-2", "MinimalShadowing", "Zone ceiling-height/volume Autocalculate from opaque surfaces (delegated GEO)"],
                                "nonthermal_features_retained": ["Exterior:Lights (exterior meter only)", "inactive SizingPeriod:DesignDay declarations", "output/report requests"]},

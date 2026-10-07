@@ -30,7 +30,7 @@
 각 원본/파생 IDF·EPW 해시와 모든 필드 변경은 사례 metadata에 기록한다.
 별도 각도/warmup 단위 입력은 생산 사례 행렬의 범위를 늘리지 않는다.
 
-13개 상태 계약과 변수/단위별 허용오차는 `../contracts/`에 고정한다.
+14개 상태 계약과 변수/단위별 허용오차는 `../contracts/`에 고정한다.
 MAT/ZT/ZTAV, civil year/EPW record year, 원본 환경 번호와 Rust materialized
 index를 구분한다. 부하 수렴 오차는 정규화된 무차원 값이며 W가 아니다.
 
@@ -39,7 +39,7 @@ CLI의 `run --porting-scope A|B`가 입력을 컴파일한 뒤, scope 위반을
 graph/runtime 생성 전에 차단하고 `porting_scope.json`을 기록한다.
 CON-01 admission은 후속 열물리의 수치 동등성이나 완성 판정이 아니다.
 
-사전 검증: `cargo test -p ep_run porting_scope --lib` 8개 통과.
+사전 검증: `cargo test -p ep_run porting_scope --lib` 9개 통과.
 실행 증거와 완료 gate는 구현 커밋 후 재실행 결과를 검토하여 갱신한다.
 
 파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.

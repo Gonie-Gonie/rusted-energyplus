@@ -111,10 +111,18 @@ def eio_settings(path: Path, expected: dict) -> tuple[dict, list[str], dict]:
             errors.append(f"EIO unsupported active default: {label}")
     if by_name.get("HVACSystemRootFindingAlgorithm", [[]])[0] != ["RegulaFalsi"]:
         errors.append("EIO root-finding default mismatch")
+    site = by_name.get("Environment:Site Atmospheric Variation", [[]])[0]
+    site_keys = ("wind_speed_profile_exponent", "wind_speed_profile_boundary_layer_thickness_m", "air_temperature_gradient_k_per_m")
+    if len(site) == 3:
+        observed["site_atmosphere"] = dict(zip(site_keys, map(float, site)))
+        if observed["site_atmosphere"] != expected["site_atmosphere"]:
+            errors.append("EIO effective site wind profile/temperature-gradient defaults mismatch")
+    else:
+        errors.append("missing EIO Environment:Site Atmospheric Variation")
     # EIO is not an introspection API for every control field. Unreported fields
     # are checked against pinned IDF and bounded Rust trace, never fabricated.
     observed["unreported_controls"] = ["simulation_control (weather-only verified by actual environments)", "room_air_model_type (default; no room-air declarations)"]
-    selected = {k: v for k, v in by_name.items() if k in ("Program Version", "Building Information", "Inside Convection Algorithm", "Outside Convection Algorithm", "Zone Air Solution Algorithm", "Surface Heat Transfer Algorithm", "Environment", "Environment:Daylight Saving", "Environment:WarmupDays", "Warmup Convergence Information", "Zone Air Carbon Dioxide Balance Simulation", "Zone Air Generic Contaminant Balance Simulation", "Zone Air Mass Flow Balance Simulation", "HVACSystemRootFindingAlgorithm", "Site:Location", "Zone Information", "Construction CTF", "Component Sizing Information")}
+    selected = {k: v for k, v in by_name.items() if k in ("Program Version", "Building Information", "Inside Convection Algorithm", "Outside Convection Algorithm", "Zone Air Solution Algorithm", "Surface Heat Transfer Algorithm", "Environment", "Environment:Site Atmospheric Variation", "Environment:Daylight Saving", "Environment:WarmupDays", "Warmup Convergence Information", "Zone Air Carbon Dioxide Balance Simulation", "Zone Air Generic Contaminant Balance Simulation", "Zone Air Mass Flow Balance Simulation", "HVACSystemRootFindingAlgorithm", "Site:Location", "Zone Information", "Construction CTF", "Component Sizing Information")}
     return observed, errors, selected
 
 
@@ -145,7 +153,7 @@ def rust_settings(case: dict, output: Path, cli: Path, zone_rows: list[dict]) ->
         compare("trace.violations", trace.get("violations"), [])
         for key in ("oracle_inputs_used", "fixture_inputs_used", "conformance_claim"):
             compare("trace.production." + key, trace.get("production", {}).get(key), False)
-        for key in ("building", "heat_balance_algorithm", "zone_air_heat_balance_algorithm", "inside_convection", "outside_convection", "timesteps_per_hour", "room_air_model_type", "simulation_control"):
+        for key in ("building", "heat_balance_algorithm", "zone_air_heat_balance_algorithm", "inside_convection", "outside_convection", "timesteps_per_hour", "room_air_model_type", "simulation_control", "site_atmosphere"):
             actual = settings.get(key)
             if isinstance(expected[key], dict):
                 for field, value in expected[key].items():

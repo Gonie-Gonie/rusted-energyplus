@@ -33,8 +33,12 @@ matrix records missing reference evidence as `not_run`.
 
 The weather file stays at its SHA-pinned installed path; it is not duplicated.
 Input years and weekdays use the 2013 civil calendar, separate from each TMY
-weather record year. A retains its two DesignDay definitions, but sizing and
-sizing-period simulation are disabled. It also retains exterior lights as an
+weather record year.
+Civil/weather ordinals use the 2013 non-leap calendar. Schedule ordinals use
+EnergyPlus's canonical 366-day lookup table; June 30 is schedule ordinal 182,
+separate from civil/weather ordinal 181. Both meanings stay explicit.
+A retains its two DesignDay definitions, but sizing and sizing-period simulation
+are disabled. It also retains exterior lights as an
 exterior-meter feature with no zone heat source. No OA, humidification,
 dehumidification, autosizing, or non-Mixing room-air branch is enabled for B.
 B has a shared system-availability schedule: daily first three hours Off and

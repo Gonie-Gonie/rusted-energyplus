@@ -1,7 +1,7 @@
 //! Compiled project controls and branch settings for bounded admission traces.
 
 use ep_model::{
-    AutosizeOrNumber, InsideSurfaceConvectionAlgorithm, OutsideSurfaceConvectionAlgorithm,
+    AutosizeOrNumber, InsideSurfaceConvectionAlgorithm, OutsideSurfaceConvectionAlgorithm, Terrain,
     TypedModel,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
@@ -210,6 +210,22 @@ pub(super) fn project_settings(
             "solar_distribution": format!("{:?}", building.solar_distribution),
             "maximum_warmup_days": building.maximum_number_of_warmup_days,
             "minimum_warmup_days": building.minimum_number_of_warmup_days,
+        })
+    });
+    settings["site_atmosphere"] = model.building.as_ref().map_or(Value::Null, |building| {
+        // GetProjectControlData:566-585 derives these values from Terrain.
+        // GetSiteAtmosphereData:1302-1308 retains them and sets the gradient
+        // when Site:HeightVariation is absent, as required by this scope.
+        let (exponent, height) = match building.terrain {
+            Terrain::Country => (0.14, 270.0),
+            Terrain::Suburbs | Terrain::Urban => (0.22, 370.0),
+            Terrain::City => (0.33, 460.0),
+            Terrain::Ocean => (0.10, 210.0),
+        };
+        json!({
+            "wind_speed_profile_exponent": exponent,
+            "wind_speed_profile_boundary_layer_thickness_m": height,
+            "air_temperature_gradient_k_per_m": 0.0065,
         })
     });
     if let Some(zone) = model.zones.first() {

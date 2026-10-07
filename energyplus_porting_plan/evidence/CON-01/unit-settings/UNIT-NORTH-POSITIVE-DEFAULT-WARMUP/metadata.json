@@ -728,9 +728,10 @@
     },
     "contaminants": false,
     "zone_air_mass_flow_conservation": false,
-    "site_wind": {
-      "exponent": 0.22,
-      "boundary_layer_height_m": 370.0
+    "site_atmosphere": {
+      "wind_speed_profile_exponent": 0.22,
+      "wind_speed_profile_boundary_layer_thickness_m": 370.0,
+      "air_temperature_gradient_k_per_m": 0.0065
     },
     "loads_convergence_tolerance_units": "dimensionless normalized load difference (source IDF comment incorrectly labels W)",
     "ideal_loads": []
