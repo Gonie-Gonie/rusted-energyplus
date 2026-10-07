@@ -15,6 +15,33 @@
 함께 읽을 선언/호출자: 선정 객체의 epJSON schema + 대상 .hh의 실제 사용 필드만  
 출처: https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/HeatBalanceManager.cc
 
+### 2026-10-07 착수 검토
+
+고정 소스의 실제 함수 범위는 `GetHeatBalanceInput` 243–327행,
+`GetProjectControlData` 494–1250행이다. 선택 설정 블록과 직접 helper의
+행 범위·파일/범위 해시는 `../contracts/source-boundaries.json`에 기록한다.
+기하·재료/CTF·복사·내부발열 helper의 수치 본문은 각 후속 카드가 검증한다.
+여기서는 활성 입력, 기본값, 상태 경계와 호출 순서를 확정한다.
+
+생산 입력은 `../contracts/scope.json`의 A 3개/B 12개로 고정한다.
+2013년의 24시간·72시간·연간 weather-only 입력이며, A의 원본 설계일
+실행을 명시적으로 비활성화한다. B는 NoLimit/Flow/Capacity/Both를 구분하며, 동일한 named availability
+스케줄로 매일 첫 3시간 Off/나머지 21시간 On을 고정한다.
+각 원본/파생 IDF·EPW 해시와 모든 필드 변경은 사례 metadata에 기록한다.
+별도 각도/warmup 단위 입력은 생산 사례 행렬의 범위를 늘리지 않는다.
+
+13개 상태 계약과 변수/단위별 허용오차는 `../contracts/`에 고정한다.
+MAT/ZT/ZTAV, civil year/EPW record year, 원본 환경 번호와 Rust materialized
+index를 구분한다. 부하 수렴 오차는 정규화된 무차원 값이며 W가 아니다.
+
+Rust 생산 진입점은 `ep_run::run_bounded_porting`이다.
+CLI의 `run --porting-scope A|B`가 입력을 컴파일한 뒤, scope 위반을
+graph/runtime 생성 전에 차단하고 `porting_scope.json`을 기록한다.
+CON-01 admission은 후속 열물리의 수치 동등성이나 완성 판정이 아니다.
+
+사전 검증: `cargo test -p ep_run porting_scope --lib` 8개 통과.
+실행 증거와 완료 gate는 구현 커밋 후 재실행 결과를 검토하여 갱신한다.
+
 파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.
 
 ## 재사용 후보
@@ -38,7 +65,7 @@ scope.json, 입력 해시, 활성/비활성 분기표, typed state 계약, 출�
 
 ## 제외 범위
 
-창호·차양기하·침기/AFN·Plant·EMS·autosizing·다중 설비는 기본 범위 밖. 본표는 전체 EP의 함수 전수 목록이 아니다.
+창호·차양기하·침기/AFN·Plant·EMS·HVAC 설비 autosizing·다중 설비는 기본 범위 밖. 본표는 전체 EP의 함수 전수 목록이 아니다.
 
 ## 단위시험
 

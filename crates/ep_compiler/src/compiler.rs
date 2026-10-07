@@ -809,7 +809,7 @@ impl<'a> Compiler<'a> {
             return;
         };
 
-        let building = Building {
+        let mut building = Building {
             name: NormalizedName::new(&name),
             north_axis_deg: self.number_default("Building", &name, &object, "north_axis", 0.0),
             terrain: self.enum_default(
@@ -857,6 +857,12 @@ impl<'a> Compiler<'a> {
                 1,
             ),
         };
+        // GetProjectControlData uses C++ mod, which preserves the dividend's
+        // sign, and raises the maximum warmup day count to the minimum.
+        building.north_axis_deg %= 360.0;
+        building.maximum_number_of_warmup_days = building
+            .maximum_number_of_warmup_days
+            .max(building.minimum_number_of_warmup_days);
         model.building = Some(building);
     }
 

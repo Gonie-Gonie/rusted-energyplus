@@ -879,6 +879,24 @@ struct ComparisonSeriesSummary {
 
 /// Runs an arbitrary IDF/epJSON through the Rust support gate and optional oracle comparison.
 pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
+    run_with_optional_porting_scope(config, None)
+}
+
+/// Runs the ordinary Rust pipeline with a strict, opt-in CON-01 input boundary.
+///
+/// Writes `porting_scope.json` before graph/runtime construction. Admission does
+/// not certify any physical calculation or promote conformance claims.
+pub fn run_bounded_porting(
+    config: &RunConfig,
+    scope: crate::PortingScope,
+) -> Result<RunOutcome, RunError> {
+    run_with_optional_porting_scope(config, Some(scope))
+}
+
+fn run_with_optional_porting_scope(
+    config: &RunConfig,
+    scope: Option<crate::PortingScope>,
+) -> Result<RunOutcome, RunError> {
     let total_start = Instant::now();
     prepare_output_dir(&config.output_dir, config.overwrite)?;
     create_output_layout(&config.output_dir)
@@ -969,15 +987,84 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
 
     let support_start = Instant::now();
-    let assessment = assess_support(
+    let mut scoped_report;
+    let support_report = if scope.is_some() {
+        scoped_report = compile_result.report.clone();
+        // These bounded controls are admitted only after the strict scope guard
+        // confirms the same ThirdOrder/Mixing branches as the Rust runtime.
+        scoped_report.coverage.retain(|entry| {
+            !matches!(
+                entry.object_type.as_str(),
+                "ZoneAirHeatBalanceAlgorithm" | "RoomAirModelType"
+            )
+        });
+        &scoped_report
+    } else {
+        &compile_result.report
+    };
+    let mut assessment = assess_support(
         &raw_model,
-        &compile_result.report,
+        support_report,
         typed_model,
         config.mode,
         config.partial_policy,
         config.output_format,
         config.trace_level,
     );
+    if let Some(scope) = scope {
+        let mut trace =
+            crate::inspect_porting_scope(&raw_model, &compile_result.report, typed_model, scope);
+        if trace.admissible {
+            if let (Some(model), Some(weather_path)) = (typed_model, config.weather_path.as_ref()) {
+                match crate::porting_scope::porting_environment_trace(model, weather_path) {
+                    Ok(environment) => {
+                        trace.violations.extend(
+                            crate::porting_scope::validate_porting_environment(&environment),
+                        );
+                        trace.environment = Some(environment);
+                    }
+                    Err(error) => trace
+                        .violations
+                        .push(format!("EPW/calendar input preparation failed: {error}")),
+                }
+            } else {
+                trace
+                    .violations
+                    .push("bounded porting requires a fixed EPW weather input".into());
+            }
+            trace.admissible = trace.violations.is_empty();
+        }
+        let exemptions: Vec<_> = compile_result
+            .report
+            .coverage
+            .iter()
+            .filter(|entry| {
+                matches!(
+                    entry.object_type.as_str(),
+                    "ZoneAirHeatBalanceAlgorithm" | "RoomAirModelType"
+                )
+            })
+            .map(|entry| entry.object_type.clone())
+            .collect();
+        trace.production["bounded_coverage_exemptions"] = json!(exemptions);
+        write_json(&config.output_dir.join("porting_scope.json"), &trace)
+            .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+        if !trace.admissible {
+            for violation in trace.violations {
+                assessment
+                    .diagnostics
+                    .error("PortingScopeRejected", "porting_scope", violation);
+            }
+            assessment.status = SupportStatus::Unsupported;
+            assessment.run_result_state = RunResultState::RunBlocked;
+            assessment.runtime_class = RuntimeClass::None;
+            assessment.selected_algorithm_lane = crate::SelectedAlgorithmLane::none();
+            assessment.runtime_selection_note = format!(
+                "scope {} rejected input before graph/runtime construction",
+                scope.id()
+            );
+        }
+    }
     timing.push(
         "support_assessment",
         "ep_run",

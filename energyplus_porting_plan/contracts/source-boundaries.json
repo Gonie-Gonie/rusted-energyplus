@@ -1,0 +1,380 @@
+{
+  "schema_version": "con01-source-boundaries.v1",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "scope": "selected input branches and project defaults; downstream geometry/CTF/radiation/gains numerics retain their card gates",
+  "get_heat_balance_input_order": [
+    "GetProjectControlData",
+    "GetSiteAtmosphereData",
+    "GetWindowGlassSpectralData",
+    "GetMaterialData",
+    "GetHysteresisData",
+    "GetFrameAndDividerData",
+    "GetConstructData",
+    "GetBuildingData",
+    "GetVariableAbsorptanceSurfaceList",
+    "GetIncidentSolarMultiplier",
+    "GetScheduledSurfaceGains",
+    "CreateTCConstructions",
+    "CheckUsedConstructions",
+    "InitSolarViewFactors",
+    "ManageInternalHeatGains(InitOnly=true)"
+  ],
+  "project_control_selected_lines": {
+    "Building": [
+      530,
+      722
+    ],
+    "inside_convection": [
+      724,
+      762
+    ],
+    "outside_convection": [
+      764,
+      798
+    ],
+    "CTF": [
+      800,
+      893
+    ],
+    "zone_air": [
+      921,
+      985
+    ],
+    "contaminants": [
+      987,
+      1100
+    ],
+    "mass_flow_conservation": [
+      1102,
+      1202
+    ],
+    "default_HVAC_root_finding": [
+      1208,
+      1250
+    ]
+  },
+  "get_building_data_direct_calls": [
+    "SolarShading::GetShadowingInput (default/no shading geometry; SRC cards)",
+    "GetZoneData (one zone; GEO cards)",
+    "SurfaceGeometry::SetupZoneGeometry (six opaque surfaces; GEO cards)"
+  ],
+  "inactive_calls": [
+    "representative surface printing",
+    "invalid zero-zone surface check",
+    "Kiva setup"
+  ],
+  "ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetHeatBalanceInput",
+      "start_line": 243,
+      "end_line": 327,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "dce45d86722cba7a2334532729e7fd682be4d9d1d4c6cd5a01e88f6762ca452f",
+      "purpose": "input-order skeleton",
+      "branch": "active",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetProjectControlData",
+      "start_line": 494,
+      "end_line": 1250,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "70503328cd5d9ca97a6786c8dc858ba9000987e90c578f5445855aef14b9a3af",
+      "purpose": "selected project controls/defaults",
+      "branch": "active",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetSiteAtmosphereData",
+      "start_line": 1252,
+      "end_line": 1317,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+      "purpose": "absent atmosphere object default branch",
+      "branch": "default",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetConstructData",
+      "start_line": 1319,
+      "end_line": 1798,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "74ccf00c09739d137ae824a7188fe0a7218ec8dff045c0b57af9fd8a9b245c78",
+      "purpose": "three A/one B opaque constructions; advanced branches absent",
+      "branch": "active/delegated CTF",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetBuildingData",
+      "start_line": 1800,
+      "end_line": 1820,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "3a64ac0d40227f10ccb5f34a4228b1341f8caac8fa5c7feba500630586e2db80",
+      "purpose": "one-zone geometry dispatch",
+      "branch": "active/delegated GEO",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetFrameAndDividerData",
+      "start_line": 3439,
+      "end_line": 3598,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "e3975f3bea7c1b53b4021f728442b7f238f0d1e8228a10d03bec9139410dab3d",
+      "purpose": "no frame/divider objects",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetIncidentSolarMultiplier",
+      "start_line": 2084,
+      "end_line": 2177,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "70a5e20b6db7bf93ade84e87d3ddd02840859313929ac29a29ce11d8b73eab76",
+      "purpose": "no multiplier objects",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "GetScheduledSurfaceGains",
+      "start_line": 4984,
+      "end_line": 5183,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "3bdbe0c2a736ad32da2c96bceb08067dac25505d829098d3b33afd6e0bd9cb62",
+      "purpose": "no scheduled surface-gain objects",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "CreateTCConstructions",
+      "start_line": 5256,
+      "end_line": 5329,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "0a86245fdec96b23d36d310d7cd627982f9a4f37c9ae37691695b9c70a900eed",
+      "purpose": "no thermochromic material",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "CheckUsedConstructions",
+      "start_line": 329,
+      "end_line": 403,
+      "file_sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "range_sha256": "01b353b138ae4d5bb44700b2002fa5fcf1e431beb466a3dcf253bac1d5a0e07f",
+      "purpose": "used construction membership",
+      "branch": "active",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+      "upstream_path": "src/EnergyPlus/Material.cc",
+      "symbol": "GetWindowGlassSpectralData",
+      "start_line": 2946,
+      "end_line": 3101,
+      "file_sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+      "range_sha256": "dc515e70b937af752fddb86040bb821afda4eeac6885d1b307110927c5fb0903",
+      "purpose": "no spectral glass",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+      "upstream_path": "src/EnergyPlus/Material.cc",
+      "symbol": "GetMaterialData",
+      "start_line": 101,
+      "end_line": 2836,
+      "file_sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+      "range_sha256": "9221d775ba70dd0c160a917ec2ed3c9c06c50006eb466aa3e5937a504ac4d489",
+      "purpose": "Material/Material:NoMass branches only",
+      "branch": "active/delegated CTF",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PhaseChangeModeling/HysteresisModel.cc",
+      "upstream_path": "src/EnergyPlus/PhaseChangeModeling/HysteresisModel.cc",
+      "symbol": "GetHysteresisData",
+      "start_line": 298,
+      "end_line": 401,
+      "file_sha256": "27d6e763bf9949d0516a243b8c094b54eeecf413ffeae7900be143e7ebebb256",
+      "range_sha256": "71afc0ea5e50440a6e3711d1a2e48e29be07fe13193046f190fcbf5b7904d425",
+      "purpose": "no phase-change hysteresis",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.cc",
+      "upstream_path": "src/EnergyPlus/DataSurfaces.cc",
+      "symbol": "GetVariableAbsorptanceSurfaceList",
+      "start_line": 749,
+      "end_line": 798,
+      "file_sha256": "c80eaefe852c5deebdb5f6eab35a58b0d7500d887218cbcdeaacb8573e4044ff",
+      "range_sha256": "ec6eab07443a5408ea99ebf2652ae0b154b6a64002a717e7357ded59cf4d66a4",
+      "purpose": "no variable-absorptance objects",
+      "branch": "inactive",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "upstream_path": "src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "symbol": "InitSolarViewFactors",
+      "start_line": 811,
+      "end_line": 1103,
+      "file_sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+      "range_sha256": "a33ecde7084a929fc5ba8e32c787451759ecc861d3cf9ea3ab593e4bfa722446",
+      "purpose": "opaque radiative setup",
+      "branch": "active/delegated RAD",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InternalHeatGains.cc",
+      "upstream_path": "src/EnergyPlus/InternalHeatGains.cc",
+      "symbol": "ManageInternalHeatGains",
+      "start_line": 195,
+      "end_line": 229,
+      "file_sha256": "479e86d5372defffcece1f12a6b7f686cff552b10ece1812e5e2e571350d923e",
+      "range_sha256": "d60d54abf51c23762c8ce85204e797bac0e76c09149b41e9d18b3969ce7becd3",
+      "purpose": "InitOnly=true input/setup then return; gains delegated",
+      "branch": "active/delegated SRC",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WindowManager.cc",
+      "upstream_path": "src/EnergyPlus/WindowManager.cc",
+      "symbol": "initWindowModel",
+      "start_line": 8512,
+      "end_line": 8518,
+      "file_sha256": "84bbea90820aaa785ad8ed264706556b36c6e06b61e362d83ee9a5014ad99fdf",
+      "range_sha256": "950a4deb25d345c58f03f1eb2c1ae01aea6ac9c17a0c4f1f7717ba1a5c107d20",
+      "purpose": "unconditional factory initialization; zero-window numerical model inactive",
+      "branch": "default",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WindowModel.cc",
+      "upstream_path": "src/EnergyPlus/WindowModel.cc",
+      "symbol": "CWindowModel constructor/WindowModelFactory",
+      "start_line": 69,
+      "end_line": 100,
+      "file_sha256": "f2cd871bbcd199d705cd87980b0ef1f41e8f71e2980b2bfa7c00cbd273ea140f",
+      "range_sha256": "196f9e5bafa80f437b760cc747f4e9c9d8397329a92d17bd452024c25b1193f5",
+      "purpose": "absent WindowsCalculationEngine => BuiltIn",
+      "branch": "default",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WindowModel.cc",
+      "upstream_path": "src/EnergyPlus/WindowModel.cc",
+      "symbol": "CWindowOpticalModel constructor/WindowOpticalModelFactory",
+      "start_line": 121,
+      "end_line": 137,
+      "file_sha256": "f2cd871bbcd199d705cd87980b0ef1f41e8f71e2980b2bfa7c00cbd273ea140f",
+      "range_sha256": "70eca985c0f3503ae3b741c620acb0ad7849ca8f9b9e079acc7bde780540f74e",
+      "purpose": "absent complex fenestration => Simplified",
+      "branch": "default",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "upstream_path": "src/EnergyPlus/DataRoomAirModel.hh",
+      "symbol": "AirModel/TempCoupleScheme defaults",
+      "start_line": 170,
+      "end_line": 176,
+      "file_sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+      "range_sha256": "902fca5d01e05487c53b76aab1fc7b0446d7a85dd931dc6229921e6fe3e29cc2",
+      "purpose": "Mixing/Direct defaults with no RoomAirModelType object",
+      "branch": "default",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "upstream_path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "project-control mutable fields/defaults",
+      "start_line": 1790,
+      "end_line": 1838,
+      "file_sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "range_sha256": "9d0cccd84384ae42e757d8e78d3e8fdf2942adebb618e4eaf380d6506dd78eaa",
+      "purpose": "low/high convection limits, algorithm flags, warmup and zone-air controls",
+      "branch": "default",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+      "upstream_path": "src/EnergyPlus/ConvectionConstants.hh",
+      "symbol": "HcInt enum/name mapping",
+      "start_line": 62,
+      "end_line": 190,
+      "file_sha256": "c66c69839ec46bcedb083d887f74f17c77e9c4eb34bde99f6720ef2829f6c8d7",
+      "range_sha256": "6ddea4903afe93a93f82a1db269f41ab8674cf62776ccc0c3c714b705701ff5b",
+      "purpose": "selected TARP enum/name mapping",
+      "branch": "declaration",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+      "upstream_path": "src/EnergyPlus/ConvectionConstants.hh",
+      "symbol": "HcExt enum/name mapping",
+      "start_line": 235,
+      "end_line": 349,
+      "file_sha256": "c66c69839ec46bcedb083d887f74f17c77e9c4eb34bde99f6720ef2829f6c8d7",
+      "range_sha256": "6521c25c2bf0f7da08c1f42425b3ae378abbb2ebda62c40714d2a27437eb1df0",
+      "purpose": "selected DOE-2 enum/name mapping",
+      "branch": "declaration",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "upstream_path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "symbol": "getNumObjectsFound",
+      "start_line": 505,
+      "end_line": 541,
+      "file_sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "range_sha256": "fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301",
+      "purpose": "object-count boundary",
+      "branch": "active",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "upstream_path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "symbol": "getObjectItem",
+      "start_line": 932,
+      "end_line": 1120,
+      "file_sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+      "range_sha256": "83d71ce38620af856414b77756c0df21cbc1bc62fb2a737fa80b91b7a85f6494",
+      "purpose": "typed input retrieval boundary",
+      "branch": "active",
+      "numerical_body_certified": false
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh",
+      "upstream_path": "src/EnergyPlus/UtilityRoutines.hh",
+      "symbol": "getEnumValue/getYesNoValue",
+      "start_line": 665,
+      "end_line": 681,
+      "file_sha256": "e7a3a24bdc834e39564962e6af38cc631b13552109c128bb6da11da9f942a07f",
+      "range_sha256": "55e554b87800942d61751822925a93359e8c2b74055dbbb46a2ea4ddfb18a11d",
+      "purpose": "selected algorithm/NoYes conversion",
+      "branch": "active",
+      "numerical_body_certified": false
+    }
+  ]
+}

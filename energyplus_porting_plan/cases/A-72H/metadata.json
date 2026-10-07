@@ -1,0 +1,741 @@
+{
+  "schema_version": "con01-case.v1",
+  "id": "A-72H",
+  "scope": "A",
+  "duration": "72H",
+  "limit_variant": null,
+  "source": {
+    "path": ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf",
+    "sha256": "77d099ff08791ab40ddc7c7bd7894bee3d03a994deafb4fd887c853d356e0600"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+    "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+  },
+  "serialization": "UTF-8/LF; comments removed; object/field order retained except documented added defaults and replaced Output:Variable collection",
+  "patches": [
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 2,
+      "field": "begin_month",
+      "before": "1",
+      "after": "6"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 3,
+      "field": "begin_day",
+      "before": "1",
+      "after": "30"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 4,
+      "field": "begin_year",
+      "before": "",
+      "after": "2013"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 5,
+      "field": "end_month",
+      "before": "12",
+      "after": "7"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 6,
+      "field": "end_day",
+      "before": "31",
+      "after": "2"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 7,
+      "field": "end_year",
+      "before": "",
+      "after": "2013"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 8,
+      "field": "start_weekday",
+      "before": "Tuesday",
+      "after": "Sunday"
+    },
+    {
+      "object_type": "SimulationControl",
+      "object_name": "No",
+      "field_index": 4,
+      "field": "simulation_control_4",
+      "before": "Yes",
+      "after": "No"
+    },
+    {
+      "object_type": "HeatBalanceAlgorithm",
+      "object_name": "ConductionTransferFunction",
+      "field_index": 2,
+      "field": "field_2",
+      "before": null,
+      "after": "200"
+    },
+    {
+      "object_type": "HeatBalanceAlgorithm",
+      "object_name": "ConductionTransferFunction",
+      "field_index": 3,
+      "field": "field_3",
+      "before": null,
+      "after": "0.1"
+    },
+    {
+      "object_type": "HeatBalanceAlgorithm",
+      "object_name": "ConductionTransferFunction",
+      "field_index": 4,
+      "field": "field_4",
+      "before": null,
+      "after": "1000"
+    },
+    {
+      "object_type": "ZoneAirHeatBalanceAlgorithm",
+      "operation": "add",
+      "before": null,
+      "after_fields": [
+        "ThirdOrderBackwardDifference",
+        "No",
+        "No"
+      ],
+      "reason": "make the selected EnergyPlus default explicit"
+    },
+    {
+      "object_type": "Output:Variable",
+      "operation": "replace_collection",
+      "before_fields": [
+        [
+          "*",
+          "Site Outdoor Air Drybulb Temperature",
+          "hourly"
+        ],
+        [
+          "*",
+          "Site Total Sky Cover",
+          "hourly"
+        ],
+        [
+          "*",
+          "Site Opaque Sky Cover",
+          "hourly"
+        ],
+        [
+          "*",
+          "Site Daylight Saving Time Status",
+          "daily"
+        ],
+        [
+          "*",
+          "Site Day Type Index",
+          "daily"
+        ],
+        [
+          "*",
+          "Zone Mean Air Temperature",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Operative Temperature",
+          "hourly"
+        ],
+        [
+          "ZONE ONE",
+          "Zone Wetbulb Globe Temperature",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Total Internal Latent Gain Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Mean Radiant Temperature",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Air Heat Balance Surface Convection Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Air Heat Balance Air Energy Storage Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Inside Face Temperature",
+          "daily"
+        ],
+        [
+          "*",
+          "Surface Outside Face Temperature",
+          "daily"
+        ],
+        [
+          "*",
+          "Surface Inside Face Convection Heat Transfer Coefficient",
+          "daily"
+        ],
+        [
+          "*",
+          "Surface Outside Face Convection Heat Transfer Coefficient",
+          "daily"
+        ],
+        [
+          "*",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Inside Face Conduction Heat Gain Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Inside Face Conduction Heat Loss Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Inside Face Conduction Heat Transfer Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Outside Face Conduction Heat Gain Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Outside Face Conduction Heat Loss Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Outside Face Conduction Heat Transfer Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Average Face Conduction Heat Transfer Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Average Face Conduction Heat Gain Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Average Face Conduction Heat Loss Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Average Face Conduction Heat Transfer Rate per Area",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Average Face Conduction Heat Transfer Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Heat Storage Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Heat Storage Gain Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Heat Storage Loss Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Heat Storage Rate per Area",
+          "hourly"
+        ],
+        [
+          "*",
+          "Surface Heat Storage Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Inside Faces Conduction Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Inside Faces Conduction Heat Gain Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Inside Faces Conduction Heat Loss Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Inside Faces Conduction Heat Gain Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Inside Faces Conduction Heat Loss Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Outside Faces Conduction Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Outside Faces Conduction Heat Gain Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Outside Faces Conduction Heat Gain Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Zone Opaque Surface Outside Faces Conduction Heat Loss Energy",
+          "hourly"
+        ],
+        [
+          "*",
+          "Other Equipment Total Heating Energy",
+          "monthly"
+        ],
+        [
+          "*",
+          "Zone Other Equipment Total Heating Energy",
+          "monthly"
+        ]
+      ],
+      "after_fields": [
+        [
+          "ZONE ONE",
+          "Zone Mean Air Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone Air Humidity Ratio",
+          "Timestep"
+        ],
+        [
+          "AlwaysOn",
+          "Schedule Value",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall001",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall002",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall003",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Wall004",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Flr001",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "Zn001:Roof001",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Outdoor Air Drybulb Temperature",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Outdoor Air Wetbulb Temperature",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Sky Temperature",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Horizontal Infrared Radiation Rate per Area",
+          "Timestep"
+        ]
+      ],
+      "reason": "freeze the output comparison contract at zone-step reporting frequency"
+    }
+  ],
+  "object_counts": {
+    "building": 1,
+    "buildingsurface:detailed": 6,
+    "construction": 3,
+    "exterior:lights": 1,
+    "globalgeometryrules": 1,
+    "heatbalancealgorithm": 1,
+    "material": 1,
+    "material:nomass": 2,
+    "otherequipment": 2,
+    "output:constructions": 1,
+    "output:diagnostics": 1,
+    "output:meter:meterfileonly": 3,
+    "output:surfaces:drawing": 1,
+    "output:table:summaryreports": 1,
+    "output:variable": 55,
+    "output:variabledictionary": 1,
+    "outputcontrol:table:style": 1,
+    "runperiod": 1,
+    "schedule:constant": 1,
+    "scheduletypelimits": 2,
+    "simulationcontrol": 1,
+    "site:location": 1,
+    "sizingperiod:designday": 2,
+    "surfaceconvectionalgorithm:inside": 1,
+    "surfaceconvectionalgorithm:outside": 1,
+    "timestep": 1,
+    "version": 1,
+    "zone": 1,
+    "zoneairheatbalancealgorithm": 1
+  },
+  "expected_zone_steps_excluding_warmup": 288,
+  "expected_weather_environments": 1,
+  "expected_settings": {
+    "building": {
+      "name": "Simple One Zone (Wireframe DXF)",
+      "north_axis_deg": 0.0,
+      "effective_north_axis_deg": 0.0,
+      "terrain": "Suburbs",
+      "loads_convergence_tolerance": 0.04,
+      "temperature_convergence_tolerance": 0.004,
+      "solar_distribution": "MinimalShadowing",
+      "maximum_warmup_days": 30,
+      "minimum_warmup_days": 6
+    },
+    "heat_balance_algorithm": "ConductionTransferFunction",
+    "zone_air_heat_balance_algorithm": "ThirdOrderBackwardDifference",
+    "inside_convection": "TARP",
+    "outside_convection": "DOE-2",
+    "timesteps_per_hour": 4,
+    "room_air_model_type": "Mixing",
+    "room_air_model_provenance": "EnergyPlus default; RoomAirModelType absent",
+    "air_temperature_coupling": "Direct",
+    "heat_balance_defaults": {
+      "maximum_surface_temperature_C": 200,
+      "minimum_convection_coefficient_W_m2_K": 0.1,
+      "maximum_convection_coefficient_W_m2_K": 1000
+    },
+    "simulation_control": {
+      "do_zone_sizing_calculation": false,
+      "do_system_sizing_calculation": false,
+      "do_plant_sizing_calculation": false,
+      "run_simulation_for_sizing_periods": false,
+      "run_simulation_for_weather_file_run_periods": true,
+      "do_hvac_sizing_simulation_for_sizing_periods": false,
+      "maximum_number_of_hvac_sizing_simulation_passes": 1
+    },
+    "run_periods": [
+      {
+        "name": "Run Period 1",
+        "begin_date": "2013-06-30",
+        "end_date": "2013-07-02",
+        "start_weekday": "Sunday",
+        "use_weather_holidays": true,
+        "use_weather_dst": true,
+        "apply_weekend_holiday_rule": false,
+        "use_weather_rain": true,
+        "use_weather_snow": true
+      }
+    ],
+    "space_heat_balance": {
+      "sizing": false,
+      "simulation": false
+    },
+    "contaminants": false,
+    "zone_air_mass_flow_conservation": false,
+    "site_wind": {
+      "exponent": 0.22,
+      "boundary_layer_height_m": 370.0
+    },
+    "loads_convergence_tolerance_units": "dimensionless normalized load difference (source IDF comment incorrectly labels W)",
+    "ideal_loads": []
+  },
+  "active_branch_declarations": [],
+  "execution_status": "recorded separately in evidence; preparation does not imply execution",
+  "gate_status": "unreviewed"
+}

@@ -1,0 +1,867 @@
+{
+  "schema_version": "con01-case.v1",
+  "id": "B-BOTH-72H",
+  "scope": "B",
+  "duration": "72H",
+  "limit_variant": "BOTH",
+  "source": {
+    "path": "data/conformance_cases/ideal_loads_flow_capacity_limit_diagnostic_001/ideal_loads_flow_capacity_limit_diagnostic.idf",
+    "sha256": "46dd8b61825aeaefcd688cbdc608a58d10430dfe16ad6da5cde2b994c8ed851a"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+    "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+  },
+  "serialization": "UTF-8/LF; comments removed; object/field order retained except documented added defaults and replaced Output:Variable collection",
+  "patches": [
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 2,
+      "field": "begin_month",
+      "before": "1",
+      "after": "6"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 3,
+      "field": "begin_day",
+      "before": "1",
+      "after": "30"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 5,
+      "field": "end_month",
+      "before": "1",
+      "after": "7"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 6,
+      "field": "end_day",
+      "before": "1",
+      "after": "2"
+    },
+    {
+      "object_type": "RunPeriod",
+      "object_name": "Run Period 1",
+      "field_index": 8,
+      "field": "start_weekday",
+      "before": "Tuesday",
+      "after": "Sunday"
+    },
+    {
+      "object_type": "SimulationControl",
+      "object_name": "No",
+      "field_index": 6,
+      "field": "simulation_control_6",
+      "before": null,
+      "after": "No"
+    },
+    {
+      "object_type": "SimulationControl",
+      "object_name": "No",
+      "field_index": 7,
+      "field": "simulation_control_7",
+      "before": null,
+      "after": "1"
+    },
+    {
+      "object_type": "HeatBalanceAlgorithm",
+      "operation": "add",
+      "before": null,
+      "after_fields": [
+        "ConductionTransferFunction",
+        "200",
+        "0.1",
+        "1000"
+      ],
+      "reason": "make the selected EnergyPlus default explicit"
+    },
+    {
+      "object_type": "SurfaceConvectionAlgorithm:Inside",
+      "operation": "add",
+      "before": null,
+      "after_fields": [
+        "TARP"
+      ],
+      "reason": "make the selected EnergyPlus default explicit"
+    },
+    {
+      "object_type": "SurfaceConvectionAlgorithm:Outside",
+      "operation": "add",
+      "before": null,
+      "after_fields": [
+        "DOE-2"
+      ],
+      "reason": "make the selected EnergyPlus default explicit"
+    },
+    {
+      "object_type": "ZoneAirHeatBalanceAlgorithm",
+      "operation": "add",
+      "before": null,
+      "after_fields": [
+        "ThirdOrderBackwardDifference",
+        "No",
+        "No"
+      ],
+      "reason": "make the selected EnergyPlus default explicit"
+    },
+    {
+      "object_type": "Schedule:Compact",
+      "object_name": "CON-01 System Availability",
+      "singleton": false,
+      "operation": "add",
+      "before": null,
+      "after_fields": [
+        "CON-01 System Availability",
+        "Fraction",
+        "Through: 12/31",
+        "For: AllDays",
+        "Until: 03:00",
+        "0",
+        "Until: 24:00",
+        "1"
+      ],
+      "reason": "declare the existing HVAC-03 availability route: daily 00:00-03:00 Off, 03:00-24:00 On; downstream phase gate remains unverified"
+    },
+    {
+      "object_type": "ZoneHVAC:IdealLoadsAirSystem",
+      "object_name": "ZONE ONE IDEAL LOADS",
+      "field_index": 2,
+      "field": "system_availability_schedule_name",
+      "before": "",
+      "after": "CON-01 System Availability"
+    },
+    {
+      "object_type": "Output:Variable",
+      "operation": "replace_collection",
+      "before_fields": [
+        [
+          "ZONE ONE",
+          "Zone Thermostat Heating Setpoint Temperature",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE",
+          "Zone Thermostat Cooling Setpoint Temperature",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Total Heating Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Total Cooling Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Sensible Heating Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Sensible Cooling Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Heating Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Cooling Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE",
+          "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE",
+          "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE",
+          "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE INLET",
+          "System Node Temperature",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE INLET",
+          "System Node Mass Flow Rate",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE AIR NODE",
+          "System Node Temperature",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE AIR NODE",
+          "System Node Humidity Ratio",
+          "Detailed"
+        ],
+        [
+          "ZONE ONE INLET",
+          "System Node Humidity Ratio",
+          "Detailed"
+        ]
+      ],
+      "after_fields": [
+        [
+          "ZONE ONE",
+          "Zone Mean Air Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone Air Humidity Ratio",
+          "Timestep"
+        ],
+        [
+          "Zone Control Type Schedule",
+          "Schedule Value",
+          "Timestep"
+        ],
+        [
+          "Heating Setpoint",
+          "Schedule Value",
+          "Timestep"
+        ],
+        [
+          "Cooling Setpoint",
+          "Schedule Value",
+          "Timestep"
+        ],
+        [
+          "Internal Gain Schedule",
+          "Schedule Value",
+          "Timestep"
+        ],
+        [
+          "CON-01 System Availability",
+          "Schedule Value",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "FLOOR",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "ROOF",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "WALL X0",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "WALL X1",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "WALL Y0",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Inside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Outside Face Temperature",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Inside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Inside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Outside Face Conduction Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Outside Face Conduction Heat Transfer Rate per Area",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Heat Storage Rate",
+          "Timestep"
+        ],
+        [
+          "WALL Y1",
+          "Surface Heat Storage Rate per Area",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Outdoor Air Drybulb Temperature",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Outdoor Air Wetbulb Temperature",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Sky Temperature",
+          "Timestep"
+        ],
+        [
+          "Environment",
+          "Site Horizontal Infrared Radiation Rate per Area",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone Thermostat Heating Setpoint Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone Thermostat Cooling Setpoint Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE",
+          "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE INLET",
+          "System Node Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE INLET",
+          "System Node Humidity Ratio",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE INLET",
+          "System Node Mass Flow Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE AIR NODE",
+          "System Node Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE AIR NODE",
+          "System Node Humidity Ratio",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE AIR NODE",
+          "System Node Mass Flow Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE RETURN",
+          "System Node Temperature",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE RETURN",
+          "System Node Humidity Ratio",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE RETURN",
+          "System Node Mass Flow Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Total Heating Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Total Heating Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Sensible Heating Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Sensible Heating Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Latent Heating Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Latent Heating Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Total Cooling Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Total Cooling Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Sensible Cooling Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Sensible Cooling Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Latent Cooling Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Zone Latent Cooling Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Heating Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Heating Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Sensible Heating Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Sensible Heating Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Latent Heating Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Latent Heating Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Cooling Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Cooling Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Latent Cooling Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Latent Cooling Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Heating Fuel Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Total Cooling Fuel Energy",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Mass Flow Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+          "Timestep"
+        ],
+        [
+          "ZONE ONE IDEAL LOADS",
+          "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+          "Timestep"
+        ]
+      ],
+      "reason": "freeze the output comparison contract at zone-step reporting frequency"
+    }
+  ],
+  "object_counts": {
+    "building": 1,
+    "buildingsurface:detailed": 6,
+    "construction": 1,
+    "globalgeometryrules": 1,
+    "heatbalancealgorithm": 1,
+    "material": 1,
+    "nodelist": 1,
+    "otherequipment": 1,
+    "output:variable": 102,
+    "output:variabledictionary": 1,
+    "runperiod": 1,
+    "schedule:compact": 2,
+    "schedule:constant": 3,
+    "scheduletypelimits": 3,
+    "simulationcontrol": 1,
+    "site:location": 1,
+    "surfaceconvectionalgorithm:inside": 1,
+    "surfaceconvectionalgorithm:outside": 1,
+    "thermostatsetpoint:dualsetpoint": 1,
+    "timestep": 1,
+    "version": 1,
+    "zone": 1,
+    "zoneairheatbalancealgorithm": 1,
+    "zonecontrol:thermostat": 1,
+    "zonehvac:equipmentconnections": 1,
+    "zonehvac:equipmentlist": 1,
+    "zonehvac:idealloadsairsystem": 1
+  },
+  "expected_zone_steps_excluding_warmup": 288,
+  "expected_weather_environments": 1,
+  "expected_settings": {
+    "building": {
+      "name": "Rusted EnergyPlus IdealLoads Flow And Capacity Limit Diagnostic",
+      "north_axis_deg": 0.0,
+      "effective_north_axis_deg": 0.0,
+      "terrain": "Suburbs",
+      "loads_convergence_tolerance": 0.04,
+      "temperature_convergence_tolerance": 0.4,
+      "solar_distribution": "FullExterior",
+      "maximum_warmup_days": 25,
+      "minimum_warmup_days": 6
+    },
+    "heat_balance_algorithm": "ConductionTransferFunction",
+    "zone_air_heat_balance_algorithm": "ThirdOrderBackwardDifference",
+    "inside_convection": "TARP",
+    "outside_convection": "DOE-2",
+    "timesteps_per_hour": 4,
+    "room_air_model_type": "Mixing",
+    "room_air_model_provenance": "EnergyPlus default; RoomAirModelType absent",
+    "air_temperature_coupling": "Direct",
+    "heat_balance_defaults": {
+      "maximum_surface_temperature_C": 200,
+      "minimum_convection_coefficient_W_m2_K": 0.1,
+      "maximum_convection_coefficient_W_m2_K": 1000
+    },
+    "simulation_control": {
+      "do_zone_sizing_calculation": false,
+      "do_system_sizing_calculation": false,
+      "do_plant_sizing_calculation": false,
+      "run_simulation_for_sizing_periods": false,
+      "run_simulation_for_weather_file_run_periods": true,
+      "do_hvac_sizing_simulation_for_sizing_periods": false,
+      "maximum_number_of_hvac_sizing_simulation_passes": 1
+    },
+    "run_periods": [
+      {
+        "name": "Run Period 1",
+        "begin_date": "2013-06-30",
+        "end_date": "2013-07-02",
+        "start_weekday": "Sunday",
+        "use_weather_holidays": true,
+        "use_weather_dst": true,
+        "apply_weekend_holiday_rule": false,
+        "use_weather_rain": true,
+        "use_weather_snow": true
+      }
+    ],
+    "space_heat_balance": {
+      "sizing": false,
+      "simulation": false
+    },
+    "contaminants": false,
+    "zone_air_mass_flow_conservation": false,
+    "site_wind": {
+      "exponent": 0.22,
+      "boundary_layer_height_m": 370.0
+    },
+    "loads_convergence_tolerance_units": "dimensionless normalized load difference (source IDF comment incorrectly labels W)",
+    "ideal_loads": [
+      {
+        "name": "ZONE ONE IDEAL LOADS",
+        "heating_limit": "LimitFlowRateAndCapacity",
+        "cooling_limit": "LimitFlowRateAndCapacity",
+        "maximum_heating_volume_flow_m3_s": 0.02,
+        "maximum_cooling_volume_flow_m3_s": 0.02,
+        "maximum_sensible_heating_capacity_W": 120.0,
+        "maximum_total_cooling_capacity_W": 120.0,
+        "dehumidification_control": "None",
+        "humidification_control": "None",
+        "outdoor_air": false,
+        "economizer": "NoEconomizer",
+        "heat_recovery": "None",
+        "availability_schedule_name": "CON-01 System Availability",
+        "maximum_heating_supply_temperature_C": 50.0,
+        "minimum_cooling_supply_temperature_C": 13.0
+      }
+    ]
+  },
+  "active_branch_declarations": [
+    {
+      "branch": "AvailabilityActive",
+      "active": true,
+      "schedule_name": "CON-01 System Availability",
+      "off_interval": "daily 00:00-03:00 (first 12 zone-step report endpoints)",
+      "on_interval": "daily 03:00-24:00 (remaining 84 endpoints)",
+      "producer_card": "HVAC-03",
+      "internal_phase_gate": "SYS-06",
+      "internal_branch_verified_by_preparation": false
+    }
+  ],
+  "execution_status": "recorded separately in evidence; preparation does not imply execution",
+  "gate_status": "unreviewed"
+}

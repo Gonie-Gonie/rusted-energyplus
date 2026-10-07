@@ -13,6 +13,7 @@ mod diagnostics;
 mod oracle;
 mod outputs;
 mod pipeline;
+mod porting_scope;
 mod support;
 mod support_registry;
 
@@ -20,4 +21,5 @@ pub use config::*;
 pub use diagnostics::*;
 pub use oracle::*;
 pub use pipeline::*;
+pub use porting_scope::{PortingScope, PortingScopeTrace, inspect_porting_scope};
 pub use support::*;

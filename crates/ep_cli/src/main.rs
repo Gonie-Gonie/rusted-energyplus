@@ -6,6 +6,8 @@
     allow(clippy::approx_constant, clippy::expect_used, clippy::unwrap_used)
 )]
 
+#[cfg(test)]
+mod arbitrary_run_options_tests;
 mod conformance_artifacts;
 mod ideal_loads;
 mod internal_gains;
@@ -54,8 +56,8 @@ use ep_model::{
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, RawModelSummary, RawValue, load_epjson_file};
 use ep_run::{
-    PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
-    run_arbitrary_idf,
+    PartialRunPolicy, PortingScope, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel,
+    TraceSelection, run_arbitrary_idf, run_bounded_porting,
 };
 use ep_runtime::schedules::{
     HEAT_BALANCE_INTERNAL_GAIN_SCHEDULE_PROFILE_SCOPE,
@@ -180,7 +182,7 @@ const CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE: &str =
     "usage: eplus-rs conformance internal-gains-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-no-oa-sensible-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_OUTDOOR_AIR_DESIGN_FLOW_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-outdoor-air-design-flow-report <case.toml> <oracle-root> <output-root>";
-const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--mode compatibility|diagnostic] [--partial deny|allow] [--oracle-baseline] [--compare-oracle] [--trace-surface NAME] [--trace-node NAME] [--dry-run]";
+const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--mode compatibility|diagnostic] [--partial deny|allow] [--porting-scope A|B] [--oracle-baseline] [--compare-oracle] [--trace-surface NAME] [--trace-node NAME] [--dry-run]";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -2895,7 +2897,14 @@ impl ArbitraryRunParseError {
     }
 }
 
+#[cfg(test)]
 fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRunParseError> {
+    parse_run_options(args).map(|(config, _)| config)
+}
+
+fn parse_run_options(
+    args: &[String],
+) -> Result<(RunConfig, Option<PortingScope>), ArbitraryRunParseError> {
     let Some(input_path) = args.first() else {
         return Err(ArbitraryRunParseError::new("missing input path", true));
     };
@@ -2916,10 +2925,33 @@ fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRun
     let mut json_stdout = false;
     let mut oracle_root = None;
     let mut hours = None;
+    let mut porting_scope = None;
 
     let mut index = 1;
     while index < args.len() {
         match args[index].as_str() {
+            "--porting-scope" => {
+                if porting_scope.is_some() {
+                    return Err(ArbitraryRunParseError::new(
+                        "--porting-scope may be specified once",
+                        false,
+                    ));
+                }
+                let Some(value) = args.get(index + 1) else {
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --porting-scope",
+                        true,
+                    ));
+                };
+                let Some(parsed) = PortingScope::parse(value) else {
+                    return Err(ArbitraryRunParseError::new(
+                        format!("unsupported porting scope: {value}; expected A or B"),
+                        false,
+                    ));
+                };
+                porting_scope = Some(parsed);
+                index += 2;
+            }
             "--weather" | "-w" => {
                 let Some(value) = args.get(index + 1) else {
                     return Err(ArbitraryRunParseError::new(
@@ -3104,30 +3136,33 @@ fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRun
         ));
     };
 
-    Ok(RunConfig {
-        input_path: PathBuf::from(input_path),
-        weather_path,
-        output_dir,
-        mode,
-        partial_policy,
-        output_format,
-        overwrite,
-        keep_intermediate,
-        trace_level,
-        trace_selection,
-        fail_on_warning,
-        dry_run,
-        oracle_baseline,
-        compare_oracle,
-        json_stdout,
-        oracle_root,
-        hours,
-    })
+    Ok((
+        RunConfig {
+            input_path: PathBuf::from(input_path),
+            weather_path,
+            output_dir,
+            mode,
+            partial_policy,
+            output_format,
+            overwrite,
+            keep_intermediate,
+            trace_level,
+            trace_selection,
+            fail_on_warning,
+            dry_run,
+            oracle_baseline,
+            compare_oracle,
+            json_stdout,
+            oracle_root,
+            hours,
+        },
+        porting_scope,
+    ))
 }
 
 fn run_arbitrary_run_command(args: &[String]) -> i32 {
-    let config = match parse_arbitrary_run_config(args) {
-        Ok(config) => config,
+    let (config, porting_scope) = match parse_run_options(args) {
+        Ok(options) => options,
         Err(error) => {
             eprintln!("{}", error.message);
             if error.show_usage {
@@ -3137,7 +3172,11 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
         }
     };
 
-    match run_arbitrary_idf(&config) {
+    let result = match porting_scope {
+        Some(scope) => run_bounded_porting(&config, scope),
+        None => run_arbitrary_idf(&config),
+    };
+    match result {
         Ok(outcome) => {
             if config.json_stdout {
                 match std::fs::read_to_string(&outcome.run_summary_path) {

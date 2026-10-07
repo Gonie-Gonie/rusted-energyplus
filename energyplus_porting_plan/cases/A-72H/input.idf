@@ -1,0 +1,680 @@
+! CON-01 pinned case A-72H; patches and original hashes are in metadata.json.
+Version,
+  26.1;
+
+Timestep,
+  4;
+
+Building,
+  Simple One Zone (Wireframe DXF),
+  0,
+  Suburbs,
+  0.04,
+  0.004,
+  MinimalShadowing,
+  30,
+  6;
+
+HeatBalanceAlgorithm,
+  ConductionTransferFunction,
+  200,
+  0.1,
+  1000;
+
+SurfaceConvectionAlgorithm:Inside,
+  TARP;
+
+SurfaceConvectionAlgorithm:Outside,
+  DOE-2;
+
+SimulationControl,
+  No,
+  No,
+  No,
+  No,
+  Yes,
+  No,
+  1;
+
+RunPeriod,
+  Run Period 1,
+  6,
+  30,
+  2013,
+  7,
+  2,
+  2013,
+  Sunday,
+  Yes,
+  Yes,
+  No,
+  Yes,
+  Yes;
+
+Site:Location,
+  Denver Centennial  Golden   N_CO_USA Design_Conditions,
+  39.74,
+  -105.18,
+  -7.00,
+  1829.00;
+
+SizingPeriod:DesignDay,
+  Denver Centennial  Golden   N Ann Htg 99% Condns DB,
+  12,
+  21,
+  WinterDesignDay,
+  -15.5,
+  0.0,
+  ,
+  ,
+  Wetbulb,
+  -15.5,
+  ,
+  ,
+  ,
+  ,
+  81198.,
+  3,
+  340,
+  No,
+  No,
+  No,
+  ASHRAEClearSky,
+  ,
+  ,
+  ,
+  ,
+  0.00;
+
+SizingPeriod:DesignDay,
+  Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB,
+  7,
+  21,
+  SummerDesignDay,
+  32,
+  15.2,
+  ,
+  ,
+  Wetbulb,
+  15.5,
+  ,
+  ,
+  ,
+  ,
+  81198.,
+  4.9,
+  0,
+  No,
+  No,
+  No,
+  ASHRAEClearSky,
+  ,
+  ,
+  ,
+  ,
+  1.00;
+
+Material:NoMass,
+  R13LAYER,
+  Rough,
+  2.290965,
+  0.9000000,
+  0.7500000,
+  0.7500000;
+
+Material:NoMass,
+  R31LAYER,
+  Rough,
+  5.456,
+  0.9000000,
+  0.7500000,
+  0.7500000;
+
+Material,
+  C5 - 4 IN HW CONCRETE,
+  MediumRough,
+  0.1014984,
+  1.729577,
+  2242.585,
+  836.8000,
+  0.9000000,
+  0.6500000,
+  0.6500000;
+
+Construction,
+  R13WALL,
+  R13LAYER;
+
+Construction,
+  FLOOR,
+  C5 - 4 IN HW CONCRETE;
+
+Construction,
+  ROOF31,
+  R31LAYER;
+
+Zone,
+  ZONE ONE,
+  0,
+  0,
+  0,
+  0,
+  1,
+  1,
+  autocalculate,
+  autocalculate;
+
+ScheduleTypeLimits,
+  Fraction,
+  0.0,
+  1.0,
+  CONTINUOUS;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+BuildingSurface:Detailed,
+  Zn001:Wall001,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5000000,
+  4,
+  0,
+  0,
+  4.572000,
+  0,
+  0,
+  0,
+  15.24000,
+  0,
+  0,
+  15.24000,
+  0,
+  4.572000;
+
+BuildingSurface:Detailed,
+  Zn001:Wall002,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5000000,
+  4,
+  15.24000,
+  0,
+  4.572000,
+  15.24000,
+  0,
+  0,
+  15.24000,
+  15.24000,
+  0,
+  15.24000,
+  15.24000,
+  4.572000;
+
+BuildingSurface:Detailed,
+  Zn001:Wall003,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5000000,
+  4,
+  15.24000,
+  15.24000,
+  4.572000,
+  15.24000,
+  15.24000,
+  0,
+  0,
+  15.24000,
+  0,
+  0,
+  15.24000,
+  4.572000;
+
+BuildingSurface:Detailed,
+  Zn001:Wall004,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5000000,
+  4,
+  0,
+  15.24000,
+  4.572000,
+  0,
+  15.24000,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  4.572000;
+
+BuildingSurface:Detailed,
+  Zn001:Flr001,
+  Floor,
+  FLOOR,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  1.000000,
+  4,
+  15.24000,
+  0.000000,
+  0.0,
+  0.000000,
+  0.000000,
+  0.0,
+  0.000000,
+  15.24000,
+  0.0,
+  15.24000,
+  15.24000,
+  0.0;
+
+BuildingSurface:Detailed,
+  Zn001:Roof001,
+  Roof,
+  ROOF31,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0,
+  4,
+  0.000000,
+  15.24000,
+  4.572,
+  0.000000,
+  0.000000,
+  4.572,
+  15.24000,
+  0.000000,
+  4.572,
+  15.24000,
+  15.24000,
+  4.572;
+
+Output:Diagnostics,
+  DisplayAdvancedReportVariables;
+
+Output:VariableDictionary,
+  IDF;
+
+Output:Surfaces:Drawing,
+  dxf:wireframe;
+
+Output:Constructions,
+  Constructions;
+
+Output:Meter:MeterFileOnly,
+  ExteriorLights:Electricity,
+  hourly;
+
+Output:Meter:MeterFileOnly,
+  EnergyTransfer:Building,
+  hourly;
+
+Output:Meter:MeterFileOnly,
+  EnergyTransfer:Facility,
+  hourly;
+
+OutputControl:Table:Style,
+  ALL;
+
+Output:Table:SummaryReports,
+  AllSummary;
+
+Exterior:Lights,
+  ExtLights,
+  AlwaysOn,
+  5250,
+  AstronomicalClock,
+  Grounds Lights;
+
+ScheduleTypeLimits,
+  On/Off,
+  0,
+  1,
+  DISCRETE;
+
+OtherEquipment,
+  Test 352a,
+  None,
+  ZONE ONE,
+  AlwaysOn,
+  EquipmentLevel,
+  352,
+  ,
+  ,
+  0,
+  0,
+  0;
+
+OtherEquipment,
+  Test 352 minus,
+  None,
+  ZONE ONE,
+  AlwaysOn,
+  EquipmentLevel,
+  -352,
+  ,
+  ,
+  0,
+  0,
+  0;
+
+Schedule:Constant,
+  AlwaysOn,
+  On/Off,
+  1.0;
+
+ZoneAirHeatBalanceAlgorithm,
+  ThirdOrderBackwardDifference,
+  No,
+  No;
+
+Output:Variable,
+  ZONE ONE,
+  Zone Mean Air Temperature,
+  Timestep;
+
+Output:Variable,
+  ZONE ONE,
+  Zone Air Humidity Ratio,
+  Timestep;
+
+Output:Variable,
+  AlwaysOn,
+  Schedule Value,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Inside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Outside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Inside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Inside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Outside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Outside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Heat Storage Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall001,
+  Surface Heat Storage Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Inside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Outside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Inside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Inside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Outside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Outside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Heat Storage Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall002,
+  Surface Heat Storage Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Inside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Outside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Inside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Inside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Outside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Outside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Heat Storage Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall003,
+  Surface Heat Storage Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Inside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Outside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Inside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Inside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Outside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Outside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Heat Storage Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Wall004,
+  Surface Heat Storage Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Inside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Outside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Inside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Inside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Outside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Outside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Heat Storage Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Flr001,
+  Surface Heat Storage Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Inside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Outside Face Temperature,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Inside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Inside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Outside Face Conduction Heat Transfer Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Outside Face Conduction Heat Transfer Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Heat Storage Rate,
+  Timestep;
+
+Output:Variable,
+  Zn001:Roof001,
+  Surface Heat Storage Rate per Area,
+  Timestep;
+
+Output:Variable,
+  Environment,
+  Site Outdoor Air Drybulb Temperature,
+  Timestep;
+
+Output:Variable,
+  Environment,
+  Site Outdoor Air Wetbulb Temperature,
+  Timestep;
+
+Output:Variable,
+  Environment,
+  Site Sky Temperature,
+  Timestep;
+
+Output:Variable,
+  Environment,
+  Site Horizontal Infrared Radiation Rate per Area,
+  Timestep;

@@ -1,0 +1,390 @@
+{
+  "schema_version": "con01-state-contracts.v1",
+  "normative_origin": {
+    "path": "energyplus_porting_plan/STATE_CONTRACTS.md",
+    "sha256": "bc2110e8915856c56f1e0bc4a8e3c4557ada93bff2bcde85506f94d40a031eba"
+  },
+  "status": "design contract; ownership mappings do not certify numerical implementation",
+  "mutation_rule": "each card may write only declared output/mutable fields; compare changed caches, flags and arrays as well as return values",
+  "temperature_semantics": {
+    "MAT": "end-of-zone-step mean air temperature",
+    "ZT": "air temperature averaged over the system time step",
+    "ZTAV": "air temperature averaged over the zone time step"
+  },
+  "contracts": [
+    {
+      "name": "Geometry",
+      "producer_cards": "GEO-01/GEO-02/GEO-03",
+      "consumers": [
+        "CTF",
+        "SRC",
+        "RAD",
+        "ZON"
+      ],
+      "timing": "immutable after geometry initialization",
+      "fields_with_units": [
+        "vertices[m]",
+        "area[m2]",
+        "normal[1]",
+        "azimuth/tilt[deg]",
+        "centroid[m]",
+        "volume[m3]"
+      ],
+      "rust_owner_or_planned_boundary": "TypedModel geometry (existing owner; field mapping refined by GEO cards)"
+    },
+    {
+      "name": "CalendarFrame",
+      "producer_cards": "CLK-01/CLK-03",
+      "consumers": [
+        "SCH",
+        "weather",
+        "report"
+      ],
+      "timing": "environment/date transition then each zone step",
+      "fields_with_units": [
+        "civil_date[date]",
+        "weather_ordinal[int]",
+        "schedule_ordinal[int]",
+        "day_type[enum]",
+        "hour[int]",
+        "timestep[int]",
+        "environment[int]"
+      ],
+      "rust_owner_or_planned_boundary": "calendar/weather runtime"
+    },
+    {
+      "name": "WeatherStep",
+      "producer_cards": "CLK-02/CLK-03/CLK-04/CLK-05/CLK-06/PSY",
+      "consumers": [
+        "SRC",
+        "ZON"
+      ],
+      "timing": "begin accepted zone timestep, after weather update",
+      "fields_with_units": [
+        "dry_bulb[C]",
+        "wet_bulb[C]",
+        "humidity_ratio[kg/kg]",
+        "pressure[Pa]",
+        "wind[m/s]",
+        "rain[bool]",
+        "DNI/DHI/IR[W/m2]"
+      ],
+      "rust_owner_or_planned_boundary": "weather runtime step"
+    },
+    {
+      "name": "ScheduleValue",
+      "producer_cards": "SCH-03",
+      "consumers": [
+        "gains",
+        "setpoints",
+        "availability",
+        "efficiency"
+      ],
+      "timing": "original lookup/update stage; retain queried civil timestamp",
+      "fields_with_units": [
+        "schedule_id[id]",
+        "value[scalar]",
+        "lookup_time[date/time]",
+        "update_stage[enum]"
+      ],
+      "rust_owner_or_planned_boundary": "schedule evaluator"
+    },
+    {
+      "name": "CtfCoefficients",
+      "producer_cards": "CTF-01..CTF-10",
+      "consumers": [
+        "SUR"
+      ],
+      "timing": "immutable after construction initialization",
+      "fields_with_units": [
+        "X/Y/Z/flux_coefficients[array]",
+        "NumCTFTerms[int]",
+        "CTFTimeStep[h]",
+        "NumHistories[int]"
+      ],
+      "rust_owner_or_planned_boundary": "ConstructionThermalDataCache"
+    },
+    {
+      "name": "CtfHistory",
+      "producer_cards": "SUR-01/SUR-06",
+      "consumers": [
+        "SUR-02",
+        "SUR-03",
+        "SUR-04"
+      ],
+      "timing": "frozen during retries/iterations; shift only at accepted zone-step commit",
+      "fields_with_units": [
+        "inside/outside_temperature_current/lag/master[C]",
+        "inside/outside_flux_current/lag/master[W/m2]"
+      ],
+      "rust_owner_or_planned_boundary": "SurfaceCtfState"
+    },
+    {
+      "name": "SurfaceIterationInput",
+      "producer_cards": "SRC/RAD/SUR",
+      "consumers": [
+        "SUR-04",
+        "SUR-05"
+      ],
+      "timing": "per inner heat-balance iteration",
+      "fields_with_units": [
+        "exterior_solve[C]",
+        "frozen_history_constants[W/m2]",
+        "previous_iteration_inside_temperature[C]",
+        "reference_air_temperature[C]",
+        "h[W/m2/K]",
+        "radiant_source[W/m2]"
+      ],
+      "rust_owner_or_planned_boundary": "SurfaceHeatBalanceState iteration snapshot"
+    },
+    {
+      "name": "ZoneAirState",
+      "producer_cards": "ZON-01/ZON-04/ZON-05/ZON-06",
+      "consumers": [
+        "ZON-02",
+        "ZON-03",
+        "HVAC"
+      ],
+      "timing": "separate previous-zone/previous-system/current-iteration/accepted/zone-average meanings",
+      "fields_with_units": [
+        "MAT[C]",
+        "ZT[C]",
+        "ZTAV[C]",
+        "W[kg/kg]",
+        "zone_history[array]",
+        "system_history[array]",
+        "dt[s]",
+        "retry_flags[bool]"
+      ],
+      "rust_owner_or_planned_boundary": "ZoneHeatBalanceState"
+    },
+    {
+      "name": "ZoneCoefficients",
+      "producer_cards": "ZON-02/HVAC-08",
+      "consumers": [
+        "predictor",
+        "corrector"
+      ],
+      "timing": "snapshot at each predictor/corrector stage",
+      "fields_with_units": [
+        "SumHA[W/K]",
+        "SumHATsurf/ref[W]",
+        "SumIntGain[W]",
+        "SumMCp/SumSysMCp[W/K]",
+        "SumMCpT/SumSysMCpT[W]",
+        "AirPowerCap[W/K]"
+      ],
+      "rust_owner_or_planned_boundary": "zone predictor/corrector coefficient snapshot"
+    },
+    {
+      "name": "Demand",
+      "producer_cards": "ZON-03",
+      "consumers": [
+        "HVAC-03",
+        "HVAC-04",
+        "HVAC-05"
+      ],
+      "timing": "before equipment dispatch; preserve zone/group multiplier application",
+      "fields_with_units": [
+        "heating_threshold[W]",
+        "cooling_threshold[W]",
+        "active_demand[W]",
+        "deadband[bool]",
+        "multipliers[1]"
+      ],
+      "rust_owner_or_planned_boundary": "zone demand snapshot"
+    },
+    {
+      "name": "SupplyState",
+      "producer_cards": "HVAC-04/HVAC-05/HVAC-06",
+      "consumers": [
+        "HVAC-08",
+        "report"
+      ],
+      "timing": "commit at CalcPurchasedAir tail; node update afterwards",
+      "fields_with_units": [
+        "temperature[C]",
+        "humidity_ratio[kg/kg]",
+        "enthalpy[J/kg]",
+        "mass_flow[kg/s]",
+        "delivered_sensible[W]",
+        "delivered_moisture[kg/s]"
+      ],
+      "rust_owner_or_planned_boundary": "PurchasedAirRuntimeState"
+    },
+    {
+      "name": "StepReport",
+      "producer_cards": "SUR-07/HVAC-07",
+      "consumers": [
+        "SYS-04"
+      ],
+      "timing": "iteration values overwritten; sum accepted system/zone step exactly once",
+      "fields_with_units": [
+        "rate[W]",
+        "energy[J]",
+        "store_type[Average/Sum]",
+        "accepted_dt[s]",
+        "warmup/report_flags[bool]"
+      ],
+      "rust_owner_or_planned_boundary": "ResultStore/report accumulators"
+    },
+    {
+      "name": "WarmupConvergence",
+      "producer_cards": "SYS-02",
+      "consumers": [
+        "SYS-03"
+      ],
+      "timing": "day end; all four temperature/heating/cooling convergence conditions",
+      "fields_with_units": [
+        "Tmax/Tmin[C]",
+        "heating/cooling_extrema[W]",
+        "previous_day_values[matching units]",
+        "absolute_temperature_difference[C]",
+        "normalized_load_difference[1]"
+      ],
+      "rust_owner_or_planned_boundary": "warmup convergence state"
+    }
+  ],
+  "source_declarations": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 159,
+      "end_line": 186,
+      "fields": [
+        "CTFCross",
+        "CTFFlux",
+        "CTFInside",
+        "CTFOutside",
+        "CTFTimeStep",
+        "NumHistories",
+        "NumCTFTerms"
+      ],
+      "file_sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "range_sha256": "aed95bc070f605f42873105dd1005bdf28e1e323b631f40a17565bbf24b38b57"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 107,
+      "end_line": 121,
+      "fields": [
+        "MAT",
+        "ZT",
+        "ZTAV",
+        "XMPT",
+        "XMAT",
+        "DSXMAT"
+      ],
+      "file_sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "range_sha256": "4883de65b1d84147a61744f02c5069229f4f4640687087da298ec6c077a1f4f9"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 128,
+      "end_line": 137,
+      "fields": [
+        "airHumRat",
+        "airHumRatAvg",
+        "airHumRatTemp",
+        "WPrevZoneTS",
+        "DSWPrevZoneTS"
+      ],
+      "file_sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "range_sha256": "05b114fb2756b5cf837069e740a75d05d0e0af42ffd3a86af552d0bcb74762b2"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 147,
+      "end_line": 154,
+      "fields": [
+        "SumIntGain",
+        "SumHA",
+        "SumHATsurf",
+        "SumHATref",
+        "SumMCp",
+        "SumMCpT",
+        "SumSysMCp",
+        "SumSysMCpT"
+      ],
+      "file_sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "range_sha256": "b5bcd1e0b94548a201774b376ebee4ad5c8ec77817301361d34d74e53583e1b4"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 208,
+      "end_line": 208,
+      "fields": [
+        "AirPowerCap"
+      ],
+      "file_sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "range_sha256": "4b3a98183cc378e46fe9ecbd606a16376b229d671ab5de3459d93fe36de12e5b"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "start_line": 66,
+      "end_line": 86,
+      "fields": [
+        "RemainingOutputRequired",
+        "UnadjRemainingOutputRequired",
+        "TotalOutputRequired",
+        "OutputRequiredToHeatingSP",
+        "OutputRequiredToCoolingSP"
+      ],
+      "file_sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "range_sha256": "9beeee9b2b1da6abe0e8af0886475aaaefebc66cf00759d27c7842135a64ad98"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.hh",
+      "start_line": 143,
+      "end_line": 146,
+      "fields": [
+        "MaxHeatSuppAirTemp",
+        "MinCoolSuppAirTemp",
+        "MaxHeatSuppAirHumRat",
+        "MinCoolSuppAirHumRat"
+      ],
+      "file_sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+      "range_sha256": "76e45e7928cb0b6516a9f72136c51c03fc8e0b6877cfe9bdb9c49b98162744db"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.hh",
+      "start_line": 173,
+      "end_line": 186,
+      "fields": [
+        "MaxHeatMassFlowRate",
+        "MaxCoolMassFlowRate",
+        "SupplyAirMassFlowRate"
+      ],
+      "file_sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+      "range_sha256": "803233070f9008fde76e2a1b2eda4f00bb266aa5bc53710ff4b6f8033a658ece"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.hh",
+      "start_line": 259,
+      "end_line": 259,
+      "fields": [
+        "SupplyTemp"
+      ],
+      "file_sha256": "231692659a62b82742d1714848097d4139f5e0cb3b25fbbc95aac8f02c792d46",
+      "range_sha256": "1c3ac1d0fefa0df028c4f2ccf67fd3fdae9b4972d081f333c88a4c54ed50aabf"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "start_line": 68,
+      "end_line": 86,
+      "fields": [
+        "PassFlag",
+        "TestMaxTempValue",
+        "TestMinTempValue",
+        "TestMaxHeatLoadValue",
+        "TestMaxCoolLoadValue"
+      ],
+      "file_sha256": "2080fdb48dc3a03429f093dfe4f7ce2fffa01519b7783db250410ea8b1bfcd69",
+      "range_sha256": "2d15c0245a35243edc609336028fd3e0afe78a58ce5e8c1680642411814a75eb"
+    }
+  ],
+  "comparison_policy": {
+    "ids_enums_array_lengths_timestamps": "exact",
+    "cache_input_version_invalidation_and_calculation_order": "preserve",
+    "MAT_ZT_ZTAV_may_be_merged": false
+  }
+}

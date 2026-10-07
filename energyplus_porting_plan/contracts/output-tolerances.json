@@ -1,0 +1,1648 @@
+{
+  "schema_version": "con01-output-tolerances.v2",
+  "status": "fixed before comparison; no completed numerical gates implied",
+  "units_policy": "per variable/key/frequency, never one mixed-unit tolerance",
+  "exact": [
+    "branch IDs",
+    "enum values",
+    "timestamps",
+    "environment IDs",
+    "array lengths",
+    "integer counts",
+    "NumCTFTerms",
+    "NumHistories",
+    "rain flags"
+  ],
+  "profiles": {
+    "A": [
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone Mean Air Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone Air Humidity Ratio",
+        "units": "kgWater/kgDryAir",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "AlwaysOn",
+        "variable": "Schedule Value",
+        "units": "scalar (declared schedule type retained)",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall001",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall002",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall003",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Wall004",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Flr001",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "Zn001:Roof001",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Outdoor Air Drybulb Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Outdoor Air Wetbulb Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Sky Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Horizontal Infrared Radiation Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      }
+    ],
+    "B": [
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone Mean Air Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone Air Humidity Ratio",
+        "units": "kgWater/kgDryAir",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "Zone Control Type Schedule",
+        "variable": "Schedule Value",
+        "units": "scalar (declared schedule type retained)",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "Heating Setpoint",
+        "variable": "Schedule Value",
+        "units": "scalar (declared schedule type retained)",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "Cooling Setpoint",
+        "variable": "Schedule Value",
+        "units": "scalar (declared schedule type retained)",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "Internal Gain Schedule",
+        "variable": "Schedule Value",
+        "units": "scalar (declared schedule type retained)",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "CON-01 System Availability",
+        "variable": "Schedule Value",
+        "units": "scalar (declared schedule type retained)",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "FLOOR",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ROOF",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL X0",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL X1",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL Y0",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Inside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Outside Face Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Inside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Outside Face Conduction Heat Transfer Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Heat Storage Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "WALL Y1",
+        "variable": "Surface Heat Storage Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Outdoor Air Drybulb Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Outdoor Air Wetbulb Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Sky Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "Environment",
+        "variable": "Site Horizontal Infrared Radiation Rate per Area",
+        "units": "W/m2",
+        "frequency": "Timestep",
+        "sampling_stage": "zone",
+        "atol": 1e-05,
+        "rtol": 0.0,
+        "rmse_max": 1e-05
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone Thermostat Heating Setpoint Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone Thermostat Cooling Setpoint Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE",
+        "variable": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE INLET",
+        "variable": "System Node Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ZONE ONE INLET",
+        "variable": "System Node Humidity Ratio",
+        "units": "kgWater/kgDryAir",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE INLET",
+        "variable": "System Node Mass Flow Rate",
+        "units": "kg/s",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE AIR NODE",
+        "variable": "System Node Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ZONE ONE AIR NODE",
+        "variable": "System Node Humidity Ratio",
+        "units": "kgWater/kgDryAir",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE AIR NODE",
+        "variable": "System Node Mass Flow Rate",
+        "units": "kg/s",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE RETURN",
+        "variable": "System Node Temperature",
+        "units": "C",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-06,
+        "rtol": 0.0,
+        "rmse_max": 1e-06
+      },
+      {
+        "key": "ZONE ONE RETURN",
+        "variable": "System Node Humidity Ratio",
+        "units": "kgWater/kgDryAir",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE RETURN",
+        "variable": "System Node Mass Flow Rate",
+        "units": "kg/s",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Total Heating Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Total Heating Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Sensible Heating Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Sensible Heating Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Latent Heating Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Latent Heating Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Total Cooling Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Total Cooling Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Sensible Cooling Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Sensible Cooling Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Latent Cooling Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Zone Latent Cooling Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Total Heating Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Total Heating Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Sensible Heating Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Sensible Heating Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Latent Heating Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Latent Heating Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Total Cooling Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Total Cooling Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Latent Cooling Rate",
+        "units": "W",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 0.001,
+        "rtol": 0.0,
+        "rmse_max": 0.001
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Latent Cooling Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Total Heating Fuel Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Total Cooling Fuel Energy",
+        "units": "J",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+        "units": "kg/s",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate",
+        "units": "m3/s",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      },
+      {
+        "key": "ZONE ONE IDEAL LOADS",
+        "variable": "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+        "units": "kg/s",
+        "frequency": "Timestep",
+        "sampling_stage": "system",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09
+      }
+    ]
+  },
+  "case_profiles": {
+    "A-24H": "A",
+    "A-72H": "A",
+    "A-ANNUAL": "A",
+    "B-NOLIMIT-24H": "B",
+    "B-NOLIMIT-72H": "B",
+    "B-NOLIMIT-ANNUAL": "B",
+    "B-FLOW-24H": "B",
+    "B-FLOW-72H": "B",
+    "B-FLOW-ANNUAL": "B",
+    "B-CAPACITY-24H": "B",
+    "B-CAPACITY-72H": "B",
+    "B-CAPACITY-ANNUAL": "B",
+    "B-BOTH-24H": "B",
+    "B-BOTH-72H": "B",
+    "B-BOTH-ANNUAL": "B"
+  },
+  "unit_settings_profiles": {
+    "UNIT-NORTH-NEGATIVE-WARMUP": "A",
+    "UNIT-NORTH-POSITIVE-DEFAULT-WARMUP": "A"
+  },
+  "meter_profiles": {
+    "A": [
+      {
+        "meter": "ExteriorLights:Electricity",
+        "units": "J",
+        "frequency": "Hourly",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0,
+        "numeric_comparison_card": "SYS-04",
+        "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+      },
+      {
+        "meter": "EnergyTransfer:Building",
+        "units": "J",
+        "frequency": "Hourly",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0,
+        "numeric_comparison_card": "SYS-04",
+        "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+      },
+      {
+        "meter": "EnergyTransfer:Facility",
+        "units": "J",
+        "frequency": "Hourly",
+        "atol": 1.0,
+        "rtol": 0.0,
+        "rmse_max": 1.0,
+        "numeric_comparison_card": "SYS-04",
+        "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+      }
+    ],
+    "B": []
+  }
+}
