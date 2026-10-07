@@ -75,7 +75,7 @@ B에서는 그 의존성을 적용한다.
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
 | [x] | [GEO-01](cards/GEO-01.md) | 좌표계와 꼭짓점 변환 | `SurfaceGeometry.cc` · `GetVertices; GetHTSurfaceData` | CON-01 |
-| [ ] | [GEO-02](cards/GEO-02.md) | 면적·방위·경사·중심점 | `SurfaceGeometry.cc` · `ProcessSurfaceVertices; CalcSurfaceCentroid` | GEO-01 |
+| [x] | [GEO-02](cards/GEO-02.md) | 면적·방위·경사·중심점 | `SurfaceGeometry.cc` · `ProcessSurfaceVertices; CalcSurfaceCentroid` | GEO-01 |
 | [ ] | [GEO-03](cards/GEO-03.md) | 대상 존의 체적 산정 | `SurfaceGeometry.cc` · `CalculateZoneVolume` | GEO-02 |
 
 ### 02 시간·기상

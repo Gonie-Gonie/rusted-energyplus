@@ -26,6 +26,8 @@ FROZEN = {
 PHYSICAL_CASES = {"A-24H", "A-72H", "B-BOTH-24H"}
 NEGATIVE_CASES = {"GEO02-INVALID-COLLINEAR", "GEO02-INVALID-COINCIDENT"}
 SOURCE_OWNERS = {
+    "crates/ep_compiler/src/compiler.rs",
+    "crates/ep_model/src/objects/surfaces.rs",
     "crates/ep_runtime/src/geometry.rs",
     "crates/ep_runtime/src/heat_balance/initialization.rs",
     "crates/ep_runtime/src/heat_balance/state.rs",
@@ -48,7 +50,7 @@ def integer(value, label, minimum=0):
     return value
 
 
-def named(rows):
+def named(rows, minimum_id=0):
     require(type(rows) is list, "Named rows are not an array")
     result, ids = {}, set()
     for row in rows:
@@ -56,7 +58,7 @@ def named(rows):
                 "Missing named identity")
         key = row["name"].upper()
         require(key not in result, "Duplicate case-normalized identity")
-        engine_id = integer(row["id"], "own engine ID", 1)
+        engine_id = integer(row["id"], "own engine ID", minimum_id)
         require(engine_id not in ids, "Duplicate own engine ID")
         ids.add(engine_id)
         result[key] = row
@@ -118,6 +120,14 @@ def contains_binding(value, expected):
     return type(value) is list and any(contains_binding(item, expected) for item in value)
 
 
+def identical_archived_content(actual, expected, bindings):
+    """Separate archive locations may hold one verified compiled source body."""
+    actual_path = bindings.check(actual)
+    expected_path = bindings.check(expected)
+    return (actual["sha256"] == expected["sha256"]
+            and actual_path.read_bytes() == expected_path.read_bytes())
+
+
 def frozen_contracts(matrix, bindings):
     refs = {key: ref(CONTRACTS / f"GEO-02-{key}.json") for key in FROZEN}
     for key, digest in FROZEN.items():
@@ -126,7 +136,7 @@ def frozen_contracts(matrix, bindings):
     source, cases, tolerances = [read(bindings.check(refs[key])) for key in FROZEN]
     require(source["energyplus_commit"] == PIN and tolerances["frozen_before_numerical_comparison"] is True,
             "Wrong original pin or unfrozen numerical policy")
-    require(set(cases["Rust_physical_cases"]) == PHYSICAL_CASES, "Frozen physical subset changed")
+    require(set(cases["Rust_physical_case_ids"]) == PHYSICAL_CASES, "Frozen physical subset changed")
     return refs, source, cases, tolerances
 
 
@@ -291,7 +301,8 @@ def verify_build(matrix, bindings):
     for key, value in rust.items():
         require(same_binding(actual[key], value), "Compiled Rust source bytes differ")
     for key, owner in (("cargo_lock", "Cargo.lock"), ("toolchain", "rust-toolchain.toml")):
-        require(same_binding(build[key], sources[owner]), "Actual Cargo/toolchain source differs")
+        require(identical_archived_content(build[key], sources[owner], bindings),
+                "Actual Cargo/toolchain archived content differs")
     precision = build["compiled_source_vs_committed_blobs"]
     differences = precision["line_ending_only_differences"]
     require(type(differences) is list and precision["all_other_content_exact"] is True
@@ -418,6 +429,20 @@ def fnv1a(content):
     return f"{value:016x}"
 
 
+def bounded_typed_geometry_rules(raw):
+    """One frozen raw IDF token maps to the parser's declared enum spelling.
+
+    compiler.rs parse_vertex_entry_direction uses eq_ignore_ascii_case, returns
+    VertexEntryDirection::CounterClockwise, and geometry_trace uses Debug. Raw
+    lexical bytes and the complete parsed-input family remain separately bound.
+    """
+    require(type(raw) is dict and set(raw) == {"starting_vertex_position", "vertex_entry_direction", "coordinate_system"}
+            and raw["starting_vertex_position"] == "UpperLeftCorner"
+            and raw["vertex_entry_direction"] == "CounterClockWise"
+            and raw["coordinate_system"] == "World", "Rules differ from the frozen representative domain")
+    return dict(raw, vertex_entry_direction="CounterClockwise")
+
+
 def compiled_projection(output, case, original, family_raw, bindings):
     """Verify real staged input and own typed coordinates without transforming them."""
     path = output / "compiled-geometry.json"
@@ -453,21 +478,21 @@ def compiled_projection(output, case, original, family_raw, bindings):
     frozen = input_geometry(case, bindings)
     surfaces = named(projection["surfaces"])
     zones = named(projection["zones"])
-    source_surfaces = named(original["first_initialized"]["surfaces"]) if original is not None else None
+    source_surfaces = named(original["first_initialized"]["surfaces"], 1) if original is not None else None
     require(len(surfaces) == 6 and len(zones) == 1 and (source_surfaces is None or set(surfaces) == set(source_surfaces))
             and set(surfaces) == {row["name"].upper() for row in frozen["surfaces"]},
             "Actual typed/native/input named topology differs")
-    zone_ids = {integer(row["id"], "typed zone ID", 1): key for key, row in zones.items()}
+    zone_ids = {integer(row["id"], "typed zone ID"): key for key, row in zones.items()}
     for row in frozen["surfaces"]:
         key = row["name"].upper()
         actual = surfaces[key]
-        require(integer(actual["zone_id"], "typed surface zone ID", 1) in zone_ids
+        require(integer(actual["zone_id"], "typed surface zone ID") in zone_ids
                 and zone_ids[actual["zone_id"]] == row["zone_name"].upper()
                 and actual["zone_name"].upper() == row["zone_name"].upper()
                 and actual["class"] == row["class"] and integer(actual["sides"], "typed sides") == 4,
                 "Actual stored typed surface binding/class differs")
         require(exact(actual["world_vertex_bits"], row["input_vertex_bits"])
-                and (source_surfaces is None or exact(source_surfaces[key]["vertex_bits"], row["input_vertex_bits"])),
+                and (source_surfaces is None or exact(source_surfaces[key]["world_vertex_bits"], row["input_vertex_bits"])),
                 "Own stored kernel vertex inputs differ from frozen raw World points")
         for values, tokens in zip(actual["world_vertices_m"], actual["world_vertex_bits"], strict=True):
             require(type(values) is list and len(values) == len(tokens) == 3, "Stored coordinate cardinality differs")
@@ -480,7 +505,8 @@ def compiled_projection(output, case, original, family_raw, bindings):
     settings = projection["settings"]
     require(settings["appendix_g_rotation_deg"] == 0
             and settings["building_raw_north_axis_deg"] == frozen["building_raw_north_axis_deg"]
-            and settings["global_geometry_rules"] == frozen["rules"], "Actual geometry settings differ")
+            and exact(settings["global_geometry_rules"], bounded_typed_geometry_rules(frozen["rules"])),
+            "Actual typed geometry settings differ")
     if family_raw is not None:
         family_projection = {key:projection[key] for key in ("parsed_input", "settings", "zones", "surfaces")}
         encoded = json.dumps(family_projection,sort_keys=True,separators=(",",":"),allow_nan=False).encode()

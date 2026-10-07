@@ -1,0 +1,1187 @@
+{
+  "card": "GEO-02",
+  "created_utc": "2026-10-07T21:16:45.783688+00:00",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-02/final-evidence-writer-01/write_final_evidence.1a5a2f9d.py",
+    "sha256": "1a5a2f9df8a9d66a57910b56a389682bbf68ae68f133954399daa532b0856a3c"
+  },
+  "metadata_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    ".runtime/porting/GEO-02/final-evidence-writer-01/write_final_evidence.1a5a2f9d.py",
+    "--unit-command",
+    ".runtime/porting/GEO-02/final-unit-comparison-01/receipt.json",
+    "--production-command",
+    ".runtime/porting/GEO-02/production-comparison-command-04/receipt.json",
+    "--production-report",
+    ".runtime/porting/GEO-02/production-comparison-04/comparison-report.json",
+    "--matrix",
+    ".runtime/porting/GEO-02/production-edb6f578-01/matrix.json",
+    "--unit-build",
+    ".runtime/porting/GEO-02/builds/final-edb6f578/build-receipt.json",
+    "--cli-build",
+    ".runtime/porting/GEO-02/builds/cli-edb6f578/build-receipt.json",
+    "--output-dir",
+    ".runtime/porting/GEO-02/final-evidence-01"
+  ],
+  "implementation_commit": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-cases.json",
+      "sha256": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-tolerances.json",
+      "sha256": "3876a34a85f84dc459d1fec406106c0166ef0ff1dd6942beb0d3a7fbcb19a0e1"
+    }
+  },
+  "scientific_gates_updated": false,
+  "schema": "geo02-production-comparison-evidence.v1",
+  "status": "pass-bounded-physical-proof-only",
+  "comparison_command": {
+    "path": ".runtime/porting/GEO-02/production-comparison-command-04/receipt.json",
+    "sha256": "2dae97cfb637962960906fc8588d37a9cc8bb5292121419c474d0c7107a2f567"
+  },
+  "raw_report": {
+    "path": ".runtime/porting/GEO-02/production-comparison-04/comparison-report.json",
+    "sha256": "f27d823fa9949fc1198e68154fe35e29a7de94d7a9b9fb89b6d8964b62242eeb"
+  },
+  "executed_checker": {
+    "path": ".runtime/porting/GEO-02/production-comparison-04/source/check_geo02_production.py",
+    "sha256": "d73b5ff7e0fc441fcd98ecf21ea1eb487e5c4c5e153af238a718e2c7bc08e7ae"
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": "tools/porting/check_geo02_production.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/production-comparison-04/source/check_geo02_production.py",
+        "sha256": "d73b5ff7e0fc441fcd98ecf21ea1eb487e5c4c5e153af238a718e2c7bc08e7ae"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_production_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/production-comparison-04/source/geo02_production_provenance.py",
+        "sha256": "34c3f6bba9685c591645fa4879629a2c2f05f00a97bda89cd26fb65a44b8d735"
+      }
+    },
+    {
+      "historical_path": "tools/porting/check_geo02_units.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/production-comparison-04/source/check_geo02_units.py",
+        "sha256": "e317c381a42aefba51ec15c2ddb9975dae1336f1a51b23c6b395818e83bf7c49"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_unit_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/production-comparison-04/source/geo02_unit_provenance.py",
+        "sha256": "3f21fd6718d7b2bbf22bcf8da540ff59081005c29187756ebedb1c01710956ec"
+      }
+    }
+  ],
+  "reader_history": {
+    "historical_static_review": {
+      "path": ".runtime/porting/GEO-02/independent-production-tool-review-01/review.json",
+      "sha256": "e6d1a43848f6e98c3702dbcd2b3fdfdb46b9cc94edb30afdd3763c163e3e555c"
+    },
+    "historical_static_review_is_successful_reader_identity": false,
+    "reader_amendments": [
+      {
+        "kind": "schema_ids_and_conditional_applicability",
+        "review": {
+          "path": ".runtime/porting/GEO-02/independent-production-reader-amendment-01/review.json",
+          "sha256": "3a7f2954b1f72a31d401e34a578f9a2697d5ed31b1bb802a73151019a25a2006"
+        }
+      },
+      {
+        "kind": "copied_source_content_identity",
+        "review": {
+          "path": ".runtime/porting/GEO-02/independent-production-content-amendment-01/review.json",
+          "sha256": "5453b16c3f63e931ab3dfce3df4442f6b6dd1987f64b95d24e863899d37bbb98"
+        }
+      },
+      {
+        "kind": "bounded_raw_to_typed_enum_identity",
+        "review": {
+          "path": ".runtime/porting/GEO-02/independent-production-enum-amendment-01/review.json",
+          "sha256": "7460c858cddd141949bb94ee8c7a5498599e2f55f24f4fbaab4565eda6cc2d21"
+        }
+      }
+    ],
+    "preserved_pre_numeric_failures": [
+      {
+        "attempt": "01",
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-01/receipt.json",
+          "sha256": "1294cba86ff218ae6e24018bee05fa315b7e1bf5aec6ca4b465d4cbd007592a5"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-01/stderr.log",
+          "sha256": "da06da2b1df4c31ac24f2766b9ece3a11428205022b8d6569d3fe5afbdcc5362"
+        },
+        "exit_code": 1,
+        "failure_stage": "frozen_contract_selector",
+        "before_numerical_scalar_comparison": true,
+        "archived_readers": [
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-01/source/check_geo02_production.py",
+            "sha256": "6b679b563a8d670de8088b96bb1b392b73ebefbcf4c6b21a0c9a70c037c6d6a3"
+          },
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-01/source/geo02_production_provenance.py",
+            "sha256": "14a45652df9c5e9085e35a1b794b6d1b80ae5aec051895ced361f26ce60496c1"
+          }
+        ],
+        "raw_receipt_rewritten": false
+      },
+      {
+        "attempt": "02",
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-02/receipt.json",
+          "sha256": "31f06ae9f589d6f89102cbaff767ec03fae257943dfa4b34e833694500214390"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-02/stderr.log",
+          "sha256": "32b99c4e35352e8828fb9a877c845b4d6b78a69600a4991a962e0ddbd32c84e7"
+        },
+        "exit_code": 1,
+        "failure_stage": "copied_source_path_identity",
+        "before_numerical_scalar_comparison": true,
+        "archived_readers": [
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-02/source/check_geo02_production.py",
+            "sha256": "d73b5ff7e0fc441fcd98ecf21ea1eb487e5c4c5e153af238a718e2c7bc08e7ae"
+          },
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-02/source/geo02_production_provenance.py",
+            "sha256": "fb9b8ad5cd37c5595609b98012f6cd4570ed2efe06baf0aeb0ebfe32c716b76e"
+          }
+        ],
+        "raw_receipt_rewritten": false
+      },
+      {
+        "attempt": "03",
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-03/receipt.json",
+          "sha256": "3f31301ab2b36e67fd780db11b3d35a50ba520dbe6b4b3a047851d6287f2cbe2"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-03/stderr.log",
+          "sha256": "baea78b79c4bf76dd1bfae1dd40148803a0def23f3e98364abc3a15faeaa4901"
+        },
+        "exit_code": 1,
+        "failure_stage": "raw_token_vs_typed_enum_spelling",
+        "before_numerical_scalar_comparison": true,
+        "archived_readers": [
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-03/source/check_geo02_production.py",
+            "sha256": "d73b5ff7e0fc441fcd98ecf21ea1eb487e5c4c5e153af238a718e2c7bc08e7ae"
+          },
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-03/source/geo02_production_provenance.py",
+            "sha256": "3247c7cdc9c112812ccf71a0e99d275cbaa35d9e0963cdf1e218e0b33aaefd77"
+          }
+        ],
+        "raw_receipt_rewritten": false
+      }
+    ],
+    "engine_commands_rerun_for_reader_amendments": false,
+    "frozen_inputs_or_numerical_tolerances_changed": false
+  },
+  "producer_matrix": {
+    "path": ".runtime/porting/GEO-02/production-edb6f578-01/matrix.json",
+    "sha256": "f36b07cfe8c9ece9ded93d771b012a1e13a70cc03e17b8c3e836eee7410c0d77"
+  },
+  "build": {
+    "receipt": {
+      "path": ".runtime/porting/GEO-02/builds/cli-edb6f578/build-receipt.json",
+      "sha256": "a0fa81f257a22aab88fc6564b7a22a2af9e9c037240a73d65792f633152f3d1a"
+    },
+    "binary": {
+      "path": ".runtime/porting/GEO-02/builds/cli-edb6f578/eplus-rs.exe",
+      "sha256": "7e9418367790c9716fba5c1fd4ccf689ffa6ee6de021fa4cd43d3396ae584b91"
+    },
+    "kind": "cli",
+    "implementation_commit": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+    "source_worktree_clean": true,
+    "actual_build_command": [
+      "cargo",
+      "build",
+      "-p",
+      "ep_cli",
+      "--bin",
+      "eplus-rs",
+      "-j",
+      "2"
+    ],
+    "build_command": {
+      "path": ".runtime/porting/GEO-02/cli-build-command-01/receipt.json",
+      "sha256": "027e1fb076fb9871dd4a3d76f8e691e53cb978378f3c89fef8b4858f709f0788"
+    },
+    "source_capture": {
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/eb/eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b",
+        "sha256": "eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b"
+      },
+      "source_bytes_match_before_and_after": true,
+      "repository_before": {
+        "head": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+        "worktree_clean": true
+      },
+      "repository_after": {
+        "head": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+        "worktree_clean": true
+      }
+    },
+    "compiled_source_count": 3646,
+    "exact_byte_matches": 3645,
+    "line_ending_only_difference_count": 1,
+    "source_precision_details_retained_in_build_receipt": true
+  },
+  "original_helper_execution": {
+    "path": ".runtime/porting/GEO-02/original-helper-first-01/helper-reference.json",
+    "sha256": "9a0052d5367cdfd0a04864f52e6a050ee2bb1ac2e4e8c310463064dd70c2f4ab"
+  },
+  "native_original_matrix": {
+    "path": ".runtime/porting/GEO-02/original-native-first-01/matrix.json",
+    "sha256": "5c95fa3b811bfd69370f626f8e3db689ac2d209d76debe2fbbad3fbf068805e4"
+  },
+  "original_first_reviews": {
+    "helper": {
+      "path": ".runtime/porting/GEO-02/independent-original-helper-review-01/review.json",
+      "sha256": "1e78c253533a0bf08c3aa94d0ebbffbcc20f71ee73e7c283f54abbb49aae1a3e"
+    },
+    "native_matrix": {
+      "path": ".runtime/porting/GEO-02/independent-original-native-review-01/review.json",
+      "sha256": "8b66be40636bd70bb4d22a60f619b676799079218c6e8d550ab89a5e761a4081"
+    }
+  },
+  "input_families": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/input-families.json",
+    "sha256": "4a2d458cdee4e8906810fec0566e18d5b229d4eed6ea4353f1568e29387608f0"
+  },
+  "checks": 72555,
+  "mismatch_count": 0,
+  "actual_successful_physical_commands": 6,
+  "ordinary_negative_commands": 2,
+  "maximum_reported_errors_by_frozen_profile": {
+    "area_m2": {
+      "reported_scalar_count": 4086,
+      "maximum_absolute_error": 0.0,
+      "maximum_reported_field_rmse": 0.0
+    },
+    "angles_deg": {
+      "reported_scalar_count": 9468,
+      "maximum_absolute_error": 0.0,
+      "maximum_reported_field_rmse": 0.0
+    },
+    "newell_area_vector_m2": {
+      "reported_scalar_count": 54,
+      "maximum_absolute_error": 0.0,
+      "maximum_reported_field_rmse": 0.0
+    },
+    "centroid_m": {
+      "reported_scalar_count": 14520,
+      "maximum_absolute_error": 0.0,
+      "maximum_reported_field_rmse": 0.0
+    },
+    "normals_and_lcs": {
+      "reported_scalar_count": 270,
+      "maximum_absolute_error": 0.0,
+      "maximum_reported_field_rmse": 0.0
+    },
+    "trig": {
+      "reported_scalar_count": 1578,
+      "maximum_absolute_error": 0.0,
+      "maximum_reported_field_rmse": 0.0
+    }
+  },
+  "per_field_scalar_metrics": {
+    "area_m2": {
+      "unit": "m2",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "gross_area_m2": {
+      "unit": "m2",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "net_area_shadow_m2": {
+      "unit": "m2",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "azimuth_deg": {
+      "unit": "deg",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "tilt_deg": {
+      "unit": "deg",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "newell_area_vector_m2": {
+      "unit": "m2",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "centroid_m": {
+      "unit": "m",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "newell_normal": {
+      "unit": "1",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "out_norm": {
+      "unit": "1",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "lcsx": {
+      "unit": "1",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "lcsy": {
+      "unit": "1",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "lcsz": {
+      "unit": "1",
+      "count": 54,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 54,
+      "rmse": 0.0
+    },
+    "sin_azimuth": {
+      "unit": "1",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "cos_azimuth": {
+      "unit": "1",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "sin_tilt": {
+      "unit": "1",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "cos_tilt": {
+      "unit": "1",
+      "count": 18,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 18,
+      "rmse": 0.0
+    },
+    "consumed_height_m": {
+      "unit": "m",
+      "count": 14466,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 14466,
+      "rmse": 0.0
+    },
+    "consumed_area_m2": {
+      "unit": "m2",
+      "count": 4032,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 4032,
+      "rmse": 0.0
+    },
+    "consumed_azimuth_deg": {
+      "unit": "deg",
+      "count": 4716,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 4716,
+      "rmse": 0.0
+    },
+    "consumed_tilt_deg": {
+      "unit": "deg",
+      "count": 4716,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 4716,
+      "rmse": 0.0
+    },
+    "consumed_convection_cos_tilt": {
+      "unit": "1",
+      "count": 1506,
+      "maximum_absolute_error": 0.0,
+      "bit_equal_count": 1506,
+      "rmse": 0.0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "Full_geometry": {
+        "path": ".runtime/porting/GEO-02/production-edb6f578-01/A-24H/full/geo02-geometry.json",
+        "sha256": "16541cffcc01c1225ffa6ea9c3d3547562374d417e63b4eb6d4ae488f3db27fe"
+      },
+      "actual_operands": {
+        "path": ".runtime/porting/GEO-02/production-edb6f578-01/A-24H/full/geo02-geometry-operands.json",
+        "sha256": "28b8bbe556e61d543c0461d90ced74ba7ef744b011172a32948e5fd6524ebc70"
+      },
+      "stored_surface_count": 6,
+      "stored_fields_per_surface": 16,
+      "Full_Summary": {
+        "ordinary_reports_and_results_equal": true,
+        "Summary_observer_files_absent": true,
+        "Summary_direct_sixteen_field_geometry_observation": false
+      },
+      "operand_proof": {
+        "actual_ordered_event_count": 4179,
+        "dictionary_count": 1301,
+        "omitted_event_count": 0,
+        "physical_consumer_counts": {
+          "outdoor_air_temperature_height": 2880,
+          "outside_wind_speed_height": 81,
+          "outside_convection_orientation": 81,
+          "solar_incidence_orientation": 555,
+          "surface_heat_transfer_area": 576
+        },
+        "physical_consumer_applicability": {
+          "outdoor_air_temperature_height": {
+            "policy": "all_physical_intervals",
+            "source_condition": "Stored temperature-height path precedes conditional exterior convection.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": true,
+            "physical_event_count": 2880,
+            "occupied_interval_count": 96,
+            "physical_interval_count": 96
+          },
+          "surface_heat_transfer_area": {
+            "policy": "all_physical_intervals",
+            "source_condition": "Actual zone correction consumes stored area in every physical interval.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": true,
+            "physical_event_count": 576,
+            "occupied_interval_count": 96,
+            "physical_interval_count": 96
+          },
+          "outside_convection_orientation": {
+            "policy": "conditional_physical_subset",
+            "source_condition": "Exterior forcing may return before convection; DOE2 must be selected to emit an orientation call.",
+            "eligible_own_surface_ids": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 81,
+            "occupied_interval_count": 14,
+            "physical_interval_count": 96
+          },
+          "outside_wind_speed_height": {
+            "policy": "exposed_conditional_physical_subset",
+            "source_condition": "NoWind returns before the height hook; exterior forcing may also skip convection.",
+            "eligible_own_surface_ids": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 81,
+            "occupied_interval_count": 14,
+            "physical_interval_count": 96
+          },
+          "solar_incidence_orientation": {
+            "policy": "exposed_daylight_physical_subset",
+            "source_condition": "NoSun skips the path; a real Some solar position is required before the orientation hook.",
+            "eligible_own_surface_ids": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 555,
+            "occupied_interval_count": 37,
+            "physical_interval_count": 96
+          }
+        },
+        "postrun_validation_consumer_counts": {},
+        "unscoped_setup_or_diagnostic_consumer_counts": {
+          "surface_heat_transfer_area": 6
+        },
+        "physical_surface_ids": {
+          "outdoor_air_temperature_height": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "outside_wind_speed_height": [
+            1,
+            2,
+            3
+          ],
+          "outside_convection_orientation": [
+            1,
+            2,
+            3
+          ],
+          "solar_incidence_orientation": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "surface_heat_transfer_area": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "actual_zone_invocations": 96,
+        "solar_radians": "actual consumed operands recorded; no solar conversion/incidence-output oracle",
+        "outward_normal_dot_consumer_claimed": false,
+        "physical_occupied_sample_coverage": {
+          "outdoor_air_temperature_height": {
+            "count": 96,
+            "inclusive_spans": [
+              [
+                0,
+                95
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          },
+          "outside_wind_speed_height": {
+            "count": 14,
+            "inclusive_spans": [
+              [
+                31,
+                34
+              ],
+              [
+                39,
+                48
+              ]
+            ],
+            "covers_all_actual_zone_intervals": false
+          },
+          "outside_convection_orientation": {
+            "count": 14,
+            "inclusive_spans": [
+              [
+                31,
+                34
+              ],
+              [
+                39,
+                48
+              ]
+            ],
+            "covers_all_actual_zone_intervals": false
+          },
+          "solar_incidence_orientation": {
+            "count": 37,
+            "inclusive_spans": [
+              [
+                29,
+                65
+              ]
+            ],
+            "covers_all_actual_zone_intervals": false
+          },
+          "surface_heat_transfer_area": {
+            "count": 96,
+            "inclusive_spans": [
+              [
+                0,
+                95
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          }
+        }
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "Full_geometry": {
+        "path": ".runtime/porting/GEO-02/production-edb6f578-01/A-72H/full/geo02-geometry.json",
+        "sha256": "1a78db9d3d88c95ade172b8bfc10807855c1d6826fe6d65f09b1a61c021b3323"
+      },
+      "actual_operands": {
+        "path": ".runtime/porting/GEO-02/production-edb6f578-01/A-72H/full/geo02-geometry-operands.json",
+        "sha256": "c9b32e0451e89361a2e97af1b0e4cc8326e0bea6c0e6c5fb56c57c72be79457d"
+      },
+      "stored_surface_count": 6,
+      "stored_fields_per_surface": 16,
+      "Full_Summary": {
+        "ordinary_reports_and_results_equal": true,
+        "Summary_observer_files_absent": true,
+        "Summary_direct_sixteen_field_geometry_observation": false
+      },
+      "operand_proof": {
+        "actual_ordered_event_count": 14919,
+        "dictionary_count": 4689,
+        "omitted_event_count": 0,
+        "physical_consumer_counts": {
+          "outdoor_air_temperature_height": 8640,
+          "outside_wind_speed_height": 945,
+          "outside_convection_orientation": 945,
+          "solar_incidence_orientation": 2655,
+          "surface_heat_transfer_area": 1728
+        },
+        "physical_consumer_applicability": {
+          "outdoor_air_temperature_height": {
+            "policy": "all_physical_intervals",
+            "source_condition": "Stored temperature-height path precedes conditional exterior convection.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": true,
+            "physical_event_count": 8640,
+            "occupied_interval_count": 288,
+            "physical_interval_count": 288
+          },
+          "surface_heat_transfer_area": {
+            "policy": "all_physical_intervals",
+            "source_condition": "Actual zone correction consumes stored area in every physical interval.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": true,
+            "physical_event_count": 1728,
+            "occupied_interval_count": 288,
+            "physical_interval_count": 288
+          },
+          "outside_convection_orientation": {
+            "policy": "conditional_physical_subset",
+            "source_condition": "Exterior forcing may return before convection; DOE2 must be selected to emit an orientation call.",
+            "eligible_own_surface_ids": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 945,
+            "occupied_interval_count": 157,
+            "physical_interval_count": 288
+          },
+          "outside_wind_speed_height": {
+            "policy": "exposed_conditional_physical_subset",
+            "source_condition": "NoWind returns before the height hook; exterior forcing may also skip convection.",
+            "eligible_own_surface_ids": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 945,
+            "occupied_interval_count": 157,
+            "physical_interval_count": 288
+          },
+          "solar_incidence_orientation": {
+            "policy": "exposed_daylight_physical_subset",
+            "source_condition": "NoSun skips the path; a real Some solar position is required before the orientation hook.",
+            "eligible_own_surface_ids": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 2655,
+            "occupied_interval_count": 177,
+            "physical_interval_count": 288
+          }
+        },
+        "postrun_validation_consumer_counts": {},
+        "unscoped_setup_or_diagnostic_consumer_counts": {
+          "surface_heat_transfer_area": 6
+        },
+        "physical_surface_ids": {
+          "outdoor_air_temperature_height": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "outside_wind_speed_height": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "outside_convection_orientation": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "solar_incidence_orientation": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "surface_heat_transfer_area": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "actual_zone_invocations": 288,
+        "solar_radians": "actual consumed operands recorded; no solar conversion/incidence-output oracle",
+        "outward_normal_dot_consumer_claimed": false,
+        "physical_occupied_sample_coverage": {
+          "outdoor_air_temperature_height": {
+            "count": 288,
+            "inclusive_spans": [
+              [
+                0,
+                287
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          },
+          "outside_wind_speed_height": {
+            "count": 157,
+            "inclusive_spans": [
+              [
+                27,
+                72
+              ],
+              [
+                113,
+                169
+              ],
+              [
+                212,
+                243
+              ],
+              [
+                246,
+                267
+              ]
+            ],
+            "covers_all_actual_zone_intervals": false
+          },
+          "outside_convection_orientation": {
+            "count": 157,
+            "inclusive_spans": [
+              [
+                27,
+                72
+              ],
+              [
+                113,
+                169
+              ],
+              [
+                212,
+                243
+              ],
+              [
+                246,
+                267
+              ]
+            ],
+            "covers_all_actual_zone_intervals": false
+          },
+          "solar_incidence_orientation": {
+            "count": 177,
+            "inclusive_spans": [
+              [
+                18,
+                76
+              ],
+              [
+                114,
+                172
+              ],
+              [
+                210,
+                268
+              ]
+            ],
+            "covers_all_actual_zone_intervals": false
+          },
+          "surface_heat_transfer_area": {
+            "count": 288,
+            "inclusive_spans": [
+              [
+                0,
+                287
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          }
+        }
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "Full_geometry": {
+        "path": ".runtime/porting/GEO-02/production-edb6f578-01/B-BOTH-24H/full/geo02-geometry.json",
+        "sha256": "30f4b54678a2f972bcab9140628fbc00a2cfc60fb99a8dcccbb58446ebbc53d7"
+      },
+      "actual_operands": {
+        "path": ".runtime/porting/GEO-02/production-edb6f578-01/B-BOTH-24H/full/geo02-geometry-operands.json",
+        "sha256": "24d9bbcebcf4aeb81da006a4a05358a6841ffe0e6a07c30015982158402da3c5"
+      },
+      "stored_surface_count": 6,
+      "stored_fields_per_surface": 16,
+      "Full_Summary": {
+        "ordinary_reports_and_results_equal": true,
+        "Summary_observer_files_absent": true,
+        "Summary_direct_sixteen_field_geometry_observation": false
+      },
+      "operand_proof": {
+        "actual_ordered_event_count": 4134,
+        "dictionary_count": 1542,
+        "omitted_event_count": 0,
+        "physical_consumer_counts": {
+          "outdoor_air_temperature_height": 1920,
+          "outside_wind_speed_height": 0,
+          "outside_convection_orientation": 480,
+          "solar_incidence_orientation": 0,
+          "surface_heat_transfer_area": 1728
+        },
+        "physical_consumer_applicability": {
+          "outdoor_air_temperature_height": {
+            "policy": "all_physical_intervals",
+            "source_condition": "Stored temperature-height path precedes conditional exterior convection.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": true,
+            "physical_event_count": 1920,
+            "occupied_interval_count": 96,
+            "physical_interval_count": 96
+          },
+          "surface_heat_transfer_area": {
+            "policy": "all_physical_intervals",
+            "source_condition": "Actual zone correction consumes stored area in every physical interval.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": true,
+            "physical_event_count": 1728,
+            "occupied_interval_count": 96,
+            "physical_interval_count": 96
+          },
+          "outside_convection_orientation": {
+            "policy": "conditional_physical_subset",
+            "source_condition": "Exterior forcing may return before convection; DOE2 must be selected to emit an orientation call.",
+            "eligible_own_surface_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "input_applicable": true,
+            "exact_zero_required": false,
+            "all_intervals_required": false,
+            "physical_event_count": 480,
+            "occupied_interval_count": 96,
+            "physical_interval_count": 96
+          },
+          "outside_wind_speed_height": {
+            "policy": "exposed_conditional_physical_subset",
+            "source_condition": "NoWind returns before the height hook; exterior forcing may also skip convection.",
+            "eligible_own_surface_ids": [],
+            "input_applicable": false,
+            "exact_zero_required": true,
+            "all_intervals_required": false,
+            "physical_event_count": 0,
+            "occupied_interval_count": 0,
+            "physical_interval_count": 96
+          },
+          "solar_incidence_orientation": {
+            "policy": "exposed_daylight_physical_subset",
+            "source_condition": "NoSun skips the path; a real Some solar position is required before the orientation hook.",
+            "eligible_own_surface_ids": [],
+            "input_applicable": false,
+            "exact_zero_required": true,
+            "all_intervals_required": false,
+            "physical_event_count": 0,
+            "occupied_interval_count": 0,
+            "physical_interval_count": 96
+          }
+        },
+        "postrun_validation_consumer_counts": {},
+        "unscoped_setup_or_diagnostic_consumer_counts": {
+          "surface_heat_transfer_area": 6
+        },
+        "physical_surface_ids": {
+          "outdoor_air_temperature_height": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "outside_wind_speed_height": [],
+          "outside_convection_orientation": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "solar_incidence_orientation": [],
+          "surface_heat_transfer_area": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "actual_zone_invocations": 96,
+        "solar_radians": "actual consumed operands recorded; no solar conversion/incidence-output oracle",
+        "outward_normal_dot_consumer_claimed": false,
+        "physical_occupied_sample_coverage": {
+          "outdoor_air_temperature_height": {
+            "count": 96,
+            "inclusive_spans": [
+              [
+                0,
+                95
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          },
+          "outside_wind_speed_height": {
+            "count": 0,
+            "inclusive_spans": [],
+            "covers_all_actual_zone_intervals": false
+          },
+          "outside_convection_orientation": {
+            "count": 96,
+            "inclusive_spans": [
+              [
+                0,
+                95
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          },
+          "solar_incidence_orientation": {
+            "count": 0,
+            "inclusive_spans": [],
+            "covers_all_actual_zone_intervals": false
+          },
+          "surface_heat_transfer_area": {
+            "count": 96,
+            "inclusive_spans": [
+              [
+                0,
+                95
+              ]
+            ],
+            "covers_all_actual_zone_intervals": true
+          }
+        }
+      }
+    }
+  ],
+  "negative_cases": [
+    {
+      "case_id": "GEO02-INVALID-COLLINEAR",
+      "frozen_scope": null,
+      "configured_porting_scope": "A",
+      "original_exit": 1,
+      "Rust_exit": 6,
+      "Rust_status": "runtime",
+      "runtime_summary_null": true,
+      "final_runtime_geometry_absent": true,
+      "physics_data_absent": true,
+      "actual_observations": {
+        "geometry_operand_events": 0,
+        "actual_zone_invocations": 0
+      },
+      "absence_is_not_fabricated_zero_counter": true,
+      "error_message_parity_claimed": false,
+      "original_results": {
+        "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COLLINEAR/native/geometry-observation.json",
+        "sha256": "8bd572da92b5c831d49d436739a53c2b518341554a861cd49c902ec3bfc88327"
+      },
+      "original_error_log": {
+        "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COLLINEAR/native/eplusout.err",
+        "sha256": "6e0a2bad3a848e2ed6ee90f19bbf7e150d7b48e560f75a96c3b58b2b4b8740b0"
+      },
+      "original_exit_observed": 1,
+      "cross_engine_error_code_or_message_parity_claimed": false
+    },
+    {
+      "case_id": "GEO02-INVALID-COINCIDENT",
+      "frozen_scope": null,
+      "configured_porting_scope": "A",
+      "original_exit": 1,
+      "Rust_exit": 6,
+      "Rust_status": "runtime",
+      "runtime_summary_null": true,
+      "final_runtime_geometry_absent": true,
+      "physics_data_absent": true,
+      "actual_observations": {
+        "geometry_operand_events": 0,
+        "actual_zone_invocations": 0
+      },
+      "absence_is_not_fabricated_zero_counter": true,
+      "error_message_parity_claimed": false,
+      "original_results": {
+        "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COINCIDENT/native/geometry-observation.json",
+        "sha256": "8fb1d282e1d8da2c465713f3147105d34ab1fb33c63770afbfe9ad46f50a4f6a"
+      },
+      "original_error_log": {
+        "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COINCIDENT/native/eplusout.err",
+        "sha256": "4483215a570a067e1c2e52ed4547e9476d6afbc9949284c82e9db749f8de55eb"
+      },
+      "original_exit_observed": 1,
+      "cross_engine_error_code_or_message_parity_claimed": false
+    }
+  ],
+  "source_capture": {
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/eb/eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b",
+      "sha256": "eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b"
+    },
+    "source_bytes_match_before_and_after": true,
+    "repository_before": {
+      "head": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+      "worktree_clean": false
+    },
+    "repository_after": {
+      "head": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+      "worktree_clean": false
+    }
+  },
+  "limitations": [
+    "Full directly observes sixteen final geometry fields; Summary proves ordinary-output independence only.",
+    "Fresh physical consumers are A24/A72/BBoth24; no new per-limit, B72 or annual Rust consumption claim.",
+    "All seven unchanged CON geometry inputs share independently reviewed A/B families; missing outputs are not inferred from GEO01.",
+    "Actual Rust geometry arguments are compared with corresponding original stored geometry; the original solar incidence consumer route/output remains unpaired.",
+    "SRC04 solar-clock/incidence output and SRC05 atmospheric equations are unclaimed.",
+    "Outward normal is stored; no original outward-normal dot-product consumer parity is claimed.",
+    "Temperature-height and area cover every physical interval; convection, wind and solar coverage follows actual conditional branches and input exposure flags.",
+    "Source-only globals/scratch/lifecycle/error messages are not fabricated Rust peers.",
+    "Collector completeness applies to the collecting thread."
+  ]
+}

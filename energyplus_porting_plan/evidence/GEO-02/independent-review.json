@@ -1,0 +1,358 @@
+{
+  "schema": "geo02-independent-final-review.v1",
+  "card": "GEO-02",
+  "status": "pass-bounded-final-independent-review",
+  "completed_utc": "2026-10-07T21:18:48.959464+00:00",
+  "implementation_commit": "edb6f57822b319692b0edaa30bc276a66bd3319e",
+  "reviewed_comparison_report": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/production-comparison.json",
+    "sha256": "e4502baa88ca4a4ac5e759bfe66d8942d48bfc6aa1e2891b8c90f06544e8ada9",
+    "bytes": 39881
+  },
+  "reviewed_final_unit_comparison": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/final-unit-comparison.json",
+    "sha256": "102195018a5fa69404d00b5c549894234b9378d07a493b8ef76585ec0910fb12",
+    "bytes": 7607
+  },
+  "reviewed_actual_commands": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/actual-commands.json",
+    "sha256": "d889582fdedc3e9fad9918e8be6cd5650101cbead155cbc95de0089676d8b1e0",
+    "bytes": 34696
+  },
+  "raw_unit_data_review": {
+    "path": ".runtime/porting/GEO-02/independent-final-unit-review-01/review.json",
+    "sha256": "ecab80d25e2f477b8d59947712c8e8eb0998c6fc5c53ae801477c0a6d833d709",
+    "bytes": 4131
+  },
+  "raw_production_data_review": {
+    "path": ".runtime/porting/GEO-02/independent-final-production-review-01/review.json",
+    "sha256": "02786b3eefcd7f118ace969080a68ed124d04a843b3319520a63978096accbb2",
+    "bytes": 9168
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-cases.json",
+      "sha256": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-tolerances.json",
+      "sha256": "3876a34a85f84dc459d1fec406106c0166ef0ff1dd6942beb0d3a7fbcb19a0e1"
+    }
+  },
+  "immutable_independent_readers": [
+    {
+      "historical_path": ".runtime/porting/GEO-02/independent-final-evidence-01/publish_review.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-final-evidence-01/reviewed-source/publish_review.py",
+        "sha256": "760d85ffb46fdc7232442577eb400b8669547ac1eee6ebb21f17bde20fbbe52e",
+        "bytes": 10750
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/GEO-02/independent-final-review/read_preserved_units.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-final-evidence-01/reviewed-source/read_preserved_units.py",
+        "sha256": "ccb23c71d5d304b6e47482a9536d0f79da00dca8c662d877daddbf8298087b97",
+        "bytes": 14774
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/GEO-02/independent-final-review/read_preserved_production.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-final-evidence-01/reviewed-source/read_preserved_production.py",
+        "sha256": "ccefd9adf94050f63b084feb94a58b9d0474f0b01e28eb1f6ab10c2704ab5a7a",
+        "bytes": 27782
+      }
+    }
+  ],
+  "metadata_review_argv": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-B",
+    ".runtime/porting/GEO-02/independent-final-evidence-01/publish_review.py"
+  ],
+  "final_unit": {
+    "checks": 3182,
+    "mismatches": 0,
+    "valid_quads": 15,
+    "geometry_scalars": 450,
+    "strict_Cen_IEEE_input_and_output_pairs": 526,
+    "source_only_unsafe_quads_unpaired": 2,
+    "maximum_absolute_error": 0.0,
+    "rmse": 0.0,
+    "physics_executed": false
+  },
+  "actual_production": {
+    "checks": 72555,
+    "mismatches": 0,
+    "successful_normal_CLI_commands": 6,
+    "ordinary_negative_CLI_commands": 2,
+    "Full_zone_invocations": 480,
+    "ordered_geometry_operand_events": 23232,
+    "omitted_events": 0,
+    "copied_geometry_surfaces": 18,
+    "copied_geometry_fields_per_surface": 16,
+    "copied_geometry_scalar_components": 540,
+    "exact_copied_geometry_scalar_bits": 540,
+    "all_reported_scalar_maximum_errors_and_rmse": 0.0,
+    "Full_Summary_ordinary_outputs_equal": true,
+    "Summary_direct_sixteen_field_claim": false
+  },
+  "compiled_source_precision": {
+    "source_count": 3646,
+    "exact_byte_matches": 3645,
+    "line_ending_only_differences": [
+      {
+        "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+        "compiled_archive": {
+          "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+          "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+        },
+        "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+        "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+        "difference": "preexisting working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+      }
+    ],
+    "all_other_content_exact": true,
+    "note": "source_worktree_clean follows Git status; exact bytes compiled remain independently archived, including any preexisting line endings"
+  },
+  "source_precision_interpretation": "All 3646 compiled CLI/example Rust source archives agree. The freezer records 3645 committed-blob byte matches and one pre-existing CRLF-only scheduled_output.rs difference; independent review verifies that difference's LF-normalized SHA256 and Git blob SHA1 without invoking Git. Clean committed source is distinct from byte-identical all-source claims.",
+  "source_review_precision": "27 amended independently reviewed Rust paths match both final builds; unchanged calculation bodies and four test-only fixture repairs retain separate immutable review histories.",
+  "physical_coverage": [
+    {
+      "case_id": "A-24H",
+      "surface_count": 6,
+      "geometry_scalar_count": 180,
+      "bit_equal_geometry_scalar_count": 180,
+      "actual_zone_invocations": 96,
+      "ordered_operand_events": 4179,
+      "physical_consumer_counts": {
+        "outdoor_air_temperature_height": 2880,
+        "surface_heat_transfer_area": 576,
+        "solar_incidence_orientation": 555,
+        "outside_wind_speed_height": 81,
+        "outside_convection_orientation": 81
+      },
+      "validation_consumer_counts": {},
+      "unscoped_consumer_counts": {
+        "surface_heat_transfer_area": 6
+      },
+      "physical_occupied_sample_counts": {
+        "outdoor_air_temperature_height": 96,
+        "surface_heat_transfer_area": 96,
+        "solar_incidence_orientation": 37,
+        "outside_wind_speed_height": 14,
+        "outside_convection_orientation": 14
+      },
+      "Full_Summary_numeric_outputs_equal": true,
+      "Summary_direct_sixteen_field_claim": false
+    },
+    {
+      "case_id": "A-72H",
+      "surface_count": 6,
+      "geometry_scalar_count": 180,
+      "bit_equal_geometry_scalar_count": 180,
+      "actual_zone_invocations": 288,
+      "ordered_operand_events": 14919,
+      "physical_consumer_counts": {
+        "outdoor_air_temperature_height": 8640,
+        "surface_heat_transfer_area": 1728,
+        "solar_incidence_orientation": 2655,
+        "outside_wind_speed_height": 945,
+        "outside_convection_orientation": 945
+      },
+      "validation_consumer_counts": {},
+      "unscoped_consumer_counts": {
+        "surface_heat_transfer_area": 6
+      },
+      "physical_occupied_sample_counts": {
+        "outdoor_air_temperature_height": 288,
+        "surface_heat_transfer_area": 288,
+        "solar_incidence_orientation": 177,
+        "outside_wind_speed_height": 157,
+        "outside_convection_orientation": 157
+      },
+      "Full_Summary_numeric_outputs_equal": true,
+      "Summary_direct_sixteen_field_claim": false
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "surface_count": 6,
+      "geometry_scalar_count": 180,
+      "bit_equal_geometry_scalar_count": 180,
+      "actual_zone_invocations": 96,
+      "ordered_operand_events": 4134,
+      "physical_consumer_counts": {
+        "outdoor_air_temperature_height": 1920,
+        "surface_heat_transfer_area": 1728,
+        "outside_convection_orientation": 480
+      },
+      "validation_consumer_counts": {},
+      "unscoped_consumer_counts": {
+        "surface_heat_transfer_area": 6
+      },
+      "physical_occupied_sample_counts": {
+        "outdoor_air_temperature_height": 96,
+        "surface_heat_transfer_area": 96,
+        "outside_convection_orientation": 96,
+        "solar_incidence_orientation": 0,
+        "outside_wind_speed_height": 0
+      },
+      "Full_Summary_numeric_outputs_equal": true,
+      "Summary_direct_sixteen_field_claim": false
+    }
+  ],
+  "ordinary_negative_admission": [
+    {
+      "case_id": "GEO02-INVALID-COLLINEAR",
+      "Rust_runtime_exit": 6,
+      "original_exit": 1,
+      "physical_zone_events": 0,
+      "final_geometry_absent": true,
+      "engine_error_code_or_message_equivalence_claimed": false
+    },
+    {
+      "case_id": "GEO02-INVALID-COINCIDENT",
+      "Rust_runtime_exit": 6,
+      "original_exit": 1,
+      "physical_zone_events": 0,
+      "final_geometry_absent": true,
+      "engine_error_code_or_message_equivalence_claimed": false
+    }
+  ],
+  "preserved_reader_history": {
+    "historical_static_review": {
+      "path": ".runtime/porting/GEO-02/independent-production-tool-review-01/review.json",
+      "sha256": "e6d1a43848f6e98c3702dbcd2b3fdfdb46b9cc94edb30afdd3763c163e3e555c"
+    },
+    "historical_static_review_is_successful_reader_identity": false,
+    "reader_amendments": [
+      {
+        "kind": "schema_ids_and_conditional_applicability",
+        "review": {
+          "path": ".runtime/porting/GEO-02/independent-production-reader-amendment-01/review.json",
+          "sha256": "3a7f2954b1f72a31d401e34a578f9a2697d5ed31b1bb802a73151019a25a2006"
+        }
+      },
+      {
+        "kind": "copied_source_content_identity",
+        "review": {
+          "path": ".runtime/porting/GEO-02/independent-production-content-amendment-01/review.json",
+          "sha256": "5453b16c3f63e931ab3dfce3df4442f6b6dd1987f64b95d24e863899d37bbb98"
+        }
+      },
+      {
+        "kind": "bounded_raw_to_typed_enum_identity",
+        "review": {
+          "path": ".runtime/porting/GEO-02/independent-production-enum-amendment-01/review.json",
+          "sha256": "7460c858cddd141949bb94ee8c7a5498599e2f55f24f4fbaab4565eda6cc2d21"
+        }
+      }
+    ],
+    "preserved_pre_numeric_failures": [
+      {
+        "attempt": "01",
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-01/receipt.json",
+          "sha256": "1294cba86ff218ae6e24018bee05fa315b7e1bf5aec6ca4b465d4cbd007592a5"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-01/stderr.log",
+          "sha256": "da06da2b1df4c31ac24f2766b9ece3a11428205022b8d6569d3fe5afbdcc5362"
+        },
+        "exit_code": 1,
+        "failure_stage": "frozen_contract_selector",
+        "before_numerical_scalar_comparison": true,
+        "archived_readers": [
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-01/source/check_geo02_production.py",
+            "sha256": "6b679b563a8d670de8088b96bb1b392b73ebefbcf4c6b21a0c9a70c037c6d6a3"
+          },
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-01/source/geo02_production_provenance.py",
+            "sha256": "14a45652df9c5e9085e35a1b794b6d1b80ae5aec051895ced361f26ce60496c1"
+          }
+        ],
+        "raw_receipt_rewritten": false
+      },
+      {
+        "attempt": "02",
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-02/receipt.json",
+          "sha256": "31f06ae9f589d6f89102cbaff767ec03fae257943dfa4b34e833694500214390"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-02/stderr.log",
+          "sha256": "32b99c4e35352e8828fb9a877c845b4d6b78a69600a4991a962e0ddbd32c84e7"
+        },
+        "exit_code": 1,
+        "failure_stage": "copied_source_path_identity",
+        "before_numerical_scalar_comparison": true,
+        "archived_readers": [
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-02/source/check_geo02_production.py",
+            "sha256": "d73b5ff7e0fc441fcd98ecf21ea1eb487e5c4c5e153af238a718e2c7bc08e7ae"
+          },
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-02/source/geo02_production_provenance.py",
+            "sha256": "fb9b8ad5cd37c5595609b98012f6cd4570ed2efe06baf0aeb0ebfe32c716b76e"
+          }
+        ],
+        "raw_receipt_rewritten": false
+      },
+      {
+        "attempt": "03",
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-03/receipt.json",
+          "sha256": "3f31301ab2b36e67fd780db11b3d35a50ba520dbe6b4b3a047851d6287f2cbe2"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-02/production-comparison-command-03/stderr.log",
+          "sha256": "baea78b79c4bf76dd1bfae1dd40148803a0def23f3e98364abc3a15faeaa4901"
+        },
+        "exit_code": 1,
+        "failure_stage": "raw_token_vs_typed_enum_spelling",
+        "before_numerical_scalar_comparison": true,
+        "archived_readers": [
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-03/source/check_geo02_production.py",
+            "sha256": "d73b5ff7e0fc441fcd98ecf21ea1eb487e5c4c5e153af238a718e2c7bc08e7ae"
+          },
+          {
+            "path": ".runtime/porting/GEO-02/production-comparison-03/source/geo02_production_provenance.py",
+            "sha256": "3247c7cdc9c112812ccf71a0e99d275cbaa35d9e0963cdf1e218e0b33aaefd77"
+          }
+        ],
+        "raw_receipt_rewritten": false
+      }
+    ],
+    "engine_commands_rerun_for_reader_amendments": false,
+    "frozen_inputs_or_numerical_tolerances_changed": false
+  },
+  "hash_review": {
+    "production_reference_occurrences": 19229,
+    "production_unique_hashed_files": 4099,
+    "compact_metadata_reference_occurrences": 172,
+    "compact_metadata_unique_hashed_files": 112
+  },
+  "method": "Independent read-only inspection of pinned original source/state, frozen contracts, compiled archived Rust source, preserved typed IEEE results, actual ordinary command/input/build identities and chronology, direct geometry observations and ordered consumer context, exact Full/Summary files/results and genuine zero-area admission failures. Compact summaries, lossless occupied-sample spans and historical reader failures are checked against actual raw evidence. No engine, Cargo, CMake, Git, geometry formula or official scientific checker rerun.",
+  "limitations": [
+    "Full directly observes sixteen final geometry fields; Summary proves ordinary-output independence only.",
+    "Fresh physical consumers are A24/A72/BBoth24; no new per-limit, B72 or annual Rust consumption claim.",
+    "All seven unchanged CON geometry inputs share independently reviewed A/B families; missing outputs are not inferred from GEO01.",
+    "Actual Rust geometry arguments are compared with corresponding original stored geometry; the original solar incidence consumer route/output remains unpaired.",
+    "SRC04 solar-clock/incidence output and SRC05 atmospheric equations are unclaimed.",
+    "Outward normal is stored; no original outward-normal dot-product consumer parity is claimed.",
+    "Temperature-height and area cover every physical interval; convection, wind and solar coverage follows actual conditional branches and input exposure flags.",
+    "Source-only globals/scratch/lifecycle/error messages are not fabricated Rust peers.",
+    "Collector completeness applies to the collecting thread.",
+    "Both named near-horizontal epsilon inputs actually select the fallback branch; general oblique inputs cover the ordinary branch. No claim is based on case names alone.",
+    "Two unsafe direct original helper warning/state-retention diagnostics are unpaired with Rust ordinary negative-input admission codes or text.",
+    "Original actual x87 PC64/RNE is the bound centroid precision profile; no general ambient x87 mode or whole EnergyPlus geometry domain certification."
+  ],
+  "scientific_gates_updated": false,
+  "future_cards_started": false
+}

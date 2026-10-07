@@ -121,15 +121,15 @@ def compare_geometry(case, output, compiled, original, profiles, cmp):
             and profile["rounding"] == "nearest_ties_even" and profile["control_writes_added"] is False
             and profile["selection_basis"] == "actual_original_x87_precision_observation", "Cen actual observed precision differs")
     typed = named(compiled["surfaces"])
-    source = named(original["final_weather"]["surfaces"])
+    source = named(original["final_weather"]["surfaces"], 1)
     rust = named(observed["surfaces"])
     require(set(rust) == set(typed) == set(source) and len(rust) == 6, "Physical named geometry topology differs")
     rust_by_id = {}
     for order,row in enumerate(observed["surfaces"],1):
         key = row["name"].upper()
         require(integer(row["runtime_iteration_order"], "runtime storage order", 1) == order
-                and integer(row["id"], "runtime surface ID", 1) == typed[key]["id"]
-                and integer(row["zone_id"], "runtime owning zone ID", 1) == typed[key]["zone_id"],
+                and integer(row["id"], "runtime surface ID") == typed[key]["id"]
+                and integer(row["zone_id"], "runtime owning zone ID") == typed[key]["zone_id"],
                 "Actual runtime/compiler ID ownership differs")
         values = geometry_tokens(row["geometry"])
         original_values = geometry_tokens(source[key]["geometry"])
@@ -252,7 +252,43 @@ def operand_tokens(call):
     return tokens
 
 
-def compare_operands(case, output, rust_by_id, original, profiles, build, bindings, cmp):
+def consumer_applicability(compiled, rust_by_id):
+    """Read admitted input flags; do not reconstruct branch/weather outcomes."""
+    inputs = compiled["parsed_input"]["objects"]["BuildingSurface:Detailed"]
+    require(type(inputs) is dict, "Parsed surface exposure flags are missing")
+    by_name = {name.upper(): row for name, row in inputs.items()}
+    require(len(by_name) == len(inputs) == len(rust_by_id)
+            and set(by_name) == {row["name"].upper() for row in rust_by_id.values()},
+            "Consumer input/stored named ownership differs")
+    outside, wind, sun = set(), set(), set()
+    for surface_id, stored in rust_by_id.items():
+        row = by_name[stored["name"].upper()]
+        require(row["outside_boundary_condition"] in {"Outdoors", "Adiabatic"}
+                and row["wind_exposure"] in {"WindExposed", "NoWind"}
+                and row["sun_exposure"] in {"SunExposed", "NoSun"},
+                "Exposure flags differ from the frozen CON domain")
+        if row["outside_boundary_condition"] == "Outdoors":
+            outside.add(surface_id)
+            if row["wind_exposure"] == "WindExposed":
+                wind.add(surface_id)
+            if row["sun_exposure"] == "SunExposed":
+                sun.add(surface_id)
+    all_surfaces = set(rust_by_id)
+    return {
+        "outdoor_air_temperature_height": (all_surfaces, "all_physical_intervals",
+            "Stored temperature-height path precedes conditional exterior convection."),
+        "surface_heat_transfer_area": (all_surfaces, "all_physical_intervals",
+            "Actual zone correction consumes stored area in every physical interval."),
+        "outside_convection_orientation": (outside, "conditional_physical_subset",
+            "Exterior forcing may return before convection; DOE2 must be selected to emit an orientation call."),
+        "outside_wind_speed_height": (wind, "exposed_conditional_physical_subset",
+            "NoWind returns before the height hook; exterior forcing may also skip convection."),
+        "solar_incidence_orientation": (sun, "exposed_daylight_physical_subset",
+            "NoSun skips the path; a real Some solar position is required before the orientation hook."),
+    }
+
+
+def compare_operands(case, output, compiled, rust_by_id, original, profiles, build, bindings, cmp):
     trace = read(output/"geo02-geometry-operands.json")
     require(trace["schema"] == "geo02-geometry-operands.v1"
             and trace["capture_source"] == "actual-rust-pipeline-geometry-consumer-hooks"
@@ -286,30 +322,40 @@ def compare_operands(case, output, rust_by_id, original, profiles, build, bindin
             last_physical = sample
             physical_counts[call["consumer"]] += 1
             occupied[call["consumer"]].add(sample)
-            physical_surfaces[call["consumer"]].add(integer(call["surface_id"],"actual surface ID",1))
+            physical_surfaces[call["consumer"]].add(integer(call["surface_id"],"actual surface ID"))
         elif call["context"] is None:
             unscoped_counts[call["consumer"]] += 1
         else:
             validation_counts[call["consumer"]] += 1
     require(len(first) == len(dictionary) and exact(dict(actual_counts),trace["consumer_counts"]),"Unused dictionary rows or consumer totals differ")
-    require(set(physical_counts) == set(CONSUMERS), "Selected consumers lack genuine physical coverage")
     expected_samples = set(range(len(clock["zone_invocations"])))
-    for consumer in CONSUMERS:
-        if consumer == "solar_incidence_orientation":
-            require(bool(occupied[consumer]) and occupied[consumer] <= expected_samples,
-                    "Solar actual Some-position subset is empty or outside physical steps")
-        else:
+    applicability = consumer_applicability(compiled, rust_by_id)
+    coverage = {}
+    for consumer, (eligible, policy, condition) in applicability.items():
+        require(physical_surfaces[consumer] <= eligible and occupied[consumer] <= expected_samples,
+                "Physical consumer used an inapplicable surface or unavailable interval: " + consumer)
+        if policy == "all_physical_intervals":
             require(occupied[consumer] == expected_samples,
-                    "Non-solar consumer lacks actual coverage of every physical zone interval: " + consumer)
-    source = named(original["final_weather"]["surfaces"])
+                    "Unconditional consumer lacks every physical zone interval: " + consumer)
+        elif eligible:
+            require(bool(occupied[consumer]), "Applicable conditional consumer has no physical observation: " + consumer)
+        else:
+            require(physical_counts[consumer] == 0 and not occupied[consumer],
+                    "Unexposed inputs emitted an inapplicable physical consumer: " + consumer)
+        coverage[consumer] = {"policy": policy, "source_condition": condition,
+            "eligible_own_surface_ids": sorted(eligible), "input_applicable": bool(eligible),
+            "exact_zero_required": not eligible, "all_intervals_required": policy == "all_physical_intervals",
+            "physical_event_count": physical_counts[consumer], "occupied_interval_count": len(occupied[consumer]),
+            "physical_interval_count": len(expected_samples)}
+    source = named(original["final_weather"]["surfaces"], 1)
     seen_keys = set()
     for index,call in enumerate(dictionary):
         caller_source(call,build,bindings)
         require(call["phase"] in {"rust_runtime","rust_runtime_setup"},"Unexpected geometry observation phase")
-        surface_id = integer(call["surface_id"],"geometry surface ID",1)
+        surface_id = integer(call["surface_id"],"geometry surface ID")
         require(surface_id in rust_by_id,"Unknown actual geometry surface")
         row = rust_by_id[surface_id]
-        require(integer(call["zone_id"],"geometry owning zone ID",1) == row["zone_id"],"Actual owning zone differs")
+        require(integer(call["zone_id"],"geometry owning zone ID") == row["zone_id"],"Actual owning zone differs")
         tokens = operand_tokens(call)
         key = json.dumps({k:v for k,v in call.items() if k not in {"first_sequence","operand"}},sort_keys=True,separators=(',',':'))
         require(key not in seen_keys,"Duplicate exact dictionary observation")
@@ -336,10 +382,11 @@ def compare_operands(case, output, rust_by_id, original, profiles, build, bindin
             if physical:
                 cmp.numeric(tokens[0],native["area_m2"],profiles["area_m2"],"consumed_area_m2",prefix,weights[index])
     return {"actual_ordered_event_count":len(order),"dictionary_count":len(dictionary),"omitted_event_count":0,
-            "physical_consumer_counts":dict(physical_counts),"postrun_validation_consumer_counts":dict(validation_counts),
+            "physical_consumer_counts":{key:physical_counts[key] for key in CONSUMERS},
+            "physical_consumer_applicability":coverage,"postrun_validation_consumer_counts":dict(validation_counts),
             "unscoped_setup_or_diagnostic_consumer_counts":dict(unscoped_counts),
-            "physical_occupied_samples":{key:sorted(value) for key,value in occupied.items()},
-            "physical_surface_ids":{key:sorted(value) for key,value in physical_surfaces.items()},
+            "physical_occupied_samples":{key:sorted(occupied[key]) for key in CONSUMERS},
+            "physical_surface_ids":{key:sorted(physical_surfaces[key]) for key in CONSUMERS},
             "actual_zone_invocations":len(clock["zone_invocations"]),
             "solar_radians":"actual consumed operands recorded; no solar conversion/incidence-output oracle",
             "outward_normal_dot_consumer_claimed":False}
@@ -447,7 +494,7 @@ def main():
         summary,summary_summary,_,_=runs["Summary"]
         compiled=compiled_projection(full,case,originals[case["id"]],family_raw,bindings)
         observed,stored=compare_geometry(case,full,compiled,originals[case["id"]],tolerances["profiles"],cmp)
-        operands=compare_operands(case,full,stored,originals[case["id"]],tolerances["profiles"],build,bindings,cmp)
+        operands=compare_operands(case,full,compiled,stored,originals[case["id"]],tolerances["profiles"],build,bindings,cmp)
         results.append({"case_id":case["id"],"Full_geometry":ref(full/"geo02-geometry.json"),
             "actual_operands":ref(full/"geo02-geometry-operands.json"),"stored_surface_count":len(stored),
             "stored_fields_per_surface":len(FIELD_PROFILES),"operand_proof":operands,
@@ -479,6 +526,7 @@ def main():
             "Actual Rust geometry arguments are compared with corresponding original stored geometry; the original solar incidence consumer route/output remains unpaired.",
             "SRC04 solar-clock/incidence output and SRC05 atmospheric equations are unclaimed.",
             "Outward normal is stored; no original outward-normal dot-product consumer parity is claimed.",
+            "Temperature-height and area cover every physical interval; convection, wind and solar coverage follows actual conditional branches and input exposure flags.",
             "Source-only globals/scratch/lifecycle/error messages are not fabricated Rust peers.",
             "Collector completeness applies to the collecting thread."])
     target=directory/"comparison-report.json"

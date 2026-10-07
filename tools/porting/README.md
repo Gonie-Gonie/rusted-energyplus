@@ -273,3 +273,51 @@ Summary produces no clock artifact. Rust materialized environment indices and
 native environment numbers retain their different provenance. Current calendar
 closure does not certify original Tomorrow/cursor/global-array implementations,
 adaptive system order, warmup, report serializers or annual building/HVAC physics.
+
+## GEO-02 preserved geometry comparisons
+
+GEO-02's frozen source, input-only cases and dimensional profiles are in
+`energyplus_porting_plan/contracts/GEO-02-*.json`. Original native executions
+precede Rust numerical work. The direct Rust example consumes only the frozen
+vertices and centroid operands, calls the canonical geometry owner, and never
+reads original answers. `geo02_reference.py` and `geo02_reference_native.py`
+prepare and record genuine same-GNU original helper and ordinary-IDF lifetimes;
+the source-preserving core keeps its disclosed O0/assertion/warning configuration.
+
+The following readers reuse retained outputs. They launch no engine or Cargo
+and update no card gates:
+
+```powershell
+python -B tools/porting/check_geo02_units.py --original-first .runtime/porting/GEO-02/original-helper-first-01/helper-reference.json --native-output .runtime/porting/GEO-02/original-helper-first-01/helper-results.json --rust-execution .runtime/porting/GEO-02/rust-final-01/execution.json
+python -B tools/porting/check_geo02_production.py --matrix .runtime/porting/GEO-02/production-edb6f578-01/matrix.json --output-dir .runtime/porting/GEO-02/production-review-NEW
+```
+
+Choose a fresh production output directory; retained comparisons are never
+overwritten. Reader sources are archived with their actual invocation. Earlier
+selector, copied-source path and raw/typed-enum reader failures remain separate
+historical receipts, with no engine reruns or changed numerical tolerances.
+
+Committed implementation `edb6f57822b319692b0edaa30bc276a66bd3319e` passes
+3,182 unit checks: 15 valid quads, 450 geometry scalar components and 526 exact
+three-operand centroid results. The two unsafe helper rows remain source-only.
+The centroid product precision is selected from observed original x87 PC64/RNE;
+the observer never writes floating-point controls. Signed-zero and dimensional
+profiles remain frozen. Both horizontal-epsilon probes took the near-horizontal
+branch; their names do not establish opposite sides of that threshold.
+
+The final production reader passes 72,555 checks for A-24H, A-72H and B-BOTH-24H
+Full/Summary plus two ordinary-input failures. Full copies actual stored surface
+bundles and retains 23,232 ordered operand events with no omissions, bound to
+480 real zone-loop invocations. Temperature height and area cover every interval;
+convection, wind and solar follow actual conditional branches and exposure flags.
+B's NoWind/NoSun branches have no corresponding events. Full/Summary numerical
+outputs agree, while Summary emits no Full geometry observer files and makes
+no direct sixteen-field geometry claim. Degenerate inputs fail before physical
+events with Rust runtime exit 6 and original exit 1, without error-text parity.
+
+These comparisons verify stored geometry and actual argument connections.
+They do not certify GEO-03 volume algorithms, SRC-04 solar time/incidence or
+outward-normal dot products, SRC-05 atmospheric equations, native scratch/global
+state, new per-limit/B-72H/annual physics, or whole EnergyPlus conformance.
+The bounded results and actual commands are retained under
+`energyplus_porting_plan/evidence/GEO-02/`.

@@ -18,8 +18,8 @@ Their hashes are respectively
 The [independent pre-run review](independent-contract-review.json) verifies
 16 original files, 46 exact source ranges, the actual input patches, and
 the absence of a dynamic `Site:VariableLocation` orientation producer.
-These checks establish source/input identity; numerical and lifecycle proof
-still requires actual execution.
+These pre-run checks establish source/input identity. The committed unit and
+bounded physical evidence described below supplies the separate execution proof.
 
 ## Producers and order
 
@@ -48,7 +48,7 @@ already true.
 
 ## Input and state boundaries
 
-There are 11 planned successful native IDF lifetimes: seven unchanged CON
+There are 11 successful native IDF lifetimes: seven unchanged CON
 cases plus four valid diagnostic vertex patches. Two separately frozen
 ordinary negative IDFs contain a collinear or coincident first wall. Their
 actual original nonzero exit, error logs, and zero physical callbacks must
@@ -97,7 +97,7 @@ policy is exact bits under the actually observed original configuration;
 the other field profiles use their frozen dimensional tolerances and
 exact class/zero-sign rules.
 
-## Preparation status
+## Original-first and implementation evidence
 
 Input/source preparation and independent pre-run review passed. Native
 configure/compile/link passed with the source-preserving GNU configuration;
@@ -128,17 +128,36 @@ and tolerances remain unchanged.
 
 The preserved existing Rust baseline has 729 mismatches, including 721
 missing geometry/centroid results and eight numerical differences. The
-canonical precommit candidate has zero mismatches in 3,182 checks. An
-independent reader also finds exact bits for all 450 paired geometry scalars
-and all 526 three-point centroid results. The candidate is explicitly a
-dirty-source build; a fresh committed-source unit comparison is still
-required. The [baseline](baseline-comparison.json) and
-[candidate](candidate-comparison.json) records retain both boundaries.
+canonical precommit candidate has zero mismatches in 3,182 checks. The
+[baseline](baseline-comparison.json) and [candidate](candidate-comparison.json)
+records retain their original boundaries, including the candidate's dirty-source
+build. The source-preserving GNU core retains its documented O0 reference
+configuration, original assertions and warnings, and preserved failed builds.
 
-Committed-source final comparison, production consumer evidence, and all
-four card gates remain pending. The source-preserving GNU core
-retains its documented O0 reference configuration, original assertions and
-warnings, and all previously preserved failed build histories.
+The final unit example and normal CLI are independently archived builds of
+committed implementation `edb6f57822b319692b0edaa30bc276a66bd3319e`.
+Their archived available-source inventories contain 3,646 matching Rust files,
+including files not selected for each binary. Against committed Git blobs,
+3,645 archived files are byte-exact and one unchanged historical file has CRLF
+bytes with exact LF-normalized content. These inventory comparisons do not
+claim every archived file was compiled. Actual Cargo commands, archived
+executables, and scientific-owner source review supply the separate build proof.
+The [final unit evidence](final-unit-comparison.json) records zero mismatches
+in 3,182 checks: 15 valid quads, 450 paired geometry scalar components, and
+526 exact three-operand centroid results. All paired scalar components and
+centroid results are bit-identical to the independently executed original.
+The two unsafe helper rows remain source-only and unpaired.
+
+Rust reuses the existing geometry entry points through one canonical
+`geometry/source_geometry.rs` owner. It preserves the selected producer order,
+plain binary64 source grouping, raw-angle cleanup, separate snapped normal,
+and stored-gross-area centroid weighting. The centroid precision helper uses
+the observed 64-bit product precision without writing floating-point controls.
+Initialization assigns one geometry bundle to each actual surface state;
+temperature/wind height, convection orientation, solar orientation, and area
+consumers read that owned state. Report recomputation suspends only the optional
+geometry collector. Neither observers nor comparison tools supply geometry
+answers to production calculations.
 
 The first full workspace test run found eight regressions in older tests
 whose hand-built horizontal surface winding disagreed with their assumed
@@ -154,5 +173,55 @@ Existing GEO-01 records supply only already observed coordinate/input
 identity and area/azimuth/tilt context. They contain no new centroid or
 raw/snapped normal observations. The separate
 [input family proof](input-families.json) binds the unchanged A/B geometry
-families. Fresh Rust physical proof is planned for A-24H, A-72H, and
-B-BOTH-24H with Full/Summary; it does not claim new B-72H or annual physics.
+families.
+
+## Bounded physical connection and closure
+
+The [production evidence](production-comparison.json) records 72,555 checks
+with zero differences for fresh A-24H, A-72H, and B-BOTH-24H Full/Summary runs.
+The three Full snapshots contain 540 geometry scalar components across six
+surfaces per case, all bit-identical to matching original stored geometry.
+These are stored-state observations, not geometry-kernel invocation counts.
+The observer retains 23,232 ordered operand events without omissions and
+binds their actual contexts to 480 physical zone-loop invocations. Eighteen
+unscoped initialization area events are identified separately.
+
+Temperature-height and area consumers cover every actual interval. Other
+consumers follow the existing conditional exterior balance and input exposure
+branches, as recorded below; no additional calls are made for coverage.
+
+| Actual case | Zone intervals | Wind-height / convection occupied intervals | Solar occupied intervals |
+|---|---:|---:|---:|
+| A-24H | 96 | 14 / 14 | 37 |
+| A-72H | 288 | 157 / 157 | 177 |
+| B-BOTH-24H | 96 | 0 / 96 | 0 |
+
+B's frozen surfaces have `NoWind` and `NoSun`. Their absent wind-height and
+solar events are verified inactive branches, not numerical validation of those
+calculations. Solar events in A copy actual orientation arguments only when
+the existing solar path has a real position. Rust still consumes angles rather
+than a source outward-normal dot product; no such dot-product parity is claimed.
+
+All reported geometry/consumed-field maximum errors and per-field RMSE are
+zero under unchanged dimensional profiles and exact class/zero-sign rules.
+Summary emits no Full geometry observer files. Its ordinary series, CSVs,
+result store, and run metadata agree with Full; Summary does not directly
+observe all sixteen final geometry fields. The [actual command record](actual-commands.json)
+retains one helper execution, six successful physical executions, and two
+ordinary-input failures. Collinear and coincident first walls produce actual
+Rust runtime exit 6 before physical events or result data, while the original
+exits 1. Error-code/text equality is not claimed.
+
+Three preserved production reader failures concerned a contract selector,
+copied-source path identity, and raw-token versus typed-enum spelling. Their
+raw receipts and reader archives remain unchanged. The corrected reader
+reused the same engine results, inputs, implementation, and frozen tolerances;
+its successful identity is recorded separately from the earlier static review.
+Independent final unit and production readers verified the retained data.
+
+This evidence closes GEO-02's selected A/B producer and state-connection
+scope. It does not close GEO-03 volume calculation, SRC-04 solar timing or
+incidence output, SRC-05 atmospheric equations, native scratch/global/error
+parity, other surface families, or whole simulation physics. Fresh Rust
+physical coverage is limited to the three listed cases; no new per-limit,
+B-72H, or annual physical claim is inferred from the input family proof.
