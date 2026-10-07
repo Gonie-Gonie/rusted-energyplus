@@ -1,0 +1,42 @@
+{
+  "card": "PSY-02",
+  "status": "pass",
+  "reviewer": "/root/git_relationship_audit",
+  "phase": "Final source contract review before original/Rust unit comparison",
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-source.json",
+      "sha256": "302f96b1309fdb81bff9c4a4e9190870d9cb3616b40ad71c509c86de63d81e13"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-cases.json",
+      "sha256": "9536841ec7d730afa788247b155531d5298833d7a2cecfdcb1e693a975d95d6b"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+      "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+    }
+  ],
+  "preceding_source_contract": {
+    "path": ".runtime/porting/PSY-02/precomparison-metadata-original/PSY-02-source.129303501657.json",
+    "historical_path": "energyplus_porting_plan/contracts/PSY-02-source.json",
+    "sha256": "129303501657ed2119306b6de1025ebf2af22263a9322ba151eee024d5124967"
+  },
+  "verified": {
+    "original_files": 14,
+    "original_body_ranges": 29,
+    "complete_independent_F6_and_F7_bodies": true,
+    "ordered_ObjexxFCL_min_max_body_and_import_pins": true,
+    "original_directory_and_target_compile_definitions": true,
+    "final_wording_change_only": "/constant_and_iteration_policy/Twb: explicit if(TWB>TDB) TWB=TDB, preserving NaN",
+    "unchanged_input_cases_and_tolerances": true,
+    "original_source_bodies_and_arithmetic_unchanged": true
+  },
+  "remaining_conditions": [
+    "Preserve exact signed-zero classification and each implementation's own from_call result resolution.",
+    "An iconvTol zero attempt proves convergence failure only when original diagnostics actually demonstrate it.",
+    "Stats-OFF local iteration counts, warning recurrence parity and inactive producer calls cannot be inferred from returned values."
+  ],
+  "numerical_comparisons_executed_by_reviewer": false,
+  "gates_updated": false
+}

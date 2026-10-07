@@ -1,0 +1,73 @@
+{
+  "schema": "psy02-checkpoint-validation.v1",
+  "status": "unit_and_regression_pass_production_pending",
+  "repository_head_during_tests": "2e83ca908cf3bef7e803a0019bad175eaf02cda4",
+  "workspace_tests_passed": 4533,
+  "executed_test_suites": 16,
+  "workspace": {
+    "path": ".runtime/porting/PSY-02/rust-validation/workspace-02/receipt.json",
+    "sha256": "70e0d549fa41d4a44b6a740cd938c76906931b9a899553f74a0c84a14c21823e"
+  },
+  "clippy_all_targets": {
+    "path": ".runtime/porting/PSY-02/rust-validation/clippy-final/receipt.json",
+    "sha256": "642b80753e8b14a818c3299dc6b9cb4a09ac6e4c5281dab36f17713e9bdade1f"
+  },
+  "focused_174": {
+    "path": ".runtime/porting/PSY-02/rust-validation/focused-03/receipt.json",
+    "sha256": "2fd955939b90f7e4de779de8c693380675920067056c47bcfa7cf03c4f62951e"
+  },
+  "nonoverwrite_exit_tests": {
+    "path": ".runtime/porting/PSY-02/rust-validation/ep-run-exit-01/receipt.json",
+    "sha256": "3845161279b92ea067ad14e0e998a7b94474d4c2129ea7315bdc98fbe6b89b26"
+  },
+  "working_tree_source_equal_to_final_regression_archive": true,
+  "source_guard_migration": {
+    "path": ".runtime/porting/PSY-02/source-guard-migration/summary.json",
+    "sha256": "0f0d820745bd7db90f582a3ec222914c0c95da63a7afc703c97baa63c62b978a"
+  },
+  "tls_clippy_reproductions": {
+    "path": ".runtime/porting/PSY-02/tls-clippy-probes/receipt.json",
+    "sha256": "51c9ec97738023ffff2de00928b65c70abe10864d663dba0418890e090894d3c"
+  },
+  "original_supplemental_outdoor_compositions": {
+    "path": ".runtime/porting/PSY-02/supplemental-outdoor-wet-bulb/original-composition.json",
+    "sha256": "dafe1c3e33e78fb6b41d6b19e69014c08584e2d55a0f0ab2b3ecbff7a3f4f7dc"
+  },
+  "strict_unit_reanalysis": {
+    "path": ".runtime/porting/PSY-02/unit-comparison-type-aware/comparison-report.json",
+    "sha256": "3766462df6a77d779c48ed93226632ea22b45b63e5df7d262d699ec50a9fe875"
+  },
+  "initial_input_only_Rust_execution": {
+    "path": ".runtime/porting/PSY-02/rust-unit-first/execution.json",
+    "sha256": "9d7f937aba1aa6d2df2165bb2703cc9ee2019c52a07cac9047332109ca39baa2"
+  },
+  "metadata_checks": {
+    "path": ".runtime/porting/PSY-02/aux-checks/precommit-01/receipt.json",
+    "sha256": "3b74c7e4d9c75e6b9c4136533f6b3173cf703004df418f6b5af3bb349dc61442"
+  },
+  "metadata_checks_note": "Plan, self-tests and views passed. The heat-structure launch in this helper failed before execution due to batch path spelling; direct scripts/dev.cmd retry passed (tool session35111).",
+  "preserved_failed_commands": [
+    {
+      "path": ".runtime/porting/PSY-02/rust-validation/focused-02/receipt.json",
+      "sha256": "751750b3a7b3a8995a0a11a34bcffa8798d7fc56d789b90505155a2dcda73eba"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/rust-validation/clippy-01/receipt.json",
+      "sha256": "8f2301fce998a0ce7eb39e12596e9a539598e5ab6b2f0450588daf3ee6f7463a"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/rust-validation/clippy-02/receipt.json",
+      "sha256": "0e9b2ae089577ac2c48096b9c8affbdd7af4724f8c01bad4abb0226a2b219bb0"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/rust-validation/workspace-01/receipt.json",
+      "sha256": "c70cfbac171bb04aa3f455ead02e64ccda617a1fa8796ed86c8b8b57df91ffe3"
+    }
+  ],
+  "production_verified": false,
+  "gates_updated": false,
+  "executed_launcher": {
+    "path": ".runtime/porting/PSY-02/prepare_checkpoint.py",
+    "sha256": "f93c81763d49719b9c649b8705ffc92bfb616e77295b9389c8cf687fbcd38439"
+  }
+}

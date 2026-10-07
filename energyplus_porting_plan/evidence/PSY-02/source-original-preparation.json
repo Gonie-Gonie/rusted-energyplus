@@ -1,0 +1,148 @@
+{
+  "schema": "psy02-original-preparation-evidence.v1",
+  "status": "original_first_complete_Rust_and_production_pending",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-source.json",
+      "sha256": "302f96b1309fdb81bff9c4a4e9190870d9cb3616b40ad71c509c86de63d81e13"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-cases.json",
+      "sha256": "9536841ec7d730afa788247b155531d5298833d7a2cecfdcb1e693a975d95d6b"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+      "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+    }
+  ],
+  "original_first": {
+    "path": ".runtime/porting/PSY-02/original-first/original-first.json",
+    "sha256": "9eb4f6c52725e93c64ffb1a708af93f8b82c96382cca7c95d715cee20d29397d"
+  },
+  "original_processes": [
+    {
+      "path": ".runtime/porting/PSY-02/original-first/normal-boundary-history/reference.json",
+      "sha256": "173fb852f01c9913c090bb9533754592bb84eea517f8457ae71b609b9538795c"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/original-first/cache-history-a-first/reference.json",
+      "sha256": "85f42c074ac7f124e335a1270efa447bed2a60caec08617b6f53cb9de42ea826"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/original-first/cache-history-b-first/reference.json",
+      "sha256": "856693cfd87428c20787617e4ac18761bba0adf387e617fdffb4b113ac8819f1"
+    }
+  ],
+  "original_fresh_process_count": 3,
+  "frozen_call_count": 521,
+  "numerical_calls_eligible_for_pairing": 516,
+  "unpaired_General_Iterate_source_diagnostics": 5,
+  "supplemental_original": {
+    "path": ".runtime/porting/PSY-02/supplemental-pressure-sentinel/reference.json",
+    "sha256": "99a7fa64d68c2098d9e9b087f121e8bf51856ef96563b8fd14b2916f3ca9151e"
+  },
+  "supplemental_call_count": 2,
+  "warning_observations": [
+    {
+      "call_index": 75,
+      "function": "PsyTsatFnPb",
+      "source_error_messages": [
+        {
+          "level": 2,
+          "message": "Saturation Temperature not converged after 51 iterations (PsyTsatFnPb)"
+        },
+        {
+          "level": 0,
+          "message": " Routine=PSY-02 reference Environment=, at Simulation time= 00:00 - 00:00"
+        },
+        {
+          "level": 0,
+          "message": " Input Pressure= 1555000.00"
+        },
+        {
+          "level": 0,
+          "message": " Resultant Temperature= -N0AN"
+        }
+      ],
+      "classification": "source_iteration_limit_warning_observed",
+      "original_local_counter_instrumented": false
+    },
+    {
+      "call_index": 354,
+      "function": "PsyTwbFnTdbWPb",
+      "source_error_messages": [
+        {
+          "level": 2,
+          "message": "WetBulb not converged after 101 iterations(PsyTwbFnTdbWPb)"
+        },
+        {
+          "level": 0,
+          "message": " Routine=PSY-02 reference, Environment=, at Simulation time= 00:00 - 00:00"
+        },
+        {
+          "level": 0,
+          "message": " Input Temperature = -39.99"
+        },
+        {
+          "level": 0,
+          "message": " Input Humidity Ratio= 1.999999E-002"
+        },
+        {
+          "level": 0,
+          "message": " Input Pressure = 80000.00"
+        },
+        {
+          "level": 0,
+          "message": " Resultant Temperature= 8.92E-002"
+        }
+      ],
+      "classification": "source_iteration_limit_warning_observed",
+      "original_local_counter_instrumented": false
+    },
+    {
+      "call_index": 462,
+      "function": "PsyTwbFnTdbWPb_raw",
+      "source_error_messages": [],
+      "classification": "failure_attempt_only",
+      "original_local_counter_instrumented": false
+    }
+  ],
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "native_unit_driver_build": {
+    "path": ".runtime/porting/PSY-02/native-driver-directory-definitions/native-driver-build.json",
+    "sha256": "c89059501ed319129fc4fd562a15bcc926037c4b9b50e87e9ac6a6c9e41cc81f"
+  },
+  "historical_header_mode_failure": {
+    "path": ".runtime/porting/PSY-02/native-driver-initial/failed-mode-guard.json",
+    "sha256": "c54c2bd30b0a08932b9da97eeeb84d68653f75575c8a225adeda2db4fcf15c1d"
+  },
+  "precomparison_metadata_correction": {
+    "path": ".runtime/porting/PSY-02/precomparison-metadata-correction.json",
+    "sha256": "8c82e40456da10fc5e3d4a7c4b82756efa4e0c57ba666580693673f3180c33e2"
+  },
+  "precomparison_clamp_wording_correction": {
+    "path": ".runtime/porting/PSY-02/precomparison-metadata-clamp-correction.json",
+    "sha256": "94357ffaff825b3a8125c3c869883e7ad4acf871ecbb97fbe5a45a82afe98288"
+  },
+  "commands": [
+    "python -B tools/porting/psy02_reference.py --run-original --driver-build .runtime/porting/PSY-02/native-driver-directory-definitions/native-driver-build.json --output-dir .runtime/porting/PSY-02/original-first",
+    "python -B .runtime/porting/PSY-02/run_supplemental_pressure_sentinel.py"
+  ],
+  "executed_receipt_writer": {
+    "path": ".runtime/porting/PSY-02/make_preparation_receipt.py",
+    "sha256": "ad57609aef35e3138d5408affbdc05303f06c8f597069cc5ccdfb5fd780fc8fe"
+  },
+  "Rust_comparison_performed": false,
+  "production_proof_complete": false,
+  "gates_updated": false,
+  "limitations": [
+    "ErrorManager warning aggregation/index parity excluded",
+    "Statistics-off local iteration counters and nested call tree unobserved",
+    "No physical CON input expansion or downstream HVAC/weather pipeline completion claim",
+    "Historical initial prepare launcher was not byte-archived at its first invocation"
+  ]
+}

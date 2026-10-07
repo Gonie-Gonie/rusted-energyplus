@@ -1,0 +1,468 @@
+{
+  "schema": "psy02-original-hpb-reachability.v1",
+  "card": "PSY-02",
+  "checks_passed": true,
+  "phase": "original-source simulation reachability; supplemental bounded negative production coverage",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "compiler_abi": "verified GCC13.2 MinGW-w64 UCRT POSIX SEH non-debug containers, genuine original API state",
+  "build": {
+    "path": ".runtime/porting/PSY-02/native-reachability/native-reachability-build.json",
+    "sha256": "18d1c691d2f7d1312804c22adba38875f98148ec62480570973c2e0addf9b948"
+  },
+  "build_verification": {
+    "path": ".runtime/porting/PSY-02/native-reachability/verification.json",
+    "sha256": "c159852477182d81a5a2982b10a02cf661f769ebd8620fbb1b03734edcccb2f1"
+  },
+  "preserved_postbuild_metadata_checker_failure": {
+    "path": ".runtime/porting/PSY-02/native-reachability/postbuild-check-failure.json",
+    "sha256": "f85ff3305bce7e7d845aa5c7fe1aebe65e4fe8b8756f124cfa75ec903f515630"
+  },
+  "binary": {
+    "path": ".runtime/porting/PSY-02/native-reachability/psy02_reachability.exe",
+    "sha256": "a22c1f764d8e5e65d4a5af1fdc1787ad318ba9fa0cef218b32789a9ea7e29320"
+  },
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "actual_compile_command": {
+    "path": ".runtime/porting/PSY-02/native-reachability/actual-compile-command.json",
+    "sha256": "d6e5aa2483bbd6b83c74921915ba9b681a35785bf1608d07b32318216cce913e"
+  },
+  "actual_compile_and_link_commands": {
+    "path": ".runtime/porting/PSY-02/native-reachability/actual-target-commands.log",
+    "sha256": "1b72932ec765f862080a9b2d3a8baa157e17e9e813c4d5c907d4ca0780a8266d"
+  },
+  "immutable_observer_sources": [
+    {
+      "path": ".runtime/porting/PSY-02/native-reachability/psy02_reachability.cpp",
+      "sha256": "8e5ddc8a0b090bf3c94fa2764271160a939312217296171626995147adabdc86"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/native-reachability/psy02_reachability.cmake",
+      "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+    }
+  ],
+  "archived_executed_launcher": {
+    "path": ".runtime/porting/PSY-02/reachability-proof-source/run_cases.executed.py",
+    "sha256": "6688144aa608584aadd0e51a3260ab9efedf8a827e1a54b1cad9059438d79207"
+  },
+  "launcher_original_identity": {
+    "historical_path": ".runtime/porting/PSY-02/reachability-preparation/run_cases.py",
+    "sha256": "6688144aa608584aadd0e51a3260ab9efedf8a827e1a54b1cad9059438d79207"
+  },
+  "source_lifetime_review": {
+    "path": ".runtime/porting/PSY-02/reachability-proof-source/source-lifetime-audit.json",
+    "sha256": "4109565cfe0311e4038dbbc0141e49dbb099c7abb0082f132129378e87c54676"
+  },
+  "archived_original_source_pins": [
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/api/state.cc",
+      "sha256": "ee6d3ef12048ea82bd1cb942f2bdb7755fe4a39cdcb91272a37aee742ad3b639"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/api/runtime.cc",
+      "sha256": "74e45dca0d71e9cd1ac37f4cdc85da6fe7780d78a5ec6cf3d304da4e770b9ea2"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/Psychrometrics.cc",
+      "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/PsychCacheData.hh",
+      "sha256": "30419f4ea110c4ca8c98b2f78641bb3d1493715a0c16645a288a9888bdb87094"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/original-source/src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    }
+  ],
+  "frozen_contract_archives": [
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/contracts/PSY-02-source.json",
+      "sha256": "302f96b1309fdb81bff9c4a4e9190870d9cb3616b40ad71c509c86de63d81e13"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/contracts/PSY-02-cases.json",
+      "sha256": "9536841ec7d730afa788247b155531d5298833d7a2cecfdcb1e693a975d95d6b"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-proof-source/contracts/PSY-02-tolerances.json",
+      "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+    }
+  ],
+  "raw_execution_matrices": [
+    {
+      "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/matrix.json",
+      "sha256": "ba2dc17afee2bf87f8d5e661dc7aa77353e85363fdfac78ca4c913efa970175e"
+    },
+    {
+      "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/matrix.json",
+      "sha256": "9bb53501ce45f15de3f650c701b7e2e3aac91f243671a21c95ff6d0c54c80ceb"
+    }
+  ],
+  "actual_original_executions": {
+    "count": 15,
+    "weather_environments": 15,
+    "physical_zone_callback_total": 177120,
+    "per_duration": {
+      "24H": {
+        "case_count": 5,
+        "zone_callbacks_each": 96
+      },
+      "72H": {
+        "case_count": 5,
+        "zone_callbacks_each": 288
+      },
+      "ANNUAL": {
+        "case_count": 5,
+        "zone_callbacks_each": 35040
+      }
+    },
+    "energyplus_exit_failures": 0,
+    "empty_full_hpb_array_scans": 60,
+    "scans_per_genuine_state": [
+      "constructor",
+      "begin-new-environment",
+      "final-weather-zone-after-reporting-before-wrapup",
+      "energyplus-return-before-stateDelete"
+    ],
+    "psychrometric_probe_calls_added": 0,
+    "state_reset_requested": false,
+    "simulation_inputs_modified": false
+  },
+  "lifetime_and_pressure_constraints": {
+    "original_cache_enabled": true,
+    "cache_capacity": 1048576,
+    "constructor_default": {
+      "i_h": 0,
+      "i_pb": 0,
+      "value_bits": "0000000000000000"
+    },
+    "only_full_array_initialization": "InitializePsychRoutines once under original init_constant_state_called guard before simulation",
+    "only_other_cache_writes": "original cached HPb miss publishes H/P tags and original returned result",
+    "automatic_postrun_clear_or_reinitialization": false,
+    "final_zone_and_return_occupied_rows_equal_all_cases": true,
+    "weather_pressure_hourly_count": 8760,
+    "weather_pressure_min_pa": 80000.0,
+    "weather_pressure_max_pa": 83900.0,
+    "weather_pressure_nonpositive_or_missing_count": 0,
+    "positive_pressure_tags_survive_replacement": "Every admitted HPb cache miss with positive finite P writes nonzero P tag; a later positive-P collision replaces it with another nonzero P tag, and hits leave it retained"
+  },
+  "conclusion": {
+    "bounded_negative_coverage": "No original cached HPb invocation with admitted positive pressure occurred in any frozen CON15 state lifetime, including warmup, under verified initialization/no-reset/cache-enabled prerequisites",
+    "slot_count_is_not_call_count": true,
+    "guard_or_caller_attribution_observed": false,
+    "individual_root_call_order_observed": false,
+    "raw_internal_iteration_count_observed": false,
+    "warmup_included": true,
+    "rust_simulation_comparison_performed": false,
+    "rust_B_annual_physics_claimed": false,
+    "whole_HVAC_or_building_parity_claimed": false,
+    "other_inputs_or_source_lifetimes_claimed": false
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "physical_zone_callbacks": 96,
+      "warmup_zone_callbacks": 1920,
+      "native_weather_environment_number": 3,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/A-24H/receipt.json",
+        "sha256": "4297cad8f92e67d7b76a0931fd55057072d15efea86773b326a5528530707120"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-primary/A-24H/observation.json",
+        "sha256": "952182676e1665d138800d18126bbacc6086e99569a73f23eb142dcbc7e1f996"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "physical_zone_callbacks": 288,
+      "warmup_zone_callbacks": 1536,
+      "native_weather_environment_number": 3,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/A-72H/receipt.json",
+        "sha256": "77ad3a59aa81afa4718b0807b975afbb5e6a392c3bb77ee9620afd6766185480"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/A-72H/observation.json",
+        "sha256": "184c42adc53fa2931d06e7817902936e499ffd80cc48457edd373ad9c21de371"
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "physical_zone_callbacks": 35040,
+      "warmup_zone_callbacks": 1920,
+      "native_weather_environment_number": 3,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/A-ANNUAL/receipt.json",
+        "sha256": "684ef5de2044da7acbe89bc35171e4edb1f7a26a9a0b2c4c490ca9509284ec6d"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/A-ANNUAL/observation.json",
+        "sha256": "5df99df694828a45d31ccdf42aff4083983b74bc0974904170582ef13472fa74"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "physical_zone_callbacks": 96,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/B-BOTH-24H/receipt.json",
+        "sha256": "04be98160f6864e4b5b833b9193fc0b3792e0e170d8ef50985ea3b997b7d61fe"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-primary/B-BOTH-24H/observation.json",
+        "sha256": "8f23726460c1cd8ed3a1115df26ba3d291f08d86d8ced21a11d4046c39e77bd3"
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "physical_zone_callbacks": 288,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-BOTH-72H/receipt.json",
+        "sha256": "b36d02695525796329d08a0dacc696bc2482da41ab8acc897f7dbcd816de9026"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-BOTH-72H/observation.json",
+        "sha256": "01d66e518f027e429c5a39242acd28e1d0d43e8e46e3b295e316cc61d4324107"
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "physical_zone_callbacks": 35040,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-BOTH-ANNUAL/receipt.json",
+        "sha256": "e29b6d279fdf9d2d877eb7008e3e3ca28d3108346b728a4e52073cb5f4e29503"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-BOTH-ANNUAL/observation.json",
+        "sha256": "5d216e514f881c0ad564be299a07518db561e1a1befc73a2e4bef7e3f163957a"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "physical_zone_callbacks": 96,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/B-CAPACITY-24H/receipt.json",
+        "sha256": "dd271053b6a973bf729efd33ef6f8fd940acf15f1040a1fd8d2a55fde6e23fcc"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-primary/B-CAPACITY-24H/observation.json",
+        "sha256": "5e20500278d881b9dd38444c9cb96133f754419b7a6b946801d24e0474d21633"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "physical_zone_callbacks": 288,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-CAPACITY-72H/receipt.json",
+        "sha256": "a952dad6e8b500652a6a05b7d8953c1c2e7d83c41e028498fc4c43e18d79d9dc"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-CAPACITY-72H/observation.json",
+        "sha256": "41ea80c6c991652e4b97b07fe05daa82c48b47b5defcb3d6899c6977ff779fe7"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "physical_zone_callbacks": 35040,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-CAPACITY-ANNUAL/receipt.json",
+        "sha256": "b206fdbff164e22c7b3514119e356713182dc2b80aab530dea4a3baa5f59f570"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-CAPACITY-ANNUAL/observation.json",
+        "sha256": "e09df004dd740627ebf3182e82f4f6ba8e833224badd22efc51b10000d5bf61c"
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "physical_zone_callbacks": 96,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/B-FLOW-24H/receipt.json",
+        "sha256": "98bd2db787dcb1c78b3a50271df2f7be8b6426e96b6eaf62c0a7b48e695c8a5c"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-primary/B-FLOW-24H/observation.json",
+        "sha256": "2496e7fefcce8eaf7a68c6a5e4a0f1f0c280b1af877529c2c6283a7692a0e026"
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "physical_zone_callbacks": 288,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-FLOW-72H/receipt.json",
+        "sha256": "c9dd2382a58277119f371b82bd52988da1d737b99a2d11fa5a9e47497386178c"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-FLOW-72H/observation.json",
+        "sha256": "8f51880e2726126211a741a1deb6c82d7301c6e806404e4d4f85c4ad83f86f03"
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "physical_zone_callbacks": 35040,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-FLOW-ANNUAL/receipt.json",
+        "sha256": "dc5d730569876f16b4635fee0f78bf001e559248ebfb2ce4d6d144a7b2c73c1b"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-FLOW-ANNUAL/observation.json",
+        "sha256": "63f7e0d648a7207fe03f5b6cbff361a76e9dce6723a4d28253344be06503c3fd"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "physical_zone_callbacks": 96,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/B-NOLIMIT-24H/receipt.json",
+        "sha256": "cc8681b1cb8d91a0719c85a6cf0caa1acd7b449187fe9ef2fc8139d5fdba2036"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-primary/B-NOLIMIT-24H/observation.json",
+        "sha256": "2e3bd912175ddd772e9dfdff6670f794490686b189e51a80f41bb958fe9f2cb4"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "physical_zone_callbacks": 288,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-primary/B-NOLIMIT-72H/receipt.json",
+        "sha256": "d2c2c086dd18c05bb51edf26231a85ac8dcbdefef0c1c1f7cc6018d605820eab"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-primary/B-NOLIMIT-72H/observation.json",
+        "sha256": "66e901fe95ece57460901383ad63d829ee5ebe263927ca38fd8b0bc8b6f5822f"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "physical_zone_callbacks": 35040,
+      "warmup_zone_callbacks": 576,
+      "native_weather_environment_number": 1,
+      "constructor_begin_final_zone_return_scan_count": 4,
+      "hpb_capacity_each_scan": 1048576,
+      "occupied_hpb_slots_at_all_scans": 0,
+      "positive_pressure_hpb_tags_at_all_scans": 0,
+      "wrapup_table_retained_exact": true,
+      "receipt": {
+        "path": ".runtime/porting/PSY-02/reachability-launches/original-remainder/B-NOLIMIT-ANNUAL/receipt.json",
+        "sha256": "ce183a96d9df7b2299b6219bfc5b7d84c09d97faa7ffc5440d6c0a05c840ede1"
+      },
+      "observation": {
+        "path": ".runtime/porting/PSY-02/reachability/original-remainder/B-NOLIMIT-ANNUAL/observation.json",
+        "sha256": "d67e1bff9717c72161c077fa15d0b0d3cc1676556a838f6a61085ef331f9d79c"
+      }
+    }
+  ],
+  "gates_updated": false
+}

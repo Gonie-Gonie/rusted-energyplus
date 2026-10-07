@@ -1,0 +1,453 @@
+{
+  "schema": "psy02-source-contract.v1",
+  "card": "PSY-02",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45"
+    },
+    {
+      "path": "src/EnergyPlus/PsychCacheData.hh",
+      "sha256": "30419f4ea110c4ca8c98b2f78641bb3d1493715a0c16645a288a9888bdb87094"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658"
+    },
+    {
+      "path": "src/EnergyPlus/General.hh",
+      "sha256": "d7dcfac7390ef66dfee198739e1886110c494dd54ef953d204bad78d710eb021"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.hh",
+      "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    },
+    {
+      "path": "src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005"
+    },
+    {
+      "path": "src/EnergyPlus/api/func.cc",
+      "sha256": "78cff481145ac70564101b102748d87da9bd1b964783d27891df162e3cd1e0c9"
+    },
+    {
+      "path": "src/EnergyPlus/CMakeLists.txt",
+      "sha256": "9eeb0425b05e336d897337258035b5fc49b8f8849c7b0f3efb671fb02c0ec43c"
+    },
+    {
+      "path": "src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyWFnTdbH",
+      "start_line": 962,
+      "end_line": 998,
+      "helpers": [],
+      "range_sha256": "e0b218f02e04d69006da337d9f8817fecc3ea0302aa7e92939c8e2e90ba826cc"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyWFnTdbRhPb",
+      "start_line": 1342,
+      "end_line": 1387,
+      "helpers": [
+        "PsyPsatFnTemp",
+        "PsyWFnTdbRhPb_error",
+        "ObjexxFCL::max"
+      ],
+      "range_sha256": "9e2d3cbd4fc80af4344d6a98ce2315eb972b2717bbdf3ac638f86d845f3287e3"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyTsatFnHPb",
+      "start_line": 1073,
+      "end_line": 1120,
+      "helpers": [
+        "PsyTsatFnHPb_raw"
+      ],
+      "range_sha256": "de90cd6ca1d79f766883531b6be1d81644a6179c945e6dae83777338574e66e0"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyTsatFnHPb_raw",
+      "start_line": 899,
+      "end_line": 1072,
+      "helpers": [
+        "F6",
+        "F7",
+        "PsyHFnTdbW",
+        "PsyWFnTdbTwbPb",
+        "ObjexxFCL::max",
+        "ObjexxFCL::min"
+      ],
+      "range_sha256": "34b2e141369752e0f73ff928f47652fb23e2acb6ecf4e68601658a047988be6a"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyTwbFnTdbWPb",
+      "start_line": 279,
+      "end_line": 345,
+      "helpers": [
+        "PsyTwbFnTdbWPb_raw"
+      ],
+      "range_sha256": "5450ae54cfbf7f78aaa77a5ea9e55238a336b4ce5e41b815068ad19c1b0ed7b9"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyTwbFnTdbWPb_raw",
+      "start_line": 347,
+      "end_line": 566,
+      "helpers": [
+        "PsyTsatFnPb",
+        "PsyPsatFnTemp",
+        "General::Iterate"
+      ],
+      "range_sha256": "d6bfe4e9445ecd5b3a15ac1fb612189a407e3558134113d44f72c7aa7d490b20"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyPsatFnTemp",
+      "start_line": 1000,
+      "end_line": 1071,
+      "helpers": [
+        "PsyPsatFnTemp_raw"
+      ],
+      "range_sha256": "0022822c207e2e6bb57ee650977cb62a1732549eb3b17e958528fbc5d96d15f5"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyPsatFnTemp_raw",
+      "start_line": 640,
+      "end_line": 784,
+      "helpers": [
+        "std::exp",
+        "std::log"
+      ],
+      "range_sha256": "397e8ebae1f583ee1548036d45864f4bfe8779f522f3e756ec30b81c24897d0d"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyTsatFnPb",
+      "start_line": 1488,
+      "end_line": 1525,
+      "helpers": [
+        "PsyTsatFnPb_raw"
+      ],
+      "range_sha256": "4179f8f19cfee058f379af2aa86733e93d021ef01ea82af9a05a83af40d08825"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyTsatFnPb_raw",
+      "start_line": 1264,
+      "end_line": 1450,
+      "helpers": [
+        "PsyPsatFnTemp",
+        "General::Iterate"
+      ],
+      "range_sha256": "1f65d45ce33ca93dc49ec26e21b3ec3b1e9c9ac833a08d6da764960555fce02f"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyWFnTdbTwbPb",
+      "start_line": 1408,
+      "end_line": 1460,
+      "helpers": [
+        "PsyPsatFnTemp",
+        "PsyWFnTdbRhPb"
+      ],
+      "range_sha256": "0b0be48910147c0a7654a1c8399095514b8e6ad49629d763ab3a71ed9e81682f"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "F6",
+      "start_line": 1600,
+      "end_line": 1603,
+      "helpers": [],
+      "range_sha256": "96ab763f6521f6f32dfa6e4052c18316af4482f88006dc9c42cce4fa5d2aceb5"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "F7",
+      "start_line": 1605,
+      "end_line": 1609,
+      "helpers": [],
+      "range_sha256": "0c1a37f5a1811c3be373389db61dfbf51d09c974b061daef3784f8c608f366b5"
+    },
+    {
+      "path": "src/EnergyPlus/EnergyPlus.hh",
+      "symbol": "using ObjexxFCL::max",
+      "start_line": 165,
+      "end_line": 166,
+      "helpers": [
+        "ObjexxFCL::min"
+      ],
+      "range_sha256": "ca7a1f3ec146fa9636410022bfda1ff19282fa3e0bf83615a21c6aca8a84f3e2"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "symbol": "min",
+      "start_line": 90,
+      "end_line": 96,
+      "helpers": [],
+      "range_sha256": "e9df9b39ae0aefa1fa2738bf1a676ddde126bd15f70765f28ae6b6dc127be0f9"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "symbol": "max",
+      "start_line": 338,
+      "end_line": 344,
+      "helpers": [],
+      "range_sha256": "adac2895827d687dfeacca560aec41f77eb548a1d8c0a0d55b2950032928749a"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "symbol": "Iterate",
+      "start_line": 918,
+      "end_line": 979,
+      "helpers": [],
+      "range_sha256": "f7ba941c6919fb4b75ac4bb2f758f08a9ad896e2a3f8bdf77b75f9a4dee056d0"
+    },
+    {
+      "path": "src/EnergyPlus/PsychCacheData.hh",
+      "symbol": "PsychrometricCacheData",
+      "start_line": 80,
+      "end_line": 201,
+      "helpers": [],
+      "range_sha256": "ea545ea881fadbd02d94218de5af13851da01c0b35bc9415ab28a2fa4a3d7b14"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsychrometricsData",
+      "start_line": 1702,
+      "end_line": 1735,
+      "helpers": [
+        "InitializePsychRoutines"
+      ],
+      "range_sha256": "c071a3e3b600f1641d06fbf51bba93743573881b43863c890d54ba3464255e8c"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "InitializePsychRoutines",
+      "start_line": 110,
+      "end_line": 134,
+      "helpers": [],
+      "range_sha256": "d5f82af56c939670da609d314846f42be482d6c52eef7262693d98b92027e114"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyWFnTdbH_error",
+      "start_line": 606,
+      "end_line": 638,
+      "helpers": [],
+      "range_sha256": "692bcf3c13daf88afdb162751e187773a64c3b2f0cd751d6cd8dc965fc3064ad"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyWFnTdbRhPb_error",
+      "start_line": 1228,
+      "end_line": 1262,
+      "helpers": [],
+      "range_sha256": "a112f86787cd9908b55096a87acab2f0c59952b738f3a4b5a0b7d0f2319b2044"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "PsyWFnTdbTwbPb_temperature_error",
+      "start_line": 786,
+      "end_line": 855,
+      "helpers": [],
+      "range_sha256": "3f02bcf9aa2c5cdc2c53f94a9f3443766386681d2d1c6dc32a9c84c0dd5b8a0c"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "PsyWFnTdbRhPb",
+      "start_line": 2125,
+      "end_line": 2148,
+      "helpers": [
+        "PsyTwbFnTdbWPb"
+      ],
+      "range_sha256": "7be9f7a4703eefcc71827fbbec047220a58f8a1be5b285f24866db146806378f"
+    },
+    {
+      "path": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "PsyWFnTdbH",
+      "start_line": 2191,
+      "end_line": 2330,
+      "helpers": [
+        "PsyTsatFnHPb",
+        "PsyWFnTdbRhPb"
+      ],
+      "range_sha256": "85b5f6c8ef320c1ff4e52e6a1abb356c754cc3a8a868b342bcf68751675feb02"
+    },
+    {
+      "path": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "PsyWFnTdbRhPb",
+      "start_line": 2556,
+      "end_line": 2570,
+      "helpers": [],
+      "range_sha256": "0de6d34eb9a16db00963fa39535bb74b78dd94baa933126dabbe9c7bdeda1526"
+    },
+    {
+      "path": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "PsyWFnTdbRhPb",
+      "start_line": 2610,
+      "end_line": 2632,
+      "helpers": [],
+      "range_sha256": "46cc41c0f0e5181339bc2219d59baa576f95a7f4ab706c74e5328620993d26a6"
+    },
+    {
+      "path": "src/EnergyPlus/api/func.cc",
+      "symbol": "PsyTwbFnTdbWPb",
+      "start_line": 207,
+      "end_line": 245,
+      "helpers": [
+        "PsyWFnTdbH",
+        "PsyPsatFnTemp",
+        "PsyTsatFnHPb"
+      ],
+      "range_sha256": "d62753b28e578e1c38147a49fe45d3c0159be78f0e46a4ec143f23ce27536b2f"
+    },
+    {
+      "path": "src/EnergyPlus/api/func.cc",
+      "symbol": "PsyWFnTdbRhPb",
+      "start_line": 273,
+      "end_line": 289,
+      "helpers": [
+        "PsyWFnTdbTwbPb"
+      ],
+      "range_sha256": "a767c745d526efbcbbc7b9e66d108006fe5eb9c233b1063e42c2868e54b4d9de"
+    }
+  ],
+  "named_functions": [
+    "PsyTsatFnHPb",
+    "PsyWFnTdbRhPb",
+    "PsyWFnTdbH",
+    "PsyTwbFnTdbWPb"
+  ],
+  "direct_helpers": [
+    "PsyPsatFnTemp",
+    "PsyTsatFnPb",
+    "PsyWFnTdbTwbPb",
+    "General::Iterate",
+    "F6",
+    "F7",
+    "PsyHFnTdbW",
+    "ObjexxFCL::max",
+    "ObjexxFCL::min"
+  ],
+  "ordered_min_max_policy": "EnergyPlus.hh imports original ObjexxFCL double overloads: max uses a<b?b:a, min uses a<b?a:b; preserve operand order, NaN and signed-zero behavior rather than substituting numeric max/min intrinsics",
+  "reference": {
+    "kind": "unchanged-original-GCC-core-and-original-headers",
+    "state": "same-compiler-owned genuine EnergyPlusData; explicit original clear_state then init_constant_state; one fresh state per process",
+    "flag_targets": [
+      "energypluslib",
+      "project_options",
+      "project_fp_options",
+      "project_warnings"
+    ],
+    "header_definitions": "copy BOTH actual energypluslib target and original src/EnergyPlus DIRECTORY COMPILE_DEFINITIONS so EP_psych_errors and any ABI statistics/cache compile modes match the core; validate actual compile row before execution",
+    "original_body_patches": false,
+    "private_Msvc_DLL_state_cast": false
+  },
+  "cache_contract": {
+    "capacity_each": 1048576,
+    "Twb": {
+      "precision_bits": 20,
+      "tags": "unsigned IEEE upper bits",
+      "miss_operands": "quantized T/W/P representatives",
+      "defaults": {
+        "i_tdb": 0,
+        "i_w": 0,
+        "i_pb": 0,
+        "value": 0
+      }
+    },
+    "Psat": {
+      "precision_bits": 24,
+      "tags": "signed IEEE arithmetic upper bits",
+      "miss_operands": "quantized T representative",
+      "defaults": {
+        "i_tdb": -1000,
+        "value": 0
+      }
+    },
+    "TsatHPb": {
+      "precision_bits": 28,
+      "tags": "signed IEEE arithmetic upper bits",
+      "miss_operands": "ORIGINAL first-writer H/P; same-tag subsequent caller returns stored result",
+      "defaults": {
+        "i_h": 0,
+        "i_pb": 0,
+        "value": 0
+      }
+    },
+    "TsatPb": {
+      "precision_bits": 24,
+      "tags": "signed IEEE arithmetic upper bits",
+      "miss_operands": "ORIGINAL first-writer P",
+      "actual_storage_type": "cached_tsat_h_pb (not unused cached_tsat_pb)",
+      "defaults": {
+        "i_h": 0,
+        "i_pb": 0,
+        "value": 0
+      }
+    }
+  },
+  "state_contract": {
+    "iconv_tol": 0.0001,
+    "last_patm": -99999.0,
+    "last_t_boil": -99999.0,
+    "press_save": -99999.0,
+    "t_sat_save": -99999.0,
+    "use_interpolation": false,
+    "history": "retained across all calls and sequence IDs until fresh process; no observer reset",
+    "observations": "root target cache slot and scalar state before/after; all four genuine arrays scanned ONCE at process end to emit exact sorted NONDEFAULT tables",
+    "iteration_locals": "not observable in linked stats-OFF core; do not infer raw iteration count or internal call tree from returned values",
+    "source_error_indices_and_callbacks": "genuine source-only diagnostics; ErrorManager recurring-index/logging parity excluded"
+  },
+  "constant_and_iteration_policy": {
+    "Psat": "original Hyland-Wexler, triple point 273.16K, clamps below173.15K/above473.15K; IF97 inactive",
+    "TsatHPb": "source polynomial F6/F7 CaseRange+17863.7; abs(P-101330)/101330>0.01 secant branch; relative H tolerance1e-5; while IterCount<=30; no-convergence retains polynomial initial T",
+    "Twb": "W<0 floor1e-5; state saved boiling pressure/T; boiling clamp tBoil-.1 if WBT>=tBoil-.09; source100-iteration cap and iconvTol; final explicit if(TWB>TDB) TWB=TDB assignment, preserving NaN (not a min helper call)",
+    "TsatPb": "default interpolation=false; saved exact-pressure pair; .0017/1555000 clamps and611<P<611.25 zero plateau; 50iterations, .0001 convergence",
+    "GeneralIterate": "original .1 perturbation and1e-9 DY floor, X convergence and Y==0 conditions; source-state diagnostics"
+  },
+  "production_scope": {
+    "input_family": "unchanged CON15 ordinary2013 weather and sensible no-OA IdealLoads",
+    "primary": "actual WeatherManager W/RH and wet-bulb; cooling saturation/W consumers when genuinely invoked",
+    "TsatHPb": "supplemental original/Rust unit-state proof until actual admitted cooling guard consumption is independently observed; no artificial call solely to claim production coverage",
+    "observer_protocol": "selected OUTERMOST roots only, preserve actual invocation order; original nested helpers execute once naturally in replay; separate PSY02 artifact preserves PSY01 v2 meaning"
+  },
+  "excluded": [
+    "CON-excluded physical inputs/OA/humidity-control families",
+    "IF97 and interpolation=true alternate algorithms",
+    "full ErrorManager recurring-warning/logging lifecycle equivalence",
+    "whole HVAC05 saturation assembly or CLK04 weather pipeline completion",
+    "unobserved raw internal iteration count/nested call tree identity",
+    "whole building/HVAC numerical equivalence"
+  ],
+  "gates_updated": false
+}

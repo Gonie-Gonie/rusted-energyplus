@@ -1,23 +1,34 @@
     #[test]
-    fn energyplus_outdoor_wet_bulb_uses_psychrometric_formula() {
-        let wet_bulb_c = energyplus_outdoor_wet_bulb_c(3.0, 68.0, 82_800.0)
-            .expect("valid psychrometric wet-bulb");
+    fn energyplus_outdoor_wet_bulb_matches_original_cached_rh_to_twb_chain() {
+        // Independently executed original EnergyPlus 26.1 (6f2e40d102) in a
+        // fresh state: W(3 C, RH 0.68, 82800 Pa), then Twb(3 C, own W, 82800 Pa).
+        // Input-only proof: PSY-02 supplemental-outdoor-wet-bulb/original-composition.json.
+        crate::psychrometrics::with_fresh_psychrometric_state(|| {
+            let wet_bulb_c = energyplus_outdoor_wet_bulb_c(3.0, 68.0, 82_800.0)
+                .expect("valid psychrometric wet-bulb");
 
-        assert!(
-            (wet_bulb_c - 0.648_294_941_184).abs() < 1.0e-7,
-            "wet_bulb_c={wet_bulb_c}"
-        );
+            assert!(wet_bulb_c.is_finite() && wet_bulb_c > 0.0 && wet_bulb_c < 3.0);
+            assert!(
+                (wet_bulb_c - 0.648_293_096_990_131_2).abs() < 1.0e-10,
+                "wet_bulb_c={wet_bulb_c}"
+            );
+        });
     }
 
     #[test]
     fn energyplus_outdoor_wet_bulb_uses_energyplus_iterate_branch_near_freezing() {
-        let wet_bulb_c = energyplus_outdoor_wet_bulb_c(8.0, 20.0, 81_500.0)
-            .expect("valid psychrometric wet-bulb");
+        // Second fresh original process: W(8 C, RH 0.20, 81500 Pa), then cached
+        // Twb with that process's own W. Same input-only proof as the test above.
+        crate::psychrometrics::with_fresh_psychrometric_state(|| {
+            let wet_bulb_c = energyplus_outdoor_wet_bulb_c(8.0, 20.0, 81_500.0)
+                .expect("valid psychrometric wet-bulb");
 
-        assert!(
-            (wet_bulb_c - 0.227_141_685_581).abs() < 2.0e-9,
-            "wet_bulb_c={wet_bulb_c}"
-        );
+            assert!(wet_bulb_c.is_finite() && wet_bulb_c > 0.0 && wet_bulb_c < 8.0);
+            assert!(
+                (wet_bulb_c - 0.227_141_381_791_655_38).abs() < 1.0e-10,
+                "wet_bulb_c={wet_bulb_c}"
+            );
+        });
     }
 
     #[test]

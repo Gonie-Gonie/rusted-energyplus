@@ -1,11 +1,83 @@
 //! EnergyPlus psychrometric helper functions used by runtime and IdealLoads.
 
 mod cp_cache;
+mod psy02_state;
+
+pub use psy02_state::{
+    ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot,
+    EnergyPlusPsychrometricFinalCaches, EnergyPlusPsychrometricFunction,
+    EnergyPlusPsychrometricOperation, EnergyPlusPsychrometricStateSnapshot,
+    EnergyPlusPsychrometricsState, with_fresh_psychrometric_state,
+};
+
+/// Separate observations of selected outer property calls and their source state.
+pub mod psy02_trace;
 
 pub use cp_cache::{EnergyPlusCpAirCache, EnergyPlusCpAirCacheState};
 
 /// Opt-in observations of actual production psychrometric calls.
 pub mod production_trace;
+
+#[track_caller]
+fn invoke_psy02(function: EnergyPlusPsychrometricFunction, inputs: &[f64]) -> f64 {
+    let _guard = psy02_trace::enter();
+    let operation = psy02_state::with_state(|state| state.evaluate_validated(function, inputs));
+    let result = operation.result;
+    psy02_trace::record(function.name(), inputs, operation);
+    result
+}
+
+/// Default-build cached EnergyPlus saturation pressure, with instance state.
+#[must_use]
+#[track_caller]
+pub fn energyplus_psy_psat_fn_temp(temperature_c: f64) -> f64 {
+    invoke_psy02(EnergyPlusPsychrometricFunction::Psat, &[temperature_c])
+}
+
+/// Default-build cached EnergyPlus saturation temperature from pressure.
+#[must_use]
+#[track_caller]
+pub fn energyplus_psy_tsat_fn_pb(pressure_pa: f64) -> f64 {
+    invoke_psy02(EnergyPlusPsychrometricFunction::TsatPb, &[pressure_pa])
+}
+
+/// Default-build cached EnergyPlus saturation temperature from enthalpy/pressure.
+#[must_use]
+#[track_caller]
+pub fn energyplus_psy_tsat_fn_h_pb(enthalpy_j_per_kg: f64, pressure_pa: f64) -> f64 {
+    invoke_psy02(
+        EnergyPlusPsychrometricFunction::TsatHPb,
+        &[enthalpy_j_per_kg, pressure_pa],
+    )
+}
+
+/// Default-build cached EnergyPlus wet-bulb inverse with source state/fallbacks.
+#[must_use]
+#[track_caller]
+pub fn energyplus_psy_twb_fn_tdb_w_pb(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    pressure_pa: f64,
+) -> f64 {
+    invoke_psy02(
+        EnergyPlusPsychrometricFunction::Twb,
+        &[dry_bulb_c, humidity_ratio, pressure_pa],
+    )
+}
+
+/// Original uncached wet-bulb solver, retaining nested default-build caches.
+#[must_use]
+#[track_caller]
+pub fn energyplus_psy_twb_fn_tdb_w_pb_raw(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    pressure_pa: f64,
+) -> f64 {
+    invoke_psy02(
+        EnergyPlusPsychrometricFunction::TwbRaw,
+        &[dry_bulb_c, humidity_ratio, pressure_pa],
+    )
+}
 
 #[path = "psychrometrics_spline_tables.rs"]
 mod spline_tables;
@@ -66,6 +138,7 @@ fn energyplus_psy_rhov_fn_tdb_w_pb_raw(
         / (461.52 * (dry_bulb_c + KELVIN_OFFSET) * (humidity_ratio + 0.621_98))
 }
 
+#[track_caller]
 pub(crate) fn energyplus_outdoor_wet_bulb_c(
     dry_bulb_c: f64,
     relative_humidity_percent: f64,
@@ -84,35 +157,9 @@ pub(crate) fn energyplus_outdoor_wet_bulb_c(
         (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
         atmospheric_pressure_pa,
     )?;
-    let mut wet_bulb_c = dry_bulb_c;
-    let mut previous_wet_bulb_c = 0.0;
-    let mut previous_error = 0.0;
-    for iteration in 1..=ENERGYPLUS_WET_BULB_MAX_ITERATIONS {
-        let new_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess(
-            dry_bulb_c,
-            wet_bulb_c,
-            atmospheric_pressure_pa,
-        )?;
-        let error = humidity_ratio - new_humidity_ratio;
-        let (next_wet_bulb_c, converged) = energyplus_general_iterate(
-            wet_bulb_c,
-            error,
-            &mut previous_wet_bulb_c,
-            &mut previous_error,
-            iteration,
-            ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE,
-        );
-        wet_bulb_c = next_wet_bulb_c;
-        if converged {
-            break;
-        }
-    }
-
-    if !wet_bulb_c.is_finite() {
-        return None;
-    }
-
-    Some(wet_bulb_c.min(dry_bulb_c))
+    let wet_bulb_c =
+        energyplus_psy_twb_fn_tdb_w_pb(dry_bulb_c, humidity_ratio, atmospheric_pressure_pa);
+    wet_bulb_c.is_finite().then_some(wet_bulb_c)
 }
 
 fn energyplus_general_iterate(
@@ -445,6 +492,7 @@ pub fn energyplus_psy_w_fn_tdb_h(dry_bulb_c: f64, enthalpy_j_per_kg: f64) -> f64
         humidity_ratio
     };
     production_trace::record("PsyWFnTdbH", &[dry_bulb_c, enthalpy_j_per_kg], result);
+    psy02_trace::record_stateless("PsyWFnTdbH", &[dry_bulb_c, enthalpy_j_per_kg], result);
     result
 }
 
@@ -497,43 +545,30 @@ pub fn energyplus_water_vapor_gas_enthalpy_j_per_kg(dry_bulb_c: f64) -> f64 {
 
 /// Returns EnergyPlus `PsyWFnTdbRhPb`-style humidity ratio from dry-bulb,
 /// relative humidity, and barometric pressure.
+#[track_caller]
 pub fn energyplus_psychrometric_humidity_ratio_from_rh(
     dry_bulb_c: f64,
     relative_humidity: f64,
     atmospheric_pressure_pa: f64,
 ) -> Option<f64> {
+    if !dry_bulb_c.is_finite() {
+        return None;
+    }
+    if relative_humidity.is_finite() && atmospheric_pressure_pa.is_finite() {
+        return Some(energyplus_psy_w_fn_tdb_rh_pb(
+            dry_bulb_c,
+            relative_humidity,
+            atmospheric_pressure_pa,
+        ));
+    }
+    // Preserve this compatibility wrapper's historical nonfinite normalization.
+    // Canonical source calls use the ordered semantics of the public kernel.
     let saturation_pressure_pa = energyplus_psychrometric_saturation_pressure_pa(dry_bulb_c)?;
     let dew_pressure_pa = relative_humidity * saturation_pressure_pa;
     Some(
         (dew_pressure_pa * 0.62198 / (atmospheric_pressure_pa - dew_pressure_pa).max(1000.0))
             .max(ENERGYPLUS_MIN_HUMIDITY_RATIO),
     )
-}
-
-fn energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess(
-    dry_bulb_c: f64,
-    wet_bulb_c: f64,
-    atmospheric_pressure_pa: f64,
-) -> Option<f64> {
-    let saturation_pressure_pa = energyplus_psychrometric_saturation_pressure_pa(wet_bulb_c)?;
-    let denominator = atmospheric_pressure_pa - saturation_pressure_pa;
-    if denominator <= 0.0 {
-        return None;
-    }
-    let saturated_humidity_ratio = 0.62198 * saturation_pressure_pa / denominator;
-    if wet_bulb_c >= 0.0 {
-        Some(
-            ((2501.0 - 2.326 * wet_bulb_c) * saturated_humidity_ratio
-                - 1.006 * (dry_bulb_c - wet_bulb_c))
-                / (2501.0 + 1.86 * dry_bulb_c - 4.186 * wet_bulb_c),
-        )
-    } else {
-        Some(
-            ((2830.0 - 0.24 * wet_bulb_c) * saturated_humidity_ratio
-                - 1.006 * (dry_bulb_c - wet_bulb_c))
-                / (2830.0 + 1.86 * dry_bulb_c - 2.1 * wet_bulb_c),
-        )
-    }
 }
 
 /// Canonical EnergyPlus 26.1 default non-IF97 `PsyPsatFnTemp_raw` numerical path.
@@ -543,33 +578,34 @@ fn energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess(
 /// compile branch are outside this pure numerical scaffold.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_psat_fn_temp_raw(temperature_c: f64) -> f64 {
     let temperature_k = temperature_c + KELVIN_OFFSET;
-    if temperature_k < 173.15 {
-        return 0.001405102123874164;
-    }
-    if temperature_k < 273.16 {
-        return (-5674.5359 / temperature_k
+    let result = if temperature_k < 173.15 {
+        0.001405102123874164
+    } else if temperature_k < 273.16 {
+        (-5674.5359 / temperature_k
             + 6.392_524_7
             + temperature_k
                 * (-0.967_784_3e-2
                     + temperature_k
                         * (0.622_157_01e-6
-                            + temperature_k
-                                * (0.207_478_25e-8 - 0.948_402_4e-12 * temperature_k)))
+                            + temperature_k * (0.207_478_25e-8 - 0.948_402_4e-12 * temperature_k)))
             + 4.163_501_9 * temperature_k.ln())
-        .exp();
-    }
-    if temperature_k <= 473.15 {
-        return (-5800.2206 / temperature_k
+        .exp()
+    } else if temperature_k <= 473.15 {
+        (-5800.2206 / temperature_k
             + 1.391_499_3
             + temperature_k
                 * (-0.048_640_239
                     + temperature_k * (0.417_647_68e-4 - 0.144_520_93e-7 * temperature_k))
             + 6.545_967_3 * temperature_k.ln())
-        .exp();
-    }
-    1_555_073.745_636_215
+        .exp()
+    } else {
+        1_555_073.745_636_215
+    };
+    psy02_trace::record_stateless("PsyPsatFnTemp_raw", &[temperature_c], result);
+    result
 }
 
 #[inline]
@@ -650,72 +686,37 @@ pub fn energyplus_psy_rh_fn_tdb_w_pb(
     }
 }
 
-/// Canonical EnergyPlus 26.1 `PsyWFnTdbRhPb` ordinary-finite default-build
-/// numerical path.
-///
-/// The saturation-pressure call remains unconditional, and both the 1000 Pa
-/// denominator floor and 1e-5 humidity-ratio floor use the source's ordered
-/// comparisons. This preserves first-argument NaN propagation instead of
-/// adopting Rust's `f64::max` NaN behavior. Cache lifecycle, statistics,
-/// diagnostics, compile variants, and the history-dependent cache-sentinel
-/// edge remain separate stateful source contracts.
+/// EnergyPlus `PsyWFnTdbRhPb` with the instance-owned default Psat cache.
+/// Ordered denominator/humidity floors and nested cache effects are preserved.
+/// Warning recurrence and ErrorManager output remain source-only observations.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_w_fn_tdb_rh_pb(
     dry_bulb_c: f64,
     relative_humidity: f64,
     atmospheric_pressure_pa: f64,
 ) -> f64 {
-    let dew_pressure_pa =
-        relative_humidity * energyplus_psy_psat_fn_temp_default_numerical_projection(dry_bulb_c);
-    let pressure_difference_pa = atmospheric_pressure_pa - dew_pressure_pa;
-    let denominator_pa = if pressure_difference_pa < 1000.0 {
-        1000.0
-    } else {
-        pressure_difference_pa
-    };
-    let humidity_ratio = dew_pressure_pa * 0.621_98 / denominator_pa;
-
-    if humidity_ratio < ENERGYPLUS_MIN_HUMIDITY_RATIO {
-        ENERGYPLUS_MIN_HUMIDITY_RATIO
-    } else {
-        humidity_ratio
-    }
+    invoke_psy02(
+        EnergyPlusPsychrometricFunction::WFromRh,
+        &[dry_bulb_c, relative_humidity, atmospheric_pressure_pa],
+    )
 }
 
-/// Canonical EnergyPlus 26.1 `PsyWFnTdbTwbPb` ordinary-finite default-build
-/// numerical path.
-///
-/// This preserves the source's ordered wet-bulb clamp, saturation-pressure
-/// evaluation, coefficient grouping, and strictly-negative fallback through
-/// `PsyWFnTdbRhPb` at 0.01% relative humidity. Cache lifecycle, statistics,
-/// both diagnostic helpers, compile variants, and history-dependent cache
-/// sentinel behavior remain separate stateful source contracts.
+/// EnergyPlus `PsyWFnTdbTwbPb` with ordered clamp, negative-W fallback,
+/// exact source coefficients and instance-owned nested property caches.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_w_fn_tdb_twb_pb(
     dry_bulb_c: f64,
     wet_bulb_c: f64,
     atmospheric_pressure_pa: f64,
 ) -> f64 {
-    let wet_bulb_c = if wet_bulb_c > dry_bulb_c {
-        dry_bulb_c
-    } else {
-        wet_bulb_c
-    };
-    let wet_saturation_pressure_pa =
-        energyplus_psy_psat_fn_temp_default_numerical_projection(wet_bulb_c);
-    let saturated_humidity_ratio = 0.621_98 * wet_saturation_pressure_pa
-        / (atmospheric_pressure_pa - wet_saturation_pressure_pa);
-    let humidity_ratio = ((2501.0 - 2.381 * wet_bulb_c) * saturated_humidity_ratio
-        - (dry_bulb_c - wet_bulb_c))
-        / (2501.0 + 1.805 * dry_bulb_c - 4.186 * wet_bulb_c);
-
-    if humidity_ratio < 0.0 {
-        energyplus_psy_w_fn_tdb_rh_pb(dry_bulb_c, 0.0001, atmospheric_pressure_pa)
-    } else {
-        humidity_ratio
-    }
+    invoke_psy02(
+        EnergyPlusPsychrometricFunction::WFromTwb,
+        &[dry_bulb_c, wet_bulb_c, atmospheric_pressure_pa],
+    )
 }
 
 /// Canonical EnergyPlus 26.1 `PsyHFnTdbRhPb` ordinary-finite default-build
@@ -723,9 +724,9 @@ pub fn energyplus_psy_w_fn_tdb_twb_pb(
 ///
 /// The source first calls `PsyWFnTdbRhPb`, applies a second ordered 1e-5
 /// humidity-ratio floor, and then calls `PsyHFnTdbW`, whose own floor remains
-/// intact. This pure composition preserves that order while deferring nested
-/// saturation-pressure cache, statistics, diagnostics, caller, and compile
-/// variant state.
+/// intact. This composition uses the instance-owned nested saturation-pressure
+/// cache. Statistics, warning aggregation and alternate compile variants are
+/// outside this selected default-build numerical route.
 #[must_use]
 #[inline]
 pub fn energyplus_psy_h_fn_tdb_rh_pb(
@@ -741,14 +742,27 @@ pub fn energyplus_psy_h_fn_tdb_rh_pb(
     energyplus_psy_h_fn_tdb_w(dry_bulb_c, humidity_ratio)
 }
 
-/// EnergyPlus 26.1 `PsyTsatFnHPb_raw` default-build numerical miss path.
+/// EnergyPlus 26.1 `PsyTsatFnHPb_raw` default-build route.
 ///
 /// This retains the source's signed enthalpy floor, binary-searched nine-piece
 /// polynomial seed, pressure-correction predicate, and bounded secant update
-/// order. The public two-input cache, statistics, diagnostics, caller context,
-/// and history-dependent nested cache effects remain outside this pure core.
+/// order. This raw entry bypasses the outer two-input cache, while its nested
+/// source properties retain the current instance-owned cache state. Statistics
+/// and warning aggregation are observed separately in the original reference.
 #[must_use]
+#[track_caller]
 pub fn energyplus_psy_tsat_fn_h_pb_raw(enthalpy_j_per_kg: f64, barometric_pressure_pa: f64) -> f64 {
+    invoke_psy02(
+        EnergyPlusPsychrometricFunction::TsatHPbRaw,
+        &[enthalpy_j_per_kg, barometric_pressure_pa],
+    )
+}
+
+fn energyplus_psy_tsat_fn_h_pb_raw_with_properties(
+    enthalpy_j_per_kg: f64,
+    barometric_pressure_pa: f64,
+    mut saturated_enthalpy: impl FnMut(f64, f64) -> f64,
+) -> f64 {
     const CASE_RANGE: [f64; 10] = [
         -4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6,
         4.5866e7,
@@ -879,14 +893,7 @@ pub fn energyplus_psy_tsat_fn_h_pb_raw(enthalpy_j_per_kg: f64, barometric_pressu
     }
 
     let mut first_temperature_c = seed;
-    let first_enthalpy = energyplus_psy_h_fn_tdb_w(
-        first_temperature_c,
-        energyplus_psy_w_fn_tdb_twb_pb(
-            first_temperature_c,
-            first_temperature_c,
-            barometric_pressure_pa,
-        ),
-    );
+    let first_enthalpy = saturated_enthalpy(first_temperature_c, barometric_pressure_pa);
     let mut first_error = first_enthalpy - local_enthalpy;
     if (first_error / local_enthalpy).abs() <= 0.1e-4 {
         return first_temperature_c;
@@ -897,14 +904,7 @@ pub fn energyplus_psy_tsat_fn_h_pb_raw(enthalpy_j_per_kg: f64, barometric_pressu
     let mut iteration_count = 0;
     while iteration_count <= 30 {
         iteration_count += 1;
-        let second_enthalpy = energyplus_psy_h_fn_tdb_w(
-            second_temperature_c,
-            energyplus_psy_w_fn_tdb_twb_pb(
-                second_temperature_c,
-                second_temperature_c,
-                barometric_pressure_pa,
-            ),
-        );
+        let second_enthalpy = saturated_enthalpy(second_temperature_c, barometric_pressure_pa);
         let second_error = second_enthalpy - local_enthalpy;
         if (second_error / local_enthalpy).abs() <= 0.1e-4 || second_error == first_error {
             result = second_temperature_c;
@@ -921,60 +921,23 @@ pub fn energyplus_psy_tsat_fn_h_pb_raw(enthalpy_j_per_kg: f64, barometric_pressu
     result
 }
 
-/// Canonical EnergyPlus 26.1 default cached-build `PsyTsatFnPb_raw`
-/// non-interpolation numerical path in Celsius.
-///
-/// This preserves the ordered pressure bounds, strict triple-point shortcut,
-/// 100 C initial guess, nested default `PsyPsatFnTemp` representative, and
-/// the source's 50-iteration `General::Iterate` sequence. The source routine's
-/// saved-value sentinel and last-call shortcut, interpolation override,
-/// statistics, diagnostics, cache lifecycle, and nested nonfinite sentinel
-/// behavior remain separate state contracts.
+/// Original non-interpolation `PsyTsatFnPb_raw` route, including the saved
+/// pressure/temperature pair and nested instance-owned default Psat cache.
+/// The runtime owner retains the default non-interpolation configuration.
 #[must_use]
+#[track_caller]
 pub fn energyplus_psy_tsat_fn_pb_raw(pressure_pa: f64) -> f64 {
-    if pressure_pa >= 1_555_000.0 {
-        return 200.0;
-    }
-    if pressure_pa <= 0.0017 {
-        return -100.0;
-    }
-    if pressure_pa > 611.0 && pressure_pa < 611.25 {
-        return 0.0;
-    }
-
-    let mut saturation_temperature_c = 100.0;
-    let mut previous_temperature_c = 0.0;
-    let mut previous_error_pa = 0.0;
-    for iteration in 1..=ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS {
-        let saturation_pressure_pa =
-            energyplus_psy_psat_fn_temp_default_numerical_projection(saturation_temperature_c);
-        let error_pa = pressure_pa - saturation_pressure_pa;
-        let (next_temperature_c, converged) = energyplus_general_iterate(
-            saturation_temperature_c,
-            error_pa,
-            &mut previous_temperature_c,
-            &mut previous_error_pa,
-            iteration,
-            ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE,
-        );
-        saturation_temperature_c = next_temperature_c;
-        if converged {
-            break;
-        }
-    }
-    saturation_temperature_c
+    invoke_psy02(EnergyPlusPsychrometricFunction::TsatPbRaw, &[pressure_pa])
 }
 
-/// Canonical EnergyPlus 26.1 `PsyTdpFnWPb` default cached-build,
-/// interpolation-disabled numerical miss projection in Celsius.
+/// EnergyPlus-shaped `PsyTdpFnWPb` composition in Celsius.
 ///
 /// This preserves the ordered 1e-5 humidity-ratio floor and the source's
-/// multiply/add/divide grouping before calling the isolated `PsyTsatFnPb_raw`
-/// numerical core. It models a nonzero-tag outer-cache miss and a raw
-/// saved-value miss. The public saturation-temperature cache's tag-zero false
-/// hit, first-writer and collision history, raw saved pair, interpolation,
-/// statistics, diagnostics, lifecycle, and compile variants remain separate
-/// state contracts.
+/// multiply/add/divide grouping. This route bypasses the public `PsyTsatFnPb`
+/// outer cache, then uses the current instance-owned raw saved pair and nested
+/// Psat cache. Its complete dew-point route, outer cache, warning aggregation,
+/// interpolation and alternate compile variants remain unverified; this
+/// composition does not add a PSY-02 dew-point completion claim.
 #[must_use]
 #[inline]
 pub fn energyplus_psy_tdp_fn_w_pb(humidity_ratio: f64, atmospheric_pressure_pa: f64) -> f64 {
@@ -989,8 +952,11 @@ pub fn energyplus_psy_tdp_fn_w_pb(humidity_ratio: f64, atmospheric_pressure_pa: 
 /// This preserves the source composition through `PsyWFnTdbTwbPb`, its
 /// second ordered 1e-5 humidity-ratio floor, `PsyTdpFnWPb`, and the final
 /// ordered clamp to the original wet-bulb temperature. Statistics, warnings,
-/// recurring diagnostics, nested cache history, interpolation, lifecycle,
-/// and compile variants remain separate stateful source contracts.
+/// and recurring diagnostics remain separate. W-from-wet-bulb uses the current
+/// instance-owned nested cache; the dew-point delegate retains the raw saved
+/// pair/Psat state while bypassing its outer saturation-temperature cache.
+/// The complete dew-point route, interpolation and alternate compile variants
+/// remain unverified and outside PSY-02 completion.
 #[must_use]
 #[inline]
 pub fn energyplus_psy_tdp_fn_tdb_twb_pb(

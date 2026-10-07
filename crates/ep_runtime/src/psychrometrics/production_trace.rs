@@ -23,6 +23,15 @@ thread_local! {
     static ACTIVE_TRACE: RefCell<Option<TraceBuffer>> = RefCell::default();
 }
 
+/// Reads the actual active pipeline scope without changing the legacy trace.
+pub(crate) fn current_execution_scope() -> (&'static str, Option<ExecutionContext>) {
+    ACTIVE_TRACE.with_borrow(|active| {
+        active
+            .as_ref()
+            .map_or(("pipeline", None), |trace| (trace.phase, trace.context))
+    })
+}
+
 /// Actual caller location supplied by `track_caller`.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct PsychrometricCallSite {

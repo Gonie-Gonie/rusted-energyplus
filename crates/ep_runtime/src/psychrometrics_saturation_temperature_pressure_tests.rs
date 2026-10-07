@@ -98,8 +98,8 @@ fn saturation_temperature_matches_upstream_vectors() {
 fn pressure_bounds_are_inclusive_and_ordered() {
     for pressure_pa in [
         f64::NEG_INFINITY,
-        // The pure core intentionally excludes the source's initial
-        // Press_Save/tSat_Save = -99999 last-call sentinel shortcut.
+        // NEG_INFINITY above has already changed the saved pressure pair;
+        // this -99999 input therefore misses the cold sentinel and takes bounds.
         -99_999.0,
         -1.0,
         -0.0,

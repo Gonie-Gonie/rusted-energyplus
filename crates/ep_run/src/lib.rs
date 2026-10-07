@@ -15,6 +15,8 @@ mod oracle;
 mod outputs;
 mod pipeline;
 mod porting_scope;
+mod psy02_state_json;
+mod psy02_trace;
 mod psychrometrics_trace;
 mod support;
 mod support_registry;

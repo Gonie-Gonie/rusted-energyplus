@@ -897,6 +897,25 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
+    ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
+        let (outcome, trace) = ep_runtime::psychrometrics::psy02_trace::capture(
+            config.trace_level == TraceLevel::Full,
+            || run_with_optional_porting_scope_observed(config, scope),
+        );
+        if let Some(trace) = trace
+            && outcome.is_ok()
+            && config.output_dir.is_dir()
+        {
+            crate::psy02_trace::write_trace(config, &trace)?;
+        }
+        outcome
+    })
+}
+
+fn run_with_optional_porting_scope_observed(
+    config: &RunConfig,
+    scope: Option<crate::PortingScope>,
+) -> Result<RunOutcome, RunError> {
     let ((outcome, trace), clock_trace) =
         ep_runtime::time_axis::clock_trace::capture(config.trace_level == TraceLevel::Full, || {
             ep_runtime::psychrometrics::production_trace::capture(

@@ -203,14 +203,20 @@ Assert-Cp414Text -Text $runtimeValidationText -Pattern 'let\s+Some\(source_sites
 Assert-Cp414Text -Text $runtimeValidationText -Pattern 'source_site_execution_count\s*==\s*source_sites' -Description 'four-site checked accounting'
 
 $psychrometricsText = Read-RepoText -Path $psychrometrics
-$helper = Get-Cp414BraceBlock -Text $psychrometricsText -AnchorPattern 'pub\s+fn\s+energyplus_psy_tsat_fn_h_pb_raw\s*\(' -Description 'canonical raw PsyTsatFnHPb helper'
+$publicRaw = Get-Cp414BraceBlock -Text $psychrometricsText -AnchorPattern 'pub\s+fn\s+energyplus_psy_tsat_fn_h_pb_raw\s*\(' -Description 'canonical raw PsyTsatFnHPb facade'
+Assert-Cp414Text -Text $publicRaw -Pattern '(?s)invoke_psy02\(\s*EnergyPlusPsychrometricFunction::TsatHPbRaw,\s*&\[enthalpy_j_per_kg, barometric_pressure_pa\]\s*,?\s*\)' -Description 'raw source arguments enter the true instance owner'
+$helper = Get-Cp414BraceBlock -Text $psychrometricsText -AnchorPattern 'fn\s+energyplus_psy_tsat_fn_h_pb_raw_with_properties\s*\(' -Description 'actual canonical raw PsyTsatFnHPb numerical core'
+$psyOwnerText = Read-RepoText -Path 'crates\ep_runtime\src\psychrometrics\psy02_state.rs'
+Assert-Cp414Text -Text $psyOwnerText -Pattern 'F::TsatHPbRaw => self\.tsat_h_pb_raw\(inputs\[0\], inputs\[1\]\)' -Description 'raw dispatch preserves original H/P order'
+$ownerRaw = Get-Cp414BraceBlock -Text $psyOwnerText -AnchorPattern 'fn\s+tsat_h_pb_raw\s*\(' -Description 'nested source property owner'
+Assert-Cp414Text -Text $ownerRaw -Pattern '(?s)energyplus_psy_tsat_fn_h_pb_raw_with_properties\(h, p, \|t, pressure\| \{\s*energyplus_psy_h_fn_tdb_w\(t, self\.w_from_twb\(t, t, pressure\)\)\s*\}\)' -Description 'original saturated H of W(T,T,P) nested composition'
 foreach ($pattern in @(
     'const\s+CASE_RANGE:\s*\[f64;\s*10\]','-4\.24e4.*?-2\.2138e4.*?-6\.7012e2.*?2\.7297e4.*?7\.5222e4.*?1\.8379e5.*?4\.7577e5.*?1\.5445e6.*?3\.8353e6.*?4\.5866e7',
     'enthalpy_j_per_kg\s*\+\s*1\.78637e4','enthalpy_j_per_kg\s*>=\s*0\.0','1\.0e-5','-1\.0e-5',
     'while\s+begin\s*\+\s*1\s*<\s*end','let\s+case_index\s*=\s*begin\s*\+\s*1',
     'shifted_enthalpy\s*=\s*-4\.24e4','shifted_enthalpy\s*=\s*4\.5866e7',
     '\(barometric_pressure_pa\s*-\s*1\.0133e5\)\.abs\(\)\s*/\s*1\.0133e5\s*>\s*0\.01',
-    'energyplus_psy_h_fn_tdb_w','energyplus_psy_w_fn_tdb_twb_pb','first_temperature_c\s*\*\s*0\.9',
+    'saturated_enthalpy\(first_temperature_c,\s*barometric_pressure_pa\)','saturated_enthalpy\(second_temperature_c,\s*barometric_pressure_pa\)','first_temperature_c\s*\*\s*0\.9',
     'while\s+iteration_count\s*<=\s*30','second_error\s*/\s*\(second_error\s*-\s*first_error\)'
 )) { Assert-Cp414Text -Text $helper -Pattern "(?s)$pattern" -Description 'canonical default numerical-miss projection' }
 if ([regex]::Matches($helper, 'energyplus_f6\(').Count -ne 8 -or [regex]::Matches($helper, 'energyplus_f7\(').Count -ne 1) { throw 'CP414 exact eight-F6/one-F7 seed branch drift' }

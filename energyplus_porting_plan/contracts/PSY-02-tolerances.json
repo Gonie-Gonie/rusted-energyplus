@@ -1,0 +1,120 @@
+{
+  "schema": "psy02-tolerances.v1",
+  "card": "PSY-02",
+  "frozen_before_comparison": true,
+  "rows": [
+    {
+      "function": "PsyTsatFnHPb",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyTsatFnHPb_raw",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyWFnTdbRhPb",
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyWFnTdbH",
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyTwbFnTdbWPb",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyTwbFnTdbWPb_raw",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyPsatFnTemp",
+      "unit": "Pa",
+      "atol": 1e-08,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyPsatFnTemp_raw",
+      "unit": "Pa",
+      "atol": 1e-08,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyTsatFnPb",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyTsatFnPb_raw",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyWFnTdbTwbPb",
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyHFnTdbW",
+      "unit": "J/kg",
+      "atol": 1e-07,
+      "rtol": 1e-13
+    }
+  ],
+  "state_rows": [
+    {
+      "fields": [
+        "last_t_boil",
+        "t_sat_save",
+        "cached temperature value"
+      ],
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "fields": [
+        "last_patm",
+        "press_save",
+        "cached Psat value"
+      ],
+      "unit": "Pa",
+      "atol": 1e-08,
+      "rtol": 1e-13
+    },
+    {
+      "fields": [
+        "iconv_tol"
+      ],
+      "unit": "degC",
+      "atol": 0,
+      "rtol": 0
+    }
+  ],
+  "exact": [
+    "input identity/bits/order/context",
+    "cache kinds/indices/tags/hits/occupied keys",
+    "branch and IEEE class",
+    "warmup/interpolation/default/reset policy"
+  ],
+  "bits_policy": "input/tag/identity bits exact; floating output/state bits recorded with frozen per-unit numerical comparison; a cache HIT must return its own stored result bit-exactly",
+  "zero_policy": "atol governs near0; no tolerance relaxation after failure",
+  "warning_lifecycle": "source-only diagnostic, never fabricated Rust parity",
+  "General_Iterate": "source-only exact before/after scalar diagnostic unless true existing Rust route is separately paired",
+  "gates_updated": false
+}

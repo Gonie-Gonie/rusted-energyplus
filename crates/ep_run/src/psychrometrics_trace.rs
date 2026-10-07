@@ -93,7 +93,7 @@ pub(crate) fn write_production_trace(
     })
 }
 
-fn execution_context(context: ExecutionContext) -> Value {
+pub(crate) fn execution_context(context: ExecutionContext) -> Value {
     json!({
         "scope": context.scope,
         "zone_timestep": context.zone_timestep.map(|zone| json!({

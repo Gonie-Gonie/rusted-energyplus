@@ -1,6 +1,6 @@
 use super::{
     ENERGYPLUS_MIN_HUMIDITY_RATIO, energyplus_psy_psat_fn_temp_default_numerical_projection,
-    energyplus_psy_tdp_fn_w_pb, energyplus_psy_tsat_fn_pb_raw,
+    energyplus_psy_tdp_fn_w_pb, energyplus_psy_tsat_fn_pb_raw, with_fresh_psychrometric_state,
 };
 
 fn assert_bits(actual: f64, expected: f64) {
@@ -171,19 +171,22 @@ fn composed_pressure_reaches_raw_clamps_and_triple_shortcut() {
 }
 
 #[test]
-fn raw_saved_sentinel_is_outside_the_pure_projection() {
+fn dew_point_preserves_nested_raw_saved_sentinel_in_fresh_source_state() {
     let humidity_ratio = 0.01;
     let atmospheric_pressure_pa = -6_319_736.802;
     let dew_pressure_pa = atmospheric_pressure_pa * humidity_ratio / (0.621_98 + humidity_ratio);
 
     assert_bits(dew_pressure_pa, -99_999.0);
-    // A fresh source raw call false-hits its saved pair at input pressure
-    // -99999 Pa and returns the initial -99999 C. This isolated non-saved
-    // numerical projection instead reaches the lower clamp.
-    assert_bits(
-        energyplus_psy_tdp_fn_w_pb(humidity_ratio, atmospheric_pressure_pa),
-        -100.0,
-    );
+    with_fresh_psychrometric_state(|| {
+        // The genuine original raw call at cold pressure -99999 Pa returns
+        // the saved -99999 C before checking its inclusive lower bound.
+        assert_bits(
+            energyplus_psy_tdp_fn_w_pb(humidity_ratio, atmospheric_pressure_pa),
+            -99_999.0,
+        );
+        // A distinct next pressure misses that saved pair and takes the bound.
+        assert_bits(energyplus_psy_tsat_fn_pb_raw(0.0), -100.0);
+    });
 }
 
 #[test]

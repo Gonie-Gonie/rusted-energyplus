@@ -1,9 +1,37 @@
 use super::{
     energyplus_psy_psat_fn_temp_default_numerical_projection, energyplus_psy_psat_fn_temp_raw,
     energyplus_psy_w_fn_tdb_rh_pb, energyplus_psy_w_fn_tdb_twb_pb,
-    energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess,
     energyplus_psychrometric_psat_cache_temperature_c,
 };
+
+// Retain the former guarded inverse-solver expression as a test-only contrast.
+// The public W(Tdb,Twb,Pb) source formula has different coefficients and no
+// freezing branch; production now executes the original cached Twb solver.
+fn former_guarded_wet_bulb_guess(
+    dry_bulb_c: f64,
+    wet_bulb_c: f64,
+    atmospheric_pressure_pa: f64,
+) -> Option<f64> {
+    if !wet_bulb_c.is_finite() {
+        return None;
+    }
+    let saturation_pressure_pa =
+        energyplus_psy_psat_fn_temp_default_numerical_projection(wet_bulb_c);
+    let denominator = atmospheric_pressure_pa - saturation_pressure_pa;
+    if denominator <= 0.0 {
+        return None;
+    }
+    let saturated_humidity_ratio = 0.62198 * saturation_pressure_pa / denominator;
+    Some(if wet_bulb_c >= 0.0 {
+        ((2501.0 - 2.326 * wet_bulb_c) * saturated_humidity_ratio
+            - 1.006 * (dry_bulb_c - wet_bulb_c))
+            / (2501.0 + 1.86 * dry_bulb_c - 4.186 * wet_bulb_c)
+    } else {
+        ((2830.0 - 0.24 * wet_bulb_c) * saturated_humidity_ratio
+            - 1.006 * (dry_bulb_c - wet_bulb_c))
+            / (2830.0 + 1.86 * dry_bulb_c - 2.1 * wet_bulb_c)
+    })
+}
 
 fn assert_bits(actual: f64, expected: f64) {
     assert_eq!(
@@ -104,12 +132,9 @@ fn source_formula_has_no_freezing_branch_and_differs_from_the_guarded_guess() {
     let atmospheric_pressure_pa = 101_325.0;
     let source_result =
         energyplus_psy_w_fn_tdb_twb_pb(dry_bulb_c, wet_bulb_c, atmospheric_pressure_pa);
-    let guarded_guess = energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess(
-        dry_bulb_c,
-        wet_bulb_c,
-        atmospheric_pressure_pa,
-    )
-    .expect("guarded compatibility guess should accept this vector");
+    let guarded_guess =
+        former_guarded_wet_bulb_guess(dry_bulb_c, wet_bulb_c, atmospheric_pressure_pa)
+            .expect("guarded compatibility guess should accept this vector");
 
     assert_ne!(source_result.to_bits(), guarded_guess.to_bits());
     assert_bits(
