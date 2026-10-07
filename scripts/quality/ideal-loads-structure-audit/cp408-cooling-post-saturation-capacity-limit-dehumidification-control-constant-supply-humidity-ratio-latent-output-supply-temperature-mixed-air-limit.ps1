@@ -341,40 +341,6 @@ Assert-Contains -Path $snapshotJsonTests -Pattern 'active_snapshot_has_exact_95_
 Assert-Contains -Path $snapshotJsonTests -Pattern 'source_shaped_tie_keeps_right_operand_ieee_bits' -Description 'right-biased tie serialization'
 Assert-Contains -Path $snapshotJsonTests -Pattern '0x7ff8000000002408' -Description 'NaN payload sidecar'
 
-$heading = 'CP408 post-saturation shared-case latent-output supply-temperature mixed-air limit'
-$docs = @(
-    'docs\src\current\current-status.md',
-    'docs\src\current\project-contract.md',
-    'docs\src\porting-map\heat-balance-source-map.md',
-    'docs\src\porting-map\ideal-loads-source-map.md',
-    'docs\src\porting-map\zone-air-update-map.md'
-)
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText, "(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP408 heading count drift in $doc" }
-    $section = [regex]::Match($docText, "(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2304.*?PurchAir\.SupplyTemp = min',
-        'line 2306.*?first excluded',
-        'read-purchased-air-supply-temperature-for-minimum',
-        'read-purchased-air-mixed-air-temperature-for-minimum',
-        '20,\s*22,\s*26,\s*28,\s*31,\s*and 34',
-        '36/30/6/24',
-        'exactly 76 fields',
-        '19 .*Option<f64>',
-        '95 unique keys',
-        'CP407.*?sole immediate route',
-        'CP407.*?supply-temperature operand',
-        'mixed-air-temperature operand.*?CP329',
-        'CP407-to-CP408-to-unchanged-numerical',
-        '32\s*algorithms(?:,| and)\s*293 routines',
-        '58 .*state_mapped.*235 .*source_mapped.*170',
-        '346 total,\s*240 public,\s*106 internal',
-        '238 development commands'
-    )) {
-        Assert-Cp408Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim'
-    }
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP408 supersedes only CP407' -Description 'algorithm addendum'
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP408 additionally requires' -Description 'capability addendum'
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP408 supersedes only CP407' -Description 'canonical algorithm addendum'

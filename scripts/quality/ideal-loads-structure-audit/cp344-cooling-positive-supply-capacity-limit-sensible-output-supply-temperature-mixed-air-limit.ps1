@@ -778,74 +778,8 @@ foreach ($cp344Claim in @($cp344AlgorithmAddenda) + @($cp344CapabilityAddenda)) 
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP344 supersedes only CP343' -Description "canonical CP344 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP344 additionally requires' -Description "canonical CP344 capability index"
 
-# Exactly five hand-authored contract sections carry CP344; the
-# psychrometrics source map is intentionally unchanged.
-$cp344DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP344 now maps only.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP344 Source-Ordered Cooling Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP344 Cooling Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP344 Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP344 Cooling Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp344Documentation in $cp344DocumentationSections) {
-    $cp344DocumentText = Read-RepoText -Path $cp344Documentation.Path
-    $cp344Matches = [regex]::Matches($cp344DocumentText, $cp344Documentation.Pattern)
-    if ($cp344Matches.Count -ne 1) {
-        throw "CP344 documentation expected one scoped section in $($cp344Documentation.Path), found $($cp344Matches.Count)"
-    }
-    $cp344Section = $cp344Matches[0].Value
-    foreach ($cp344Pattern in @(
-            $cp344PurchasedAirSourceHash,
-            $cp344SourceStatementPattern,
-            $cp344OrderedSourceSitesPattern,
-            'a\s*<\s*b\s*\?\s*a\s*:\s*b',
-            'if left < right \{ left \} else \{ right \}',
-            '(?s)ties.*?unordered.*?CP329.*?right',
-            'CapacityLimitSensibleOutputSupplyTemperatureAssigned',
-            'CapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitExecuted',
-            'T\s*=\s*U\+N\+P\+G\+F\+L',
-            'A\s*=\s*F\+L',
-            'L\s*=\s*D\s*=\s*H\s*=\s*M\s*=\s*CP340 adjustment-body entries',
-            '4\*L',
-            '(?s)supplied.*?(?:latest|retained-latest).*?private CP343',
-            'resulting_supply_temperature_c',
-            '(?s)CP329.*?(?:latest|retained-latest).*?private.*?mixed_air_temperature_c',
-            '(?s)CP334.*?CP336.*?(?:lineage|corroborat)',
-            'no\s+new\s+finite\s+gate',
-            '(?s)(?:pure|defensive).*?characterization.*?(?:not|rather than).*?(?:full-public|public)',
-            'IEEE',
-            'CP343-to-CP344-to-(?:unchanged-)?numerical',
-            'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle',
-            '(?s)2204-2207.*?non-executable',
-            $cp344FirstExcludedStatementPattern,
-            '(?i)numerical[- ]DTO',
-            'state_mapped',
-            'source_mapped',
-            'Roadmap'
-        )) {
-        if ($cp344Section -notmatch $cp344Pattern) {
-            throw "CP344 documentation in $($cp344Documentation.Path) missing '$cp344Pattern'"
-        }
-    }
-    if ($cp344Section -match '(?is)public(?:ly)? reachable.{0,100}(?:infinity|NaN)|(?:infinity|NaN).{0,100}public(?:ly)? reachable') {
-        throw "CP344 documentation must not promote unproved nonfinite full-public reachability in $($cp344Documentation.Path)"
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP344\b' -Description "CP344 does not alter the psychrometrics source map"
 
 # Historical audits must explicitly admit the CP344 binding call and carry

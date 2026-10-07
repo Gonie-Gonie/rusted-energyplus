@@ -253,29 +253,6 @@ foreach ($field in $numericFields) {
     Assert-Cp418Text -Text $serializationText -Pattern ('(?m)^\s*"'+$escaped+'".*\r?\n\s*"'+$escaped+'_ieee_bits"') -Description 'adjacent IEEE sidecar'
 }
 
-$heading = 'CP418 post-saturation capacity-limit dehumidification-guard else-branch entry'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    $headings = [regex]::Matches($docText,'(?m)^## CP(?<number>40[9]|41[0-8])\b')
-    $numbers = @($headings | ForEach-Object { [int]$_.Groups['number'].Value })
-    if (($numbers -join '|') -cne '409|410|411|412|413|414|415|416|417|418') { throw "CP409-CP418 documentation order drift in $doc" }
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP418 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'physical control line 2327 exactly','sibling else entry of CP381.*?line-2266','line 2325 closes CP413.*?line 2326.*?line-2268',
-        'neither a CP413.*?false result nor a CP417.*?exit','enter-post-saturation-capacity-limit-dehumidification-guard-else-branch-after-guard-false-fallthrough',
-        'lines 2328 and 2329.*?comment-only','line 2330.*?first excluded.*?CP419','fifty-four flattened conceptual outcomes',
-        '4, 7, 10, 13, and 16','forty-nine','T418=54','Z418=49','E418=5','S418=E418=5','17/37',
-        'active public indices.*?4.*?7','active private indices.*?10.*?13.*?16','mutually exclusive.*?eighteen CP417','Eight width-36',
-        'CP417.*?sole immediate predecessor','no scalar active input','no.*?owner read','36/41/51','acquires no new owner',
-        'exact first 162 fields','existing terminal W/H/T','post_saturation_capacity_limit_dehumidification_guard_else_branch_entered',
-        '163 base fields','fifty-four.*?Option<f64>','217 unique keys','fifty-four adjacent','CP417-to-CP418-to-unchanged-numerical',
-        '108 to 109','adds no numerical or coupling-input DTO','no output DTO','never feeds','32\s+algorithms,\s+293',
-        '58.*?state_mapped','235.*?source_mapped','356 total','240 public','116\s+internal','238\s+development commands'
-    )) { Assert-Cp418Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
-
 foreach ($specAddendum in @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP418 supersedes only CP417' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP418 additionally requires' }

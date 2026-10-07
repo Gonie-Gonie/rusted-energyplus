@@ -231,7 +231,7 @@ Assert-Contains -Path $cp376ArbitraryAssertions -Pattern 'cp377_assertions::asse
 Assert-NotContains -Path $cp376ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(' -Description "CP376 terminal nonfeed relinquishment"
 Assert-NotContains -Path $cp377ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(' -Description "CP377 terminal numerical evidence relinquishment"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp378_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_exact_reconciliation\(' -Description "CP378 terminal reconciliation"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp379_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP379 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp380_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP380 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp382_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP382 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp383_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP383 terminal numerical nonfeed firewall"
 
-# Exactly two stable spec addenda and five source-ordered hand-written sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp376AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp376CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp376AlgorithmAddenda = [regex]::Matches($cp376AlgorithmText, '(?m)^\s*"CP376 supersedes only CP375[^"\r\n]+",\s*$')
@@ -253,31 +253,7 @@ foreach ($claim in @($cp376AlgorithmAddenda + $cp376CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP376 spec addendum missing '$pattern'" }
     }
 }
-$cp376Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP376 Cooling Supply-Humidity-Ratio Pre-Saturation Original Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP376 Source-Ordered Cooling Supply-Humidity-Ratio Pre-Saturation Original Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP376 Supply-Humidity-Ratio Pre-Saturation Original Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP376 Pre-Saturation Original Humidity Assignment in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP376 Pre-Saturation Original Humidity-Assignment Placement' }
-)
-foreach ($doc in $cp376Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP376 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..376) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP376 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @(
-            $cp376SourceCommit, $cp376SourceHash, '2258', '2259', $cp376Sites[0], $cp376Sites[1],
-            'eight|8', 'CP375', 'CP347', 'CP329', 'CP345', 'CP346',
-            '314\s+total', '74\s+internal'
-        )) {
-        if ($sections[0].Value -notmatch $required) { throw "CP376 documentation in $($doc.Path) missing '$required'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP376\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP376 supersedes only CP375' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP376 additionally requires' -Description "canonical capability addendum"

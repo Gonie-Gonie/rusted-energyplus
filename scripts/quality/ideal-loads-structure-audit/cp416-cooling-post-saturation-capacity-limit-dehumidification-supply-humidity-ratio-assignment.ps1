@@ -222,30 +222,6 @@ foreach ($field in $expectedNumeric) {
     Assert-Cp416Text -Text $serializationText -Pattern ('(?m)^\s*"'+$escaped+'".*\r?\n\s*"'+$escaped+'_ieee_bits"') -Description 'adjacent IEEE sidecar'
 }
 
-$heading = 'CP416 post-saturation capacity-limit dehumidification supply-humidity-ratio assignment'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    $headings = [regex]::Matches($docText,'(?m)^## CP(?<number>40[8-9]|41[0-6])\b')
-    $numbers = @($headings | ForEach-Object { [int]$_.Groups['number'].Value })
-    if (($numbers -join '|') -cne '408|409|410|411|412|413|414|415|416') { throw "CP408-CP416 documentation order drift in $doc" }
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP416 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2320 exactly','line 2321.*?first excluded','CP417 candidate',
-        'read-purchased-air-supply-temperature-for-post-saturation-capacity-limit-dehumidification-humidity-ratio-inversion',
-        'read-local-supply-enthalpy-for-post-saturation-capacity-limit-dehumidification-humidity-ratio-inversion',
-        'evaluate-psy-w-fn-tdb-h-for-post-saturation-capacity-limit-dehumidification',
-        'assign-purchased-air-supply-humidity-ratio-for-post-saturation-capacity-limit-dehumidification',
-        'fifty-four flattened conceptual outcomes','Thirty-six inactive','eighteen.*?all four','T416=54','Z416=36','A416=18','S416=4\*A416=72',
-        '17/37','23, 25, 35, and 37','Six width-36','36/41/51','CP415.*?sole immediate',
-        'resulting_supply_temperature_c.*?solely owns','resulting_supply_enthalpy_j_per_kg.*?solely owns','energyplus_psy_w_fn_tdb_h',
-        'first 125 fields','seventeen CP416','145 base fields','forty-seven.*?Option<f64>','192 unique keys','forty-seven adjacent',
-        'CP415-to-CP416-to-unchanged-numerical','106 to 107','adds no numerical or coupling-input DTO','no output DTO','never feeds',
-        '32\s+algorithms,\s+293','58.*?state_mapped','235.*?source_mapped','354 total','240 public','114\s+internal','238\s+development commands'
-    )) { Assert-Cp416Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
-
 foreach ($specAddendum in @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP416 supersedes only CP415' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP416 additionally requires' }

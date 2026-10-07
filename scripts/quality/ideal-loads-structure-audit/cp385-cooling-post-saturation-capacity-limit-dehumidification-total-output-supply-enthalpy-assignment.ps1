@@ -278,27 +278,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
     }
 }
 
-$docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP385 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP385 Source-Ordered Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP385 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP385 Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP385 Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment Placement' }
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP385 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..385) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP385 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($pattern in @($commit, $hash, '2270', '2272', 'CP386', 'twenty-three', '6\*S', 'CP384', 'CP382', '323\s+total', '83\s+internal')) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP385 documentation in $($doc.Path) missing '$pattern'" }
-    }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP385\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP385 supersedes only' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP385 additionally requires' -Description "canonical capability addendum"

@@ -180,16 +180,6 @@ Assert-Contains -Path $serialization -Pattern 'static_schema_is_first_267_exact_
 $serializationProduction = [regex]::Split($serializationText,'(?m)^#\[cfg\(test\)\]\r?$',2)[0]
 if ($serializationProduction -match 'DirectZonePurchasedAirCouplingInput|numerical_dto|prediction|feedback|nodes|loads|reports') { throw 'serializer numerical feed unexpectedly present in production source' }
 
-$heading = 'CP421 post-saturation capacity-limit dehumidification-guard else-branch sensible-output maximum-capacity guard'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-$canonical = $null
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    if ([regex]::Matches($text,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP421 heading count drift in $doc" }
-    $section = [regex]::Match($text,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## CP422\b)").Groups['body'].Value.TrimEnd([char[]]"`r`n")
-    if ($null -eq $canonical) {$canonical=$section} elseif ($section -cne $canonical) { throw "CP421 manual section drift in $doc" }
-}
-foreach ($pattern in @('physical executable/control line 2332 exactly','line\s+2333.*?first excluded.*?CP422','exact four dependency-ordered sites','T421=59','I421=49','Q421=10','F421=5','B421=5','S421=3\*Q421\+B421=35','19/40','Three width-36','36/41/56','220 base fields','seventy-six\s+`Option<f64>`','two optional comparison bools','296\s+unique JSON keys','exact first 267 keys','29-key tail','CP420-to-CP421-to-unchanged-numerical','111 to 112','359 total','240 public','119 internal')) { Assert-Cp421Text -Text $canonical -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
 foreach ($spec in @([PSCustomObject]@{Path='specs\algorithm_ledger.toml';Anchor='CP421 supersedes only CP420'},[PSCustomObject]@{Path='specs\capabilities.toml';Anchor='CP421 additionally requires'})) {
     $matches=[regex]::Matches((Read-RepoText -Path $spec.Path),'(?m)^\s*"(?<body>'+[regex]::Escape($spec.Anchor)+'.*)",\r?$')
     if ($matches.Count -ne 1) { throw "CP421 expected one bounded addendum in $($spec.Path)" }

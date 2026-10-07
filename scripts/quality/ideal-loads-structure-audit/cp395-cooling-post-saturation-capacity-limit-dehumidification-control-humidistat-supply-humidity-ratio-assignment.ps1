@@ -392,16 +392,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
         )) { if ($claim.Value -notmatch $pattern) { throw "CP395 spec addendum missing '$pattern'" } }
 }
 
-$docs = @("docs\src\current\current-status.md", "docs\src\current\project-contract.md", "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md", "docs\src\porting-map\zone-air-update-map.md")
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc; $sections = [regex]::Matches($text, '(?ms)^## CP395\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1 -or $text.LastIndexOf("## CP395 ") -le $text.LastIndexOf("## CP394 ")) { throw "CP395 documentation count/order drift in $doc" }
-    $section = $sections[0].Value
-    foreach ($pattern in @($commit, $hash, '2288', '2289', 'CP396', '2313', $sites[0], $sites[3], '19, 23, and 26', 'T395\s*=\s*T394', '4\s*\*\s*A395', '30/27/3/12', '3/17/27', '0x3ee4f8b588e368f1', 'thirteen', 'CP394-to-CP395-to-unchanged-numerical', '333\s+total', '240\s+public', '93\s+internal', 'Roadmap')) {
-        if ($section -notmatch $pattern) { throw "CP395 documentation in $doc missing '$pattern'" }
-    }
-    $cursor = 0; foreach ($field in @($numericFields + $localBools)) { $next = $section.IndexOf($field, $cursor); if ($next -lt 0) { throw "CP395 documentation schema order missing '$field' in $doc" }; $cursor = $next + $field.Length }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP395\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP395 supersedes only CP394' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP395 additionally requires' -Description "canonical capability addendum"

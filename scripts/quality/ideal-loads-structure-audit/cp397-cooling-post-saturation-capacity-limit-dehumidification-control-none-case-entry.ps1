@@ -290,19 +290,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
         )) { if ($claim.Value -notmatch $pattern) { throw "CP397 spec addendum missing '$pattern'" } }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP397\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1 -or $text.LastIndexOf("## CP397 ") -le $text.LastIndexOf("## CP396 ")) { throw "CP397 documentation count/order drift in $doc" }
-    foreach ($pattern in @($commit, $hash, '2290', '2291', 'CP398', '2294', '2313', $site, 'T397\s*=\s*T396', 'E397', '30/27/3/3', 'exactly six', 'IEEE sidecars', $localBool, 'CP396-to-CP397-to-unchanged-numerical', '335\s+total', '240\s+public', '95\s+internal', 'Roadmap')) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP397 documentation in $doc missing '$pattern'" }
-    }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP397\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP397 supersedes only CP396' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP397 additionally requires' -Description "canonical capability addendum"

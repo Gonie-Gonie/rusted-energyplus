@@ -289,20 +289,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
         )) { if ($claim.Value -notmatch $pattern) { throw "CP394 spec addendum missing '$pattern'" } }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP394\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP394 documentation count drift in $doc" }
-    foreach ($pattern in @($commit, $hash, '2286', $site, '2288', 'CP395', '2289', '2313', 'T394\s*=\s*T393', 'R\[19\]\+R\[23\]\+R\[26\]', 'exactly six', 'IEEE sidecars', 'boolean subsequence', 'CP393-to-CP394-to-unchanged-numerical', 'DirectZonePurchasedAirCouplingInput', '332\s+total', '240\s+public', '92\s+internal', '238\s+development\s+commands', 'Roadmap')) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP394 documentation in $doc missing '$pattern'" }
-    }
-    if ($text.LastIndexOf("## CP394 ") -le $text.LastIndexOf("## CP393 ")) { throw "CP393-to-CP394 documentation order drift in $doc" }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP394\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP394 supersedes only CP393' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP394 additionally requires' -Description "canonical capability addendum"

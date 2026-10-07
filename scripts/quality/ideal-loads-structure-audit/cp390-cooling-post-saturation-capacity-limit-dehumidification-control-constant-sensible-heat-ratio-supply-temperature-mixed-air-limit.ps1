@@ -356,31 +356,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
     }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md",
-    "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP390\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP390 documentation expected one section in $doc" }
-    foreach ($pattern in @(
-            $commit, $hash, '2281', '2282', '2283', 'thirty|30', 'twenty-seven|27',
-            'three|3', 'twenty-four|24', 'eleven|11', 'nineteen|19', '18', '22', '28',
-            'CP389', 'CP329', 'CP379', 'CP334', 'CP344', 'CP385', 'T390=T389',
-            'L390=A389', '12', '25|twenty-five',
-            'predecessor_resulting_supply_enthalpy_j_per_kg',
-            'resulting_supply_enthalpy_j_per_kg', 'IEEE|_ieee_bits',
-            'if left < right', 'f64::min', 'CP391', '328\s+total', '88\s+internal'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP390 documentation in $doc missing '$pattern'" }
-    }
-    $cp389DocIndex = $text.LastIndexOf("## CP389 ")
-    $cp390DocIndex = $text.LastIndexOf("## CP390 ")
-    if ($cp389DocIndex -lt 0 -or $cp390DocIndex -le $cp389DocIndex) { throw "CP389-to-CP390 documentation order drift in $doc" }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP390\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP390 supersedes only CP389' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP390 additionally requires' -Description "canonical capability addendum"

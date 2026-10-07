@@ -103,9 +103,9 @@ none
 | docs/src/conformance/tolerance-policy.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-10-07 |
-| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-07-14 |
+| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-10-07 |
 | docs/src/current/launcher-and-run-framework.md | current | Current | n/a | present | active | core | 2026-06-23 |
-| docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-07-14 |
+| docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-10-07 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-10-07 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
@@ -130,10 +130,10 @@ none
 | docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
 | docs/src/porting-map/geometry-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/geometry.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
-| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-16 |
+| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-10-07 |
 | docs/src/porting-map/heat-balance.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/hvac.md | source-map | not in SUMMARY | n/a | none |  |  |  |
-| docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-15 |
+| docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-10-07 |
 | docs/src/porting-map/input-and-schema.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-05 |
 | docs/src/porting-map/material-source-map.md | source-map | not in SUMMARY | n/a | present | active | compiler | 2026-07-16 |
 | docs/src/porting-map/node-state-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
@@ -146,7 +146,7 @@ none
 | docs/src/porting-map/surface-balance-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-20 |
 | docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/warmup-semantics-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
-| docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
+| docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-10-07 |
 | docs/src/releases/README.md | release-note | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/releases/v0.1.0.md | release-note | not in SUMMARY | n/a | present | ready | release | 2026-06-18 |
 | docs/src/releases/v0.32.0.md | release-note | not in SUMMARY | n/a | present | released | release | 2026-06-08 |

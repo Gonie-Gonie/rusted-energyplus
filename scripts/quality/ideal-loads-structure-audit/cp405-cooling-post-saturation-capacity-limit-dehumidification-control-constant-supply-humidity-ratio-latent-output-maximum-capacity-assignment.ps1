@@ -267,21 +267,6 @@ foreach ($pattern in @(
         'ends_with\("_ieee_bits"\)'
     )) { Assert-Contains -Path $arbitraryAssertions -Pattern $pattern -Description "arbitrary runtime contract" }
 
-$heading = 'CP405 post-saturation shared-case latent-output body maximum-capacity assignment'
-$docs = @(
-    'docs\src\current\current-status.md', 'docs\src\current\project-contract.md',
-    'docs\src\porting-map\heat-balance-source-map.md',
-    'docs\src\porting-map\ideal-loads-source-map.md',
-    'docs\src\porting-map\zone-air-update-map.md'
-)
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText, "(?m)^## $([regex]::Escape($heading))$").Count -ne 1) {
-        throw "CP405 documentation heading must appear exactly once in $doc"
-    }
-    Assert-Cp405Text -Text $docText -Pattern '(?s)(?:Physical )?[Ll]ine 2301.*?first excluded lexical/control.*?CP406 candidate' -Description "CP406 lexical/control boundary documentation"
-    Assert-Cp405Text -Text $docText -Pattern '(?s)[Ll]ine 2302.*?first excluded executable' -Description "first excluded executable documentation"
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP405 supersedes only CP404' -Description "algorithm claim"
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP405 additionally requires' -Description "capability claim"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP405 supersedes only CP404' -Description "canonical algorithm claim"

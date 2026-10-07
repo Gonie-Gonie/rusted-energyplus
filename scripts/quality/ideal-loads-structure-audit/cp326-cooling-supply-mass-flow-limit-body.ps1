@@ -922,55 +922,6 @@ foreach ($cp326CapabilityId in $cp326CapabilityIds) {
     Assert-CanonicalForbiddenFeatures -Id $cp326CapabilityId -Expected @('Autosizing', 'EMS') -Description "canonical CP326 '$cp326CapabilityId' feature firewall"
 }
 
-$cp326DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP326 maps only the Cooling supply mass-flow limit body.*?^conformance, and Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP326 Source-Ordered Cooling Supply Mass-Flow Limit Body\r?\n.*?Roadmap item\.\s*'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP326 Cooling Supply Mass-Flow Limit Body\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP326 Cooling Supply Mass-Flow Limit Body in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP326 Cooling Supply Mass-Flow Limit Body Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp326Documentation in $cp326DocumentationSections) {
-    $cp326DocumentText = Read-RepoText -Path $cp326Documentation.Path
-    $cp326SectionMatches = [regex]::Matches(
-        $cp326DocumentText,
-        $cp326Documentation.Pattern
-    )
-    if ($cp326SectionMatches.Count -ne 1) {
-        throw "CP326 documentation expected one scoped section in $($cp326Documentation.Path), found $($cp326SectionMatches.Count)"
-    }
-    $cp326Section = $cp326SectionMatches[0].Value
-    Assert-Cp326BoundaryStatement -Text $cp326Section -Description "CP326 documentation in $($cp326Documentation.Path)"
-    Assert-Cp326ScopedText -Text $cp326Section -Pattern '(?is)(?:does\s+not|do\s+not)\s+claim\s+a\s+C\+\+\s+function(?:-|\s+)argument\s+evaluation\s+order' -Description "CP326 no argument-order claim in $($cp326Documentation.Path)"
-    Assert-Cp326ScopedText -Text $cp326Section -Pattern '(?is)CP325.{0,100}(?:latest snapshot|snapshot).{0,80}(?:private witness|witness)' -Description "CP326 CP325 retained lineage in $($cp326Documentation.Path)"
-    Assert-Cp326ScopedText -Text $cp326Section -Pattern '(?is)(?:retained|bit-validated).{0,140}CP322.{0,500}(?:retained\s+(?:Init|BeginEnvrn)\s+cache|Init\s+cache)' -Description "CP326 CP322/Init provenance in $($cp326Documentation.Path)"
-    Assert-Cp326ScopedText -Text $cp326Section -Pattern 'purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle' -Description "CP326 JSON key in $($cp326Documentation.Path)"
-    foreach ($cp326NonPromotionTerm in @(
-            '\bsupport\b',
-            '\bstatus(?:es)?\b',
-            '\breadiness\b',
-            '\bevidence\b',
-            '\bconformance\b',
-            '\bRoadmap\b'
-        )) {
-        Assert-Cp326ScopedText -Text $cp326Section -Pattern $cp326NonPromotionTerm -Description "CP326 documentation non-promotion term in $($cp326Documentation.Path)"
-    }
-}
-
 # Keep the dot-source and script inventory order synchronized with the source
 # checkpoint order.
 $cp326MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

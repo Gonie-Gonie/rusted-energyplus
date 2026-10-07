@@ -265,7 +265,7 @@ Assert-NotContains -Path $cp360ArbitraryAssertions -Pattern 'super::super::super
 Assert-Contains -Path $cp360SnapshotSerialization -Pattern 'json_number' -Description "CP360 finite JSON projection"
 Assert-Contains -Path $cp360SnapshotSerialization -Pattern '_ieee_bits' -Description "CP360 authoritative IEEE sidecars"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp360AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp360CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp360AlgorithmAddenda = [regex]::Matches($cp360AlgorithmText, '(?m)^\s*"CP360 supersedes only CP359[^"\r\n]+",\s*$')
@@ -304,37 +304,7 @@ foreach ($target in @(
         throw "CP360 target count failed for '$($target.Pattern)'"
     }
 }
-$cp360Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP360 Cooling Humidistat Supply-Humidity-Ratio-for-Dehumidification Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP360 Source-Ordered Cooling Humidistat Supply-Humidity-Ratio Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP360 Humidistat Supply-Humidity-Ratio-for-Dehumidification Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP360 Humidistat Supply-Humidity-Ratio Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP360 Humidistat Supply-Humidity-Ratio Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp360Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP360 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp360SourceHash, '2230', 'SupplyHumRatForDehum', '2231',
-            $cp360Sites[0], $cp360Sites[1], $cp360Sites[2], $cp360Sites[3],
-            $cp360Sites[4], $cp360Sites[5], 'U/N/P/C0/Q/H/CSH',
-            'source_site_execution_count\s*=\s*6H', 'C0\s*=\s*S',
-            'Q\s*=\s*H\s*=\s*CSH\s*=\s*0', 'CP359', 'numerator',
-            'CP330', 'denominator', 'CP329', 'ZoneNodeNum', 'second explicit',
-            'no retained', 'live Node', 'CP319', 'calc::humidity',
-            'division', 'addition', 'CP359-to-CP360-to-unchanged-numerical',
-            $cp360Lifecycle, 'PurchAir\.SupplyHumRat', 'CP345',
-            '32\s+algorithms', '293\s+routines', '58\s+[^,\r\n]*state[_-]mapped',
-            '235\s+[^,\r\n]*source[_-]mapped', '170\s+required', '298\s+total',
-            '240\s+public', '58\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP360 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP360\b' -Description "CP360 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP360 supersedes only CP359' -Description "canonical CP360 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP360 additionally requires' -Description "canonical CP360 capability addendum"

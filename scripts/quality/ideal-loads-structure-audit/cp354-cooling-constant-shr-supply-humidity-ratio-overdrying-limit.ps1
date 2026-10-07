@@ -262,7 +262,7 @@ foreach ($field in @(
 Assert-Contains -Path $cp354SnapshotSerialization -Pattern '(?s)fn json_number.*?is_finite.*?Value::Null' -Description "CP354 nonfinite numeric null"
 Assert-Contains -Path $cp354SnapshotSerialization -Pattern 'format!\("0x\{:016x\}",\s*value\.to_bits\(\)\)' -Description "CP354 authoritative bits"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $algorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $capabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $algorithmAddenda = [regex]::Matches($algorithmText, '(?m)^\s*"CP354 supersedes only CP353[^"\r\n]+",\s*$')
@@ -299,35 +299,7 @@ foreach ($target in @(
         throw "CP354 target count failed for '$($target.Pattern)'"
     }
 }
-$documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP354 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP354 Source-Ordered Cooling Constant-SHR Supply-Humidity-Ratio Overdrying Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP354 Constant-SHR Supply-Humidity-Ratio Overdrying Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP354 Constant-SHR Supply-Humidity-Ratio Overdrying Limit in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP354 Constant-SHR Supply-Humidity-Ratio Overdrying Limit Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP354 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp354SourceHash, '2222', '2223', '2224', 'CP355',
-            $cp354Sites[0], $cp354Sites[1], $cp354Sites[2], $cp354Sites[3], $cp354Sites[4], $cp354Sites[5],
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH', '6\*Q', 'C0\s*=\s*S',
-            'Q\s*=\s*H\s*=\s*CSH\s*=\s*0', 'CP345', 'CP353', 'CP334', 'CP344',
-            'assigned_supply_humidity_ratio', 'resulting_supply_enthalpy_j_per_kg',
-            'energyplus_psy_w_fn_tdb_h', 'raw\s*<\s*0\.0', '0x3ee4f8b588e368f1',
-            'f64::min', '(?:left\s+NaN|NaN\s+left)', '(?:right\s+NaN|NaN\s+right)',
-            'CalledFrom', 'SuppressWarnings', 'CP353-to-CP354-to-unchanged-numerical',
-            $cp354Lifecycle, 'DirectZonePurchasedAirCouplingInput',
-            '32\s+algorithms', '293\s+routines', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP354 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP354\b' -Description "CP354 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP354 supersedes only CP353' -Description "canonical CP354 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP354 additionally requires' -Description "canonical CP354 capability addendum"

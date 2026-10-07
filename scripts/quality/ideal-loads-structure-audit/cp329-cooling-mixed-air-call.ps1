@@ -827,73 +827,8 @@ foreach ($cp329CapabilityAddendum in $cp329CapabilityAddenda) {
 }
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP329 supersedes only CP328' -Description "canonical CP329 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP329 additionally requires' -Description "canonical CP329 capability index"
-Assert-Contains -Path "docs\src\current\project-contract.md" -Pattern 'direct no-OA child route at lines 2851, 2854-2861, 2869-2874, 2876, 2878, and[\r\n\s]+2932-2937' -Description "project contract exact CP329 child route"
-Assert-Contains -Path "docs\src\porting-map\ideal-loads-source-map.md" -Pattern 'child route at lines 2851, 2854-2861, 2869-2874, 2876, 2878, and 2932-2937' -Description "IdealLoads source map exact CP329 child route"
 
-# Every hand-authored contract repeats the bounded caller/child, coherent
-# projection limitation, direct-only evidence, exclusions, and non-promotion.
-$cp329DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP329 maps the complete Cooling `CalcPurchAirMixedAir` call statement.*?^conformance, and Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP329 Source-Ordered Cooling `CalcPurchAirMixedAir` Call\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP329 Cooling `CalcPurchAirMixedAir` Call and No-OA Fallback\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP329 Cooling Mixed-Air Call in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP329 Cooling Mixed-Air Call Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp329Documentation in $cp329DocumentationSections) {
-    $cp329DocumentText = Read-RepoText -Path $cp329Documentation.Path
-    $cp329Matches = [regex]::Matches($cp329DocumentText, $cp329Documentation.Pattern)
-    if ($cp329Matches.Count -ne 1) {
-        throw "CP329 documentation expected one scoped section in $($cp329Documentation.Path), found $($cp329Matches.Count)"
-    }
-    $cp329Section = $cp329Matches[0].Value
-    foreach ($cp329Pattern in @(
-            '2171-2178',
-            '(?is)nine.{0,40}(?:textual|caller|source).{0,30}site',
-            '(?is)(?:(?:does|do)\s+not\s+claim\s+a|without\s+claiming)\s+C\+\+.{0,40}argument.{0,30}evaluation\s+order',
-            '(?i)UnitOff',
-            '(?i)non-cooling',
-            '(?is)zero\s+supply\s+flow|supply\s+flow\s+is\s+zero',
-            '(?i)CP328',
-            '(?i)no-OA',
-            '(?i)positive(?:-|\s+)zero|\+0\.0',
-            '(?i)coherent.{0,80}enthalpy|enthalpy.{0,80}coherent',
-            '(?i)stored(?:-| )H|stored enthalpy|Node\.Enthalpy',
-            '(?is)(?:no|the)\s+OA(?:-|\s+)node.{0,250}psychrometric|does\s+not\s+dereference.{0,120}psychrometric',
-            'purchased_air_calc_cooling_mixed_air_call_lifecycle',
-            '(?i)runtime-aware',
-            '(?is)completed.{0,160}pending|pending.{0,160}completed',
-            '(?is)CP328.{0,160}private\s+(?:latest\s+)?witness|private\s+witness.{0,160}CP328',
-            '(?is)UnitOff.{0,100}non-cooling.{0,100}(?:active|route)',
-            '(?is)route-aware.{0,80}checked-arithmetic',
-            '(?is)(?:fail|rejected|returns an error).{0,180}(?:unchanged|before.{0,100}mutat|without.{0,100}(?:changing|mutat))',
-            '(?i)line-?2183|line 2183',
-            '2454-2461',
-            '(?is)`OutdoorAir`.{0,100}`Economizer`.{0,100}`HeatRecovery`.{0,100}`EMS`.{0,100}Autosizing.{0,30}remain\s+forbidden',
-            '(?i)source_mapped',
-            '(?i)support',
-            '(?i)conformance',
-            '(?i)Roadmap'
-        )) {
-        if ($cp329Section -notmatch $cp329Pattern) {
-            throw "CP329 documentation in $($cp329Documentation.Path) missing '$cp329Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Main audit and generated script inventory remain ordered by source checkpoint.
 $cp329MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

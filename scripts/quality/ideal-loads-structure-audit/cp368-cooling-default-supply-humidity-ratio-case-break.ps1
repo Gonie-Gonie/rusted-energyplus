@@ -270,7 +270,7 @@ Assert-NotContains -Path $cp368ParentAssertions -Pattern 'assert_numerical_nonfe
 Assert-Contains -Path $cp368ArbitraryAssertions -Pattern 'runtime\.contains_key\(CP368_KEY\)' -Description "CP368 non-direct key"
 Assert-Contains -Path $cp368ArbitraryAssertions -Pattern 'runtime\[CP368_KEY\]\.is_null\(\)' -Description "CP368 non-direct null"
 
-# Two spec addenda, target multiplicities, and five hand-doc sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp368AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp368CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp368AlgorithmAddenda = [regex]::Matches($cp368AlgorithmText, '(?m)^\s*"CP368 supersedes only CP367[^"\r\n]+",\s*$')
@@ -305,29 +305,7 @@ foreach ($target in @(
         throw "CP368 target count failed for '$($target.Value)'"
     }
 }
-$cp368Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP368 Cooling Default Supply-Humidity-Ratio Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP368 Source-Ordered Cooling Default Supply-Humidity-Ratio Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP368 Default Supply-Humidity-Ratio Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP368 Default Supply-Humidity-Ratio Case Break in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP368 Default Supply-Humidity-Ratio Case-Break Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp368Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) { throw "CP368 documentation expected one section in $($doc.Path)" }
-    foreach ($pattern in @(
-            $cp368SourceCommit, $cp368SourceHash, '2239', 'break', '2240', '2241-2244', '2245',
-            $cp368Sites[0], 'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L', 'A\s*=\s*F\+L',
-            'B\s*=\s*default_break\s*=\s*source_site\s*=\s*0', 'CP367',
-            'sole\s+predecessor', 'CP367-to-CP368-to-unchanged-numerical',
-            $cp368Lifecycle, 'CP345', '32\s+algorithms', '293\s+routines',
-            '58\s+`?state_mapped`?', '235\s+`?source_mapped`?', '170\s+required',
-            '306\s+total', '240\s+public', '66\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP368 documentation in $($doc.Path) missing '$pattern'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP368\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP368 supersedes only CP367' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP368 additionally requires' -Description "canonical capability addendum"

@@ -386,7 +386,7 @@ foreach ($field in @(
 }
 Assert-Contains -Path $cp362SnapshotSerialization -Pattern '(?s)fn json_number.*?is_finite.*?Value::Null' -Description "CP362 nonfinite numeric projection"
 Assert-Contains -Path $cp362SnapshotSerialization -Pattern 'format!\("0x\{:016x\}",\s*value\.to_bits\(\)\)' -Description "CP362 authoritative bits"
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp362AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp362CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp362AlgorithmAddenda = [regex]::Matches($cp362AlgorithmText, '(?m)^\s*"CP362 supersedes only CP361[^"\r\n]+",\s*$')
@@ -423,35 +423,7 @@ foreach ($target in @(
         throw "CP362 target count failed for '$($target.Pattern)'"
     }
 }
-$cp362Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP362 Cooling Humidistat Supply-Humidity-Ratio Mixed-Air Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP362 Source-Ordered Cooling Humidistat Mixed-Air Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP362 Humidistat Supply-Humidity-Ratio Mixed-Air Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP362 Humidistat Mixed-Air Limit in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP362 Humidistat Mixed-Air-Limit Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp362Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP362 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp362SourceHash, '2232', '2233', 'break', 'CP363', '2234', '2235', '2245',
-            $cp362Sites[0], $cp362Sites[1], $cp362Sites[2], $cp362Sites[3],
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH', '4H', 'C0\s*=\s*S',
-            'Q\s*=\s*H\s*=\s*CSH\s*=\s*0', 'CP329', 'mixed_air_humidity_ratio',
-            'CP361', 'resulting_supply_humidity_ratio_for_dehumidification',
-            'finite no-OA', 'adds?\s+no\s+finite', 'CP345', 'CP319', 'numerical DTO',
-            'CP334', 'if left < right \{ left \} else \{ right \}', 'f64::min',
-            'CP361-to-CP362-to-unchanged-numerical', $cp362Lifecycle,
-            '32\s+algorithms', '293\s+routines', '300\s+total', '240\s+public',
-            '60\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP362 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP362 supersedes only CP361' -Description "canonical CP362 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP362 additionally requires' -Description "canonical CP362 capability addendum"
 # Historical order/firewall/count audits, master order, and generated inventory.

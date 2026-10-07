@@ -310,27 +310,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
         )) { if ($claim.Value -notmatch $pattern) { throw "CP393 spec addendum missing '$pattern'" } }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP393\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP393 documentation expected one section in $doc" }
-    foreach ($pattern in @(
-            $commit, $hash, '2285', '\}\s*break;', $site, '2286', 'CP394', '2288', '2313',
-            '30|thirty', '27|twenty-seven', '18', '22', '28', 'eleven', 'nineteen',
-            'T393\s*=\s*T392', 'B393\s*=\s*A392', 'CP392', 'exactly six', 'IEEE sidecars', 'boolean subsequence', 'Schema order',
-            'CP392-to-CP393-to-unchanged-numerical', 'DirectZonePurchasedAirCouplingInput',
-            '32\s+algorithms', '293\s+routines', '58\s+`?state[_-]mapped`?', '235\s+`?source[_-]mapped`?', '170\s+required',
-            '331\s+total', '240\s+public', '91\s+internal', '238\s+development\s+commands', 'Roadmap'
-        )) { if ($sections[0].Value -notmatch $pattern) { throw "CP393 documentation in $doc missing '$pattern'" } }
-    $cp392Index = $text.LastIndexOf("## CP392 ")
-    $cp393Index = $text.LastIndexOf("## CP393 ")
-    if ($cp392Index -lt 0 -or $cp393Index -le $cp392Index) { throw "CP392-to-CP393 documentation order drift in $doc" }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP393\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP393 supersedes only CP392' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP393 additionally requires' -Description "canonical capability addendum"

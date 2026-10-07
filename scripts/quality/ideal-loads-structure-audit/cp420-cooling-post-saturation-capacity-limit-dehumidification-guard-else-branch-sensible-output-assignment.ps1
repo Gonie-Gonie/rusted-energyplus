@@ -284,26 +284,6 @@ foreach ($field in $numeric) {
 }
 foreach ($pattern in @('cp420_preserves_cp419_prefix_and_declares_273_lossless_keys','cp420_tail_is_predecessor_then_eight_site_local_then_terminal','nonfinite_projection_keeps_authoritative_bits')) { Assert-Contains -Path $serializationTests -Pattern $pattern -Description 'serializer regression coverage' }
 
-$heading = 'CP420 post-saturation capacity-limit dehumidification-guard else-branch sensible-output assignment'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-$canonicalSection = $null
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    $numbers = @([regex]::Matches($docText,'(?m)^## CP(?<number>40[9]|41[0-9]|420)\b') | ForEach-Object { [int]$_.Groups['number'].Value })
-    if (($numbers -join '|') -cne '409|410|411|412|413|414|415|416|417|418|419|420') { throw "CP409-CP420 documentation order drift in $doc" }
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP420 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## CP421\b)").Groups['body'].Value.TrimEnd([char[]]"`r`n")
-    if ($null -eq $canonicalSection) { $canonicalSection = $section } elseif ($section -cne $canonicalSection) { throw "CP420 manual documentation section drift in $doc" }
-}
-foreach ($pattern in @(
-    'physical executable line 2331 exactly','line 2332.*?first\s+excluded.*?CP421','exact eight dependency-ordered sites',
-    'T420=54','Z420=49','A420=5','S420=8\*A420=40','17/37','active public indices are 4 and\s+7','10, 13, and 16','Ten width-36',
-    'sole immediate route\s+predecessor','CP330 solely owns','CP419 solely owns local `CpAir`','CP329 solely owns `MixedAirTemp`',
-    'zero generic predecessor-route','202 base fields','seventy-one\s+`Option<f64>`','273 unique JSON keys','exact first 171 fields','exact first 228 keys','45-key tail',
-    '36/41/51','owns only five local `CoolSensOutput` values','CP419-to-CP420-to-unchanged-numerical','110 to 111','never feeds',
-    '32 algorithms','293 routines','58 `state_mapped`','235 `source_mapped`','358 total','240 public','118 internal','238 development commands'
-)) { Assert-Cp420Text -Text $canonicalSection -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-
 foreach ($spec in @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP420 supersedes only CP419' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP420 additionally requires' }

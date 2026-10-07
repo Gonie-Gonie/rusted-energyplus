@@ -378,31 +378,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
     }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP391\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP391 documentation expected one section in $doc" }
-    foreach ($pattern in @(
-            $commit, $hash, '2283', 'SupplyEnthalpy\s*=\s*max\(SupplyEnthalpy,\s*PsyHFnTdbW\(PurchAir\.SupplyTemp,\s*0\.00001\)\);',
-            '2284', 'PurchAir\.SupplyHumRat\s*=\s*PsyWFnTdbH\(state,\s*PurchAir\.SupplyTemp,\s*SupplyEnthalpy,\s*RoutineName\);',
-            $sites[0], $sites[1], $sites[2], $sites[3], $sites[4], '30|thirty', '3|three', '27|twenty-seven',
-            '17|seventeen', '14|fourteen', '13|thirteen', '11|eleven', '19|nineteen', '18', '22', '28',
-            'T391\s*=\s*T390', 'O391\s*=\s*L390', '5\s*\*\s*O391', 'CP390', 'CP385', 'CP379', 'CP389', 'CP329',
-            'energyplus_psy_h_fn_tdb_w', '0x3ee4f8b588e368f1', 'if left < right', 'f64::max',
-            '33|thirty-three', 'CP390-to-CP391-to-unchanged-numerical', 'DirectZonePurchasedAirCouplingInput',
-            '329\s+total', '240\s+public', '89\s+internal', '238\s+development commands', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP391 documentation in $doc missing '$pattern'" }
-    }
-    $cp390DocIndex = $text.LastIndexOf("## CP390 ")
-    $cp391DocIndex = $text.LastIndexOf("## CP391 ")
-    if ($cp390DocIndex -lt 0 -or $cp391DocIndex -le $cp390DocIndex) { throw "CP390-to-CP391 documentation order drift in $doc" }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP391\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP391 supersedes only CP390' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP391 additionally requires' -Description "canonical capability addendum"

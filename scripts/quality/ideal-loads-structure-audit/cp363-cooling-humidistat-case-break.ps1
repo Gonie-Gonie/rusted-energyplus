@@ -312,7 +312,7 @@ Assert-Contains -Path $cp363ArbitraryAssertions -Pattern 'cp364_assertions::asse
 Assert-Contains -Path $cp363ArbitraryAssertions -Pattern 'cp364_assertions::assert_non_direct\(runtime\)' -Description "CP364 arbitrary non-direct delegation"
 Assert-NotContains -Path $cp363ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(runtime, results\)' -Description "CP363 relinquishes terminal nonfeed to CP364"
 
-# Two spec addenda, 2+2+1+1 targets, five hand sections, and generated docs.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp363AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp363CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp363AlgorithmAddenda = [regex]::Matches($cp363AlgorithmText, '(?m)^\s*"CP363 supersedes only CP362[^"\r\n]+",\s*$')
@@ -348,32 +348,7 @@ foreach ($target in @(
         throw "CP363 target count failed for '$($target.Pattern)'"
     }
 }
-$cp363Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP363 Cooling Humidistat Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP363 Source-Ordered Cooling Humidistat Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP363 Humidistat Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP363 Humidistat Case Break in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP363 Humidistat Case-Break Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp363Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) { throw "CP363 documentation expected one section in $($doc.Path)" }
-    foreach ($pattern in @(
-            $cp363SourceHash, '2233', 'break', '2234', 'CP364', '2235', '2245',
-            $cp363Sites[0], 'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L', 'A\s*=\s*F\+L',
-            'source_site_execution_count', 'C0\s*=\s*S', 'Q\s*=\s*H\s*=\s*CSH\s*=\s*0',
-            'false', 'true', 'ConstantSupplyHumidityRatio', 'CP362',
-            '(?s)(?:sole|solely).*?predecessor', '(?s)no.{0,80}numeric', 'gate',
-            'CP362-to-CP363-to-unchanged-numerical', $cp363Lifecycle, 'first/last',
-            '32\s+algorithms', '293\s+routines', '301\s+total', '240\s+public',
-            '61\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP363 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP363\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP363 supersedes only CP362' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP363 additionally requires' -Description "canonical capability addendum"

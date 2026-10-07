@@ -323,27 +323,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
         )) { if ($claim.Value -notmatch $pattern) { throw "CP392 spec addendum missing '$pattern'" } }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP392\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP392 documentation expected one section in $doc" }
-    foreach ($pattern in @(
-            $commit, $hash, '2284', 'PurchAir\.SupplyHumRat\s*=\s*PsyWFnTdbH\(state,\s*PurchAir\.SupplyTemp,\s*SupplyEnthalpy,\s*RoutineName\);',
-            '2285', '\}\s*break;', $sites[0], $sites[1], $sites[2], $sites[3], '30|thirty', '3|three', '27|twenty-seven',
-            '17|seventeen', '12', '18', '22', '28', 'T392\s*=\s*T391', '4\s*\*\s*A392', 'CP391',
-            'energyplus_psy_w_fn_tdb_h', '0x3ee4f8b588e368f1', 'positive sub-floor', 'negative zero', 'NaN', 'infinity', 'pole',
-            '40|forty', 'nine|9', 'CP391-to-CP392-to-unchanged-numerical', 'DirectZonePurchasedAirCouplingInput', 'CP393',
-            '330\s+total', '240\s+public', '90\s+internal', '238\s+development\s+commands', 'Roadmap'
-        )) { if ($sections[0].Value -notmatch $pattern) { throw "CP392 documentation in $doc missing '$pattern'" } }
-    $cp391DocIndex = $text.LastIndexOf("## CP391 ")
-    $cp392DocIndex = $text.LastIndexOf("## CP392 ")
-    if ($cp391DocIndex -lt 0 -or $cp392DocIndex -le $cp391DocIndex) { throw "CP391-to-CP392 documentation order drift in $doc" }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP392\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP392 supersedes only CP391' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP392 additionally requires' -Description "canonical capability addendum"

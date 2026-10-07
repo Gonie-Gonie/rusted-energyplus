@@ -234,7 +234,7 @@ foreach ($field in @(
 Assert-Contains -Path $cp356SnapshotSerialization -Pattern '(?s)fn json_number.*?is_finite.*?Value::Null' -Description "CP356 nonfinite numeric null"
 Assert-Contains -Path $cp356SnapshotSerialization -Pattern 'format!\("0x\{:016x\}",\s*value\.to_bits\(\)\)' -Description "CP356 authoritative bits"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp356AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp356CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp356AlgorithmAddenda = [regex]::Matches($cp356AlgorithmText, '(?m)^\s*"CP356 supersedes only CP355[^"\r\n]+",\s*$')
@@ -269,35 +269,7 @@ foreach ($target in @(
         throw "CP356 target count failed for '$($target.Pattern)'"
     }
 }
-$cp356Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP356 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP356 Source-Ordered Cooling Constant-SHR Supply-Humidity-Ratio Mixed-Air Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP356 Constant-SHR Supply-Humidity-Ratio Mixed-Air Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP356 Constant-SHR Supply-Humidity-Ratio Mixed-Air Limit in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP356 Constant-SHR Supply-Humidity-Ratio Mixed-Air Limit Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp356Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP356 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp356SourceHash, '2226', '2227', 'break', '2228', '2229',
-            $cp356Sites[0], $cp356Sites[1], $cp356Sites[2], $cp356Sites[3],
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH', '4\*Q', 'C0\s*=\s*S',
-            'Q\s*=\s*H\s*=\s*CSH\s*=\s*0', 'CP355', 'resulting_supply_humidity_ratio',
-            'CP329', 'mixed_air_humidity_ratio', '(?:completed recursive|recursively complete)',
-            'adds?\s+no(?:\s+line-local)?\s+finite',
-            'CP345', 'CP319', 'numerical DTO', 'if left < right \{ left \} else \{ right \}',
-            'f64::min', 'CP355-to-CP356-to-unchanged-numerical', $cp356Lifecycle,
-            '32\s+algorithms', '293\s+routines', '296\s+total', '240\s+public',
-            '56\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP356 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP356 supersedes only CP355' -Description "canonical CP356 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP356 additionally requires' -Description "canonical CP356 capability addendum"
 

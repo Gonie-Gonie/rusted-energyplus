@@ -263,25 +263,6 @@ Assert-Contains -Path $snapshotJsonTests -Pattern '120.*(?:key|field)|(?:key|fie
 Assert-Contains -Path $snapshotJsonTests -Pattern 'twenty_five_sidecar_schema|twenty-five.*sidecar' -Description 'twenty-five-sidecar JSON regression'
 Assert-Contains -Path $snapshotJsonTests -Pattern 'Some\(25\)' -Description 'twenty-five-sidecar JSON count'
 
-$heading = 'CP413 post-saturation saturation supply-humidity-ratio guard'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP413 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2315 exactly','four exact.*?source sites','line 2316.*?first excluded','CP414 candidate',
-        'routes 0 through 17.*?inactive','routes 18 through 35.*?evaluated-.*?false.*?body-entered',
-        '17/37','20, 21, 26, and 27','fourteen active predecessors','T413=54','I413=18','F413=18','B413=18',
-        'source_site_execution_count=3\*F413\+4\*B413=126','Three width-36 arrays','CP412.*?sole immediate',
-        'resulting_saturation_supply_humidity_ratio.*?solely owns','resulting_supply_humidity_ratio_original.*?solely owns',
-        'predecessor_cp411_resulting_supply_humidity_ratio.*?corroboration','36/41/51','finite saturation and original',
-        'inactive routes.*?ignore','NaN.*?unordered.*?false','signed-zero equality is false','no arithmetic, psychrometric',
-        'exactly\s+95 base\s+fields','twenty-five `Option<f64>`','one `Option<bool>`','120 unique keys','twenty-five adjacent',
-        'CP412-to-CP413-to-unchanged-numerical','no `ActiveInput`','32 algorithms, 293','58 `state_mapped`, 235 `source_mapped`',
-        '351 total, 240 public, 111 internal','238 development commands'
-    )) { Assert-Cp413Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
 $specAddenda = @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP413 supersedes only CP412' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP413 additionally requires' }

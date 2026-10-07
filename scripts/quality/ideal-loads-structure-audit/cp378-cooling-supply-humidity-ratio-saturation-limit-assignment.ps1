@@ -230,7 +230,7 @@ Assert-NotContains -Path $cp378ParentAssertions -Pattern 'assert_numerical_(?:no
 Assert-Contains -Path $cp378Assertions -Pattern 'assert_numerical_nonfeed_and_exact_reconciliation\(' -Description "CP378 terminal no-feed reconciliation"
 Assert-Contains -Path $cp378Assertions -Pattern 'mod cp379_assertions;' -Description "arbitrary CP379 module"; Assert-Contains -Path $cp378Assertions -Pattern 'cp379_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP379 direct delegation"; Assert-Contains -Path $cp378Assertions -Pattern 'cp379_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP379 non-direct delegation"; Assert-Contains -Path $cp379Assertions -Pattern 'mod cp380_assertions;' -Description "arbitrary CP380 module"; Assert-Contains -Path $cp379Assertions -Pattern 'cp380_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP380 direct delegation"; Assert-Contains -Path $cp379Assertions -Pattern 'cp380_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP380 non-direct delegation"; Assert-Contains -Path $cp380Assertions -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP380 numerical nonfeed firewall"; Assert-Contains -Path $cp380Assertions -Pattern 'mod cp381_assertions;' -Description "arbitrary CP381 module"; Assert-Contains -Path $cp380Assertions -Pattern 'cp381_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP381 direct delegation"; Assert-Contains -Path $cp380Assertions -Pattern 'cp381_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP381 non-direct delegation"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp382_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP382 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp383_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP383 terminal numerical nonfeed firewall"
 
-# Exactly two algorithm/capability addenda and five ordered handwritten sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp378AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp378CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp378AlgorithmAddenda = [regex]::Matches($cp378AlgorithmText, '(?m)^\s*"CP378 supersedes only CP377[^"\r\n]+",\s*$')
@@ -253,27 +253,7 @@ foreach ($claim in @($cp378AlgorithmAddenda + $cp378CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP378 spec addendum missing '$pattern'" }
     }
 }
-$cp378Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP378 Cooling Supply-Humidity-Ratio Saturation-Limit Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP378 Source-Ordered Cooling Supply-Humidity-Ratio Saturation-Limit Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP378 Supply-Humidity-Ratio Saturation-Limit Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP378 Saturation-Limit Humidity Assignment in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP378 Saturation-Limit Humidity-Assignment Placement' }
-)
-foreach ($doc in $cp378Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP378 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..378) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP378 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @($cp378SourceCommit, $cp378SourceHash, '2260', '2261', $cp378Sites[0], $cp378Sites[1], $cp378Sites[2], $cp378Sites[3], 'CP377', 'CP345', 'terminal', 'reconcil', '316\s+total', '76\s+internal')) {
-        if ($sections[0].Value -notmatch $required) { throw "CP378 documentation in $($doc.Path) missing '$required'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP378\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP378 supersedes only CP377' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP378 additionally requires' -Description "canonical capability addendum"

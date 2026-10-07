@@ -211,7 +211,7 @@ Assert-NotContains -Path $cp372ArbitraryAssertions -Pattern 'assert_numerical_no
 Assert-Contains -Path $cp372PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp442_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp372PipelineRoot -Pattern $cp372Lifecycle -Description "pipeline lifecycle key"
 
-# Exactly two algorithm/capability addenda, no promotion, and five hand docs.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp372AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp372CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp372AlgorithmAddenda = [regex]::Matches($cp372AlgorithmText, '(?m)^\s*"CP372 supersedes only CP371[^"\r\n]+",\s*$')
@@ -231,29 +231,7 @@ foreach ($claim in @($cp372AlgorithmAddenda + $cp372CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP372 spec addendum missing '$pattern'" }
     }
 }
-$cp372Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP372 Cooling Supply-Humidity-Ratio Humidification Moisture-Demand Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP372 Source-Ordered Cooling Supply-Humidity-Ratio Humidification Moisture-Demand Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP372 Cooling Supply-Humidity-Ratio Humidification Moisture-Demand Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP372 Cooling Supply-Humidity-Ratio Humidification Moisture-Demand Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP372 Cooling Supply-Humidity-Ratio Humidification Moisture-Demand Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp372Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) { throw "CP372 documentation expected one section in $($doc.Path)" }
-    foreach ($pattern in @(
-            $cp372SourceCommit, $cp372SourceHash, '2248', '2249', '2258',
-            $cp372Sites[0], $cp372Sites[1], 'CP371', 'sole immediate source-order predecessor',
-            'CP320', 'pre-sampled', 'no retained authoritative owner', 'direct.*zero',
-            'selected-`None`.*both|selected `None`.*both', 'Humidistat.*both',
-            'CP371-to-CP372-to-unchanged-?\s*numerical', $cp372Lifecycle, 'CP345',
-            '32\s+algorithms', '293\s+routines', '58\s+`?state_mapped`?',
-            '235\s+`?source_mapped`?', '170\s+required', '310\s+total',
-            '240\s+public', '70\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP372 documentation in $($doc.Path) missing '$pattern'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP372\b' -Description "CP372 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP372 supersedes only CP371' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP372 additionally requires' -Description "canonical capability addendum"

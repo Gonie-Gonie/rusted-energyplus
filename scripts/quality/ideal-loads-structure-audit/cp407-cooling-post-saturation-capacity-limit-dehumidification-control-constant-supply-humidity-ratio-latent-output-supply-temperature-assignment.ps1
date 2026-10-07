@@ -255,16 +255,6 @@ for ($index = 0; $index -lt 11; $index += 1) {
 Assert-Contains -Path $snapshotJsonTests -Pattern 'object\.len\(\),\s*71' -Description '60-field plus eleven-sidecar JSON shape'
 Assert-Contains -Path $snapshotJsonTests -Pattern '(?s)ends_with\("_ieee_bits"\).*?count\(\),\s*11' -Description 'eleven sidecars'
 
-$heading = 'CP407 post-saturation shared-case latent-output supply-temperature assignment'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP407 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @('line 2302.*?PsyTdbFnHW','line 2304.*?first excluded','20,\s*22,\s*26,\s*28,\s*31,\s*and 34','36/30/6/24','exactly 60 fields','11 `Option<f64>`','71 unique keys','enthalpy operand.*?CP385','humidity operand.*?CP378','CP406-to-CP407-to-unchanged-numerical','345 total,\s*240 public,\s*105 internal')) {
-        Assert-Cp407Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim'
-    }
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP407 supersedes only CP406' -Description 'algorithm addendum'
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP407 additionally requires' -Description 'capability addendum'
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP407 supersedes only CP406' -Description 'canonical algorithm addendum'

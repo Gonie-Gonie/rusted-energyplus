@@ -350,36 +350,8 @@ foreach ($target in @(
         throw "CP349 target '$($target.Pattern)' expected $($target.Expected), found $count"
     }
 }
-# Five hand-authored sections carry the same bounded, non-promoting contract.
-$documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP349 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP349 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio CpAir Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP349 Constant-Sensible-Heat-Ratio CpAir Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP349 Constant-Sensible-Heat-Ratio CpAir Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP349 Constant-Sensible-Heat-Ratio CpAir-Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $documentation) {
-    $matches = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($matches.Count -ne 1) {
-        throw "CP349 documentation expected one scoped section in $($doc.Path)"
-    }
-    $section = $matches[0].Value
-    foreach ($pattern in @(
-            $cp349SourceHash, '2216', $cp349Sites[0], $cp349Sites[1], $cp349Sites[2],
-            '2217', 'T\s*=\s*U\+N\+P\+C0\+K\+H\+CSH',
-            'S\s*=\s*C0\+K\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'source_site_execution_count\s*=\s*3\*K', 'C0\s*=\s*S',
-            'K\s*=\s*H\s*=\s*CSH\s*=\s*0', '(?s)CP348.*?(?:immediate|predecessor)',
-            'CP329', 'CP345', '(?s)CP331.*?CP338', 'finite', '>=0\.0',
-            '(?s)dwSave.*?cpaSave', 'CP348-to-CP349-to-unchanged-numerical',
-            $cp349Lifecycle, 'DirectZonePurchasedAirCouplingInput',
-            '32\s+algorithms', '293\s+routines', 'Roadmap'
-        )) {
-        if ($section -notmatch $pattern) {
-            throw "CP349 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP349\b' -Description "CP349 call-site-only psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP349 supersedes only CP348' -Description "canonical CP349 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP349 additionally requires' -Description "canonical CP349 capability addendum"

@@ -586,70 +586,7 @@ foreach ($cp337Claim in @($cp337AlgorithmAddenda) + @($cp337CapabilityAddenda)) 
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP337 supersedes only CP336' -Description "canonical CP337 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP337 additionally requires' -Description "canonical CP337 capability index"
 
-# Each hand-authored contract contains one scoped CP337 section carrying the
-# same source, lazy-selector, counter, placement, exclusion, and non-promotion
-# contract.
-$cp337DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP337 now maps only.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP337 Source-Ordered Cooling Positive-Supply Capacity-Limit Guard\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP337 Cooling Positive-Supply Capacity-Limit Guard\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP337 Positive-Supply Capacity-Limit Guard in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP337 Cooling Positive-Supply Capacity-Limit Guard Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp337Documentation in $cp337DocumentationSections) {
-    $cp337DocumentText = Read-RepoText -Path $cp337Documentation.Path
-    $cp337Matches = [regex]::Matches($cp337DocumentText, $cp337Documentation.Pattern)
-    if ($cp337Matches.Count -ne 1) {
-        throw "CP337 documentation expected one scoped section in $($cp337Documentation.Path), found $($cp337Matches.Count)"
-    }
-    $cp337Section = $cp337Matches[0].Value
-    foreach ($cp337Pattern in @(
-            '(?s)PurchasedAirManager\.cc.*?2195',
-            '54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005',
-            'read-cooling-limit-for-capacity-comparison',
-            'compare-cooling-limit-equal-to-capacity',
-            'read-cooling-limit-for-flow-rate-and-capacity-comparison-after-first-false',
-            'compare-cooling-limit-equal-to-flow-rate-and-capacity',
-            'enter-capacity-limit-body-if-compound-condition-satisfied',
-            '(?is)enum literals.*?not',
-            'operand-evaluation-order claim',
-            '\|\|.*short|short-circuit',
-            'CP336',
-            'cooling_limit',
-            'LimitCapacity',
-            'LimitFlowRateAndCapacity',
-            'NoLimit',
-            'LimitFlowRate',
-            'S\s*=\s*A\s*-\s*C|S=A-C',
-            'B\s*=\s*C\s*\+\s*F|B=C\+F',
-            '2\*A\s*\+\s*2\*S\s*\+\s*B',
-            'CP336-to-CP337-to-numerical',
-            'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle',
-            '2196',
-            '2208',
-            '(?i)numerical[- ]DTO',
-            'Roadmap'
-        )) {
-        if ($cp337Section -notmatch $cp337Pattern) {
-            throw "CP337 documentation in $($cp337Documentation.Path) missing '$cp337Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Root audit and inventory keep CP337 reachable while placing CP338 and CP339 after it.
 # Generated script totals are 284 executable, 240 public, 44 internal, and zero

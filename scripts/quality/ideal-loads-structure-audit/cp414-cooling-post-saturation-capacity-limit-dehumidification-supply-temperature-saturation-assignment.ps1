@@ -267,23 +267,6 @@ foreach ($field in $expectedNumeric) {
 }
 Assert-Contains -Path $snapshotJsonTests -Pattern '144.*32|32.*144' -Description '144-key/thirty-two-sidecar JSON regression'
 
-$heading = 'CP414 post-saturation saturation supply-temperature assignment'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP414 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2316 exactly','four exact.*?source sites','line 2317 is blank','line 2318 is comment-only','line 2319.*?first excluded','CP415 candidate',
-        'fifty-four flattened conceptual outcomes','thirty-six.*?no CP414\s+site','eighteen.*?all four','T414=54','Z414=36','A414=18','S414=4\*A414=72',
-        '17/37','0 through 8, 22 through 25, and 34 through 37','23, 25, 35, and 37','Four width-36 arrays',
-        'CP413.*?sole immediate','resulting_supply_enthalpy_j_per_kg.*?solely owns','current-timestep scheduled.*?pressure.*?sole pressure owner','CP412.*?neither bit corroboration.*?substitute','36/41/51',
-        'energyplus_psy_tsat_fn_h_pb_raw','HH=H\+1\.78637e4','ten CaseRange','nine\s+F6/F7','one-percent pressure-band','thirty-one loop iterations',
-        'finite\s+enthalpy','finite\s+strictly-positive pressure','finite\s+projected\s+temperature','Zero-site routes ignore','full.*?routine parity remain excluded',
-        'first ninety-two fields','exactly\s+seventeen','112 base fields','thirty-two `Option<f64>`','one\s+`Option<bool>`','144 unique keys','thirty-two adjacent',
-        'CP413-to-CP414-to-unchanged-numerical','adds no numerical or coupling-input DTO field','never feeds','32 algorithms, 293','58 `state_mapped`','235 `source_mapped`','352 total','240 public','112 internal','238\s+development\s+commands'
-    )) { Assert-Cp414Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
 $specAddenda = @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP414 supersedes only CP413' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP414 additionally requires' }

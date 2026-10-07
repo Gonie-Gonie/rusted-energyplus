@@ -329,7 +329,7 @@ foreach ($field in @(
 Assert-Contains -Path $cp350SnapshotSerialization -Pattern '(?s)fn json_number.*?is_finite.*?Value::Null' -Description "CP350 nonfinite numeric null"
 Assert-Contains -Path $cp350SnapshotSerialization -Pattern 'format!\("0x\{:016x\}",\s*value\.to_bits\(\)\)' -Description "CP350 authoritative bits"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $algorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $capabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $algorithmAddenda = [regex]::Matches($algorithmText, '(?m)^\s*"CP350 supersedes only CP349[^"\r\n]+",\s*$')
@@ -367,37 +367,7 @@ foreach ($target in @(
         throw "CP350 target count failed for '$($target.Pattern)'"
     }
 }
-$documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP350 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP350 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio Sensible-Output Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP350 Constant-Sensible-Heat-Ratio Sensible-Output Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP350 Constant-Sensible-Heat-Ratio Sensible-Output Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP350 Constant-Sensible-Heat-Ratio Sensible-Output Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $documentation) {
-    $sectionMatches = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sectionMatches.Count -ne 1) {
-        throw "CP350 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp350SourceHash, '2217', '2218', $cp350Sites[0], $cp350Sites[7],
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'Q\s*=\s*K', '8\*Q', 'C0\s*=\s*S', 'Q\s*=\s*H\s*=\s*CSH\s*=\s*0',
-            'CP330', 'CP349', 'CP329', 'CP334', 'CP344', 'CP345',
-            '(?s)direct.*?CP349.*?completed recursive',
-            '(?s)private.*?counterfactual',
-            '(?s)CP330.*?CP329.*?CP345.*?CP334-or-CP344.*?completed recursive',
-            '(?s)coordinated.*?corruption.*?transactionally',
-            'CP349-to-CP350-to-unchanged-numerical', $cp350Lifecycle,
-            'DirectZonePurchasedAirCouplingInput', '32\s+algorithms', '293\s+routines',
-            'Roadmap'
-        )) {
-        if ($sectionMatches[0].Value -notmatch $pattern) {
-            throw "CP350 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP350\b' -Description "CP350 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP350 supersedes only CP349' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP350 additionally requires' -Description "canonical capability addendum"

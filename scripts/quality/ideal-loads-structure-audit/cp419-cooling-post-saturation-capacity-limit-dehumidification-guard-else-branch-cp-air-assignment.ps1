@@ -303,29 +303,6 @@ foreach ($field in $numericFields) {
     Assert-Cp419Text -Text $serializationText -Pattern ('(?m)^\s*"'+$escaped+'".*\r?\n\s*"'+$escaped+'_ieee_bits"') -Description 'adjacent IEEE sidecar'
 }
 
-$heading = 'CP419 post-saturation capacity-limit dehumidification-guard else-branch `CpAir` assignment'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    $headings = [regex]::Matches($docText,'(?m)^## CP(?<number>40[9]|41[0-9])\b')
-    $numbers = @($headings | ForEach-Object { [int]$_.Groups['number'].Value })
-    if (($numbers -join '|') -cne '409|410|411|412|413|414|415|416|417|418|419') { throw "CP409-CP419 documentation order drift in $doc" }
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP419 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'physical executable line 2330 exactly','line 2331.*?first excluded.*?CP420',
-        'read-purchased-air-mixed-air-humidity-ratio.*?evaluate-psy-cp-air-fn-w.*?assign-local-cp-air',
-        'fifty-four flattened conceptual outcomes','4, 7, 10, 13, and 16','forty-nine','T419=54','Z419=49','A419=5','S419=3\*A419=15','17/37',
-        'active public indices.*?4.*?7','active private indices.*?10.*?13.*?16','mutually exclusive.*?eighteen CP417','Nine.*?width-36',
-        'CP418.*?sole.*?immediate route predecessor','sealed same-call CP329','Inactive routes acquire no numeric owner',
-        'energyplus_psy_cp_air_fn_w','finite.*?greater than or equal to zero','1\.00484e3.*?1\.85895e3','dwSave.*?cpaSave',
-        'zero generic.*?recursive exact-route derivations','174 base fields','first 159 fields','predecessor-CP418 triple',
-        'eight.*?local fields','sixty `Option<f64>`','234 unique keys','sixty adjacent IEEE sidecars','36/41/51','owns only five local `CpAir` values',
-        'CP418-to-CP419-to-unchanged-numerical','109 to 110','no numerical, coupling-input, or.*?output DTO','never feeds','32 algorithms, 293 routines',
-        '58.*?state_mapped','235.*?source_mapped','357 total','240 public','117\s+internal','238\s+development commands'
-    )) { Assert-Cp419Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
-
 foreach ($specAddendum in @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP419 supersedes only CP418' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP419 additionally requires' }

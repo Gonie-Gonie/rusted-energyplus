@@ -221,7 +221,7 @@ Assert-Contains -Path $cp375PipelineRoot -Pattern $cp375Lifecycle -Description "
 Assert-Contains -Path $cp375SnapshotSerialization -Pattern 'json_number|is_finite' -Description "finite JSON projection"
 Assert-Contains -Path $cp375SnapshotSerialization -Pattern '_ieee_bits' -Description "authoritative IEEE sidecars"
 
-# Exactly two stable spec addenda and five source-ordered hand-written sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp375AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp375CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp375AlgorithmAddenda = [regex]::Matches($cp375AlgorithmText, '(?m)^\s*"CP375 supersedes only CP374[^"\r\n]+",\s*$')
@@ -243,32 +243,7 @@ foreach ($claim in @($cp375AlgorithmAddenda + $cp375CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP375 spec addendum missing '$pattern'" }
     }
 }
-$cp375Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP375 Cooling Humidification Supply-Humidity-Ratio Maximum Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP375 Source-Ordered Cooling Humidification Supply-Humidity-Ratio Maximum Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP375 Humidification Supply-Humidity-Ratio Maximum Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP375 Humidification Supply-Humidity-Ratio Maximum Assignment in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP375 Humidification Supply-Humidity-Ratio Maximum-Assignment Placement' }
-)
-foreach ($doc in $cp375Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $pattern = '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)'
-    $sections = [regex]::Matches($text, $pattern)
-    if ($sections.Count -ne 1) { throw "CP375 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..375) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP375 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @(
-            $cp375SourceCommit, $cp375SourceHash, '2251', '2252-2257|2252-2254',
-            '2258', 'CP374', 'CP345', 'CP362', 'CP333', 'left',
-            '313\s+total', '73\s+internal'
-        )) {
-        if ($sections[0].Value -notmatch $required) { throw "CP375 documentation in $($doc.Path) missing '$required'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP375\b' -Description "CP375 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP375 supersedes only CP374' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP375 additionally requires' -Description "canonical capability addendum"

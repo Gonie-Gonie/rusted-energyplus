@@ -203,7 +203,7 @@ Assert-Contains -Path $cp357ArbitraryAssertions -Pattern 'CP357_KEY' -Descriptio
 Assert-Contains -Path $cp357ArbitraryAssertions -Pattern '(?s)for endpoint in \["first", "last"\].*?to_bits\(\).*?cp345_bits' -Description "actual result-store first/last bit-exact nonfeed"
 Assert-NotContains -Path $cp357SnapshotSerialization -Pattern '_ieee_bits|json_number|to_bits|f64' -Description "CP357 JSON has no numerical payload"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp357AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp357CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp357AlgorithmAddenda = [regex]::Matches($cp357AlgorithmText, '(?m)^\s*"CP357 supersedes only CP356[^"\r\n]+",\s*$')
@@ -239,34 +239,7 @@ foreach ($target in @(
         throw "CP357 target count failed for '$($target.Pattern)'"
     }
 }
-$cp357Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP357 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP357 Source-Ordered Cooling Constant-SHR Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP357 Constant-SHR Case Break\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP357 Constant-SHR Case Break in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP357 Constant-SHR Case Break Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp357Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP357 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp357SourceHash, '2227', 'break', '2228', 'CP358', '2229', '2245',
-            $cp357Sites[0], 'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L', 'A\s*=\s*F\+L',
-            'source_site_execution_count', 'C0\s*=\s*S', 'Q\s*=\s*H\s*=\s*CSH\s*=\s*0',
-            'false', 'true', 'Humidistat', 'CP356', '(?s)(?:sole|solely).*?predecessor',
-            '(?s)no.{0,60}numeric', 'gate', 'CP356-to-CP357-to-unchanged-numerical',
-            $cp357Lifecycle, 'first/last', '32\s+algorithms', '293\s+routines',
-            '58\s+[^,\r\n]*state[_-]mapped', '235\s+[^,\r\n]*source[_-]mapped', '170\s+required',
-            '296\s+total', '240\s+public', '56\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP357 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP357\b' -Description "CP357 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP357 supersedes only CP356' -Description "canonical CP357 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP357 additionally requires' -Description "canonical CP357 capability addendum"

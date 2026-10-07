@@ -205,7 +205,7 @@ Assert-Contains -Path $cp378Assertions -Pattern 'assert_numerical_nonfeed_and_ex
 Assert-Contains -Path $cp379Assertions -Pattern 'mod cp380_assertions;' -Description "arbitrary CP380 module"; Assert-Contains -Path $cp379Assertions -Pattern 'cp380_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP380 direct delegation"; Assert-Contains -Path $cp379Assertions -Pattern 'cp380_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP380 non-direct delegation"; Assert-Contains -Path $cp380Assertions -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP380 numerical nonfeed firewall"; Assert-Contains -Path $cp380Assertions -Pattern 'mod cp381_assertions;' -Description "arbitrary CP381 module"; Assert-Contains -Path $cp380Assertions -Pattern 'cp381_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP381 direct delegation"; Assert-Contains -Path $cp380Assertions -Pattern 'cp381_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP381 non-direct delegation"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp382_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP382 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp383_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP383 terminal numerical nonfeed firewall"
 Assert-NotContains -Path $cp379Assertions -Pattern 'System Node Enthalpy|supply_node.*enthalpy|report.*supply_enthalpy|calculation.*supply_enthalpy' -Description "CP379 numerical/node/report enthalpy comparison"
 
-# Exactly two algorithm/capability addenda and five ordered handwritten sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp379AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp379CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp379AlgorithmAddenda = [regex]::Matches($cp379AlgorithmText, '(?m)^\s*"CP379 supersedes only CP378[^"\r\n]+",\s*$')
@@ -228,27 +228,7 @@ foreach ($claim in @($cp379AlgorithmAddenda + $cp379CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP379 spec addendum missing '$pattern'" }
     }
 }
-$cp379Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP379 Cooling Supply-Enthalpy Post-Saturation Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP379 Source-Ordered Cooling Supply-Enthalpy Post-Saturation Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP379 Supply-Enthalpy Post-Saturation Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP379 Post-Saturation Supply-Enthalpy Assignment in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP379 Post-Saturation Supply-Enthalpy Assignment Placement' }
-)
-foreach ($doc in $cp379Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP379 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..379) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP379 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @($cp379SourceCommit, $cp379SourceHash, '2261', '2264', 'CP380', $cp379Sites[0], $cp379Sites[1], $cp379Sites[2], $cp379Sites[3], 'CP378', 'routine\.psy_h_fn_tdb_w', 'neither\s+terminal|not\s+(?:a\s+)?terminal|not\s+final', 'reconcil', '317\s+total', '77\s+internal')) {
-        if ($sections[0].Value -notmatch $required) { throw "CP379 documentation in $($doc.Path) missing '$required'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP379\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP379 supersedes only CP378' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP379 additionally requires' -Description "canonical capability addendum"

@@ -262,12 +262,6 @@ Assert-Contains -Path $arbitraryAssertions -Pattern 'route\(20\)\s*\+\s*route\(2
 Assert-Contains -Path $arbitraryAssertions -Pattern 'ends_with\("_ieee_bits"\)' -Description "exact IEEE-sidecar regression"
 Assert-Contains -Path $arbitraryAssertions -Pattern 'non-direct runtime must not publish CP400 evidence' -Description "non-direct regression"
 
-foreach ($doc in @(
-        'docs\src\current\current-status.md', 'docs\src\current\project-contract.md',
-        'docs\src\porting-map\heat-balance-source-map.md',
-        'docs\src\porting-map\ideal-loads-source-map.md',
-        'docs\src\porting-map\zone-air-update-map.md'
-    )) { Assert-Contains -Path $doc -Pattern 'CP400 post-saturation shared-case sensible-output assignment' -Description "CP400 documentation" }
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP400 supersedes only CP399' -Description "algorithm claim"
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP400 additionally requires' -Description "capability claim"
 

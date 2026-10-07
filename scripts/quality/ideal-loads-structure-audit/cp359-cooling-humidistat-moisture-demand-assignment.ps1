@@ -256,7 +256,7 @@ Assert-Contains -Path $cp359SnapshotSerialization -Pattern 'json_number' -Descri
 Assert-Contains -Path $cp359SnapshotSerialization -Pattern '_ieee_bits' -Description "CP359 authoritative IEEE sidecars"
 Assert-Contains -Path $cp359SnapshotSerialization -Pattern 'to_bits' -Description "CP359 exact numeric JSON evidence"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp359AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp359CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp359AlgorithmAddenda = [regex]::Matches($cp359AlgorithmText, '(?m)^\s*"CP359 supersedes only CP358[^"\r\n]+",\s*$')
@@ -293,39 +293,7 @@ foreach ($target in @(
         throw "CP359 target count failed for '$($target.Pattern)'"
     }
 }
-$cp359Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP359 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP359 Source-Ordered Cooling Humidistat Moisture-Demand Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP359 Humidistat Moisture-Demand Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP359 Humidistat Moisture-Demand Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP359 Humidistat Moisture-Demand Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp359Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP359 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp359SourceHash, '2229', 'MdotZnDehumidSP', '2230', 'first excluded',
-            '2245', $cp359Sites[0], $cp359Sites[1], 'U/N/P/C0/Q/H/CSH',
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'A\s*=\s*F\+L', 'source_site_execution_count\s*=\s*2H',
-            'C0\s*=\s*S', 'Q\s*=\s*H\s*=\s*CSH\s*=\s*0', 'CP358',
-            '(?s)(?:sole|solely).*?predecessor', 'explicit pre-sampled',
-            'no retained\s+authoritative', 'no live\s+Zone moisture-demand service',
-            'CP319', '(?s)not.{0,80}(?:predecessor|owner|feed)',
-            'CP358-to-CP359-to-unchanged-numerical', $cp359Lifecycle,
-            'first/last', 'CP345', '32\s+algorithms', '293\s+routines',
-            '58\s+[^,\r\n]*state[_-]mapped', '235\s+[^,\r\n]*source[_-]mapped',
-            '170\s+required', '297\s+total', '240\s+public', '57\s+internal',
-            'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP359 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP359\b' -Description "CP359 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP359 supersedes only CP358' -Description "canonical CP359 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP359 additionally requires' -Description "canonical CP359 capability addendum"

@@ -296,35 +296,6 @@ foreach ($pattern in @(
     Assert-Contains -Path $arbitraryAssertions -Pattern $pattern -Description "arbitrary runtime contract"
 }
 
-$heading = 'CP406 post-saturation shared-case latent-output capacity-guard else-branch entry'
-$docs = @(
-    'docs\src\current\current-status.md', 'docs\src\current\project-contract.md',
-    'docs\src\porting-map\heat-balance-source-map.md',
-    'docs\src\porting-map\ideal-loads-source-map.md',
-    'docs\src\porting-map\zone-air-update-map.md'
-)
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    $headingPattern = "(?m)^## $([regex]::Escape($heading))$"
-    if ([regex]::Matches($docText, $headingPattern).Count -ne 1) {
-        throw "CP406 documentation heading must appear exactly once in $doc"
-    }
-    $sectionMatch = [regex]::Match($docText, "(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)")
-    if (-not $sectionMatch.Success) { throw "CP406 documentation section missing in $doc" }
-    $section = $sectionMatch.Groups['body'].Value
-    foreach ($pattern in @(
-            'line[- ]2301.*?\} else \{',
-            'line 2302.*?first excluded executable.*?CP407 candidate',
-            '20,\s*22,\s*26,\s*28,\s*31,\s*and 34',
-            '21,\s*23,\s*27,\s*29,\s*32,\s*and 35',
-            'T406=T405', 'I406=I402\+A405', '36/30/6/6',
-            'exactly 46 fields', 'Exactly six\s+.*?Option<f64>', '52 unique keys',
-            'routine\.psy_tdb_fn_h_w.*?state_mapped',
-            '344 total,\s*240 public,\s*(?:and\s+)?104\s+internal'
-        )) {
-        Assert-Cp406Text -Text $section -Pattern "(?is)$pattern" -Description "bounded documentation claim"
-    }
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP406 supersedes only CP405' -Description "algorithm claim"
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP406 additionally requires' -Description "capability claim"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP406 supersedes only CP405' -Description "canonical algorithm claim"

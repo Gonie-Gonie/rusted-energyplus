@@ -208,27 +208,12 @@ foreach ($field in $expectedNumeric) {
 }
 Assert-Contains -Path $snapshotJsonTests -Pattern '52.*(?:key|field)|(?:key|field).*52' -Description '52-key JSON regression'
 
-$heading = 'CP410 post-saturation dehumidification-control default case break'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
 $successorReachabilityPatterns = @(
     'flattened\s+CP410 routes 18 through 35\s*\(18 routes total\)',
     'split 4 public and 14 private',
     'flattened routes 0 through 17 do not reach'
 )
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP410 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2308:\s*`break;`','line 2307.*?non-executable `default:`','sole CP410\s+source site','line 2313.*?first excluded','CP411 candidate',
-        '(?:36|thirty-six) logical routes','13/23 public/private','no active public or private','T410=T409=36','I410=T410=36','B410=0','source_site_execution_count=B410=0',
-        'Three width-30 arrays','B409=6\+6=12','CP409.*?sole immediate route','exactly 46 base fields','six\s*`Option<f64>`','52 unique keys','CP409-to-CP410-to-unchanged-numerical',
-        '32 algorithms, 293 routines','58\s*`state_mapped`, 235\s*`source_mapped`','170 required','348 total, 240 public, 108 internal','238 development commands'
-    )) { Assert-Cp410Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-    foreach ($pattern in $successorReachabilityPatterns) {
-        Assert-Cp410Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded CP411 reachability claim'
-    }
-}
+
 $specAddenda = @(
     [PSCustomObject]@{ Path = 'specs\algorithm_ledger.toml'; Anchor = 'CP410 supersedes only CP409' },
     [PSCustomObject]@{ Path = 'specs\capabilities.toml'; Anchor = 'CP410 additionally requires' }

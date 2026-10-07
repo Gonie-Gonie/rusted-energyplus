@@ -258,7 +258,7 @@ Assert-Contains -Path $cp383Assertions -Pattern 'cp384_assertions::assert_direct
 Assert-Contains -Path $cp383Assertions -Pattern 'cp384_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP384 non-direct delegation"
 Assert-NotContains -Path $cp383Assertions -Pattern 'CoolTotOutput\s*=|(?:latest|cp383|results)\["(?:supply_node|report)' -Description "CP383 excluded cap/node/report assertion"
 
-# Exactly two algorithm/capability addenda and five ordered handwritten sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp383AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp383CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp383AlgorithmAddenda = [regex]::Matches($cp383AlgorithmText, '(?m)^\s*"CP383 supersedes only [^"\r\n]+",\s*$')
@@ -280,34 +280,7 @@ foreach ($claim in @($cp383AlgorithmAddenda + $cp383CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP383 spec addendum missing '$pattern'" }
     }
 }
-$cp383Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP383 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Guard' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP383 Source-Ordered Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Guard' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP383 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Guard' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP383 Post-Saturation Capacity-Limit Dehumidification Total-Output Guard in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP383 Post-Saturation Capacity-Limit Dehumidification Total-Output Guard Placement' }
-)
-foreach ($doc in $cp383Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP383 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..383) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP383 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @(
-            $cp383SourceCommit, $cp383SourceHash, '2268', '2269', 'CP384',
-            $cp383Sites[0], $cp383Sites[1], $cp383Sites[2],
-            $cp383Sites[3], 'twenty-three', '3\*A\+E',
-            'CP382', 'CP321', 'CP340', '321\s+total', '81\s+internal'
-        )) {
-        if ($sections[0].Value -notmatch $required) {
-            throw "CP383 documentation in $($doc.Path) missing '$required'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP383\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP383 supersedes only' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP383 additionally requires' -Description "canonical capability addendum"

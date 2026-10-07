@@ -240,24 +240,6 @@ foreach ($field in $expectedNumeric) {
 Assert-Contains -Path $snapshotJsonTests -Pattern 'compact_snapshot_has_exact_51_key_and_six_sidecar_schema' -Description '51-key/six-sidecar regression'
 Assert-Contains -Path $snapshotJsonTests -Pattern '0x7ff8_0000_0000_0409' -Description 'NaN payload regression'
 
-$heading = 'CP409 post-saturation shared None/constant-supply-humidity-ratio case break'
-$docs = @(
-    'docs\src\current\current-status.md','docs\src\current\project-contract.md',
-    'docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md',
-    'docs\src\porting-map\zone-air-update-map.md'
-)
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP409 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2306:\s*`} break;`','leading `}` is non-executable','sole executable source site','line 2308.*?first excluded executable',
-        'dynamic continuation.*?line 2313','(?:36|thirty-six) logical routes','13/23 public/private','20, 21, 22, 23, 26, 27, 28','active public indices are 20, 21, 26, and 27',
-        'B409=L408\+M405=6\+6=12','I409=T409-B409=24','Three width-30 arrays','CP408.*?sole immediate route',
-        'exactly 45 base fields','six\s*`Option<f64>`','51 unique keys','CP408-to-CP409-to-unchanged-numerical',
-        '32 algorithms, 293 routines','58\s*`state_mapped`, 235\s*`source_mapped`','170 required','347 total, 240 public, 107 internal','238 development commands'
-    )) { Assert-Cp409Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP409 supersedes only CP408' -Description 'algorithm addendum'
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP409 additionally requires' -Description 'capability addendum'
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP409 supersedes only CP408' -Description 'canonical algorithm addendum'

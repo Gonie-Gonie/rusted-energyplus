@@ -241,19 +241,6 @@ Assert-Contains -Path $arbitraryAssertions -Pattern 'mod\s+cp405_assertions' -De
 Assert-Contains -Path $arbitraryAssertions -Pattern 'cp405_assertions::assert_direct\(runtime,\s*results\)' -Description "CP405 direct arbitrary assertion delegation"
 Assert-Contains -Path $arbitraryAssertions -Pattern 'cp405_assertions::assert_non_direct\(runtime\)' -Description "CP405 non-direct arbitrary assertion delegation"
 
-$heading = 'CP404 post-saturation shared-case latent-output body supply-humidity-ratio psychrometric assignment'
-$docs = @(
-    'docs\src\current\current-status.md', 'docs\src\current\project-contract.md',
-    'docs\src\porting-map\heat-balance-source-map.md',
-    'docs\src\porting-map\ideal-loads-source-map.md',
-    'docs\src\porting-map\zone-air-update-map.md'
-)
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText, "(?m)^## $([regex]::Escape($heading))$").Count -ne 1) {
-        throw "CP404 documentation heading must appear exactly once in $doc"
-    }
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP404 supersedes only CP403' -Description "algorithm claim"
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP404 additionally requires' -Description "capability claim"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP404 supersedes only CP403' -Description "canonical algorithm claim"

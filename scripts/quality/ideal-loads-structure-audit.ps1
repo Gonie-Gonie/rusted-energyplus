@@ -19,6 +19,10 @@ Set-Location $RepoRoot
 
 $script:CanonicalClaimBoundaryData = $null
 
+# Bounded claims are checked by canonical registry ID below. Human source maps
+# may be reorganized without duplicating historical checkpoint paragraphs or
+# freezing document bytes; source/state/call-order/runtime checks remain local.
+
 function Get-CanonicalClaimRecord {
     param(
         [Parameter(Mandatory = $true)][ValidateSet("algorithm", "capability")][string]$Registry,
@@ -4151,16 +4155,7 @@ Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_z
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP321 additionally requires' -Description "CP321 capability claim-boundary addendum"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP321 supersedes CP320' -Description "canonical CP321 algorithm boundary"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP321 additionally requires' -Description "canonical CP321 capability boundary"
-foreach ($cp321Doc in @(
-        "docs\src\current\current-status.md",
-        "docs\src\current\project-contract.md",
-        "docs\src\porting-map\ideal-loads-source-map.md",
-        "docs\src\porting-map\heat-balance-source-map.md",
-        "docs\src\porting-map\zone-air-update-map.md"
-    )) {
-    Assert-Contains -Path $cp321Doc -Pattern 'CP321' -Description "CP321 documentation boundary"
-    Assert-Contains -Path $cp321Doc -Pattern '2155' -Description "CP321 first excluded executable documentation"
-}
+
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp322-cooling-supply-mass-flow-maximum.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp323-cooling-supply-mass-flow-ems-override-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp324-cooling-supply-mass-flow-ems-override-body.ps1")

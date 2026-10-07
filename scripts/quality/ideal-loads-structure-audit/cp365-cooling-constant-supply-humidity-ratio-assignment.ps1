@@ -287,7 +287,7 @@ Assert-NotContains -Path $cp365ArbitraryAssertions -Pattern 'assert_numerical_no
 Assert-Contains -Path $cp365ArbitraryAssertions -Pattern 'runtime\.contains_key\(CP365_KEY\)' -Description "CP365 non-direct key"
 Assert-Contains -Path $cp365ArbitraryAssertions -Pattern 'runtime\[CP365_KEY\]\.is_null\(\)' -Description "CP365 non-direct null"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp365AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp365CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp365AlgorithmAddenda = [regex]::Matches($cp365AlgorithmText, '(?m)^\s*"CP365 supersedes only CP364[^"\r\n]+",\s*$')
@@ -323,36 +323,7 @@ foreach ($target in @(
         throw "CP365 target count failed for '$($target.Pattern)'"
     }
 }
-$cp365Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP365 Cooling Constant-Supply-Humidity-Ratio Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP365 Source-Ordered Cooling Constant-Supply-Humidity-Ratio Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP365 Constant-Supply-Humidity-Ratio Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP365 Constant-Supply-Humidity-Ratio Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP365 Constant-Supply-Humidity-Ratio Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp365Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) { throw "CP365 documentation expected one section in $($doc.Path)" }
-    foreach ($pattern in @(
-            $cp365SourceCommit, $cp365SourceHash, '2235', 'SupplyHumRat',
-            'MinCoolSuppAirHumRat', $cp365Sites[0], $cp365Sites[1], '2236',
-            'CP366', '2237', '2245', 'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'A\s*=\s*F\+L', 'source_site_execution_count\s*=\s*2\*CSH',
-            'C0\s*=\s*S', 'Q\s*=\s*H\s*=\s*CSH\s*=\s*0',
-            '(?s)(?:does not read|reads no right operand|no owner read|lazily skips the owner read)',
-            'minimum_cooling_supply_air_humidity_ratio', '(?:\.is_finite\(\)|finite-only)',
-            '(?s)(?:raw|directly|bit-copies|copies binary64).{0,80}(?:binary64|bits|owner)', 'signed[- ]zero',
-            'CP364-to-CP365-to-unchanged-numerical', $cp365Lifecycle,
-            '(?:DirectZonePurchasedAirCouplingInput|cannot feed or replace coupling)', 'CP345', '32\s+algorithms',
-            '293\s+routines', '303\s+total', '240\s+public', '63\s+internal',
-            'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP365 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP365\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP365 supersedes only CP364' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP365 additionally requires' -Description "canonical capability addendum"

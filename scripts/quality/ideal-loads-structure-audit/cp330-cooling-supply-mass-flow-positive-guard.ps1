@@ -764,71 +764,7 @@ Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP329/CP330 fail-closed retained-chain hardening' -Description "canonical CP329/CP330 algorithm hardening"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP329/CP330 fail-closed retained-chain hardening' -Description "canonical CP329/CP330 capability hardening"
 
-# Every hand-authored contract repeats the exact guard, dynamic count, raw IEEE
-# partition, direct CP329 lineage, exclusions, and non-promotion terms.
-$cp330DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP330 maps only the complete Cooling positive-supply guard.*?^and Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP330 Source-Ordered Cooling Positive-Supply Guard\r?\n.*?Roadmap item\.\s*'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP330 Cooling Positive-Supply Guard\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP330 Cooling Positive-Supply Guard in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP330 Cooling Positive-Supply Guard Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp330Documentation in $cp330DocumentationSections) {
-    $cp330DocumentText = Read-RepoText -Path $cp330Documentation.Path
-    $cp330Matches = [regex]::Matches($cp330DocumentText, $cp330Documentation.Pattern)
-    if ($cp330Matches.Count -ne 1) {
-        throw "CP330 documentation expected one scoped section in $($cp330Documentation.Path), found $($cp330Matches.Count)"
-    }
-    $cp330Section = $cp330Matches[0].Value
-    foreach ($cp330Pattern in @(
-            'line 2183|line-2183',
-            '(?:exactly )?three(?:-site|\s+lexical)',
-            '> \+0\.0',
-            '2 \* active \+ positive_body_entries',
-            'C\+\+',
-            'evaluation[- ]order',
-            '(?i)UnitOff',
-            '(?i)non-cooling',
-            '(?is)positive\s+infinity',
-            '(?is)negative\s+infinity',
-            '(?i)NaN|unordered',
-            '(?is)positive zero.{0,100}negative zero|signed zeros',
-            '(?is)CP329.{0,200}(?:bit-exact|retained|supply)',
-            'purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle',
-            '(?i)runtime-aware',
-            '(?is)completed.{0,160}pending|pending.{0,160}completed',
-            '(?is)UnitOff.{0,100}non-cooling.{0,100}(?:active|route)',
-            '(?is)coordinated.{0,160}CP329.{0,80}CP330|CP329/CP330.{0,160}corruption',
-            '(?is)(?:fail|rejected).{0,180}(?:unchanged|before.{0,100}(?:transition|mutat|witness)|without.{0,100}(?:changing|mutat))',
-            'line 2185',
-            '2340',
-            '2454-2461',
-            '2465',
-            '(?i)source_mapped',
-            '(?i)support',
-            '(?i)conformance',
-            '(?i)Roadmap'
-        )) {
-        if ($cp330Section -notmatch $cp330Pattern) {
-            throw "CP330 documentation in $($cp330Documentation.Path) missing '$cp330Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Main audit and generated script inventory remain in source-checkpoint order.
 $cp330MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

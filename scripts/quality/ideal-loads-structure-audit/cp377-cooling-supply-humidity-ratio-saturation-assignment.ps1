@@ -219,7 +219,7 @@ Assert-Contains -Path $cp377ParentAssertions -Pattern 'cp377_assertions::assert_
 Assert-NotContains -Path $cp377ParentAssertions -Pattern 'assert_numerical_nonfeed\(' -Description "CP376 terminal nonfeed relinquishment"
 Assert-Contains -Path $cp377ArbitraryAssertions -Pattern 'mod cp378_assertions;' -Description "arbitrary CP378 module"; Assert-Contains -Path $cp377ArbitraryAssertions -Pattern 'cp378_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP378 direct delegation"; Assert-Contains -Path $cp377ArbitraryAssertions -Pattern 'cp378_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP378 non-direct delegation"; Assert-NotContains -Path $cp377ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(' -Description "CP377 terminal numerical evidence relinquishment"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp378_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_exact_reconciliation\(' -Description "CP378 terminal reconciliation"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp379_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP379 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp380_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP380 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp382_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP382 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp383_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP383 terminal numerical nonfeed firewall"
 
-# Exactly two spec addenda and five ordered handwritten sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp377AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp377CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp377AlgorithmAddenda = [regex]::Matches($cp377AlgorithmText, '(?m)^\s*"CP377 supersedes only CP376[^"\r\n]+",\s*$')
@@ -243,27 +243,7 @@ foreach ($claim in @($cp377AlgorithmAddenda + $cp377CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP377 spec addendum missing '$pattern'" }
     }
 }
-$cp377Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP377 Cooling Supply-Humidity-Ratio Saturation Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP377 Source-Ordered Cooling Supply-Humidity-Ratio Saturation Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP377 Supply-Humidity-Ratio Saturation Assignment' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP377 Saturation Humidity Assignment in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP377 Saturation Humidity-Assignment Placement' }
-)
-foreach ($doc in $cp377Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP377 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..377) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP377 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @($cp377SourceCommit, $cp377SourceHash, '2259', '2260', $cp377Sites[0], $cp377Sites[1], $cp377Sites[2], $cp377Sites[3], 'eight|8', 'CP376', 'CP334', 'CP344', '315\s+total', '75\s+internal')) {
-        if ($sections[0].Value -notmatch $required) { throw "CP377 documentation in $($doc.Path) missing '$required'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP377\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP377 supersedes only CP376' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP377 additionally requires' -Description "canonical capability addendum"

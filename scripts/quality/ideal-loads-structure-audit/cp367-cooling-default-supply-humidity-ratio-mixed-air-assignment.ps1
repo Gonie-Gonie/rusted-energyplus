@@ -310,8 +310,7 @@ Assert-NotContains -Path $cp367ParentAssertions -Pattern 'assert_numerical_nonfe
 Assert-Contains -Path $cp367ArbitraryAssertions -Pattern 'runtime\.contains_key\(CP367_KEY\)' -Description "CP367 non-direct key"
 Assert-Contains -Path $cp367ArbitraryAssertions -Pattern 'runtime\[CP367_KEY\]\.is_null\(\)' -Description "CP367 non-direct null"
 
-# Exactly two addenda in each spec, exact target multiplicity, five hand-doc
-# sections, generated docs, historical propagation, and 305/240/65/0 scripts.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp367AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp367CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp367AlgorithmAddenda = [regex]::Matches($cp367AlgorithmText, '(?m)^\s*"CP367 supersedes only CP366[^"\r\n]+",\s*$')
@@ -346,35 +345,7 @@ foreach ($target in @(
         throw "CP367 target count failed for '$($target.Value)'"
     }
 }
-$cp367Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP367 Cooling Default Supply-Humidity-Ratio Mixed-Air Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP367 Source-Ordered Cooling Default Supply-Humidity-Ratio Mixed-Air Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP367 Default Supply-Humidity-Ratio Mixed-Air Assignment\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP367 Default Supply-Humidity-Ratio Mixed-Air Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP367 Default Supply-Humidity-Ratio Mixed-Air Assignment Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp367Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) { throw "CP367 documentation expected one section in $($doc.Path)" }
-    foreach ($pattern in @(
-            $cp367SourceCommit, $cp367SourceHash, '2238', 'SupplyHumRat\s*=\s*PurchAir\.MixedAirHumRat',
-            '2237', 'not\s+claimed', '2239', 'first excluded', '2245',
-            '(?s)(?:read-purchased-air-mixed-air-humidity-ratio.{0,300}assign-purchased-air-supply-humidity-ratio|two\s+(?:dependency-)?ordered|two ordered read\s+and\s+assignment|ordered\s+mixed-air-humidity read\s+and\s+supply-humidity assignment)',
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH', 'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'A\s*=\s*F\+L', 'D\s*=\s*read\s*=\s*assignment\s*=\s*source_site\s*=\s*0',
-            '(?i)no\s+invalid(?:-enum|\s+discriminant)[^.\r\n]{0,50}eighth', 'CP366',
-            'sole\s+predecessor', '(?s)(?:canonical private.{0,30}(?:bridge|break)|sole\s+predecessor.{0,50}private bridge|typed private.{0,20}break)',
-            'CP366-to-CP367-to-unchanged-numerical', $cp367Lifecycle, 'CP345',
-            '32\s+algorithms', '293\s+routines', '58\s+[^0-9\r\n]{0,5}state[_-]mapped',
-            '235\s+[^0-9\r\n]{0,5}source[_-]mapped',
-            '170\s+required', '305\s+total', '240\s+public', '65\s+internal',
-            'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP367 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP367\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP367 supersedes only CP366' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP367 additionally requires' -Description "canonical capability addendum"

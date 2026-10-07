@@ -276,19 +276,6 @@ Assert-Contains -Path $arbitraryAssertions -Pattern 'route\(20\).*route\(24\)' -
 Assert-Contains -Path $arbitraryAssertions -Pattern 'ends_with\("_ieee_bits"\)' -Description "exact IEEE-sidecar regression"
 Assert-Contains -Path $arbitraryAssertions -Pattern 'non-direct runtime must not publish CP403 evidence' -Description "non-direct regression"
 
-$heading = 'CP403 post-saturation shared-case latent-output body supply-temperature mixed-air assignment'
-$docs = @(
-    'docs\src\current\current-status.md', 'docs\src\current\project-contract.md',
-    'docs\src\porting-map\heat-balance-source-map.md',
-    'docs\src\porting-map\ideal-loads-source-map.md',
-    'docs\src\porting-map\zone-air-update-map.md'
-)
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    if ([regex]::Matches($docText, "(?m)^## $([regex]::Escape($heading))$").Count -ne 1) {
-        throw "CP403 documentation heading must appear exactly once in $doc"
-    }
-}
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP403 supersedes only CP402' -Description "algorithm claim"
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP403 additionally requires' -Description "capability claim"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP403 supersedes only CP402' -Description "canonical algorithm claim"

@@ -625,75 +625,7 @@ foreach ($cp339Claim in @($cp339AlgorithmAddenda) + @($cp339CapabilityAddenda)) 
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP339 supersedes only CP338' -Description "canonical CP339 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP339 additionally requires' -Description "canonical CP339 capability index"
 
-# Each hand-authored contract has one scoped CP339 section carrying the same
-# source, routes, operand lineage, IEEE/JSON boundary, exclusion, and no-promotion.
-$cp339DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP339 now maps only.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP339 Source-Ordered Cooling Positive-Supply Capacity-Limit Sensible-Output Assignment\r?\n.*?Roadmap state remain unchanged\.\r?\n'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP339 Cooling Positive-Supply Capacity-Limit Sensible-Output Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP339 Positive-Supply Capacity-Limit Sensible-Output Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP339 Cooling Positive-Supply Capacity-Limit Sensible-Output Assignment Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp339Documentation in $cp339DocumentationSections) {
-    $cp339DocumentText = Read-RepoText -Path $cp339Documentation.Path
-    $cp339Matches = [regex]::Matches($cp339DocumentText, $cp339Documentation.Pattern)
-    if ($cp339Matches.Count -ne 1) {
-        throw "CP339 documentation expected one scoped section in $($cp339Documentation.Path), found $($cp339Matches.Count)"
-    }
-    $cp339Section = $cp339Matches[0].Value
-    foreach ($cp339Pattern in @(
-            '(?s)PurchasedAirManager\.cc.*?2197',
-            $cp339SourceStatementPattern,
-            '54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005',
-            $cp339OrderedSourceSitesPattern,
-            'CapacityLimitCpAirAssigned',
-            'UnitOff',
-            'NonCooling',
-            'PositiveGuardFalseFallthrough',
-            'ActiveCapacityLimitGuardFalseFallthrough',
-            'CapacityLimitSensibleOutputAssigned',
-            '6\*A\s*=\s*6\*B',
-            'CP330 latest/private\s+witness',
-            'supply_mass_flow_rate_kg_per_s',
-            'CP329 latest/private\s+witness',
-            'mixed_air_enthalpy_projection_j_per_kg',
-            'CP336 latest/private\s+witness',
-            'supply_enthalpy_j_per_kg',
-            'raw IEEE',
-            'derived finite-result rejection',
-            '\+infinity',
-            'Serde\s+JSON',
-            'nonfinite numeric',
-            'bit\s+string',
-            $cp339SerializationOwnershipPattern,
-            'CP338-to-CP339-to-numerical',
-            'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle',
-            $cp339FirstExcludedStatementPattern,
-            '2198',
-            'CP340',
-            '(?i)numerical[- ]DTO',
-            'Roadmap'
-        )) {
-        if ($cp339Section -notmatch $cp339Pattern) {
-            throw "CP339 documentation in $($cp339Documentation.Path) missing '$cp339Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Root reachability and generated inventory account for one new internal
 # script: 284 executable records, 240 public, 44 internal, and zero uncalled.

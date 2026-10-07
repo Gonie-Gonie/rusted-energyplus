@@ -312,60 +312,7 @@ foreach ($cp328CapabilityAddendum in $cp328CapabilityAddenda) {
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP328 supersedes only CP327' -Description "canonical CP328 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP328 additionally requires' -Description "canonical CP328 capability index"
 
-# Every hand-authored contract repeats the exact source/zero, retained CP327
-# provenance, non-executable delimiter, first executable exclusion, and
-# non-promotion terms.
-$cp328DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP328 maps only the executable line-2167 Cooling supply mass-flow reset body.*?^and Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP328 Source-Ordered Cooling Supply Mass-Flow Positive-Zero Reset Body\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP328 Cooling Supply Mass-Flow Positive-Zero Reset Body\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP328 Cooling Supply Mass-Flow Positive-Zero Reset in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP328 Cooling Supply Mass-Flow Positive-Zero Reset Body Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp328Documentation in $cp328DocumentationSections) {
-    $cp328DocumentText = Read-RepoText -Path $cp328Documentation.Path
-    $cp328Matches = [regex]::Matches($cp328DocumentText, $cp328Documentation.Pattern)
-    if ($cp328Matches.Count -ne 1) {
-        throw "CP328 documentation expected one scoped section in $($cp328Documentation.Path), found $($cp328Matches.Count)"
-    }
-    $cp328Section = $cp328Matches[0].Value
-    foreach ($cp328Pattern in @(
-            'line 2167|line-2167',
-            '(?:one|single)(?:-site|\s+lexical| exact lexical)',
-            '0x0000000000000000',
-            '(?is)CP327.{0,220}(?:bit|exact|same-call|retained)',
-            '(?i)UnitOff',
-            '(?i)non-cooling',
-            '(?i)NaN',
-            '-0\.0',
-            'purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle',
-            'Line 2168 is an excluded non-executable\s+closing delimiter',
-            '(?is)line 2171.{0,80}first excluded\s+executable',
-            '(?i)`EMS`\s+and\s+Autosizing\s+remain\s+forbidden',
-            '(?i)support',
-            '(?i)conformance',
-            '(?i)Roadmap'
-        )) {
-        if ($cp328Section -notmatch $cp328Pattern) {
-            throw "CP328 documentation in $($cp328Documentation.Path) missing '$cp328Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Main audit and generated script inventory remain ordered by source checkpoint.
 $cp328MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

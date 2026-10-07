@@ -748,78 +748,7 @@ foreach ($cp332CapabilityAddendum in $cp332CapabilityAddenda) {
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP332 supersedes only CP331' -Description "canonical CP332 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP332 additionally requires' -Description "canonical CP332 capability index"
 
-# Every hand-authored contract repeats source, provenance, order,
-# transactionality, first exclusion, and explicit non-promotion.
-$cp332DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP332 maps only the single Cooling positive-supply.*?^Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP332 Source-Ordered Cooling Positive-Supply Temperature Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP332 Cooling Positive-Supply Temperature Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP332 Positive-Supply Temperature Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP332 Cooling Positive-Supply Temperature Assignment Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp332Documentation in $cp332DocumentationSections) {
-    $cp332DocumentText = Read-RepoText -Path $cp332Documentation.Path
-    $cp332Matches = [regex]::Matches($cp332DocumentText, $cp332Documentation.Pattern)
-    if ($cp332Matches.Count -ne 1) {
-        throw "CP332 documentation expected one scoped section in $($cp332Documentation.Path), found $($cp332Matches.Count)"
-    }
-    $cp332Section = $cp332Matches[0].Value
-    foreach ($cp332Pattern in @(
-            'physical\s+(?:executable\s+)?(?:`PurchasedAirManager\.cc`\s+)?line\s+2186',
-            '(?:exactly )?eight(?:-site|\s+lexical|\s+sites)|all eight',
-            '8 \* cp_air_assignment_count',
-            '8 \* positive_supply_mass_flow_body_entries',
-            '(?i)UnitOff',
-            '(?i)non-cooling',
-            '(?i)active[- ]false|guard-false',
-            'QZnCoolSP / \(CpAir \* SupplyMassFlowRate\)',
-            '(?i)CP310',
-            '(?i)CP331',
-            '(?i)CP330',
-            'ZoneHeatBalanceState::mean_air_temperature_c',
-            '(?i)CP318',
-            '(?i)CP329',
-            '(?is)lineage.{0,180}(?:not substitute|not replace|without replacing)|same-call lineage evidence',
-            '(?is)(?:No|no).{0,30}duplicate.{0,80}(?:scalar|input)',
-            '(?is)psychrometric.{0,60}(?:re-evaluation|re-evaluate)|(?:re-evaluate).{0,60}psychrometric|PsyCpAirFnW',
-            '(?i)latest/private witness|latest snapshot, private',
-            '(?is)checked(?:-|\s+)arithmetic',
-            '(?i)transaction|before mutation|state unchanged',
-            'purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle',
-            'CP331-to-CP332-to-numerical|immediately after CP331 and before',
-            '(?is)(?:does not|neither).{0,120}(?:consume|reconcile).{0,180}numerical DTO',
-            'line 2187',
-            '(?i)CP333',
-            'line-2189',
-            '2340',
-            '2454-2461',
-            '2465',
-            '(?i)scaffold',
-            '(?i)source_mapped',
-            '(?i)support',
-            '(?i)conformance',
-            '(?i)Roadmap'
-        )) {
-        if ($cp332Section -notmatch $cp332Pattern) {
-            throw "CP332 documentation in $($cp332Documentation.Path) missing '$cp332Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Main audit and generated script inventory remain in checkpoint order.
 $cp332MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

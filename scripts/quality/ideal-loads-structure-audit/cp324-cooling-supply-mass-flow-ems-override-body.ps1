@@ -253,14 +253,3 @@ Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP324 additionally re
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '(?s)forbidden_active_features\s*=\s*\[.*?"EMS"' -Description "EMS remains forbidden"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP324 supersedes only CP323' -Description "canonical CP324 algorithm boundary"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP324 additionally requires' -Description "canonical CP324 capability boundary"
-foreach ($cp324Doc in @(
-        "docs\src\current\current-status.md",
-        "docs\src\current\project-contract.md",
-        "docs\src\porting-map\ideal-loads-source-map.md",
-        "docs\src\porting-map\heat-balance-source-map.md",
-        "docs\src\porting-map\zone-air-update-map.md"
-    )) {
-    Assert-Contains -Path $cp324Doc -Pattern 'CP324' -Description "CP324 documentation boundary"
-    Assert-Contains -Path $cp324Doc -Pattern '2161' -Description "CP324 first excluded executable documentation"
-    Assert-Contains -Path $cp324Doc -Pattern 'EMS.*forbidden|`EMS` remains forbidden' -Description "CP324 EMS-forbidden documentation"
-}

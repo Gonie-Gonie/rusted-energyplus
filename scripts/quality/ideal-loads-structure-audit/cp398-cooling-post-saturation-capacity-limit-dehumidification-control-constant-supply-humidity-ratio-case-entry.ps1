@@ -310,32 +310,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
         )) { if ($claim.Value -notmatch $pattern) { throw "CP398 spec addendum missing '$pattern'" } }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md", "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP398\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1 -or $text.LastIndexOf("## CP398 ") -le $text.LastIndexOf("## CP397 ")) { throw "CP398 documentation count/order drift in $doc" }
-    foreach ($pattern in @(
-            $commit, $hash, 'physical source line 2291', 'case HumControl::ConstantSupplyHumidityRatio:',
-            '2290', 'case HumControl::None:', 'fall through', '2292-2293', '2294', 'CP399', '2313', $site,
-            'pure typed stacked-case-label', '20,\s+24,\s+and\s+27', '21,\s+25,\s+and\s+29',
-            'six routes are active', 'twenty-four', 'public exact-direct routes remain 0 through 8, 20, and 24',
-            'N398=E397=R\[20\]\+R\[24\]\+R\[27\]', 'C398=R\[21\]\+R\[25\]\+R\[29\]',
-            'E398=N398\+C398', 'T398=T397', 'I398=T398-E398', '30/24/6/6',
-            'sole immediate predecessor', 'exactly six', 'IEEE sidecars', $numericFields[0], $numericFields[5],
-            'predecessor_dehumidification_control_none_case_entered', $localBool,
-            'dehumidification_control_constant_supply_humidity_ratio_case_entry_count',
-            'CP397-to-CP398-to-unchanged-numerical', 'DirectZonePurchasedAirCouplingInput',
-            '32 algorithms', '293 routines', '336\s+total', '240\s+public', '96\s+internal',
-            '238 development', 'Roadmap checklist promotion'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP398 documentation in $doc missing '$pattern'" }
-    }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP398\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP398 supersedes only CP397' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP398 additionally requires' -Description "canonical capability addendum"

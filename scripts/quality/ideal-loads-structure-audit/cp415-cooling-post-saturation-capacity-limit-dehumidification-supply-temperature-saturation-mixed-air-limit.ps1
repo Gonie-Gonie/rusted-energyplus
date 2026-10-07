@@ -221,29 +221,6 @@ foreach ($field in $expectedNumeric) {
     Assert-Cp415Text -Text $serializationText -Pattern ('(?m)^\s*"'+$escaped+'".*\r?\n\s*"'+$escaped+'_ieee_bits"') -Description 'adjacent IEEE sidecar'
 }
 
-$heading = 'CP415 post-saturation saturation supply-temperature mixed-air limit'
-$docs = @('docs\src\current\current-status.md','docs\src\current\project-contract.md','docs\src\porting-map\heat-balance-source-map.md','docs\src\porting-map\ideal-loads-source-map.md','docs\src\porting-map\zone-air-update-map.md')
-foreach ($doc in $docs) {
-    $docText = Read-RepoText -Path $doc
-    $headings = [regex]::Matches($docText,"(?m)^## CP(?<number>40[8-9]|41[0-5])\b")
-    $numbers = @($headings | ForEach-Object { [int]$_.Groups['number'].Value })
-    if (($numbers -join '|') -cne '408|409|410|411|412|413|414|415') { throw "CP408-CP415 documentation order drift in $doc" }
-    if ([regex]::Matches($docText,"(?m)^## $([regex]::Escape($heading))$").Count -ne 1) { throw "CP415 heading count drift in $doc" }
-    $section = [regex]::Match($docText,"(?ms)^## $([regex]::Escape($heading))\r?\n(?<body>.*?)(?=^## |\z)").Groups['body'].Value
-    foreach ($pattern in @(
-        'line 2319 exactly','line 2320.*?first excluded','CP416 candidate',
-        'read-purchased-air-supply-temperature-for-minimum','read-purchased-air-mixed-air-temperature-for-minimum',
-        'apply-source-shaped-two-argument-minimum','assign-purchased-air-supply-temperature',
-        'fifty-four flattened conceptual outcomes','Thirty-six inactive','eighteen.*?all four','T415=54','Z415=36','L415=18','S415=4\*L415=72',
-        '17/37','0 through 8, 22 through 25, and 34 through 37','23, 25, 35, and 37','Five\s+width-36','36/41/51',
-        'CP414.*?sole immediate','resulting_supply_temperature_c.*?solely owns','CP329.*?solely owns',
-        'if left < right \{ left \} else \{ right \}','signed-zero ties','NaN','f64::min',
-        'first 109 fields','exactly\s+sixteen','128 base fields','forty.*?Option<f64>','one.*?Option<bool>','168 unique keys','forty adjacent',
-        'CP414-to-CP415-to-unchanged-numerical','105 to 106','adds no numerical or coupling-input DTO','no output DTO','never feeds',
-        '32 algorithms, 293','58.*?state_mapped','235.*?source_mapped','353 total','240 public','113\s+internal','238\s+development commands'
-    )) { Assert-Cp415Text -Text $section -Pattern "(?is)$pattern" -Description 'bounded documentation claim' }
-}
-
 foreach ($specAddendum in @(
     [PSCustomObject]@{ Path='specs\algorithm_ledger.toml'; Anchor='CP415 supersedes only CP414' },
     [PSCustomObject]@{ Path='specs\capabilities.toml'; Anchor='CP415 additionally requires' }

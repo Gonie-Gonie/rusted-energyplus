@@ -236,23 +236,6 @@ foreach ($claim in @($algorithmClaims + $capabilityClaims)) {
     }
 }
 
-$docs = @(
-    "docs\src\current\current-status.md", "docs\src\current\project-contract.md",
-    "docs\src\porting-map\ideal-loads-source-map.md",
-    "docs\src\porting-map\heat-balance-source-map.md",
-    "docs\src\porting-map\zone-air-update-map.md"
-)
-foreach ($doc in $docs) {
-    $text = Read-RepoText -Path $doc
-    $sections = [regex]::Matches($text, '(?ms)^## CP387\b.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP387 documentation expected one section in $doc" }
-    foreach ($pattern in @($commit, $hash, '2273', '2277', '2278', 'thirty|30', 'twenty-seven|27', 'three|3', 'CP329', '325\s+total', '85\s+internal')) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP387 documentation in $doc missing '$pattern'" }
-    }
-    $cp386Index = $text.LastIndexOf("## CP386 ")
-    $cp387Index = $text.LastIndexOf("## CP387 ")
-    if ($cp386Index -lt 0 -or $cp387Index -le $cp386Index) { throw "CP386-to-CP387 documentation order drift in $doc" }
-}
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP387\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP387 supersedes CP386' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP387 additionally requires' -Description "canonical capability addendum"

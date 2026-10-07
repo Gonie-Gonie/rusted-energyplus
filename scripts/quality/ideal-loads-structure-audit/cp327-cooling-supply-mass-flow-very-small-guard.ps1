@@ -267,61 +267,7 @@ foreach ($cp327CapabilityAddendum in $cp327CapabilityAddenda) {
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP327 supersedes only CP326' -Description "canonical CP327 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP327 additionally requires' -Description "canonical CP327 capability index"
 
-# Every hand-authored contract repeats the exact source/constant, C++ operand
-# caveat, retained CP326 provenance, first exclusion, and non-promotion terms.
-$cp327DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP327 maps only the complete Cooling supply mass-flow very-small-flow guard.*?^conformance, and Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP327 Source-Ordered Cooling Supply Mass-Flow Very-Small-Flow Guard\r?\n.*?Roadmap item\.\s*'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP327 Cooling Supply Mass-Flow Very-Small-Flow Guard\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP327 Cooling Supply Mass-Flow Very-Small-Flow Guard in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP327 Cooling Supply Mass-Flow Very-Small-Flow Guard Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp327Documentation in $cp327DocumentationSections) {
-    $cp327DocumentText = Read-RepoText -Path $cp327Documentation.Path
-    $cp327Matches = [regex]::Matches($cp327DocumentText, $cp327Documentation.Pattern)
-    if ($cp327Matches.Count -ne 1) {
-        throw "CP327 documentation expected one scoped section in $($cp327Documentation.Path), found $($cp327Matches.Count)"
-    }
-    $cp327Section = $cp327Matches[0].Value
-    foreach ($cp327Pattern in @(
-            'line 2166|line-2166',
-            'four(?:-site|\s+lexical)',
-            'DataHVACGlobals\.hh:89',
-            'VerySmallMassFlow\(1\.0E-30\)',
-            '0x39b4484bfeebc2a0',
-            '(?is)no(?:t| claim).{0,100}C\+\+\s+built-in\s+relational-operand evaluation order',
-            '(?is)CP326.{0,160}(?:bit-exact|exact)',
-            '(?i)UnitOff',
-            '(?i)non-cooling',
-            '(?i)NaN|unordered',
-            '(?is)signed\s+zeros|\+0\.0.{0,40}-0\.0',
-            'purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle',
-            'Line 2167 is the first excluded executable',
-            '(?i)`EMS`\s+and\s+Autosizing\s+remain\s+forbidden',
-            '(?i)support',
-            '(?i)conformance',
-            '(?i)Roadmap'
-        )) {
-        if ($cp327Section -notmatch $cp327Pattern) {
-            throw "CP327 documentation in $($cp327Documentation.Path) missing '$cp327Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Main audit and generated script inventory remain ordered by source checkpoint.
 $cp327MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

@@ -270,7 +270,7 @@ foreach ($field in @(
 Assert-Contains -Path $cp353SnapshotSerialization -Pattern '(?s)fn json_number.*?is_finite.*?Value::Null' -Description "CP353 nonfinite numeric null"
 Assert-Contains -Path $cp353SnapshotSerialization -Pattern 'format!\("0x\{:016x\}",\s*value\.to_bits\(\)\)' -Description "CP353 authoritative bits"
 
-# Two algorithm/capability addenda, 2+2+1+1 targets, and five hand sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $algorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $capabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $algorithmAddenda = [regex]::Matches($algorithmText, '(?m)^\s*"CP353 supersedes only CP352[^"\r\n]+",\s*$')
@@ -307,33 +307,7 @@ foreach ($target in @(
         throw "CP353 target count failed for '$($target.Pattern)'"
     }
 }
-$documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^CP353 now maps only.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP353 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio Overdrying Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP353 Constant-Sensible-Heat-Ratio Overdrying Limit\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP353 Constant-Sensible-Heat-Ratio Overdrying Limit in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP353 Constant-Sensible-Heat-Ratio Overdrying Limit Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) {
-        throw "CP353 documentation expected one section in $($doc.Path)"
-    }
-    foreach ($pattern in @(
-            $cp353SourceHash, '2221', '2222', 'CP354',
-            $cp353Sites[0], $cp353Sites[1], $cp353Sites[2], $cp353Sites[3], $cp353Sites[4],
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH', '5\*Q', 'C0\s*=\s*S',
-            'Q\s*=\s*H\s*=\s*CSH\s*=\s*0', 'CP352', 'CP345', 'CP334', 'CP344',
-            'energyplus_psy_h_fn_tdb_w', '0x3ee4f8b588e368f1', 'f64::max',
-            '(?:left NaN|NaN\s+left\s+operand)', '(?:right NaN|NaN\s+psychrometric\s+right\s+operand)', 'CP352-to-CP353-to-unchanged-numerical',
-            $cp353Lifecycle, 'DirectZonePurchasedAirCouplingInput',
-            '32\s+algorithms', '293\s+routines', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) {
-            throw "CP353 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP353\b' -Description "CP353 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP353 supersedes only CP352' -Description "canonical CP353 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP353 additionally requires' -Description "canonical CP353 capability addendum"

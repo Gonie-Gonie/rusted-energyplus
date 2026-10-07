@@ -642,76 +642,7 @@ foreach ($cp334CapabilityAddendum in $cp334CapabilityAddenda) {
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP334 supersedes only CP333' -Description "canonical CP334 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP334 additionally requires' -Description "canonical CP334 capability index"
 
-# Each hand-authored contract carries one scoped CP334 section with source,
-# operand provenance, transactionality, exclusions, and explicit non-promotion.
-$cp334DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP334 maps only the single Cooling positive-supply.*?^Roadmap state remain unchanged\.\s*$'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP334 Source-Ordered Cooling Positive-Supply Temperature Mixed-Air Limit\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP334 Cooling Positive-Supply Temperature Mixed-Air Limit\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP334 Positive-Supply Temperature Mixed-Air Limit in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP334 Cooling Positive-Supply Temperature Mixed-Air Limit Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp334Documentation in $cp334DocumentationSections) {
-    $cp334DocumentText = Read-RepoText -Path $cp334Documentation.Path
-    $cp334Matches = [regex]::Matches($cp334DocumentText, $cp334Documentation.Pattern)
-    if ($cp334Matches.Count -ne 1) {
-        throw "CP334 documentation expected one scoped section in $($cp334Documentation.Path), found $($cp334Matches.Count)"
-    }
-    $cp334Section = $cp334Matches[0].Value
-    foreach ($cp334Pattern in @(
-            'physical\s+(?:executable\s+)?(?:line\s+)?2189',
-            '(?:exactly )?four(?:-site|\s+textual|\s+sites)|all four',
-            'a < b \? a : b',
-            '4 \* supply_temperature_mixed_air_limit_count',
-            '4 \* supply_temperature_minimum_limit_count',
-            '4 \* supply_temperature_assignment_count',
-            '4 \* cp_air_assignment_count',
-            '4 \* positive_supply_mass_flow_body_entries',
-            '(?i)UnitOff',
-            '(?i)non-cooling',
-            '(?i)guard-false',
-            '(?i)CP333',
-            '(?i)CP329',
-            'mixed_air_temperature_c',
-            '(?i)finite',
-            '(?i)latest',
-            '(?i)private witness|private-witness',
-            '(?i)checked',
-            '(?i)transaction|before mutation',
-            'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle',
-            'CP333-to-CP334-to-numerical',
-            '(?is)(?:does not|neither|without).{0,120}(?:consum(?:e|ing)|reconcil(?:e|ing)).{0,180}numerical\s+DTO',
-            'line 2190',
-            '(?i)CP335',
-            '2340',
-            '2454-2461',
-            '2465',
-            '(?i)scaffold',
-            '(?i)source_mapped',
-            '(?i)support',
-            '(?i)conformance',
-            '(?i)Roadmap'
-        )) {
-        if ($cp334Section -notmatch $cp334Pattern) {
-            throw "CP334 documentation in $($cp334Documentation.Path) missing '$cp334Pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
 
 # Main audit and generated script inventory remain in source-checkpoint order.
 $cp334MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"

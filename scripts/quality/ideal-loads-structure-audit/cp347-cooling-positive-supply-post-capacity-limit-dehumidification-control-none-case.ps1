@@ -441,62 +441,8 @@ foreach ($target in @(
     }
 }
 
-# Exactly five hand-authored sections carry the same boundary.
-$documentation = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP347 now maps only.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP347 Source-Ordered Cooling Positive-Supply Post-Capacity-Limit Dehumidification-Control None Case\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP347 Cooling Positive-Supply Post-Capacity-Limit Dehumidification-Control None Case\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP347 Dehumidification-Control None Case in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP347 Cooling Positive-Supply Dehumidification-Control None-Case Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($doc in $documentation) {
-    $matches = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($matches.Count -ne 1) {
-        throw "CP347 documentation expected one scoped section in $($doc.Path)"
-    }
-    $section = $matches[0].Value
-    foreach ($pattern in @(
-            $cp347SourceHash,
-            '2210-2212',
-            '(?s)enter-purchased-air-dehumidification-control-none-case.*?read-purchased-air-mixed-air-humidity-ratio-for-none-case.*?assign-purchased-air-supply-humidity-ratio-in-none-case.*?exit-purchased-air-dehumidification-control-none-case-via-break',
-            '2213',
-            '2216',
-            '2245',
-            'T\s*=\s*U\+N\+P\+C0\+CSHR\+H\+CSH',
-            'S\s*=\s*C0\+CSHR\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'A\s*=\s*F\+L',
-            '4\*C0',
-            'C0\s*=\s*S',
-            'CSHR\s*=\s*H\s*=\s*CSH\s*=\s*0',
-            '(?s)CP329.*?mixed_air_humidity_ratio.*?(?:sole|solely|only|owns|owner)',
-            '(?s)CP345.*?corroborat',
-            'CP346-to-CP347-to-unchanged-numerical',
-            $cp347Lifecycle,
-            'DirectZonePurchasedAirCouplingInput',
-            '32\s+algorithms',
-            '293\s+routines',
-            'Roadmap'
-        )) {
-        if ($section -notmatch $pattern) {
-            throw "CP347 documentation in $($doc.Path) missing '$pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP347\b' -Description "CP347 psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP347 supersedes only CP346' -Description "canonical CP347 algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP347 additionally requires' -Description "canonical CP347 capability addendum"

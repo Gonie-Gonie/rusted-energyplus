@@ -1006,68 +1006,8 @@ foreach ($claim in @($cp345AlgorithmAddenda) + @($cp345CapabilityAddenda)) {
 }
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP346 supersedes only CP345' -Description "canonical CP346 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP346 additionally requires' -Description "canonical CP346 capability index"
-# Exactly five hand-authored contract sections carry CP345. The psychrometrics
-# map remains unchanged.
-$cp345DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP345 now maps only.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP345 Source-Ordered Cooling Positive-Supply Post-Capacity-Limit Humidity-Ratio Mixed-Air Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP345 Cooling Positive-Supply Post-Capacity-Limit Humidity-Ratio Mixed-Air Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP345 Post-Capacity-Limit Humidity-Ratio Mixed-Air Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP345 Cooling Positive-Supply Post-Capacity-Limit Humidity-Ratio Assignment Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($documentation in $cp345DocumentationSections) {
-    $documentText = Read-RepoText -Path $documentation.Path
-    $matches = [regex]::Matches($documentText, $documentation.Pattern)
-    if ($matches.Count -ne 1) {
-        throw "CP345 documentation expected one scoped section in $($documentation.Path), found $($matches.Count)"
-    }
-    $section = $matches[0].Value
-    foreach ($pattern in @(
-            $cp345SourceHash,
-            $cp345SourceStatementPattern,
-            $cp345OrderedSitesPattern,
-            'SupplyHumidityRatioMixedAirAssigned',
-            '(?s)(?:Separate|separate) public.*?G.*?F.*?L.*?private witnessed parity',
-            'T\s*=\s*U\+N\+P\+R',
-            'R\s*=\s*G\+F\+L',
-            'A\s*=\s*F\+L',
-            '2\*R',
-            '(?s)CP329.*?mixed_air_humidity_ratio.*?(?:solely|sole).*?owner',
-            '(?s)CP335.*?assigned_supply_humidity_ratio.*?corroborat',
-            'CP344-to-CP345-to-unchanged-numerical',
-            $cp345LifecycleField,
-            'DirectZonePurchasedAirCouplingInput',
-            $cp345FirstExcludedPattern,
-            '(?is)pure.*?(?:signed zero|signed-zero).*?NaN.*?infinit',
-            '(?is)complete direct release.*?CP329.*?finite.*?>= 0\.0',
-            '(?is)no (?:new )?finite gate|adds no finite gate',
-            '(?is)JSON.*?nonfinite.*?null.*?IEEE.*?defensive',
-            '32\s+algorithms',
-            '293\s+routines',
-            'state[_-]mapped',
-            'source[_-]mapped',
-            'Roadmap'
-        )) {
-        if ($section -notmatch $pattern) {
-            throw "CP345 documentation in $($documentation.Path) missing '$pattern'"
-        }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP345\b' -Description "CP345 does not alter the psychrometrics source map"
 # Historical binding audits admit the CP345 call; cumulative non-direct audits
 # and coupled regression names reach CP345.

@@ -344,35 +344,8 @@ foreach ($target in @(
     }
 }
 
-# Five hand-doc sections and non-promotion to psychrometrics.
-$cp370Documentation = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Pattern = '(?ms)^## CP370 Cooling Supply-Humidity-Ratio Humidification-Control Humidistat Guard\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Pattern = '(?ms)^## CP370 Source-Ordered Cooling Supply-Humidity-Ratio Humidification-Control Humidistat Guard\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Pattern = '(?ms)^## CP370 Cooling Supply-Humidity-Ratio Humidification-Control Humidistat Guard\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Pattern = '(?ms)^## CP370 Cooling Supply-Humidity-Ratio Humidification-Control Humidistat Guard in the Heat-Balance Loop\r?\n.*?(?=^## |\z)' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Pattern = '(?ms)^## CP370 Cooling Supply-Humidity-Ratio Humidification-Control Humidistat Guard Placement\r?\n.*?(?=^## |\z)' }
-)
-foreach ($doc in $cp370Documentation) {
-    $sections = [regex]::Matches((Read-RepoText -Path $doc.Path), $doc.Pattern)
-    if ($sections.Count -ne 1) { throw "CP370 documentation expected one section in $($doc.Path)" }
-    foreach ($pattern in @(
-            $cp370SourceCommit, $cp370SourceHash, '2246', '2247', '2258',
-            $cp370Sites[0], $cp370Sites[1], $cp370Sites[2],
-            'T\s*=\s*U\+N\+P\+C0\+Q\+H\+CSH',
-            'S\s*=\s*C0\+Q\+H\+CSH\s*=\s*R\s*=\s*G\+F\+L',
-            'A\s*=\s*F\+L', 'V\s*=\s*CP369 body entries\s*=\s*M\+Z',
-            'source_site_execution_count\s*=\s*2\*V\+M',
-            'HumidificationControlType::None|humidification_control_type=None',
-            'HumidificationControlType::Humidistat|typed-enum\s+`Humidistat`|canonical private(?:\s+typed-enum)?\s+`Humidistat`',
-            'CP369', '(?:sole\s+immediate|immediate\s+and\s+sole)\s+source-order\s+predecessor',
-            'CP320', 'corroborat', 'named-enum', 'CP369-to-CP370-to-unchanged-?\s*numerical',
-            $cp370Lifecycle, 'CP345', '32\s+algorithms', '293\s+routines',
-            '58\s+`?state_mapped`?', '235\s+`?source_mapped`?', '170\s+required',
-            '308\s+total', '240\s+public', '68\s+internal', 'zero\s+unused', 'Roadmap'
-        )) {
-        if ($sections[0].Value -notmatch $pattern) { throw "CP370 documentation in $($doc.Path) missing '$pattern'" }
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP370\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP370 supersedes only CP369' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP370 additionally requires' -Description "canonical capability addendum"

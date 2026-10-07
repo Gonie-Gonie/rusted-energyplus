@@ -213,7 +213,7 @@ Assert-Contains -Path $cp379Assertions -Pattern 'cp380_assertions::assert_non_di
 Assert-Contains -Path $cp380Assertions -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP380 terminal numerical nonfeed"; Assert-Contains -Path $cp380Assertions -Pattern 'mod cp381_assertions;' -Description "arbitrary CP381 module"; Assert-Contains -Path $cp380Assertions -Pattern 'cp381_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP381 direct delegation"; Assert-Contains -Path $cp380Assertions -Pattern 'cp381_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP381 non-direct delegation"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp382_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP382 terminal numerical nonfeed firewall"; Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp383_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP383 terminal numerical nonfeed firewall"
 Assert-NotContains -Path $cp381Assertions -Pattern 'MaxCoolTotCap|CoolTotOutput|SupplyMassFlowRate|MixedAirEnthalpy|SupplyEnthalpy|(?:latest|cp381|results)\["(?:supply_node|report|capacity_w)' -Description "CP381 body/numerical assertion"
 
-# Exactly two algorithm/capability addenda and five ordered handwritten sections.
+# Bounded claims are checked against canonical algorithm/capability IDs.
 $cp380AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $cp380CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
 $cp380AlgorithmAddenda = [regex]::Matches($cp380AlgorithmText, '(?m)^\s*"CP380 supersedes only CP379[^"\r\n]+",\s*$')
@@ -237,27 +237,7 @@ foreach ($claim in @($cp380AlgorithmAddenda + $cp380CapabilityAddenda)) {
         if ($claim.Value -notmatch $pattern) { throw "CP380 spec addendum missing '$pattern'" }
     }
 }
-$cp380Docs = @(
-    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP380 Cooling Post-Saturation Capacity-Limit Guard' },
-    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP380 Source-Ordered Cooling Post-Saturation Capacity-Limit Guard' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP380 Cooling Post-Saturation Capacity-Limit Guard' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP380 Post-Saturation Capacity-Limit Guard in the Heat-Balance Loop' },
-    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP380 Post-Saturation Capacity-Limit Guard Placement' }
-)
-foreach ($doc in $cp380Docs) {
-    $text = Read-RepoText -Path $doc.Path
-    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
-    if ($sections.Count -ne 1) { throw "CP380 documentation expected one section in $($doc.Path)" }
-    $previous = -1
-    foreach ($checkpoint in 370..380) {
-        $index = $text.LastIndexOf("## CP$checkpoint ")
-        if ($index -le $previous) { throw "CP370 through CP380 documentation order drift in $($doc.Path)" }
-        $previous = $index
-    }
-    foreach ($required in @($cp380SourceCommit, $cp380SourceHash, '2264', '2266', 'CP381', $cp380Sites[0], $cp380Sites[1], $cp380Sites[2], $cp380Sites[3], $cp380Sites[4], 'CP379', 'CP337', 'cooling_limit', '2\*G\+2\*S\+B', '318\s+total', '78\s+internal')) {
-        if ($sections[0].Value -notmatch $required) { throw "CP380 documentation in $($doc.Path) missing '$required'" }
-    }
-}
+
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP380\b' -Description "psychrometrics non-promotion"
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP380 supersedes only CP379' -Description "canonical algorithm addendum"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP380 additionally requires' -Description "canonical capability addendum"

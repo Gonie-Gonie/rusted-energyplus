@@ -485,77 +485,8 @@ Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'broader downstream
 Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP343 supersedes only CP342' -Description "canonical CP343 algorithm ledger"
 Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP343 additionally requires' -Description "canonical CP343 capability index"
 
-# Five hand-authored contracts and the psychrometrics source map carry the
-# source, owner, IEEE, lifecycle, exclusion, and no-promotion boundaries.
-$cp343DocumentationSections = @(
-    [PSCustomObject]@{
-        Path = "docs\src\current\current-status.md"
-        Pattern = '(?ms)^CP343 now maps only.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\current\project-contract.md"
-        Pattern = '(?ms)^## CP343 Source-Ordered Cooling Positive-Supply Capacity-Limit Supply-Temperature Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\ideal-loads-source-map.md"
-        Pattern = '(?ms)^## CP343 Cooling Positive-Supply Capacity-Limit Supply-Temperature Assignment\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\heat-balance-source-map.md"
-        Pattern = '(?ms)^## CP343 Positive-Supply Capacity-Limit Supply-Temperature Assignment in the Heat-Balance Loop\r?\n.*?(?=^## |\z)'
-    },
-    [PSCustomObject]@{
-        Path = "docs\src\porting-map\zone-air-update-map.md"
-        Pattern = '(?ms)^## CP343 Cooling Positive-Supply Capacity-Limit Supply-Temperature Assignment Placement\r?\n.*?(?=^## |\z)'
-    }
-)
-foreach ($cp343Documentation in $cp343DocumentationSections) {
-    $cp343DocumentText = Read-RepoText -Path $cp343Documentation.Path
-    $cp343Matches = [regex]::Matches($cp343DocumentText, $cp343Documentation.Pattern)
-    if ($cp343Matches.Count -ne 1) {
-        throw "CP343 documentation expected one scoped section in $($cp343Documentation.Path), found $($cp343Matches.Count)"
-    }
-    $cp343Section = $cp343Matches[0].Value
-    foreach ($cp343Pattern in @(
-            $cp343PurchasedAirSourceHash,
-            $cp343PsychrometricsSourceHash,
-            $cp343SourceStatementPattern,
-            $cp343OrderedSourceSitesPattern,
-            'Psychrometrics\.hh',
-            '743-762',
-            'max\(dW,\s*1\.0e-5\)',
-            'first-argument\s+NaN',
-            'CapacityLimitSensibleOutputSupplyEnthalpyAssigned',
-            'CapacityLimitSensibleOutputSupplyTemperatureAssigned',
-            'T\s*=\s*U\+N\+P\+G\+F\+D',
-            'A\s*=\s*F\+D',
-            'D\s*=\s*H\s*=\s*M\s*=\s*CP340 adjustment-body entries',
-            '4\*D',
-            '(?s)supplied.*?(?:latest|retained-latest).*?private CP342',
-            'resulting_supply_enthalpy_j_per_kg',
-            '(?s)(?:CP335.*?(?:owns|owned).*?humidity|humidity.*?owned.*?CP335)',
-            '(?s)(?:CP334.*?(?:owns|owned).*?preexisting temperature|preexisting temperature.*?owned.*?CP334)',
-            '(?s)CP336.*?corroborat',
-            'no\s+new\s+finite\s+gate',
-            '(?s)(?:pure|defensive).*?characterization.*?(?:not|rather than).*?(?:full-public|public)',
-            'IEEE',
-            'CP342-to-CP343-to-(?:unchanged-)?numerical',
-            'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle',
-            'line\s+2202\s+is\s+commentary',
-            $cp343FirstExcludedStatementPattern,
-            '(?i)numerical[- ]DTO',
-            'state_mapped',
-            'source_mapped',
-            'Roadmap'
-        )) {
-        if ($cp343Section -notmatch $cp343Pattern) {
-            throw "CP343 documentation in $($cp343Documentation.Path) missing '$cp343Pattern'"
-        }
-    }
-    if ($cp343Section -match '(?is)public(?:ly)? reachable.{0,100}(?:-infinity|NaN)|(?:-infinity|NaN).{0,100}public(?:ly)? reachable') {
-        throw "CP343 documentation must not promote unproved nonfinite full-public reachability in $($cp343Documentation.Path)"
-    }
-}
+# Bounded claims are checked against canonical algorithm/capability IDs.
+
 Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern $cp343PsychrometricsSourceHash -Description "psychrometrics locked raw source"
 Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern 'bounded `PurchasedAirManager\.cc` physical-line-2201 direct lifecycle' -Description "bounded CP343 PsyTdbFnHW integration"
 Assert-Contains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern 'broader downstream IdealLoads inverse replacement beyond bounded CP343 physical line 2201' -Description "psychrometrics broader downstream nonclaim"
