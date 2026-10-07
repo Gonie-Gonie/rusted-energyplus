@@ -1,0 +1,62 @@
+{
+  "schema": "geo01-tolerances.v1",
+  "card": "GEO-01",
+  "frozen_before_comparison": true,
+  "profiles": {
+    "world_vertices_m": {
+      "unit": "m",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "rule": "abs(actual-reference) <= atol+rtol*abs(reference)",
+      "finite_class": "exact",
+      "zero_sign": "exact when both numerical outputs zero and same actual parsed inputsign established; inputparser discrepancies separatelyfail identity, never infer preservednegativezero from lexeme",
+      "nonzero_bits": "recorded; no blanketbit-equality requirement across compiler libm"
+    },
+    "connection_area_m2": {
+      "unit": "m2",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "scope": "selected CON actual physical consumers only; no GEO02 algorithm closure"
+    },
+    "connection_zone_volume_m3": {
+      "unit": "m3",
+      "absolute_tolerance": 1e-09,
+      "relative_tolerance": 1e-13,
+      "scope": "selected CON actual physical consumers only; no GEO03 algorithm closure"
+    },
+    "connection_azimuth_deg": {
+      "unit": "deg",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "scope": "selected CON actual physical consumers only; no GEO02 algorithm closure"
+    },
+    "connection_tilt_deg": {
+      "unit": "deg",
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-13,
+      "scope": "selected CON actual physical consumers only; no GEO02 algorithm closure"
+    }
+  },
+  "exact_metadata": [
+    "canonical names",
+    "surface/zone binding",
+    "vertex cardinality and arrayorder",
+    "typed GGR flags",
+    "recorded input coordinates after lexicalconversion",
+    "first/final original retained vertex bits",
+    "inactive-domain predicates"
+  ],
+  "native_only_unpaired": [
+    "engine IDs",
+    "MaxVerticesPerSurface lifecycle",
+    "original trig owner state/caches/deallocation",
+    "normal/centroid and diagnostic-only area/azimuth/tilt/volume consumers; selected CON physical area/volume/azimuth/tilt are paired stored-field connection projections under the separate profiles"
+  ],
+  "forbidden": [
+    "tolerance widening after failure",
+    "expectedoriginal outputs used as Rust input",
+    "precomputed geometry fixture answers",
+    "GEO02/GEO03 or wholephysics gate inference"
+  ],
+  "gates_updated": false
+}

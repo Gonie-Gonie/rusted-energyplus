@@ -404,6 +404,7 @@ struct PreparedInput {
 }
 
 struct RustRuntimeResult {
+    geometry_snapshot: Option<Value>,
     results: ResultStore,
     runtime_class: RuntimeClass,
     sample_count: usize,
@@ -1031,6 +1032,7 @@ fn run_with_optional_porting_scope_impl(
     );
     write_compile_artifacts(&config.output_dir, &compile_result.report, typed_model)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+    crate::geometry_trace::write_compiled_geometry(config, &raw_model, typed_model)?;
 
     let support_start = Instant::now();
     let mut scoped_report;
@@ -1317,6 +1319,7 @@ fn run_with_optional_porting_scope_impl(
                         assessment.runtime_class,
                         source_order_gate,
                         &runtime_inputs,
+                        config.trace_level == TraceLevel::Full,
                     )
                 })
             })
@@ -1342,6 +1345,9 @@ fn run_with_optional_porting_scope_impl(
                 let export_start = Instant::now();
                 write_runtime_artifacts(&config.output_dir, &result.results)
                     .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+                if let Some(snapshot) = result.geometry_snapshot.as_ref() {
+                    crate::geometry_trace::write_runtime_geometry(config, snapshot)?;
+                }
                 timing.push(
                     "rust_output_export",
                     "ep_run",
@@ -3394,6 +3400,7 @@ fn execute_rust_runtime(
     runtime_class: RuntimeClass,
     source_order_gate: SourceOrderGateSummary,
     runtime_inputs: &PreparedRuntimeInputs,
+    capture_geometry: bool,
 ) -> Result<RustRuntimeResult, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_inputs.sample_count;
@@ -3415,6 +3422,9 @@ fn execute_rust_runtime(
             )
             .map_err(|error| error.to_string())?;
             Ok(RustRuntimeResult {
+                geometry_snapshot: capture_geometry.then(|| {
+                    crate::geometry_trace::runtime_projection(&model.typed, &simulation.state)
+                }),
                 results: simulation.results,
                 runtime_class,
                 sample_count,
@@ -4330,6 +4340,9 @@ fn execute_rust_runtime(
                         .calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle,
                 );
             Ok(RustRuntimeResult {
+                geometry_snapshot: capture_geometry.then(|| {
+                    crate::geometry_trace::runtime_projection(&model.typed, &simulation.state)
+                }),
                 results: simulation.results,
                 runtime_class,
                 sample_count,
@@ -4486,6 +4499,7 @@ fn execute_rust_runtime(
             )
             .map_err(|error| error.to_string())?;
             Ok(RustRuntimeResult {
+                geometry_snapshot: None,
                 results: simulation.results,
                 runtime_class,
                 sample_count,
@@ -4685,6 +4699,7 @@ fn execute_rust_runtime(
             )
             .map_err(|error| error.to_string())?;
             Ok(RustRuntimeResult {
+                geometry_snapshot: None,
                 results: projection.results,
                 runtime_class,
                 sample_count,
@@ -8911,6 +8926,7 @@ mod tests {
     #[test]
     fn non_direct_runtime_rejects_cp316_through_cp442_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
+            geometry_snapshot: None,
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
             sample_count: 1,

@@ -1,0 +1,79 @@
+{
+  "schema": "geo01-checkpoint-validation.v1",
+  "status": "unit_and_regression_pass_production_pending",
+  "repository_head_during_tests": "ead2c1b34f67cdf83facc0d08678186ed1453fdf",
+  "workspace": {
+    "path": ".runtime/porting/GEO-01/rust-validation/workspace-01/receipt.json",
+    "sha256": "39761b2a7410322b2a846f776d5a639e8ec8463f658d274f3da4c30e27faa799"
+  },
+  "clippy_all_targets": {
+    "path": ".runtime/porting/GEO-01/rust-validation/clippy-01/receipt.json",
+    "sha256": "3b7289ac3ecad3e1c20b3ef32a74fbe17efe5a327b4cdaf2cd75be901d26e38a"
+  },
+  "workspace_tests_passed": 4535,
+  "executed_test_suites": 16,
+  "focused_compiler_15": {
+    "path": ".runtime/porting/GEO-01/rust-validation/compiler-geometry-01/receipt.json",
+    "sha256": "f5b2ce94af261414c9a904783578c89a347de815636c33e118e457fc5aa2334a"
+  },
+  "focused_observer_2": {
+    "path": ".runtime/porting/GEO-01/rust-validation/focused-01/receipt.json",
+    "sha256": "08929bf56e10520f6c3f3612f3c8f550bb35e2e9c6e96ef492204982bd100067"
+  },
+  "nonoverwrite_output_protection": {
+    "path": ".runtime/porting/GEO-01/rust-validation/nonoverwrite-01/receipt.json",
+    "sha256": "27b18bf2a4da6acf1230c68b6fb0b64a7cface163abcc4c72ed4578e637d7ae7"
+  },
+  "original_first_matrix": {
+    "path": ".runtime/porting/GEO-01/original-first/matrix.json",
+    "sha256": "f7e460dabd9eb9b2e3a5f8dfc15989d7fb8c8e9408f3c47bf400308c225764ab"
+  },
+  "original_first_review": {
+    "path": ".runtime/porting/GEO-01/original-first-review/preparation-review.json",
+    "sha256": "968814926a26a7a60ab30972b119f784f4c9e1053e7cb221073fbb7de9bf3466"
+  },
+  "baseline_comparison": {
+    "path": ".runtime/porting/GEO-01/baseline-comparison-01/comparison-report.json",
+    "sha256": "a12519c93ee5fe34892cef0bd0e4c7bb088989374599746084931ffe57c8cd5a"
+  },
+  "baseline_comparison_execution": {
+    "path": ".runtime/porting/GEO-01/rust-validation/baseline-comparison-01/receipt.json",
+    "sha256": "9870ad4a857e467e40a929f557517f7233d27d79be7da44d0afc456d69721115"
+  },
+  "fixed_comparison": {
+    "path": ".runtime/porting/GEO-01/fixed-comparison-01/comparison-report.json",
+    "sha256": "d6ada5c659e2e5c9fbe77e2a245ad9965d7c7f4407166787ea466b1961be3c99"
+  },
+  "fixed_comparison_execution": {
+    "path": ".runtime/porting/GEO-01/rust-validation/fixed-comparison-01/receipt.json",
+    "sha256": "87663c426bd4e33042e6c75a399a218f6756cf2fbe2c038ae0140b7f2122af55"
+  },
+  "baseline_Rust_matrix": {
+    "path": ".runtime/porting/GEO-01/rust-baseline-01/matrix.json",
+    "sha256": "74d70a45af62b853c92940658ee5c5c01130dba71a20f4b8676d7a546e482ec2"
+  },
+  "fixed_Rust_matrix": {
+    "path": ".runtime/porting/GEO-01/rust-fixed-01/matrix.json",
+    "sha256": "64d4ebf57b90d2a51d889b8cf1cb21081d592e9d5e6f9495a5859376477613e5"
+  },
+  "fixed_working_tree_build": {
+    "path": ".runtime/porting/GEO-01/builds/fixed-01/build-receipt.json",
+    "sha256": "c7a901643ba23b18278db037b7e8a74315443bf1f851c71033ff83d8080030fe"
+  },
+  "baseline_failure": "36 actual signed-zero differences; all numerical coordinate errors zero",
+  "correction": "original World AppendixG0 rotation operations and Relative sum-before-negation order",
+  "input_contracts_and_tolerances_changed_after_comparison": false,
+  "working_tree_source_equal_to_regression_archive": true,
+  "compile_projection_physics_executed": false,
+  "actual_cli_exit_codes_for_all_unit_cases": {
+    "4": 37
+  },
+  "unit_admission_note": "Ordinary dry-run completed typed compilation and declared unsupported runtime semantics; no scope override or physics calculation.",
+  "production_verified": false,
+  "committed_source_refresh_required": true,
+  "gates_updated": false,
+  "executed_launcher": {
+    "path": ".runtime/porting/GEO-01/prepare_checkpoint.py",
+    "sha256": "8efc157dfd38cd7c3ed3ff2cb3db7c093c397d920e43ce08e262c1f899208525"
+  }
+}

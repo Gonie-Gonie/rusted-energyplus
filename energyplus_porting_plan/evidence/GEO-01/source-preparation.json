@@ -1,0 +1,179 @@
+{
+  "schema": "geo01-source-preparation.v1",
+  "card": "GEO-01",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "status": "original-first-preparation-pass",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-source.json",
+      "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+      "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+      "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+    }
+  },
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "native_driver_build": {
+    "path": ".runtime/porting/GEO-01/native-driver-final/native-driver-build.json",
+    "sha256": "ece162afac27002dd7c43fc51df36cbda8ba36e5eb27126dfe7d9c2af2d47ff5"
+  },
+  "original_matrix": {
+    "path": ".runtime/porting/GEO-01/original-first/matrix.json",
+    "sha256": "f7e460dabd9eb9b2e3a5f8dfc15989d7fb8c8e9408f3c47bf400308c225764ab"
+  },
+  "original_preparation_review": {
+    "path": ".runtime/porting/GEO-01/original-first-review/preparation-review.json",
+    "sha256": "968814926a26a7a60ab30972b119f784f4c9e1053e7cb221073fbb7de9bf3466"
+  },
+  "case_count": 37,
+  "production_inputs": 15,
+  "unit_diagnostic_inputs": 22,
+  "surfaces": 222,
+  "input_coordinates_checked": 2664,
+  "actual_original_zone_callbacks": 179232,
+  "genuine_original_parsed_input_bits_checked": true,
+  "first_final_vertex_bits_retained": true,
+  "inactive_geometry_cleanup_and_aspect_checked": true,
+  "geometry_error_log_refs": "Per-case original_preparation_review cases[].geometry_error_log; no globalzero-warning assumption",
+  "native_constructor_max_vertices": 4,
+  "native_final_max_vertices": 4,
+  "native_counter_has_Rust_lifecycle_peer": false,
+  "commands": [
+    {
+      "command": [
+        "python",
+        "-B",
+        "tools/porting/geo01_reference.py",
+        "--prepare"
+      ],
+      "exit_code": 0,
+      "purpose": "input-onlycontractpreparation"
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "tools/porting/geo01_reference.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "purpose": "source/inputhashpreflight"
+    },
+    {
+      "recorded_receipt": {
+        "path": ".runtime/porting/GEO-01/native-driver-final/configure-command.json",
+        "sha256": "a1b21ea36efb610b3f821ea74d7dc00d089aeed085603750550f48f01d9f5c65"
+      }
+    },
+    {
+      "recorded_receipt": {
+        "path": ".runtime/porting/GEO-01/native-driver-final/build-command.json",
+        "sha256": "1a445004a166e3461751dcb5d23b17a0eb9d891c0087026158cd3ce2d706ff0b"
+      }
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "tools/porting/geo01_reference.py",
+        "--run-original",
+        "--driver-build",
+        ".runtime/porting/GEO-01/native-driver-final/native-driver-build.json",
+        "--output-dir",
+        ".runtime/porting/GEO-01/original-first"
+      ],
+      "exit_code": 0,
+      "mechanism": "actual37per-casebinarycommands/logs/exit0 in matrix-referencedreceipts"
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "tools/porting/geo01_reference.py",
+        "--review-original",
+        "--original-matrix",
+        ".runtime/porting/GEO-01/original-first/matrix.json",
+        "--output-dir",
+        ".runtime/porting/GEO-01/original-first-review"
+      ],
+      "exit_code": 0,
+      "executed_checker": {
+        "path": ".runtime/porting/GEO-01/original-first-review/geo01_reference.py",
+        "sha256": "d798dbaf977854e26273678e19b6cfb40e2712dacfbe76bd3016a0eb1eb77383"
+      }
+    }
+  ],
+  "preserved_build_attempts": [
+    {
+      "configure": {
+        "path": ".runtime/porting/GEO-01/native-driver-first/configure-command.json",
+        "sha256": "443df024f2322a0ad423fa47b44e23751c5653a01e0da532b65130312f8b579f"
+      },
+      "compile_link": {
+        "path": ".runtime/porting/GEO-01/native-driver-first/build-command.json",
+        "sha256": "699ea99a1fe141349b384e4349c49191027e8aa1ade8b2877ebacc22be1443a4"
+      },
+      "status": "compilepassed-linkfailedmissingoriginalObjexxFCLIndexRange.npos",
+      "executed_cpp": {
+        "path": ".runtime/porting/GEO-01/native-driver-first/source/geo01_reference.cpp",
+        "sha256": "9743b151675b8ef71db7c6cc16f15aaeb32159b86f95cec808e9cd0d100ddc74"
+      },
+      "executed_cmake": {
+        "path": ".runtime/porting/GEO-01/native-driver-first/source/geo01_reference.cmake",
+        "sha256": "9cfb968609c97786a4160fe49f14059f057b9c9884bd55eded7eddb7fec43fe9"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/GEO-01/native-driver-linked/native-driver-build-archive-resolved.json",
+        "sha256": "026a0cd9892b2e6c368c82b54dca6b265eeaeef400720a4f46d4ce79ad7e0ca5"
+      },
+      "status": "wrapper-onlyoriginalobjexxlinkpassed; finalreceiptfreshlyrecompiledunchangedwrapper",
+      "historical_raw_receipt": {
+        "historical_path": ".runtime/porting/GEO-01/native-driver-linked/native-driver-build.json",
+        "sha256": "dbbd97ed2e1c523208b33172f2631436688db86b694cd822303e2d326fba045f"
+      }
+    }
+  ],
+  "unchanged_wrapper_recompile_request": {
+    "path": ".runtime/porting/GEO-01/unchanged-wrapper-recompile-request.json",
+    "sha256": "ae7e4000fb1b0f1f42d71f973e644d914e931adf85960ab9810eb617236a7e63"
+  },
+  "precomparison_history": [
+    {
+      "path": ".runtime/porting/GEO-01/precomparison-initial-contracts/manifest.json",
+      "sha256": "cfe9bee7074959d809de1f6426821993f591ca9d446f0ca1ece56fbb92859c34"
+    },
+    {
+      "path": ".runtime/porting/GEO-01/precomparison-connection-profile-draft/GEO-01-tolerances.json",
+      "sha256": "bb6486d2c4f1a615ef8abaf7cf8be531227f80a860d8441dc5b5f75d9cb34c7a"
+    }
+  ],
+  "early_signed_zero_probe": {
+    "matrix": {
+      "path": ".runtime/porting/GEO-01/original-zero-first/matrix.json",
+      "sha256": "d1c134d57691fdfe427735c6a0557d61a16e0abaf01edf02d855e1af2e29ef37"
+    },
+    "case_id": "WORLD-NEGATIVE-ZERO",
+    "additional_actual_original_callbacks": 96,
+    "result": "Actualparsed-0.0 survives; WorldAppG0 transforms firstWall001(-0,-0,z) to(-0,+0,z), sineAppGbits8000000000000000",
+    "no_extra_case_or_CON_admission": true
+  },
+  "Rust_unit_comparison": "pending",
+  "selected_CON_physical_connection_comparison": "pending",
+  "gates_updated": false,
+  "limitations": [
+    "Relative/axes/origins/corner/signedzero inputs arediagnostic-only; unchangedCON15selectedproduction",
+    "Nativefullinput initialization source reference; no direct GetVertices scalar-call or transientzonecache beforeafterclaimed",
+    "Nativecountergrowth inactive; no fabricatedRustglobal",
+    "GEO02/GEO03general algorithms, diagnosticdryrunconsumerparity and wholephysicsunclaimed"
+  ]
+}

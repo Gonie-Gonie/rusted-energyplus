@@ -68,3 +68,29 @@ CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## 진행 기록 — 단위 검증 완료, 생산 연결 미확인
+
+고정 원본의 12개 파일·35개 행구간과 37개 입력은
+`contracts/GEO-01-{source,cases,tolerances}.json`에 기록했다. CON의 15개 입력과
+기하 진단용 22개 입력을 구분했으며, 진단 입력으로 생산 지원 범위를 확장하지 않는다.
+원본의 실제 초기화·warmup·물리 실행에서 보존한 꼭짓점을 먼저 수집했다.
+
+수정 전 Rust의 2,664개 좌표 비교에서 0의 부호 불일치 36개가 확인됐다.
+기존 컴파일러에 원본 World 분기의 Appendix G 0도 회전 연산과 Relative 분기의
+각도 합산 후 부호 반전 순서를 반영했다. 동일 입력·동일 허용오차로 다시 비교한
+결과 불일치 0개, 최대 수치 오차와 RMSE 0을 확인했다.
+
+Rust 단위 결과는 일반 CLI의 Full dry-run에서 실제 컴파일된 좌표를 복사했다.
+37개 모두 컴파일 준비를 완료한 뒤 미지원 실행 의미를 종료 코드 4로 보고했고,
+물리 계산·oracle 계산·진단 수치 probe는 실행하지 않았다. 생산 연결 검증은
+별도의 성공한 A/B 물리 실행에서 실제 최종 상태의 면적·방위·기울기·체적을
+확인해야 한다. GEO-02·GEO-03 알고리즘 또는 warmup 완료로 해석하지 않는다.
+
+시험: `cargo test -p ep_compiler global_geometry_rules --lib -j 2` 15개,
+`cargo test -p ep_run geometry_trace --lib -j 2` 2개,
+기존 출력 덮어쓰기 거부 시험 1개 통과. `cargo test --workspace --all-targets -j 2`
+16개 묶음·4,535개 시험과 `cargo clippy --workspace --all-targets -j 2 -- -D warnings`
+통과. 실행 시 HEAD는 `ead2c1b34f67cdf83facc0d08678186ed1453fdf`이며 수정된 실제
+컴파일 소스와 바이너리는 별도로 보존했다. 커밋된 소스의 재실행과 생산 연결은
+아직 미확인이다. 증거: `evidence/GEO-01/initial-checks.json` 및 독립 검토 기록.

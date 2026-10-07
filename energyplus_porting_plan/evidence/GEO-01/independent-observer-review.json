@@ -1,0 +1,94 @@
+{
+  "schema": "geo01-independent-observer-review.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "review_scope": "Independent static review of output-only Rust geometry observations, preserved-output comparison and ordinary CLI/build-freeze launchers before the baseline coordinate comparison and source correction. This is not a Rust numerical-equivalence result.",
+  "contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/independent-contract-review.json",
+    "sha256": "ad32b6a3fb4dd89cddadb30060e6d27fbdfd9b56e3f04aa4cb28381328c5d8a5"
+  },
+  "native_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/independent-native-review.json",
+    "sha256": "f442b7548e3c9ad2af75c6cd6459b010ed7334db56cea18af851fe1a18fe7832"
+  },
+  "reviewed_source_archives": {
+    "path": ".runtime/porting/GEO-01/independent-observer-review/source-manifest.json",
+    "sha256": "ca3ad21cb4147cd15dfe2fd00d93da961c737fc9ea5f576bea3565820a5fcf4e"
+  },
+  "reviewed_tool_archives": {
+    "path": ".runtime/porting/GEO-01/independent-observer-review/reviewed-tools-manifest.json",
+    "sha256": "1be1b72ff44e6d94dec3aca75e0e6b6b25ae27ad5e2316a52743199abb97174c"
+  },
+  "source_phase": "Observer-only working-tree snapshot before the World AppendixG0 arithmetic correction; archived compiler is the original Rust baseline. No implementation commit or compiled binary is certified by this static review.",
+  "review_method": "Read exact source bodies and call sites, inspect actual original A-24H command/payload shape, and byte-verify the six source archives and three reviewed tool archives. No Cargo, CMake, native simulation, Rust CLI or scientific comparator invocation was performed by this reviewer.",
+  "rust_observation_checks": [
+    {
+      "source": "crates/ep_run/src/geometry_trace.rs",
+      "lines": [33, 66, 104, 140, 147],
+      "finding": "Selected actual RawModel numerical lexemes use the compiler f64 parse and export authoritative IEEE bits. Compiled vertices, names, own IDs and collection order are copied from TypedModel. The observer contains no coordinate transform or expected-output injection. Input-path semantics are explicitly slash-delimited rather than escaped JSON pointers."
+    },
+    {
+      "source": "crates/ep_run/src/geometry_trace.rs",
+      "lines": [113, 116, 130, 139, 155],
+      "finding": "compiled-geometry.v1 is preparation-only and physics_executed=false. Normal pipeline FNV-1a-64 input metadata is named accurately and is separately checked against actual files by SHA-256 in the proof tools. AppendixG0 is an explicit fixed admitted-domain boundary, not an observed Rust global. Native transient caches and MaxVerticesPerSurface lifecycle have no invented Rust peer or cross-engine ID equality."
+    },
+    {
+      "source": "crates/ep_run/src/geometry_trace.rs",
+      "lines": [160, 166, 169, 178, 182],
+      "finding": "geo01-runtime-consumers.v1 copies existing final HeatBalanceState surface area/azimuth/tilt, zone volume, own IDs and actual timestep index. It does not recompute consumers from input vertices. The scope is a stored-field connection projection, excluding general GEO-02/GEO-03 and whole-building physics."
+    },
+    {
+      "source": "crates/ep_run/src/pipeline.rs",
+      "lines": [948, 1035, 1322, 1327, 1348, 3425, 4343],
+      "finding": "Output-directory admission precedes observer output. The compiled writer returns before projection allocation outside Full. Runtime snapshots are allocated lazily only for Full and copied from actual completed A/B simulations. Consumer export occurs only after successful runtime selection/execution/provenance validation. Default Summary numerical/state/call-order behavior is unchanged."
+    },
+    {
+      "source": "crates/ep_run/src/pipeline.rs",
+      "lines": [1035, 1037, 1348],
+      "finding": "The preparation artifact is written before support assessment; it may therefore remain after a later unsupported/runtime failure. This review does not claim all failed runs lack a compiled artifact. The denied-overwrite path exits before either geometry artifact; runtime consumer output requires a validated successful runtime."
+    },
+    {
+      "source": "crates/ep_run/src/geometry_trace/tests.rs",
+      "lines": [27, 32, 55, 76, 85],
+      "finding": "Two inspected tests deliberately vary stored compiled/runtime values independently of incoming geometry and retain parsed negative-zero bits, meaningfully checking copying rather than an alternate serializer calculation. Test execution belongs to the parent receipts and is not claimed as performed by this review."
+    },
+    {
+      "source": "crates/ep_run/tests/arbitrary_run_exit_codes.rs",
+      "lines": [133, 154, 156, 160, 161, 162],
+      "finding": "The existing Full/no-overwrite regression preserves existing bytes, reports the Args error, and checks both new artifacts absent and directory cardinality unchanged. This reviewer read the test and did not execute it."
+    }
+  ],
+  "checker_review": {
+    "reviewed_sha256": "3bb7867c6bc5ab36101e3859a10cf9a14b716f1aa28e4958bbc2498aacfe2437",
+    "status": "pass",
+    "corrected_findings": [
+      "Reject bool-as-int own zone IDs, native exits/probes/counters/topology/corner/class/cardinality through explicit integer checks.",
+      "Cross-bind actual original payload, receipt, frozen inputs/weather/IDD, actual driver binary, verified core/API and all three authoritative contracts with normalized paths and SHA-256.",
+      "Bind all eight actual GEO wrapper argv entries and the eight original energyplus simulation argv entries, retaining the genuine DLL binding through the verified core receipt.",
+      "Count all per-case mismatches from function entry and report coordinate-kind mismatches separately, without filtering metadata mismatches."
+    ],
+    "preserved_policy": "Actual parsed input IEEE bits must match before output comparison. Each engine retains its own unique integer IDs and pairs objects by case-insensitive name; vertex order/cardinality remain exact. Coordinate numbers must agree with their authoritative bits, finite classification is checked, frozen atol=1e-10 m/rtol=1e-13 is unchanged, and equal zero values require exact sign bits. No angle wrapping, output-derived inputs or geometry equations are introduced.",
+    "provenance_boundary": "The preserved-output comparator establishes artifact agreement. The parent independently owns archived ordinary-CLI executable/build/source/input/command/run-summary bindings; this checker does not by itself certify a Rust producer or an actual physical consumer run."
+  },
+  "launcher_review": {
+    "run_launcher_sha256": "4f043346c31f7ab0af9a39be8fb4a594507f8b77da8f628c773ade8698b7c61b",
+    "build_freezer_sha256": "4366fcf90624842bb6f72f1d59c0b2be856ebdbeaf027cfe91c1694220ecd4cb",
+    "status": "pass",
+    "finding": "The launcher supplies only frozen IDF/weather to an archived hash-verified ordinary CLI. Unit dry-run permits exit 0 or 4 only with matching actual summary status/exit, dry-run-completed message, rust_runtime=null and preparation-only projection. Original-first proof files are hashed, not parsed into numerical inputs; chronology is explicitly a parent-established statement. Production requires a clean committed-source build and fixed CON cases, records exact commands and Full/Summary artifacts, and forbids oracle flags. The freezer verifies captured source archives against live post-build snapshots and copies executable/lock/toolchain bytes; the observer baseline may honestly be uncommitted and is not promoted to a committed implementation."
+  },
+  "remaining_scientific_work": [
+    "Capture the actual archived-CLI signed-zero baseline failure before applying source-exact World arithmetic.",
+    "Execute fresh committed-source coordinate comparisons on all 37 frozen inputs after the correction.",
+    "Separately compare selected-CON actual physical stored consumers and Full/Summary ordinary outputs under the pre-frozen connection profiles."
+  ],
+  "limitations": [
+    "No source numerical equivalence, final coordinate PASS, physical connection PASS or card closure is established by this static review.",
+    "Diagnostic coordinate inputs do not expand CON or claim physics execution.",
+    "Native transient state/counters, source global lifecycle/order and general GEO-02/GEO-03 algorithms remain outside the paired projection.",
+    "Other geometry controls/shapes, whole-building physics, HVAC and system order are unclaimed."
+  ],
+  "scientific_executions_performed_by_this_review": 0,
+  "source_math_edits_performed_by_this_review": 0,
+  "original_raw_proof_mutations": 0,
+  "gates_updated": false
+}

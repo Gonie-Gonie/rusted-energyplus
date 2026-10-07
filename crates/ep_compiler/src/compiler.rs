@@ -17416,11 +17416,15 @@ fn canonical_world_surface_vertices(
         }
     }
 
+    // Appendix G rotation is fixed to zero in the supported input domain.
+    // Keep its addition and rotation operations: they affect IEEE zero signs.
+    let appendix_g_rotation_deg = 0.0_f64;
     if rules.coordinate_system == GeometryCoordinateSystem::Relative {
         let zone_angle_rad = (-zone_relative_north_deg).to_radians();
         let zone_cos = zone_angle_rad.cos();
         let zone_sin = zone_angle_rad.sin();
-        let building_angle_rad = (-building_north_axis_deg).to_radians();
+        let building_angle_rad =
+            (-(building_north_axis_deg + appendix_g_rotation_deg)).to_radians();
         let building_cos = building_angle_rad.cos();
         let building_sin = building_angle_rad.sin();
 
@@ -17432,6 +17436,16 @@ fn canonical_world_surface_vertices(
             vertex.x_m = building_relative_x * building_cos - building_relative_y * building_sin;
             vertex.y_m = building_relative_x * building_sin + building_relative_y * building_cos;
             vertex.z_m += zone_origin.z_m;
+        }
+    } else {
+        let appendix_g_angle_rad = (-appendix_g_rotation_deg).to_radians();
+        let appendix_g_cos = appendix_g_angle_rad.cos();
+        let appendix_g_sin = appendix_g_angle_rad.sin();
+        for vertex in &mut vertices {
+            let x = vertex.x_m;
+            let y = vertex.y_m;
+            vertex.x_m = x * appendix_g_cos - y * appendix_g_sin;
+            vertex.y_m = x * appendix_g_sin + y * appendix_g_cos;
         }
     }
 

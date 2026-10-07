@@ -1,0 +1,192 @@
+{
+  "schema": "geo01-independent-contract-review.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "review_scope": "Frozen contracts, source bodies/declarations/lifetimes, input-only domain and future observation plan; this is not a numerical equivalence or build/run receipt.",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-source.json",
+      "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-cases.json",
+      "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json",
+      "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+    }
+  },
+  "reviewed_frozen_contract_archives": {
+    "source": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/frozen-contracts/GEO-01-source.json",
+      "sha256": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739",
+      "historical_path": "energyplus_porting_plan/contracts/GEO-01-source.json"
+    },
+    "cases": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/frozen-contracts/GEO-01-cases.json",
+      "sha256": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0",
+      "historical_path": "energyplus_porting_plan/contracts/GEO-01-cases.json"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/frozen-contracts/GEO-01-tolerances.json",
+      "sha256": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2",
+      "historical_path": "energyplus_porting_plan/contracts/GEO-01-tolerances.json"
+    }
+  },
+  "actual_read_only_audit": {
+    "command_receipt": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/command.json",
+      "sha256": "fd2cc77db823206cbe3e221c185b3ec2b6c0d85b0bb9d0e7bdc240c58b106501"
+    },
+    "executed_script": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/final-contract-audit.py",
+      "sha256": "796be6c077d12d9145ea6276ffff75739125ce82742bbc6939b388984e81cdb0"
+    },
+    "raw_stdout": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/stdout.json",
+      "sha256": "17333567e56e2b3417c11bd800993574219f3faf016c757a035ce7e381fdf8d4"
+    },
+    "raw_stderr": {
+      "path": ".runtime/porting/GEO-01/independent-contract-review/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "result": {
+      "status": "pass",
+      "review_kind": "read-only metadata/input/source audit, no scientific execution",
+      "contract_sha256": {
+        "source": "1c07297412d2408cf50905609fc6157a4dfb3488d833c9dacb15fa31e2275739",
+        "cases": "b6c8189ffc86e973986610a5a48fd8edb72f9f3fb557a3f1e7ab432a3a5a0ff0",
+        "tolerances": "87baa3978c3a26dd0d05b28850265cee96a3eb73dbf5aa82b3abfe8dec116bf2"
+      },
+      "source_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+      "source_origin": "https://github.com/NatLabRockies/EnergyPlus.git",
+      "source_files_and_HEAD_blobs": 12,
+      "exact_ranges_and_literal_symbols": 35,
+      "cases": 37,
+      "selected_CON_inputs": 15,
+      "diagnostic_inputs": 22,
+      "surfaces": 222,
+      "input_coordinates": 2664,
+      "checked_reference_occurrences": 190,
+      "unique_hashed_artifacts": 91,
+      "numerical_kernels_executed_by_review": 0,
+      "native_or_Rust_CLI_executions_by_review": 0,
+      "calculation_or_state_mutations_by_review": 0,
+      "gates_updated": false
+    }
+  },
+  "historical_iteration": {
+    "path": ".runtime/porting/GEO-01/independent-contract-review/historical-draft-review.json",
+    "sha256": "a95e1930d824f24f4fc5c28b3a1c133d6b79e81422f067accc27e35006cedd01"
+  },
+  "source_publisher_and_pin": {
+    "official_origin": "https://github.com/NatLabRockies/EnergyPlus.git",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048",
+    "verification": "Read-only git rev-parse HEAD and remote get-url origin; 12 declared current file hashes also equal exact git show HEAD:path blob hashes. No fetch, checkout, ref/config/file mutation.",
+    "range_verification": "35 exact UTF-8 range hashes and actual literal symbol occurrences."
+  },
+  "source_semantics": {
+    "operation_order": [
+      "Copy actual XYZ input in vertex order.",
+      "CW reverses vertices2..N and preserves vertex1.",
+      "Execute original starting-corner swap loop.",
+      "Relative rotates by zone north, adds XY origins, then rotates by Building effective north; Z adds zone origin.",
+      "World still executes AppendixG-only XY multiply/add when fixed AppendixG rotation is zero."
+    ],
+    "angle_policy": "Original Pi/180 DegToRad, Building modulo prerequisite, exact grouping and signed zero remain observable. No angle wrapping is added by comparison.",
+    "lifetime": "Original constructor flags/coefficient defaults precede GetGeometryParameters/SetupZoneGeometry/GetHTSurfaceData; temporary vertex/zone trig arrays are genuinely deallocated. Final retained Surface.Vertex is observed after genuine initialization and at API return.",
+    "counter_precision": {
+      "actual_original_MaxVerticesPerSurface_constructor_default": 4,
+      "growth_branch": "Inactive only under the declared exact4=4 domain; native before/after observed separately.",
+      "Rust_equivalent_counter": "Absent; never synthesize a Rust zero or pair native lifecycle to an invented state.",
+      "observer_added_geometry_probe_calls": 0,
+      "zero_meaning": "Zero added observation/probe calls is distinct from the original native maximum-vertex default four and from unobserved original GetVertices call counts."
+    }
+  },
+  "input_domain": {
+    "case_count": 37,
+    "selected_CON_input_count": 15,
+    "diagnostic_input_count": 22,
+    "surface_count": 222,
+    "input_coordinate_count": 2664,
+    "selected_CON": "All selected IDFs are UpperLeft/CCW/World, zero Building/Zone axes and origins, six opaque detailed quadrilaterals, declared4=actual4, no GeometryTransform or Compliance:Building. This is selected proof topology, not a universal CLI Relative admission rejection.",
+    "diagnostics": "Same A24 IDF with geometry-only flag/angle/origin changes and input cyclic/reversal permutations preserving physical face orientation. Finite coordinates; no expected outputs. No porting-scope production expansion.",
+    "negative_zero": "Actual original parsed InputProcessor.epJSON numeric bits and Rust converted/parsed input bits must establish identity; negative-zero lexemes alone do not establish sign preservation.",
+    "excluded_branch_requirements": [
+      "Unchanged actual Sides/vertex lengths and zero genuine coincident/degenerate counters.",
+      "No original roof/floor automatic-fix warning.",
+      "Actual noTransform/aspect controls establish absent aspect transformation.",
+      "AppendixG=0; no detached/subsurface/simple geometry branch claims."
+    ]
+  },
+  "observation_route_review": {
+    "reviewed_driver_source_archives": [
+      {
+        "path": ".runtime/porting/GEO-01/independent-contract-review/reviewed-driver-sources/geo01_reference.cpp",
+        "sha256": "9743b151675b8ef71db7c6cc16f15aaeb32159b86f95cec808e9cd0d100ddc74",
+        "historical_path": "tools/porting/geo01_reference.cpp"
+      },
+      {
+        "path": ".runtime/porting/GEO-01/independent-contract-review/reviewed-driver-sources/geo01_reference.cmake",
+        "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d",
+        "historical_path": "tools/porting/geo01_reference.cmake"
+      },
+      {
+        "path": ".runtime/porting/GEO-01/independent-contract-review/reviewed-driver-sources/geo01_reference.py",
+        "sha256": "08e23c56cdfe75ca44177a5ee0b40b3653a51aefcf43971f4a7dbcf81f1f183b",
+        "historical_path": "tools/porting/geo01_reference.py"
+      }
+    ],
+    "native": "Unchanged original dynamic API stateNew/energyplus/stateDelete owns parsing and calculations. Observer uses opaque public symbols then const ABI-private reads; no GetVertices calls, setters, actuators, input changes or state resets. Constructor, first geometry-ready callback (possibly warmup), first/final physical phase and return retained vertices are separate.",
+    "ABI_required": "Same genuine GCC13.2 original core/API; target plus original src/EnergyPlus directory compile definitions; assertions enabled, EP_psych_errors ON/stats OFF, non-debug GNU containers, O0/Werror/FP contraction OFF/no fast math.",
+    "GEO_driver_build_and_execution_verification": "Deferred: source/CMake design reviewed; actual GEO compile/link command and execution provenance are not certified by this receipt.",
+    "Rust_input_projection": "Planned immutable ordinary CLI --dry-run --trace-level full on the same IDF, actual normal converter and compiler outputs; physics_executed=false. No scalar mirror, supplied reference vertices or reconstructed model.",
+    "Rust_physical_connection": "Separate fixed-CON ordinary Full/Summary runs copy actual stored final heat-balance geometry consumer fields. No diagnostic dry-run physical consumer claim.",
+    "correspondence": "Case-normalized surface/zone names; exact per-surface vertex count and order. Each engine retains its own IDs; cross-engine IDs are not asserted equal."
+  },
+  "frozen_consumer_policy": {
+    "profiles": {
+      "world_vertices_m": {
+        "unit": "m",
+        "absolute_tolerance": 1e-10,
+        "relative_tolerance": 1e-13,
+        "rule": "abs(actual-reference) <= atol+rtol*abs(reference)",
+        "finite_class": "exact",
+        "zero_sign": "exact when both numerical outputs zero and same actual parsed inputsign established; inputparser discrepancies separatelyfail identity, never infer preservednegativezero from lexeme",
+        "nonzero_bits": "recorded; no blanketbit-equality requirement across compiler libm"
+      },
+      "connection_area_m2": {
+        "unit": "m2",
+        "absolute_tolerance": 1e-10,
+        "relative_tolerance": 1e-13,
+        "scope": "selected CON actual physical consumers only; no GEO02 algorithm closure"
+      },
+      "connection_zone_volume_m3": {
+        "unit": "m3",
+        "absolute_tolerance": 1e-09,
+        "relative_tolerance": 1e-13,
+        "scope": "selected CON actual physical consumers only; no GEO03 algorithm closure"
+      },
+      "connection_azimuth_deg": {
+        "unit": "deg",
+        "absolute_tolerance": 1e-10,
+        "relative_tolerance": 1e-13,
+        "scope": "selected CON actual physical consumers only; no GEO02 algorithm closure"
+      },
+      "connection_tilt_deg": {
+        "unit": "deg",
+        "absolute_tolerance": 1e-10,
+        "relative_tolerance": 1e-13,
+        "scope": "selected CON actual physical consumers only; no GEO02 algorithm closure"
+      }
+    },
+    "scope": "Selected CON actual physical stored area, zone volume, azimuth and tilt only; no post-hoc geometry calculation. A geometric autocalculated volume and B declared hard volume remain distinct provenance.",
+    "limits": "Diagnostic consumers and general area/normal/azimuth/tilt/centroid/volume algorithms remain unpaired/unclosed; no GEO02/GEO03, whole physics, HVAC, or broader geometry admission claim."
+  },
+  "review_timing": "Pre-execution policy PASS was sent before Root GO. This immutable metadata audit/receipt was persisted after GO; other agents may subsequently build or run the original. This review performed no scientific executions.",
+  "scientific_executions_performed_by_this_review": 0,
+  "tracked_nonreview_source_edits_by_this_review": 0,
+  "Git_writes_by_this_review": 0,
+  "gates_updated": false
+}

@@ -1,0 +1,546 @@
+{
+  "schema": "geo01-source-contract.v1",
+  "card": "GEO-01",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "named_card_functions": [
+    "GetVertices",
+    "GetHTSurfaceData"
+  ],
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "sha256": "359720562a1122716bf842f23a54a9967d6bdaeea2e5c31638b8002e31f7160e"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa"
+    },
+    {
+      "path": "src/EnergyPlus/DataErrorTracking.hh",
+      "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "sha256": "74e45dca0d71e9cd1ac37f4cdc85da6fe7780d78a5ec6cf3d304da4e770b9ea2"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d"
+    },
+    {
+      "path": "src/EnergyPlus/CMakeLists.txt",
+      "sha256": "9eeb0425b05e336d897337258035b5fc49b8f8849c7b0f3efb671fb02c0ec43c"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.hh",
+      "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "SetupZoneGeometry",
+      "description": "SetupZoneGeometry original trig cache and input caller",
+      "function_owner": "SetupZoneGeometry",
+      "start_line": 251,
+      "end_line": 311,
+      "helpers": [
+        "GetSurfaceData",
+        "std::cos",
+        "std::sin"
+      ],
+      "role": "selected",
+      "range_sha256": "466fc52684c10b6ac7cd8bb690a74d1c988eeccd5379c66a1c6a329e57528b8d"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetSurfaceData",
+      "description": "GetSurfaceData one-time control and GGR caller",
+      "function_owner": "GetSurfaceData",
+      "start_line": 1051,
+      "end_line": 1064,
+      "helpers": [
+        "GetGeometryParameters"
+      ],
+      "role": "selected-input-context",
+      "range_sha256": "44b54846186d76444c2263efaa04e67d83743137e4ce09b68fa97b1f6e576689"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetHTSurfaceData",
+      "description": "GetSurfaceData detailed surface input caller",
+      "function_owner": "GetSurfaceData",
+      "start_line": 1154,
+      "end_line": 1167,
+      "helpers": [
+        "GetHTSurfaceData"
+      ],
+      "role": "selected-input-context",
+      "range_sha256": "0756ae2c83480faa0330d7191cb6893b2cc7291529471130646ae685f459bfac"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "UpperLeftCorner",
+      "description": "GetGeometryParameters valid GGR branch",
+      "function_owner": "GetGeometryParameters",
+      "start_line": 3225,
+      "end_line": 3302,
+      "helpers": [
+        "InputProcessor::getObjectItem",
+        "Util::FindItem",
+        "Util::SameString"
+      ],
+      "role": "selected",
+      "range_sha256": "41089c3a773107cb5016f79124b2c1af84e60e196ed3f6bc641fcf59a9b5bb84"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "surfTemp",
+      "description": "GetHTSurfaceData Detailed parser and class",
+      "function_owner": "GetHTSurfaceData",
+      "start_line": 3888,
+      "end_line": 3936,
+      "helpers": [
+        "InputProcessor::getObjectItem"
+      ],
+      "role": "selected-input-context",
+      "range_sha256": "eabcbdc3006c065f38b75a6de4b214e79a590bdef0be1a1f90dcb4fbea00bb22"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "surfTemp",
+      "description": "GetHTSurfaceData construction and zone binding",
+      "function_owner": "GetHTSurfaceData",
+      "start_line": 3938,
+      "end_line": 3986,
+      "helpers": [
+        "Util::FindItemInList"
+      ],
+      "role": "selected-input-context",
+      "range_sha256": "4916c78b97e3232c5c3fef15267e4177fc5dae366dd3ec7476dd1b9b1d0a5658"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetVertices",
+      "description": "GetHTSurfaceData vertex count allocation and GetVertices",
+      "function_owner": "GetHTSurfaceData",
+      "start_line": 4294,
+      "end_line": 4348,
+      "helpers": [
+        "GetVertices",
+        "CheckConvexity"
+      ],
+      "role": "selected",
+      "range_sha256": "3d22e4e78a9a61abe9abf32a286d7d015b85018ea7502bb9dfed70dbf5b7b908"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "GetVertices",
+      "description": "GetVertices declaration, counter, copy, winding, corner and coordinates",
+      "function_owner": "GetVertices",
+      "start_line": 9169,
+      "end_line": 9314,
+      "helpers": [
+        "SetupZoneGeometry trig cache"
+      ],
+      "role": "selected",
+      "range_sha256": "143b6c2139987891b79211bb21021c53e1a0a027d84b714c5f897156146ddf96"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "checkPopCoincidentVertex",
+      "description": "checkPopCoincidentVertex inactive coincident removal",
+      "function_owner": "checkPopCoincidentVertex",
+      "start_line": 9115,
+      "end_line": 9167,
+      "helpers": [],
+      "role": "inactive-domain-guard",
+      "range_sha256": "4ba31669a0432ff36df4722c728243ab99e38be312d32311fafc6ad3e654034e"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "checkPopCoincidentVertex",
+      "description": "GetVertices downstream removal/orientation/aspect/geometry",
+      "function_owner": "GetVertices",
+      "start_line": 9316,
+      "end_line": 9485,
+      "helpers": [
+        "checkPopCoincidentVertex",
+        "ReverseAndRecalculate",
+        "TransformVertsByAspect",
+        "Vectors::CreateNewellSurfaceNormalVector",
+        "Vectors::CreateNewellAreaVector",
+        "Vectors::DetermineAzimuthAndTilt"
+      ],
+      "role": "downstream-original-context-not-GEO02-GEO03-closure",
+      "range_sha256": "2ce300ff19717e17f80b06f0236abb2a3184b24cc38200bf1e7df2c8cc04bb92"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "surfTemp",
+      "description": "GetSurfaceData final owned array relocation",
+      "function_owner": "GetSurfaceData",
+      "start_line": 1504,
+      "end_line": 1530,
+      "helpers": [],
+      "role": "immutable-array-relay",
+      "range_sha256": "179b319bb92bb9474ba68d137ff4fb497e20679d650b94fe542f3fc2663334fe"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "SurfaceTmp",
+      "description": "GetSurfaceData temporary array deallocation",
+      "function_owner": "GetSurfaceData",
+      "start_line": 1729,
+      "end_line": 1735,
+      "helpers": [],
+      "role": "state-lifetime-context",
+      "range_sha256": "e4bc339b71d7599f64391ca9963308d2baf4ba45f3e171c7b4506ed09a75d378"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "ProcessSurfaceVertices",
+      "description": "SetupZoneGeometry processed vertex consumer",
+      "function_owner": "SetupZoneGeometry",
+      "start_line": 343,
+      "end_line": 356,
+      "helpers": [
+        "ProcessSurfaceVertices"
+      ],
+      "role": "GEO02-GEO03-consumer-context-only",
+      "range_sha256": "3c4c815ef8f4db946f84e6ee53a6eb222a3895265fbd88653eef5bcb8c27064c"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "ProcessSurfaceVertices",
+      "description": "ProcessSurfaceVertices base-surface vertex readers",
+      "function_owner": "ProcessSurfaceVertices",
+      "start_line": 12899,
+      "end_line": 12977,
+      "helpers": [],
+      "role": "GEO02-GEO03-consumer-context-only",
+      "range_sha256": "cdf516644d77ff254649f33c646714d5998774f5467f1462061079fd4b6952f2"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.cc",
+      "symbol": "TransformVertsByAspect",
+      "description": "TransformVertsByAspect absent-object early return",
+      "function_owner": "TransformVertsByAspect",
+      "start_line": 14391,
+      "end_line": 14474,
+      "helpers": [],
+      "role": "inactive-domain-guard",
+      "range_sha256": "84f8db597b779eeed2b423a0592d94a68b5346023f2761bd4c9d328849a70061"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "GetGeometryParameters",
+      "description": "selected routine declarations",
+      "function_owner": "selected",
+      "start_line": 89,
+      "end_line": 130,
+      "helpers": [],
+      "role": "declarations",
+      "range_sha256": "90804c375d8f52ed1485c07e65a6a005d7db3f21fa93d6b68038fafb2da35abc"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "GetVertices",
+      "description": "GetVertices declaration",
+      "function_owner": "GetVertices",
+      "start_line": 278,
+      "end_line": 282,
+      "helpers": [],
+      "role": "declarations",
+      "range_sha256": "0cdf4cbbe0686d2a888201e58abb71cfe9a726f2075a4d98ff17045a75fc5d65"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "ProcessSurfaceVertices",
+      "description": "geometry initialization owner and flags",
+      "function_owner": "geometry",
+      "start_line": 442,
+      "end_line": 478,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "09a5b1ffc01b7b333136c20b6c8f3cf18e3e422b9eedb0c9c3fd6c481ba8b742"
+    },
+    {
+      "path": "src/EnergyPlus/SurfaceGeometry.hh",
+      "symbol": "ProcessSurfaceVertices",
+      "description": "geometry clear-state defaults",
+      "function_owner": "geometry",
+      "start_line": 509,
+      "end_line": 534,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "777a33519434d080a7dfd0d3701353b85d6cf21f12db5ca71d6b0d97eeae45c2"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "symbol": "UpperLeftCorner",
+      "description": "four corner enum constants",
+      "function_owner": "four",
+      "start_line": 304,
+      "end_line": 307,
+      "helpers": [],
+      "role": "constants",
+      "range_sha256": "b8bb135ba0c3e61c02cd3cd9386f45b45e623c9e55490fed7857ae92ea58753b"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "symbol": "SurfaceData",
+      "description": "owned surface name/class/sides/vertices",
+      "function_owner": "owned",
+      "start_line": 687,
+      "end_line": 746,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "81faac78809ef652d04ce4c7994d5644448de4065d3a56e888527d32dacd1797"
+    },
+    {
+      "path": "src/EnergyPlus/DataSurfaces.hh",
+      "symbol": "MaxVerticesPerSurface",
+      "description": "counter and geometry flags constructor defaults",
+      "function_owner": "counter",
+      "start_line": 1489,
+      "end_line": 1500,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "73b3b1375a6eb904237fe82e0a996bd8ff6b80f4ed6ee6a9dec6612711481162"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "RelNorth",
+      "description": "zone relative north and origin defaults",
+      "function_owner": "zone",
+      "start_line": 573,
+      "end_line": 581,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "35bf83de29367b04b50f7d2bae03f56741855bf03c53858941cbc687057b6b61"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "Volume",
+      "description": "actual selected zone Volume consumer field",
+      "function_owner": "actual",
+      "start_line": 438,
+      "end_line": 443,
+      "helpers": [],
+      "role": "GEO03-consumer-context-only",
+      "range_sha256": "f999dc9bee7828838df25eae3c2151d26db4b216b2fcc71b93ceb5170ef88cd7"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "BuildingAzimuth",
+      "description": "BuildingAzimuth",
+      "function_owner": "BuildingAzimuth",
+      "start_line": 1809,
+      "end_line": 1813,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "38d020f414247fb5b3c20d85997ae68243720e10f2364887949c75fe5b8414cf"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "BuildingRotationAppendixG",
+      "description": "BuildingRotationAppendixG",
+      "function_owner": "BuildingRotationAppendixG",
+      "start_line": 1837,
+      "end_line": 1840,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "a5f75e0db9b504de6b43fff7d1f99a86992f64bb8ca152bafbd291b619b31b74"
+    },
+    {
+      "path": "src/EnergyPlus/DataErrorTracking.hh",
+      "symbol": "TotalCoincidentVertices",
+      "description": "inactive geometry error counters",
+      "function_owner": "inactive",
+      "start_line": 214,
+      "end_line": 220,
+      "helpers": [],
+      "role": "state-contract",
+      "range_sha256": "848e80a3d28579f80e39f9dce1030364b24437559b54e478ad23234645405728"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "symbol": "DegToRad",
+      "description": "distance and angle constants",
+      "function_owner": "distance",
+      "start_line": 582,
+      "end_line": 591,
+      "helpers": [],
+      "role": "constants",
+      "range_sha256": "974f65f03054f0ce55cc99459c4886e6cba0bb5092cfd9799c3b8f387eb8e79b"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "Building",
+      "description": "Building angle modulo prerequisite",
+      "function_owner": "Building",
+      "start_line": 559,
+      "end_line": 565,
+      "helpers": [],
+      "role": "CON01-prerequisite",
+      "range_sha256": "3ab5f476d7cf3361b57ae1c1a90b6b55126d882dfc3a7ee36fc6902b6d143550"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "Zone",
+      "description": "Zone rotation and origin parsed input",
+      "function_owner": "Zone",
+      "start_line": 2311,
+      "end_line": 2326,
+      "helpers": [],
+      "role": "selected-input-context",
+      "range_sha256": "662c3dacc5b78823f90fa88b84e5f0180045ea977718caf00f02bde632ea3fa1"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "SetupZoneGeometry",
+      "description": "SetupZoneGeometry initialization call",
+      "function_owner": "SetupZoneGeometry",
+      "start_line": 1815,
+      "end_line": 1823,
+      "helpers": [
+        "SetupZoneGeometry"
+      ],
+      "role": "selected-input-context",
+      "range_sha256": "797274f1ace445f64bb35feb0d0259208765a427d3e7c0c686c971ee7785944c"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "geometry",
+      "description": "geometry input precedes before-init callback",
+      "function_owner": "geometry",
+      "start_line": 147,
+      "end_line": 198,
+      "helpers": [],
+      "role": "callback-phase-proof",
+      "range_sha256": "28559b95d4808475145055151bff07cb22ae6af0da2985220ea6d71f44163f31"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "symbol": "callbackBeginZoneTimeStepBeforeInitHeatBalance",
+      "description": "public native before-init callback",
+      "function_owner": "public",
+      "start_line": 187,
+      "end_line": 197,
+      "helpers": [],
+      "role": "opaque-public-API",
+      "range_sha256": "c7d25c26a2ad7734c258a444d04a1a50f5a8d77cfc3401ab3e8426927ff1f23b"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "symbol": "epJSON",
+      "description": "genuine parsed epJSON",
+      "function_owner": "genuine",
+      "start_line": 307,
+      "end_line": 319,
+      "helpers": [],
+      "role": "input-bit-observation",
+      "range_sha256": "8c61f154aa669e8a002c3eb8d842ebaa0e9fed685ee6c5688425b2b3c2818769"
+    },
+    {
+      "path": "src/EnergyPlus/CMakeLists.txt",
+      "symbol": "EP_psych_errors",
+      "description": "original directory compile definitions",
+      "function_owner": "original",
+      "start_line": 25,
+      "end_line": 45,
+      "helpers": [],
+      "role": "ABI-provenance",
+      "range_sha256": "0ff1e44c4e3297eb76be103e9f15039061d8a016cfe95ee2769b75864a3b2ac6"
+    }
+  ],
+  "coordinate_order": [
+    "original XYZ buffer copy",
+    "CW reverses vertices2..N preservingvertex1",
+    "original corner swap loop",
+    "Relative: zone rotation then XY origin then building rotation; Z adds zone origin",
+    "World: AppendixG-only XY multiply/add still executes, fixedangle0"
+  ],
+  "angle_constants": "Original Constant::Pi/180.0 DegToRad multiply; building raw angle source mod(value,360.0) is CON01 prerequisite",
+  "state_contract": {
+    "owner": "original constructor/GetGeometryParameters/SetupZoneGeometry/GetHTSurfaceData initialization then retained owned Surface.Vertex",
+    "first_phase": "first callbackBeginZoneTimeStepBeforeInitHeatBalance after original geometry input/setup, possibly warmup; full GetVertices has already returned",
+    "final_phase": "energyplus return before stateDelete; arrays compared to first initialized bytes",
+    "cold_defaults": {
+      "Corner": 0,
+      "CCW": false,
+      "WorldCoordSystem": false,
+      "MaxVerticesPerSurface": 4,
+      "geometry_coefficients": 0.0,
+      "firstTime": true,
+      "noTransform": true,
+      "GetSurfaceDataOneTimeFlag": false
+    },
+    "native_only": [
+      "MaxVerticesPerSurface before/after (no Rust lifecycle counter owner; four-vertex inputs keepgrowth inactive)",
+      "source trig coefficients, zone trig arrays allocated then genuinelydeallocated; never reconstructed",
+      "TotalCoincidentVertices/TotalDegenerateSurfaces",
+      "geometry flags"
+    ],
+    "paired_projection": "case-normalized surface/zone names, exact cardinality/order, actual flags and stored world coordinates; own indices retained independently"
+  },
+  "reference": {
+    "method": "unchanged full original dynamic API run; genuine same-GCC DLL constructs/parses/initializes/destroys its own EnergyPlusData; const private reads only",
+    "core_receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+    },
+    "ABI": "same GCC13.2 headers/options; original directory+target COMPILE_DEFINITIONS; project_options/project_fp_options/project_warnings",
+    "prohibited": [
+      "rewritten geometry equations as oracle",
+      "fake EnergyPlusData",
+      "MSVC private-state cast",
+      "expectedvertices in Rust inputs",
+      "observer geometry/probe calls or state mutation"
+    ]
+  },
+  "domain": {
+    "production": "unchanged CON15 World/UpperLeft/CCW zero Building/Zone controls; onlyselectedinput topology, not universalCLI admission predicate",
+    "diagnostics": "same A24 valid closed opaque six-face model with declared4=actual4; Relative, axes/origins/corners/CW and finitezero inputvariants; no production scope expansion",
+    "inactive_required": [
+      "coincident/degenerate removal",
+      "roof/floor auto-reversal",
+      "GeometryTransform",
+      "AppendixG nonzero",
+      "subsurface/detached/simple geometry branches"
+    ],
+    "max_counter_growth": "inactive with explicit four-vertex domain; true native default4 retained, never surrogateRust0"
+  },
+  "integration_connection": "Selected CON physical snapshots compare actual consumed area/azimuth/tilt and zonevolume with original final source consumers only; this establishes vertices connection, never GEO02/GEO03 algorithm closure or diagnostic dry-run consumerproof",
+  "excluded": [
+    "GEO02/GEO03 area/normal/azimuth/tilt/centroid/volume algorithm closure",
+    "invalid/missing GGR and invalid/extra/auto vertex-count parsing",
+    "triangle/5+ vertex corner and counter-growth branches",
+    "nonfinite geometry inputs",
+    "aspect/AppendixG transform and full shading/windows/air-boundary families",
+    "whole building/HVAC numerical equivalence"
+  ],
+  "comparison_status": "not_run",
+  "gates_updated": false
+}

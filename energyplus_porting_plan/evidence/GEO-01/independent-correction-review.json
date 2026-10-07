@@ -1,0 +1,61 @@
+{
+  "schema": "geo01-independent-correction-review.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "review_scope": "Read-only review of the preserved ordinary-CLI baseline failure and the narrow source arithmetic correction. No final Rust comparison or card gate closure is established here.",
+  "observer_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/independent-observer-review.json",
+    "sha256": "8df28189219f7a85143a642f61c8f8658f212565cf1e01cfc18cba2823046a2e"
+  },
+  "actual_independent_command": {
+    "path": ".runtime/porting/GEO-01/independent-correction-review/corrected-command.json",
+    "sha256": "39376fa191b715fcac54398c37d85b937c8bc8679ad605f537ad58f7d97c3510"
+  },
+  "raw_review_output": {
+    "path": ".runtime/porting/GEO-01/independent-correction-review/corrected-stdout.json",
+    "sha256": "526df7265d5f89fcd653cf650659a9c0af89f0ca68598bc952de54c4fca20f0b"
+  },
+  "baseline_comparison": {
+    "path": ".runtime/porting/GEO-01/baseline-comparison-01/comparison-report.json",
+    "sha256": "a12519c93ee5fe34892cef0bd0e4c7bb088989374599746084931ffe57c8cd5a"
+  },
+  "corrected_source": {
+    "historical_path": "crates/ep_compiler/src/compiler.rs",
+    "archive": {
+      "path": ".runtime/porting/GEO-01/independent-correction-review/corrected-compiler.rs",
+      "sha256": "d50509e5b63abdcc8b6219f560d07ec89cd59b22a7c21e52877ad75aebf25c07"
+    },
+    "phase": "Reviewed working-tree correction, not a certified compiled or committed source build"
+  },
+  "baseline_findings": {
+    "cases": 37,
+    "coordinates": 2664,
+    "actual_cli_exits": {"unsupported_4": 37},
+    "dry_run_completed": true,
+    "physics_executed": false,
+    "mismatch_count": 36,
+    "mismatch_kind": "signed_zero",
+    "case_mismatches": {
+      "WORLD-NEGATIVE-ZERO": 12,
+      "WORLD-X-NEGATIVE-ZERO": 12,
+      "RELATIVE-NEGATIVE-ZERO": 12
+    },
+    "coordinate_numeric_maximum_absolute_error": 0.0,
+    "coordinate_numeric_rmse": 0.0,
+    "precision": "All actual command/summary/input/output hashes and preparation boundaries were checked. Native-reference agreement had an observable IEEE zero-sign defect despite zero ordinary numerical error; that baseline failure is preserved rather than waived. The baseline build correctly declares an uncommitted source worktree and no implementation_commit."
+  },
+  "source_body_findings": [
+    "Original SurfaceGeometry.cc:273-288 computes BuildingAzimuth + BuildingRotationAppendixG before negation and maintains separate world AppendixG-only and zone coefficients. The fixed Rust Relative branch now retains that sum with the explicit admitted AppG0 before conversion/cos/sin, restoring the negative-zero boundary.",
+    "Original SurfaceGeometry.cc:9296-9305 executes the World AppendixG rotation even when AppG is zero. Rust now saves incoming X and Y separately and evaluates X*cos - Y*sin, X*sin + Y*cos with the source -AppG0 coefficient sign. Z remains unchanged.",
+    "The existing winding/corner iteration and Relative Xb/Yb translation, building rotation and Z-origin addition retain their bodies and operand order. Byte-normalized source text outside canonical_world_surface_vertices is unchanged; all five archived observer/callsite/test files remain byte-identical.",
+    "The correction contains no expected output, input-sign patch, output repair or tolerance change. Trigonometric cache lifetime/global ordering remain native-only unpaired state; the paired result is the bounded stored-vertex projection. Nonzero AppendixG, detached surfaces and general GEO-02/GEO-03 algorithms remain outside scope."
+  ],
+  "review_reader_precision": "The first independent metadata reader rejected equivalent relative/absolute --output-dir spellings. Its script, failed exit and raw logs remain untouched. A new reader normalizes only argv path positions and passes; no original proof, scientific engine or coordinate policy was rerun or changed.",
+  "checked_reference_occurrences": 833,
+  "unique_hashed_artifacts": 770,
+  "pending_evidence": "Fresh final committed-source all37 ordinary-CLI coordinate comparison and separate selected-CON actual physical consumer/Full-Summary proof are reviewed in their own final records.",
+  "scientific_executions_performed_by_this_review": 0,
+  "source_edits_performed_by_this_review": 0,
+  "original_raw_proof_mutations": 0,
+  "gates_updated": false
+}

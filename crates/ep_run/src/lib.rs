@@ -11,6 +11,7 @@
 mod clock_trace;
 mod config;
 mod diagnostics;
+mod geometry_trace;
 mod oracle;
 mod outputs;
 mod pipeline;

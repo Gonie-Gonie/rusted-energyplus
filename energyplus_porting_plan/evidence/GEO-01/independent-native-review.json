@@ -1,0 +1,89 @@
+{
+  "schema": "geo01-independent-native-review.v1",
+  "card": "GEO-01",
+  "status": "pass",
+  "review_scope": "Independent read-only completed original build, input parsing, initialized state, lifetime, four-phase vertex retention and inactive-domain audit. No Rust numerical comparison or scientific gate closure.",
+  "contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-01/independent-contract-review.json",
+    "sha256": "ad32b6a3fb4dd89cddadb30060e6d27fbdfd9b56e3f04aa4cb28381328c5d8a5"
+  },
+  "native_build": {
+    "path": ".runtime/porting/GEO-01/native-driver-final/native-driver-build.json",
+    "sha256": "ece162afac27002dd7c43fc51df36cbda8ba36e5eb27126dfe7d9c2af2d47ff5"
+  },
+  "original_matrix": {
+    "path": ".runtime/porting/GEO-01/original-first/matrix.json",
+    "sha256": "f7e460dabd9eb9b2e3a5f8dfc15989d7fb8c8e9408f3c47bf400308c225764ab"
+  },
+  "peer_preparation_review": {
+    "path": ".runtime/porting/GEO-01/original-first-review/preparation-review.json",
+    "sha256": "968814926a26a7a60ab30972b119f784f4c9e1053e7cb221073fbb7de9bf3466"
+  },
+  "actual_independent_command": {
+    "path": ".runtime/porting/GEO-01/independent-contract-review/native-proof-command.json",
+    "sha256": "2bd6ad0b28114649244ffc84f10cfaf10d6ddac29dbf6ccdcadebff16d280f59"
+  },
+  "executed_review_script": {
+    "path": ".runtime/porting/GEO-01/independent-contract-review/native-proof-audit.py",
+    "sha256": "540579c41607f67ce0f73621def32671757edb3eb2d8824fe2d0122058643f7d"
+  },
+  "raw_review_output": {
+    "path": ".runtime/porting/GEO-01/independent-contract-review/native-proof-stdout.json",
+    "sha256": "ac0fef7593dc8b6eaa989350acf39c8bdb177086827b77cf41cc11b17d58a3bd"
+  },
+  "raw_review_stderr": {
+    "path": ".runtime/porting/GEO-01/independent-contract-review/native-proof-stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "review_summary": {
+    "status": "pass",
+    "review_kind": "independent read-only original build/input/state/retention audit",
+    "matrix_sha256": "f7e460dabd9eb9b2e3a5f8dfc15989d7fb8c8e9408f3c47bf400308c225764ab",
+    "build_receipt_sha256": "ece162afac27002dd7c43fc51df36cbda8ba36e5eb27126dfe7d9c2af2d47ff5",
+    "cases": 37,
+    "surfaces": 222,
+    "original_parsed_coordinate_bits": 2664,
+    "actual_original_physical_zone_callbacks": 179232,
+    "actual_original_warmup_zone_callbacks": 54336,
+    "four_phase_retained_ordered_vertex_bits_exact": true,
+    "inactive_cleanup_aspect_guards": true,
+    "original_constructor_max_vertices": 4,
+    "added_observer_probe_calls": 0,
+    "original_compiler_baseline_rows_unchanged": 643,
+    "checked_reference_occurrences": 804,
+    "unique_hashed_artifacts": 293,
+    "scientific_executions_by_this_review": 0,
+    "Rust_comparisons_by_this_review": 0,
+    "gates_updated": false
+  },
+  "build_and_source_binding": "Actual core/API bytes, immutable archived driver/source/build receipt, configure/build exit0, exact compile and actual linker command, unchanged libobjexx/prior card binaries and all643baseline rows verified. SameGCC13.2, aligned non-debug containers, EP_psych_errors ON/statsOFF, O0/Werror/BigObj/FPcontractOFF/no fastmath; final -UNDEBUG overrides earlier -DNDEBUG. Dynamic opaque public API owns the genuine EnergyPlusData; no geometry calls/setters injected by observer.",
+  "original_input_and_state_scope": "All37 exact frozen IDFs and weather/IDD/binary/contract refs bound to actual commands; genuine parsed input2664coordinatebits match input-only contract including negativezero. Original constructor counter4 is distinct from zero added probe calls and zero cleanup counters. Normalized-name correspondence retains original IDs; source flags and own ordering observed. First callback may be warmup;179232 physical and54336 warmup are separately counted.",
+  "branch_and_retention_evidence": "All222 surfaces remain four vertices across first_initialized,first_physical,final_weather and API return with exact ordered bits. MaxVertices4?4; source coincident/degenerate counters0;is_degenerate=false,vertices_processed=true;actual noTransform=true/aspect=false,zone/temparraysdeallocated. Read actual37errorlogs for coincident/drop/degenerate/upside-down/autofix/planarity/convexity warnings; none.",
+  "signed_zero_witness": {
+    "case_id": "WORLD-NEGATIVE-ZERO",
+    "same_domain_main_reference": {
+      "path": ".runtime/porting/GEO-01/original-first/WORLD-NEGATIVE-ZERO/receipt.json",
+      "sha256": "a6f2e69743adf11bae258ac827a0a7afbd813ff82f2f7eda208d07d2a5d5516a"
+    },
+    "extra_fresh_original_lifetime": {
+      "path": ".runtime/porting/GEO-01/original-zero-first/WORLD-NEGATIVE-ZERO/receipt.json",
+      "sha256": "5a3fa22b53ae5b1d7a542105ad010da36a750a7ff451a7bebbe6ffae56d9b337"
+    },
+    "surface": "ZN001:WALL001",
+    "actual_original_parsed_first_vertex_xy_bits": [
+      "8000000000000000",
+      "8000000000000000"
+    ],
+    "actual_original_retained_first_vertex_xy_bits": [
+      "8000000000000000",
+      "0000000000000000"
+    ],
+    "source_policy": "World AppendixG0 executes cos1/sin?0 multiply/add. The original parsed sign survives; this is an observable signed-zero boundary, not a tolerance failure to waive.",
+    "Rust_baseline_execution": "Not performed by this review; parent will capture actual existing bypass mismatch before any source fix."
+  },
+  "consumer_precision": "Original actual stored Area/Azimuth/Tilt/Zone.Volume values retained. Pairing awaits separate actual fixed-CON Rust physical consumer artifacts under prefrozen connectionprofiles; diagnostic Rust dry-run has no physical consumer evidence. General GEO02/GEO03 algorithms, other shapes/controls, full physics/HVAC/system ordering remain unclaimed.",
+  "scientific_executions_performed_by_this_review": 0,
+  "Rust_comparisons_performed_by_this_review": 0,
+  "original_raw_proof_mutations": 0,
+  "gates_updated": false
+}
