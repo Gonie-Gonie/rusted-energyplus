@@ -617,8 +617,8 @@ foreach ($cp333CapabilityAddendum in $cp333CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP333 supersedes only CP332' -Description "generated CP333 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP333 additionally requires' -Description "generated CP333 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP333 supersedes only CP332' -Description "canonical CP333 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP333 additionally requires' -Description "canonical CP333 capability index"
 
 # Historical CP332 sections remain separate; each hand doc has one new CP333
 # section with source, provenance, exclusions, and explicit non-promotion.

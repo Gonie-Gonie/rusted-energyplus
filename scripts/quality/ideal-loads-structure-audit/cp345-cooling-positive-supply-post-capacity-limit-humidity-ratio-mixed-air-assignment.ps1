@@ -1004,8 +1004,8 @@ foreach ($claim in @($cp345AlgorithmAddenda) + @($cp345CapabilityAddenda)) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP346 supersedes only CP345' -Description "generated CP346 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP346 additionally requires' -Description "generated CP346 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP346 supersedes only CP345' -Description "canonical CP346 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP346 additionally requires' -Description "canonical CP346 capability index"
 # Exactly five hand-authored contract sections carry CP345. The psychrometrics
 # map remains unchanged.
 $cp345DocumentationSections = @(

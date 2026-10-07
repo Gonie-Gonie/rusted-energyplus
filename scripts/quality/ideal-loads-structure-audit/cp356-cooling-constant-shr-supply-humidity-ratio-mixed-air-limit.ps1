@@ -298,8 +298,8 @@ foreach ($doc in $cp356Documentation) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP356 supersedes only CP355' -Description "generated CP356 algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP356 additionally requires' -Description "generated CP356 capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP356 supersedes only CP355' -Description "canonical CP356 algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP356 additionally requires' -Description "canonical CP356 capability addendum"
 
 # Historical order/firewall audits, master order, and generated inventory.
 foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(

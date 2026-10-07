@@ -376,8 +376,8 @@ foreach ($doc in $cp367Documentation) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP367\b' -Description "psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP367 supersedes only CP366' -Description "generated algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP367 additionally requires' -Description "generated capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP367 supersedes only CP366' -Description "canonical algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP367 additionally requires' -Description "canonical capability addendum"
 
 foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
         329..366 | ForEach-Object {

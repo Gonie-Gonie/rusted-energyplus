@@ -299,8 +299,8 @@ foreach ($specAddendum in $specAddenda) {
         '112 base fields','thirty-two.*?numeric|thirty-two `Option<f64>`','144 JSON keys','CP413-to-CP414-to-unchanged-numerical','352 total, 240 public, 112 internal'
     )) { Assert-Cp414Text -Text $body -Pattern "(?is)$claim" -Description "bounded addendum claim in $($specAddendum.Path)" }
 }
-Assert-Contains -Path 'docs\src\generated\algorithm-ledger.md' -Pattern 'CP414 supersedes only CP413' -Description 'generated algorithm addendum'
-Assert-Contains -Path 'docs\src\generated\capability-index.md' -Pattern 'CP414 additionally requires' -Description 'generated capability addendum'
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP414 supersedes only CP413' -Description 'canonical algorithm addendum'
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP414 additionally requires' -Description 'canonical capability addendum'
 Assert-NotContains -Path 'docs\src\current\roadmap.md' -Pattern '(?m)^## CP414\b' -Description 'Roadmap non-promotion'
 Assert-NotContains -Path 'docs\src\porting-map\psychrometrics-source-map.md' -Pattern '(?m)^## CP414\b' -Description 'psychrometrics-map non-promotion'
 

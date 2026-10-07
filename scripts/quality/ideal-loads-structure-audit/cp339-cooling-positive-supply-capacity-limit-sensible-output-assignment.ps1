@@ -622,8 +622,8 @@ foreach ($cp339Claim in @($cp339AlgorithmAddenda) + @($cp339CapabilityAddenda)) 
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP339 supersedes only CP338' -Description "generated CP339 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP339 additionally requires' -Description "generated CP339 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP339 supersedes only CP338' -Description "canonical CP339 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP339 additionally requires' -Description "canonical CP339 capability index"
 
 # Each hand-authored contract has one scoped CP339 section carrying the same
 # source, routes, operand lineage, IEEE/JSON boundary, exclusion, and no-promotion.

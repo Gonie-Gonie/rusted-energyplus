@@ -279,8 +279,8 @@ foreach ($doc in $cp376Docs) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP376\b' -Description "psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP376 supersedes only CP375' -Description "generated algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP376 additionally requires' -Description "generated capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP376 supersedes only CP375' -Description "canonical algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP376 additionally requires' -Description "canonical capability addendum"
 
 # Historical terminal expectations, master order, and generated inventory.
 foreach ($historical in 334..375) {

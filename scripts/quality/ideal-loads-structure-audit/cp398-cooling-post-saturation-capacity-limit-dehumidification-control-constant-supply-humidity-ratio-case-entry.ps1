@@ -337,8 +337,8 @@ foreach ($doc in $docs) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP398\b' -Description "psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP398 supersedes only CP397' -Description "generated algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP398 additionally requires' -Description "generated capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP398 supersedes only CP397' -Description "canonical algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP398 additionally requires' -Description "canonical capability addendum"
 
 foreach ($historical in 334..397) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name

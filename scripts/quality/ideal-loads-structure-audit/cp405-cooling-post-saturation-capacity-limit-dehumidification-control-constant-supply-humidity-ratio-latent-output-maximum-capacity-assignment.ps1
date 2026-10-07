@@ -284,8 +284,8 @@ foreach ($doc in $docs) {
 }
 Assert-Contains -Path 'specs\algorithm_ledger.toml' -Pattern 'CP405 supersedes only CP404' -Description "algorithm claim"
 Assert-Contains -Path 'specs\capabilities.toml' -Pattern 'CP405 additionally requires' -Description "capability claim"
-Assert-Contains -Path 'docs\src\generated\algorithm-ledger.md' -Pattern 'CP405 supersedes only CP404' -Description "generated algorithm claim"
-Assert-Contains -Path 'docs\src\generated\capability-index.md' -Pattern 'CP405 additionally requires' -Description "generated capability claim"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP405 supersedes only CP404' -Description "canonical algorithm claim"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP405 additionally requires' -Description "canonical capability claim"
 Assert-NotContains -Path 'docs\src\current\roadmap.md' -Pattern 'CP405' -Description "Roadmap non-promotion"
 Assert-NotContains -Path 'docs\src\porting-map\psychrometrics-source-map.md' -Pattern '(?m)^## CP405\b' -Description "psychrometrics-map non-promotion"
 

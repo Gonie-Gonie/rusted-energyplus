@@ -5,6 +5,7 @@ $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 
 $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
+. (Join-Path $ScriptsRoot "lib\python.ps1")
 $RepoRoot = Get-RepoRoot; Set-Location $RepoRoot
 . (Join-Path $PSScriptRoot "strict-no-false-conformance\assertions.ps1")
 
@@ -1836,7 +1837,7 @@ Assert-Contains -Path "tools/docs/generate_docs.py" -Pattern 'support_boundary_a
 Assert-Contains -Path "specs/algorithm_ledger.toml" -Pattern 'support_boundary_addendum = "CP55 deterministic Rust operation evidence' -Description "CP55 algorithm operation boundary"
 Assert-Contains -Path "specs/object_coverage.toml" -Pattern 'evaluate each referenced calendar-invariant Compact profile exactly 24 times' -Description "CP55 object Compact build boundary"
 Assert-Contains -Path "specs/variable_coverage.toml" -Pattern 'without changing the existing Schedule Value conformance boundary' -Description "CP55 Schedule Value nonpromotion addendum"
-Assert-Contains -Path "docs/src/generated/algorithm-ledger.md" -Pattern 'hot cached phases record zero live fallback lookups' -Description "CP55 generated algorithm operation boundary"
+Assert-CanonicalBoundaryContains -Registry algorithm -Id "calendar_time_state" -Pattern 'hot cached phases record zero live fallback lookups' -Description "CP55 canonical algorithm operation boundary"
 Assert-Contains -Path "docs/src/generated/object-coverage.md" -Pattern 'calendar-invariant Compact profile exactly 24 times' -Description "CP55 generated object operation boundary"
 Assert-Contains -Path "docs/src/generated/variable-coverage.md" -Pattern 'without changing the existing Schedule Value conformance boundary' -Description "CP55 generated variable nonpromotion boundary"
 

@@ -3204,8 +3204,8 @@ category = "internal"
 classification = "internal"
 command = ""
 entrypoint = ""
-callers = ["scripts/compare/official-dynamic-heat-balance-probe-summary.ps1", "scripts/conformance/manifest-validate-all.ps1", "scripts/conformance/v0.26-dynamic-idf-inventory.ps1", "scripts/quality/algorithm-ledger-check.ps1", "scripts/quality/capability-registry-check.ps1", "scripts/quality/diagnostic-probe-check.ps1", "scripts/quality/docs-generate.ps1", "scripts/quality/project-contract-check.ps1", "scripts/quality/script-inventory-check.ps1", "scripts/quality/variable-coverage-check.ps1", "scripts/release/conformance-evidence-report.ps1", "scripts/release/conformance-index-report.ps1", "scripts/release/performance-summary.ps1", "scripts/release/plot-evidence.ps1", "scripts/release/release-evidence-manifest.ps1", "scripts/release/stability-summary.ps1", "scripts/release/support-coverage-report.ps1", "scripts/release/user-coverage-handbook.ps1", "scripts/setup/python-smoke.ps1", "scripts/setup/setup.ps1", "scripts/setup/source-smoke.ps1"]
-caller_evidence = ["scripts/compare/official-dynamic-heat-balance-probe-summary.ps1::dot_sources", "scripts/conformance/manifest-validate-all.ps1::dot_sources", "scripts/conformance/v0.26-dynamic-idf-inventory.ps1::dot_sources", "scripts/quality/algorithm-ledger-check.ps1::dot_sources", "scripts/quality/capability-registry-check.ps1::dot_sources", "scripts/quality/diagnostic-probe-check.ps1::dot_sources", "scripts/quality/docs-generate.ps1::dot_sources", "scripts/quality/project-contract-check.ps1::dot_sources", "scripts/quality/script-inventory-check.ps1::dot_sources", "scripts/quality/variable-coverage-check.ps1::dot_sources", "scripts/release/conformance-evidence-report.ps1::dot_sources", "scripts/release/conformance-index-report.ps1::dot_sources", "scripts/release/performance-summary.ps1::dot_sources", "scripts/release/plot-evidence.ps1::dot_sources", "scripts/release/release-evidence-manifest.ps1::dot_sources", "scripts/release/stability-summary.ps1::dot_sources", "scripts/release/support-coverage-report.ps1::dot_sources", "scripts/release/user-coverage-handbook.ps1::dot_sources", "scripts/setup/python-smoke.ps1::dot_sources", "scripts/setup/setup.ps1::dot_sources", "scripts/setup/source-smoke.ps1::dot_sources"]
+callers = ["scripts/compare/official-dynamic-heat-balance-probe-summary.ps1", "scripts/conformance/manifest-validate-all.ps1", "scripts/conformance/v0.26-dynamic-idf-inventory.ps1", "scripts/quality/algorithm-ledger-check.ps1", "scripts/quality/capability-registry-check.ps1", "scripts/quality/diagnostic-probe-check.ps1", "scripts/quality/docs-generate.ps1", "scripts/quality/ideal-loads-structure-audit.ps1", "scripts/quality/project-contract-check.ps1", "scripts/quality/script-inventory-check.ps1", "scripts/quality/strict-no-false-conformance.ps1", "scripts/quality/variable-coverage-check.ps1", "scripts/release/conformance-evidence-report.ps1", "scripts/release/conformance-index-report.ps1", "scripts/release/performance-summary.ps1", "scripts/release/plot-evidence.ps1", "scripts/release/release-evidence-manifest.ps1", "scripts/release/stability-summary.ps1", "scripts/release/support-coverage-report.ps1", "scripts/release/user-coverage-handbook.ps1", "scripts/setup/python-smoke.ps1", "scripts/setup/setup.ps1", "scripts/setup/source-smoke.ps1"]
+caller_evidence = ["scripts/compare/official-dynamic-heat-balance-probe-summary.ps1::dot_sources", "scripts/conformance/manifest-validate-all.ps1::dot_sources", "scripts/conformance/v0.26-dynamic-idf-inventory.ps1::dot_sources", "scripts/quality/algorithm-ledger-check.ps1::dot_sources", "scripts/quality/capability-registry-check.ps1::dot_sources", "scripts/quality/diagnostic-probe-check.ps1::dot_sources", "scripts/quality/docs-generate.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit.ps1::dot_sources", "scripts/quality/project-contract-check.ps1::dot_sources", "scripts/quality/script-inventory-check.ps1::dot_sources", "scripts/quality/strict-no-false-conformance.ps1::dot_sources", "scripts/quality/variable-coverage-check.ps1::dot_sources", "scripts/release/conformance-evidence-report.ps1::dot_sources", "scripts/release/conformance-index-report.ps1::dot_sources", "scripts/release/performance-summary.ps1::dot_sources", "scripts/release/plot-evidence.ps1::dot_sources", "scripts/release/release-evidence-manifest.ps1::dot_sources", "scripts/release/stability-summary.ps1::dot_sources", "scripts/release/support-coverage-report.ps1::dot_sources", "scripts/release/user-coverage-handbook.ps1::dot_sources", "scripts/setup/python-smoke.ps1::dot_sources", "scripts/setup/setup.ps1::dot_sources", "scripts/setup/source-smoke.ps1::dot_sources"]
 callees = []
 callee_evidence = []
 calls = []
@@ -3401,7 +3401,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3417,7 +3417,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3433,7 +3433,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3449,7 +3449,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3465,7 +3465,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3481,7 +3481,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3497,7 +3497,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3513,7 +3513,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3529,7 +3529,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3545,7 +3545,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3561,7 +3561,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3577,7 +3577,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3593,7 +3593,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3609,7 +3609,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3625,7 +3625,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3641,7 +3641,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3657,7 +3657,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3673,7 +3673,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3689,7 +3689,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3705,7 +3705,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3721,7 +3721,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3737,7 +3737,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3753,7 +3753,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3769,7 +3769,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3785,7 +3785,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3801,7 +3801,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3817,7 +3817,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3833,7 +3833,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3849,7 +3849,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3865,7 +3865,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3881,7 +3881,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3897,7 +3897,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3913,7 +3913,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3929,7 +3929,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3945,7 +3945,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3961,7 +3961,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3977,7 +3977,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -3993,7 +3993,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4009,7 +4009,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = ["docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4025,7 +4025,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4041,7 +4041,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4057,7 +4057,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4073,7 +4073,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4089,7 +4089,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4105,7 +4105,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4121,7 +4121,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4137,7 +4137,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4153,7 +4153,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4169,7 +4169,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4185,7 +4185,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4201,7 +4201,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4217,7 +4217,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4233,7 +4233,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4249,7 +4249,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4265,7 +4265,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4281,7 +4281,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4297,7 +4297,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4313,7 +4313,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4329,7 +4329,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4345,7 +4345,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4361,7 +4361,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4377,7 +4377,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4393,7 +4393,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4409,7 +4409,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4425,7 +4425,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4441,7 +4441,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4457,7 +4457,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4473,7 +4473,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4489,7 +4489,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4505,7 +4505,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4521,7 +4521,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4537,7 +4537,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4553,7 +4553,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4569,7 +4569,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4585,7 +4585,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4601,7 +4601,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4681,7 +4681,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4697,7 +4697,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4713,7 +4713,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4729,7 +4729,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4745,7 +4745,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh", ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh", ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4761,7 +4761,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4777,7 +4777,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4793,7 +4793,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4809,7 +4809,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4825,7 +4825,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4841,7 +4841,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4857,7 +4857,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc", ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc", ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4873,7 +4873,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4889,7 +4889,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4905,7 +4905,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4921,7 +4921,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4937,7 +4937,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4953,7 +4953,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4969,7 +4969,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -4985,7 +4985,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5001,7 +5001,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5017,7 +5017,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5033,7 +5033,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5049,7 +5049,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5065,7 +5065,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5081,7 +5081,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5097,7 +5097,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5113,7 +5113,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5129,7 +5129,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5145,7 +5145,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5161,7 +5161,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md", "target/.remove"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md", "target/.remove"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5177,7 +5177,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5193,7 +5193,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5209,7 +5209,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5225,7 +5225,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5241,7 +5241,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5257,7 +5257,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5273,7 +5273,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5289,7 +5289,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5305,7 +5305,7 @@ caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources
 callees = []
 callee_evidence = []
 calls = []
-generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md", "docs/src/generated/script-index.md"]
+generated_artifacts = [".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc", "docs/src/generated/script-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
@@ -5318,12 +5318,12 @@ command = "ideal-loads-structure-audit"
 entrypoint = "dev:ideal-loads-structure-audit"
 callers = ["scripts/dev.ps1", "scripts/quality/check.ps1"]
 caller_evidence = ["scripts/dev.ps1::dev_catalog", "scripts/quality/check.ps1::invoke_dev_command"]
-callees = ["scripts/lib/common.ps1", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp332-cooling-positive-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp333-cooling-positive-supply-temperature-minimum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp334-cooling-positive-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp346-cooling-positive-supply-post-capacity-limit-dehumidification-control-switch.ps1", "scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1", "scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp354-cooling-constant-shr-supply-humidity-ratio-overdrying-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp357-cooling-constant-shr-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp358-cooling-humidistat-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp359-cooling-humidistat-moisture-demand-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp363-cooling-humidistat-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp365-cooling-constant-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp366-cooling-constant-supply-humidity-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp368-cooling-default-supply-humidity-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp369-cooling-supply-humidity-ratio-humidification-heating-availability-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp370-cooling-supply-humidity-ratio-humidification-control-humidistat-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp371-cooling-supply-humidity-ratio-humidification-dehumidification-control-humidistat-or-none-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp372-cooling-supply-humidity-ratio-humidification-moisture-demand-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp378-cooling-supply-humidity-ratio-saturation-limit-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp379-cooling-supply-enthalpy-post-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp380-cooling-post-saturation-capacity-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1", "scripts/quality/ideal-loads-structure-audit/cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp389-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp395-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp396-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp397-cooling-post-saturation-capacity-limit-dehumidification-control-none-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp398-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp399-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp400-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp401-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp404-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp409-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp410-cooling-post-saturation-capacity-limit-dehumidification-control-default-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp411-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp412-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp413-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp414-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp415-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp416-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp417-cooling-post-saturation-capacity-limit-dehumidification-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp418-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp427-cooling-zero-supply-mass-flow-supply-temperature-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp428-cooling-zero-supply-mass-flow-sensible-output-positive-zero-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp429-cooling-zero-supply-mass-flow-total-output-positive-zero-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp430-heating-or-no-load-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp431-heating-mode-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp432-heating-operating-mode-heat-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp433-heating-mode-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp434-heating-operating-mode-deadband-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp435-heating-outdoor-air-maximum-flow-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp436-heating-outdoor-air-maximum-flow-body-volume-flow-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp437-heating-outdoor-air-maximum-flow-first-warning-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp438-heating-outdoor-air-maximum-flow-first-warning-counter-increment.ps1", "scripts/quality/ideal-loads-structure-audit/cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1"]
-callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp332-cooling-positive-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp333-cooling-positive-supply-temperature-minimum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp334-cooling-positive-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp346-cooling-positive-supply-post-capacity-limit-dehumidification-control-switch.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp354-cooling-constant-shr-supply-humidity-ratio-overdrying-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp357-cooling-constant-shr-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp358-cooling-humidistat-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp359-cooling-humidistat-moisture-demand-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp363-cooling-humidistat-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp365-cooling-constant-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp366-cooling-constant-supply-humidity-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp368-cooling-default-supply-humidity-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp369-cooling-supply-humidity-ratio-humidification-heating-availability-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp370-cooling-supply-humidity-ratio-humidification-control-humidistat-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp371-cooling-supply-humidity-ratio-humidification-dehumidification-control-humidistat-or-none-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp372-cooling-supply-humidity-ratio-humidification-moisture-demand-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp378-cooling-supply-humidity-ratio-saturation-limit-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp379-cooling-supply-enthalpy-post-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp380-cooling-post-saturation-capacity-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp389-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp395-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp396-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp397-cooling-post-saturation-capacity-limit-dehumidification-control-none-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp398-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp399-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp400-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp401-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp404-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp409-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp410-cooling-post-saturation-capacity-limit-dehumidification-control-default-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp411-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-pre-saturation-original-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp412-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp413-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp414-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp415-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp416-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp417-cooling-post-saturation-capacity-limit-dehumidification-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp418-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp427-cooling-zero-supply-mass-flow-supply-temperature-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp428-cooling-zero-supply-mass-flow-sensible-output-positive-zero-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp429-cooling-zero-supply-mass-flow-total-output-positive-zero-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp430-heating-or-no-load-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp431-heating-mode-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp432-heating-operating-mode-heat-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp433-heating-mode-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp434-heating-operating-mode-deadband-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp435-heating-outdoor-air-maximum-flow-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp436-heating-outdoor-air-maximum-flow-body-volume-flow-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp437-heating-outdoor-air-maximum-flow-first-warning-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp438-heating-outdoor-air-maximum-flow-first-warning-counter-increment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1::dot_sources"]
-calls = ["script:scripts/lib/common.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp332-cooling-positive-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp333-cooling-positive-supply-temperature-minimum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp334-cooling-positive-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp346-cooling-positive-supply-post-capacity-limit-dehumidification-control-switch.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp354-cooling-constant-shr-supply-humidity-ratio-overdrying-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp357-cooling-constant-shr-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp358-cooling-humidistat-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp359-cooling-humidistat-moisture-demand-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp363-cooling-humidistat-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp365-cooling-constant-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp366-cooling-constant-supply-humidity-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp368-cooling-default-supply-humidity-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp369-cooling-supply-humidity-ratio-humidification-heating-availability-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp370-cooling-supply-humidity-ratio-humidification-control-humidistat-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp371-cooling-supply-humidity-ratio-humidification-dehumidification-control-humidistat-or-none-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp372-cooling-supply-humidity-ratio-humidification-moisture-demand-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp378-cooling-supply-humidity-ratio-saturation-limit-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp379-cooling-supply-enthalpy-post-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp380-cooling-post-saturation-capacity-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp389-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp395-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp396-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp397-cooling-post-saturation-capacity-limit-dehumidification-control-none-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp398-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp399-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp400-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp401-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp404-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp409-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp410-cooling-post-saturation-capacity-limit-dehumidification-control-default-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp411-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp412-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp413-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp414-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp415-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp416-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp417-cooling-post-saturation-capacity-limit-dehumidification-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp418-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp427-cooling-zero-supply-mass-flow-supply-temperature-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp428-cooling-zero-supply-mass-flow-sensible-output-positive-zero-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp429-cooling-zero-supply-mass-flow-total-output-positive-zero-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp430-heating-or-no-load-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp431-heating-mode-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp432-heating-operating-mode-heat-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp433-heating-mode-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp434-heating-operating-mode-deadband-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp435-heating-outdoor-air-maximum-flow-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp436-heating-outdoor-air-maximum-flow-body-volume-flow-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp437-heating-outdoor-air-maximum-flow-first-warning-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp438-heating-outdoor-air-maximum-flow-first-warning-counter-increment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1", "tools/docs/generate_docs.py"]
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+callees = ["scripts/lib/common.ps1", "scripts/lib/python.ps1", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp332-cooling-positive-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp333-cooling-positive-supply-temperature-minimum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp334-cooling-positive-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp346-cooling-positive-supply-post-capacity-limit-dehumidification-control-switch.ps1", "scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1", "scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp354-cooling-constant-shr-supply-humidity-ratio-overdrying-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp357-cooling-constant-shr-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp358-cooling-humidistat-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp359-cooling-humidistat-moisture-demand-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp363-cooling-humidistat-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp365-cooling-constant-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp366-cooling-constant-supply-humidity-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp368-cooling-default-supply-humidity-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp369-cooling-supply-humidity-ratio-humidification-heating-availability-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp370-cooling-supply-humidity-ratio-humidification-control-humidistat-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp371-cooling-supply-humidity-ratio-humidification-dehumidification-control-humidistat-or-none-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp372-cooling-supply-humidity-ratio-humidification-moisture-demand-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp378-cooling-supply-humidity-ratio-saturation-limit-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp379-cooling-supply-enthalpy-post-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp380-cooling-post-saturation-capacity-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1", "scripts/quality/ideal-loads-structure-audit/cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp389-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp395-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp396-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp397-cooling-post-saturation-capacity-limit-dehumidification-control-none-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp398-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp399-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp400-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp401-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp404-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp409-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp410-cooling-post-saturation-capacity-limit-dehumidification-control-default-case-break.ps1", "scripts/quality/ideal-loads-structure-audit/cp411-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp412-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp413-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp414-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp415-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-mixed-air-limit.ps1", "scripts/quality/ideal-loads-structure-audit/cp416-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp417-cooling-post-saturation-capacity-limit-dehumidification-supply-enthalpy-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp418-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp427-cooling-zero-supply-mass-flow-supply-temperature-mixed-air-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp428-cooling-zero-supply-mass-flow-sensible-output-positive-zero-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp429-cooling-zero-supply-mass-flow-total-output-positive-zero-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp430-heating-or-no-load-case-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp431-heating-mode-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp432-heating-operating-mode-heat-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp433-heating-mode-guard-else-branch-entry.ps1", "scripts/quality/ideal-loads-structure-audit/cp434-heating-operating-mode-deadband-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp435-heating-outdoor-air-maximum-flow-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp436-heating-outdoor-air-maximum-flow-body-volume-flow-assignment.ps1", "scripts/quality/ideal-loads-structure-audit/cp437-heating-outdoor-air-maximum-flow-first-warning-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp438-heating-outdoor-air-maximum-flow-first-warning-counter-increment.ps1", "scripts/quality/ideal-loads-structure-audit/cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1"]
+callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/lib/python.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp332-cooling-positive-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp333-cooling-positive-supply-temperature-minimum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp334-cooling-positive-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp346-cooling-positive-supply-post-capacity-limit-dehumidification-control-switch.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp354-cooling-constant-shr-supply-humidity-ratio-overdrying-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp357-cooling-constant-shr-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp358-cooling-humidistat-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp359-cooling-humidistat-moisture-demand-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp363-cooling-humidistat-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp365-cooling-constant-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp366-cooling-constant-supply-humidity-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp368-cooling-default-supply-humidity-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp369-cooling-supply-humidity-ratio-humidification-heating-availability-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp370-cooling-supply-humidity-ratio-humidification-control-humidistat-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp371-cooling-supply-humidity-ratio-humidification-dehumidification-control-humidistat-or-none-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp372-cooling-supply-humidity-ratio-humidification-moisture-demand-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp378-cooling-supply-humidity-ratio-saturation-limit-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp379-cooling-supply-enthalpy-post-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp380-cooling-post-saturation-capacity-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp389-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp395-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp396-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp397-cooling-post-saturation-capacity-limit-dehumidification-control-none-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp398-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp399-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp400-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp401-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp404-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp409-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp410-cooling-post-saturation-capacity-limit-dehumidification-control-default-case-break.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp411-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-pre-saturation-original-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp412-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp413-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp414-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp415-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-mixed-air-limit.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp416-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp417-cooling-post-saturation-capacity-limit-dehumidification-supply-enthalpy-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp418-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp427-cooling-zero-supply-mass-flow-supply-temperature-mixed-air-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp428-cooling-zero-supply-mass-flow-sensible-output-positive-zero-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp429-cooling-zero-supply-mass-flow-total-output-positive-zero-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp430-heating-or-no-load-case-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp431-heating-mode-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp432-heating-operating-mode-heat-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp433-heating-mode-guard-else-branch-entry.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp434-heating-operating-mode-deadband-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp435-heating-outdoor-air-maximum-flow-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp436-heating-outdoor-air-maximum-flow-body-volume-flow-assignment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp437-heating-outdoor-air-maximum-flow-first-warning-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp438-heating-outdoor-air-maximum-flow-first-warning-counter-increment.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1::dot_sources"]
+calls = ["script:scripts/lib/common.ps1", "script:scripts/lib/python.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp332-cooling-positive-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp333-cooling-positive-supply-temperature-minimum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp334-cooling-positive-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp346-cooling-positive-supply-post-capacity-limit-dehumidification-control-switch.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp354-cooling-constant-shr-supply-humidity-ratio-overdrying-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp357-cooling-constant-shr-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp358-cooling-humidistat-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp359-cooling-humidistat-moisture-demand-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp363-cooling-humidistat-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp364-cooling-constant-supply-humidity-ratio-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp365-cooling-constant-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp366-cooling-constant-supply-humidity-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp368-cooling-default-supply-humidity-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp369-cooling-supply-humidity-ratio-humidification-heating-availability-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp370-cooling-supply-humidity-ratio-humidification-control-humidistat-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp371-cooling-supply-humidity-ratio-humidification-dehumidification-control-humidistat-or-none-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp372-cooling-supply-humidity-ratio-humidification-moisture-demand-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp378-cooling-supply-humidity-ratio-saturation-limit-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp379-cooling-supply-enthalpy-post-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp380-cooling-post-saturation-capacity-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp389-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp395-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp396-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp397-cooling-post-saturation-capacity-limit-dehumidification-control-none-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp398-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp399-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp400-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp401-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp404-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp409-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp410-cooling-post-saturation-capacity-limit-dehumidification-control-default-case-break.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp411-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-pre-saturation-original-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp412-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp413-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-saturation-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp414-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp415-cooling-post-saturation-capacity-limit-dehumidification-supply-temperature-saturation-mixed-air-limit.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp416-cooling-post-saturation-capacity-limit-dehumidification-supply-humidity-ratio-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp417-cooling-post-saturation-capacity-limit-dehumidification-supply-enthalpy-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp418-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp427-cooling-zero-supply-mass-flow-supply-temperature-mixed-air-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp428-cooling-zero-supply-mass-flow-sensible-output-positive-zero-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp429-cooling-zero-supply-mass-flow-total-output-positive-zero-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp430-heating-or-no-load-case-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp431-heating-mode-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp432-heating-operating-mode-heat-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp433-heating-mode-guard-else-branch-entry.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp434-heating-operating-mode-deadband-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp435-heating-outdoor-air-maximum-flow-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp436-heating-outdoor-air-maximum-flow-body-volume-flow-assignment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp437-heating-outdoor-air-maximum-flow-first-warning-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp438-heating-outdoor-air-maximum-flow-first-warning-counter-increment.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1", "tools/docs/read_claim_boundaries.py"]
+generated_artifacts = []
 reachable_from_public_root = true
-exit_contract = "nonzero via PowerShell throw"
+exit_contract = "nonzero when checked child process fails"
 
 [[script]]
 path = "scripts/quality/perf.ps1"
@@ -5464,10 +5464,10 @@ callers = ["scripts/quality/strict-no-false-conformance.ps1"]
 caller_evidence = ["scripts/quality/strict-no-false-conformance.ps1::dot_sources"]
 callees = []
 callee_evidence = []
-calls = []
+calls = ["tools/docs/read_claim_boundaries.py"]
 generated_artifacts = []
 reachable_from_public_root = true
-exit_contract = "nonzero via PowerShell throw"
+exit_contract = "nonzero when checked child process fails"
 
 [[script]]
 path = "scripts/quality/strict-no-false-conformance.ps1"
@@ -5478,9 +5478,9 @@ command = "strict-no-false-conformance"
 entrypoint = "dev:strict-no-false-conformance"
 callers = ["scripts/dev.ps1", "scripts/quality/check.ps1", "scripts/release/v0.1-verify.ps1", "scripts/release/v0.32-verify.ps1"]
 caller_evidence = ["scripts/dev.ps1::dev_catalog", "scripts/quality/check.ps1::invoke_dev_command", "scripts/release/v0.1-verify.ps1::invoke_dev_command", "scripts/release/v0.32-verify.ps1::invoke_dev_command"]
-callees = ["scripts/lib/common.ps1", "scripts/quality/strict-no-false-conformance/assertions.ps1"]
-callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/quality/strict-no-false-conformance/assertions.ps1::dot_sources"]
-calls = ["script:scripts/lib/common.ps1", "script:scripts/quality/strict-no-false-conformance/assertions.ps1", "tools/docs/generate_docs.py", "tools/docs/validate_algorithm_ledger.py", "tools/reporting/conformance_evidence_report.py", "tools/reporting/conformance_index_report.py", "tools/reporting/release_evidence_manifest.py", "tools/reporting/support_coverage_report.py", "tools/reporting/user_coverage_handbook.py"]
+callees = ["scripts/lib/common.ps1", "scripts/lib/python.ps1", "scripts/quality/strict-no-false-conformance/assertions.ps1"]
+callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/lib/python.ps1::dot_sources", "scripts/quality/strict-no-false-conformance/assertions.ps1::dot_sources"]
+calls = ["script:scripts/lib/common.ps1", "script:scripts/lib/python.ps1", "script:scripts/quality/strict-no-false-conformance/assertions.ps1", "tools/docs/generate_docs.py", "tools/docs/validate_algorithm_ledger.py", "tools/reporting/conformance_evidence_report.py", "tools/reporting/conformance_index_report.py", "tools/reporting/release_evidence_manifest.py", "tools/reporting/support_coverage_report.py", "tools/reporting/user_coverage_handbook.py"]
 generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/conformance-case-index.md", "docs/src/generated/current-status-classification.md", "docs/src/generated/object-coverage.md", "docs/src/generated/script-index.md", "docs/src/generated/variable-coverage.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"

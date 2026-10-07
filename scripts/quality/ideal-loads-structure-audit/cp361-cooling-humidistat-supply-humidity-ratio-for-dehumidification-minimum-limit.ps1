@@ -346,8 +346,8 @@ foreach ($doc in $cp361Documentation) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP361\b' -Description "CP361 psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP361 supersedes only CP360' -Description "generated CP361 algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP361 additionally requires' -Description "generated CP361 capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP361 supersedes only CP360' -Description "canonical CP361 algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP361 additionally requires' -Description "canonical CP361 capability addendum"
 
 # Historical current-state expectations and master/inventory reachability.
 $cp361BindingHistory = @(326) + @(329..360)

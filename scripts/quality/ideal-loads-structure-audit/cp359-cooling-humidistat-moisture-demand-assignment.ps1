@@ -327,8 +327,8 @@ foreach ($doc in $cp359Documentation) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP359\b' -Description "CP359 psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP359 supersedes only CP358' -Description "generated CP359 algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP359 additionally requires' -Description "generated CP359 capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP359 supersedes only CP358' -Description "canonical CP359 algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP359 additionally requires' -Description "canonical CP359 capability addendum"
 
 # Exact historical binding/firewall/inventory ranges and master reachability.
 $cp359BindingHistory = @(326) + @(329..358)

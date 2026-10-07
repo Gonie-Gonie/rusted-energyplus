@@ -645,8 +645,8 @@ foreach ($cp336CapabilityAddendum in $cp336CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP336 supersedes only CP335' -Description "generated CP336 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP336 additionally requires' -Description "generated CP336 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP336 supersedes only CP335' -Description "canonical CP336 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP336 additionally requires' -Description "canonical CP336 capability index"
 
 # Each hand-authored contract carries one scoped CP336 section. The two
 # argument reads are explicitly textual inventory, not a C++ evaluation-order

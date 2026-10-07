@@ -745,8 +745,8 @@ foreach ($cp331CapabilityAddendum in $cp331CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP331 supersedes only CP330' -Description "generated CP331 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP331 additionally requires' -Description "generated CP331 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP331 supersedes only CP330' -Description "canonical CP331 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP331 additionally requires' -Description "canonical CP331 capability index"
 
 # Every hand-authored contract repeats the statement, live-Zone ownership,
 # CP329-only lineage, cache exclusions, transactional chain, and non-promotion.

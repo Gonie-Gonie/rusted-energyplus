@@ -309,8 +309,8 @@ foreach ($cp328CapabilityAddendum in $cp328CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP328 supersedes only CP327' -Description "generated CP328 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP328 additionally requires' -Description "generated CP328 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP328 supersedes only CP327' -Description "canonical CP328 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP328 additionally requires' -Description "canonical CP328 capability index"
 
 # Every hand-authored contract repeats the exact source/zero, retained CP327
 # provenance, non-executable delimiter, first executable exclusion, and

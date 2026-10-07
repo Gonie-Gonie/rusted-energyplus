@@ -381,8 +381,8 @@ foreach ($doc in $documentation) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP349\b' -Description "CP349 call-site-only psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP349 supersedes only CP348' -Description "generated CP349 algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP349 additionally requires' -Description "generated CP349 capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP349 supersedes only CP348' -Description "canonical CP349 algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP349 additionally requires' -Description "canonical CP349 capability addendum"
 # Historical order whitelists, cumulative firewalls, master order, and inventory.
 foreach ($historical in @(
         "cp326-cooling-supply-mass-flow-limit-body.ps1",

@@ -518,10 +518,11 @@ foreach ($cp340Claim in @($cp340AlgorithmAddenda) + @($cp340CapabilityAddenda)) 
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP340 supersedes only CP339' -Description "generated CP340 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP340 additionally requires' -Description "generated CP340 capability index"
-Assert-NotContains -Path "docs\src\generated\algorithm-ledger.md" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete generated CP340 algorithm reachability claim"
-Assert-NotContains -Path "docs\src\generated\capability-index.md" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete generated CP340 capability reachability claim"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP340 supersedes only CP339' -Description "canonical CP340 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP340 additionally requires' -Description "canonical CP340 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete canonical CP340 algorithm reachability claim" -Absent
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete canonical CP340 capability reachability claim" -Absent
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_finite_limits" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete canonical CP340 finite-limit reachability claim" -Absent
 
 # Five hand-authored contracts repeat the scoped CP340 source/lineage boundary.
 $cp340DocumentationSections = @(

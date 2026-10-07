@@ -759,10 +759,10 @@ foreach ($cp330HardeningAddendum in $cp330HardeningCapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP330 supersedes only CP329' -Description "generated CP330 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP330 additionally requires' -Description "generated CP330 capability index"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP329/CP330 fail-closed retained-chain hardening' -Description "generated CP329/CP330 algorithm hardening"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP329/CP330 fail-closed retained-chain hardening' -Description "generated CP329/CP330 capability hardening"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP330 supersedes only CP329' -Description "canonical CP330 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP330 additionally requires' -Description "canonical CP330 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP329/CP330 fail-closed retained-chain hardening' -Description "canonical CP329/CP330 algorithm hardening"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP329/CP330 fail-closed retained-chain hardening' -Description "canonical CP329/CP330 capability hardening"
 
 # Every hand-authored contract repeats the exact guard, dynamic count, raw IEEE
 # partition, direct CP329 lineage, exclusions, and non-promotion terms.

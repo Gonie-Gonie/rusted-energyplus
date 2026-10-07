@@ -404,8 +404,8 @@ foreach ($doc in $docs) {
     if ($cp390DocIndex -lt 0 -or $cp391DocIndex -le $cp390DocIndex) { throw "CP390-to-CP391 documentation order drift in $doc" }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP391\b' -Description "psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP391 supersedes only CP390' -Description "generated algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP391 additionally requires' -Description "generated capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP391 supersedes only CP390' -Description "canonical algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP391 additionally requires' -Description "canonical capability addendum"
 
 foreach ($historical in 334..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name

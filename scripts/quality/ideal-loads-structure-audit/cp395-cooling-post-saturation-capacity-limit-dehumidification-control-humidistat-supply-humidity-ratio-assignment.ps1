@@ -403,8 +403,8 @@ foreach ($doc in $docs) {
     $cursor = 0; foreach ($field in @($numericFields + $localBools)) { $next = $section.IndexOf($field, $cursor); if ($next -lt 0) { throw "CP395 documentation schema order missing '$field' in $doc" }; $cursor = $next + $field.Length }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP395\b' -Description "psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP395 supersedes only CP394' -Description "generated algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP395 additionally requires' -Description "generated capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP395 supersedes only CP394' -Description "canonical algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP395 additionally requires' -Description "canonical capability addendum"
 
 foreach ($historical in 334..394) { $file = (Get-ChildItem "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name; Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp442_lifecycle_evidence' -Description "historical firewall" }
 foreach ($historical in 335..394) { $file = (Get-ChildItem "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name; Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 380 \|')) -Description "historical generated total"; Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 140 \|')) -Description "historical generated internal" }

@@ -53,7 +53,7 @@ progress{width:100%;height:9px;margin-top:12px;accent-color:#365f82}
 <section class="metrics">
 <div class="metric"><span>전체 작업카드</span><b>64</b></div>
 <div class="metric"><span>선택 경로의 대상 카드</span><b id="activeCount">64</b></div>
-<div class="metric"><span>4개 gate + 선행 인증 완료</span><b id="doneCount">0</b></div>
+<div class="metric"><span>4개 gate 체크 + 선행 충족</span><b id="doneCount">0</b></div>
 <div class="metric"><span>4개 gate 체크 / 선행 미완료</span><b id="waitingCount">0</b></div>
 </section>
 <progress id="bar" value="0" max="64"></progress>
@@ -71,7 +71,7 @@ progress{width:100%;height:9px;margin-top:12px;accent-color:#365f82}
 <button id="reset">체크 초기화</button>
 <input type="file" id="file" class="hidden" accept=".json,application/json">
 </div>
-<div id="message">체크는 가능하면 이 브라우저에 저장됩니다. 다른 브라우저로 옮기려면 JSON 내보내기를 사용하세요.</div>
+<div id="message">저장소의 plan.json 인증 상태에 로컬 작업 체크를 더해 표시합니다. 로컬 체크는 검증 증거를 대신하지 않습니다. 다른 브라우저로 옮기려면 JSON 내보내기를 사용하세요.</div>
 <div id="list"></div>
 <footer>로컬 작업계획 · 외부 스크립트 없음 · 저장소를 변경하지 않음 · 수치 결과의 독립 인증서가 아님<br>
 원본 소스는 고정 커밋의 GitHub 링크로 연결됩니다. 단위시험용 reference와 생산 계산 입력을 분리하세요.</footer>
@@ -87,7 +87,12 @@ try{progressState=JSON.parse(localStorage.getItem(storageKey)||"{}")}catch(e){pr
 const labels=["범위·상태 계약 확정","단위 검증 통과","연결 검증 통과","생산 경로·선행 확인"];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const relevant=t=>scope!=="A"||t.applicability!=="B";
-function flags(id){let a=progressState[id];return Array.isArray(a)&&a.length===4?a.map(Boolean):[false,false,false,false]}
+const gateKeys=["scope_review","unit_gate","integration_gate","production_gate"];
+function recordedFlags(id){
+ const t=map[id], paths=scope==="all"?t.applicability.split("/"):[scope];
+ return gateKeys.map(g=>paths.every(s=>((t.scope_gates||{})[s]||t)[g]==="통과"));
+}
+function flags(id){const a=progressState[id];return recordedFlags(id).map((v,i)=>v||(Array.isArray(a)&&a.length===4&&a[i]===true))}
 function deps(t){let d=[...t.dependencies];if(scope!=="A") d.push(...((t.conditional_dependencies||{}).B||[]));return d}
 function completed(id,trail=new Set()){
  if(trail.has(id)||!flags(id).every(Boolean)) return false;

@@ -639,8 +639,8 @@ foreach ($cp334CapabilityAddendum in $cp334CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP334 supersedes only CP333' -Description "generated CP334 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP334 additionally requires' -Description "generated CP334 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP334 supersedes only CP333' -Description "canonical CP334 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP334 additionally requires' -Description "canonical CP334 capability index"
 
 # Each hand-authored contract carries one scoped CP334 section with source,
 # operand provenance, transactionality, exclusions, and explicit non-promotion.

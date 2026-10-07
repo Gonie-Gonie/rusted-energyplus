@@ -1,5 +1,37 @@
 # Assertion helpers for strict-no-false-conformance.ps1.
 
+$script:CanonicalClaimBoundaryData = $null
+
+function Assert-CanonicalBoundaryContains {
+    param(
+        [Parameter(Mandatory = $true)][ValidateSet("algorithm", "capability")][string]$Registry,
+        [Parameter(Mandatory = $true)][string]$Id,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if ($null -eq $script:CanonicalClaimBoundaryData) {
+        $reader = Join-Path $RepoRoot "tools\docs\read_claim_boundaries.py"
+        $python = Get-PortablePythonExe
+        if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
+            $command = Get-Command python -ErrorAction SilentlyContinue
+            if ($null -eq $command) { throw "Python 3.11+ is required to read canonical claim boundaries." }
+            $python = $command.Source
+        }
+        $payload = & $python $reader --repo-root $RepoRoot
+        if ($LASTEXITCODE -ne 0) { throw "Canonical TOML claim-boundary read failed." }
+        $script:CanonicalClaimBoundaryData = ($payload -join "`n") | ConvertFrom-Json
+    }
+
+    $records = $script:CanonicalClaimBoundaryData.$Registry
+    $property = $records.PSObject.Properties[$Id]
+    if ($null -eq $property) { throw "$Description missing canonical $Registry ID '$Id'." }
+    if (-not $property.Value.boundary.Contains($Pattern)) {
+        throw "Missing required boundary for $Description in canonical $Registry '$Id': $Pattern"
+    }
+    Write-Host "OK canonical boundary for $Description`: $Registry/$Id"
+}
+
 function Assert-DoesNotContain {
     param(
         [Parameter(Mandatory = $true)][string]$Path,

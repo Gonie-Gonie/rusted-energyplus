@@ -372,8 +372,8 @@ foreach ($doc in $cp364Documentation) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP364\b' -Description "psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP364 supersedes only CP363' -Description "generated algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP364 additionally requires' -Description "generated capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP364 supersedes only CP363' -Description "canonical algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP364 additionally requires' -Description "canonical capability addendum"
 
 # Historical propagation, master order, and generated script inventory.
 foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(

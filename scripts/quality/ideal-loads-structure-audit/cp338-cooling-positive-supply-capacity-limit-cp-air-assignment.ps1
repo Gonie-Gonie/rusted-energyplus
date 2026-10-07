@@ -558,8 +558,8 @@ foreach ($cp338Claim in @($cp338AlgorithmAddenda) + @($cp338CapabilityAddenda)) 
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP338 supersedes only CP337' -Description "generated CP338 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP338 additionally requires' -Description "generated CP338 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP338 supersedes only CP337' -Description "canonical CP338 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP338 additionally requires' -Description "canonical CP338 capability index"
 
 # Each hand-authored contract has one scoped CP338 section carrying the same
 # source, operand, routes, counters, placement, exclusion, and nonpromotion.

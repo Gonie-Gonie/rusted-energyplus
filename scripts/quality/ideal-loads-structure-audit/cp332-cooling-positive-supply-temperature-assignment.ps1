@@ -745,8 +745,8 @@ foreach ($cp332CapabilityAddendum in $cp332CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP332 supersedes only CP331' -Description "generated CP332 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP332 additionally requires' -Description "generated CP332 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP332 supersedes only CP331' -Description "canonical CP332 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP332 additionally requires' -Description "canonical CP332 capability index"
 
 # Every hand-authored contract repeats source, provenance, order,
 # transactionality, first exclusion, and explicit non-promotion.

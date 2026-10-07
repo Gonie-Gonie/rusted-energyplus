@@ -514,8 +514,8 @@ foreach ($cp341Claim in @($cp341AlgorithmAddenda) + @($cp341CapabilityAddenda)) 
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP341 supersedes only CP340' -Description "generated CP341 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP341 additionally requires' -Description "generated CP341 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP341 supersedes only CP340' -Description "canonical CP341 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP341 additionally requires' -Description "canonical CP341 capability index"
 
 # Five hand-authored contracts repeat the same source, lineage, IEEE, JSON,
 # numerical-firewall, exclusion, and no-promotion boundary.

@@ -583,8 +583,8 @@ foreach ($cp337Claim in @($cp337AlgorithmAddenda) + @($cp337CapabilityAddenda)) 
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP337 supersedes only CP336' -Description "generated CP337 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP337 additionally requires' -Description "generated CP337 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP337 supersedes only CP336' -Description "canonical CP337 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP337 additionally requires' -Description "canonical CP337 capability index"
 
 # Each hand-authored contract contains one scoped CP337 section carrying the
 # same source, lazy-selector, counter, placement, exclusion, and non-promotion

@@ -74,18 +74,12 @@ def support_boundary_value(item: dict[str, Any]) -> str:
     )
 
 
-def claim_boundary_value(item: dict[str, Any]) -> str:
-    return " ".join(
-        value
-        for value in [
-            str(item.get("claim_boundary", "")).strip(),
-            *[
-                str(addendum).strip()
-                for addendum in item.get("claim_boundary_addenda", [])
-            ],
-        ]
-        if value
-    )
+def boundary_summary(item: dict[str, Any], field: str, spec_name: str) -> str:
+    """Keep navigation tables short; complete restrictions remain canonical."""
+    boundary = str(item.get(field, "")).strip()
+    first_sentence = re.split(r"(?<=\.)\s+", boundary, maxsplit=1)[0]
+    reference = f"[specs/{spec_name}](../../../specs/{spec_name})"
+    return f"{first_sentence} Full boundary and addenda: {reference}.".strip()
 
 
 def repo_path(path: Path, repo_root: Path) -> str:
@@ -201,7 +195,7 @@ def algorithm_ledger(repo_root: Path) -> str:
                 str(item.get("first_evidence", item.get("first_case", ""))),
                 list_value(item.get("proof_variables", [])),
                 str(item.get("claim_level", "")),
-                support_boundary_value(item),
+                boundary_summary(item, "support_boundary", "algorithm_ledger.toml"),
             ]
         )
         for routine_id, routine in item.get("routine", {}).items():
@@ -438,7 +432,7 @@ def capability_index(repo_root: Path) -> str:
                 inline_list([str(value) for value in item.get("forbidden_active_features", [])]),
                 inline_list([str(value) for value in item.get("algorithms", [])]),
                 inline_list([str(value) for value in item.get("evidence_cases", [])]),
-                claim_boundary_value(item),
+                boundary_summary(item, "claim_boundary", "capabilities.toml"),
             ]
         )
 
@@ -839,6 +833,7 @@ def generated_manifest(repo_root: Path) -> str:
             "scripts/dev/commands.json",
             "tools/docs/generate_docs.py",
             "tools/docs/routine_completion_contract.py",
+            "tools/docs/read_claim_boundaries.py",
             "tools/docs/script_inventory.py",
             "tools/docs/validate_algorithm_ledger.py",
             "README.md",

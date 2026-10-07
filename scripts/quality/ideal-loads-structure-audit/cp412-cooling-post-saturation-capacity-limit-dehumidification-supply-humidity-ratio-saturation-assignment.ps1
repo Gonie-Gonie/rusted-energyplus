@@ -244,8 +244,8 @@ foreach ($specAddendum in $specAddenda) {
     $body = $matches[0].Groups['body'].Value
     foreach ($claim in @('line[- ]2314|physical executable line 2314','line 2315.*?CP413','36/18/18/72|T412=T411=36','18 through 35.*?active','20, 21, 26, and 27','77 base fields','twenty `Option<f64>`|twenty numeric optionals','97 JSON keys','CP411-to-CP412-to-unchanged-numerical','350 total, 240 public, 110 internal')) { Assert-Cp412Text -Text $body -Pattern "(?is)$claim" -Description "bounded addendum claim in $($specAddendum.Path)" }
 }
-Assert-Contains -Path 'docs\src\generated\algorithm-ledger.md' -Pattern 'CP412 supersedes only CP411' -Description 'generated algorithm addendum'
-Assert-Contains -Path 'docs\src\generated\capability-index.md' -Pattern 'CP412 additionally requires' -Description 'generated capability addendum'
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP412 supersedes only CP411' -Description 'canonical algorithm addendum'
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP412 additionally requires' -Description 'canonical capability addendum'
 Assert-NotContains -Path 'docs\src\current\roadmap.md' -Pattern '(?m)^## CP412\b' -Description 'Roadmap non-promotion'
 Assert-NotContains -Path 'docs\src\porting-map\psychrometrics-source-map.md' -Pattern '(?m)^## CP412\b' -Description 'psychrometrics-map non-promotion'
 

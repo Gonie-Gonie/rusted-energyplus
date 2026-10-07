@@ -313,8 +313,8 @@ foreach ($spec in @(
     if ($matches.Count -ne 1) { throw "CP420 expected one bounded addendum in $($spec.Path)" }
     foreach ($pattern in @('2331','2332.*?CP421','eight','54.*?49.*?(?:5|five).*?(?:40|forty)','17/37','ten width-36','202 base','seventy-one','273 JSON','228','45-key','110 to 111','358/240/118|358 total, 240 public, 118 internal')) { Assert-Cp420Text -Text $matches[0].Groups['body'].Value -Pattern "(?is)$pattern" -Description 'bounded spec claim' }
 }
-Assert-Contains -Path 'docs\src\generated\algorithm-ledger.md' -Pattern 'CP420 supersedes only CP419' -Description 'generated algorithm addendum'
-Assert-Contains -Path 'docs\src\generated\capability-index.md' -Pattern 'CP420 additionally requires' -Description 'generated capability addendum'
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP420 supersedes only CP419' -Description 'canonical algorithm addendum'
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP420 additionally requires' -Description 'canonical capability addendum'
 Assert-NotContains -Path 'docs\src\current\roadmap.md' -Pattern '(?m)^## CP420\b' -Description 'Roadmap non-promotion'
 Assert-NotContains -Path 'docs\src\porting-map\psychrometrics-source-map.md' -Pattern '(?m)^## CP420\b' -Description 'psychrometrics-map non-promotion'
 

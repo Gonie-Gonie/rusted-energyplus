@@ -775,8 +775,8 @@ foreach ($cp344Claim in @($cp344AlgorithmAddenda) + @($cp344CapabilityAddenda)) 
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP344 supersedes only CP343' -Description "generated CP344 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP344 additionally requires' -Description "generated CP344 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP344 supersedes only CP343' -Description "canonical CP344 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP344 additionally requires' -Description "canonical CP344 capability index"
 
 # Exactly five hand-authored contract sections carry CP344; the
 # psychrometrics source map is intentionally unchanged.

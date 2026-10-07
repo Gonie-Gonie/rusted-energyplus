@@ -232,8 +232,8 @@ Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern '"CP323 supersedes 
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'ems_override_guard\.rs::PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState' -Description "CP323 algorithm state target"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP323 additionally requires' -Description "CP323 capability boundary"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '(?s)forbidden_active_features\s*=\s*\[.*?"EMS"' -Description "EMS remains forbidden"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP323 supersedes only CP322' -Description "generated CP323 algorithm boundary"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP323 additionally requires' -Description "generated CP323 capability boundary"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP323 supersedes only CP322' -Description "canonical CP323 algorithm boundary"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP323 additionally requires' -Description "canonical CP323 capability boundary"
 foreach ($cp323Doc in @(
         "docs\src\current\current-status.md",
         "docs\src\current\project-contract.md",

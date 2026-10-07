@@ -12,9 +12,76 @@ Set-StrictMode -Version Latest
 
 $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
+. (Join-Path $ScriptsRoot "lib\python.ps1")
 
 $RepoRoot = Get-RepoRoot
 Set-Location $RepoRoot
+
+$script:CanonicalClaimBoundaryData = $null
+
+function Get-CanonicalClaimRecord {
+    param(
+        [Parameter(Mandatory = $true)][ValidateSet("algorithm", "capability")][string]$Registry,
+        [Parameter(Mandatory = $true)][string]$Id,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if ($null -eq $script:CanonicalClaimBoundaryData) {
+        $reader = Join-Path $RepoRoot "tools\docs\read_claim_boundaries.py"
+        $python = Get-PortablePythonExe
+        if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
+            $command = Get-Command python -ErrorAction SilentlyContinue
+            if ($null -eq $command) { throw "Python 3.11+ is required to read canonical claim boundaries." }
+            $python = $command.Source
+        }
+        $payload = & $python $reader --repo-root $RepoRoot
+        if ($LASTEXITCODE -ne 0) { throw "Canonical TOML claim-boundary read failed." }
+        $script:CanonicalClaimBoundaryData = ($payload -join "`n") | ConvertFrom-Json
+    }
+
+    $records = $script:CanonicalClaimBoundaryData.$Registry
+    $property = $records.PSObject.Properties[$Id]
+    if ($null -eq $property) { throw "$Description missing canonical $Registry ID '$Id'." }
+    return $property.Value
+}
+
+function Read-CanonicalBoundary {
+    param(
+        [Parameter(Mandatory = $true)][ValidateSet("algorithm", "capability")][string]$Registry,
+        [Parameter(Mandatory = $true)][string]$Id,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    return (Get-CanonicalClaimRecord -Registry $Registry -Id $Id -Description $Description).boundary
+}
+
+function Assert-CanonicalBoundary {
+    param(
+        [Parameter(Mandatory = $true)][ValidateSet("algorithm", "capability")][string]$Registry,
+        [Parameter(Mandatory = $true)][string]$Id,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description,
+        [switch]$Absent
+    )
+
+    $text = Read-CanonicalBoundary -Registry $Registry -Id $Id -Description $Description
+    if (($Absent -and $text -match $Pattern) -or (-not $Absent -and $text -notmatch $Pattern)) {
+        throw "$Description failed in canonical $Registry '$Id'."
+    }
+}
+
+function Assert-CanonicalForbiddenFeatures {
+    param(
+        [Parameter(Mandatory = $true)][string]$Id,
+        [Parameter(Mandatory = $true)][string[]]$Expected,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $features = (Get-CanonicalClaimRecord -Registry capability -Id $Id -Description $Description).forbidden_active_features
+    foreach ($feature in $Expected) {
+        if ($features -cnotcontains $feature) { throw "$Description missing forbidden feature '$feature' in capability '$Id'." }
+    }
+}
 
 function Read-RepoText {
     param([Parameter(Mandatory = $true)][string]$Path)
@@ -3115,10 +3182,10 @@ Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_co
 Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads.rs" -Pattern 'purchased_air_calc_cooling_sensible_flow_lifecycle' -Description "diagnostic run cooling sensible-flow null-evidence assertion"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'support_boundary_addenda = \[\s*[\r\n]+\s*"CP318 supersedes CP317' -Description "CP318 algorithm support-boundary addendum"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern 'claim_boundary_addenda = \[\s*[\r\n]+\s*"CP318 additionally requires' -Description "CP318 capability claim-boundary addendum"
-Assert-Contains -Path "tools\docs\generate_docs.py" -Pattern 'item\.get\("support_boundary_addenda", \[\]\)' -Description "generated algorithm support-boundary addenda"
-Assert-Contains -Path "tools\docs\generate_docs.py" -Pattern 'item\.get\("claim_boundary_addenda", \[\]\)' -Description "generated capability claim-boundary addenda"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP318 supersedes CP317' -Description "generated CP318 algorithm boundary"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP318 additionally requires' -Description "generated CP318 capability boundary"
+# Boundary/addendum assertions read decoded canonical TOML records below.
+# Generated navigation tables are not the evidence source for these checks.
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP318 supersedes CP317' -Description "canonical CP318 algorithm boundary"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP318 additionally requires' -Description "canonical CP318 capability boundary"
 foreach ($coolingSensibleFlowIntegrationFile in @(
     $idealLoadsCoupledCoolingSensibleFlowValidation,
     $runPurchasedAirCoolingSensibleFlow,
@@ -3302,8 +3369,8 @@ Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads.rs" -Patter
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern '"CP319 supersedes CP318' -Description "CP319 algorithm support-boundary addendum"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_dehumidification_flow/release\.rs::advance_direct_no_oa_calc_cooling_dehumidification_flow' -Description "CP319 algorithm Rust release target"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP319 additionally requires' -Description "CP319 capability claim-boundary addendum"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP319 supersedes CP318' -Description "generated CP319 algorithm boundary"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP319 additionally requires' -Description "generated CP319 capability boundary"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP319 supersedes CP318' -Description "canonical CP319 algorithm boundary"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP319 additionally requires' -Description "canonical CP319 capability boundary"
 foreach ($coolingDehumidificationFlowIntegrationFile in @(
     $idealLoadsCoupledCoolingDehumidificationFlowValidation,
     $runPurchasedAirCoolingDehumidificationFlow,
@@ -3509,8 +3576,8 @@ Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidifica
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidification_flow\.rs::purchased_air_calc_cooling_humidification_flow_lifecycle_summary' -Description "CP320 algorithm Rust lifecycle accessor target"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidification_flow/release\.rs::advance_direct_no_oa_calc_cooling_humidification_flow' -Description "CP320 algorithm Rust release target"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP320 additionally requires' -Description "CP320 capability claim-boundary addendum"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP320 supersedes CP319' -Description "generated CP320 algorithm boundary"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP320 additionally requires' -Description "generated CP320 capability boundary"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP320 supersedes CP319' -Description "canonical CP320 algorithm boundary"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP320 additionally requires' -Description "canonical CP320 capability boundary"
 foreach ($coolingHumidificationFlowIntegrationFile in @(
     $idealLoadsCoupledCoolingHumidificationFlowValidation,
     $runPurchasedAirCoolingHumidificationFlow,
@@ -4082,8 +4149,8 @@ Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_z
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset/release\.rs::advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset' -Description "CP321 algorithm Rust release target"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset\.rs::purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary' -Description "CP321 algorithm lifecycle accessor target"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP321 additionally requires' -Description "CP321 capability claim-boundary addendum"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP321 supersedes CP320' -Description "generated CP321 algorithm boundary"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP321 additionally requires' -Description "generated CP321 capability boundary"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP321 supersedes CP320' -Description "canonical CP321 algorithm boundary"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP321 additionally requires' -Description "canonical CP321 capability boundary"
 foreach ($cp321Doc in @(
         "docs\src\current\current-status.md",
         "docs\src\current\project-contract.md",

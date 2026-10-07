@@ -28,6 +28,7 @@ Use focused checks while implementing a card:
 
 ```powershell
 python tools/porting/check_plan.py --check
+python tools/porting/sync_plan_views.py --check
 cargo fmt --all -- --check
 cargo test -p ep_runtime <card_test_filter> --lib
 ```
@@ -35,6 +36,10 @@ cargo test -p ep_runtime <card_test_filter> --lib
 Run the card's EnergyPlus comparison and execution test before closing its
 gates. Run the broader repository checks at integration milestones. Commit
 and push each reviewable unit after its relevant validation.
+After reviewing a card and updating its evidence and gate metadata, run
+`python tools/porting/sync_plan_views.py --write` to refresh the checklist and
+offline HTML plan. Browser checks are local work notes; recorded repository
+evidence governs completion.
 
 ## Compatibility Contract
 

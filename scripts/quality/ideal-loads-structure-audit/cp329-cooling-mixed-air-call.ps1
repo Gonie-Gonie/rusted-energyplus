@@ -825,8 +825,8 @@ foreach ($cp329CapabilityAddendum in $cp329CapabilityAddenda) {
         }
     }
 }
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP329 supersedes only CP328' -Description "generated CP329 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP329 additionally requires' -Description "generated CP329 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP329 supersedes only CP328' -Description "canonical CP329 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP329 additionally requires' -Description "canonical CP329 capability index"
 Assert-Contains -Path "docs\src\current\project-contract.md" -Pattern 'direct no-OA child route at lines 2851, 2854-2861, 2869-2874, 2876, 2878, and[\r\n\s]+2932-2937' -Description "project contract exact CP329 child route"
 Assert-Contains -Path "docs\src\porting-map\ideal-loads-source-map.md" -Pattern 'child route at lines 2851, 2854-2861, 2869-2874, 2876, 2878, and 2932-2937' -Description "IdealLoads source map exact CP329 child route"
 

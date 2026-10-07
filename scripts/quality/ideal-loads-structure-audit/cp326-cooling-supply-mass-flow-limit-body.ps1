@@ -838,22 +838,6 @@ function Get-Cp326TomlArrayEntry {
     }
 }
 
-function Get-Cp326GeneratedRow {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Id,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    $text = Read-RepoText -Path $Path
-    $idText = [regex]::Escape($Id)
-    $rowMatches = [regex]::Matches($text, "(?m)^\|\s*$idText\s*\|[^\r\n]*$")
-    if ($rowMatches.Count -ne 1) {
-        throw "$Description expected one generated '$Id' row in $Path, found $($rowMatches.Count)"
-    }
-    return $rowMatches[0].Value
-}
-
 function Assert-Cp326BoundaryStatement {
     param(
         [Parameter(Mandatory = $true)][string]$Text,
@@ -919,23 +903,23 @@ foreach ($cp326CapabilityId in $cp326CapabilityIds) {
     Assert-Cp326ScopedText -Text $forbiddenFeatureMatch.Groups["features"].Value -Pattern '(?m)^\s*"Autosizing",?\s*$' -Description "CP326 '$cp326CapabilityId' Autosizing feature firewall"
 }
 
-$cp326GeneratedAlgorithmRow = Get-Cp326GeneratedRow `
-    -Path "docs\src\generated\algorithm-ledger.md" `
+$cp326CanonicalAlgorithmBoundary = Read-CanonicalBoundary `
+    -Registry algorithm `
     -Id "ideal_loads_zone_equipment_purchased_air_source_order" `
-    -Description "generated CP326 algorithm ledger"
-Assert-Cp326BoundaryStatement -Text $cp326GeneratedAlgorithmRow -Description "generated CP326 algorithm row"
-Assert-Cp326ScopedText -Text $cp326GeneratedAlgorithmRow -Pattern 'both parents remain `scaffold`/`none`' -Description "generated CP326 parent status non-promotion"
-Assert-Cp326ScopedText -Text $cp326GeneratedAlgorithmRow -Pattern 'support and counts stay unchanged' -Description "generated CP326 support/count non-promotion"
-Assert-Cp326ScopedText -Text $cp326GeneratedAlgorithmRow -Pattern 'readiness, capability, evidence, numerical conformance, and Roadmap state remain unchanged' -Description "generated CP326 readiness/evidence/conformance/Roadmap non-promotion"
+    -Description "canonical CP326 algorithm ledger"
+Assert-Cp326BoundaryStatement -Text $cp326CanonicalAlgorithmBoundary -Description "canonical CP326 algorithm row"
+Assert-Cp326ScopedText -Text $cp326CanonicalAlgorithmBoundary -Pattern 'both parents remain `scaffold`/`none`' -Description "canonical CP326 parent status non-promotion"
+Assert-Cp326ScopedText -Text $cp326CanonicalAlgorithmBoundary -Pattern 'support and counts stay unchanged' -Description "canonical CP326 support/count non-promotion"
+Assert-Cp326ScopedText -Text $cp326CanonicalAlgorithmBoundary -Pattern 'readiness, capability, evidence, numerical conformance, and Roadmap state remain unchanged' -Description "canonical CP326 readiness/evidence/conformance/Roadmap non-promotion"
 
 foreach ($cp326CapabilityId in $cp326CapabilityIds) {
-    $cp326GeneratedCapabilityRow = Get-Cp326GeneratedRow `
-        -Path "docs\src\generated\capability-index.md" `
+    $cp326CanonicalCapabilityBoundary = Read-CanonicalBoundary `
+        -Registry capability `
         -Id $cp326CapabilityId `
-        -Description "generated CP326 capability index"
-    Assert-Cp326BoundaryStatement -Text $cp326GeneratedCapabilityRow -Description "generated CP326 '$cp326CapabilityId' row"
-    Assert-Cp326ScopedText -Text $cp326GeneratedCapabilityRow -Pattern 'This changes no support level, run state, required or forbidden feature, evidence case, or numerical conformance' -Description "generated CP326 '$cp326CapabilityId' non-promotion"
-    Assert-Cp326ScopedText -Text $cp326GeneratedCapabilityRow -Pattern '`Autosizing`<br>`EMS`' -Description "generated CP326 '$cp326CapabilityId' feature firewall"
+        -Description "canonical CP326 capability index"
+    Assert-Cp326BoundaryStatement -Text $cp326CanonicalCapabilityBoundary -Description "canonical CP326 '$cp326CapabilityId' row"
+    Assert-Cp326ScopedText -Text $cp326CanonicalCapabilityBoundary -Pattern 'This changes no support level, run state, required or forbidden feature, evidence case, or numerical conformance' -Description "canonical CP326 '$cp326CapabilityId' non-promotion"
+    Assert-CanonicalForbiddenFeatures -Id $cp326CapabilityId -Expected @('Autosizing', 'EMS') -Description "canonical CP326 '$cp326CapabilityId' feature firewall"
 }
 
 $cp326DocumentationSections = @(

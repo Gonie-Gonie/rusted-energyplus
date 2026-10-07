@@ -482,8 +482,8 @@ foreach ($cp343Claim in @($cp343AlgorithmAddenda) + @($cp343CapabilityAddenda)) 
 }
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'routine\.psy_tdb_fn_h_w\.completion_status = "state_mapped"' -Description "PsyTdbFnHW remains state_mapped"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'broader downstream IdealLoads inverse replacement beyond bounded CP343 physical line 2201' -Description "PsyTdbFnHW broader downstream nonclaim"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP343 supersedes only CP342' -Description "generated CP343 algorithm ledger"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP343 additionally requires' -Description "generated CP343 capability index"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP343 supersedes only CP342' -Description "canonical CP343 algorithm ledger"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP343 additionally requires' -Description "canonical CP343 capability index"
 
 # Five hand-authored contracts and the psychrometrics source map carry the
 # source, owner, IEEE, lifecycle, exclusion, and no-promotion boundaries.

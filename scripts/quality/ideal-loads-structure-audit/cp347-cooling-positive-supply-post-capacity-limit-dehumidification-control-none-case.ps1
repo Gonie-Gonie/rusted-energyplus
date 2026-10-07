@@ -498,8 +498,8 @@ foreach ($doc in $documentation) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP347\b' -Description "CP347 psychrometrics non-promotion"
-Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP347 supersedes only CP346' -Description "generated CP347 algorithm addendum"
-Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP347 additionally requires' -Description "generated CP347 capability addendum"
+Assert-CanonicalBoundary -Registry algorithm -Id "ideal_loads_zone_equipment_purchased_air_source_order" -Pattern 'CP347 supersedes only CP346' -Description "canonical CP347 algorithm addendum"
+Assert-CanonicalBoundary -Registry capability -Id "ideal_loads_no_oa_sensible" -Pattern 'CP347 additionally requires' -Description "canonical CP347 capability addendum"
 
 # Historical binding whitelists, cumulative firewalls, root reachability, and
 # the generated script inventory all advance to CP347.
