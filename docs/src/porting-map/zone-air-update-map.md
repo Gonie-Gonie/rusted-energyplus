@@ -28468,3 +28468,67 @@ Roadmap promotion is added. Counts remain 32 algorithms and 293 routines split
 58 state-mapped plus 235 source-mapped with 170 required; inventory becomes
 379 total, 240 public, 139 internal, zero unused, zero unreachable, with 238
 development commands.
+
+## CP442 heating outdoor-air maximum-flow first-warning guard else-branch entry
+
+CP442 supersedes only CP441's physical-line-2375 structural/control exclusion
+by mapping the exact pinned sibling else entry:
+
+```cpp
+} else {
+```
+
+CP437 already owns physical line 2364's first-warning predicate and its exact
+false-fallthrough authority. CP438 through CP441 own only the mutually
+exclusive true branch through its timestamp call. CP442 maps neither a
+true-body exit, closing delimiter, branch merge, nor unconditional entry. Its
+exact sole textual source site is
+`enter-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-after-guard-false-fallthrough`.
+Physical executable line 2376 begins the first excluded
+`ShowRecurringWarningErrorAtEnd` call, which continues through line 2381.
+Structural line 2382, the line-2383 outdoor-air mass-flow clamp, and every
+later effect remain excluded.
+
+CP442 preserves CP441's 67 outcomes one-for-one. The 61 inherited outcomes
+that never evaluated the CP437 guard and the three true-branch timestamp-call
+outcomes skip the sibling else. Exactly three private CP437 guard-false
+outcomes enter, giving T442=67, Z442=64, E442=3, and S442=3. Public/private
+remains 20/47, with active public/private 0/3. Exactly two width-36 arrays
+retain predecessor and local else-entry routes. The local array exactly
+aliases CP441's retained first-warning-guard false-fallthrough array. The
+three CP441 timestamp calls and three CP442 else entries are disjoint and
+exactly partition the six CP437 guard evaluations and CP436 assignments.
+
+Same-call bit-exact sealed CP441 lifecycle, latest snapshot, private witness,
+completion evidence, committed route, and bounded accounting are the sole
+immediate predecessor and route authority. Absence of a timestamp call is
+insufficient to activate CP442 because the 61 guard-unevaluated routes also
+lack one. Each active entry retains guard operand `Some(1)` and comparison
+`Some(false)`, while its CP438 assigned-counter carrier remains `None`.
+This characterizes only the retained zero/one counter slice. CP442 replays no
+guard, reads or mutates no counter, adds no warning-counter owner accounting,
+invokes no warning, timestamp, or recurring-warning service, reads no message
+or warning-index state, performs no clamp or outdoor-air mutation, consumes no
+caller scalar, and invokes no global, callback, diagnostic, or mutable
+service. Exact public release records zero else entries because CP436 admits
+zero public guard evaluations.
+
+The snapshot preserves all 429 CP441 fields verbatim and appends only plain
+Boolean
+`heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entered`,
+yielding 430 unique Rust fields. Its option classes remain exactly 146
+`Option<f64>`, nine `Option<bool>`, six optional enums, and two
+`Option<usize>` carriers. JSON preserves all 575 CP441 keys and appends the
+same marker for 576 unique keys with 146 adjacent IEEE sidecars. W/H/T
+presence, ownership, and bit-exact unchanged preservation remain 37/42/57.
+
+Binding becomes CP441-to-CP442-to-unchanged-numerical at zero-based index 132
+and current count 133. CP442 does not consume, reconcile with, feed, replace,
+or mutate any numerical, coupling-input, or output DTO; direct coupled and
+pipeline validation require zero public else entries and reject non-direct
+evidence. No support, readiness, capability, routine, algorithm, numerical-
+conformance, source-map, psychrometrics-map, output/status/conformance, or
+Roadmap promotion is added. Counts remain 32 algorithms and 293 routines split
+58 state-mapped plus 235 source-mapped with 170 required; inventory becomes
+380 total, 240 public, 140 internal, zero unused, zero unreachable, with 238
+development commands.

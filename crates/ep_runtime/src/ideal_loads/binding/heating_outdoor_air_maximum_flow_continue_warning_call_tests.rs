@@ -31,9 +31,9 @@ fn cp440_adapter_accepts_only_the_cp439_snapshot_and_no_scalar_input() {
 fn cp440_extends_current_scheduled_binding_from_130_to_131_snapshots() {
     let fields = include_str!("scheduled_output.rs")
         .lines()
-        .filter(|line| line.starts_with("    pub calculation_"))
+        .filter(|line| line.contains("pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 132);
+    assert_eq!(fields.len(), 133);
     assert!(
         fields[128].contains(
             "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"

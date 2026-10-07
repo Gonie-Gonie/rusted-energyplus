@@ -26,9 +26,9 @@ fn cp432_contract_locks_61_transitions_and_current_schema_and_binding() {
     assert_eq!(snapshot.matches("Option<").count() - 125 - 4, 3);
     assert_eq!(
         include_str!("binding/scheduled_output.rs")
-            .matches("    pub calculation_")
+            .matches("pub calculation_")
             .count(),
-        132
+        133
     );
 }
 

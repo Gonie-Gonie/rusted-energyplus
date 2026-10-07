@@ -1,5 +1,6 @@
 //! CP441 boundary, exhaustive call-site, prefix, and no-service tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::transition::{
@@ -182,22 +183,24 @@ fn cp441_transition_contains_no_sink_format_service_or_counter_mutation() {
 }
 
 #[test]
-fn cp441_subtree_is_twelve_files_and_every_file_is_bounded() {
+fn cp441_sealed_subtree_is_fourteen_files_and_every_file_is_bounded() {
     let files = [
         include_str!("../heating_outdoor_air_maximum_flow_continue_warning_timestamp_call.rs"),
         include_str!("release.rs"),
         include_str!("state.rs"),
         include_str!("tests.rs"),
         include_str!("transition.rs"),
+        include_str!("release/committed.rs"),
         include_str!("release/error.rs"),
         include_str!("release/prefix.rs"),
         include_str!("release/runtime_validation.rs"),
         include_str!("release/snapshot_validation.rs"),
+        include_str!("tests/committed_seal.rs"),
         include_str!("tests/schema_prefix.rs"),
         include_str!("transition/accounting.rs"),
         include_str!("transition/snapshot.rs"),
     ];
-    assert_eq!(files.len(), 12);
+    assert_eq!(files.len(), 14);
     assert!(
         files
             .into_iter()
@@ -219,7 +222,7 @@ pub(in crate::ideal_loads::calc) fn cp441_all_snapshots_for_successor_tests()
 
 #[allow(dead_code)]
 pub(in crate::ideal_loads::calc) fn cp441_fixture_unit_for_successor_tests() -> (
-    PurchasedAirUnitRuntimeState,
+    Box<PurchasedAirUnitRuntimeState>,
     super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningTimestampCallSnapshot,
     Route,
 ) {
@@ -230,6 +233,87 @@ pub(in crate::ideal_loads::calc) fn cp441_fixture_unit_for_successor_tests() -> 
         advance_validated(&mut state, predecessor, predecessor_route, route).expect("CP441");
     unit.calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call = state;
     (unit, snapshot, route)
+}
+
+#[allow(dead_code)]
+pub(in crate::ideal_loads::calc) fn cp441_guard_false_fixture_unit_for_successor_tests() -> (
+    Box<PurchasedAirUnitRuntimeState>,
+    super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningTimestampCallSnapshot,
+    Route,
+) {
+    use crate::ideal_loads::{
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallRuntimeState,
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallRuntimeState,
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementRuntimeState,
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardRuntimeState,
+    };
+
+    let (mut unit, cp436, _, _) =
+        crate::ideal_loads::calc::cp436_fixture_unit_for_successor_tests();
+    let mut cp437_state =
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardRuntimeState::new(
+            cp436.system,
+        );
+    cp437_state.outdoor_air_flow_maximum_heating_output_error_count = 1;
+    let cp437 = crate::ideal_loads::calc::advance_heating_outdoor_air_maximum_flow_first_warning_guard_state(
+        &mut cp437_state,
+        cp436,
+    )
+    .expect("CP437 guard-false snapshot");
+    assert!(cp437.heating_outdoor_air_maximum_flow_first_warning_guard_false_fallthrough);
+
+    let mut cp438_state =
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCounterIncrementRuntimeState::new(
+            cp436.system,
+        );
+    let cp438 = crate::ideal_loads::calc::advance_heating_outdoor_air_maximum_flow_first_warning_counter_increment_state(
+        &mut cp438_state,
+        &mut cp437_state,
+        cp437,
+    )
+    .expect("CP438 guard-false snapshot");
+    let mut cp439_state =
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningCallRuntimeState::new(cp436.system);
+    let cp439 = crate::ideal_loads::calc::advance_heating_outdoor_air_maximum_flow_first_warning_call_state(
+        &mut cp439_state,
+        cp438,
+    )
+    .expect("CP439 guard-false snapshot");
+    let mut cp440_state =
+        PurchasedAirCalcHeatingOutdoorAirMaximumFlowContinueWarningCallRuntimeState::new(
+            cp436.system,
+        );
+    let cp440 = crate::ideal_loads::calc::advance_heating_outdoor_air_maximum_flow_continue_warning_call_state(
+        &mut cp440_state,
+        cp439,
+    )
+    .expect("CP440 guard-false snapshot");
+    let mut cp441_state = State::new(cp436.system);
+    let cp441 = advance(&mut cp441_state, cp440).expect("CP441 guard-false snapshot");
+    assert_eq!(
+        cp441.outdoor_air_flow_maximum_heating_output_error_count_before,
+        Some(1)
+    );
+    assert_eq!(
+        cp441.outdoor_air_flow_maximum_heating_output_error_count_less_than_one,
+        Some(false)
+    );
+    assert_eq!(
+        cp441.assigned_outdoor_air_flow_maximum_heating_output_error_count,
+        None
+    );
+    let route =
+        super::heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_snapshot_route(
+            cp441,
+        )
+        .expect("CP441 guard-false route");
+
+    unit.calc_heating_outdoor_air_maximum_flow_first_warning_guard = cp437_state;
+    unit.calc_heating_outdoor_air_maximum_flow_first_warning_counter_increment = cp438_state;
+    unit.calc_heating_outdoor_air_maximum_flow_first_warning_call = cp439_state;
+    unit.calc_heating_outdoor_air_maximum_flow_continue_warning_call = cp440_state;
+    unit.calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call = cp441_state;
+    (unit, cp441, route)
 }
 
 fn route_for(predecessor: Predecessor) -> PredecessorRoute {

@@ -4,6 +4,9 @@ use std::collections::BTreeSet;
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp442_assertions.rs"]
+mod cp442_assertions;
+
 const CP440_KEY: &str =
     "purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_call_lifecycle";
 const CP441_KEY: &str =
@@ -158,6 +161,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     assert_eq!(latest[MARKER], json!(false));
     assert_schema_and_binding_cardinalities();
     assert!(!results.to_string().contains(CP441_KEY));
+    cp442_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -166,6 +170,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP441_KEY].is_null(),
         "non-direct runtime must not publish CP441 evidence"
     );
+    cp442_assertions::assert_non_direct(runtime);
 }
 
 fn assert_actual_json_key_set(
@@ -218,9 +223,9 @@ fn assert_schema_and_binding_cardinalities() {
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
     let fields = binding
         .lines()
-        .filter(|line| line.starts_with("    pub calculation_"))
+        .filter(|line| line.contains("pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 132);
+    assert_eq!(fields.len(), 133);
     assert!(
         fields[130].contains("calculation_heating_outdoor_air_maximum_flow_continue_warning_call")
     );

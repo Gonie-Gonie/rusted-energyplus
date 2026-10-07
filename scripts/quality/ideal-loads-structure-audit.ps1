@@ -4201,4 +4201,5 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp439-heating-outdoor-air-maximum-flow-first-warning-call.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp440-heating-outdoor-air-maximum-flow-continue-warning-call.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp441-heating-outdoor-air-maximum-flow-continue-warning-timestamp-call.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp442-heating-outdoor-air-maximum-flow-first-warning-guard-else-branch-entry.ps1")
 Write-Host "IdealLoads structure audit complete."

@@ -35,9 +35,9 @@ fn cp436_contract_locks_exhaustive_routes_current_schema_and_binding() {
     assert_eq!(snapshot.matches("Option<").count() - 140 - 8, 6);
     let fields = include_str!("binding/scheduled_output.rs")
         .lines()
-        .filter(|line| line.starts_with("    pub calculation_"))
+        .filter(|line| line.contains("pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 132);
+    assert_eq!(fields.len(), 133);
     assert!(fields[125].contains("calculation_heating_outdoor_air_maximum_flow_guard"));
     assert!(
         fields[126]

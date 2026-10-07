@@ -47,9 +47,9 @@ fn cp439_contract_locks_routes_schema_json_and_current_binding() {
     );
     let fields = include_str!("binding/scheduled_output.rs")
         .lines()
-        .filter(|line| line.starts_with("    pub calculation_"))
+        .filter(|line| line.contains("pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 132);
+    assert_eq!(fields.len(), 133);
     assert!(
         fields[128].contains(
             "calculation_heating_outdoor_air_maximum_flow_first_warning_counter_increment"

@@ -238,7 +238,7 @@ pub(in crate::ideal_loads::calc) fn cp435_all_snapshots_for_successor_tests(
 }
 
 pub(in crate::ideal_loads::calc) fn cp435_fixture_unit_for_successor_tests() -> (
-    crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    Box<crate::ideal_loads::PurchasedAirUnitRuntimeState>,
     super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowGuardSnapshot,
     Route,
     Option<crate::ideal_loads::PurchasedAirCalcCoolingMixedAirCallSnapshot>,

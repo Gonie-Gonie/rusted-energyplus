@@ -299,9 +299,9 @@ fn assert_schema_and_binding_cardinalities() {
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
     let calculation_fields = binding
         .lines()
-        .filter(|line| line.starts_with("    pub calculation_"))
+        .filter(|line| line.contains("pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(calculation_fields.len(), 132);
+    assert_eq!(calculation_fields.len(), 133);
     assert!(calculation_fields[123].contains("calculation_heating_mode_guard_else_branch_entry"));
     assert!(
         calculation_fields[124].contains("calculation_heating_operating_mode_deadband_assignment")

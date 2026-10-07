@@ -42,6 +42,7 @@ mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp
 #[rustfmt::skip] mod heating_outdoor_air_maximum_flow_first_warning_call;
 #[rustfmt::skip] mod heating_outdoor_air_maximum_flow_continue_warning_call;
 #[rustfmt::skip] mod heating_outdoor_air_maximum_flow_continue_warning_timestamp_call;
+#[rustfmt::skip] mod heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry;
 use ep_model::IdealLoadsAirSystemId;
 
 use super::PurchasedAirRuntimeState;

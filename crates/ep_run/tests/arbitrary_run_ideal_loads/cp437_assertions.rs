@@ -303,9 +303,9 @@ fn assert_schema_and_binding_cardinalities() {
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
     let fields = binding
         .lines()
-        .filter(|line| line.starts_with("    pub calculation_"))
+        .filter(|line| line.contains("pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 132);
+    assert_eq!(fields.len(), 133);
     assert!(
         fields[126]
             .contains("calculation_heating_outdoor_air_maximum_flow_body_volume_flow_assignment")

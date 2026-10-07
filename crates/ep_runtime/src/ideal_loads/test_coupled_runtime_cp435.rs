@@ -27,9 +27,9 @@ fn cp435_contract_locks_exhaustive_routes_current_schema_and_binding() {
     assert_eq!(snapshot.matches("Option<").count() - 133 - 8, 6);
     assert_eq!(
         include_str!("binding/scheduled_output.rs")
-            .matches("    pub calculation_")
+            .matches("pub calculation_")
             .count(),
-        132
+        133
     );
 }
 

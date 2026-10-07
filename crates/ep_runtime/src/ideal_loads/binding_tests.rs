@@ -184,6 +184,8 @@ mod heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_tests;
 mod heating_outdoor_air_maximum_flow_first_warning_call_tests;
 #[path = "binding/heating_outdoor_air_maximum_flow_first_warning_counter_increment_tests.rs"]
 mod heating_outdoor_air_maximum_flow_first_warning_counter_increment_tests;
+#[path = "binding/heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_tests.rs"]
+mod heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_tests;
 #[path = "binding/heating_outdoor_air_maximum_flow_first_warning_guard_tests.rs"]
 mod heating_outdoor_air_maximum_flow_first_warning_guard_tests;
 #[path = "binding/heating_outdoor_air_maximum_flow_guard_tests.rs"]

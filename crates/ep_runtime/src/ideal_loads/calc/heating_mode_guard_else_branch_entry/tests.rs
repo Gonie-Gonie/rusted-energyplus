@@ -345,13 +345,14 @@ pub(in crate::ideal_loads::calc) fn cp433_all_snapshots_for_successor_tests() ->
 }
 
 pub(in crate::ideal_loads::calc) fn cp433_fixture_unit_for_successor_tests() -> (
-    PurchasedAirUnitRuntimeState,
+    Box<PurchasedAirUnitRuntimeState>,
     super::PurchasedAirCalcHeatingModeGuardElseBranchEntrySnapshot,
     Route,
     Option<Cp329Snapshot>,
 ) {
-    let (mut unit, predecessor, predecessor_route, owner) =
+    let (unit, predecessor, predecessor_route, owner) =
         cp432_fixture_unit_for_successor_tests();
+    let mut unit = Box::new(unit);
     let route = successor_route(predecessor, predecessor_route).expect("CP433 route");
     let mut state = State::new(predecessor.system);
     let snapshot = advance_validated(&mut state, predecessor, predecessor_route, route)

@@ -303,7 +303,7 @@ pub(in crate::ideal_loads::calc) fn cp437_all_snapshots_for_successor_tests()
 
 #[allow(dead_code)]
 pub(in crate::ideal_loads::calc) fn cp437_fixture_unit_for_successor_tests() -> (
-    PurchasedAirUnitRuntimeState,
+    Box<PurchasedAirUnitRuntimeState>,
     super::PurchasedAirCalcHeatingOutdoorAirMaximumFlowFirstWarningGuardSnapshot,
     Route,
     Option<Cp329Snapshot>,

@@ -174,6 +174,8 @@ mod coupled_runtime_tests_cp439;
 mod coupled_runtime_tests_cp440;
 #[path = "test_coupled_runtime_cp441.rs"]
 mod coupled_runtime_tests_cp441;
+#[path = "test_coupled_runtime_cp442.rs"]
+mod coupled_runtime_tests_cp442;
 
 use crate::{
     ideal_loads::{
@@ -2147,6 +2149,38 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         assert!(
             !latest.heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_site_reached
         );
+    }
+    {
+        let predecessor = &simulation
+            .summary
+            .calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle
+            .state;
+        let cp442 = &simulation
+            .summary
+            .calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle;
+        let state = &cp442.state;
+        assert_eq!(
+            cp442.source,
+            crate::ideal_loads::PURCHASED_AIR_CALC_HEATING_OUTDOOR_AIR_MAXIMUM_FLOW_FIRST_WARNING_GUARD_ELSE_BRANCH_ENTRY_SOURCE
+        );
+        assert_eq!(state.transition_count, required_steps);
+        assert_eq!(state.transition_count, predecessor.transition_count);
+        assert_eq!(
+            state.predecessor_route_counts,
+            predecessor.predecessor_route_counts
+        );
+        assert_eq!(
+            state.heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_route_counts,
+            predecessor.predecessor_first_warning_guard_false_fallthrough_route_counts
+        );
+        assert_eq!(state.inactive_transition_count, required_steps);
+        assert_eq!(
+            state.heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_count,
+            0
+        );
+        assert_eq!(state.source_site_execution_count, 0);
+        let latest = state.latest.expect("latest exact-release CP442 snapshot");
+        assert!(!latest.heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entered);
     }
     let lifecycle = simulation.summary.init_lifecycle;
     assert_eq!(lifecycle.source, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE);

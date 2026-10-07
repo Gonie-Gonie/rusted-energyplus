@@ -307,7 +307,7 @@ pub(in crate::ideal_loads::calc) fn cp434_all_snapshots_for_successor_tests()
 }
 
 pub(in crate::ideal_loads::calc) fn cp434_fixture_unit_for_successor_tests() -> (
-    PurchasedAirUnitRuntimeState,
+    Box<PurchasedAirUnitRuntimeState>,
     super::PurchasedAirCalcHeatingOperatingModeDeadbandAssignmentSnapshot,
     Route,
     Option<Cp329Snapshot>,
