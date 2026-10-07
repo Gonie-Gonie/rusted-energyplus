@@ -10,6 +10,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -104,6 +105,33 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def cargo_artifacts(command: list[str], stdout: Path) -> dict:
+    """Bind Cargo's emitted executable identity immediately after its command.
+
+    Cache hits are valid. No timestamp heuristic identifies a compiled artifact.
+    """
+    requested = (command[:2] == ["cargo", "build"] and
+                 "--message-format=json-render-diagnostics" in command)
+    result = {"requested": requested, "captured_utc": utc_now(),
+              "status": "not_requested", "rows": [], "error": None}
+    if not requested:
+        return result
+    try:
+        with stdout.open(encoding="utf-8") as stream:
+            for line in stream:
+                message = json.loads(line)
+                if message.get("reason") != "compiler-artifact" or message.get("executable") is None:
+                    continue
+                path = contained(Path(message["executable"]), ROOT)
+                result["rows"].append({"cargo_message": message, "executable": {
+                    "historical_path": path.relative_to(ROOT).as_posix(), "sha256": sha(path),
+                }})
+        result["status"] = "pass"
+    except (OSError, UnicodeError, ValueError, TypeError) as error:
+        result["status"], result["error"] = "failed", str(error)
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -120,16 +148,21 @@ def main() -> int:
     launcher = store_bytes(Path(__file__).read_bytes())
     before = git_state()
     stdout, stderr = directory / "stdout.log", directory / "stderr.log"
+    environment = os.environ.copy()
+    environment_keys = ("RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CARGO_BUILD_TARGET",
+                        "CARGO_TARGET_DIR", "RUSTUP_TOOLCHAIN", "RUSTC", "RUSTC_WRAPPER",
+                        "RUSTC_WORKSPACE_WRAPPER", "CARGO_HOME")
     start_utc, started = utc_now(), time.perf_counter()
     launch_error = None
     with stdout.open("xb") as out, stderr.open("xb") as err:
         try:
-            result = subprocess.run(command, cwd=ROOT, stdout=out, stderr=err)
+            result = subprocess.run(command, cwd=ROOT, stdout=out, stderr=err, env=environment)
             exit_code = result.returncode
         except OSError as error:
             launch_error, exit_code = str(error), 127
             err.write((launch_error + "\n").encode("utf-8"))
     end_utc, elapsed = utc_now(), time.perf_counter() - started
+    artifact_capture = cargo_artifacts(command, stdout)
     after = git_state()
     receipt = {
         "schema": "recorded-porting-command.v1", "command": command,
@@ -140,6 +173,9 @@ def main() -> int:
         "executed_launcher": {"historical_path": Path(__file__).relative_to(ROOT).as_posix(), "archive": launcher},
         "python": {"version": sys.version, "executable": str(Path(sys.executable)), "sha256": sha(Path(sys.executable))},
         "stdout": ref(stdout), "stderr": ref(stderr),
+        "cargo_compiler_artifacts_capture": artifact_capture,
+        "launch_environment_selected": {key: environment.get(key) for key in environment_keys},
+        "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
         "recorder_updates_gates": False, "recorder_supplies_reference_answers": False,
     }
     receipt_path = directory / "receipt.json"

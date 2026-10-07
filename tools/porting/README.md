@@ -18,6 +18,30 @@ existing historical receipts are not rewritten. This is command provenance,
 and the recorder itself does not compute scientific reference values or update
 card gates. The invoked command's behavior needs its own review.
 
+Archive a successful recorded CLI or `ep_runtime` example build with the shared
+freezer before executing that binary:
+
+```powershell
+python -B tools/porting/freeze_rust_build.py --command-receipt .runtime/porting/<CARD>/<BUILD-COMMAND>/receipt.json --output-dir .runtime/porting/<CARD>/builds/<FRESH-TAG> --cli
+python -B tools/porting/freeze_rust_build.py --command-receipt .runtime/porting/<CARD>/<BUILD-COMMAND>/receipt.json --output-dir .runtime/porting/<CARD>/builds/<FRESH-TAG> --example <EXAMPLE_NAME>
+```
+
+The recorded build must use `cargo build -p ep_cli --bin eplus-rs -j 2 --message-format=json-render-diagnostics` or
+`cargo build -p ep_runtime --example <EXAMPLE_NAME> -j 2 --message-format=json-render-diagnostics`.
+The recorder hashes Cargo's emitted executable immediately after that command;
+the freezer requires the emitted package, source path, target and current bytes
+to agree before archiving it. Cached Cargo artifacts are valid. The freezer launches
+neither Cargo nor a simulation. It checks the recorded/current revision and
+source bytes, then copies the actual executable, Cargo lock, toolchain, and
+reader sources into a fresh directory. Its manifest inventories available
+source files, including files the compiler may not select. A clean Rust source
+tree gets a committed-blob comparison with any CRLF difference kept explicit.
+`--allow-dirty` labels a precommit build without committed-source certification.
+Selected launch environment values passed to the actual subprocess are recorded.
+Environment and toolchain version queries made during freezing are separately
+labeled as after-command diagnostics.
+No freezer result promotes a scientific card gate.
+
 ## CON-01 input preparation and reference observations
 
 From the repository root:

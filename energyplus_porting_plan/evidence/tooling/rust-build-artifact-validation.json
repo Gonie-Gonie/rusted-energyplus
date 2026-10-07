@@ -1,0 +1,94 @@
+{
+  "schema": "porting-build-tool-validation.v1",
+  "status": "pass-tool-validation-only",
+  "scientific_gates_updated": false,
+  "engine_executions": 0,
+  "recorded_Rust_implementation_commit": "5d2a34aaa17ed88fe0a641a3dbc25b973171d6b8",
+  "independent_review": {
+    "path": ".runtime/porting/GEO-03/shared-build-tool-review-01/review.json",
+    "sha256": "d28859a3c4ac9bd180001b992fc83041f22dfc8864ae756c4011196c5f96e3e7"
+  },
+  "validated_tool_identities": {
+    "recorder": {
+      "historical_path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    },
+    "freezer": {
+      "historical_path": "tools/porting/freeze_rust_build.py",
+      "sha256": "96b1988490aa61a6df060d63506ef1c39cd550e11eae82a402d332953184fcff"
+    }
+  },
+  "current_schema_validations": [
+    {
+      "target": "ep_cli/eplus-rs",
+      "command": "cargo build -p ep_cli --bin eplus-rs -j 2 --message-format=json-render-diagnostics",
+      "actual_exit_code": 0,
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/shared-freezer-cargo-verification-02/receipt.json",
+        "sha256": "377040c11da52620c9acd21db14ee6931e7c5a74ae38773e5bb893583a360d12"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/shared-freezer-verified-02/build-receipt.json",
+        "sha256": "29415f1b6b3b462924a6369e70be7e4eac003607636f4c743ecd85c6e1a633c3"
+      },
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/shared-freezer-verified-02/eplus-rs.exe",
+        "sha256": "7e9418367790c9716fba5c1fd4ccf689ffa6ee6de021fa4cd43d3396ae584b91"
+      },
+      "Cargo_reported_fresh_cache_hit": true
+    },
+    {
+      "target": "ep_runtime/geo02_tuples",
+      "command": "cargo build -p ep_runtime --example geo02_tuples -j 2 --message-format=json-render-diagnostics",
+      "actual_exit_code": 0,
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/shared-freezer-example-cargo-verification-02/receipt.json",
+        "sha256": "26e94d86e55400629bad7d9a4e28f8f354430b99ba8f2f0b5db50dae57be1a32"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/shared-freezer-example-verified-02/build-receipt.json",
+        "sha256": "7736665b9d1760b95709a911e8858263cc52abe1782f9eda5329d2c59be391a9"
+      },
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/shared-freezer-example-verified-02/geo02_tuples.exe",
+        "sha256": "5a13269fbbebf9a5c5f61a6cabb3f9f7524a927bc992146f8e5ed94ca7d1be2c"
+      },
+      "Cargo_reported_fresh_cache_hit": true,
+      "example_executed": false
+    }
+  ],
+  "verification": {
+    "available_Rust_source_files_per_build": 3646,
+    "full_source_manifest_files_per_build": 3659,
+    "archived_Rust_files_exact_to_Git_blob": 3645,
+    "line_ending_only_difference": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs: preexisting CRLF, exact LF-normalized SHA256 and Git blob identity",
+    "Cargo_emitted_package_source_target_and_executable_verified": true,
+    "captured_executable_hash_matches_immutable_archive": true,
+    "available_source_inventory_is_not_compiler_file_selection": true,
+    "selected_launch_environment_passed_to_actual_subprocess": true,
+    "freeze_environment_and_version_queries_are_after_command_diagnostics": true,
+    "independent_reference_occurrences": 21974,
+    "independent_distinct_immutable_files": 3683
+  },
+  "historical_pre_amendment_observations": {
+    "CLI_command": {
+      "path": ".runtime/porting/GEO-03/shared-freezer-cargo-verification-01/receipt.json",
+      "sha256": "f4d0555a0d693d5d77f6cfe1d56012a27fb8881faf7324242a1ce84539f6fb1d"
+    },
+    "CLI_freezer": {
+      "path": ".runtime/porting/GEO-03/builds/shared-freezer-verified-01/build-receipt.json",
+      "sha256": "6ce5443ee0eb6624eed36d626df1ca0faec88379e7f7b03f207d33b5c93cad67"
+    },
+    "example_command": {
+      "path": ".runtime/porting/GEO-03/shared-freezer-example-cargo-verification-01/receipt.json",
+      "sha256": "3f87d14e940b8d2e58848086c5fedb1c71fb799245e25dc305bde7818c3b8224"
+    },
+    "resolution": "The legacy captured executable path identifies a historical sample, resolved through the byte-identical immutable final archives above. Original receipt bytes remain unchanged; the revised schema uses historical_path plus a matching immutable archive."
+  },
+  "limitations": [
+    "Actual Cargo invocation and compiler-artifact records include valid cache hits; no new compilation of every source file is claimed.",
+    "Source equality before and after a command cannot detect transient edits.",
+    "Available-source inventories include cfg(test) and other files that may not be compiled into each target.",
+    "No EnergyPlus or Rust simulation was launched for this tool validation, and no GEO-03 numerical result is certified."
+  ]
+}
