@@ -371,6 +371,8 @@ pub struct SurfaceHeatBalanceState {
     pub azimuth_deg: f64,
     /// Surface tilt in degrees using EnergyPlus orientation conventions.
     pub tilt_deg: f64,
+    /// One actual initialized source geometry bundle; no observer recomputation.
+    pub geometry: crate::geometry::SurfaceGeometryProperties,
     /// Area-normalized thermal resistance in m2-K/W.
     pub thermal_resistance_m2_k_per_w: f64,
     /// Area-normalized heat capacity in J/m2-K when available.

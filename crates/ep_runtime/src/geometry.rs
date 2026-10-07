@@ -1,6 +1,17 @@
 //! Geometry summary and polygon helper functions.
 
+pub(crate) mod centroid_precision;
 pub mod production_trace;
+mod source_geometry;
+pub use source_geometry::{
+    SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
+    surface_geometry_properties,
+};
+/// Actual original product precision observed for the bounded centroid owner.
+pub const SOURCE_CENTROID_PRODUCT_PRECISION_BITS: u32 =
+    centroid_precision::SOURCE_PRODUCT_PRECISION_BITS;
+/// Binary64 third promoted by the original long-double centroid expression.
+pub const SOURCE_CENTROID_THIRD_BITS: u64 = centroid_precision::SOURCE_THIRD_BITS;
 
 use crate::first_zone::{SurfaceGeometrySummary, ZoneGeometrySummary};
 use ep_model::{AutoOrNumber, OutsideBoundaryCondition, Point3, SurfaceType, TypedModel, Zone};
@@ -145,119 +156,13 @@ fn bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
 /// Calculates a polygon surface area from 3D vertices in square meters.
 #[must_use]
 pub fn surface_area_m2(vertices: &[Point3]) -> f64 {
-    if vertices.len() < 3 {
-        return 0.0;
-    }
-
-    let origin = vertices[0];
-    vertices[1..]
-        .windows(2)
-        .map(|window| {
-            let first = vector_between(origin, window[0]);
-            let second = vector_between(origin, window[1]);
-            cross(first, second).magnitude() * 0.5
-        })
-        .sum()
+    source_geometry::gross_area(vertices)
 }
 
 pub(crate) fn surface_azimuth_deg(vertices: &[Point3]) -> f64 {
-    let Some(normal) = polygon_normal(vertices) else {
-        return 0.0;
-    };
-
-    let horizontal_magnitude = normal.x.hypot(normal.y);
-    if horizontal_magnitude > 1.0e-12 {
-        return normalize_degrees(normal.x.atan2(normal.y).to_degrees());
-    }
-
-    // EnergyPlus DetermineAzimuthAndTilt defines the local x axis from vertex 2 to
-    // vertex 3 for horizontal surfaces, whose normal cannot define an azimuth.
-    let edge = vector_between(vertices[1], vertices[2]);
-    if edge.x.hypot(edge.y) <= 1.0e-12 {
-        return 0.0;
-    }
-
-    normalize_degrees(180.0 - edge.y.atan2(edge.x).to_degrees())
+    source_geometry::orientation(vertices).map_or(0.0, |value| value.azimuth_deg)
 }
 
-pub(crate) fn surface_tilt_deg(surface_type: SurfaceType, vertices: &[Point3]) -> f64 {
-    let Some(normal) = polygon_normal(vertices) else {
-        return 0.0;
-    };
-    let magnitude = normal.magnitude();
-    if magnitude <= 1.0e-12 {
-        return 0.0;
-    }
-    if (normal.z.abs() / magnitude) > 1.0 - 1.0e-12 {
-        return match surface_type {
-            SurfaceType::Floor => 180.0,
-            SurfaceType::Roof | SurfaceType::Ceiling => 0.0,
-            SurfaceType::Wall => 90.0,
-        };
-    }
-
-    (-normal.z / magnitude).clamp(-1.0, 1.0).acos().to_degrees()
-}
-
-fn polygon_normal(vertices: &[Point3]) -> Option<Vector3> {
-    if vertices.len() < 3 {
-        return None;
-    }
-
-    let origin = vertices[0];
-    let mut normal = Vector3 {
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
-    for window in vertices[1..].windows(2) {
-        let first = vector_between(origin, window[0]);
-        let second = vector_between(origin, window[1]);
-        let triangle_normal = cross(first, second);
-        normal.x += triangle_normal.x;
-        normal.y += triangle_normal.y;
-        normal.z += triangle_normal.z;
-    }
-
-    if normal.magnitude() > 1.0e-12 {
-        Some(normal)
-    } else {
-        None
-    }
-}
-
-fn normalize_degrees(value: f64) -> f64 {
-    value.rem_euclid(360.0)
-}
-
-#[derive(Clone, Copy)]
-struct Vector3 {
-    x: f64,
-    y: f64,
-    z: f64,
-}
-
-impl Vector3 {
-    fn magnitude(self) -> f64 {
-        (self
-            .x
-            .mul_add(self.x, self.y.mul_add(self.y, self.z * self.z)))
-        .sqrt()
-    }
-}
-
-fn vector_between(origin: Point3, point: Point3) -> Vector3 {
-    Vector3 {
-        x: point.x_m - origin.x_m,
-        y: point.y_m - origin.y_m,
-        z: point.z_m - origin.z_m,
-    }
-}
-
-fn cross(left: Vector3, right: Vector3) -> Vector3 {
-    Vector3 {
-        x: left.y * right.z - left.z * right.y,
-        y: left.z * right.x - left.x * right.z,
-        z: left.x * right.y - left.y * right.x,
-    }
+pub(crate) fn surface_tilt_deg(_surface_type: SurfaceType, vertices: &[Point3]) -> f64 {
+    source_geometry::orientation(vertices).map_or(0.0, |value| value.tilt_deg)
 }

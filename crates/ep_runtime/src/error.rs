@@ -41,6 +41,13 @@ pub enum RuntimeError {
         /// Surface name.
         surface_name: String,
     },
+    /// Actual surface geometry cannot initialize a numerical heat-transfer state.
+    InvalidSurfaceGeometry {
+        /// Actual EnergyPlus-normalized surface name.
+        surface_name: String,
+        /// Invalid input or derived geometry, without source warning-string parity.
+        reason: String,
+    },
     /// An opaque building surface references a non-opaque construction.
     UnsupportedConstructionForOpaqueHeatBalance {
         /// Surface name.
@@ -123,6 +130,13 @@ impl Display for RuntimeError {
             Self::MissingConstruction { surface_name } => write!(
                 formatter,
                 "surface {surface_name} references a missing construction"
+            ),
+            Self::InvalidSurfaceGeometry {
+                surface_name,
+                reason,
+            } => write!(
+                formatter,
+                "surface {surface_name} geometry is invalid: {reason}"
             ),
             Self::UnsupportedConstructionForOpaqueHeatBalance {
                 surface_name,

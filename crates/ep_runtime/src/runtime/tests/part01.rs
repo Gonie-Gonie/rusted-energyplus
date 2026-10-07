@@ -142,6 +142,19 @@
     };
     use std::collections::BTreeMap;
 
+    // Source DetermineAzimuthAndTilt reads vertex winding without the old
+    // floor/roof class override. Only independent downstream horizontal-face
+    // tests use this fixture; the shared cube and its wall windings stay intact.
+    fn cube_model_with_outward_horizontal_surfaces() -> TypedModel {
+        let mut model = cube_model();
+        for surface in &mut model.surfaces {
+            if matches!(surface.surface_type, SurfaceType::Floor | SurfaceType::Roof) {
+                surface.vertices[1..].reverse();
+            }
+        }
+        model
+    }
+
     fn all_schedule_day_types() -> Vec<ScheduleDayType> {
         vec![
             ScheduleDayType::Sunday,
@@ -577,12 +590,15 @@
             "Sunrise Roof",
             SurfaceType::Roof,
             [
+                // Upward +Z winding supplies the horizontal sky-facing roof
+                // required by this independent solar formula regression.
                 point(0.0, 0.0, 1.0),
-                point(0.0, 1.0, 1.0),
-                point(1.0, 1.0, 1.0),
                 point(1.0, 0.0, 1.0),
+                point(1.0, 1.0, 1.0),
+                point(0.0, 1.0, 1.0),
             ],
         );
+        assert_eq!(surface_tilt_deg(roof.surface_type, &roof.vertices), 0.0);
 
         let incident = surface_incident_solar_radiation_for_weather_context_w_per_m2(
             &roof,
@@ -652,12 +668,15 @@
             "Spring Sunrise Roof",
             SurfaceType::Roof,
             [
+                // Upward +Z winding supplies the horizontal sky-facing roof
+                // required by this independent solar formula regression.
                 point(0.0, 0.0, 1.0),
-                point(0.0, 1.0, 1.0),
-                point(1.0, 1.0, 1.0),
                 point(1.0, 0.0, 1.0),
+                point(1.0, 1.0, 1.0),
+                point(0.0, 1.0, 1.0),
             ],
         );
+        assert_eq!(surface_tilt_deg(roof.surface_type, &roof.vertices), 0.0);
 
         let components = surface_incident_solar_components_hourly_average_w_per_m2(
             &roof,

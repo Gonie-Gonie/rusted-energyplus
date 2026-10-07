@@ -71,6 +71,14 @@ pub(crate) fn zone_surface_convection_sums_for_indices(
         .iter()
         .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| {
+            crate::geometry::production_trace::record(
+                crate::geometry::production_trace::GeometryConsumer::SurfaceHeatTransfer,
+                surface.surface_id,
+                surface.zone_id,
+                crate::geometry::production_trace::GeometryOperand::Area {
+                    area_m2: surface.area_m2,
+                },
+            );
             let surface_ha_w_per_k =
                 surface.inside_convection_coefficient_w_per_m2_k * surface.area_m2;
             (

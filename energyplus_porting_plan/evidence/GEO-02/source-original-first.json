@@ -1,0 +1,671 @@
+{
+  "schema": "geo02-original-first-observations.v1",
+  "status": "original-reference-complete-Rust-comparison-pending",
+  "completed_utc": "2026-10-07T19:42:28.647187+00:00",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-02/original-first-evidence-01/write_receipt.py",
+    "sha256": "76ed0265935b7545f674ac206c3748f5f0a71fa8cf56d852a20c3892fb4ba70d"
+  },
+  "metadata_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-02\\original-first-evidence-01\\write_receipt.py"
+  ],
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-cases.json",
+      "sha256": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-tolerances.json",
+      "sha256": "3876a34a85f84dc459d1fec406106c0166ef0ff1dd6942beb0d3a7fbcb19a0e1"
+    }
+  },
+  "native_preparation": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/native-preparation.json",
+    "sha256": "d5b900a24c49896a6b864e0a0808064f4b4e1dc550b6486068a1a6df8ed7fd0c"
+  },
+  "original_helper_execution": {
+    "path": ".runtime/porting/GEO-02/original-helper-first-01/helper-reference.json",
+    "sha256": "9a0052d5367cdfd0a04864f52e6a050ee2bb1ac2e4e8c310463064dd70c2f4ab"
+  },
+  "original_native_matrix": {
+    "path": ".runtime/porting/GEO-02/original-native-first-01/matrix.json",
+    "sha256": "5c95fa3b811bfd69370f626f8e3db689ac2d209d76debe2fbbad3fbf068805e4"
+  },
+  "helper_summary": {
+    "valid_quad_count": 15,
+    "valid_quad_ids": [
+      "ROOF-HORIZONTAL",
+      "FLOOR-HORIZONTAL",
+      "WALL-VERTICAL",
+      "WALL-REVERSED",
+      "ROOF-SLOPED",
+      "WALL-TRAPEZOID",
+      "WALL-TRANSLATED-TRAPEZOID",
+      "WALL-NEGATIVE-Z",
+      "QUAD-CONCAVE-ALTERNATE",
+      "AZ180-BELOW",
+      "AZ180-ABOVE",
+      "AZ360-BELOW",
+      "AZ360-ABOVE",
+      "HORIZONTAL-EPS-BELOW",
+      "HORIZONTAL-EPS-ABOVE"
+    ],
+    "source_only_unsafe_count": 2,
+    "source_only_unsafe_observations": [
+      {
+        "case_id": "DEGENERATE-COLLINEAR",
+        "centroid_retained_m": [
+          17.0,
+          -23.0,
+          31.0
+        ],
+        "source_messages": [
+          {
+            "level": 2,
+            "message": "CalcSurfaceCentroid: zero area surface, for surface=DEGENERATE-COLLINEAR"
+          }
+        ],
+        "ordinary_parser_admission_claimed": false
+      },
+      {
+        "case_id": "DEGENERATE-COINCIDENT",
+        "centroid_retained_m": [
+          17.0,
+          -23.0,
+          31.0
+        ],
+        "source_messages": [
+          {
+            "level": 2,
+            "message": "CalcSurfaceCentroid: zero area surface, for surface=DEGENERATE-COINCIDENT"
+          }
+        ],
+        "ordinary_parser_admission_claimed": false
+      }
+    ],
+    "cen_call_count": 526,
+    "retained_ordered_kernel_input_bits_equal_request": true,
+    "Process_second_call_owned_state_unchanged": true,
+    "source_centroid_precedes_Process": true,
+    "cen_observed_FP_controls": {
+      "control_writes_added": false,
+      "fe_round": 0,
+      "mxcsr_rounding_control_bits": 0,
+      "x87_control_word": 895,
+      "x87_precision_bits": 64,
+      "x87_precision_control_bits": 3,
+      "x87_rounding_control_bits": 0
+    },
+    "cen_special_triples": [
+      {
+        "case_id": "CEN-ALL-NEGATIVE-ZERO",
+        "input": {
+          "case_id": "CEN-ALL-NEGATIVE-ZERO",
+          "kind": "ordered-three-operand-boundary",
+          "x_operand_bits": [
+            "8000000000000000",
+            "8000000000000000",
+            "8000000000000000"
+          ],
+          "x_operands": [
+            -0.0,
+            -0.0,
+            -0.0
+          ]
+        },
+        "value": {
+          "value": -0.0,
+          "value_bits": "8000000000000000",
+          "value_class": "negative_zero"
+        }
+      },
+      {
+        "case_id": "CEN-CANCELLATION-LEFT-LOSS",
+        "input": {
+          "case_id": "CEN-CANCELLATION-LEFT-LOSS",
+          "kind": "ordered-three-operand-boundary",
+          "x_operand_bits": [
+            "4341c37937e08000",
+            "3ff0000000000000",
+            "c341c37937e08000"
+          ],
+          "x_operands": [
+            1e+16,
+            1.0,
+            -1e+16
+          ]
+        },
+        "value": {
+          "value": 0.0,
+          "value_bits": "0000000000000000",
+          "value_class": "positive_zero"
+        }
+      },
+      {
+        "case_id": "CEN-CANCELLATION-LEFT-EXACT",
+        "input": {
+          "case_id": "CEN-CANCELLATION-LEFT-EXACT",
+          "kind": "ordered-three-operand-boundary",
+          "x_operand_bits": [
+            "4341c37937e08000",
+            "c341c37937e08000",
+            "3ff0000000000000"
+          ],
+          "x_operands": [
+            1e+16,
+            -1e+16,
+            1.0
+          ]
+        },
+        "value": {
+          "value": 0.3333333333333333,
+          "value_bits": "3fd5555555555555",
+          "value_class": "finite"
+        }
+      }
+    ]
+  },
+  "native_summary": {
+    "valid_input_count": 11,
+    "ordinary_negative_count": 2,
+    "total_physical_zone_callbacks": 1440,
+    "valid_static_geometry_and_centroid_retained_through_final": true,
+    "observed_initialized_FP_controls": {
+      "control_writes_added": false,
+      "fe_round": 0,
+      "mxcsr_rounding_control_bits": 0,
+      "x87_control_word": 895,
+      "x87_precision_bits": 64,
+      "x87_precision_control_bits": 3,
+      "x87_rounding_control_bits": 0
+    },
+    "cases": [
+      {
+        "case_id": "A-24H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-24H/receipt.json",
+          "sha256": "f4da2c5f42e4d5320ca3be1c29a9104d9ffbb11f7d6aa3b6785adc5db67f1a7c"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-24H/native/geometry-observation.json",
+          "sha256": "43ebd2af8b22545c86ea4a792d483e631ea6707cbfdccad38b8f455d39e174f6"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-24H/original-command.json",
+          "sha256": "e9a60b2a061a35f3b8e2c015e52d472b04f79ab49190c5af0fe0469e11a233d4"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-24H/native/eplusout.err",
+          "sha256": "32efbac172a87f4a3e982d8735d0c7df0deec35d0569039baa6edbd1045fb3eb"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "A-72H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-72H/receipt.json",
+          "sha256": "cf75cd238c593046c8de84ab960d5088e2b0913e087d4ddb0c1ee28f6249fd7b"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-72H/native/geometry-observation.json",
+          "sha256": "303a55ef6ca7768fe6a402f28882aad34c44f9b59b7f6c813b0d60580ff37c53"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-72H/original-command.json",
+          "sha256": "d86daea48e1b1b57448bd9bdab2427a4285e70847fefb83b7cd9e34a3059779f"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/A-72H/native/eplusout.err",
+          "sha256": "2d3fa71da218102fe3fc9fcb4608329fdd40f658c6397ba848de13cf46c51876"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 288,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-NOLIMIT-24H/receipt.json",
+          "sha256": "d89c9c21c4f1e720eda76ec452ac49a823236dbe2f545bcfb93031af2d8e7c6f"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-NOLIMIT-24H/native/geometry-observation.json",
+          "sha256": "57456d40a7f2185dff67d8f5c90c81b431381b9c4c149871590b5818bdf08b4e"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-NOLIMIT-24H/original-command.json",
+          "sha256": "5b12d63e1cef972e45ec54cea106e0b2958b80654952941349d85561bb527f47"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-NOLIMIT-24H/native/eplusout.err",
+          "sha256": "d7c0c9feced8741037708c2224709b38fe67274deddacab3e36f317b17db3926"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-FLOW-24H/receipt.json",
+          "sha256": "f1662400f7e765d621ae077f0759090e93f21a8834a26f2ae813ebe265666b0b"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-FLOW-24H/native/geometry-observation.json",
+          "sha256": "30d6b345ec4685c8d56302c8a2603864a6f370cd1661090766cd4e47a58ddcc8"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-FLOW-24H/original-command.json",
+          "sha256": "adfd5139f7d506f3d244b0dbb2bbce3fed5d83875e8458990568b0a4f60d3bd2"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-FLOW-24H/native/eplusout.err",
+          "sha256": "36792ae2edf3e695dbb37817ead74c7f77ca0b53261975d06960c1b1b05a7b91"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-CAPACITY-24H/receipt.json",
+          "sha256": "689f89070e4fb632d4003dcdae2fec2e1c9a78ae8a56720099f6a544d5dbc81a"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-CAPACITY-24H/native/geometry-observation.json",
+          "sha256": "eb6aea56762836cb6b29e9e48e96ba5681968fd7d11042840a21e2b489e96779"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-CAPACITY-24H/original-command.json",
+          "sha256": "4e738e16f4867ff4859dddce05d1c5de120716beea4f86fd4636a4a8c22d7e81"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-CAPACITY-24H/native/eplusout.err",
+          "sha256": "51899ec4051a9034b962062b6e79e6fb4434a360f3752cc0835155e27a6387b8"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-24H/receipt.json",
+          "sha256": "17a19de853c62556fc474b5a03b8bf8c8a06711907587e5e46c4c0e2ed90f3b5"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-24H/native/geometry-observation.json",
+          "sha256": "9edfe3b291b55ae61d67bd3130a2a6b87b43eab5ab0d40f6c4c4b2face5909b8"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-24H/original-command.json",
+          "sha256": "e0be84e24d58636f0f0d8b15d8e1353e474c576bf9c0c959633c8dd157accae0"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-24H/native/eplusout.err",
+          "sha256": "2dd45907e4d6a736a8f47fa0fba1b95347a69ced1c01b8f08e886c8d986f1d28"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "B-BOTH-72H",
+        "kind": "unchanged-CON-input",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-72H/receipt.json",
+          "sha256": "1d81ce6c0511760fb27ccee39d6d739dfb4ada22734a06b4a9b3676e00b6087f"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-72H/native/geometry-observation.json",
+          "sha256": "a843142cd88b2d0dc04df54066b1717990e90e90b5663ee8cbf1cd58760227dc"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-72H/original-command.json",
+          "sha256": "c413a4814bd4ccc384291689638c3f522f3864cf6e0725aabb0e0ee6b3d619eb"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/B-BOTH-72H/native/eplusout.err",
+          "sha256": "eb3a419cab8ba3d0f84093a05184c8e5af6e457e4ccf528cb3b0eb9b0ca3e6c2"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 288,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "GEO02-OBLIQUE-AFFINE",
+        "kind": "valid-diagnostic-not-CON",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-OBLIQUE-AFFINE/receipt.json",
+          "sha256": "648d8a9871f275db0786447295be53c5fdbf4762acae5e98be0244c507262b72"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-OBLIQUE-AFFINE/native/geometry-observation.json",
+          "sha256": "7e3d8096ee7274d9a52f58efd31b28a5aa3fc30b604af143b92d1f0aed4d3926"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-OBLIQUE-AFFINE/original-command.json",
+          "sha256": "a26ac124475da162dd68e2ba204f15a953d8e420a2baf0cd04964eca855eef21"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-OBLIQUE-AFFINE/native/eplusout.err",
+          "sha256": "2d3fa71da218102fe3fc9fcb4608329fdd40f658c6397ba848de13cf46c51876"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "GEO02-NONUNIFORM-TRAPEZOID",
+        "kind": "valid-diagnostic-not-CON",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-NONUNIFORM-TRAPEZOID/receipt.json",
+          "sha256": "0c67b7804f6741f88f31e3b3bb10436352471daf5bf3f89301c5ebf62e8fe745"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-NONUNIFORM-TRAPEZOID/native/geometry-observation.json",
+          "sha256": "37c0382a15012e134fb211aac91e52c9da34cce951126c127a811700750efd27"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-NONUNIFORM-TRAPEZOID/original-command.json",
+          "sha256": "591ab9fb57aced7eb2c7aff9217c5392ff4b6a239f8f5f21449a79d7221149f4"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-NONUNIFORM-TRAPEZOID/native/eplusout.err",
+          "sha256": "2eb2efe2b2c53ba88e2ff35ede4ed1458dd8ca1e05d95ba7c71aa51d92867136"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "GEO02-SNAP-BELOW",
+        "kind": "valid-diagnostic-not-CON",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-BELOW/receipt.json",
+          "sha256": "4b59a2686abefa4412e704e707f92da84c5341f8f2902b057c0a77939a79934c"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-BELOW/native/geometry-observation.json",
+          "sha256": "a040ef4dc0cb04ccdd710edc0571d8d6741edaf7c94612c0d88c0ee22d93c200"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-BELOW/original-command.json",
+          "sha256": "959729b95be3f9b864d02a490ef058928757f15837ac739402bd81a1389ff5c6"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-BELOW/native/eplusout.err",
+          "sha256": "42fefb4bbed5fd0495fd521e49df4a91ec03be17e5f412418066c996a3090e2c"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "GEO02-SNAP-ABOVE",
+        "kind": "valid-diagnostic-not-CON",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-ABOVE/receipt.json",
+          "sha256": "c8471f6fe0d0009fb69ee5055d309ce81a2e40cf389e527c736597cb90980164"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-ABOVE/native/geometry-observation.json",
+          "sha256": "d4b2d7283b1bdd9b873816b4e5b21bc0de8d6e475b57ebf620e7684ae907e1fd"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-ABOVE/original-command.json",
+          "sha256": "8bd7d722ae474fbe4fd31f87c3f403b0474d3fbe423d690d462a4b473ffd0bcb"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-SNAP-ABOVE/native/eplusout.err",
+          "sha256": "2051c0e128f53172cd9fba155f593e6b31b7614183761129b05639fe6356e8a4"
+        },
+        "energyplus_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 96,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": true,
+          "first_physical": true,
+          "final_weather": true,
+          "final": true
+        },
+        "first_final_owned_geometry_identity_exact": true,
+        "centroid_retention_checked": true,
+        "geometry_specific_warning_and_inactive_predicates_passed_by_original_launcher": true
+      },
+      {
+        "case_id": "GEO02-INVALID-COLLINEAR",
+        "kind": "ordinary-input-negative-not-CON",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COLLINEAR/receipt.json",
+          "sha256": "f9ab0d355cebaea305e227a020ce63414586a086438bc7f268fc5d14cce8069f"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COLLINEAR/native/geometry-observation.json",
+          "sha256": "8bd572da92b5c831d49d436739a53c2b518341554a861cd49c902ec3bfc88327"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COLLINEAR/original-command.json",
+          "sha256": "cb9aefdf8dd8fb6629fc470c54eac02290a47daeea41e33cbe10c7b9729ae0ba"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COLLINEAR/native/eplusout.err",
+          "sha256": "6e0a2bad3a848e2ed6ee90f19bbf7e150d7b48e560f75a96c3b58b2b4b8740b0"
+        },
+        "energyplus_exit_code": 1,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 0,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": false,
+          "first_physical": false,
+          "final_weather": false,
+          "final": false
+        },
+        "first_final_owned_geometry_identity_exact": false,
+        "centroid_retention_checked": false,
+        "unavailable_geometry_is_null": true
+      },
+      {
+        "case_id": "GEO02-INVALID-COINCIDENT",
+        "kind": "ordinary-input-negative-not-CON",
+        "receipt": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COINCIDENT/receipt.json",
+          "sha256": "83a9f55794217bdc9ed60cac2bad69c6c5bc072c87cae32035112a3c378855f7"
+        },
+        "results": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COINCIDENT/native/geometry-observation.json",
+          "sha256": "8fb1d282e1d8da2c465713f3147105d34ab1fb33c63770afbfe9ad46f50a4f6a"
+        },
+        "execution": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COINCIDENT/original-command.json",
+          "sha256": "72291b9ec9622b9dd652539bbaf4c685068133dbdc11785c75eeb7b04ec0941a"
+        },
+        "geometry_error_log": {
+          "path": ".runtime/porting/GEO-02/original-native-first-01/GEO02-INVALID-COINCIDENT/native/eplusout.err",
+          "sha256": "4483215a570a067e1c2e52ed4547e9476d6afbc9949284c82e9db749f8de55eb"
+        },
+        "energyplus_exit_code": 1,
+        "wrapper_exit_code": 0,
+        "physical_zone_callbacks": 0,
+        "available_phases": {
+          "constructor": true,
+          "first_initialized": false,
+          "first_physical": false,
+          "final_weather": false,
+          "final": false
+        },
+        "first_final_owned_geometry_identity_exact": false,
+        "centroid_retention_checked": false,
+        "unavailable_geometry_is_null": true
+      }
+    ]
+  },
+  "observed_boundary_coverage": {
+    "named_horizontal_epsilon_pair": {
+      "HORIZONTAL-EPS-BELOW": {
+        "raw_normal_z": {
+          "value": 0.9999999999999999,
+          "value_bits": "3fefffffffffffff",
+          "value_class": "finite"
+        },
+        "azimuth_deg": {
+          "value": 90.0,
+          "value_bits": "4056800000000000",
+          "value_class": "finite"
+        },
+        "tilt_deg": {
+          "value": 8.537736462515939e-07,
+          "value_bits": "3eaca5dc1a63c1f8",
+          "value_class": "finite"
+        }
+      },
+      "HORIZONTAL-EPS-ABOVE": {
+        "raw_normal_z": {
+          "value": 0.9999999999999999,
+          "value_bits": "3fefffffffffffff",
+          "value_class": "finite"
+        },
+        "azimuth_deg": {
+          "value": 90.0,
+          "value_bits": "4056800000000000",
+          "value_class": "finite"
+        },
+        "tilt_deg": {
+          "value": 8.537736462515939e-07,
+          "value_bits": "3eaca5dc1a63c1f8",
+          "value_class": "finite"
+        }
+      }
+    },
+    "named_pair_crosses_threshold": false,
+    "precision": "Both frozen named epsilon rows returned z=0.9999999999999999 and selected the near-horizontal fallback. Names are not branch evidence. Other valid nonhorizontal quads exercise the ordinary branch; no adjacent-threshold claim.",
+    "input_or_tolerance_amended_after_observation": false
+  },
+  "reference_outputs_supplied_to_Rust": false,
+  "Rust_comparison_executed": false,
+  "gates_updated": false,
+  "limitations": [
+    "Original parsed IDF lifetimes and prepared helper calls are separate methods.",
+    "Unsafe helper warning/retention is not ordinary parser rejection or Rust error-message parity.",
+    "Original negative inputs exited before initialized geometry; unavailable snapshots are null.",
+    "FP rounding controls are observed; MXCSR exception status bits may differ after arithmetic.",
+    "Native11 valid includes seven CON and four diagnostic-only inputs; CON production domain is unchanged.",
+    "No new annual, SRC04, SRC05, GEO03 or whole-physics equivalence claim."
+  ]
+}

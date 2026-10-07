@@ -161,6 +161,7 @@ fn compiled_projection(
 pub(crate) fn runtime_projection(model: &TypedModel, state: &HeatBalanceState) -> Value {
     json!({
         "schema":"geo01-runtime-consumers.v1", "phase":"runtime_final_state_geometry",
+        "geo02_geometry_snapshot":crate::geo02_trace::runtime_projection(state),
         "physics_executed":true, "observer_supplies_inputs":false,
         "compiled_geometry_artifact":"compiled-geometry.json",
         "observed_timestep_index":state.timestep_index,
@@ -219,7 +220,11 @@ pub(crate) fn write_runtime_geometry(config: &RunConfig, artifact: &Value) -> Re
     write(config, "geometry-consumers.json", artifact).map_err(|message| RunError {
         exit_code: RunExitCode::OutputExport,
         message,
-    })
+    })?;
+    if let Some(geometry) = artifact.get("geo02_geometry_snapshot") {
+        crate::geo02_trace::write_geometry(config, geometry)?;
+    }
+    Ok(())
 }
 
 fn write(config: &RunConfig, filename: &str, artifact: &Value) -> Result<(), String> {

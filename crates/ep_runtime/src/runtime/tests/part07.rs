@@ -98,7 +98,7 @@
     #[test]
     fn exterior_longwave_terms_use_energyplus_sky_air_ground_split()
     -> Result<(), Box<dyn std::error::Error>> {
-        let typed = cube_model();
+        let typed = cube_model_with_outward_horizontal_surfaces();
         let model = SimulationModel::from_typed(typed.clone());
         let mut state = initialize_heat_balance_state(&model, 20.0)?;
         let surface_state = state
@@ -269,7 +269,7 @@
     #[test]
     fn heat_balance_warmup_uses_weather_context_for_exterior_forcing()
     -> Result<(), Box<dyn std::error::Error>> {
-        let mut typed = cube_model();
+        let mut typed = cube_model_with_outward_horizontal_surfaces();
         typed.timestep = TimestepConfig {
             number_of_timesteps_per_hour: 1,
         };
@@ -470,7 +470,7 @@ DATA PERIODS
     #[test]
     fn surface_incident_solar_diagnostic_appends_roof_series()
     -> Result<(), Box<dyn std::error::Error>> {
-        let mut typed = cube_model();
+        let mut typed = cube_model_with_outward_horizontal_surfaces();
         typed.surfaces[0].sun_exposure = SunExposure::NoSun;
         typed.site = Some(SiteLocation {
             name: NormalizedName::new("Solar Test Site"),
@@ -551,7 +551,7 @@ DATA PERIODS
     #[test]
     fn weather_record_exterior_balance_forces_exterior_conduction()
     -> Result<(), Box<dyn std::error::Error>> {
-        let mut typed = cube_model();
+        let mut typed = cube_model_with_outward_horizontal_surfaces();
         typed.site = Some(SiteLocation {
             name: NormalizedName::new("Solar Test Site"),
             latitude_deg: 39.75,

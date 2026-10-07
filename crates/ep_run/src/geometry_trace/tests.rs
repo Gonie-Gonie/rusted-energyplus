@@ -86,6 +86,8 @@ fn runtime_projection_copies_mutated_final_consumer_fields_without_recomputation
     state.surfaces[0].azimuth_deg = -77.25;
     state.surfaces[0].tilt_deg = 44.75;
     state.zones[0].volume_m3 = 2468.125;
+    state.surfaces[0].geometry.centroid_m.z_m = -123.5;
+    state.surfaces[0].geometry.out_norm = [-0.0, 0.25, 0.75];
     let observed = runtime_projection(&simulation_model.typed, &state);
     assert_eq!(observed["phase"], "runtime_final_state_geometry");
     assert_eq!(observed["physics_executed"], true);
@@ -101,5 +103,14 @@ fn runtime_projection_copies_mutated_final_consumer_fields_without_recomputation
     assert_eq!(
         observed["zones"][0]["rust_consumer"]["volume_bits"],
         format!("{:016x}", 2468.125_f64.to_bits())
+    );
+    let canonical = &observed["geo02_geometry_snapshot"]["surfaces"][0]["geometry"];
+    assert_eq!(canonical["centroid_m"][2]["value"], -123.5);
+    assert_eq!(canonical["out_norm"][0]["value_bits"], "8000000000000000");
+    assert_eq!(canonical["out_norm"][1]["value"], 0.25);
+    assert_eq!(canonical["out_norm"][2]["value"], 0.75);
+    assert_eq!(
+        observed["geo02_geometry_snapshot"]["surfaces"][0]["legacy_geometry"]["area_m2"]["value"],
+        12345.125,
     );
 }

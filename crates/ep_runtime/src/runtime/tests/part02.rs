@@ -660,7 +660,7 @@ DATA PERIODS
     }
 
     #[test]
-    fn surface_geometry_summary_reports_cube_orientation() -> Result<(), Box<dyn std::error::Error>>
+    fn surface_geometry_summary_retains_typed_cube_vertex_winding() -> Result<(), Box<dyn std::error::Error>>
     {
         let summaries = surface_geometry_summaries(&cube_model());
 
@@ -673,7 +673,10 @@ DATA PERIODS
         assert_eq!(floor.surface_type, SurfaceType::Floor);
         assert_eq!(floor.area_m2, 1.0);
         assert!((floor.azimuth_deg - 90.0).abs() < 1.0e-9);
-        assert!((floor.tilt_deg - 180.0).abs() < 1.0e-9);
+        // This hand-built fixture has an upward floor and downward roof normal.
+        // DetermineAzimuthAndTilt uses their vertex winding, independent of
+        // class. The summary does not perform the excluded GetVertices healing.
+        assert!((floor.tilt_deg - 0.0).abs() < 1.0e-9);
 
         let roof = summaries
             .iter()
@@ -682,7 +685,7 @@ DATA PERIODS
         assert_eq!(roof.surface_type, SurfaceType::Roof);
         assert_eq!(roof.area_m2, 1.0);
         assert!((roof.azimuth_deg - 180.0).abs() < 1.0e-9);
-        assert!((roof.tilt_deg - 0.0).abs() < 1.0e-9);
+        assert!((roof.tilt_deg - 180.0).abs() < 1.0e-9);
 
         let wall_azimuths = [
             ("WALL X0", 90.0),

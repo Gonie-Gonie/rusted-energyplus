@@ -109,10 +109,46 @@ are all present and exact. A separately preserved correction explains the
 historical receipt's erroneous subtraction of two Git metadata absences
 outside that archive table; no built source or binary was changed.
 
-Original helper and IDF execution, Rust baseline/final comparison,
-production consumer evidence, and all four card gates remain pending. The source-preserving GNU core
+Original-first execution completed: 15 valid and two source-only helper
+quadrilaterals, 526 unchanged-header centroid calls, and 13 ordinary IDFs
+(11 valid and two rejected inputs). The [original observations receipt](source-original-first.json)
+binds raw commands, inputs, state snapshots and errors. Valid helper retained
+coordinate bits equal the frozen request; valid original IDF geometry and
+centroids remain unchanged through final return. The 11 valid runs observed
+1,440 physical zone callbacks. Both ordinary invalid inputs exited before
+initialized geometry or physical callbacks. The separate unsafe helper rows
+warned and retained their supplied prior centroids.
+
+Actual helper and initialized original lifetimes observed x87 precision 64
+and round-to-nearest without observer control writes. The two named
+horizontal-epsilon probes both selected the near-horizontal branch after
+normalization; their labels do not establish opposite sides of that threshold.
+Other nonhorizontal valid inputs exercise the ordinary branch. Frozen inputs
+and tolerances remain unchanged.
+
+The preserved existing Rust baseline has 729 mismatches, including 721
+missing geometry/centroid results and eight numerical differences. The
+canonical precommit candidate has zero mismatches in 3,182 checks. An
+independent reader also finds exact bits for all 450 paired geometry scalars
+and all 526 three-point centroid results. The candidate is explicitly a
+dirty-source build; a fresh committed-source unit comparison is still
+required. The [baseline](baseline-comparison.json) and
+[candidate](candidate-comparison.json) records retain both boundaries.
+
+Committed-source final comparison, production consumer evidence, and all
+four card gates remain pending. The source-preserving GNU core
 retains its documented O0 reference configuration, original assertions and
 warnings, and all previously preserved failed build histories.
+
+The first full workspace test run found eight regressions in older tests
+whose hand-built horizontal surface winding disagreed with their assumed
+floor/roof direction. The shared cube fixture remains unchanged. Geometry
+tests now assert its actual Floor +Z / Roof -Z normals. Independent
+convection, longwave, solar and conduction tests explicitly prepare the
+opposite horizontal winding required by their existing physical assertions.
+Their numerical constants and tolerances are unchanged. This test-only
+correction does not change the frozen CON or diagnostic inputs, the
+canonical geometry calculation, or any original result.
 
 Existing GEO-01 records supply only already observed coordinate/input
 identity and area/azimuth/tilt context. They contain no new centroid or

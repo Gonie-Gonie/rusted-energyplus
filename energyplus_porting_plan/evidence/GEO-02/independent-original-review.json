@@ -1,0 +1,57 @@
+{
+  "schema": "geo02-independent-original-observation-review.v1",
+  "status": "pass-original-provenance-input-state-and-FP-only",
+  "completed_utc": "2026-10-07T19:54:01.783048+00:00",
+  "reviewed_original_evidence": {
+    "path": "energyplus_porting_plan/evidence/GEO-02/source-original-first.json",
+    "sha256": "fcabc7e9ddcdc43c6956fe8317c9901d7795cfe87df395f7a143499e9d702235"
+  },
+  "independent_actual_build_review": {
+    "path": ".runtime/porting/GEO-02/independent-native-build-review-01/final-review.json",
+    "sha256": "fe2b0ec8d57b67a581fd665c356842f08a6c3c1b98638921bd15e9cf5dac763b"
+  },
+  "independent_executed_original_helper_reader": {
+    "path": ".runtime/porting/GEO-02/independent-original-helper-review-01/review.json",
+    "sha256": "1e78c253533a0bf08c3aa94d0ebbffbcc20f71ee73e7c283f54abbb49aae1a3e"
+  },
+  "independent_executed_original_native_reader": {
+    "path": ".runtime/porting/GEO-02/independent-original-native-review-01/review.json",
+    "sha256": "8b66be40636bd70bb4d22a60f619b676799079218c6e8d550ab89a5e761a4081"
+  },
+  "checks": {
+    "helper": 48747,
+    "native": 27412
+  },
+  "actual_original_observations": {
+    "valid_helper_quads": 15,
+    "source_only_unsafe_helpers": 2,
+    "unchanged_header_cen_calls": 526,
+    "helper_FP_samples": 1165,
+    "valid_native_IDFs": 11,
+    "ordinary_invalid_IDFs": 2,
+    "actual_valid_native_zone_callbacks": 1440,
+    "parsed_input_coordinate_bits_verified": 792,
+    "native_FP_phases": 57,
+    "x87_precision_bits": 64,
+    "rounding": "nearest",
+    "FTZ_DAZ": "both-off"
+  },
+  "verified_boundaries": [
+    "Actual command/binary/build/source/input bindings and original completion, with the prior 13713-check full build audit reused immutably.",
+    "Valid raw ordered post-GetVertices bits equal frozen own request bits; all own typed parsed coordinate bits agree.",
+    "Unwritten Vertex/Triangle values are omitted until genuine writes; original constructor/preparation and Process scratch/first-use/second-call stability remain source-only states.",
+    "All valid initialized geometry, centroid and vertices remain exact through actual physical and final-before-delete observations.",
+    "Two unsafe helper warnings retain the supplied prior centroid; two separate ordinary invalid IDFs actually fail original admission before initialized/physical phases.",
+    "Actual PC64/nearest controls observed, decoded from raw registers, without control writes; FTZ and DAZ off."
+  ],
+  "coverage_limit": "Both HORIZONTAL-EPS-BELOW and HORIZONTAL-EPS-ABOVE actually select the near-horizontal fallback. Their names do not prove opposite epsilon branches. Nonhorizontal valid quads provide separate ordinary-branch observations. Frozen inputs/tolerances remain unchanged.",
+  "claims_excluded": [
+    "No Rust numerical comparison or canonical math pass by this review.",
+    "No paired Rust global/scratch/counter/shape state or unsafe-helper parser-error equivalence.",
+    "No SRC04/SRC05 algorithm, complete system call-order or whole physics parity."
+  ],
+  "engine_executions_by_reviewer": 0,
+  "Cargo_executions_by_reviewer": 0,
+  "Git_executions_by_reviewer": 0,
+  "gates_updated": false
+}

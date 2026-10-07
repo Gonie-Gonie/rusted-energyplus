@@ -1,0 +1,44 @@
+{
+  "card": "GEO-02",
+  "created_utc": "2026-10-07T20:30:47.655713+00:00",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-02/candidate-evidence-01/write_evidence.py",
+    "sha256": "165dad64ee368cd46346e30fe9bc28ce125f7b8c005dbbf565c73a1d38a322c5"
+  },
+  "metadata_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-02\\candidate-evidence-01\\write_evidence.py"
+  ],
+  "scientific_gates_updated": false,
+  "schema": "geo02-independent-production-tool-review-evidence.v1",
+  "status": "pass-static-only",
+  "raw_independent_review": {
+    "path": ".runtime/porting/GEO-02/independent-production-tool-review-01/review.json",
+    "sha256": "e6d1a43848f6e98c3702dbcd2b3fdfdb46b9cc94edb30afdd3763c163e3e555c"
+  },
+  "review_method": "Manual source/DTO/call-path review plus byte-exact snapshots and AST parsing; no checker import/execution or geometry formula evaluation.",
+  "reviewed_checker_sources": [
+    {
+      "historical_path": "tools/porting/check_geo02_production.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-production-tool-review-01/reviewed-source/tools/porting/check_geo02_production.py",
+        "sha256": "6b679b563a8d670de8088b96bb1b392b73ebefbcf4c6b21a0c9a70c037c6d6a3",
+        "bytes": 31843
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_production_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-02/independent-production-tool-review-01/reviewed-source/tools/porting/geo02_production_provenance.py",
+        "sha256": "14a45652df9c5e9085e35a1b794b6d1b80ae5aec051895ced361f26ce60496c1",
+        "bytes": 30095
+      }
+    }
+  ],
+  "reviewed_dependency_and_launcher_count": 3,
+  "actual_production_proof_reviewed": false,
+  "scientific_comparers_executed": 0,
+  "engine_executions": 0,
+  "scope": "Static source/DTO/provenance/clock/consumer-policy review only. Full copies sixteen geometry fields; Summary proves ordinary-output independence. Actual Rust geometry operands are checked against corresponding original stored geometry; original solar incidence, SRC04/SRC05 equations and source globals remain unpaired.",
+  "remaining": "Fresh committed execution evidence and unchanged-tool actual data/hash review are still required before scientific closure."
+}

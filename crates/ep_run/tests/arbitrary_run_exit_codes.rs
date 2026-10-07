@@ -159,6 +159,8 @@ fn full_trace_preserves_nonempty_output_directory_when_overwrite_is_denied()
     assert!(!output_dir.join("clock-calls.json").exists());
     assert!(!output_dir.join("compiled-geometry.json").exists());
     assert!(!output_dir.join("geometry-consumers.json").exists());
+    assert!(!output_dir.join("geo02-geometry.json").exists());
+    assert!(!output_dir.join("geo02-geometry-operands.json").exists());
     assert_eq!(std::fs::read_dir(&output_dir)?.count(), 1);
     std::fs::remove_dir_all(&case_dir)?;
     Ok(())

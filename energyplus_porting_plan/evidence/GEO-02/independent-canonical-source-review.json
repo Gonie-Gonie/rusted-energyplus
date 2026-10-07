@@ -1,0 +1,36 @@
+{
+  "schema": "geo02-independent-canonical-source-review-compact.v1",
+  "card": "GEO-02",
+  "status": "pass-static-source-review",
+  "review": {
+    "path": ".runtime/porting/GEO-02/independent-canonical-source-review-01/review.json",
+    "sha256": "4f3e91aeda5768284e5a299cb1d9ffcb6cb0ddce5f85dc90f69dd0d41d6d5bbb",
+    "bytes": 19431
+  },
+  "reviewed_rust_source_count": 24,
+  "unchanged_fixture_context_count": 1,
+  "original_source_file_pins_rehashed": 16,
+  "numerical_comparison_claim": false,
+  "compiled_byte_certification": false,
+  "committed_source_certification": false,
+  "production_execution_claim": false,
+  "scientific_gates_updated": false,
+  "limits": [
+    "Only frozen bounded valid opaque input geometry; excluded class healing/aspect/subsurface/counter and scratch lifecycle algorithms.",
+    "Named epsilon pair both observed fallback; ordinary nonhorizontal inputs cover general branch, names do not establish opposite epsilon sides.",
+    "OutNorm is stored but actual normal-dot/SRC04/SRC05/full physical pipeline parity remains unclaimed."
+  ],
+  "export_status_precision": {
+    "path": ".runtime/porting/GEO-02/independent-canonical-source-export-clarification-01/clarification.json",
+    "sha256": "beb791da84715f428c537886868d3a76c0f15819b69fb52c799e633c22c76938",
+    "bytes": 1858
+  },
+  "tests_only_amendment": {
+    "path": ".runtime/porting/GEO-02/independent-tests-amendment-01/review.json",
+    "sha256": "2ef7b2d3fcded678716f3ac5fcf40934cebd96b8f1d2021622aa1da8d477906c",
+    "bytes": 9144
+  },
+  "amended_test_file_count": 4,
+  "current_unique_reviewed_rust_source_count": 27,
+  "historical_candidate_does_not_compile_amended_tests": true
+}

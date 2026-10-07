@@ -4,6 +4,7 @@ use crate::geometry::surface_tilt_deg;
 use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::convection::{
     ExteriorConvectionTerms, energyplus_building_terrain, energyplus_exterior_convection_terms,
+    energyplus_stored_surface_outdoor_air_temperature_c,
     energyplus_surface_outdoor_air_temperature_c, heat_balance_uses_doe2_outside_convection,
 };
 use crate::heat_balance::ctf::{
@@ -12,7 +13,10 @@ use crate::heat_balance::ctf::{
     energyplus_ctf_outside_face_temperature_quick_conduction_calculation,
 };
 use crate::heat_balance::longwave::{ExteriorLongwaveTerms, energyplus_exterior_longwave_terms};
-use crate::heat_balance::solar::surface_incident_solar_radiation_for_weather_context_w_per_m2;
+use crate::heat_balance::solar::{
+    stored_surface_incident_solar_radiation_for_weather_context_w_per_m2,
+    surface_incident_solar_radiation_for_weather_context_w_per_m2,
+};
 use crate::heat_balance::state::{
     SurfaceBoundaryBalanceResult, SurfaceExteriorReportTerms, SurfaceHeatBalanceState,
     SurfaceOutsideBalanceDiagnostics,
@@ -153,9 +157,9 @@ pub(crate) fn exterior_surface_boundary_balance(
         record.horizontal_infrared_radiation_wh_per_m2,
     );
     let surface_outdoor_dry_bulb_c =
-        energyplus_surface_outdoor_air_temperature_c(typed_surface, outdoor_dry_bulb_c);
-    let wet_reference_temperature_c = energyplus_surface_outdoor_air_temperature_c(
-        typed_surface,
+        energyplus_stored_surface_outdoor_air_temperature_c(surface_state, outdoor_dry_bulb_c);
+    let wet_reference_temperature_c = energyplus_stored_surface_outdoor_air_temperature_c(
+        surface_state,
         energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c),
     );
 
@@ -180,8 +184,9 @@ pub(crate) fn exterior_surface_boundary_balance(
                     .and_then(|context| context.exterior_coefficient_surface_temperature_c),
             );
         };
-        surface_incident_solar_radiation_for_weather_context_w_per_m2(
+        stored_surface_incident_solar_radiation_for_weather_context_w_per_m2(
             typed_surface,
+            surface_state,
             site,
             context.records,
             context.record_index,
@@ -246,6 +251,9 @@ pub(crate) fn surface_exterior_report_terms(
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     runtime_config: HeatBalanceRuntimeConfig,
 ) -> SurfaceExteriorReportTerms {
+    // Report recomputation shares physical coefficient helpers, but must not
+    // be counted as an actual physical geometry consumer invocation.
+    let _geometry_observation = crate::geometry::production_trace::suspend_observations();
     if surface_state.outside_boundary_condition != OutsideBoundaryCondition::Outdoors
         || surface_state.area_m2 <= 0.0
     {
@@ -472,8 +480,7 @@ pub(crate) fn exterior_surface_energy_balance(
 
     let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
     let solar_gain_per_area_w_per_m2 = solar_absorptance * incident_solar_w_per_m2.max(0.0);
-    let tilt_rad =
-        surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
+    let tilt_rad = surface_state.tilt_deg.to_radians();
     let coefficient_surface_temperature_c = exterior_coefficient_surface_temperature_c
         .unwrap_or(surface_state.outside_face_temperature_c);
     let use_doe2_outside_convection = use_doe2_outside_convection

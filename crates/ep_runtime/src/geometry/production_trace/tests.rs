@@ -141,3 +141,47 @@ fn disabled_and_nested_capture_preserve_execution_and_predecessor() {
     assert_eq!(inner.dictionary[0].surface_id, SurfaceId(2));
     assert!(!ACTIVE_GEOMETRY.with_borrow(Option::is_some));
 }
+
+#[test]
+#[allow(clippy::panic)] // Deliberate unwind verifies observer-only predecessor restoration.
+fn suspension_restores_predecessor_after_nested_scopes_and_unwinding() {
+    let operand = GeometryOperand::Area { area_m2: 3.0 };
+    let (_, trace) = capture(true, || {
+        record(
+            GeometryConsumer::SurfaceHeatTransfer,
+            SurfaceId(1),
+            ZoneId(2),
+            operand,
+        );
+        let result = std::panic::catch_unwind(|| {
+            let _outer = suspend_observations();
+            record(
+                GeometryConsumer::SurfaceHeatTransfer,
+                SurfaceId(1),
+                ZoneId(2),
+                operand,
+            );
+            {
+                let _inner = suspend_observations();
+                record(
+                    GeometryConsumer::SurfaceHeatTransfer,
+                    SurfaceId(1),
+                    ZoneId(2),
+                    operand,
+                );
+            }
+            panic!("intentional observer suspension unwind");
+        });
+        assert!(result.is_err());
+        record(
+            GeometryConsumer::SurfaceHeatTransfer,
+            SurfaceId(1),
+            ZoneId(2),
+            operand,
+        );
+    });
+    let trace = trace.expect("outer capture restores");
+    assert_eq!(trace.total_call_count, 2);
+    assert_eq!(trace.ordered_ids.len(), 2);
+    assert_eq!(trace.omitted_call_count, 0);
+}

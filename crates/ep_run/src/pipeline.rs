@@ -917,11 +917,16 @@ fn run_with_optional_porting_scope_observed(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    let ((outcome, trace), clock_trace) =
+    let (((outcome, geometry_trace), trace), clock_trace) =
         ep_runtime::time_axis::clock_trace::capture(config.trace_level == TraceLevel::Full, || {
             ep_runtime::psychrometrics::production_trace::capture(
                 config.trace_level == TraceLevel::Full,
-                || run_with_optional_porting_scope_impl(config, scope),
+                || {
+                    ep_runtime::geometry::production_trace::capture(
+                        config.trace_level == TraceLevel::Full,
+                        || run_with_optional_porting_scope_impl(config, scope),
+                    )
+                },
             )
         });
     if let Some(trace) = trace {
@@ -936,6 +941,12 @@ fn run_with_optional_porting_scope_observed(
         && config.output_dir.is_dir()
     {
         crate::clock_trace::write_clock_trace(config, &trace)?;
+    }
+    if let Some(trace) = geometry_trace
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+    {
+        crate::geo02_trace::write_trace(config, &trace)?;
     }
     outcome
 }

@@ -1,7 +1,8 @@
 //! Heat-balance solar radiation and weather interpolation helpers.
 
+use crate::geometry::production_trace::{self, GeometryConsumer, GeometryOperand};
 use crate::geometry::{surface_azimuth_deg, surface_tilt_deg};
-use crate::heat_balance::state::SurfaceIncidentSolarComponents;
+use crate::heat_balance::state::{SurfaceHeatBalanceState, SurfaceIncidentSolarComponents};
 use crate::time_axis::{DEFAULT_RUN_PERIOD_YEAR, day_of_year};
 use crate::weather::{
     EpwRecord, next_solar_weather_record_within_day,
@@ -374,6 +375,7 @@ pub(crate) fn surface_incident_solar_components_hourly_average_w_per_m2(
 ) -> SurfaceIncidentSolarComponents {
     surface_incident_solar_components_for_weather_context_w_per_m2(
         surface,
+        None,
         site,
         weather_records,
         record_index,
@@ -394,6 +396,32 @@ pub(crate) fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
 ) -> f64 {
     surface_incident_solar_components_for_weather_context_w_per_m2(
         surface,
+        None,
+        site,
+        weather_records,
+        record_index,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+    )
+    .total_w_per_m2()
+}
+
+/// Physical solar consumer receives the initialized state; diagnostic/report
+/// wrappers above keep their separate API and produce no geometry observations.
+pub(crate) fn stored_surface_incident_solar_radiation_for_weather_context_w_per_m2(
+    surface: &Surface,
+    state: &SurfaceHeatBalanceState,
+    site: &SiteLocation,
+    weather_records: &[EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    zone_timestep: Option<u32>,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    surface_incident_solar_components_for_weather_context_w_per_m2(
+        surface,
+        Some(state),
         site,
         weather_records,
         record_index,
@@ -406,6 +434,7 @@ pub(crate) fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
 
 fn surface_incident_solar_components_for_weather_context_w_per_m2(
     surface: &Surface,
+    state: Option<&SurfaceHeatBalanceState>,
     site: &SiteLocation,
     weather_records: &[EpwRecord],
     record_index: usize,
@@ -425,6 +454,7 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
     if let Some(timestep) = zone_timestep {
         return surface_incident_solar_components_at_weather_timestep_w_per_m2(
             surface,
+            state,
             site,
             weather_records,
             record_index,
@@ -441,6 +471,7 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
     for timestep in 1..=steps {
         let timestep_components = surface_incident_solar_components_at_weather_timestep_w_per_m2(
             surface,
+            state,
             site,
             weather_records,
             record_index,
@@ -466,6 +497,7 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
 
 fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
     surface: &Surface,
+    state: Option<&SurfaceHeatBalanceState>,
     site: &SiteLocation,
     weather_records: &[EpwRecord],
     record_index: usize,
@@ -511,6 +543,7 @@ fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
 
     surface_incident_solar_components_at_local_hour_w_per_m2(
         surface,
+        state,
         site,
         SurfaceSolarTimestepInput {
             local_hour,
@@ -537,6 +570,7 @@ struct SurfaceSolarTimestepInput {
 
 fn surface_incident_solar_components_at_local_hour_w_per_m2(
     surface: &Surface,
+    state: Option<&SurfaceHeatBalanceState>,
     site: &SiteLocation,
     input: SurfaceSolarTimestepInput,
 ) -> SurfaceIncidentSolarComponents {
@@ -546,7 +580,11 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
         return SurfaceIncidentSolarComponents::default();
     };
 
-    let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
+    let tilt_deg = state.map_or_else(
+        || surface_tilt_deg(surface.surface_type, &surface.vertices),
+        |value| value.tilt_deg,
+    );
+    let tilt_rad = tilt_deg.to_radians();
     let direct_normal = input.direct_normal_radiation_w_per_m2.max(0.0);
     let diffuse_horizontal = input.diffuse_horizontal_radiation_w_per_m2.max(0.0);
 
@@ -560,7 +598,24 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
         input.equation_of_time_hours,
     );
 
-    let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
+    let azimuth_deg = state.map_or_else(
+        || surface_azimuth_deg(&surface.vertices),
+        |value| value.azimuth_deg,
+    );
+    let surface_azimuth_rad = azimuth_deg.to_radians();
+    if let Some(state) = state {
+        production_trace::record(
+            GeometryConsumer::SolarIncidence,
+            state.surface_id,
+            state.zone_id,
+            GeometryOperand::Orientation {
+                azimuth_deg,
+                tilt_deg,
+                azimuth_rad: surface_azimuth_rad,
+                tilt_rad,
+            },
+        );
+    }
 
     let shadowing_period_cos_incidence =
         shadowing_period_solar_position_rad.map(|(solar_altitude_rad, solar_azimuth_rad)| {

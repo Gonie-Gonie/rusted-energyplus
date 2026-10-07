@@ -210,6 +210,12 @@ impl Drop for CaptureGuard {
     }
 }
 
+/// Temporarily disables only this optional observer, restoring its predecessor
+/// on scope exit or unwinding. Shared report calculations keep their math.
+pub(crate) fn suspend_observations() -> impl Drop {
+    CaptureGuard(ACTIVE_GEOMETRY.with_borrow_mut(Option::take))
+}
+
 /// Executes unchanged. Disabled captures allocate no observation storage.
 /// Nested captures and unwinding restore their predecessor. Bound exhaustion
 /// retains a contiguous prefix and continues counting the omitted suffix.

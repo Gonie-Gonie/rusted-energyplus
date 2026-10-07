@@ -1,11 +1,17 @@
 //! Heat-balance convection source-order ownership notes.
 
-use crate::geometry::surface_azimuth_deg;
+mod geometry_operands;
+use crate::geometry::production_trace::{self, GeometryConsumer, GeometryOperand};
 use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::{
-    MaterialSurfaceRoughness, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3,
-    Surface, Terrain, TypedModel, WindExposure,
+    MaterialSurfaceRoughness, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Surface,
+    Terrain, TypedModel, WindExposure,
+};
+use geometry_operands::surface_centroid_z_m;
+pub(crate) use geometry_operands::{
+    energyplus_stored_surface_outdoor_air_temperature_c,
+    energyplus_stored_surface_outside_wind_speed_m_per_s,
 };
 
 /// Current inside convection routine family used by the compatibility lane.
@@ -208,13 +214,13 @@ pub(crate) fn energyplus_outside_convection_branch_id(
     if !use_doe2_outside_convection {
         return "simple-combined";
     }
-    let Some(typed_surface) = typed_surface else {
+    let Some(_typed_surface) = typed_surface else {
         return "missing-surface";
     };
 
     if energyplus_surface_is_windward(
         surface_state.tilt_deg.to_radians().cos(),
-        surface_azimuth_deg(&typed_surface.vertices),
+        surface_state.azimuth_deg,
         wind_direction_deg,
     ) {
         "doe2-windward"
@@ -310,17 +316,29 @@ pub(crate) fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
     wind_direction_deg: f64,
     use_doe2_outside_convection: bool,
 ) -> f64 {
-    let wind_speed_m_per_s = energyplus_surface_outside_wind_speed_m_per_s(
+    let wind_speed_m_per_s = energyplus_stored_surface_outside_wind_speed_m_per_s(
+        surface_state,
         typed_surface,
         terrain,
         weather_file_wind_speed_m_per_s,
     );
     if use_doe2_outside_convection {
+        let cos_tilt = tilt_rad.cos();
+        production_trace::record(
+            GeometryConsumer::OutsideConvection,
+            surface_state.surface_id,
+            surface_state.zone_id,
+            GeometryOperand::ConvectionOrientation {
+                azimuth_deg: surface_state.azimuth_deg,
+                tilt_deg: surface_state.tilt_deg,
+                cos_tilt,
+            },
+        );
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
             surface_temperature_c,
             outdoor_dry_bulb_c,
-            tilt_rad.cos(),
-            surface_azimuth_deg(&typed_surface.vertices),
+            cos_tilt,
+            surface_state.azimuth_deg,
             wind_direction_deg,
             wind_speed_m_per_s,
             surface_state.outside_layer_roughness,
@@ -402,14 +420,6 @@ pub(crate) fn energyplus_air_temperature_at_height_c(
     weather_file_temperature_c
         - ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M
             * (height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M)
-}
-
-pub(crate) fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {
-    if vertices.is_empty() {
-        return 0.0;
-    }
-
-    vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / vertices.len() as f64
 }
 
 pub(crate) fn heat_balance_uses_doe2_outside_convection(

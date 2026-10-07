@@ -11,7 +11,7 @@ pub use schedule_cache::{
 };
 
 use crate::error::RuntimeError;
-use crate::geometry::{surface_area_m2, surface_azimuth_deg, surface_tilt_deg, zone_volume_m3};
+use crate::geometry::zone_volume_m3;
 use crate::heat_balance::ctf::{
     ConstructionCtfCoefficientOverride, construction_ctf_coefficients_by_name,
     steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
@@ -102,9 +102,14 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .surfaces
         .iter()
         .map(|surface| {
-            let area_m2 = surface_area_m2(&surface.vertices);
-            let azimuth_deg = surface_azimuth_deg(&surface.vertices);
-            let tilt_deg = surface_tilt_deg(surface.surface_type, &surface.vertices);
+            let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
+                .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
+                    surface_name: surface.name.0.clone(),
+                    reason: error.to_string(),
+                })?;
+            let area_m2 = geometry.area_m2;
+            let azimuth_deg = geometry.azimuth_deg;
+            let tilt_deg = geometry.tilt_deg;
             let thermal = construction_thermal_data.data_for_surface(surface)?;
             let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
@@ -139,6 +144,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 area_m2,
                 azimuth_deg,
                 tilt_deg,
+                geometry,
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 thermal_absorptance: thermal.thermal_absorptance,

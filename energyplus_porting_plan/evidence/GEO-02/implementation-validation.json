@@ -1,0 +1,368 @@
+{
+  "schema": "geo02-implementation-validation.v1",
+  "purpose": "non-gate implementation regression and source-quality validation; historical failed executions retained",
+  "required_final_checks_passed": true,
+  "required_final_check_ids": [
+    "canonical-focused-tests-02",
+    "workspace-tests-02",
+    "clippy-01",
+    "source-quality-01",
+    "structure-01"
+  ],
+  "validation_source_status": "executed uncommitted source snapshots; no final committed-source proof is claimed",
+  "gates_updated": false,
+  "scientific_numerical_equivalence_claimed": false,
+  "production_proof_claimed": false,
+  "checks": [
+    {
+      "check_id": "canonical-focused-tests-01",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/canonical-focused-tests-01/receipt.json",
+        "sha256": "b04f473f364c005ce417a1007846c7e645a992fa34f9f32bc13467c1d8d6e8dc"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "ep_runtime",
+        "geometry",
+        "-j",
+        "2"
+      ],
+      "exit_code": 101,
+      "started_utc": "2026-10-07T20:00:48.472883+00:00",
+      "finished_utc": "2026-10-07T20:02:14.350406+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/1a/1a22bde959a7c25e0f022ee379e4baf608e32fdad7836c718624bc59dc3532f6",
+        "sha256": "1a22bde959a7c25e0f022ee379e4baf608e32fdad7836c718624bc59dc3532f6"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/canonical-focused-tests-01/stdout.log",
+        "sha256": "f2849b293233d8be18bf10c001b0e462339ae4cc5da3ea4d52e7c7c3cb953878"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/canonical-focused-tests-01/stderr.log",
+        "sha256": "ed2333318f33aceef47db7193bd74a3ae852021ccd7d44b41ec01cbac3fcbe27"
+      },
+      "test_summary": {
+        "reported_suites": 1,
+        "passed": 11,
+        "failed": 1,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 2922
+      },
+      "observed_failures": [
+        {
+          "test": "runtime::tests::surface_geometry_summary_reports_cube_orientation",
+          "observed_failure": "thread 'runtime::tests::surface_geometry_summary_reports_cube_orientation' (9940) panicked at crates\\ep_runtime\\src\\runtime\\tests/part02.rs:676:9:\nassertion failed: (floor.tilt_deg - 180.0).abs() < 1.0e-9\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace"
+        }
+      ]
+    },
+    {
+      "check_id": "canonical-focused-tests-02",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/canonical-focused-tests-02/receipt.json",
+        "sha256": "4fc586b252b15b0eca4d5bdee6d1b43ecfe30b7e15245bfbddc9f03ae180327c"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "ep_runtime",
+        "geometry",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-07T20:07:05.307940+00:00",
+      "finished_utc": "2026-10-07T20:08:03.520223+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/63/631d9f596f4f5dc172eb9fff4265ca3eadd2b18fd57546c1b1d8ac8b04ff9eb4",
+        "sha256": "631d9f596f4f5dc172eb9fff4265ca3eadd2b18fd57546c1b1d8ac8b04ff9eb4"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/canonical-focused-tests-02/stdout.log",
+        "sha256": "2e2a0fb5fb79f2bd1791986fa3703cf6d75c2a370e293648d0959f8880115b7b"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/canonical-focused-tests-02/stderr.log",
+        "sha256": "c32435c11449684fe19095aac64ce137eb5dbf2260cbf914551d5aba0fbfb491"
+      },
+      "test_summary": {
+        "reported_suites": 1,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 2922
+      }
+    },
+    {
+      "check_id": "workspace-tests-01",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/workspace-tests-01/receipt.json",
+        "sha256": "caae3b3020f1996951835a4a2825428f645f4ddba97e1aabd2ebde9691e8eb12"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "-j",
+        "2"
+      ],
+      "exit_code": 101,
+      "started_utc": "2026-10-07T20:12:11.549561+00:00",
+      "finished_utc": "2026-10-07T20:16:34.327835+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/63/631d9f596f4f5dc172eb9fff4265ca3eadd2b18fd57546c1b1d8ac8b04ff9eb4",
+        "sha256": "631d9f596f4f5dc172eb9fff4265ca3eadd2b18fd57546c1b1d8ac8b04ff9eb4"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/workspace-tests-01/stdout.log",
+        "sha256": "6f8f507c01dbc0f3b2a047adc809cf0c7ab4f0a941147e8b8b9972db9887462f"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/workspace-tests-01/stderr.log",
+        "sha256": "e493c37f96115ab73c327da26740640673e2680738b66211a3f1882d0e164262"
+      },
+      "test_summary": {
+        "reported_suites": 13,
+        "passed": 4535,
+        "failed": 8,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      "observed_failures": [
+        {
+          "test": "runtime::tests::energyplus_tarp_inside_convection_uses_surface_orientation_and_limits",
+          "observed_failure": "thread 'runtime::tests::energyplus_tarp_inside_convection_uses_surface_orientation_and_limits' (33336) panicked at crates\\ep_runtime\\src\\runtime\\tests/part03.rs:634:9:\nassertion failed: (floor_coefficient - expected_floor).abs() < 1.0e-12"
+        },
+        {
+          "test": "runtime::tests::exterior_longwave_terms_use_energyplus_sky_air_ground_split",
+          "observed_failure": "thread 'runtime::tests::exterior_longwave_terms_use_energyplus_sky_air_ground_split' (2268) panicked at crates\\ep_runtime\\src\\runtime\\tests/part07.rs:145:9:\nassertion failed: (terms.sky_coefficient_w_per_m2_k - expected_sky_coefficient).abs() < 1.0e-12"
+        },
+        {
+          "test": "runtime::tests::heat_balance_state_shell_initializes_cube_metrics",
+          "observed_failure": "thread 'runtime::tests::heat_balance_state_shell_initializes_cube_metrics' (46088) panicked at crates\\ep_runtime\\src\\runtime\\tests/part03.rs:129:9:\nassertion failed: (floor.tilt_deg - 180.0).abs() < 1.0e-9"
+        },
+        {
+          "test": "runtime::tests::heat_balance_warmup_uses_weather_context_for_exterior_forcing",
+          "observed_failure": "thread 'runtime::tests::heat_balance_warmup_uses_weather_context_for_exterior_forcing' (59000) panicked at crates\\ep_runtime\\src\\runtime\\tests/part07.rs:368:9:\nassertion failed: weather_context_roof.outside_face_temperature_c >\n    dry_only_roof.outside_face_temperature_c + 1.0"
+        },
+        {
+          "test": "runtime::tests::horizontal_roof_sky_diffuse_matches_energyplus_shadowing_sunrise_edge",
+          "observed_failure": "thread 'runtime::tests::horizontal_roof_sky_diffuse_matches_energyplus_shadowing_sunrise_edge' (6932) panicked at crates\\ep_runtime\\src\\runtime\\tests/part01.rs:670:9:\nassertion failed: (components.sky_diffuse_w_per_m2 - 42.517992377816).abs() < 1.0e-9"
+        },
+        {
+          "test": "runtime::tests::surface_solar_uses_shadowing_sunlit_fraction_at_sunrise_edge",
+          "observed_failure": "thread 'runtime::tests::surface_solar_uses_shadowing_sunlit_fraction_at_sunrise_edge' (60420) panicked at crates\\ep_runtime\\src\\runtime\\tests/part01.rs:597:9:\nassertion failed: (incident - 6.003845309857875).abs() < 1.0e-9"
+        },
+        {
+          "test": "runtime::tests::surface_incident_solar_diagnostic_appends_roof_series",
+          "observed_failure": "thread 'runtime::tests::surface_incident_solar_diagnostic_appends_roof_series' (34440) panicked at crates\\ep_runtime\\src\\runtime\\tests/part07.rs:532:9:\nassertion failed: roof_solar.values[0] > 600.0"
+        },
+        {
+          "test": "runtime::tests::weather_record_exterior_balance_forces_exterior_conduction",
+          "observed_failure": "thread 'runtime::tests::weather_record_exterior_balance_forces_exterior_conduction' (58276) panicked at crates\\ep_runtime\\src\\runtime\\tests/part07.rs:675:9:\nassertion failed: (coupled_roof_temperature.values[0] -\n                previous_inside_roof_temperature.values[0]).abs() > 1.0e-6"
+        }
+      ]
+    },
+    {
+      "check_id": "workspace-tests-02",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/workspace-tests-02/receipt.json",
+        "sha256": "9771c76eed98cd3d765744c78e9fdddccb0946d2070a150ed0e025c49d3f3f55"
+      },
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-07T20:28:58.296207+00:00",
+      "finished_utc": "2026-10-07T20:30:52.377946+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/eb/eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b",
+        "sha256": "eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/workspace-tests-02/stdout.log",
+        "sha256": "a4e5e1c0f0f3e3693a9916296850124c58fd72537040b67d4ee62cff6a5d3df6"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/workspace-tests-02/stderr.log",
+        "sha256": "ebd32cce3ac8c89be0ad51e600db122e86d07fac48040b1b729f6b86debbb8b1"
+      },
+      "test_summary": {
+        "reported_suites": 21,
+        "passed": 4543,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      "doctest_summary": {
+        "suite_names": [
+          "ep_compare",
+          "ep_compiler",
+          "ep_conformance",
+          "ep_model",
+          "ep_oracle",
+          "ep_raw_model",
+          "ep_run",
+          "ep_runtime"
+        ],
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "check_id": "clippy-01",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/clippy-01/receipt.json",
+        "sha256": "8af9636d4eb35b7ca4b4427035ba588a4fdcf6f2cf8aeb479ecfa9f747d039ee"
+      },
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-07T20:31:11.279571+00:00",
+      "finished_utc": "2026-10-07T20:32:38.220800+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/eb/eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b",
+        "sha256": "eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/clippy-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/clippy-01/stderr.log",
+        "sha256": "b9fc421406b762d353c14b83f1619da11ec3020f7b89ef3314f9545deb118e41"
+      }
+    },
+    {
+      "check_id": "source-quality-01",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/source-quality-01/receipt.json",
+        "sha256": "605fb945f7c56e9c52caa955d8ad16ab196d3fe8a0f8b6b96b00681dd8a9fd20"
+      },
+      "command": [
+        "cmd",
+        "/c",
+        "scripts\\dev.cmd",
+        "source-quality-gate"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-07T20:31:34.582336+00:00",
+      "finished_utc": "2026-10-07T20:31:55.684763+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/eb/eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b",
+        "sha256": "eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/source-quality-01/stdout.log",
+        "sha256": "d2cb2e2f1e2bf20cbf3d938bede200c9c11f1648c7d43b4be5bf7d9624d1831e"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/source-quality-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_quality": {
+        "checked_rust_files": 2482,
+        "skipped_test_files": 1164
+      }
+    },
+    {
+      "check_id": "structure-01",
+      "receipt": {
+        "path": ".runtime/porting/GEO-02/structure-01/receipt.json",
+        "sha256": "e27f82d00f84e49bad95c3a90196fb77e04e798a42f1975de67d83b6bbd9e1de"
+      },
+      "command": [
+        "cmd",
+        "/c",
+        "scripts\\dev.cmd",
+        "heat-balance-structure-audit"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-07T20:31:34.582336+00:00",
+      "finished_utc": "2026-10-07T20:31:53.229069+00:00",
+      "repository_head": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+      "source_worktree_clean_at_execution": false,
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/eb/eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b",
+        "sha256": "eb65c28c7ce2babd8e921d2265056608b3792f8d36bc360b3f121625cc39c18b"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-02/structure-01/stdout.log",
+        "sha256": "ce2cfab7a00d0146e97b9f4d91e5b317d43b989ee4edaad74211f8932cdfd9fa"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-02/structure-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "historical_failures": {
+    "canonical-focused-tests-01": "One outdated raw-winding expectation: unchanged hand-built Floor +Z/Roof -Z fixture had been masked by the old class-specific tilt override.",
+    "workspace-tests-01": "Eight failures: one initialized raw-geometry expectation and seven downstream fixture-precondition failures. The unchanged shared cube and standalone sunrise roof quads had inward horizontal winding; no centroid-height failure was identified.",
+    "correction": "Raw geometry tests now assert actual winding. Independent TARP/sky/solar/weather-forcing tests use explicitly outward horizontal faces; only Floor/Roof tail vertices are reversed in their local fixture. Shared cube vertices and wall windings remain unchanged; standalone solar roof quads are explicitly +Z. All prior numerical constants, assertion tolerances, physical branch and coefficient checks are retained.",
+    "observer_source_correction": "The separate report recomputation path now suspends only the optional geometry observer and restores its predecessor on Drop/unwind; physical coefficient hooks remain live. The selected pure geometry producer order is normal, fan area, angles/local axes, trig, snapped outward normal, then centroid.",
+    "test_files_after_correction": [
+      {
+        "path": "crates/ep_runtime/src/runtime/tests/part01.rs",
+        "sha256": "f02dce1f762e86636452e5ebf63417fa33e412ce28013efd9f9d33efccc406a1"
+      },
+      {
+        "path": "crates/ep_runtime/src/runtime/tests/part02.rs",
+        "sha256": "591108a0e13eb2076676348919640d396953b7421f172d85150c551549605c0c"
+      },
+      {
+        "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "ebd2f380dde5e33258eea080602bf723de88a7fef0dc0972670aa40ea18b018c"
+      },
+      {
+        "path": "crates/ep_runtime/src/runtime/tests/part07.rs",
+        "sha256": "b161d6d179dc44390cfef2730f7262d047eb7c79da52d88772b03124ce3c3338"
+      }
+    ]
+  },
+  "boundaries": [
+    "Regression success does not substitute for the frozen original-helper numerical comparison or the three fresh Full physical geometry/operand proofs.",
+    "Eight doctest suites contain zero tests and zero failures; they are reported separately rather than counted as additional assertions.",
+    "Summary observational independence and the native-only warning/counter/scratch lifecycle are separate from these regression checks."
+  ]
+}

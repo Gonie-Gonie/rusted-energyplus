@@ -1,0 +1,83 @@
+{
+  "schema": "geo02-baseline-comparison-evidence.v1",
+  "status": "fail-incomplete",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-02/baseline-evidence-01/write_baseline_evidence.py",
+    "sha256": "1d05a7179412f58870634bedafa9a6957909acab931c88b4939b47e37e94440b"
+  },
+  "comparison_command": {
+    "path": ".runtime/porting/GEO-02/baseline-comparison-01/receipt.json",
+    "sha256": "0e6d54724ed6e8605cd030e3303c4921dd402bd9d58c240810a5f07cb3f56c69"
+  },
+  "raw_comparison_report": {
+    "path": ".runtime/porting/GEO-02/baseline-comparison-01/stdout.log",
+    "sha256": "9f986a884c0ee10e42555d8d3328c5ce1c2f645389b0adc889f6261f1b7be319"
+  },
+  "original_helper_execution": {
+    "path": ".runtime/porting/GEO-02/original-helper-first-01/helper-reference.json",
+    "sha256": "9a0052d5367cdfd0a04864f52e6a050ee2bb1ac2e4e8c310463064dd70c2f4ab"
+  },
+  "original_helper_output": {
+    "path": ".runtime/porting/GEO-02/original-helper-first-01/helper-results.json",
+    "sha256": "e1ad3b992df9aa5dcca7c7be7df28e375c4fc60e20df35ed5b0053361cb8fb32"
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/GEO-02/rust-baseline-01/execution.json",
+    "sha256": "a5ebaab4dfd7f0dfb009e9938310f3eb83eafa686d1d6f05865ee491f280a80c"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/GEO-02/builds/baseline-f38d3bc1/build-receipt.json",
+    "sha256": "b58ccef79ee2ab182d3140845c03330db612be4a9fe2a95f6f6784183ade99b7"
+  },
+  "Rust_binary": {
+    "path": ".runtime/porting/GEO-02/builds/baseline-f38d3bc1/geo02_tuples.exe",
+    "sha256": "317233837a710c11bec7c307bf3e58891ba68a85a0f5a8e6334b247299429d38"
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-source.json",
+      "sha256": "68af6b2b164832f110d1fa308688463790ab899d9fae77565661cf3f56bbeb09"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-cases.json",
+      "sha256": "452d910b6afb81a1dcbf23b43d75d50e74c59da5d7e372ff45424511dc6cf435"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-02-tolerances.json",
+      "sha256": "3876a34a85f84dc459d1fec406106c0166ef0ff1dd6942beb0d3a7fbcb19a0e1"
+    }
+  },
+  "input_request": {
+    "path": "energyplus_porting_plan/cases/GEO-02/helper-request.json",
+    "sha256": "1b685699dcb264e391a5474ef6d5f02310269e53d96c69683eecfc1079f88c5f"
+  },
+  "actual_original_cen_x87_precision_bits": [
+    64
+  ],
+  "source_worktree_clean": true,
+  "implementation_commit": "f38d3bc15d778f6428cf0edb3d546538f649bdfa",
+  "metrics": {
+    "checks": 2446,
+    "mismatch_count": 729,
+    "mismatch_categories": {
+      "missing_required_output": 721,
+      "numerical_tolerance": 8
+    },
+    "scalar_error_metrics": {
+      "m2": {
+        "count": 15,
+        "maximum_absolute_error": 1.5,
+        "rmse": 0.3872983346207417
+      },
+      "deg": {
+        "count": 30,
+        "maximum_absolute_error": 359.99980901406826,
+        "rmse": 85.31513910811681
+      }
+    }
+  },
+  "interpretation": "The existing three-field public geometry route omits 195 required quad field observations and all 526 cen outputs. Eight existing area/angle observations exceed the frozen limits. The original-first inputs, operation order, tolerances and failure record are preserved before canonical math changes.",
+  "original_outputs_supplied_to_Rust": false,
+  "physics_executed_by_baseline_helper": false,
+  "scientific_gates_updated": false
+}

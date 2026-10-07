@@ -126,13 +126,15 @@
             .iter()
             .find(|surface| surface.surface_name == "FLOOR")
             .ok_or_else(|| std::io::Error::other("missing floor surface"))?;
-        assert!((floor.tilt_deg - 180.0).abs() < 1.0e-9);
+        // The unchanged hand-built cube has raw Floor +Z and Roof -Z winding;
+        // initialization copies canonical geometry, without class-based healing.
+        assert!((floor.tilt_deg - 0.0).abs() < 1.0e-9);
         let roof = state
             .surfaces
             .iter()
             .find(|surface| surface.surface_name == "ROOF")
             .ok_or_else(|| std::io::Error::other("missing roof surface"))?;
-        assert!((roof.tilt_deg - 0.0).abs() < 1.0e-9);
+        assert!((roof.tilt_deg - 180.0).abs() < 1.0e-9);
         let wall = state
             .surfaces
             .iter()
@@ -609,7 +611,7 @@
     #[test]
     fn energyplus_tarp_inside_convection_uses_surface_orientation_and_limits()
     -> Result<(), Box<dyn std::error::Error>> {
-        let model = SimulationModel::from_typed(cube_model());
+        let model = SimulationModel::from_typed(cube_model_with_outward_horizontal_surfaces());
         let state = initialize_heat_balance_state(&model, 20.0)?;
         let floor = state
             .surfaces
@@ -627,6 +629,8 @@
             .find(|surface| surface.surface_name == "WALL Y0")
             .ok_or_else(|| std::io::Error::other("missing wall surface"))?;
 
+        assert_eq!(floor.tilt_deg, 180.0);
+        assert_eq!(roof.tilt_deg, 0.0);
         let delta_term = 2.0_f64.powf(1.0 / 3.0);
         let floor_coefficient =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(floor, 22.0, 20.0);

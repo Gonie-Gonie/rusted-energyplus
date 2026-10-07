@@ -11,6 +11,7 @@
 mod clock_trace;
 mod config;
 mod diagnostics;
+mod geo02_trace;
 mod geometry_trace;
 mod oracle;
 mod outputs;

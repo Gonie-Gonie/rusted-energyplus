@@ -1,7 +1,7 @@
-//! Input-only GEO-02 baseline dispatch through existing public geometry summaries.
+//! Input-only GEO-02 dispatch through the actual initialized geometry owner.
 //!
-//! This adapter exposes the current area/angle implementation before the canonical
-//! geometry owner is ported. Missing normal and centroid outputs stay explicit.
+//! Inputs contain coordinates and operand bits only. Native results are never read.
+//! Unsafe native warning/centroid-retention helpers remain explicitly unpaired.
 
 use ep_model::{
     AutoOrNumber, ConstructionId, InsideSurfaceConvectionAlgorithm, NormalizedName,
@@ -9,7 +9,10 @@ use ep_model::{
     Surface, SurfaceId, SurfaceType, TypedModel, WindExposure, Zone, ZoneConvectionAlgorithm,
     ZoneId,
 };
-use ep_runtime::geometry::surface_geometry_summaries;
+use ep_runtime::geometry::{
+    SOURCE_CENTROID_PRODUCT_PRECISION_BITS, SOURCE_CENTROID_THIRD_BITS, SurfaceGeometryProperties,
+    source_triangle_centroid, surface_geometry_properties,
+};
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, error::Error, io::Read};
 
@@ -173,25 +176,30 @@ fn execute(input: &Value) -> Result<Value, String> {
                     .map(|coordinate| format!("{:016x}", coordinate.to_bits()))
             })
             .collect();
-        let summaries = surface_geometry_summaries(&typed);
-        let summary = summaries.first().ok_or("geometry summary missing")?;
+        let geometry = if kind == "valid_quad" {
+            Some(
+                surface_geometry_properties(&typed.surfaces[0].vertices)
+                    .map_err(|error| format!("{case_id}: {error}"))?,
+            )
+        } else {
+            None
+        };
+        if case["input_vertex_bits"] != json!(input_vertex_bits) {
+            return Err(format!(
+                "{case_id}: actual numeric input differs from declared input bits"
+            ));
+        }
         results.push(json!({
             "case_id":case_id,"kind":kind,"input":case,
-            "status":if kind == "valid_quad" {"baseline_partial"} else {"unsupported_source_only"},
-            "route":"ep_runtime::geometry::surface_geometry_summaries",
-            "surface_id":summary.surface_id.0,"surface_name":summary.surface_name,
-            "zone_name":summary.zone_name,
+            "status":if geometry.is_some() {"source_complete"} else {"unsupported_source_only"},
+            "route":"ep_runtime::geometry::surface_geometry_properties",
+            "surface_id":typed.surfaces[0].id.0,"surface_name":typed.surfaces[0].name.0,
+            "zone_name":typed.zones[0].name.0,
             "observed_input_vertex_bits":input_vertex_bits,
-            "geometry":{
-                "area_m2":scalar(summary.area_m2),
-                "azimuth_deg":scalar(summary.azimuth_deg),
-                "tilt_deg":scalar(summary.tilt_deg)
-            },
-            "unimplemented_fields":["gross_area_m2","net_area_shadow_m2",
-                "newell_area_vector_m2","newell_unit_normal","outward_unit_normal",
-                "centroid_m","lcs","trig"],
+            "geometry":geometry.map(geometry_json),
             "initial_centroid_consumed":false,
-            "admission_checked":false
+            "admission_checked":false,
+            "source_only_state_unpaired":["global counters","scratch arrays","shape","warning/centroid retention"]
         }));
     }
     let cen_calls = input["cen_calls"]
@@ -199,12 +207,54 @@ fn execute(input: &Value) -> Result<Value, String> {
         .ok_or("expected cen_calls array")?;
     let mut cen_results = Vec::with_capacity(cen_calls.len());
     for call in cen_calls {
-        call["case_id"].as_str().ok_or("expected cen case_id")?;
-        cen_results.push(json!({"input":call,"status":"unsupported_baseline",
-            "reason":"no existing public source cen helper or centroid geometry owner"}));
+        let case_id = call["case_id"].as_str().ok_or("expected cen case_id")?;
+        let tokens = call["x_operand_bits"]
+            .as_array()
+            .ok_or("expected three input bit operands")?;
+        if tokens.len() != 3 {
+            return Err("cen requires exactly three input operands".into());
+        }
+        let mut operands = [0.0; 3];
+        for (operand, token) in operands.iter_mut().zip(tokens) {
+            let token = token.as_str().ok_or("expected input hexadecimal bits")?;
+            if token.len() != 16 {
+                return Err("input bits require 16 hexadecimal digits".into());
+            }
+            *operand = f64::from_bits(u64::from_str_radix(token, 16).map_err(|e| e.to_string())?);
+        }
+        let point = |x_m| Point3 {
+            x_m,
+            y_m: 0.0,
+            z_m: 0.0,
+        };
+        let result =
+            source_triangle_centroid(point(operands[0]), point(operands[1]), point(operands[2]));
+        cen_results.push(json!({"case_id":case_id,"input":call,
+            "route":"ep_runtime::geometry::source_triangle_centroid", "value":scalar(result.x_m)}));
     }
     Ok(json!({"schema":"geo02-helper-results.v1",
-        "implementation_stage":"existing_helpers_baseline", "cases":results,
-        "cen_calls":cen_results,"physics_executed":false,
-        "reference_outputs_supplied_to_Rust":false}))
+    "implementation_stage":"source_geometry_owner", "cases":results,
+    "cen_calls":cen_results,"physics_executed":false,
+    "reference_outputs_supplied_to_Rust":false,
+    "cen_precision_profile":{
+        "sum_precision_bits":53,"product_precision_bits":SOURCE_CENTROID_PRODUCT_PRECISION_BITS,
+        "third_bits":format!("{SOURCE_CENTROID_THIRD_BITS:016x}"),
+        "rounding":"nearest_ties_even","control_writes_added":false,
+        "selection_basis":"actual_original_x87_precision_observation"
+    }}))
+}
+
+fn geometry_json(value: SurfaceGeometryProperties) -> Value {
+    let vector = |components: [f64; 3]| components.map(scalar);
+    json!({
+        "area_m2":scalar(value.area_m2),"gross_area_m2":scalar(value.gross_area_m2),
+        "net_area_shadow_m2":scalar(value.net_area_shadow_m2),
+        "azimuth_deg":scalar(value.azimuth_deg),"tilt_deg":scalar(value.tilt_deg),
+        "newell_area_vector_m2":vector(value.newell_area_vector_m2),
+        "newell_normal":vector(value.newell_normal),"out_norm":vector(value.out_norm),
+        "centroid_m":vector([value.centroid_m.x_m,value.centroid_m.y_m,value.centroid_m.z_m]),
+        "lcsx":vector(value.lcsx),"lcsy":vector(value.lcsy),"lcsz":vector(value.lcsz),
+        "sin_azimuth":scalar(value.sin_azimuth),"cos_azimuth":scalar(value.cos_azimuth),
+        "sin_tilt":scalar(value.sin_tilt),"cos_tilt":scalar(value.cos_tilt)
+    })
 }
