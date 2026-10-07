@@ -1,7 +1,7 @@
 {
   "schema": "psy01-source-reference.v1",
   "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
-  "execution_repository_head": "f62aeed0596be61b4084527dcbca6901f1c19dbe",
+  "execution_repository_head": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
   "contracts": [
     {
       "path": "energyplus_porting_plan/contracts/PSY-01-source.json",
@@ -27,8 +27,8 @@
       "-UNDEBUG",
       "-MMD",
       "-MF",
-      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\reference.d",
-      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\reference.d",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit",
       "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src",
       "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party",
       "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\ObjexxFCL\\src",
@@ -36,21 +36,21 @@
       "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\valijson\\include",
       "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\psy01_reference.cpp",
       "-o",
-      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\psy01_reference.exe"
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\psy01_reference.exe"
     ],
     "exit_code": 0,
     "artifacts": [
       {
-        "path": ".runtime/porting/PSY-01/build-command.json",
-        "sha256": "20a04405e736c56545a40b8fee129a113183330a7a5d8f80d7a72019f5ecb7fb"
+        "path": ".runtime/porting/PSY-01/committed-unit/build-command.json",
+        "sha256": "21be92c0bfcb2a5c5aad2f292defd3d758936d5614ae568fc0e11210b3515923"
       },
       {
-        "path": ".runtime/porting/PSY-01/build-stdout.log",
+        "path": ".runtime/porting/PSY-01/committed-unit/build-stdout.log",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "path": ".runtime/porting/PSY-01/build-stderr.log",
-        "sha256": "6e9cc225f04cf6db9130d122b2b6192116cad717ad208206f004d275fbc7db19"
+        "path": ".runtime/porting/PSY-01/committed-unit/build-stderr.log",
+        "sha256": "5fc25af69d2724a8c58ba0303d950a9f1c550f74bd0d3b95b0111c1172520301"
       }
     ],
     "compiler": {
@@ -66,20 +66,20 @@
       "sha256": "a3bc0008540c206d21433e8b28b9598baf7c2ba5bde8a326736159c82edeaaa8"
     },
     "instrumented_original_header": {
-      "path": ".runtime/porting/PSY-01/psy01_original_instrumented.hh",
+      "path": ".runtime/porting/PSY-01/committed-unit/psy01_original_instrumented.hh",
       "sha256": "02838a0c8e0d3b474cc006f9af689858a225f53fabaa211184f4407eb5509a03"
     },
     "dependency_file": {
-      "path": ".runtime/porting/PSY-01/reference.d",
-      "sha256": "b3c2a219188c8e13ea6dbe77056ad92996dbaf73c046b2ec1d7d5039f7764c57"
+      "path": ".runtime/porting/PSY-01/committed-unit/reference.d",
+      "sha256": "32cfb1a769a9620898988946f8a77bbeab071946e5ed82c8d34841160691598b"
     },
     "binary": {
-      "path": ".runtime/porting/PSY-01/psy01_reference.exe",
-      "sha256": "a72981ee6c9f2a74623bc2748637972653333861ace1f4f7b4dd699af41bb65d"
+      "path": ".runtime/porting/PSY-01/committed-unit/psy01_reference.exe",
+      "sha256": "82368ca4a25beef3f0527235f2e13b26583f57f6c696af92d6d81149aea9899a"
     },
     "dependency_manifest": {
-      "path": ".runtime/porting/PSY-01/reference-dependencies.json",
-      "sha256": "e7a6fe516dc82f1601f91187e0ea3f20b0123b708602d290e74e0177017328c3"
+      "path": ".runtime/porting/PSY-01/committed-unit/reference-dependencies.json",
+      "sha256": "01c2830db88f4a314e17f802a31b7dc5bafcdbe90781ca8c0977f59945f1e17f"
     },
     "dependency_count": 91,
     "flags": {
@@ -103,70 +103,238 @@
       "process_id": "normal-boundary-and-ieee",
       "call_count": 381,
       "tuples": {
-        "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-tuples.json",
+        "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-tuples.json",
         "sha256": "2d6e738de704197b58917d7548e67831c1e1e0de2d2882de533623b4c502e71e"
       },
       "original_results": {
-        "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference.json",
+        "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-reference.json",
         "sha256": "f21594fb8d2894327b424f04a65a99444720333c170430fe65ec74835c803980"
       },
       "execution": {
         "command": [
-          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\psy01_reference.exe",
-          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\normal-boundary-and-ieee-tuples.json",
-          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\normal-boundary-and-ieee-reference.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\psy01_reference.exe",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\normal-boundary-and-ieee-tuples.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\normal-boundary-and-ieee-reference.json",
           "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\energyplusapi.dll"
         ],
         "exit_code": 0,
         "artifacts": [
           {
-            "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference-command.json",
-            "sha256": "aaea80f9983893520e7520c6a8970629b99b3072d61e007faa792c5235c41684"
+            "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-reference-command.json",
+            "sha256": "5ac4d1b8b16f808f8a446fcde5e1a89def4c77cb84e34d92ef704fe50d2eafe4"
           },
           {
-            "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference-stdout.log",
+            "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-reference-stdout.log",
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
           {
-            "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference-stderr.log",
+            "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-reference-stderr.log",
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           }
         ]
+      },
+      "rust_binary": {
+        "path": ".runtime/porting/PSY-01/committed-build/psy01_tuples.exe",
+        "sha256": "f1edf4bd75dec5b0fb0003e9358c329809daa246b4ca1c464327db46bf89ce83"
+      },
+      "rust_execution": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-build\\psy01_tuples.exe",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\normal-boundary-and-ieee-tuples.json"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-rust-command.json",
+            "sha256": "965473f435ac3ae32f148079011146ccb5b79f3eb22882332d144db8d4c17cce"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-rust-stdout.log",
+            "sha256": "5a8b2f414935df507e0d335f37ea4f35078a8ca8dadcb42634aa73ed470c0f88"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/committed-unit/normal-boundary-and-ieee-rust-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "comparison": {
+        "call_count": 381,
+        "mismatch_count": 0,
+        "failures": [],
+        "per_function": {
+          "PsyCpAirFnW": {
+            "count": 59,
+            "finite_count": 55,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyCpAirFnW_fast": {
+            "count": 36,
+            "finite_count": 34,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyRhoAirFnPbTdbW": {
+            "count": 53,
+            "finite_count": 51,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyRhoAirFnPbTdbW_fast": {
+            "count": 29,
+            "finite_count": 29,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyHFnTdbW": {
+            "count": 57,
+            "finite_count": 56,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyHFnTdbW_fast": {
+            "count": 30,
+            "finite_count": 29,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyTdbFnHW": {
+            "count": 94,
+            "finite_count": 91,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyWFnTdbH": {
+            "count": 23,
+            "finite_count": 21,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          }
+        },
+        "checks_passed": true
       }
     },
     {
       "process_id": "cold-cp-sentinel",
       "call_count": 13,
       "tuples": {
-        "path": ".runtime/porting/PSY-01/cold-cp-sentinel-tuples.json",
+        "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-tuples.json",
         "sha256": "7ebf25953e824f1181763de2c1369014992b0bc530d8dffaba90ea8d0c0860df"
       },
       "original_results": {
-        "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference.json",
+        "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-reference.json",
         "sha256": "11c899881c5578b34f5f3df55181aab16cc4126eb757b969466d2d4603121924"
       },
       "execution": {
         "command": [
-          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\psy01_reference.exe",
-          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\cold-cp-sentinel-tuples.json",
-          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\cold-cp-sentinel-reference.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\psy01_reference.exe",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\cold-cp-sentinel-tuples.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\cold-cp-sentinel-reference.json",
           "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\energyplusapi.dll"
         ],
         "exit_code": 0,
         "artifacts": [
           {
-            "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference-command.json",
-            "sha256": "61c2dfe96a184b832fe3ef13442fb4df6627821e38e05deb5f12ee2d23669f24"
+            "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-reference-command.json",
+            "sha256": "f20e97090592113a07668e60edca19234b0822b12556fa3b5bb413e04ee9cbb9"
           },
           {
-            "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference-stdout.log",
+            "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-reference-stdout.log",
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
           {
-            "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference-stderr.log",
+            "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-reference-stderr.log",
             "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           }
         ]
+      },
+      "rust_binary": {
+        "path": ".runtime/porting/PSY-01/committed-build/psy01_tuples.exe",
+        "sha256": "f1edf4bd75dec5b0fb0003e9358c329809daa246b4ca1c464327db46bf89ce83"
+      },
+      "rust_execution": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-build\\psy01_tuples.exe",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-unit\\cold-cp-sentinel-tuples.json"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-rust-command.json",
+            "sha256": "47c3d1353d21b650204cd7a090cb4b9bab5b920e672955ee01cbbec1b09463ac"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-rust-stdout.log",
+            "sha256": "27f27361110ac7ce8f210e59079c4b362015d5e0085fd8b493ae58f9bea6277a"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/committed-unit/cold-cp-sentinel-rust-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "comparison": {
+        "call_count": 13,
+        "mismatch_count": 0,
+        "failures": [],
+        "per_function": {
+          "PsyCpAirFnW": {
+            "count": 9,
+            "finite_count": 7,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyCpAirFnW_fast": {
+            "count": 4,
+            "finite_count": 4,
+            "max_abs_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyRhoAirFnPbTdbW": {
+            "count": 0,
+            "finite_count": 0,
+            "max_abs_error": 0.0,
+            "sum_square_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyRhoAirFnPbTdbW_fast": {
+            "count": 0,
+            "finite_count": 0,
+            "max_abs_error": 0.0,
+            "sum_square_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyHFnTdbW": {
+            "count": 0,
+            "finite_count": 0,
+            "max_abs_error": 0.0,
+            "sum_square_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyHFnTdbW_fast": {
+            "count": 0,
+            "finite_count": 0,
+            "max_abs_error": 0.0,
+            "sum_square_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyTdbFnHW": {
+            "count": 0,
+            "finite_count": 0,
+            "max_abs_error": 0.0,
+            "sum_square_error": 0.0,
+            "rmse": 0.0
+          },
+          "PsyWFnTdbH": {
+            "count": 0,
+            "finite_count": 0,
+            "max_abs_error": 0.0,
+            "sum_square_error": 0.0,
+            "rmse": 0.0
+          }
+        },
+        "checks_passed": true
       },
       "cold_cache_observations": [
         {
@@ -603,7 +771,7 @@
   ],
   "reference_processes": 2,
   "production_trace": null,
-  "comparisons_executed": false,
+  "comparisons_executed": true,
   "checks_passed": true,
   "gates_updated": false,
   "limitations": [

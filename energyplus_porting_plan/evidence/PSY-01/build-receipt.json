@@ -1,0 +1,54 @@
+{
+  "schema": "psy01-committed-build.v1",
+  "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "cargo_lock": {
+    "path": ".runtime/porting/PSY-01/committed-build/Cargo.lock",
+    "sha256": "ebddfe56e3c0d242b920814be6c69b97c2f81bb99909dcbb27b75fead358df3a",
+    "implementation_path": "Cargo.lock"
+  },
+  "toolchain": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)\nbinary: rustc\ncommit-hash: ac68faa20c58cbccd01ee7208bf3b6e93a7d7f96\ncommit-date: 2026-05-25\nhost: x86_64-pc-windows-gnu\nrelease: 1.96.0\nLLVM version: 22.1.2"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "ep_cli"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 29.109,
+      "log": ".runtime/porting/PSY-01/committed-build/build-0.log",
+      "log_sha256": "b9363ae8838ca7c71e6d14f1a6d8cb7dce2668c0b82c11fff406ed2c310fa3b0"
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "ep_runtime",
+        "--example",
+        "psy01_tuples"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.39,
+      "log": ".runtime/porting/PSY-01/committed-build/build-1.log",
+      "log_sha256": "03afe83f1b7f0c2bca804af676225e6233fa2bd5d5bdc15b2a429d49db3ee296"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".runtime/porting/PSY-01/committed-build/eplus-rs.exe",
+      "sha256": "cc9b312687c17db5a987c21f3c9d57f5c0454affe9350913a9768118798c7d8e",
+      "build_output_path": "target/debug/eplus-rs.exe"
+    },
+    {
+      "path": ".runtime/porting/PSY-01/committed-build/psy01_tuples.exe",
+      "sha256": "f1edf4bd75dec5b0fb0003e9358c329809daa246b4ca1c464327db46bf89ce83",
+      "build_output_path": "target/debug/examples/psy01_tuples.exe"
+    }
+  ]
+}

@@ -1,0 +1,574 @@
+{
+  "schema": "psy01-production-case.v1",
+  "case_id": "B-CAPACITY-24H",
+  "scope": "B",
+  "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "binary": {
+    "path": ".runtime/porting/PSY-01/committed-build/eplus-rs.exe",
+    "sha256": "cc9b312687c17db5a987c21f3c9d57f5c0454affe9350913a9768118798c7d8e"
+  },
+  "case_metadata": {
+    "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+    "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+    "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "checker": {
+    "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.a093a7d37e7d.py",
+    "sha256": "a093a7d37e7da3fc6e4d641606007e64ef5221b981aa8ae77829801553de35e5"
+  },
+  "actual_coupling_invocations": 96,
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-build\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\B-CAPACITY-24H\\full",
+        "--porting-scope",
+        "B",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 135.406,
+      "stdout": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/cli-full-stdout.log",
+        "sha256": "68a6440868c18af95e9dd6d27139c8548ad3522abee56dc9daa00624fed72071"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/cli-full-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution_repository_head": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+      "orchestrator_source": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.a093a7d37e7d.py",
+        "sha256": "a093a7d37e7da3fc6e4d641606007e64ef5221b981aa8ae77829801553de35e5"
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-build\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\B-CAPACITY-24H\\summary",
+        "--porting-scope",
+        "B",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 92.824,
+      "stdout": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/cli-summary-stdout.log",
+        "sha256": "55c2d15678a7353a91fa84413d5231c1684b677add2ee093aee2fec091459fa0"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/cli-summary-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution_repository_head": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+      "orchestrator_source": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.a093a7d37e7d.py",
+        "sha256": "a093a7d37e7da3fc6e4d641606007e64ef5221b981aa8ae77829801553de35e5"
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\psy01_reference.py",
+        "--production-trace",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\B-CAPACITY-24H\\full\\psychrometrics-calls.json",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\B-CAPACITY-24H\\replay"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 26.39,
+      "stdout": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/original-replay-stdout.log",
+        "sha256": "6941a7170315ae24664e944229137964d03ed290d68239893200981e2f4ee1ea"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/original-replay-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution_repository_head": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+      "orchestrator_source": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.a093a7d37e7d.py",
+        "sha256": "a093a7d37e7da3fc6e4d641606007e64ef5221b981aa8ae77829801553de35e5"
+      }
+    }
+  ],
+  "full_summary_numerical_equality": {
+    "selected-outputs.csv": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/full/results/selected-outputs.csv",
+        "sha256": "4e29eb573cf91afd593909f8b7704a8528d565ea1555f72d71e97ee7d4cf50f1"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/summary/results/selected-outputs.csv",
+        "sha256": "4e29eb573cf91afd593909f8b7704a8528d565ea1555f72d71e97ee7d4cf50f1"
+      },
+      "comparison": "byte-exact"
+    },
+    "meters.csv": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/full/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/summary/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "comparison": "byte-exact"
+    },
+    "result-store.json": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/full/results/result-store.json",
+        "sha256": "2fb5db26d6dace8dc09a45278009dc679fcf108086f6fe22efab67dc505c207b"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/summary/results/result-store.json",
+        "sha256": "2fb5db26d6dace8dc09a45278009dc679fcf108086f6fe22efab67dc505c207b"
+      },
+      "comparison": "complete result series JSON equality"
+    }
+  },
+  "summary_kernel_artifact_absent": true,
+  "observation": {
+    "trace": {
+      "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/full/psychrometrics-calls.json",
+      "sha256": "63d041fbd542fe30bc78f6781d25d94791a0751e021330cee431295f1f04a965"
+    },
+    "total_call_count": 8526488,
+    "dictionary_count": 2729,
+    "omitted_call_count": 0,
+    "event_limit": 20000000,
+    "unique_tuple_limit": 100000,
+    "routine_counts": {
+      "PsyRhoAirFnPbTdbW": 393,
+      "PsyCpAirFnW": 4991476,
+      "PsyHFnTdbW": 3278657,
+      "PsyTdbFnHW": 255962
+    },
+    "scope_counts": {
+      "unbound": 6,
+      "zone_timestep_execution": 776,
+      "direct_zone_purchased_air_system_call": 8517398,
+      "coupled_output_validation": 8308
+    },
+    "caller_counts": {
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/ideal_loads/calc/psychrometrics.rs:27|pipeline|unbound": 3,
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/ideal_loads/calc/psychrometrics.rs:27|rust_runtime|unbound": 1,
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/heat_balance/initialization.rs:66|rust_runtime|unbound": 1,
+      "PsyCpAirFnW|crates/ep_runtime/src/heat_balance/initialization.rs:66|rust_runtime|unbound": 1,
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/heat_balance/air_manager.rs:73|rust_runtime|zone_timestep_execution": 384,
+      "PsyCpAirFnW|crates/ep_runtime/src/heat_balance/air_manager.rs:73|rust_runtime|zone_timestep_execution": 384,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:244|rust_runtime|direct_zone_purchased_air_system_call": 96,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:698|rust_runtime|direct_zone_purchased_air_system_call": 13,
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/heat_balance/run_period.rs:328|rust_runtime|zone_timestep_execution": 4,
+      "PsyCpAirFnW|crates/ep_runtime/src/heat_balance/run_period.rs:334|rust_runtime|zone_timestep_execution": 4,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:409|rust_runtime|direct_zone_purchased_air_system_call": 35,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:433|rust_runtime|direct_zone_purchased_air_system_call": 35,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:438|rust_runtime|direct_zone_purchased_air_system_call": 35,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:458|rust_runtime|direct_zone_purchased_air_system_call": 35,
+      "PsyCpAirFnW|C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/core/src/ops/function.rs:250|rust_runtime|direct_zone_purchased_air_system_call": 145,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_sensible_flow/release/snapshot_validation.rs:78|rust_runtime|direct_zone_purchased_air_system_call": 3735986,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_mixed_air_call/release.rs:381|rust_runtime|direct_zone_purchased_air_system_call": 49,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_mixed_air_call/release.rs:543|rust_runtime|direct_zone_purchased_air_system_call": 2750699,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_mixed_air_call/release/committed.rs:133|rust_runtime|direct_zone_purchased_air_system_call": 602,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_cp_air_assignment/release.rs:257|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_cp_air_assignment/release/snapshot_validation.rs:81|rust_runtime|direct_zone_purchased_air_system_call": 851768,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_enthalpy_assignment/release.rs:308|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_enthalpy_assignment/transition.rs:33|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_enthalpy_assignment/release/snapshot_validation.rs:87|rust_runtime|direct_zone_purchased_air_system_call": 524448,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_cp_air_assignment/release.rs:296|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_cp_air_assignment/release/snapshot_validation.rs:133|rust_runtime|direct_zone_purchased_air_system_call": 393648,
+      "PsyTdbFnHW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment/transition.rs:55|rust_runtime|direct_zone_purchased_air_system_call": 47,
+      "PsyTdbFnHW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment/release/snapshot_validation.rs:219|rust_runtime|direct_zone_purchased_air_system_call": 191854,
+      "PsyTdbFnHW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment/release/prefix_validation.rs:121|rust_runtime|direct_zone_purchased_air_system_call": 63920,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_supply_enthalpy_post_saturation_assignment/release.rs:194|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_supply_enthalpy_post_saturation_assignment/transition.rs:171|rust_runtime|direct_zone_purchased_air_system_call": 144,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_supply_enthalpy_post_saturation_assignment/release/snapshot_validation.rs:223|rust_runtime|direct_zone_purchased_air_system_call": 1776,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment/release.rs:148|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment/transition.rs:324|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment/release.rs:264|rust_runtime|direct_zone_purchased_air_system_call": 1344,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:536|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:541|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:542|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyTdbFnHW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:549|rust_runtime|direct_zone_purchased_air_system_call": 47,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:578|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:583|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:598|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/no_oa.rs:618|rust_runtime|direct_zone_purchased_air_system_call": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_sensible_flow/release/snapshot_validation.rs:78|rust_runtime|coupled_output_validation": 49,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_mixed_air_call/release.rs:543|rust_runtime|coupled_output_validation": 196,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/coupled_runtime/cooling_mixed_air_call_validation.rs:74|rust_runtime|coupled_output_validation": 49,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_cp_air_assignment/release/snapshot_validation.rs:81|rust_runtime|coupled_output_validation": 48,
+      "PsyCpAirFnW|C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/core/src/ops/function.rs:250|rust_runtime|coupled_output_validation": 96,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/coupled_runtime/cooling_positive_supply_enthalpy_assignment_validation.rs:55|rust_runtime|coupled_output_validation": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_enthalpy_assignment/release/snapshot_validation.rs:87|rust_runtime|coupled_output_validation": 48,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/coupled_runtime/cooling_positive_supply_enthalpy_assignment_validation.rs:102|rust_runtime|coupled_output_validation": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_cp_air_assignment/release/snapshot_validation.rs:133|rust_runtime|coupled_output_validation": 48,
+      "PsyTdbFnHW|crates/ep_runtime/src/ideal_loads/calc/cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment/release/snapshot_validation.rs:219|rust_runtime|coupled_output_validation": 47,
+      "PsyTdbFnHW|crates/ep_runtime/src/ideal_loads/coupled_runtime/cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_validation.rs:355|rust_runtime|coupled_output_validation": 47,
+      "PsyHFnTdbW|crates/ep_runtime/src/ideal_loads/calc/cooling_supply_enthalpy_post_saturation_assignment/release/snapshot_validation.rs:223|rust_runtime|coupled_output_validation": 48,
+      "PsyCpAirFnW|crates/ep_runtime/src/ideal_loads/calc/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment/release.rs:264|rust_runtime|coupled_output_validation": 7536
+    },
+    "kernel_argument_humidity_ranges": {
+      "PsyRhoAirFnPbTdbW": [
+        1e-05,
+        0.008
+      ],
+      "PsyCpAirFnW": [
+        0.002431765074591631,
+        0.008
+      ],
+      "PsyHFnTdbW": [
+        0.002431765074591631,
+        0.002431765074591631
+      ],
+      "PsyTdbFnHW": [
+        0.002431765074591631,
+        0.002431765074591631
+      ]
+    },
+    "physical_zone_steps": 96,
+    "actual_system_call_steps": 96,
+    "referenced_output_validation_steps": 49,
+    "kernel_bearing_system_samples": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95
+    ],
+    "kernel_bearing_validation_samples": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72
+    ],
+    "scope_coverage_boundary": "Only scopes containing actual psychrometric calls are observable here; zero-kernel invocations create no synthetic trace events. Actual coupling invocation count comes independently from the runtime summary.",
+    "context_order_verified": true,
+    "first_actual_normal_cp": {
+      "after": {
+        "cpa_save": 1019.7116000000001,
+        "cpa_save_bits": "408fddb15b573eac",
+        "dw_save": 0.008,
+        "dw_save_bits": "3f80624dd2f1a9fc"
+      },
+      "before": {
+        "cpa_save": -100.0,
+        "cpa_save_bits": "c059000000000000",
+        "dw_save": -100.0,
+        "dw_save_bits": "c059000000000000"
+      },
+      "hit": false
+    },
+    "physical_no_oa_tdb_call_count": 47,
+    "other_transition_validation_tdb_call_count": 255915,
+    "physical_return_samples": [
+      {
+        "sample_index": 25,
+        "input_bits": [
+          "40e911b7f8a697e2",
+          "3f63ebc7eef10ee9"
+        ],
+        "returned_temperature_bits": "40466b8fa6cc94f2",
+        "returned_temperature_C": 44.84032139767977,
+        "caller": {
+          "column": 17,
+          "file": "crates\\ep_runtime\\src\\ideal_loads\\calc\\no_oa.rs",
+          "line": 549
+        },
+        "event_count": 1
+      },
+      {
+        "sample_index": 26,
+        "input_bits": [
+          "40e92ce6c408cd60",
+          "3f63ebc7eef10ee9"
+        ],
+        "returned_temperature_bits": "404687235fd5550c",
+        "returned_temperature_C": 45.055767039457436,
+        "caller": {
+          "column": 17,
+          "file": "crates\\ep_runtime\\src\\ideal_loads\\calc\\no_oa.rs",
+          "line": 549
+        },
+        "event_count": 1
+      },
+      {
+        "sample_index": 70,
+        "input_bits": [
+          "40ea843f9e564c35",
+          "3f63ebc7eef10ee9"
+        ],
+        "returned_temperature_bits": "4047e3770eb00be4",
+        "returned_temperature_C": 47.777070842704944,
+        "caller": {
+          "column": 17,
+          "file": "crates\\ep_runtime\\src\\ideal_loads\\calc\\no_oa.rs",
+          "line": 549
+        },
+        "event_count": 1
+      },
+      {
+        "sample_index": 71,
+        "input_bits": [
+          "40ea67975e11de34",
+          "3f63ebc7eef10ee9"
+        ],
+        "returned_temperature_bits": "4047c664674aefa7",
+        "returned_temperature_C": 47.549939071264184,
+        "caller": {
+          "column": 17,
+          "file": "crates\\ep_runtime\\src\\ideal_loads\\calc\\no_oa.rs",
+          "line": 549
+        },
+        "event_count": 1
+      }
+    ],
+    "return_consumption": "no_oa.rs assigns the actual kernel return to supply_temperature_c before the mixed-air min; dispatch produces supply_node_update/report and coupling derives actual system feedback",
+    "return_consumer_source": [
+      {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/ideal_loads/calc/no_oa.rs",
+        "sha256": "a80ac1f87193d76dace79ad2b76c705e7dee63c01fc5b6ed4648dbfbe89e35c2"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/ideal_loads/dispatch.rs",
+        "sha256": "b4423112a0c81ae1c70d3db67aeb2f0aa8064c2e0c4b6b78cb0c2405b00a1a56"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/ideal_loads/coupling.rs",
+        "sha256": "21a8f85fe33f2dadac6f6d847bd767deedb05e35bcd4d496b3ee809d72e38b47"
+      }
+    ]
+  },
+  "original_cpp_replay": {
+    "receipt": {
+      "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/B-CAPACITY-24H/replay/source-reference.json",
+      "sha256": "aa8402000c8ba593a8d7d57abda3218131fdefa2ee4f9b608439827cd4078c40"
+    },
+    "event_count": 8526488,
+    "unique_pair_count": 2729,
+    "mismatch_count": 0,
+    "per_function": {
+      "PsyCpAirFnW": {
+        "count": 4991476,
+        "finite_count": 4991476,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyCpAirFnW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW": {
+        "count": 393,
+        "finite_count": 393,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW": {
+        "count": 3278657,
+        "finite_count": 3278657,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyTdbFnHW": {
+        "count": 255962,
+        "finite_count": 255962,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyWFnTdbH": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      }
+    },
+    "cache_context_order_checked": true
+  },
+  "checks_passed": true,
+  "claim": "conditional kernel replay on actual Rust arguments; physical pipeline and upstream EP caller parity remain unverified"
+}

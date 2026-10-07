@@ -1,0 +1,304 @@
+{
+  "schema": "psy01-production-case.v1",
+  "case_id": "A-24H",
+  "scope": "A",
+  "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "binary": {
+    "path": ".runtime/porting/PSY-01/committed-build/eplus-rs.exe",
+    "sha256": "cc9b312687c17db5a987c21f3c9d57f5c0454affe9350913a9768118798c7d8e"
+  },
+  "case_metadata": {
+    "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+    "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+  },
+  "input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+  },
+  "weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+  },
+  "checker": {
+    "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.a093a7d37e7d.py",
+    "sha256": "a093a7d37e7da3fc6e4d641606007e64ef5221b981aa8ae77829801553de35e5"
+  },
+  "actual_coupling_invocations": null,
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-build\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\A-24H\\full",
+        "--porting-scope",
+        "A",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 2.501,
+      "stdout": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/cli-full-stdout.log",
+        "sha256": "eb1f06cfe9e98a9bb55df6d6f063c252f942a6e866fd2e215c8778c5033ec331"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/cli-full-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution_repository_head": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+      "orchestrator_source": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.before-scope-review.py",
+        "sha256": "4c290229ad435456f657c6e28fdefda972d714e7bfc97540df5f9a15ef3e48a5"
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\committed-build\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\A-24H\\summary",
+        "--porting-scope",
+        "A",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 0.983,
+      "stdout": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/cli-summary-stdout.log",
+        "sha256": "c214226c7c1193e9715049b3f29b08a6575fd88f1851799bad7792207d852ff9"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/cli-summary-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution_repository_head": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+      "orchestrator_source": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.before-scope-review.py",
+        "sha256": "4c290229ad435456f657c6e28fdefda972d714e7bfc97540df5f9a15ef3e48a5"
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\psy01_reference.py",
+        "--production-trace",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\A-24H\\full\\psychrometrics-calls.json",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\production\\f5de70ed4eb3\\A-24H\\replay"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "elapsed_seconds": 10.138,
+      "stdout": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/original-replay-stdout.log",
+        "sha256": "40c853665e51e4feb590915b820c910a79f8070ce4f6fd62e1ff1bc728962b84"
+      },
+      "stderr": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/original-replay-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "execution_repository_head": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+      "orchestrator_source": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.before-scope-review.py",
+        "sha256": "4c290229ad435456f657c6e28fdefda972d714e7bfc97540df5f9a15ef3e48a5"
+      }
+    }
+  ],
+  "full_summary_numerical_equality": {
+    "selected-outputs.csv": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/full/results/selected-outputs.csv",
+        "sha256": "f37ac41cc742239ee822f990cfa3c3dd481d8d4933476dfe2e21247bc7eb8a73"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/summary/results/selected-outputs.csv",
+        "sha256": "f37ac41cc742239ee822f990cfa3c3dd481d8d4933476dfe2e21247bc7eb8a73"
+      },
+      "comparison": "byte-exact"
+    },
+    "meters.csv": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/full/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/summary/results/meters.csv",
+        "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+      },
+      "comparison": "byte-exact"
+    },
+    "result-store.json": {
+      "equal": true,
+      "full": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/full/results/result-store.json",
+        "sha256": "4684af9003b23acd7923bac46c246c3e05b593ca01177c48abe997abc2313b04"
+      },
+      "summary": {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/summary/results/result-store.json",
+        "sha256": "4684af9003b23acd7923bac46c246c3e05b593ca01177c48abe997abc2313b04"
+      },
+      "comparison": "complete result series JSON equality"
+    }
+  },
+  "summary_kernel_artifact_absent": true,
+  "observation": {
+    "trace": {
+      "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/full/psychrometrics-calls.json",
+      "sha256": "538456c9b2721afbc5746b4d511c3ba2e6abcd4f9a746f79c538fe4c190428e8"
+    },
+    "total_call_count": 202,
+    "dictionary_count": 202,
+    "omitted_call_count": 0,
+    "event_limit": 20000000,
+    "unique_tuple_limit": 100000,
+    "routine_counts": {
+      "PsyRhoAirFnPbTdbW": 101,
+      "PsyCpAirFnW": 101
+    },
+    "scope_counts": {
+      "unbound": 2,
+      "zone_timestep_execution": 200
+    },
+    "caller_counts": {
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/heat_balance/initialization.rs:66|rust_runtime|unbound": 1,
+      "PsyCpAirFnW|crates/ep_runtime/src/heat_balance/initialization.rs:66|rust_runtime|unbound": 1,
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/heat_balance/air_manager.rs:73|rust_runtime|zone_timestep_execution": 96,
+      "PsyCpAirFnW|crates/ep_runtime/src/heat_balance/air_manager.rs:73|rust_runtime|zone_timestep_execution": 96,
+      "PsyRhoAirFnPbTdbW|crates/ep_runtime/src/heat_balance/run_period.rs:328|rust_runtime|zone_timestep_execution": 4,
+      "PsyCpAirFnW|crates/ep_runtime/src/heat_balance/run_period.rs:334|rust_runtime|zone_timestep_execution": 4
+    },
+    "kernel_argument_humidity_ranges": {
+      "PsyRhoAirFnPbTdbW": [
+        0.002431765074591631,
+        0.008
+      ],
+      "PsyCpAirFnW": [
+        0.002431765074591631,
+        0.008
+      ]
+    },
+    "physical_zone_steps": 96,
+    "actual_system_call_steps": 0,
+    "referenced_output_validation_steps": 0,
+    "kernel_bearing_system_samples": [],
+    "kernel_bearing_validation_samples": [],
+    "scope_coverage_boundary": "Only scopes containing actual psychrometric calls are observable here; zero-kernel invocations create no synthetic trace events. Actual coupling invocation count comes independently from the runtime summary.",
+    "context_order_verified": true,
+    "first_actual_normal_cp": {
+      "after": {
+        "cpa_save": 1019.7116000000001,
+        "cpa_save_bits": "408fddb15b573eac",
+        "dw_save": 0.008,
+        "dw_save_bits": "3f80624dd2f1a9fc"
+      },
+      "before": {
+        "cpa_save": -100.0,
+        "cpa_save_bits": "c059000000000000",
+        "dw_save": -100.0,
+        "dw_save_bits": "c059000000000000"
+      },
+      "hit": false
+    },
+    "physical_no_oa_tdb_call_count": 0,
+    "other_transition_validation_tdb_call_count": 0,
+    "physical_return_samples": [],
+    "return_consumption": "no_oa.rs assigns the actual kernel return to supply_temperature_c before the mixed-air min; dispatch produces supply_node_update/report and coupling derives actual system feedback",
+    "return_consumer_source": [
+      {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/ideal_loads/calc/no_oa.rs",
+        "sha256": "a80ac1f87193d76dace79ad2b76c705e7dee63c01fc5b6ed4648dbfbe89e35c2"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/ideal_loads/dispatch.rs",
+        "sha256": "b4423112a0c81ae1c70d3db67aeb2f0aa8064c2e0c4b6b78cb0c2405b00a1a56"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/ideal_loads/coupling.rs",
+        "sha256": "21a8f85fe33f2dadac6f6d847bd767deedb05e35bcd4d496b3ee809d72e38b47"
+      }
+    ]
+  },
+  "original_cpp_replay": {
+    "receipt": {
+      "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/A-24H/replay/source-reference.json",
+      "sha256": "9a71d3fba7ce285df4fc53a889ae96213d65f1eee6df8ca3025bc5591606fd66"
+    },
+    "event_count": 202,
+    "unique_pair_count": 202,
+    "mismatch_count": 0,
+    "per_function": {
+      "PsyCpAirFnW": {
+        "count": 101,
+        "finite_count": 101,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyCpAirFnW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW": {
+        "count": 101,
+        "finite_count": 101,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyTdbFnHW": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyWFnTdbH": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      }
+    },
+    "cache_context_order_checked": true
+  },
+  "checks_passed": true,
+  "claim": "conditional kernel replay on actual Rust arguments; physical pipeline and upstream EP caller parity remain unverified"
+}

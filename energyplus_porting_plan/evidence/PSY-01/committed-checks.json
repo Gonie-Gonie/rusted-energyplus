@@ -1,0 +1,747 @@
+{
+  "schema": "psy01-committed-checks.v1",
+  "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "root_tree_at_start": "6812697ca1196d1ffabfb2664a9765f6a084e146",
+  "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "started_utc": "2026-10-07T11:48:53.969073+00:00",
+  "status": "PASS",
+  "gate_promotion": false,
+  "conformance_claim": false,
+  "physics_claim": "No EnergyPlus caller or simulation numerical gate is certified by these checks.",
+  "source_worktree_changes_before": [],
+  "oracle_lock": {
+    "energyplus_version": "26.1.0",
+    "source_tag": "v26.1.0",
+    "source_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+    "runtime_dir": ".runtime/energyplus/26.1.0",
+    "source_dir": ".reference/energyplus-src/26.1.0"
+  },
+  "cargo_lock": {
+    "path": ".runtime/porting/PSY-01/committed-build/Cargo.lock",
+    "sha256": "ebddfe56e3c0d242b920814be6c69b97c2f81bb99909dcbb27b75fead358df3a",
+    "original_source_path": "Cargo.lock"
+  },
+  "archived_build_artifacts": [
+    {
+      "path": ".runtime/porting/PSY-01/committed-build/eplus-rs.exe",
+      "sha256": "cc9b312687c17db5a987c21f3c9d57f5c0454affe9350913a9768118798c7d8e"
+    },
+    {
+      "path": ".runtime/porting/PSY-01/committed-build/psy01_tuples.exe",
+      "sha256": "f1edf4bd75dec5b0fb0003e9358c329809daa246b4ca1c464327db46bf89ce83"
+    }
+  ],
+  "tools": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)\nbinary: rustc\ncommit-hash: ac68faa20c58cbccd01ee7208bf3b6e93a7d7f96\ncommit-date: 2026-05-25\nhost: x86_64-pc-windows-gnu\nrelease: 1.96.0\nLLVM version: 22.1.2",
+    "git": "git version 2.50.1.windows.1",
+    "python": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "powershell": "5.1.26100.9549",
+    "mdbook": "mdbook v0.5.3"
+  },
+  "runner": {
+    "path": ".runtime/porting/PSY-01/committed-checks/run_checks.py",
+    "sha256": "8889501919fab787139427c872ba45e17b6151fdca521102caab95dcab0c7895"
+  },
+  "notes": [
+    "IdealLoads and strict master audits have no SelfTest switch; the full normal command is used.",
+    "Raw log bytes are retained without filtering or truncation.",
+    "The required stack setting is explicitly supplied to every command."
+  ],
+  "checks": [
+    {
+      "id": "workspace-all-target-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--quiet"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\.cargo\\bin\\cargo.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:48:53.971077+00:00",
+      "finished_utc": "2026-10-07T11:50:58.079552+00:00",
+      "elapsed_seconds": 124.107,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/workspace-all-target-tests.log",
+      "log_sha256": "48508d07402d2b6249380bfcebc91af4b9cd3101db75a33e637770e15edc61dd",
+      "log_bytes": 6616,
+      "test_groups": [
+        {
+          "passed": 176,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 93,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 472,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 30,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 23,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 771,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 2908,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        }
+      ],
+      "test_passed_total": 4516,
+      "test_failed_total": 0
+    },
+    {
+      "id": "core-run-cli-clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "-p",
+        "ep_runtime",
+        "-p",
+        "ep_run",
+        "-p",
+        "ep_cli",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\.cargo\\bin\\cargo.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:50:58.080572+00:00",
+      "finished_utc": "2026-10-07T11:52:10.517652+00:00",
+      "elapsed_seconds": 72.437,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/core-run-cli-clippy.log",
+      "log_sha256": "e85db73c95c21bd6891445730d9eb534fd9fa1d9c45befcf65347ed76591bbea",
+      "log_bytes": 593
+    },
+    {
+      "id": "workspace-format",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\.cargo\\bin\\cargo.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:10.519658+00:00",
+      "finished_utc": "2026-10-07T11:52:16.676225+00:00",
+      "elapsed_seconds": 6.156,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/workspace-format.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_bytes": 0
+    },
+    {
+      "id": "heat-balance-structure-self-test",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/heat-balance-structure-audit.ps1",
+        "-SelfTest"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:16.688892+00:00",
+      "finished_utc": "2026-10-07T11:52:34.859140+00:00",
+      "elapsed_seconds": 18.17,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/heat-balance-structure-self-test.log",
+      "log_sha256": "2a2210d758a8c295c5c37619af69309bcd03389ce591c7b9ef3f21b1a9da8d97",
+      "log_bytes": 98
+    },
+    {
+      "id": "ideal-loads-structure",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/ideal-loads-structure-audit.ps1"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:16.688892+00:00",
+      "finished_utc": "2026-10-07T11:52:33.770169+00:00",
+      "elapsed_seconds": 17.081,
+      "exit_code": 1,
+      "log": ".runtime/porting/PSY-01/committed-checks/ideal-loads-structure.log",
+      "log_sha256": "34b73a4b7a499fbc29c643f8c3e905efc9022366713a9eb3cb2d36bef5b8c097",
+      "log_bytes": 566,
+      "failure_excerpt": [
+        "bounded CP343 PsyTdbFnHW integration missing in docs\\src\\porting-map\\psychrometrics-source-map.md",
+        "At C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\scripts\\quality\\ideal-loads-structure-audit.ps1:115 char:9",
+        "+         throw \"$Description missing in $Path\"",
+        "+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+        "    + CategoryInfo          : OperationStopped: (bounded CP343 P...s-source-map.md:String) [], RuntimeException",
+        "    + FullyQualifiedErrorId : bounded CP343 PsyTdbFnHW integration missing in docs\\src\\porting-map\\psychrometrics-sour ",
+        "   ce-map.md",
+        " "
+      ]
+    },
+    {
+      "id": "strict-no-false-conformance",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/strict-no-false-conformance.ps1"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:33.772178+00:00",
+      "finished_utc": "2026-10-07T11:52:45.554415+00:00",
+      "elapsed_seconds": 11.783,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/strict-no-false-conformance.log",
+      "log_sha256": "f8397ad2f4e683b0a429673ee2be0c41f70fe1abe2e95d3455f58d47a0b2040c",
+      "log_bytes": 311749
+    },
+    {
+      "id": "docs-check",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/docs-check.ps1"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:34.860141+00:00",
+      "finished_utc": "2026-10-07T11:52:46.949805+00:00",
+      "elapsed_seconds": 12.09,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/docs-check.log",
+      "log_sha256": "fb08f762070fc43e40c30bc9d9760c6516a0cafea5282bb6a82fd6886ea66884",
+      "log_bytes": 354
+    },
+    {
+      "id": "project-contract-self-test",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/project-contract-check.ps1",
+        "-SelfTest"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:45.555421+00:00",
+      "finished_utc": "2026-10-07T11:52:48.482664+00:00",
+      "elapsed_seconds": 2.927,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/project-contract-self-test.log",
+      "log_sha256": "574dd3eb52a80d5538135de0ea47ad3784b1e39669b0be3bb0f93277b1f1fe52",
+      "log_bytes": 194
+    },
+    {
+      "id": "spec-cross-self-test",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/capability-registry-check.ps1",
+        "-SelfTest"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:46.950949+00:00",
+      "finished_utc": "2026-10-07T11:52:48.049882+00:00",
+      "elapsed_seconds": 1.098,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/spec-cross-self-test.log",
+      "log_sha256": "0e7698e4579cefb244a49523ef08227206bbd9ac952fea1aa363e4ced7da21a8",
+      "log_bytes": 536
+    },
+    {
+      "id": "algorithm-ledger-self-test",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/algorithm-ledger-check.ps1",
+        "-SelfTest"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:48.049882+00:00",
+      "finished_utc": "2026-10-07T11:53:20.070871+00:00",
+      "elapsed_seconds": 32.02,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/algorithm-ledger-self-test.log",
+      "log_sha256": "22578c53dc3b23343e19c0e3092af83e4c3dc4179b5cd22217d9f5f43ed647ce",
+      "log_bytes": 3934
+    },
+    {
+      "id": "diagnostic-probe-self-test",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/diagnostic-probe-check.ps1",
+        "-SelfTest"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:48.483666+00:00",
+      "finished_utc": "2026-10-07T11:52:58.437856+00:00",
+      "elapsed_seconds": 9.955,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/diagnostic-probe-self-test.log",
+      "log_sha256": "a22cc6850a56aedf97d756b733a833205ed504789efa5e7724149dddce9783e8",
+      "log_bytes": 1248
+    },
+    {
+      "id": "variable-coverage",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/variable-coverage-check.ps1"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:58.438860+00:00",
+      "finished_utc": "2026-10-07T11:52:59.100385+00:00",
+      "elapsed_seconds": 0.662,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/variable-coverage.log",
+      "log_sha256": "c4a5d2de941362d7a03a7d1d7ff5d7803e97f4deb57eb70445a3184a9cc307f7",
+      "log_bytes": 110
+    },
+    {
+      "id": "ideal-loads-claim-inventory",
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/quality/ideal-loads-claim-inventory-audit.ps1"
+      ],
+      "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:52:59.101557+00:00",
+      "finished_utc": "2026-10-07T11:53:00.531682+00:00",
+      "elapsed_seconds": 1.43,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/ideal-loads-claim-inventory.log",
+      "log_sha256": "77a0a0c55695bab36c8796f381544a4d4a1beec9dc63f3f9f736cf4a31135a67",
+      "log_bytes": 444
+    },
+    {
+      "id": "claim-sources",
+      "argv": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tools/docs/validate_claim_sources.py",
+        "--repo-root",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:53:00.532784+00:00",
+      "finished_utc": "2026-10-07T11:53:01.136680+00:00",
+      "elapsed_seconds": 0.604,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/claim-sources.log",
+      "log_sha256": "e9d0ddcb7dbb78f10cc38c80bf6fe828f0c7604788b79ab5348a039d8fa688b8",
+      "log_bytes": 210
+    },
+    {
+      "id": "porting-plan",
+      "argv": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tools/porting/check_plan.py",
+        "--check"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:53:01.137196+00:00",
+      "finished_utc": "2026-10-07T11:53:01.418716+00:00",
+      "elapsed_seconds": 0.281,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/porting-plan.log",
+      "log_sha256": "37c7205148cd9c7ca8edf85e18584d6f4e5d0c456a091e90770fd827e68cc257",
+      "log_bytes": 381
+    },
+    {
+      "id": "porting-plan-self-test",
+      "argv": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tools/porting/check_plan.py",
+        "--self-test"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:53:01.419724+00:00",
+      "finished_utc": "2026-10-07T11:53:04.257953+00:00",
+      "elapsed_seconds": 2.838,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/porting-plan-self-test.log",
+      "log_sha256": "bb67b7ba297939c2ef8e5b3553291e8f0ab1bd1f3c0773bd25c07ac894c90f31",
+      "log_bytes": 642
+    },
+    {
+      "id": "porting-plan-views",
+      "argv": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tools/porting/sync_plan_views.py",
+        "--check"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:53:04.258954+00:00",
+      "finished_utc": "2026-10-07T11:53:04.540767+00:00",
+      "elapsed_seconds": 0.283,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/porting-plan-views.log",
+      "log_sha256": "09d374224151680ce8a41de351befeb4004646619f7d3bbf764eeae3e0d66a80",
+      "log_bytes": 71
+    },
+    {
+      "id": "psy01-reference-contracts",
+      "argv": [
+        "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tools/porting/psy01_reference.py",
+        "--check"
+      ],
+      "resolved_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:53:04.541772+00:00",
+      "finished_utc": "2026-10-07T11:53:04.692085+00:00",
+      "elapsed_seconds": 0.15,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/psy01-reference-contracts.log",
+      "log_sha256": "96dafcf6622e16bf4dba0deb6fc9cb08fbf403f97a9177828cfb912968ec63b6",
+      "log_bytes": 87
+    },
+    {
+      "id": "patch-whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "resolved_executable": "C:\\Program Files\\Git\\cmd\\git.EXE",
+      "working_directory": ".",
+      "environment_overrides": {
+        "RUST_MIN_STACK": "8388608",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "started_utc": "2026-10-07T11:53:04.693086+00:00",
+      "finished_utc": "2026-10-07T11:53:04.815397+00:00",
+      "elapsed_seconds": 0.123,
+      "exit_code": 0,
+      "log": ".runtime/porting/PSY-01/committed-checks/patch-whitespace.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_bytes": 0
+    }
+  ],
+  "head_at_finish": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "crates_tree_at_finish": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "source_worktree_changes_after": [],
+  "archived_artifacts_unchanged": true,
+  "finished_utc": "2026-10-07T12:01:14.228879+00:00",
+  "checks_executed": 21,
+  "checks_failed": 0,
+  "initial_validation": {
+    "status": "FAIL",
+    "checks_executed": 19,
+    "checks_failed": 1,
+    "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+    "raw_receipt": ".runtime/porting/PSY-01/committed-checks/committed-checks.initial-f5de70ed.json",
+    "raw_receipt_sha256": "3b3cd66f7cf61c185fe882338310e90afe199082b3470fc46683afbcf99a2284"
+  },
+  "validation_revision_retry": {
+    "revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+    "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+    "reason": "Only two historical human-doc assertion patterns were updated to the current bounded integration and broader nonclaim wording; numerical/source/state guards and Rust tree are unchanged.",
+    "runner": {
+      "path": ".runtime/porting/PSY-01/committed-checks/retry_checks.py",
+      "sha256": "317256bc7bdbb3da8bc1c65b96aa394a46eed61832977ceaeb0ff29ac40fe695"
+    },
+    "checks": [
+      {
+        "id": "docs-check-retry-4426ca70",
+        "argv": [
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "scripts/quality/docs-check.ps1"
+        ],
+        "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "working_directory": ".",
+        "environment_overrides": {
+          "RUST_MIN_STACK": "8388608",
+          "PYTHONIOENCODING": "utf-8"
+        },
+        "started_utc": "2026-10-07T11:58:47.768359+00:00",
+        "finished_utc": "2026-10-07T11:58:59.734693+00:00",
+        "elapsed_seconds": 11.966,
+        "exit_code": 0,
+        "log": ".runtime/porting/PSY-01/committed-checks/docs-check-retry-4426ca70.log",
+        "log_sha256": "fb08f762070fc43e40c30bc9d9760c6516a0cafea5282bb6a82fd6886ea66884",
+        "log_bytes": 354,
+        "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+        "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+        "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+        "source_refs": [
+          {
+            "path": "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1",
+            "sha256": "b1a1208f20b5ac6f654ac5d76afb665324b0f306cdcfa074da50499293acd624",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          },
+          {
+            "path": "scripts/quality/ideal-loads-structure-audit.ps1",
+            "sha256": "ad39dc67424f81d313e99d3a81fccb8260f2ceeaf66a41635735631e89fe14d3",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          },
+          {
+            "path": "scripts/quality/docs-check.ps1",
+            "sha256": "98508e9146ec5ec56da49ddf928d9d9b133cff569daf8351cd72d8e5075915a3",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          },
+          {
+            "path": "docs/src/porting-map/psychrometrics-source-map.md",
+            "sha256": "d374a6ba6cdbdecff5c735742f60ba204e733501f079ac0677c51b8d9a5806b7",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          }
+        ]
+      },
+      {
+        "id": "ideal-loads-structure-retry-4426ca70",
+        "argv": [
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "scripts/quality/ideal-loads-structure-audit.ps1"
+        ],
+        "resolved_executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+        "working_directory": ".",
+        "environment_overrides": {
+          "RUST_MIN_STACK": "8388608",
+          "PYTHONIOENCODING": "utf-8"
+        },
+        "started_utc": "2026-10-07T11:58:47.768359+00:00",
+        "finished_utc": "2026-10-07T12:01:13.114531+00:00",
+        "elapsed_seconds": 145.345,
+        "exit_code": 0,
+        "log": ".runtime/porting/PSY-01/committed-checks/ideal-loads-structure-retry-4426ca70.log",
+        "log_sha256": "47ac17d5b3e3ee17423ab3675fdbf9903a80348eb544719253ad367206e2d351",
+        "log_bytes": 8133,
+        "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+        "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+        "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+        "source_refs": [
+          {
+            "path": "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1",
+            "sha256": "b1a1208f20b5ac6f654ac5d76afb665324b0f306cdcfa074da50499293acd624",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          },
+          {
+            "path": "scripts/quality/ideal-loads-structure-audit.ps1",
+            "sha256": "ad39dc67424f81d313e99d3a81fccb8260f2ceeaf66a41635735631e89fe14d3",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          },
+          {
+            "path": "scripts/quality/docs-check.ps1",
+            "sha256": "98508e9146ec5ec56da49ddf928d9d9b133cff569daf8351cd72d8e5075915a3",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          },
+          {
+            "path": "docs/src/porting-map/psychrometrics-source-map.md",
+            "sha256": "d374a6ba6cdbdecff5c735742f60ba204e733501f079ac0677c51b8d9a5806b7",
+            "validation_revision": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+          }
+        ]
+      }
+    ]
+  },
+  "effective_check_exit_codes": {
+    "workspace-all-target-tests": 0,
+    "core-run-cli-clippy": 0,
+    "workspace-format": 0,
+    "heat-balance-structure-self-test": 0,
+    "ideal-loads-structure": 0,
+    "strict-no-false-conformance": 0,
+    "docs-check": 0,
+    "project-contract-self-test": 0,
+    "spec-cross-self-test": 0,
+    "algorithm-ledger-self-test": 0,
+    "diagnostic-probe-self-test": 0,
+    "variable-coverage": 0,
+    "ideal-loads-claim-inventory": 0,
+    "claim-sources": 0,
+    "porting-plan": 0,
+    "porting-plan-self-test": 0,
+    "porting-plan-views": 0,
+    "psy01-reference-contracts": 0,
+    "patch-whitespace": 0
+  },
+  "source_worktree_changes_after_retry": [],
+  "validation_revision_at_finish": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091"
+}

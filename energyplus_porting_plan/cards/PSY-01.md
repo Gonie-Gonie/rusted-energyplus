@@ -80,13 +80,19 @@ ZON-02와 HVAC-04/05에서 같은 입력 tuple과 호출 순서
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+구현 커밋: `f5de70ed4eb316b60cd63945bc70ed7726a01755`; 문서 검사 보완 `4426ca70586bd5fcee5a52c411bb0cd7aa1d9091`.
+시험 명령: `python -B -X utf8 tools/porting/psy01_reference.py --check`, `--rust-runner .runtime/porting/PSY-01/committed-build/psy01_tuples.exe --output-dir .runtime/porting/PSY-01/committed-unit`, `python tools/porting/check_psy01_production.py`, `cargo test --workspace --all-targets` (`RUST_MIN_STACK=8388608`). 실제 실행·기존 증거 재검토의 전체 argv와 실행 커밋은 개별 receipt에 보존.
+증거 경로: `evidence/PSY-01/{source-reference,production-matrix,comparison-report,committed-checks,build-receipt}.json`, `source-review.md`, `production-review.md`.
+최대오차/RMSE/상태 불일치: 394개 C++/Rust 단위 호출과 20,613,998개 실제 생산 호출 모두 수치 오차·RMSE·분류·캐시·인수·순서 불일치 0; 생산 호출 누락 0. NaN payload 일치는 계약상 요구하지 않음.
+추가 검토할 helper: PSY-02의 포화·캐시 함수와 ZON/HVAC/SYS 조립은 미확인. 여기서는 실제 Rust 인수·호출 순서에 따른 네 정상 커널과 좁은 반환값 연결만 완료.
+
+A 및 B의 NoLimit/Flow/Capacity/Both 24시간 실행에서 각각 실제 zone context 96개를 확인했다. Full/Summary CSV·meters·전체 result series가 같고 Summary에는 kernel trace가 없다. Capacity/Both의 실제 `no_oa.rs` 역산 온도 반환값 소비는 각 47회이며, 나머지 CP·검증 호출과 구분했다. 후처리 검증 중 kernel을 호출한 구간은 NoLimit/Flow 48개, Capacity/Both 49개로 기록했다. 호출하지 않은 구간에 가상 호출을 추가하지 않았다.
+
+정상/fast Cp의 독립 캐시, cold `(-100,-100)`, 원래 W 기준 hit/miss, signed zero·NaN 및 자체 H 반환값을 쓰는 역산 체인을 검증했다. fast와 추가 W helper의 실제 생산 호출은 0이며 단위 증거만 있다. 기존 H/W 소비자와 no-OA 용량 제한 H→T 경로를 원본 연산 순서로 연결하고, 분기 fixture 수정과 실패 로그는 `regression-diagnosis.json` 및 `source-fixture-probe.json`에 남겼다. 전체 시험 4,516개와 유효 품질 검사 19개가 통과했다.
+
+guarded rho/Cp 호출자가 W를 먼저 정규화할 수 있으므로 이 결과는 원래 EP 상위 호출자의 입력·오류 처리·전체 호출 순서를 확정하지 않는다. 시간 context는 실제 Rust 축·호출 인수 또는 후처리 cursor이며 독립 EP 시계 관측으로 취급하지 않는다. 단일 실행 스레드의 커널 상태가 대상이고, 경고·통계 집계, 원래 unsafe cross-thread 공유, CTF·조/HVAC 전체 수치, warmup·adaptive timestep·상태 인계 및 72H/연간 물리 결과는 후속 gate에 남는다.

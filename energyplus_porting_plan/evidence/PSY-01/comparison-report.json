@@ -1,0 +1,269 @@
+{
+  "schema": "psy01-comparison-report.v1",
+  "card": "PSY-01",
+  "scopes": [
+    "A",
+    "B"
+  ],
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "production_crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "unit_execution_repository_head": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "production_reference_execution_revisions": [
+    "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+    "f5de70ed4eb316b60cd63945bc70ed7726a01755"
+  ],
+  "scope_semantics": "four named normal inline kernels on declared helper domain and actual bounded Rust arguments; induced W and fast functions supplemental only",
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-source.json",
+      "sha256": "c4652cfeb8fbc1629444fa6c246892f4ea2dfe8d45dade76f0bf7261ea464e82"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-cases.json",
+      "sha256": "e9a19f51d09ee24eb9240c336e3157db846d95d87144ddb9ec31b3955e204949"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+      "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+    }
+  ],
+  "unit": {
+    "ordered_calls": 394,
+    "fresh_processes": 2,
+    "mismatch_count": 0,
+    "per_function": {
+      "PsyCpAirFnW": {
+        "count": 68,
+        "finite_count": 62,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyCpAirFnW_fast": {
+        "count": 40,
+        "finite_count": 38,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW": {
+        "count": 53,
+        "finite_count": 51,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW_fast": {
+        "count": 29,
+        "finite_count": 29,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW": {
+        "count": 57,
+        "finite_count": 56,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW_fast": {
+        "count": 30,
+        "finite_count": 29,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyTdbFnHW": {
+        "count": 94,
+        "finite_count": 91,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyWFnTdbH": {
+        "count": 23,
+        "finite_count": 21,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      }
+    },
+    "receipt": {
+      "path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json",
+      "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+    }
+  },
+  "production": {
+    "ordered_actual_calls": 20613998,
+    "original_cpp_body_evaluated_each_event": true,
+    "omitted_calls": 0,
+    "mismatch_count": 0,
+    "physical_no_oa_tdb_calls": 94,
+    "per_function": {
+      "PsyCpAirFnW": {
+        "count": 12092079,
+        "finite_count": 12092079,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyCpAirFnW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW": {
+        "count": 1673,
+        "finite_count": 1673,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyRhoAirFnPbTdbW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW": {
+        "count": 8008322,
+        "finite_count": 8008322,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyHFnTdbW_fast": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyTdbFnHW": {
+        "count": 511924,
+        "finite_count": 511924,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      },
+      "PsyWFnTdbH": {
+        "count": 0,
+        "finite_count": 0,
+        "max_abs_error": 0.0,
+        "rmse": 0.0
+      }
+    },
+    "cases": [
+      {
+        "case_id": "A-24H",
+        "scope": "A",
+        "actual_calls": 202,
+        "actual_zone_contexts": 96,
+        "actual_system_kernel_contexts": 0,
+        "post_validation_kernel_contexts": 0,
+        "physical_no_oa_tdb_calls": 0,
+        "other_tdb_calls": 0,
+        "omitted_calls": 0,
+        "mismatch_count": 0,
+        "full_summary_equal": true,
+        "receipt": {
+          "path": "energyplus_porting_plan/evidence/PSY-01/production/A-24H.json",
+          "sha256": "f28fc6632495afdb592b8579f656313e1965b6109011681d4401da8475aab443"
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "scope": "B",
+        "actual_calls": 1780394,
+        "actual_zone_contexts": 96,
+        "actual_system_kernel_contexts": 96,
+        "post_validation_kernel_contexts": 48,
+        "physical_no_oa_tdb_calls": 0,
+        "other_tdb_calls": 0,
+        "omitted_calls": 0,
+        "mismatch_count": 0,
+        "full_summary_equal": true,
+        "receipt": {
+          "path": "energyplus_porting_plan/evidence/PSY-01/production/B-NOLIMIT-24H.json",
+          "sha256": "2756dc5a55f5fb825a7e1c769573d2f49b3955e31809c0e757f853c02191ee26"
+        }
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "scope": "B",
+        "actual_calls": 1780394,
+        "actual_zone_contexts": 96,
+        "actual_system_kernel_contexts": 96,
+        "post_validation_kernel_contexts": 48,
+        "physical_no_oa_tdb_calls": 0,
+        "other_tdb_calls": 0,
+        "omitted_calls": 0,
+        "mismatch_count": 0,
+        "full_summary_equal": true,
+        "receipt": {
+          "path": "energyplus_porting_plan/evidence/PSY-01/production/B-FLOW-24H.json",
+          "sha256": "ae62a3380d12f4d17b8d7cc22b0aa2ce94d40bff1f6e2b97d238abca7fef03e7"
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "scope": "B",
+        "actual_calls": 8526488,
+        "actual_zone_contexts": 96,
+        "actual_system_kernel_contexts": 96,
+        "post_validation_kernel_contexts": 49,
+        "physical_no_oa_tdb_calls": 47,
+        "other_tdb_calls": 255915,
+        "omitted_calls": 0,
+        "mismatch_count": 0,
+        "full_summary_equal": true,
+        "receipt": {
+          "path": "energyplus_porting_plan/evidence/PSY-01/production/B-CAPACITY-24H.json",
+          "sha256": "34c37af38579d4d61abc5560887ac449798572108c6107ac4b715be185b84859"
+        }
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "scope": "B",
+        "actual_calls": 8526520,
+        "actual_zone_contexts": 96,
+        "actual_system_kernel_contexts": 96,
+        "post_validation_kernel_contexts": 49,
+        "physical_no_oa_tdb_calls": 47,
+        "other_tdb_calls": 255915,
+        "omitted_calls": 0,
+        "mismatch_count": 0,
+        "full_summary_equal": true,
+        "receipt": {
+          "path": "energyplus_porting_plan/evidence/PSY-01/production/B-BOTH-24H.json",
+          "sha256": "56ef2cc1da26c36b81d656755131d798b2aac3c47bd6571d215e92c128468a4c"
+        }
+      }
+    ],
+    "matrix": {
+      "path": "energyplus_porting_plan/evidence/PSY-01/production-matrix.json",
+      "sha256": "b4366ae2e39a961c76e71c0d48bf92eeca10645f2e8fa1307dee83e612937a17"
+    },
+    "rust_entrypoint": "ordinary eplus-rs run --porting-scope A|B --mode compatibility --partial deny",
+    "oracle_inputs_used": false,
+    "fixture_result_inputs_used": false
+  },
+  "regression": {
+    "workspace_tests_passed": 4516,
+    "workspace_tests_failed": 0,
+    "required_effective_checks_passed": 19,
+    "receipt": {
+      "path": "energyplus_porting_plan/evidence/PSY-01/committed-checks.json",
+      "sha256": "37eb66e2923583f50ce7757dd8f5cfb2dd7959424513b830f47dbd5337202845"
+    }
+  },
+  "exact_checks": [
+    "actual argument identity and ordered invocation sequence",
+    "actual cache hit and non-NaN cache state; NaN payload recorded but not required equal",
+    "result classification and signed zero",
+    "opaque actual Rust invocation context retained exactly; not an independent EP clock observation"
+  ],
+  "limitations": [
+    "actual Rust kernel argument replay only; upstream EP caller inputs/order unverified",
+    "guarded density/Cp wrappers may normalize humidity before the recorded canonical kernel arguments",
+    "copied Rust calendar/environment axes do not prove original EP system/source ordering, warmup or adaptive steps",
+    "one collecting execution thread; original unsafe static races excluded",
+    "physical heat-balance/HVAC/SYS gates remain separate",
+    "fast variants can have zero genuine production calls; separate unit coverage does not manufacture production callers",
+    "PSY-02 and all downstream assembly/CTF/warmup/adaptive/handoff/72H/annual physics gates remain separate",
+    "Fast functions and induced W have zero actual production calls in this matrix; their evidence is unit-only",
+    "Post-run validation may invoke no kernel at a timestep; kernel-bearing subsets are reported without inventing calls"
+  ],
+  "checks_passed": true,
+  "gates_updated_by_this_report": false
+}

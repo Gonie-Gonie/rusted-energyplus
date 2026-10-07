@@ -682,14 +682,390 @@
       "companion": "Psychrometrics.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Psychrometrics.hh",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyRhoAirFnPbTdbW",
+            "start_line": 512,
+            "end_line": 547,
+            "helpers": [
+              "ObjexxFCL::max",
+              "Constant::Kelvin"
+            ],
+            "boundary_description": "PsyRhoAirFnPbTdbW state overload"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyRhoAirFnPbTdbW",
+            "start_line": 549,
+            "end_line": 574,
+            "helpers": [
+              "ObjexxFCL::max",
+              "Constant::Kelvin"
+            ],
+            "boundary_description": "PsyRhoAirFnPbTdbW constexpr overload"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyRhoAirFnPbTdbW_fast",
+            "start_line": 576,
+            "end_line": 591,
+            "helpers": [
+              "Constant::Kelvin"
+            ],
+            "boundary_description": "PsyRhoAirFnPbTdbW_fast"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyHFnTdbW",
+            "start_line": 648,
+            "end_line": 666,
+            "helpers": [
+              "ObjexxFCL::max"
+            ],
+            "boundary_description": "PsyHFnTdbW"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyHFnTdbW_fast",
+            "start_line": 668,
+            "end_line": 677,
+            "helpers": [],
+            "boundary_description": "PsyHFnTdbW_fast"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyCpAirFnW",
+            "start_line": 679,
+            "end_line": 716,
+            "helpers": [
+              "ObjexxFCL::max"
+            ],
+            "boundary_description": "PsyCpAirFnW"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyCpAirFnW_fast",
+            "start_line": 718,
+            "end_line": 741,
+            "helpers": [],
+            "boundary_description": "PsyCpAirFnW_fast"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyTdbFnHW",
+            "start_line": 743,
+            "end_line": 762,
+            "helpers": [
+              "ObjexxFCL::max"
+            ],
+            "boundary_description": "PsyTdbFnHW"
+          },
+          {
+            "path": "src/EnergyPlus/Psychrometrics.hh",
+            "symbol": "PsyWFnTdbH",
+            "start_line": 962,
+            "end_line": 998,
+            "helpers": [],
+            "boundary_description": "PsyWFnTdbH induced consumer compatibility helper"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyHFnTdbW",
+            "start_line": 2191,
+            "end_line": 2204,
+            "helpers": [
+              "PsyCpAirFnW",
+              "PsyHFnTdbW",
+              "PsyTdbFnHW",
+              "ObjexxFCL::min"
+            ],
+            "boundary_description": "positive-flow cooling supply H and sensible capacity inverse T"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyWFnTdbH",
+            "start_line": 2213,
+            "end_line": 2227,
+            "helpers": [
+              "PsyCpAirFnW",
+              "PsyHFnTdbW",
+              "PsyWFnTdbH",
+              "ObjexxFCL::min"
+            ],
+            "boundary_description": "ConstantSensibleHeatRatio initial H-to-W consumer"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyTdbFnHW",
+            "start_line": 2263,
+            "end_line": 2306,
+            "helpers": [
+              "PsyCpAirFnW",
+              "PsyHFnTdbW",
+              "PsyTdbFnHW",
+              "PsyWFnTdbH",
+              "ObjexxFCL::min"
+            ],
+            "boundary_description": "dehumidifying capacity consumer control branches"
+          },
+          {
+            "path": "src/EnergyPlus/PurchasedAirManager.cc",
+            "symbol": "PsyHFnTdbW",
+            "start_line": 2313,
+            "end_line": 2325,
+            "helpers": [
+              "PsyCpAirFnW",
+              "PsyHFnTdbW",
+              "PsyTsatFnHPb",
+              "PsyWFnTdbH",
+              "PsyWFnTdbRhPb",
+              "ObjexxFCL::min"
+            ],
+            "boundary_description": "post-saturation H-to-W-to-H consumer (upstream saturation excluded)"
+          },
+          {
+            "path": "src/EnergyPlus/DataGlobalConstants.hh",
+            "symbol": "Kelvin",
+            "start_line": 611,
+            "end_line": 611,
+            "helpers": [],
+            "boundary_description": "Constant::Kelvin"
+          },
+          {
+            "path": "src/EnergyPlus/api/TypeDefs.h",
+            "symbol": "Real64",
+            "start_line": 52,
+            "end_line": 52,
+            "helpers": [],
+            "boundary_description": "Real64"
+          },
+          {
+            "path": "src/EnergyPlus/EnergyPlus.hh",
+            "symbol": "using ObjexxFCL::max",
+            "start_line": 165,
+            "end_line": 165,
+            "helpers": [],
+            "boundary_description": "using ObjexxFCL::max"
+          },
+          {
+            "path": "src/EnergyPlus/api/func.cc",
+            "symbol": "psyRhoFnPbTdbW",
+            "start_line": 165,
+            "end_line": 199,
+            "helpers": [],
+            "boundary_description": "native API dispatcher"
+          },
+          {
+            "path": "src/EnergyPlus/api/state.cc",
+            "symbol": "stateNew",
+            "start_line": 56,
+            "end_line": 60,
+            "helpers": [],
+            "boundary_description": "stateNew"
+          },
+          {
+            "path": "src/EnergyPlus/api/state.cc",
+            "symbol": "stateDelete",
+            "start_line": 76,
+            "end_line": 79,
+            "helpers": [],
+            "boundary_description": "stateDelete"
+          }
+        ],
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/contracts/PSY-01-cases.json",
+            "sha256": "e9a19f51d09ee24eb9240c336e3157db846d95d87144ddb9ec31b3955e204949"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json",
+              "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/source-compression-check.json",
+              "sha256": "74c9e847bc354c66754d2e70ba2e681140145cfc59746bae9b20ddfeaa8508d6"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/production/A-24H.json",
+              "sha256": "f28fc6632495afdb592b8579f656313e1965b6109011681d4401da8475aab443"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/production/B-NOLIMIT-24H.json",
+              "sha256": "2756dc5a55f5fb825a7e1c769573d2f49b3955e31809c0e757f853c02191ee26"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/production/B-FLOW-24H.json",
+              "sha256": "ae62a3380d12f4d17b8d7cc22b0aa2ce94d40bff1f6e2b97d238abca7fef03e7"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/production/B-CAPACITY-24H.json",
+              "sha256": "34c37af38579d4d61abc5560887ac449798572108c6107ac4b715be185b84859"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/PSY-01/production/B-BOTH-24H.json",
+              "sha256": "56ef2cc1da26c36b81d656755131d798b2aac3c47bd6571d215e92c128468a4c"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python -B -X utf8 tools/porting/psy01_reference.py --check; source review of original complete header and direct consumers",
+            "commit": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/source-review.md",
+                "sha256": "b3122ec78e982c0cfd00c3fd4c90e8ebdfd7e4ba74cf89f32ae72fcd950cc121"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/PSY-01-source.json",
+                "sha256": "c4652cfeb8fbc1629444fa6c246892f4ea2dfe8d45dade76f0bf7261ea464e82"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production-review.md",
+                "sha256": "84fe2d9ef879d2cd1d3c4e7135c0af578f22883615884bb21bebf7d725f82d9c"
+              }
+            ]
+          },
+          "unit_gate": {
+            "command": "python -B -X utf8 tools/porting/psy01_reference.py --rust-runner .runtime/porting/PSY-01/committed-build/psy01_tuples.exe --output-dir .runtime/porting/PSY-01/committed-unit",
+            "commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/source-reference.json",
+                "sha256": "e2abc73a9c3486c4b19398a93150136ad50bd0e6e929d00a8b2c81743f915cac"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/source-fixture-probe.json",
+                "sha256": "b7f787ac3bf4cb98ba86b69d63d7a779f5d4f450cb6d66f01cb614e135515a4e"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/committed-checks.json",
+                "sha256": "37eb66e2923583f50ce7757dd8f5cfb2dd7959424513b830f47dbd5337202845"
+              }
+            ]
+          },
+          "integration_gate": {
+            "command": "ordinary eplus-rs Full/Summary runs and psy01_reference.py --production-trace for A-24H and all four B limit variants; exact per-case argv and execution revisions retained in production receipts",
+            "commit": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production-matrix.json",
+                "sha256": "b4366ae2e39a961c76e71c0d48bf92eeca10645f2e8fa1307dee83e612937a17"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/comparison-report.json",
+                "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production/A-24H.json",
+                "sha256": "f28fc6632495afdb592b8579f656313e1965b6109011681d4401da8475aab443"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production/B-NOLIMIT-24H.json",
+                "sha256": "2756dc5a55f5fb825a7e1c769573d2f49b3955e31809c0e757f853c02191ee26"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production/B-FLOW-24H.json",
+                "sha256": "ae62a3380d12f4d17b8d7cc22b0aa2ce94d40bff1f6e2b97d238abca7fef03e7"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production/B-CAPACITY-24H.json",
+                "sha256": "34c37af38579d4d61abc5560887ac449798572108c6107ac4b715be185b84859"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production/B-BOTH-24H.json",
+                "sha256": "56ef2cc1da26c36b81d656755131d798b2aac3c47bd6571d215e92c128468a4c"
+              }
+            ]
+          },
+          "production_gate": {
+            "command": "python tools/porting/check_psy01_production.py; full CPP replay and read-only existing-artifact review commands in each case receipt; cargo test --workspace --all-targets; bounded consumer/source review",
+            "commit": "4426ca70586bd5fcee5a52c411bb0cd7aa1d9091",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/build-receipt.json",
+                "sha256": "0dd211273a09e596a91940be5b3662e042e6b3b164f3125e45e89550c9e0e387"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production-matrix.json",
+                "sha256": "b4366ae2e39a961c76e71c0d48bf92eeca10645f2e8fa1307dee83e612937a17"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/committed-checks.json",
+                "sha256": "37eb66e2923583f50ce7757dd8f5cfb2dd7959424513b830f47dbd5337202845"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/PSY-01/production-review.md",
+                "sha256": "84fe2d9ef879d2cd1d3c4e7135c0af578f22883615884bb21bebf7d725f82d9c"
+              }
+            ]
+          }
+        },
+        "production": {
+          "rust_entrypoint": "ordinary eplus-rs run --porting-scope A|B -> ep_run::run_bounded_porting -> canonical normal kernel callers",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "gate_semantics": "four named normal inline kernels and actual bounded caller integration on the collecting thread; full EP caller/physics/system order remains separate"
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+            "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+          },
+          "report": {
+            "path": "energyplus_porting_plan/evidence/PSY-01/comparison-report.json",
+            "sha256": "f9adb68df0a67578062f4346345207ddc01f4e74cb944503d40dff8a0b5bcfb1"
+          }
+        }
+      },
+      "completion_note": "394 original/Rust unit calls and 20,613,998 actual ordered production calls pass fixed tolerances, cache/context/order and Full/Summary checks. 94 genuine capacity inverse-T returns consumed. PSY-02/global caller/CTF/ZON/HVAC/SYS/72H/annual physics remain unconfirmed."
     },
     {
       "id": "PSY-02",

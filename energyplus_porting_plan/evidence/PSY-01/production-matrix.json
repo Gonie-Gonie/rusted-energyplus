@@ -1,0 +1,95 @@
+{
+  "schema": "psy01-production-matrix.v1",
+  "implementation_commit": "f5de70ed4eb316b60cd63945bc70ed7726a01755",
+  "crates_tree": "af23c6a213614698d13f1a4c6e06869256c729b6",
+  "build_receipt": {
+    "path": "energyplus_porting_plan/evidence/PSY-01/build-receipt.json",
+    "sha256": "0dd211273a09e596a91940be5b3662e042e6b3b164f3125e45e89550c9e0e387"
+  },
+  "binary": {
+    "path": ".runtime/porting/PSY-01/committed-build/eplus-rs.exe",
+    "sha256": "cc9b312687c17db5a987c21f3c9d57f5c0454affe9350913a9768118798c7d8e"
+  },
+  "checker": {
+    "path": ".runtime/porting/PSY-01/production/f5de70ed4eb3/source/check_psy01_production.a093a7d37e7d.py",
+    "sha256": "a093a7d37e7da3fc6e4d641606007e64ef5221b981aa8ae77829801553de35e5"
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "receipt": {
+        "path": "energyplus_porting_plan/evidence/PSY-01/production/A-24H.json",
+        "sha256": "f28fc6632495afdb592b8579f656313e1965b6109011681d4401da8475aab443"
+      },
+      "actual_calls": 202,
+      "actual_zone_steps": 96,
+      "omitted_calls": 0,
+      "physical_no_oa_tdb_calls": 0,
+      "cpp_mismatches": 0,
+      "checks_passed": true
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "receipt": {
+        "path": "energyplus_porting_plan/evidence/PSY-01/production/B-NOLIMIT-24H.json",
+        "sha256": "2756dc5a55f5fb825a7e1c769573d2f49b3955e31809c0e757f853c02191ee26"
+      },
+      "actual_calls": 1780394,
+      "actual_zone_steps": 96,
+      "omitted_calls": 0,
+      "physical_no_oa_tdb_calls": 0,
+      "cpp_mismatches": 0,
+      "checks_passed": true
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "receipt": {
+        "path": "energyplus_porting_plan/evidence/PSY-01/production/B-FLOW-24H.json",
+        "sha256": "ae62a3380d12f4d17b8d7cc22b0aa2ce94d40bff1f6e2b97d238abca7fef03e7"
+      },
+      "actual_calls": 1780394,
+      "actual_zone_steps": 96,
+      "omitted_calls": 0,
+      "physical_no_oa_tdb_calls": 0,
+      "cpp_mismatches": 0,
+      "checks_passed": true
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "receipt": {
+        "path": "energyplus_porting_plan/evidence/PSY-01/production/B-CAPACITY-24H.json",
+        "sha256": "34c37af38579d4d61abc5560887ac449798572108c6107ac4b715be185b84859"
+      },
+      "actual_calls": 8526488,
+      "actual_zone_steps": 96,
+      "omitted_calls": 0,
+      "physical_no_oa_tdb_calls": 47,
+      "cpp_mismatches": 0,
+      "checks_passed": true
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "receipt": {
+        "path": "energyplus_porting_plan/evidence/PSY-01/production/B-BOTH-24H.json",
+        "sha256": "56ef2cc1da26c36b81d656755131d798b2aac3c47bd6571d215e92c128468a4c"
+      },
+      "actual_calls": 8526520,
+      "actual_zone_steps": 96,
+      "omitted_calls": 0,
+      "physical_no_oa_tdb_calls": 47,
+      "cpp_mismatches": 0,
+      "checks_passed": true
+    }
+  ],
+  "complete_five_case_matrix": true,
+  "all_recorded_events_original_cpp_replayed": true,
+  "gates_updated": false,
+  "limitations": [
+    "actual Rust kernel argument replay only; upstream EP caller inputs/order unverified",
+    "guarded density/Cp wrappers may normalize humidity before the recorded canonical kernel arguments",
+    "copied Rust calendar/environment axes do not prove original EP system/source ordering, warmup or adaptive steps",
+    "one collecting execution thread; original unsafe static races excluded",
+    "physical heat-balance/HVAC/SYS gates remain separate",
+    "fast variants can have zero genuine production calls; separate unit coverage does not manufacture production callers"
+  ]
+}
