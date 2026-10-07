@@ -1,9 +1,11 @@
-# CLK-01 source preparation — pending validation
+# CLK-01 source and unit evidence — production review pending
 
 The selected source is EnergyPlus 26.1.0 commit
 `6f2e40d10250a105b49966baa24d843711e61048`. The three CLK-01 contracts pin full
 file bytes, selected source ranges, input identities and tolerances before any
-Rust/reference comparison. No CLK-01 gate is closed by this preparation.
+Rust/reference comparison. The final selected helper/calendar unit comparison
+passed 71,358 checks with zero mismatches. No CLK-01 gate is closed by this report;
+production invocation and native clock/ESO evidence remain a separate review.
 
 The production input set remains the 15 CON cases: ordinary weather RunPeriod,
 explicit 2013, one zone, one selected weather environment, no sizing execution,
@@ -33,8 +35,16 @@ complete GetWeatherInput/GetNextEnvironment factory or sizing simulation.
 
 The C++ reference is linked to the unchanged original EnergyPlus static core and
 uses the same GNU compiler and actual selected configuration's ABI and project
-option/math/warning targets. Source-supported RelWithDebInfo has no
-_GLIBCXX_DEBUG; the driver inherits those actual flags rather than assuming Debug.
+option/math/warning targets. The actual selected test-reference configuration is
+RelWithDebInfo with explicit -O0 -g -DNDEBUG and the original target's later
+-UNDEBUG, preserving assertions and -Werror. It also preserves the original
+source FP options, disables contraction with -ffp-contract=off, and has neither
+fastmath nor _GLIBCXX_DEBUG. The driver inherits those actual flags rather than
+assuming Debug. This does not claim that the default optimized Windows GNU build
+passes: the original optimized Boost/Kiva warning failure, Debug fegetexcept
+platform failure, PE section-limit failure and long-path failure remain in the
+native build provenance. No original scientific source or extra warning waiver
+was introduced.
 Its original InputProcessor::processInput path parses and validates the pinned
 IDFs before GetRunPeriodData. It does not insert common unit-test objects or
 expected answers. A separate fallback compiles byte-exact original pure bodies
@@ -60,6 +70,9 @@ zone invocation evidence. Actual consumer coverage requires representative A/B
 24H and 72H invocations, with A annual clock coverage when feasible. B annual
 whole-physics execution remains a later SYS obligation because its current
 validation cost is large. No prepared calendar is reported as a physical run.
+The final unit comparison now covers all 15 calendars and all 1,845 daily rows,
+180 monthly-array entries and every annual month start exactly. Its 177,120
+prepared zone points are still preparation evidence.
 
 The observation phase is
 `callback_begin_zone_timestep_before_init_heat_balance`. SimulationManager calls
@@ -96,7 +109,8 @@ then build target `clk01_reference`. This must be coordinated with the native
 build owner; linking only energypluslib would omit its private ABI/math options.
 Raw helper/calendar requests, original-body extraction and preparation hashes
 are written to `.runtime/porting/CLK-01/preparation`. Native compilation,
-stateful reference runs and calendar/production comparisons are pending.
+stateful reference runs and selected calendar comparisons have now completed.
+Production comparison remains pending.
 
 The pure fallback compiled and dispatched the original pure bodies successfully.
 The initial preparation comparison then matched 1,912 existing Rust helper calls
@@ -106,8 +120,9 @@ maximum absolute error and RMSE are zero for each eligible routine. These are
 pre-checkpoint diagnostic executions, not committed-source closure evidence.
 The remaining 1,168 Rust helper rows are explicitly unpaired; the pure fallback
 executed 776 source-only diagnostics and declared 392 genuine-state calls
-unavailable. Source mutable-array/state proof still requires the matching native
-core. No numerical tolerance or CON case changed.
+unavailable. That historical preparation result remains unchanged. The later
+matching native core supplied the missing mutable-state diagnostics. No numerical
+tolerance or CON case changed.
 
 The first pure executable launch failed with Windows loader exit 3221225781
 because the compiler runtime directory was absent from PATH. Its original log
@@ -126,3 +141,52 @@ The calendar comparison requires all 15 original parsed cases and all annual
 month starts. It compares each original GetRunPeriodData monthly array to the
 actual consumed annual month-start projection, in addition to every declared
 day's date/weekday/ordinals. It never clones the original global arrays in Rust.
+
+## Original-first native and committed unit execution
+
+The compact final unit receipt is [source-reference.json](source-reference.json).
+The original core receipt is
+`.runtime/porting/reference-energyplus-26.1.0/native-core-build.json`; the matching
+driver's actual configure, compile/link, flag inheritance, archived source/binary
+and constructor/state-write smoke are bound by
+`.runtime/porting/CLK-01/native-driver/native-driver-build.json`. Reconfiguration
+added only the agreed CMAKE_PROJECT_INCLUDE. Every existing core compile command
+and both core/API library hashes remained unchanged.
+
+An isolated syntax-only preflight first failed because InputProcessor.hh declares
+a global EnergyPlusData in addition to the actual EnergyPlus::EnergyPlusData.
+Only the wrapper's three native state type names were qualified; that correction
+is committed in e8b7d578 and the matching preflight passed. Both receipts/logs are
+preserved in `.runtime/porting/CLK-01/driver-preflight` and
+`driver-preflight-qualified`. The exact earlier f6f0c5b3 wrapper bytes are archived
+under `.runtime/porting/CLK-01/preparation/source`; the historical pure build and
+failed preflight are not relabeled as having executed the corrected source.
+
+The genuine native executable ran all 3,080 helper inputs and all 15 original
+parsed IDFs first, with exit zero. Only afterward did the immutable committed Rust
+example run the same input requests, also with exit zero. That example is from
+fe57a357, SHA 2e8b5130d4c0e1bc8663a80e76f74ec86e02d6c78c08d95539577e0ee9d5b7d1;
+e8b7d578 leaves its crates tree and binary unchanged. Actual commands are:
+
+    python tools/porting/clk01_reference.py --run-helpers --reference-exe .runtime/porting/CLK-01/native-driver/clk01_reference.exe --native-core-build .runtime/porting/reference-energyplus-26.1.0/native-core-build.json --native-driver-build .runtime/porting/CLK-01/native-driver/native-driver-build.json --runtime-bin .runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin --output-dir .runtime/porting/CLK-01/committed-unit/original-helpers
+    python tools/porting/clk01_reference.py --run-calendar --reference-exe .runtime/porting/CLK-01/native-driver/clk01_reference.exe --native-core-build .runtime/porting/reference-energyplus-26.1.0/native-core-build.json --native-driver-build .runtime/porting/CLK-01/native-driver/native-driver-build.json --runtime-bin .runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin --output-dir .runtime/porting/CLK-01/committed-unit/original-calendar
+    .runtime/porting/CLK-01/committed-build/fe57a357/clk01_calendar.exe .runtime/porting/CLK-01/committed-unit/original-helpers/helper-tuples.json
+    .runtime/porting/CLK-01/committed-build/fe57a357/clk01_calendar.exe .runtime/porting/CLK-01/committed-unit/original-calendar/calendar-cases.json
+    python tools/porting/check_clk01_units.py --cpp-helpers .runtime/porting/CLK-01/committed-unit/original-helpers/helpers-results.json --rust-helpers .runtime/porting/CLK-01/committed-unit/rust-helpers/helpers-results.json --cpp-calendar .runtime/porting/CLK-01/committed-unit/original-calendar/calendar-results.json --rust-calendar .runtime/porting/CLK-01/committed-unit/rust-calendar/calendar-results.json --cpp-build-receipt .runtime/porting/CLK-01/native-driver/native-driver-build.json --rust-build-receipt energyplus_porting_plan/evidence/CLK-01/build-receipt.json --helper-request .runtime/porting/CLK-01/committed-unit/original-helpers/helper-tuples.json --calendar-request .runtime/porting/CLK-01/committed-unit/original-calendar/calendar-cases.json --output-dir .runtime/porting/CLK-01/committed-unit/comparison
+
+The exact checker exited zero: 71,358 checks, zero mismatches, and zero maximum
+absolute error/RMSE for all 1,912 eligible scalar helpers. All 15 resolved calendars
+and 1,845 daily rows match. The 180 original monthly-array entries match the actual
+annual consumed month-start projection, and every annual calendar includes all
+12 month starts. The original-only 1,168 helper rows now also contain actual
+genuine-state writes for 384 calculateDayOfWeek calls and before/after arrays for
+eight SetupWeekDaysByMonth calls. These direct mutable-state diagnostics remain
+unpaired; they are not counted as Rust helper passes or a full raw 366-array clone.
+
+Raw commands, input identities, stdout/stderr and execution receipts are under
+`.runtime/porting/CLK-01/committed-unit/{original-helpers,original-calendar,rust-helpers,rust-calendar}`.
+The report is `committed-unit/comparison/unit-comparison.json` with SHA
+9ca1197b98c06ad572fc571c2d0118fc3f2113b251da62ffef38f6f8213f55fc.
+The unit runner executes no zone physics: prepared zone rows, including B annual,
+do not imply actual invocation or physical equivalence. All card gates and the
+separate production/native pre-report/ESO review remain pending here.

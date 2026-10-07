@@ -338,7 +338,8 @@ def main() -> int:
         write(PLAN / "evidence/CLK-01/production" / (name + ("-actual.json" if args.actual else "-prepared.json")), result)
         results.append({"case_id": name, "checks_passed": True,
                         "comparison": ref(output_root / name / ("actual" if args.actual else "prepared") / "comparison.json")})
-    write(output_root / ("actual-matrix.json" if args.actual else "prepared-matrix.json"),
+    case_group = hashlib.sha256("\n".join(args.case).encode("utf-8")).hexdigest()[:12]
+    write(output_root / (("actual-matrix." + case_group + ".json") if args.actual else "prepared-matrix.json"),
           {"schema": "clk01-production-matrix.v1", "cases": results, "gates_updated": False})
     return 0
 

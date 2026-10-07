@@ -1,0 +1,310 @@
+{
+  "schema": "clk01-source-reference.v1",
+  "status": "pass",
+  "unit_scope": "Eligible existing scalar helpers and admitted ordinary 2013 calendar preparation; no production/gate/physics completion claim",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "rust_implementation_commit": "fe57a35751652c7fe7734a5b88ae475c36fc7b3b",
+  "qualified_wrapper_source_commit": "e8b7d578a14709868f48caf31ec6b4e1366c6246",
+  "comparison_count": 71358,
+  "mismatch_count": 0,
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+      "sha256": "6cd7fa8294ff5b28cfec3feb0f6efa765b9b66c1ea0495974cd61262255c9412"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+      "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-tolerances.json",
+      "sha256": "33190899639f89d05bee694f7cbcc193f2bc6b827b11aebdfdbf151bf9e0b4a3"
+    }
+  ],
+  "comparison_report": {
+    "path": ".runtime/porting/CLK-01/committed-unit/comparison/unit-comparison.json",
+    "sha256": "9ca1197b98c06ad572fc571c2d0118fc3f2113b251da62ffef38f6f8213f55fc"
+  },
+  "helper_summary": {
+    "total_original_calls": 3080,
+    "original_supported_calls": 3080,
+    "paired_calls": 1912,
+    "routine_statistics": {
+      "isLeapYear": {
+        "paired_count": 384,
+        "typed_value_mismatch_count": 0,
+        "numeric_count": 384,
+        "max_absolute_error": 0,
+        "sum_squared_error": 0,
+        "rmse": 0.0
+      },
+      "calculateDayOfYear": {
+        "paired_count": 764,
+        "typed_value_mismatch_count": 0,
+        "numeric_count": 764,
+        "max_absolute_error": 0,
+        "sum_squared_error": 0,
+        "rmse": 0.0
+      },
+      "General::OrdinalDay": {
+        "paired_count": 764,
+        "typed_value_mismatch_count": 0,
+        "numeric_count": 764,
+        "max_absolute_error": 0,
+        "sum_squared_error": 0,
+        "rmse": 0.0
+      }
+    },
+    "unpaired_source_only_diagnostics": {
+      "computeJulianDate": 384,
+      "computeGregorianDate": 384,
+      "calculateDayOfWeek": 384,
+      "SetupWeekDaysByMonth": 8,
+      "validMonthDay": 8
+    },
+    "unpaired_counted_as_paired_pass": false,
+    "source_state": {
+      "calculateDayOfWeek": {
+        "original_calls": 384,
+        "before_after_recorded": true,
+        "paired_rust_state_clone": false,
+        "classification": "source-only direct state diagnostics; consumed calendar projection is paired separately"
+      },
+      "SetupWeekDaysByMonth": {
+        "original_calls": 8,
+        "before_after_recorded": true,
+        "paired_rust_state_clone": false,
+        "classification": "source-only direct state diagnostics; consumed calendar projection is paired separately"
+      }
+    }
+  },
+  "calendar_summary": {
+    "case_count": 15,
+    "paired_daily_rows": 1845,
+    "monthly_array_entries_compared": 180,
+    "full_annual_month_start_count": 12,
+    "prepared_zone_rows": 177120,
+    "monthly_arrays_paired_to_consumed_projection": true,
+    "calendar_cases": [
+      {
+        "case_id": "A-24H",
+        "paired_daily_rows": 1,
+        "prepared_zone_rows": 96,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "A-72H",
+        "paired_daily_rows": 3,
+        "prepared_zone_rows": 288,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "A-ANNUAL",
+        "paired_daily_rows": 365,
+        "prepared_zone_rows": 35040,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "paired_daily_rows": 1,
+        "prepared_zone_rows": 96,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-NOLIMIT-72H",
+        "paired_daily_rows": 3,
+        "prepared_zone_rows": 288,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-NOLIMIT-ANNUAL",
+        "paired_daily_rows": 365,
+        "prepared_zone_rows": 35040,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "paired_daily_rows": 1,
+        "prepared_zone_rows": 96,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-FLOW-72H",
+        "paired_daily_rows": 3,
+        "prepared_zone_rows": 288,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-FLOW-ANNUAL",
+        "paired_daily_rows": 365,
+        "prepared_zone_rows": 35040,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "paired_daily_rows": 1,
+        "prepared_zone_rows": 96,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-CAPACITY-72H",
+        "paired_daily_rows": 3,
+        "prepared_zone_rows": 288,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-CAPACITY-ANNUAL",
+        "paired_daily_rows": 365,
+        "prepared_zone_rows": 35040,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "paired_daily_rows": 1,
+        "prepared_zone_rows": 96,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-BOTH-72H",
+        "paired_daily_rows": 3,
+        "prepared_zone_rows": 288,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      },
+      {
+        "case_id": "B-BOTH-ANNUAL",
+        "paired_daily_rows": 365,
+        "prepared_zone_rows": 35040,
+        "monthly_entries_compared": 12,
+        "mismatch_count": 0,
+        "physics_executed": false
+      }
+    ],
+    "physical_invocations_from_unit_runner": 0,
+    "physics_executed": false
+  },
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "native_driver_build": {
+    "path": ".runtime/porting/CLK-01/native-driver/native-driver-build.json",
+    "sha256": "b6a62b2ca64cca48ec0f57a7782068973189e922c4f980e0ba6efebbea6a4ed8"
+  },
+  "committed_rust_build": {
+    "path": "energyplus_porting_plan/evidence/CLK-01/build-receipt.json",
+    "sha256": "3c4ba86c9267f0c4601ffcc4bd5f2fb547ae804144b4c88d4921bb6f10372283"
+  },
+  "executions": {
+    "contract_check": {
+      "path": ".runtime/porting/CLK-01/committed-unit/contract-check/receipt.json",
+      "sha256": "dcf66f5413b82c0e5cde12e6f2799f28ea83eeb21c0e463c8251e2fc1d43fe80"
+    },
+    "original_helpers": {
+      "path": ".runtime/porting/CLK-01/committed-unit/original-helpers/helpers-reference.json",
+      "sha256": "f50b1eaf90ed775aaf667a1c23904288e51a2112d7139417c2384372df84f8dc"
+    },
+    "original_calendar": {
+      "path": ".runtime/porting/CLK-01/committed-unit/original-calendar/calendar-reference.json",
+      "sha256": "1ae54255e12d49d9ae0a3e9801999b47595e5a6829023f35bda205fbc85e9101"
+    },
+    "rust_helpers": {
+      "path": ".runtime/porting/CLK-01/committed-unit/rust-helpers/execution.json",
+      "sha256": "3b97d134a72169b34185b29fd5c7ab32f7e37b251c8e9ca10965c46d8e932057"
+    },
+    "rust_calendar": {
+      "path": ".runtime/porting/CLK-01/committed-unit/rust-calendar/execution.json",
+      "sha256": "fc485f5b7603ff35191f54229132785885b7d3ccbb95d2206256a12565605eca"
+    }
+  },
+  "executed_tool_sources": {
+    "reference_launcher": {
+      "path": ".runtime/porting/CLK-01/committed-unit/source/clk01_reference.py",
+      "sha256": "0f759a86f22b6cf53f86e7aa7d2854fdaefe6bd985a1ede54793067cd7c3c038"
+    },
+    "unit_checker": {
+      "path": ".runtime/porting/CLK-01/committed-unit/source/check_clk01_units.py",
+      "sha256": "6f09948b48a7a992d5b3bcdb89a2fc91fde9ec86abe17177faab233188f85dac"
+    },
+    "native_wrapper": {
+      "path": ".runtime/porting/CLK-01/native-driver/source/clk01_reference.cpp",
+      "sha256": "8adda49a2c20196703559ff9cc3846877a6bb89e608018c5894b6ebaa9661346"
+    },
+    "native_cmake": {
+      "path": ".runtime/porting/CLK-01/native-driver/source/clk01_reference.cmake",
+      "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+    }
+  },
+  "preflight": {
+    "initial_failed_receipt": {
+      "path": ".runtime/porting/CLK-01/driver-preflight/receipt.json",
+      "sha256": "04ad72b5aa4c5e8b4f890e865caaea65a161bb44dc5c5f09fe23e7e95a1f2eb3"
+    },
+    "qualified_pass_receipt": {
+      "path": ".runtime/porting/CLK-01/driver-preflight-qualified/receipt.json",
+      "sha256": "ce6df6ba3a75b644cc72811a4e169749880f6996b937370df0cf775edf308533"
+    },
+    "historical_source_binding": {
+      "historical_path": "tools/porting/clk01_reference.cpp",
+      "sha256": "f6f0c5b30f6ba2cfc1e584fa3606f56ed89e334e9d189b96bd667140c91d7cd1"
+    },
+    "historical_source_archive": {
+      "path": ".runtime/porting/CLK-01/preparation/source/clk01_reference.f6f0c5b30f6b.cpp",
+      "sha256": "f6f0c5b30f6ba2cfc1e584fa3606f56ed89e334e9d189b96bd667140c91d7cd1"
+    },
+    "fix": "Only three type names qualified EnergyPlus::EnergyPlusData; no original body/input/tolerance changes"
+  },
+  "native_configuration": {
+    "compiler": "GCC 13.2 MinGW-w64 UCRT POSIX SEH",
+    "build_type": "RelWithDebInfo",
+    "reference_cxx_optimization": "-O0 -g -DNDEBUG with original later -UNDEBUG",
+    "assertions_enabled": true,
+    "original_Werror_retained": true,
+    "extra_warning_waivers": false,
+    "fast_math": false,
+    "fp_contract": "off",
+    "glibcxx_debug": false,
+    "same_compiler_owned_private_state": true,
+    "existing_core_compile_commands_and_library_bytes_unchanged_by_driver": true,
+    "default_optimized_upstream_build_claimed_pass": false
+  },
+  "limits": [
+    "Direct Julian/Gregorian inverse, validMonthDay, DOW mutable global and SetupWeekDays mutable-array diagnostics have no existing Rust scalar/stateful peer; they are unpaired",
+    "GetRunPeriodData uses original parser and real Data; SetupEnvironmentTypes receives explicit parsed counts/selected EPW leap policy/allocated array unit prerequisites, not a full GetWeatherInput factory simulation",
+    "Direct source 12 element before/after arrays and full annual consumed month/day projections are observed; no Rust clone or full raw366array identity claim",
+    "Prepared 177120 zone points are not actual Rust invocation evidence; production/native pre-report/ESO comparison is a separate proof",
+    "Today/Tomorrow, weather-prefetch/reset/warmup sequencing,post-report CalendarYear mutation and full OutputProcessor serialization remain CLK03/SYS obligations",
+    "No building/HVAC numerical equivalence or B annual physics pass is claimed",
+    "Earlier original default optimized/Debug/platform build failures remain preserved in native build provenance; selected O0 test reference pass does not erase them"
+  ],
+  "production_status": "pending separate ROOT evidence review",
+  "gates_updated": false,
+  "completed_utc": "2026-10-07T13:52:40.528058+00:00"
+}
