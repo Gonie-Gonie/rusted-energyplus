@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-06-23
+last_reviewed: 2026-10-07
 ---
 
 # Architecture Overview
@@ -30,6 +30,11 @@ Core crates:
 - `ep_compare`: ESO/MTR readers, tolerances, comparison summaries
 - `ep_conformance`: case manifests, output requests, report/gate contracts
 - `ep_cli`: command dispatch and user-facing text/json output
+
+Compiler output distinguishes typed objects, raw-only objects, missing
+references, unsupported objects, and coverage status. Typed input support is
+an interpretation claim; runtime and numerical evidence must be established
+separately.
 
 Compatibility modules must map to EnergyPlus source routines. Diagnostic probe
 modules may call compatibility functions and add instrumentation, but

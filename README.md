@@ -8,6 +8,34 @@ Rust-only EnergyPlus-compatible porting project.
 26.1.0 as the locked oracle and treats generated evidence, not demos, as the
 basis for compatibility claims.
 
+## Porting Work
+
+The active work plan is [energyplus_porting_plan/README.md](energyplus_porting_plan/README.md).
+Its 64 cards cover an unconditioned opaque one-zone model and a single-zone,
+direct, no-outdoor-air sensible IdealLoads model with explicit limits.
+Start with `CON-01`, then take a card whose applicable predecessors are verified.
+The packet's Rust commit is the reviewed baseline; each new result records its
+actual implementation and execution commit.
+
+For each card, fix the original EnergyPlus source range and state ownership,
+compare equal inputs and initial states with EnergyPlus, verify the connected
+execution, and confirm that Rust performs the production calculation.
+Record commands, results, unresolved issues, and the four gates in the card,
+`CHECKLIST.md`, and `plan.json`. Existing code and skipped branches do not
+establish numerical equivalence.
+
+Use focused checks while implementing a card:
+
+```powershell
+python tools/porting/check_plan.py --check
+cargo fmt --all -- --check
+cargo test -p ep_runtime <card_test_filter> --lib
+```
+
+Run the card's EnergyPlus comparison and execution test before closing its
+gates. Run the broader repository checks at integration milestones. Commit
+and push each reviewable unit after its relevant validation.
+
 ## Compatibility Contract
 
 `rusted-energyplus` targets the locked EnergyPlus 26.1.0 oracle. Compatibility

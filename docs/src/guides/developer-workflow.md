@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-06-07
+last_reviewed: 2026-10-07
 ---
 
 # Developer Workflow
@@ -17,6 +17,17 @@ Use `scripts/dev.cmd` as the single entry point:
 .\scripts\dev.cmd file-size-check
 .\scripts\dev.cmd check
 ```
+
+For input and execution-plan inspection, the CLI also provides:
+
+```powershell
+cargo run -p ep_cli -- model inspect <input.epJSON>
+cargo run -p ep_cli -- model compile <input.epJSON>
+cargo run -p ep_cli -- model plan <input.epJSON>
+```
+
+These commands inspect input and planning state; they do not establish
+numerical compatibility.
 
 When changing plans, claim boundaries, object coverage, variable coverage, or
 algorithm status, update the matching file under `specs/` and regenerate the

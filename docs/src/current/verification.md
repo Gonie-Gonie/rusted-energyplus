@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: qa
-last_reviewed: 2026-06-23
+last_reviewed: 2026-10-07
 ---
 
 # Verification
@@ -32,6 +32,10 @@ Conformance gates require declared cases, variables/meters, tolerances,
 oracle baselines, Rust artifacts, generated compare reports, and blocking
 scripts. Diagnostic reports can explain source-order mismatches, but they do
 not support compatibility claims.
+
+Object support is recorded in `specs/object_coverage.toml` and the generated
+object-coverage page. Parsing or typing an object does not establish that its
+runtime behavior was simulated or compared with EnergyPlus.
 
 Support assessment is the internal gate for arbitrary IDF/epJSON runs. It
 loads capability rules, checks active objects and algorithms, classifies the

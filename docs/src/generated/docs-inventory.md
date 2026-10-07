@@ -9,9 +9,9 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 85 |
+| docs files | 76 |
 | SUMMARY links | 19 |
-| README h2 sections | 5 |
+| README h2 sections | 6 |
 | README h2 section limit | pass |
 | Current nav expected | 6 |
 | Current nav actual | 6 |
@@ -25,7 +25,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | Non-core SUMMARY sections | 0 |
 | SUMMARY section scope violations | 0 |
 | Release notes in Current nav | 0 |
-| Non-generated docs not in SUMMARY | 65 |
+| Non-generated docs not in SUMMARY | 56 |
 
 ## Current Navigation Check
 
@@ -79,7 +79,6 @@ none
 | docs/src/architecture/data-architecture.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/architecture/diagnostics-trace.md | spec-explanation | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/architecture/execution-plan.md | spec-explanation | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
-| docs/src/architecture/model-compiler.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-05 |
 | docs/src/architecture/output-registry.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
 | docs/src/architecture/performance-optimization-boundaries.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-07 |
 | docs/src/architecture/performance-stability-core-porting-philosophy.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-07 |
@@ -101,15 +100,14 @@ none
 | docs/src/conformance/release-gates.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/report-format.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
 | docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
-| docs/src/conformance/supported-object-matrix.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/tolerance-policy.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
-| docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-06-23 |
+| docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-10-07 |
 | docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-07-14 |
 | docs/src/current/launcher-and-run-framework.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-07-14 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-06-23 |
-| docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-06-23 |
+| docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-10-07 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/capability-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/conformance-case-index.md | generated | Generated References | present | none |  |  |  |
@@ -119,14 +117,13 @@ none
 | docs/src/generated/object-coverage.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/script-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/variable-coverage.md | generated | Generated References | present | none |  |  |  |
-| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-06-07 |
+| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |
 | docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-06-08 |
 | docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | none |  |  |  |
-| docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-06-07 |
+| docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |
 | docs/src/introduction.md | spec-explanation | Summary | n/a | present | active | docs | 2026-06-05 |
 | docs/src/operations/documentation-framework.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
 | docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-07-14 |
-| docs/src/operations/setup-checklist.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-08 |
 | docs/src/operations/supported-object-coverage.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-07-14 |
 | docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |
@@ -150,12 +147,6 @@ none
 | docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/warmup-semantics-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
 | docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
-| docs/src/quick-start.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |
 | docs/src/releases/README.md | release-note | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/releases/v0.1.0.md | release-note | not in SUMMARY | n/a | present | ready | release | 2026-06-18 |
 | docs/src/releases/v0.32.0.md | release-note | not in SUMMARY | n/a | present | released | release | 2026-06-08 |
-| docs/src/user-guide/basic-commands.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-05 |
-| docs/src/user-guide/diagnostics.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-05 |
-| docs/src/user-guide/limitations.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |
-| docs/src/user-guide/oracle-runtime.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-05 |
-| docs/src/user-guide/setup.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
