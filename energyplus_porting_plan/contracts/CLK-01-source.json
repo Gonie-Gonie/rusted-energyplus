@@ -1,0 +1,424 @@
+{
+  "schema": "clk01-source-contract.v1",
+  "card": "CLK-01",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "named_card_functions": [
+    "GetRunPeriodData",
+    "SetupWeekDaysByMonth",
+    "calculateDayOfYear",
+    "isLeapYear"
+  ],
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658"
+    },
+    {
+      "path": "src/EnergyPlus/General.hh",
+      "sha256": "d7dcfac7390ef66dfee198739e1886110c494dd54ef953d204bad78d710eb021"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+    },
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f"
+    },
+    {
+      "path": "src/EnergyPlus/Data/EnergyPlusData.hh",
+      "sha256": "2bdbb583c802ba2b8141b3f79f3e98d8ade68774bf2fe6c571ead5462323bf21"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d"
+    },
+    {
+      "path": "src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/api/datatransfer.cc",
+      "sha256": "17ba348cbbc67afbe878d982bcc9e5e04e55abeccef9113a9f3c644ea4555e1b"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "sha256": "74e45dca0d71e9cd1ac37f4cdc85da6fe7780d78a5ec6cf3d304da4e770b9ea2"
+    },
+    {
+      "path": "tst/EnergyPlus/unit/Fixtures/EnergyPlusFixture.cc",
+      "sha256": "cfb2a7173b12bfe6ac291bebaf6100a6351b0d05e4f81411a8c5a5c28b5baec9"
+    },
+    {
+      "path": "tst/EnergyPlus/unit/RunPeriod.unit.cc",
+      "sha256": "36f50ce5385ab62cbb21fd28bb571b6dded3c79ddbae1abc36756da6a553a148"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "isLeapYear",
+      "start_line": 8521,
+      "end_line": 8531,
+      "range_sha256": "2552a63cb807b79371ef446283894a87f7fbaba6b8ad2b1732111fb6928e7a44",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "computeJulianDate",
+      "start_line": 8533,
+      "end_line": 8558,
+      "range_sha256": "f394a9b0f2bc38379a940a374ea3db1c2c31f64fc7fc86fd12067c49c31d1dd3",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "computeJulianDate GregorianDate overload",
+      "start_line": 8560,
+      "end_line": 8563,
+      "range_sha256": "d1cd084d0eb114202f26f8581b21ac6fb37ec7a87334d43edca8f21244a54f50",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "computeGregorianDate",
+      "start_line": 8565,
+      "end_line": 8579,
+      "range_sha256": "f96586d9f88408413ef1ff45068154e0184fc6ce7a8b3ee8685fcb99ebc7bce7",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "calculateDayOfYear",
+      "start_line": 8616,
+      "end_line": 8634,
+      "range_sha256": "f7651765ac046d2845b27694b0820dde0395a5d25d800ac1f11484ae5c036170",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "validMonthDay",
+      "start_line": 8636,
+      "end_line": 8675,
+      "range_sha256": "1a813dcf59025474efb17fe1c8275b71f2df0d6fd1a6d8b54c8b7fcd838e0e32",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/General.cc",
+      "symbol": "OrdinalDay",
+      "start_line": 705,
+      "end_line": 737,
+      "range_sha256": "a75944ba1e753120c50af5c3741a157e2f33c456df3f2c00c6247309b3b4e665",
+      "role": "original-pure-body"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupWeekDaysByMonth",
+      "start_line": 1246,
+      "end_line": 1327,
+      "range_sha256": "064e426422838349aaa68060a6977ed70592244a6c78daae7605e15bb8c93daa",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetRunPeriodData input allocation and fields",
+      "start_line": 5012,
+      "end_line": 5083,
+      "range_sha256": "9bb061d674563baab01fbb266ef70cc7a20915babd06ba53f852c479d814b880",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetRunPeriodData year/date/weekday selection",
+      "start_line": 5092,
+      "end_line": 5299,
+      "range_sha256": "71d4c3d409b5a4bfcc713ab20e2842fc81ed3579d8396f4675240023cef2025d",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetRunPeriodData policy flags and month weekday array",
+      "start_line": 5301,
+      "end_line": 5381,
+      "range_sha256": "66e34df9194f85be658f3c6595b3238a3f16647c45e73cb4f34f23c790203dcd",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupEnvironmentTypes selected regular RunPeriod",
+      "start_line": 8438,
+      "end_line": 8519,
+      "range_sha256": "de7d52041d4cfd4340b32e459a0a84233d9ec5ab6cb1ab8b57106a94dd8faec3",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "calculateDayOfWeek actual DayOfWeek write",
+      "start_line": 8581,
+      "end_line": 8614,
+      "range_sha256": "eebee55bc5370f59b0d3d0fc644bc16566d699cc540656d7d833f64035168341",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetDayOfWeekInitialValues",
+      "start_line": 3228,
+      "end_line": 3250,
+      "range_sha256": "3e79dc4aef8e86433017055ad9d0e70da8b7097b42b1c3128cd03c18d0a04425",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment calendar and environment selection",
+      "start_line": 775,
+      "end_line": 884,
+      "range_sha256": "27d0597ef81931b9f921fd24a544394ba30fd3a691d00d3e7a8cc7ddc5cadb7a",
+      "role": "consumed-calendar-context"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment weekday/DST/reset policy",
+      "start_line": 1083,
+      "end_line": 1128,
+      "range_sha256": "f8ed5797f829e9b20eabb779b887fdc3081e021001931de2e51a42ab2a9d22ee",
+      "role": "consumed-calendar-context"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather schedule ordinal/current zone time",
+      "start_line": 2069,
+      "end_line": 2092,
+      "range_sha256": "6328a239dbdeb4342820a7452bf2db08890ca73f531f7349d2748c0e3c643a96",
+      "role": "actual-consumer-context"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "UpdateWeatherData daily fields",
+      "start_line": 2009,
+      "end_line": 2034,
+      "range_sha256": "ecf4a659a44801746c48ace36bc14c01703ae55ea90ffc24319a6126a176b04a",
+      "role": "CLK-03-producer-context-only"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather warmup/last-day/prefetch/reset",
+      "start_line": 1788,
+      "end_line": 1930,
+      "range_sha256": "7c6e331688c10a8d160fceb74233b94358fa2deb00480b47d6de3893bdbbc12d",
+      "role": "CLK-03-context-only"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "DatesShouldBeReset timing",
+      "start_line": 1954,
+      "end_line": 1958,
+      "range_sha256": "c25513ea262af37bfb54f844771cb36c80064dad24c5ef948325a43b31717a36",
+      "role": "CLK-03-context-only"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "EnvironmentData",
+      "start_line": 176,
+      "end_line": 223,
+      "range_sha256": "1253807b570160efb7a3a1307f3fdb6ec2daec5a7695574634efdd0e1eef6671",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "RunPeriodData and DayWeatherVariables",
+      "start_line": 275,
+      "end_line": 319,
+      "range_sha256": "bcf51223f5bf27eb2c464cf6ca137098e4d81462d7c60dec3f5b52644d0d5858",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "weekday/DST arrays and flags",
+      "start_line": 818,
+      "end_line": 836,
+      "range_sha256": "2eb2c9c675e25dfdea7e4f6a6af2707aed7b87b70c61d31127a541b3eeabc812",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "month/leap/reset state",
+      "start_line": 861,
+      "end_line": 868,
+      "range_sha256": "98e1eec1e38bdaf510c1d832c533c5cae4a85ff727d3812631c40a2aa7f773f8",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "calendar/day/hour/zone flags",
+      "start_line": 75,
+      "end_line": 114,
+      "range_sha256": "577be0a22056f80dc1c6cfa21e2e65efabb419991060c32f130c8fa9e3bcbf27",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "weather/schedule ordinal and weekday fields",
+      "start_line": 103,
+      "end_line": 121,
+      "range_sha256": "167d20bf99018efdb72bd40ddcaa56b1c97b8c142110b80cfe60a33ff0c5073e",
+      "role": "selected"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "environment reset",
+      "start_line": 413,
+      "end_line": 419,
+      "range_sha256": "c8c8ae9bcae9a3ed3c1f571a157cd3cb9419e70adc35ed62e007c4e848c866b5",
+      "role": "caller-context"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "day counter advance",
+      "start_line": 444,
+      "end_line": 459,
+      "range_sha256": "b41bd0f1c7cdb054843b6bdee6faad109024d3e15af6e833d7e92bd737188b40",
+      "role": "caller-context"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "flags and Weather before HeatBalance",
+      "start_line": 515,
+      "end_line": 546,
+      "range_sha256": "ebe8b2e44c458fdcd5f4cd18946e0d66bc74d16dac9ca20048e186339aaf49be",
+      "role": "callback-phase-proof"
+    },
+    {
+      "file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "before/after InitHeatBalance callback",
+      "start_line": 189,
+      "end_line": 200,
+      "range_sha256": "64ebccca6942fd44721d988533004fa2403e7d050635d1c15b06181ba15f4db4",
+      "role": "callback-phase-proof"
+    },
+    {
+      "file": "src/EnergyPlus/api/runtime.cc",
+      "symbol": "before-init callback registration",
+      "start_line": 187,
+      "end_line": 208,
+      "range_sha256": "adf094852c8532014b0f8a134dbd7fcea00e93e9149f4be5cbea61d1d41c01b5",
+      "role": "opaque-public-api"
+    },
+    {
+      "file": "src/EnergyPlus/api/datatransfer.cc",
+      "symbol": "year/calendar/time/state public projections",
+      "start_line": 860,
+      "end_line": 998,
+      "range_sha256": "266771b5bb525ca19232a4969fa9ede026e3fab817bd3f92d99a3cbac24220ed",
+      "role": "opaque-public-api"
+    },
+    {
+      "file": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "symbol": "original processInput parser/schema/maps/buffers",
+      "start_line": 259,
+      "end_line": 322,
+      "range_sha256": "46c960d3fabcc2844bb02553dd0abf7793e211a77832fc0b22d11a53fde8b7bb",
+      "role": "selected"
+    },
+    {
+      "file": "tst/EnergyPlus/unit/Fixtures/EnergyPlusFixture.cc",
+      "symbol": "original process_idf pattern",
+      "start_line": 360,
+      "end_line": 416,
+      "range_sha256": "85f21948dd5c094cbe5a714d1a3cd8dbfa0fca9f6c3522d2f300d96621053c8d",
+      "role": "setup-provenance-only"
+    },
+    {
+      "file": "tst/EnergyPlus/unit/RunPeriod.unit.cc",
+      "symbol": "original GetRunPeriodData unit call",
+      "start_line": 197,
+      "end_line": 201,
+      "range_sha256": "429e53c734b9b0e44247310bc7c52240eb9a184cb092ffa3b7e9909e96d8901a",
+      "role": "setup-provenance-only"
+    },
+    {
+      "file": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "symbol": "integer mod",
+      "start_line": 692,
+      "end_line": 715,
+      "range_sha256": "54d9ae42d64744d26e97302e4467be86b5c5d10945394ae1028cf82a8312c120",
+      "role": "selected"
+    }
+  ],
+  "scope": {
+    "calendar_year": 2013,
+    "weather_run_periods": 1,
+    "actual_weather": false,
+    "sizing_environment_execution": false,
+    "actual_dst_steps": 0,
+    "actual_special_days": 0,
+    "dst_holiday_input_policy": "Yes is retained; no active overrides after pinned EPW resolution",
+    "unit_gregorian_leap_inputs_do_not_admit_production_leap_years": true
+  },
+  "reference": {
+    "native": "Unchanged original linked bodies with compiler-owned genuine EnergyPlusData",
+    "input": "Original InputProcessor::processInput on pinned IDFs, then GetRunPeriodData",
+    "environment_setup": "Parser-derived definition counts and declared EPW leap policy are explicit before-state inputs to original SetupEnvironmentTypes; no design/sizing payloads are fabricated",
+    "flags": "Same GNU compiler and energypluslib/project_options/project_fp_options/project_warnings targets; Debug ABI flags must match",
+    "pure_fallback": "Only listed exact pure bodies, original WeatherManager.hh GregorianDate/type declarations and original ObjexxFCL mod",
+    "pure_copy_sha256": "98a756a3a5ddd84938400669191efa2ad24be11f4070341cc990db6c21adcc11",
+    "private_state_from_installed_msvc_dll": false,
+    "pure_fallback_stateful_calls": "explicit unsupported; never a stateful-reference PASS"
+  },
+  "state_contract": {
+    "GetRunPeriodData": "Read original input buffers; write RunPeriodInput, dataEnvrn.DayOfWeek, month weekday array; record genuine before/after state",
+    "SetupWeekDaysByMonth": "Read EndDayOfMonth/LeapYearAdd and 12-element WeekDays initial content; write original array in source order, including retained entries",
+    "calculateDayOfWeek": "Writes dataEnvrn.DayOfWeek, returns matching Sched::DayType",
+    "CalendarFrame": "Current consumed date/weekday, Gregorian/weather/schedule ordinal, day type, hour/zone interval and report-column date projection; not future weather buffer or post-report year mutation"
+  },
+  "native_phase": {
+    "selected": "callback_begin_zone_timestep_before_init_heat_balance",
+    "source_order": "SimulationManager Weather::ManageWeather -> ManageHeatBalance -> HeatBalanceManager before-init callback -> InitHeatBalance -> reporting later",
+    "raw_api_clock_at_both_phases": "Retain public API year/calendar/current_time/minutes separately; even the pre-report phase can carry shortened SYS-adjusted currentTime, so neither raw phase clock is a canonical zone end"
+  },
+  "production_proof": {
+    "prepared_calendars": "All 15 fixed cases including all 365 annual days; preparation is not consumed invocation proof",
+    "actual_zone_consumers_required": "A/B24H and72H; A annual when feasible; B annual physics deferred to SYS obligations",
+    "native_reference": "Separate installed pinned original DLL public exports only; root-owned all15 phase trace harness",
+    "daily_projection": "Original native GetRunPeriodData/SetupEnvironmentTypes plus original date/weekday/ordinal helpers; not CLK-03 producer execution"
+  },
+  "paired_direct_helpers": [
+    "isLeapYear",
+    "calculateDayOfYear",
+    "General::OrdinalDay"
+  ],
+  "exclusions": [
+    "CLK-02 full EPW parsing/missing data",
+    "CLK-03 record selection, Today/Tomorrow, prefetch, DatesShouldBeReset and repeat/warmup producer",
+    "active DST/holiday/IDF overrides rejected by CON",
+    "OutputProcessor CalendarYear mutation and SYS04 reporting sequence",
+    "design/sizing/multiyear/actual-weather production branches",
+    "schedule scalar values and SCH-03 lookup timing",
+    "whole building/HVAC numerical equivalence"
+  ],
+  "comparison_status": "not_run",
+  "gates_updated": false
+}

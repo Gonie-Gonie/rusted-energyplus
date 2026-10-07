@@ -1,0 +1,85 @@
+{
+  "schema": "clk01-tolerances.v1",
+  "frozen_before_comparison": true,
+  "rows": [
+    {
+      "quantity": "civil_year/month/day",
+      "unit": "calendar integer",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "Gregorian/weather/schedule ordinal",
+      "unit": "day index",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "weekday/day_type/DST/holiday",
+      "unit": "enum or integer",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "Julian date",
+      "unit": "integer day",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "leap flags",
+      "unit": "boolean",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "monthly weekday array",
+      "unit": "12 integer elements",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "selected source environment ordinal",
+      "unit": "integer identity",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "hour/zone step/interval endpoints",
+      "unit": "hour/minute/second",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "canonical zone interval duration",
+      "unit": "binary64 second",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    },
+    {
+      "quantity": "source state before/after",
+      "unit": "typed exact fields",
+      "atol": 0,
+      "rtol": 0,
+      "comparison": "exact"
+    }
+  ],
+  "policy": {
+    "identity_inputs_order_counts_context": "exact",
+    "undefined_source_input_domains": "excluded",
+    "raw_api_clock_pre_and_post_report": "recorded separately at both phases; not compared as a canonical zone timestamp",
+    "post_report_calendar_year_mutation": "outside CLK-01 gate",
+    "environment_id": "Source full ordinal and Rust materialized ordinal have different provenance; require explicit mapping based on raw definitions, never arbitrary numeric equality",
+    "physical_output_tolerance": "No building/HVAC physical outputs compared by CLK-01",
+    "unpaired_diagnostics": "Exact original result recorded; no paired PASS"
+  }
+}

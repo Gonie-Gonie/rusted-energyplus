@@ -7,6 +7,7 @@ use ep_model::{
 };
 
 mod calendar_rules;
+pub mod clock_trace;
 mod day_type;
 mod daylight_saving;
 mod error;

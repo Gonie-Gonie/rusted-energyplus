@@ -1,0 +1,111 @@
+{
+  "schema": "clk01-source-helper-preparation.v1",
+  "phase": "pre-checkpoint diagnostic; not final committed-source proof",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "status": "pass",
+  "eligible_helper_calls": 1912,
+  "comparison_count": 38496,
+  "mismatch_count": 0,
+  "routine_statistics": {
+    "isLeapYear": {
+      "paired_count": 384,
+      "typed_value_mismatch_count": 0,
+      "numeric_count": 384,
+      "max_absolute_error": 0,
+      "sum_squared_error": 0,
+      "rmse": 0.0
+    },
+    "calculateDayOfYear": {
+      "paired_count": 764,
+      "typed_value_mismatch_count": 0,
+      "numeric_count": 764,
+      "max_absolute_error": 0,
+      "sum_squared_error": 0,
+      "rmse": 0.0
+    },
+    "General::OrdinalDay": {
+      "paired_count": 764,
+      "typed_value_mismatch_count": 0,
+      "numeric_count": 764,
+      "max_absolute_error": 0,
+      "sum_squared_error": 0,
+      "rmse": 0.0
+    }
+  },
+  "unpaired": {
+    "computeJulianDate": 384,
+    "computeGregorianDate": 384,
+    "calculateDayOfWeek": 384,
+    "SetupWeekDaysByMonth": 8,
+    "validMonthDay": 8
+  },
+  "source_only_diagnostics": {
+    "computeJulianDate": 384,
+    "computeGregorianDate": 384,
+    "validMonthDay": 8
+  },
+  "source_stateful_unavailable": {
+    "calculateDayOfWeek": 384,
+    "SetupWeekDaysByMonth": 8
+  },
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+      "sha256": "6cd7fa8294ff5b28cfec3feb0f6efa765b9b66c1ea0495974cd61262255c9412"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+      "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/CLK-01-tolerances.json",
+      "sha256": "33190899639f89d05bee694f7cbcc193f2bc6b827b11aebdfdbf151bf9e0b4a3"
+    }
+  ],
+  "raw": [
+    {
+      "path": ".runtime/porting/CLK-01/checks-initial/paired-helpers/unit-comparison.json",
+      "sha256": "aa4e9c77f8ef6e5bfd4b2204977729469a53f073f84aa8bb496d73a75655a408"
+    },
+    {
+      "path": ".runtime/porting/CLK-01/preparation/build-pure.json",
+      "sha256": "d34941a075acac4ec974643e2d193be6e5c2f144f1cab05cd563fe84a8ec235f"
+    },
+    {
+      "path": ".runtime/porting/CLK-01/preparation/helpers-reference.json",
+      "sha256": "74cb4fa98ca02fb26e080054e69da44160de31dc16202de458c5bd698500133a"
+    },
+    {
+      "path": ".runtime/porting/CLK-01/checks-initial/helpers-rust/execution.json",
+      "sha256": "f1d87f1dec100d37f0e573b268524e749068691d6ba738953ddbad6f07a9dce4"
+    }
+  ],
+  "checker": {
+    "path": "tools/porting/check_clk01_units.py",
+    "sha256": "6f09948b48a7a992d5b3bcdb89a2fc91fde9ec86abe17177faab233188f85dac"
+  },
+  "original_reference_driver": {
+    "path": "tools/porting/clk01_reference.cpp",
+    "sha256": "f6f0c5b30f6ba2cfc1e584fa3606f56ed89e334e9d189b96bd667140c91d7cd1"
+  },
+  "initial_loader_failure": {
+    "exit_code_observed": 3221225781,
+    "raw_logs_preserved": false,
+    "note": "First missing-runtime-DLL launch was retried using the same stem before the existing-output guard was added; no numerical proof from that failed launch"
+  },
+  "remaining": [
+    "original matching-core genuine-state compilation and execution",
+    "15 original/Rust calendar parsed-state/daily/month-start comparisons",
+    "committed-source reference refresh and actual production/native clock review"
+  ],
+  "gates_updated": false,
+  "current_preparation_tool": {
+    "path": "tools/porting/clk01_reference.py",
+    "sha256": "0f759a86f22b6cf53f86e7aa7d2854fdaefe6bd985a1ede54793067cd7c3c038"
+  },
+  "preparation_tool_history": {
+    "pre_native_binding_extension_sha256": "681855fc658ca5e32bb70307e3a7bf249a74e8f2003da9660aa6e8d083e15503",
+    "archived_executed_python_source_available": false,
+    "note": "Launcher evolved after the original pure dispatch to add output preservation and native build receipt checks; compiled original CPP body and requests stayed byte-exact. Actual CPP binary/source/build receipts are preserved."
+  }
+}

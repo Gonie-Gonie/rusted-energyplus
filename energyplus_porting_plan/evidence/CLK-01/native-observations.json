@@ -1,0 +1,562 @@
+{
+  "schema": "clk01-native-observations.v1",
+  "execution_kind": "original-installed-EnergyPlus-native-API",
+  "case_count": 15,
+  "total_before_report_zone_invocations": 177120,
+  "total_after_report_zone_invocations": 177120,
+  "duration_counts": [
+    {
+      "duration": "24H",
+      "zone_invocations_per_execution": 96,
+      "executions": 5
+    },
+    {
+      "duration": "72H",
+      "zone_invocations_per_execution": 288,
+      "executions": 5
+    },
+    {
+      "duration": "ANNUAL",
+      "zone_invocations_per_execution": 35040,
+      "executions": 5
+    }
+  ],
+  "native_library": {
+    "path": ".runtime/energyplus/26.1.0/energyplusapi.dll",
+    "sha256": "bbe6f66240d108df9f51a03b9beb968808a2173234253574d27a31605aec2aa2"
+  },
+  "executed_observer_archive": {
+    "path": ".runtime/porting/CLK-01/native-api-first/source/trace_clk01_native.py",
+    "sha256": "8d6b303d75b131407a30f4228488d1d2793249a09655d3ada85a9c5d7d44146e"
+  },
+  "initial_contract_archive_manifest": {
+    "path": ".runtime/porting/CLK-01/native-api-first/source/frozen-contracts/manifest.json",
+    "sha256": "c2e3c3fd37c7c500ffdaab0fcd0a909dacd7b57a3d05d89e86da9193f6b6ea62"
+  },
+  "contract_phase_mapping": [
+    {
+      "initial_execution_binding": {
+        "historical_path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+        "sha256": "c45472901622b05b84f65a10efc2ab7990bfdf77a7a968630b38e021ad628641"
+      },
+      "initial_bytes_archive": {
+        "path": ".runtime/porting/CLK-01/native-api-first/source/frozen-contracts/CLK-01-source.json",
+        "sha256": "c45472901622b05b84f65a10efc2ab7990bfdf77a7a968630b38e021ad628641"
+      },
+      "current_clarified_contract": {
+        "path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+        "sha256": "6cd7fa8294ff5b28cfec3feb0f6efa765b9b66c1ea0495974cd61262255c9412"
+      },
+      "clarified_fields": [
+        "native_phase.raw_api_clock_at_both_phases",
+        "native_phase.raw_post_reporting"
+      ],
+      "numerical_requests_or_tolerance_rows_changed": false
+    },
+    {
+      "initial_execution_binding": {
+        "historical_path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+        "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+      },
+      "initial_bytes_archive": {
+        "path": ".runtime/porting/CLK-01/native-api-first/source/frozen-contracts/CLK-01-cases.json",
+        "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+      },
+      "current_clarified_contract": {
+        "path": "energyplus_porting_plan/contracts/CLK-01-cases.json",
+        "sha256": "9351fd66017d55d28dce81dcaec05c1c562428e41d715af0217781df967497d0"
+      },
+      "clarified_fields": [],
+      "numerical_requests_or_tolerance_rows_changed": false
+    },
+    {
+      "initial_execution_binding": {
+        "historical_path": "energyplus_porting_plan/contracts/CLK-01-tolerances.json",
+        "sha256": "7deec6e0818d46387ee0cc495774f2423908b1385a39323ec938e03eb442e3db"
+      },
+      "initial_bytes_archive": {
+        "path": ".runtime/porting/CLK-01/native-api-first/source/frozen-contracts/CLK-01-tolerances.json",
+        "sha256": "7deec6e0818d46387ee0cc495774f2423908b1385a39323ec938e03eb442e3db"
+      },
+      "current_clarified_contract": {
+        "path": "energyplus_porting_plan/contracts/CLK-01-tolerances.json",
+        "sha256": "33190899639f89d05bee694f7cbcc193f2bc6b827b11aebdfdbf151bf9e0b4a3"
+      },
+      "clarified_fields": [
+        "policy.raw_api_clock_pre_and_post_report",
+        "policy.raw_post_report_api_clock"
+      ],
+      "numerical_requests_or_tolerance_rows_changed": false
+    }
+  ],
+  "weather_record_years_by_observed_month": {
+    "1": [
+      1999
+    ],
+    "2": [
+      2001
+    ],
+    "3": [
+      1998
+    ],
+    "4": [
+      2004
+    ],
+    "5": [
+      2002
+    ],
+    "6": [
+      1991
+    ],
+    "7": [
+      2004
+    ],
+    "8": [
+      2001
+    ],
+    "9": [
+      2002
+    ],
+    "10": [
+      1998
+    ],
+    "11": [
+      2004
+    ],
+    "12": [
+      1996
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/A-24H/receipt.json",
+        "sha256": "46591a7286adb4b03640da8bd3f83ea5e7a0a725b2551e165c38d44f95ec189f"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/A-24H/clock-callbacks.jsonl",
+        "sha256": "811480f5b529e0b57d79800bb11229011962401352edf2302d5f6aa2dbd155a2"
+      },
+      "before_report_zone_count": 96,
+      "after_report_zone_count": 96,
+      "observed_current_dates": 1,
+      "native_source_environment_number": 3,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1999
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1999
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/A-72H/receipt.json",
+        "sha256": "7f33bc3834a69eae6ada2c2b5fe5f9dc4bc95e9c5b637b75fdb6aa6dcae23ebc"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/A-72H/clock-callbacks.jsonl",
+        "sha256": "786dc6090fce028648336ed59d63d7126d12df347618052050baec467fdbdbd4"
+      },
+      "before_report_zone_count": 288,
+      "after_report_zone_count": 288,
+      "observed_current_dates": 3,
+      "native_source_environment_number": 3,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1991,
+        2004
+      ],
+      "first_weather_record_year": 1991,
+      "last_weather_record_year": 2004
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "scope": "A",
+      "duration": "ANNUAL",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/A-ANNUAL/receipt.json",
+        "sha256": "0eb52aea417bce03eb2ae99cce3accf5e6accb777f22cc3a6ecb134444438146"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/A-ANNUAL/clock-callbacks.jsonl",
+        "sha256": "bcc62850338ead817c89c81c46e2d1032ef9f63dcc6c8be45b5cff736e43f9ec"
+      },
+      "before_report_zone_count": 35040,
+      "after_report_zone_count": 35040,
+      "observed_current_dates": 365,
+      "native_source_environment_number": 3,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2014,
+      "weather_record_years": [
+        1991,
+        1996,
+        1998,
+        1999,
+        2001,
+        2002,
+        2004
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1996
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-BOTH-24H/receipt.json",
+        "sha256": "3d81d47d312cc9bf5405fe6a048394ac9ecbcc456db65931e134e2d6b53066d6"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-BOTH-24H/clock-callbacks.jsonl",
+        "sha256": "2834e3289e2ffe877ff2863ce5ccc188298c5ed37e59c9f7303fe95e0e2e2778"
+      },
+      "before_report_zone_count": 96,
+      "after_report_zone_count": 96,
+      "observed_current_dates": 1,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1999
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1999
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "scope": "B",
+      "duration": "72H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-BOTH-72H/receipt.json",
+        "sha256": "44a28ee53e7ee8d2d3d954da73de128ab97ced8431580222c1dd162ec993f184"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-BOTH-72H/clock-callbacks.jsonl",
+        "sha256": "095edb6ee9dd6a43bc8851b2831337cbe399666bcf7f0d8718fed15dbe67f52f"
+      },
+      "before_report_zone_count": 288,
+      "after_report_zone_count": 288,
+      "observed_current_dates": 3,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1991,
+        2004
+      ],
+      "first_weather_record_year": 1991,
+      "last_weather_record_year": 2004
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-BOTH-ANNUAL/receipt.json",
+        "sha256": "2f67ca195d7df57696dbe74608c92be9f68c24fd47d2672a4ec1204cd2a26081"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-BOTH-ANNUAL/clock-callbacks.jsonl",
+        "sha256": "e6d501fbdf4f081eee4c962298e8b90847097485981812cb03df42c848c5aca9"
+      },
+      "before_report_zone_count": 35040,
+      "after_report_zone_count": 35040,
+      "observed_current_dates": 365,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2014,
+      "weather_record_years": [
+        1991,
+        1996,
+        1998,
+        1999,
+        2001,
+        2002,
+        2004
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1996
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "scope": "B",
+      "duration": "24H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-CAPACITY-24H/receipt.json",
+        "sha256": "9d8396caf4a106dddec7d45f16a37e61d31f14383b2892193b324485b89232ab"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-CAPACITY-24H/clock-callbacks.jsonl",
+        "sha256": "312e2d8b4521052ca8bc375c0c8152386d12096075bce2c428dd7da4144d6d85"
+      },
+      "before_report_zone_count": 96,
+      "after_report_zone_count": 96,
+      "observed_current_dates": 1,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1999
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1999
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "scope": "B",
+      "duration": "72H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-CAPACITY-72H/receipt.json",
+        "sha256": "dd5dc4e36fd53c905372b1dcf5e4479b2f2a635c7d5bb307d21a3672d5b637fa"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-CAPACITY-72H/clock-callbacks.jsonl",
+        "sha256": "0dec802cea6d8a9583cc4ba5d49a3571a3d8c7b44c9f16b4b7f1c6fac7897afc"
+      },
+      "before_report_zone_count": 288,
+      "after_report_zone_count": 288,
+      "observed_current_dates": 3,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1991,
+        2004
+      ],
+      "first_weather_record_year": 1991,
+      "last_weather_record_year": 2004
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-CAPACITY-ANNUAL/receipt.json",
+        "sha256": "8c12940561134d44d64137cb044a00aaea01ed0dc9c91e3838f7f0c8bb153ccf"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-CAPACITY-ANNUAL/clock-callbacks.jsonl",
+        "sha256": "521c13a3d70c1d193c03e5935e7a0fb83801d578b95d1c708f8e774383a5ba45"
+      },
+      "before_report_zone_count": 35040,
+      "after_report_zone_count": 35040,
+      "observed_current_dates": 365,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2014,
+      "weather_record_years": [
+        1991,
+        1996,
+        1998,
+        1999,
+        2001,
+        2002,
+        2004
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1996
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "scope": "B",
+      "duration": "24H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-FLOW-24H/receipt.json",
+        "sha256": "d0bc35af03e59097b7fd4525be27939c2b2d5ef28cdb602d4271c9d85ce0b410"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-FLOW-24H/clock-callbacks.jsonl",
+        "sha256": "220687fe7c2c4856216fe3adef473501c15cf07df2e077360590f54e95b8dd81"
+      },
+      "before_report_zone_count": 96,
+      "after_report_zone_count": 96,
+      "observed_current_dates": 1,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1999
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1999
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "scope": "B",
+      "duration": "72H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-FLOW-72H/receipt.json",
+        "sha256": "868529cb0b01be304eef1c6a72b5a121f3af797c807f9daa4bd5af49f1f7c550"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-FLOW-72H/clock-callbacks.jsonl",
+        "sha256": "f033756d568908d802450e1f326b3ac88c8c730c575a3c70eb404be0bc9e24bc"
+      },
+      "before_report_zone_count": 288,
+      "after_report_zone_count": 288,
+      "observed_current_dates": 3,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1991,
+        2004
+      ],
+      "first_weather_record_year": 1991,
+      "last_weather_record_year": 2004
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-FLOW-ANNUAL/receipt.json",
+        "sha256": "d982c6c26bafe11d4dd19413d8d56bc6ea1be95ed284862eb74cde73811b5a65"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-FLOW-ANNUAL/clock-callbacks.jsonl",
+        "sha256": "f400114acfbb0eeaac042ebaeb72229fc64e729b946c5653ebf908c016b5303b"
+      },
+      "before_report_zone_count": 35040,
+      "after_report_zone_count": 35040,
+      "observed_current_dates": 365,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2014,
+      "weather_record_years": [
+        1991,
+        1996,
+        1998,
+        1999,
+        2001,
+        2002,
+        2004
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1996
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "scope": "B",
+      "duration": "24H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-24H/receipt.json",
+        "sha256": "3371528f7d32f0d6b80a4470bf9a31937df18a4d064b1ba8099003e2c5d1611b"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-24H/clock-callbacks.jsonl",
+        "sha256": "28862e0eeb6e367140da330d203730f90440c04a28ad460b159f14bd97b294b9"
+      },
+      "before_report_zone_count": 96,
+      "after_report_zone_count": 96,
+      "observed_current_dates": 1,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1999
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1999
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "scope": "B",
+      "duration": "72H",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-72H/receipt.json",
+        "sha256": "939c4b4cb89d93bd76e9eaf5ec56a78433f9436d51cbda3793b3bea7fec76438"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-72H/clock-callbacks.jsonl",
+        "sha256": "c059b41ecd05443013f7dbb6e53112a9ae58e7b3a878d2dc1b4f2e5914173ecf"
+      },
+      "before_report_zone_count": 288,
+      "after_report_zone_count": 288,
+      "observed_current_dates": 3,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2013,
+      "weather_record_years": [
+        1991,
+        2004
+      ],
+      "first_weather_record_year": 1991,
+      "last_weather_record_year": 2004
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "receipt": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-ANNUAL/receipt.json",
+        "sha256": "a393c2585117aadc45d1decb0dd19f669020c15280ef8c3682ade00c4ad57a11"
+      },
+      "raw_callbacks": {
+        "path": ".runtime/porting/CLK-01/native-api-first/B-NOLIMIT-ANNUAL/clock-callbacks.jsonl",
+        "sha256": "f398c7982b9696263aee0445fe9b28f1fdab005132a1a6656b208df1f043ddc6"
+      },
+      "before_report_zone_count": 35040,
+      "after_report_zone_count": 35040,
+      "observed_current_dates": 365,
+      "native_source_environment_number": 1,
+      "pre_report_civil_calendar_years": [
+        2013
+      ],
+      "final_after_report_calendar_year": 2014,
+      "weather_record_years": [
+        1991,
+        1996,
+        1998,
+        1999,
+        2001,
+        2002,
+        2004
+      ],
+      "first_weather_record_year": 1999,
+      "last_weather_record_year": 1996
+    }
+  ],
+  "raw_callbacks_count_and_phase_order_rechecked": true,
+  "rust_calendar_comparison_performed": false,
+  "building_or_HVAC_parity_claimed": false,
+  "gate_updates_performed": false,
+  "boundary": "Native pre-report civil year is 2013; TMY weather-record years are separate observed values by month. Annual after-report CalendarYear 2014 is retained outside CLK-01. Raw system currentTime/minutes are not canonical zone timestamps. No Rust/default/calendar values were generated or injected."
+}

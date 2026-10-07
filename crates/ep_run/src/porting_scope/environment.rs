@@ -65,6 +65,7 @@ pub(super) fn environment_from_weather(
             .map(|point|point.day_of_sim).collect::<std::collections::BTreeSet<_>>().len(),
         "active_dst_step_count": axis.points.iter().filter(|point|point.dst).count(),
         "first": first, "last": last,
+        "prepared_calendar": crate::clock_trace::prepared_calendar(&hourly),
         "daylight_saving": {
             "active": axis.daylight_saving.active,
             "effective_source": axis.daylight_saving.effective_source.as_str(),

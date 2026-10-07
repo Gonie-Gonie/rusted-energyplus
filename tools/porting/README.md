@@ -80,8 +80,9 @@ declared prepared schedule values, and saves a compact matrix with command/log/
 trace hashes. It also creates three separately patched negative inputs (latent
 gains, OA, Autosize), then requires RunBlocked/unsupported exit 4 and specific scope violations.
 Their IDFs, source hashes and patch metadata are retained for direct CLI replay.
-The full annual prepared arrays and logs remain under `.runtime`; 72H/annual
-EnergyPlus simulation and Rust numerical comparison remain unexecuted.
+The full annual prepared arrays and logs remain under `.runtime`. CON-01's
+closure evidence excludes 72H/annual physical comparisons; later card references
+and production executions have their own scope and receipts.
 
 The runner records implementation artifacts and reference DLL hashes as well as
 the repository revision. Evidence created from an uncommitted working tree is
@@ -159,3 +160,59 @@ observed production results. Fast variants that aren't called by production
 remain unit-only coverage. Raw arrays/logs and compiled tools remain `.runtime`;
 compact source receipts live in `evidence/PSY-01`. This workflow does not update
 cards or gates and does not certify downstream ZON-02/HVAC-04/05 physics.
+
+# CLK-01 calendar and actual clock observations
+
+```powershell
+python -B tools/porting/clk01_reference.py --prepare
+python -B tools/porting/clk01_reference.py --check
+python -B tools/porting/clk01_reference.py --build-pure
+python -B tools/porting/clk01_reference.py --run-helpers --reference-exe .runtime/porting/CLK-01/preparation/clk01_reference_pure.exe
+python -B tools/porting/trace_clk01_native.py --case A-72H --raw-root .runtime/porting/CLK-01/native-fresh
+```
+
+Source, input recipes and exact clock precision contracts are frozen before
+comparisons. The pure fallback includes verified original bodies and supports
+only genuinely pure functions. Stateful routines remain explicitly unsupported
+there. Their driver links the complete original `energypluslib` and inherits its
+actual `project_options`, `project_fp_options` and `project_warnings`, using the
+same GNU compiler and container ABI. Private state is constructed by that core;
+it is never borrowed from the separately installed MSVC DLL.
+
+`clk01_reference.cmake` adds a test-only target through the original CMake
+project's deferred include. The genuine-state driver parses the fixed IDF with
+the original InputProcessor, calls GetRunPeriodData and SetupEnvironmentTypes,
+and records original arrays and before/after fields. Its daily projection uses
+original linked helpers. It does not execute weather prefetch, warmup or reporting.
+The Rust example accepts input-only calendar or helper requests. It forwards the
+three existing scalar helper routes and reports other source routines as unpaired.
+
+`trace_clk01_native.py` observes opaque public API states from the pinned original
+DLL. For all 15 selected cases, it records the callback after WeatherManager and
+before heat-balance initialization, followed by the raw after-zone-report callback.
+The 2013 civil year is independent of monthly TMY record years. Both phases retain
+raw API currentTime/minutes: shortened system state can affect these even before
+heat-balance initialization. Neither is a canonical zone clock. Native ESO
+date/hour/interval columns provide the separate reporting projection. Final
+December 31 post-report CalendarYear increments are retained without confusing
+them with the current pre-report date. This observer has no Rust operands,
+actuators, Python date oracle, gate updates or physical output comparisons.
+
+After a committed source checkpoint and archived Rust build, run the production
+checker with the genuine-state `calendar-results.json`, native observer root and
+a fresh output root:
+
+```powershell
+python -B tools/porting/check_clk01_production.py --case A-72H --cpp-calendar .runtime/porting/CLK-01/preparation/calendar-results.json --native-root .runtime/porting/CLK-01/native-api-first --output-root .runtime/porting/CLK-01/production/COMMIT
+python -B tools/porting/check_clk01_production.py --case A-72H --actual --cpp-calendar .runtime/porting/CLK-01/preparation/calendar-results.json --native-root .runtime/porting/CLK-01/native-api-first --output-root .runtime/porting/CLK-01/production/COMMIT
+```
+
+Prepared daily/month-start rows explicitly have `physics_executed=false`. Full
+actual execution records one existing physical zone-loop invocation per real
+substep, including steps with no psychrometric kernel call. It compares the
+referenced existing calendar and duration with original pre-report dates and
+canonical ESO intervals, then requires Full/Summary numerical output equality.
+Summary produces no clock artifact. Rust materialized environment indices and
+native environment numbers retain their different provenance. Current calendar
+closure does not certify original Tomorrow/cursor/global-array implementations,
+adaptive system order, warmup, report serializers or annual building/HVAC physics.

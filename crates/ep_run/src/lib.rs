@@ -8,6 +8,7 @@
 #![cfg_attr(test, allow(clippy::expect_used, clippy::unwrap_used))]
 #![recursion_limit = "1024"]
 
+mod clock_trace;
 mod config;
 mod diagnostics;
 mod oracle;

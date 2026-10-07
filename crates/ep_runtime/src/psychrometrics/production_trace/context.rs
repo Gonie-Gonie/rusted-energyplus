@@ -115,6 +115,7 @@ impl Drop for ExecutionContextGuard {
 /// Registers an existing runtime axis only while collection is enabled.
 /// No simulation date is reconstructed from weather records.
 pub fn register_time_axis(axis: &TimeAxis) {
+    crate::time_axis::clock_trace::register_time_axis(axis);
     ACTIVE_TRACE.with(|active| {
         if let Some(trace) = active.borrow_mut().as_mut() {
             trace.hourly_calendar = axis
@@ -135,6 +136,7 @@ pub fn register_time_axis(axis: &TimeAxis) {
 /// Observes the already-materialized first B environment axis, without adding
 /// missing sizing/design environments or changing the schedule cache.
 pub fn register_environment_axis(axis: &EnvironmentTimeAxis) {
+    crate::time_axis::clock_trace::register_environment_axis(axis);
     ACTIVE_TRACE.with(|active| {
         if let Some(trace) = active.borrow_mut().as_mut() {
             trace.environment_points = axis
@@ -200,6 +202,7 @@ pub fn zone_step(
     steps: u32,
     seconds: f64,
 ) -> ExecutionContextGuard {
+    crate::time_axis::clock_trace::record_zone_step(hour_index, substep, steps, seconds);
     bind(|trace| ExecutionContext {
         scope: "zone_timestep_execution",
         zone_timestep: Some(zone_context(trace, hour_index, substep, steps, seconds)),

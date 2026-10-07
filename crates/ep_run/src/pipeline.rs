@@ -897,16 +897,25 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    let (outcome, trace) = ep_runtime::psychrometrics::production_trace::capture(
-        config.trace_level == TraceLevel::Full,
-        || run_with_optional_porting_scope_impl(config, scope),
-    );
+    let ((outcome, trace), clock_trace) =
+        ep_runtime::time_axis::clock_trace::capture(config.trace_level == TraceLevel::Full, || {
+            ep_runtime::psychrometrics::production_trace::capture(
+                config.trace_level == TraceLevel::Full,
+                || run_with_optional_porting_scope_impl(config, scope),
+            )
+        });
     if let Some(trace) = trace {
         // The collector starts before runtime input preparation or any possible
         // Cp cache priming on this execution thread. Export only an observation.
         if outcome.is_ok() && config.output_dir.is_dir() {
             crate::psychrometrics_trace::write_production_trace(config, &trace)?;
         }
+    }
+    if let Some(trace) = clock_trace
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+    {
+        crate::clock_trace::write_clock_trace(config, &trace)?;
     }
     outcome
 }
@@ -1032,6 +1041,13 @@ fn run_with_optional_porting_scope_impl(
     if let Some(scope) = scope {
         let mut trace =
             crate::inspect_porting_scope(&raw_model, &compile_result.report, typed_model, scope);
+        ep_runtime::time_axis::clock_trace::register_design_day_declaration_count(
+            trace
+                .object_counts
+                .get("SizingPeriod:DesignDay")
+                .copied()
+                .unwrap_or(0),
+        );
         if trace.admissible {
             if let (Some(model), Some(weather_path)) = (typed_model, config.weather_path.as_ref()) {
                 match crate::porting_scope::porting_environment_trace(model, weather_path) {

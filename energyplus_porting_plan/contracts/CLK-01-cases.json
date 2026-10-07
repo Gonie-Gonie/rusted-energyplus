@@ -1,0 +1,2818 @@
+{
+  "schema": "clk01-cases.v1",
+  "card": "CLK-01",
+  "scope": [
+    "A",
+    "B"
+  ],
+  "calendar_request": {
+    "schema": "clk01-calendar-cases.v1",
+    "cases": [
+      {
+        "case_id": "A-24H",
+        "scope": "A",
+        "duration": "24H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 1,
+          "end_day_of_month": 1,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+            "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+          }
+        }
+      },
+      {
+        "case_id": "A-72H",
+        "scope": "A",
+        "duration": "72H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 6,
+          "begin_day_of_month": 30,
+          "begin_year": 2013,
+          "end_month": 7,
+          "end_day_of_month": 2,
+          "end_year": 2013,
+          "start_weekday": 1,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+            "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+          }
+        }
+      },
+      {
+        "case_id": "A-ANNUAL",
+        "scope": "A",
+        "duration": "ANNUAL",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 12,
+          "end_day_of_month": 31,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+            "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+            "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+          }
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "scope": "B",
+        "duration": "24H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 1,
+          "end_day_of_month": 1,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+            "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+          }
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-72H",
+        "scope": "B",
+        "duration": "72H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 6,
+          "begin_day_of_month": 30,
+          "begin_year": 2013,
+          "end_month": 7,
+          "end_day_of_month": 2,
+          "end_year": 2013,
+          "start_weekday": 1,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+            "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+            "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+          }
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-ANNUAL",
+        "scope": "B",
+        "duration": "ANNUAL",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 12,
+          "end_day_of_month": 31,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+            "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+            "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+          }
+        }
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "scope": "B",
+        "duration": "24H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 1,
+          "end_day_of_month": 1,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+            "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+          }
+        }
+      },
+      {
+        "case_id": "B-FLOW-72H",
+        "scope": "B",
+        "duration": "72H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 6,
+          "begin_day_of_month": 30,
+          "begin_year": 2013,
+          "end_month": 7,
+          "end_day_of_month": 2,
+          "end_year": 2013,
+          "start_weekday": 1,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+            "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+            "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+          }
+        }
+      },
+      {
+        "case_id": "B-FLOW-ANNUAL",
+        "scope": "B",
+        "duration": "ANNUAL",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 12,
+          "end_day_of_month": 31,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+            "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+            "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+          }
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "scope": "B",
+        "duration": "24H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 1,
+          "end_day_of_month": 1,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+            "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+          }
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-72H",
+        "scope": "B",
+        "duration": "72H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 6,
+          "begin_day_of_month": 30,
+          "begin_year": 2013,
+          "end_month": 7,
+          "end_day_of_month": 2,
+          "end_year": 2013,
+          "start_weekday": 1,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+            "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+            "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+          }
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-ANNUAL",
+        "scope": "B",
+        "duration": "ANNUAL",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 12,
+          "end_day_of_month": 31,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+            "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+            "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+          }
+        }
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "scope": "B",
+        "duration": "24H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 1,
+          "end_day_of_month": 1,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+            "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+          }
+        }
+      },
+      {
+        "case_id": "B-BOTH-72H",
+        "scope": "B",
+        "duration": "72H",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 6,
+          "begin_day_of_month": 30,
+          "begin_year": 2013,
+          "end_month": 7,
+          "end_day_of_month": 2,
+          "end_year": 2013,
+          "start_weekday": 1,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+            "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+          }
+        }
+      },
+      {
+        "case_id": "B-BOTH-ANNUAL",
+        "scope": "B",
+        "duration": "ANNUAL",
+        "run_period": {
+          "name": "Run Period 1",
+          "begin_month": 1,
+          "begin_day_of_month": 1,
+          "begin_year": 2013,
+          "end_month": 12,
+          "end_day_of_month": 31,
+          "end_year": 2013,
+          "start_weekday": 3,
+          "first_hour_interpolation_starting_values": "Hour24",
+          "use_weather_holidays": true,
+          "use_weather_dst": true,
+          "apply_weekend_holiday_rule": false,
+          "treat_weather_as_actual": false
+        },
+        "weather_calendar": {
+          "leap_year_observed": false
+        },
+        "zone_timesteps_per_hour": 4,
+        "source_metadata": {
+          "input": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+            "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+          },
+          "weather": {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          "metadata": {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+            "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+          }
+        }
+      }
+    ]
+  },
+  "helper_recipe": {
+    "schema": "clk01-helper-tuples.v1",
+    "dates": [
+      [
+        2013,
+        1,
+        1
+      ],
+      [
+        2013,
+        1,
+        2
+      ],
+      [
+        2013,
+        1,
+        3
+      ],
+      [
+        2013,
+        1,
+        4
+      ],
+      [
+        2013,
+        1,
+        5
+      ],
+      [
+        2013,
+        1,
+        6
+      ],
+      [
+        2013,
+        1,
+        7
+      ],
+      [
+        2013,
+        1,
+        8
+      ],
+      [
+        2013,
+        1,
+        9
+      ],
+      [
+        2013,
+        1,
+        10
+      ],
+      [
+        2013,
+        1,
+        11
+      ],
+      [
+        2013,
+        1,
+        12
+      ],
+      [
+        2013,
+        1,
+        13
+      ],
+      [
+        2013,
+        1,
+        14
+      ],
+      [
+        2013,
+        1,
+        15
+      ],
+      [
+        2013,
+        1,
+        16
+      ],
+      [
+        2013,
+        1,
+        17
+      ],
+      [
+        2013,
+        1,
+        18
+      ],
+      [
+        2013,
+        1,
+        19
+      ],
+      [
+        2013,
+        1,
+        20
+      ],
+      [
+        2013,
+        1,
+        21
+      ],
+      [
+        2013,
+        1,
+        22
+      ],
+      [
+        2013,
+        1,
+        23
+      ],
+      [
+        2013,
+        1,
+        24
+      ],
+      [
+        2013,
+        1,
+        25
+      ],
+      [
+        2013,
+        1,
+        26
+      ],
+      [
+        2013,
+        1,
+        27
+      ],
+      [
+        2013,
+        1,
+        28
+      ],
+      [
+        2013,
+        1,
+        29
+      ],
+      [
+        2013,
+        1,
+        30
+      ],
+      [
+        2013,
+        1,
+        31
+      ],
+      [
+        2013,
+        2,
+        1
+      ],
+      [
+        2013,
+        2,
+        2
+      ],
+      [
+        2013,
+        2,
+        3
+      ],
+      [
+        2013,
+        2,
+        4
+      ],
+      [
+        2013,
+        2,
+        5
+      ],
+      [
+        2013,
+        2,
+        6
+      ],
+      [
+        2013,
+        2,
+        7
+      ],
+      [
+        2013,
+        2,
+        8
+      ],
+      [
+        2013,
+        2,
+        9
+      ],
+      [
+        2013,
+        2,
+        10
+      ],
+      [
+        2013,
+        2,
+        11
+      ],
+      [
+        2013,
+        2,
+        12
+      ],
+      [
+        2013,
+        2,
+        13
+      ],
+      [
+        2013,
+        2,
+        14
+      ],
+      [
+        2013,
+        2,
+        15
+      ],
+      [
+        2013,
+        2,
+        16
+      ],
+      [
+        2013,
+        2,
+        17
+      ],
+      [
+        2013,
+        2,
+        18
+      ],
+      [
+        2013,
+        2,
+        19
+      ],
+      [
+        2013,
+        2,
+        20
+      ],
+      [
+        2013,
+        2,
+        21
+      ],
+      [
+        2013,
+        2,
+        22
+      ],
+      [
+        2013,
+        2,
+        23
+      ],
+      [
+        2013,
+        2,
+        24
+      ],
+      [
+        2013,
+        2,
+        25
+      ],
+      [
+        2013,
+        2,
+        26
+      ],
+      [
+        2013,
+        2,
+        27
+      ],
+      [
+        2013,
+        2,
+        28
+      ],
+      [
+        2013,
+        3,
+        1
+      ],
+      [
+        2013,
+        3,
+        2
+      ],
+      [
+        2013,
+        3,
+        3
+      ],
+      [
+        2013,
+        3,
+        4
+      ],
+      [
+        2013,
+        3,
+        5
+      ],
+      [
+        2013,
+        3,
+        6
+      ],
+      [
+        2013,
+        3,
+        7
+      ],
+      [
+        2013,
+        3,
+        8
+      ],
+      [
+        2013,
+        3,
+        9
+      ],
+      [
+        2013,
+        3,
+        10
+      ],
+      [
+        2013,
+        3,
+        11
+      ],
+      [
+        2013,
+        3,
+        12
+      ],
+      [
+        2013,
+        3,
+        13
+      ],
+      [
+        2013,
+        3,
+        14
+      ],
+      [
+        2013,
+        3,
+        15
+      ],
+      [
+        2013,
+        3,
+        16
+      ],
+      [
+        2013,
+        3,
+        17
+      ],
+      [
+        2013,
+        3,
+        18
+      ],
+      [
+        2013,
+        3,
+        19
+      ],
+      [
+        2013,
+        3,
+        20
+      ],
+      [
+        2013,
+        3,
+        21
+      ],
+      [
+        2013,
+        3,
+        22
+      ],
+      [
+        2013,
+        3,
+        23
+      ],
+      [
+        2013,
+        3,
+        24
+      ],
+      [
+        2013,
+        3,
+        25
+      ],
+      [
+        2013,
+        3,
+        26
+      ],
+      [
+        2013,
+        3,
+        27
+      ],
+      [
+        2013,
+        3,
+        28
+      ],
+      [
+        2013,
+        3,
+        29
+      ],
+      [
+        2013,
+        3,
+        30
+      ],
+      [
+        2013,
+        3,
+        31
+      ],
+      [
+        2013,
+        4,
+        1
+      ],
+      [
+        2013,
+        4,
+        2
+      ],
+      [
+        2013,
+        4,
+        3
+      ],
+      [
+        2013,
+        4,
+        4
+      ],
+      [
+        2013,
+        4,
+        5
+      ],
+      [
+        2013,
+        4,
+        6
+      ],
+      [
+        2013,
+        4,
+        7
+      ],
+      [
+        2013,
+        4,
+        8
+      ],
+      [
+        2013,
+        4,
+        9
+      ],
+      [
+        2013,
+        4,
+        10
+      ],
+      [
+        2013,
+        4,
+        11
+      ],
+      [
+        2013,
+        4,
+        12
+      ],
+      [
+        2013,
+        4,
+        13
+      ],
+      [
+        2013,
+        4,
+        14
+      ],
+      [
+        2013,
+        4,
+        15
+      ],
+      [
+        2013,
+        4,
+        16
+      ],
+      [
+        2013,
+        4,
+        17
+      ],
+      [
+        2013,
+        4,
+        18
+      ],
+      [
+        2013,
+        4,
+        19
+      ],
+      [
+        2013,
+        4,
+        20
+      ],
+      [
+        2013,
+        4,
+        21
+      ],
+      [
+        2013,
+        4,
+        22
+      ],
+      [
+        2013,
+        4,
+        23
+      ],
+      [
+        2013,
+        4,
+        24
+      ],
+      [
+        2013,
+        4,
+        25
+      ],
+      [
+        2013,
+        4,
+        26
+      ],
+      [
+        2013,
+        4,
+        27
+      ],
+      [
+        2013,
+        4,
+        28
+      ],
+      [
+        2013,
+        4,
+        29
+      ],
+      [
+        2013,
+        4,
+        30
+      ],
+      [
+        2013,
+        5,
+        1
+      ],
+      [
+        2013,
+        5,
+        2
+      ],
+      [
+        2013,
+        5,
+        3
+      ],
+      [
+        2013,
+        5,
+        4
+      ],
+      [
+        2013,
+        5,
+        5
+      ],
+      [
+        2013,
+        5,
+        6
+      ],
+      [
+        2013,
+        5,
+        7
+      ],
+      [
+        2013,
+        5,
+        8
+      ],
+      [
+        2013,
+        5,
+        9
+      ],
+      [
+        2013,
+        5,
+        10
+      ],
+      [
+        2013,
+        5,
+        11
+      ],
+      [
+        2013,
+        5,
+        12
+      ],
+      [
+        2013,
+        5,
+        13
+      ],
+      [
+        2013,
+        5,
+        14
+      ],
+      [
+        2013,
+        5,
+        15
+      ],
+      [
+        2013,
+        5,
+        16
+      ],
+      [
+        2013,
+        5,
+        17
+      ],
+      [
+        2013,
+        5,
+        18
+      ],
+      [
+        2013,
+        5,
+        19
+      ],
+      [
+        2013,
+        5,
+        20
+      ],
+      [
+        2013,
+        5,
+        21
+      ],
+      [
+        2013,
+        5,
+        22
+      ],
+      [
+        2013,
+        5,
+        23
+      ],
+      [
+        2013,
+        5,
+        24
+      ],
+      [
+        2013,
+        5,
+        25
+      ],
+      [
+        2013,
+        5,
+        26
+      ],
+      [
+        2013,
+        5,
+        27
+      ],
+      [
+        2013,
+        5,
+        28
+      ],
+      [
+        2013,
+        5,
+        29
+      ],
+      [
+        2013,
+        5,
+        30
+      ],
+      [
+        2013,
+        5,
+        31
+      ],
+      [
+        2013,
+        6,
+        1
+      ],
+      [
+        2013,
+        6,
+        2
+      ],
+      [
+        2013,
+        6,
+        3
+      ],
+      [
+        2013,
+        6,
+        4
+      ],
+      [
+        2013,
+        6,
+        5
+      ],
+      [
+        2013,
+        6,
+        6
+      ],
+      [
+        2013,
+        6,
+        7
+      ],
+      [
+        2013,
+        6,
+        8
+      ],
+      [
+        2013,
+        6,
+        9
+      ],
+      [
+        2013,
+        6,
+        10
+      ],
+      [
+        2013,
+        6,
+        11
+      ],
+      [
+        2013,
+        6,
+        12
+      ],
+      [
+        2013,
+        6,
+        13
+      ],
+      [
+        2013,
+        6,
+        14
+      ],
+      [
+        2013,
+        6,
+        15
+      ],
+      [
+        2013,
+        6,
+        16
+      ],
+      [
+        2013,
+        6,
+        17
+      ],
+      [
+        2013,
+        6,
+        18
+      ],
+      [
+        2013,
+        6,
+        19
+      ],
+      [
+        2013,
+        6,
+        20
+      ],
+      [
+        2013,
+        6,
+        21
+      ],
+      [
+        2013,
+        6,
+        22
+      ],
+      [
+        2013,
+        6,
+        23
+      ],
+      [
+        2013,
+        6,
+        24
+      ],
+      [
+        2013,
+        6,
+        25
+      ],
+      [
+        2013,
+        6,
+        26
+      ],
+      [
+        2013,
+        6,
+        27
+      ],
+      [
+        2013,
+        6,
+        28
+      ],
+      [
+        2013,
+        6,
+        29
+      ],
+      [
+        2013,
+        6,
+        30
+      ],
+      [
+        2013,
+        7,
+        1
+      ],
+      [
+        2013,
+        7,
+        2
+      ],
+      [
+        2013,
+        7,
+        3
+      ],
+      [
+        2013,
+        7,
+        4
+      ],
+      [
+        2013,
+        7,
+        5
+      ],
+      [
+        2013,
+        7,
+        6
+      ],
+      [
+        2013,
+        7,
+        7
+      ],
+      [
+        2013,
+        7,
+        8
+      ],
+      [
+        2013,
+        7,
+        9
+      ],
+      [
+        2013,
+        7,
+        10
+      ],
+      [
+        2013,
+        7,
+        11
+      ],
+      [
+        2013,
+        7,
+        12
+      ],
+      [
+        2013,
+        7,
+        13
+      ],
+      [
+        2013,
+        7,
+        14
+      ],
+      [
+        2013,
+        7,
+        15
+      ],
+      [
+        2013,
+        7,
+        16
+      ],
+      [
+        2013,
+        7,
+        17
+      ],
+      [
+        2013,
+        7,
+        18
+      ],
+      [
+        2013,
+        7,
+        19
+      ],
+      [
+        2013,
+        7,
+        20
+      ],
+      [
+        2013,
+        7,
+        21
+      ],
+      [
+        2013,
+        7,
+        22
+      ],
+      [
+        2013,
+        7,
+        23
+      ],
+      [
+        2013,
+        7,
+        24
+      ],
+      [
+        2013,
+        7,
+        25
+      ],
+      [
+        2013,
+        7,
+        26
+      ],
+      [
+        2013,
+        7,
+        27
+      ],
+      [
+        2013,
+        7,
+        28
+      ],
+      [
+        2013,
+        7,
+        29
+      ],
+      [
+        2013,
+        7,
+        30
+      ],
+      [
+        2013,
+        7,
+        31
+      ],
+      [
+        2013,
+        8,
+        1
+      ],
+      [
+        2013,
+        8,
+        2
+      ],
+      [
+        2013,
+        8,
+        3
+      ],
+      [
+        2013,
+        8,
+        4
+      ],
+      [
+        2013,
+        8,
+        5
+      ],
+      [
+        2013,
+        8,
+        6
+      ],
+      [
+        2013,
+        8,
+        7
+      ],
+      [
+        2013,
+        8,
+        8
+      ],
+      [
+        2013,
+        8,
+        9
+      ],
+      [
+        2013,
+        8,
+        10
+      ],
+      [
+        2013,
+        8,
+        11
+      ],
+      [
+        2013,
+        8,
+        12
+      ],
+      [
+        2013,
+        8,
+        13
+      ],
+      [
+        2013,
+        8,
+        14
+      ],
+      [
+        2013,
+        8,
+        15
+      ],
+      [
+        2013,
+        8,
+        16
+      ],
+      [
+        2013,
+        8,
+        17
+      ],
+      [
+        2013,
+        8,
+        18
+      ],
+      [
+        2013,
+        8,
+        19
+      ],
+      [
+        2013,
+        8,
+        20
+      ],
+      [
+        2013,
+        8,
+        21
+      ],
+      [
+        2013,
+        8,
+        22
+      ],
+      [
+        2013,
+        8,
+        23
+      ],
+      [
+        2013,
+        8,
+        24
+      ],
+      [
+        2013,
+        8,
+        25
+      ],
+      [
+        2013,
+        8,
+        26
+      ],
+      [
+        2013,
+        8,
+        27
+      ],
+      [
+        2013,
+        8,
+        28
+      ],
+      [
+        2013,
+        8,
+        29
+      ],
+      [
+        2013,
+        8,
+        30
+      ],
+      [
+        2013,
+        8,
+        31
+      ],
+      [
+        2013,
+        9,
+        1
+      ],
+      [
+        2013,
+        9,
+        2
+      ],
+      [
+        2013,
+        9,
+        3
+      ],
+      [
+        2013,
+        9,
+        4
+      ],
+      [
+        2013,
+        9,
+        5
+      ],
+      [
+        2013,
+        9,
+        6
+      ],
+      [
+        2013,
+        9,
+        7
+      ],
+      [
+        2013,
+        9,
+        8
+      ],
+      [
+        2013,
+        9,
+        9
+      ],
+      [
+        2013,
+        9,
+        10
+      ],
+      [
+        2013,
+        9,
+        11
+      ],
+      [
+        2013,
+        9,
+        12
+      ],
+      [
+        2013,
+        9,
+        13
+      ],
+      [
+        2013,
+        9,
+        14
+      ],
+      [
+        2013,
+        9,
+        15
+      ],
+      [
+        2013,
+        9,
+        16
+      ],
+      [
+        2013,
+        9,
+        17
+      ],
+      [
+        2013,
+        9,
+        18
+      ],
+      [
+        2013,
+        9,
+        19
+      ],
+      [
+        2013,
+        9,
+        20
+      ],
+      [
+        2013,
+        9,
+        21
+      ],
+      [
+        2013,
+        9,
+        22
+      ],
+      [
+        2013,
+        9,
+        23
+      ],
+      [
+        2013,
+        9,
+        24
+      ],
+      [
+        2013,
+        9,
+        25
+      ],
+      [
+        2013,
+        9,
+        26
+      ],
+      [
+        2013,
+        9,
+        27
+      ],
+      [
+        2013,
+        9,
+        28
+      ],
+      [
+        2013,
+        9,
+        29
+      ],
+      [
+        2013,
+        9,
+        30
+      ],
+      [
+        2013,
+        10,
+        1
+      ],
+      [
+        2013,
+        10,
+        2
+      ],
+      [
+        2013,
+        10,
+        3
+      ],
+      [
+        2013,
+        10,
+        4
+      ],
+      [
+        2013,
+        10,
+        5
+      ],
+      [
+        2013,
+        10,
+        6
+      ],
+      [
+        2013,
+        10,
+        7
+      ],
+      [
+        2013,
+        10,
+        8
+      ],
+      [
+        2013,
+        10,
+        9
+      ],
+      [
+        2013,
+        10,
+        10
+      ],
+      [
+        2013,
+        10,
+        11
+      ],
+      [
+        2013,
+        10,
+        12
+      ],
+      [
+        2013,
+        10,
+        13
+      ],
+      [
+        2013,
+        10,
+        14
+      ],
+      [
+        2013,
+        10,
+        15
+      ],
+      [
+        2013,
+        10,
+        16
+      ],
+      [
+        2013,
+        10,
+        17
+      ],
+      [
+        2013,
+        10,
+        18
+      ],
+      [
+        2013,
+        10,
+        19
+      ],
+      [
+        2013,
+        10,
+        20
+      ],
+      [
+        2013,
+        10,
+        21
+      ],
+      [
+        2013,
+        10,
+        22
+      ],
+      [
+        2013,
+        10,
+        23
+      ],
+      [
+        2013,
+        10,
+        24
+      ],
+      [
+        2013,
+        10,
+        25
+      ],
+      [
+        2013,
+        10,
+        26
+      ],
+      [
+        2013,
+        10,
+        27
+      ],
+      [
+        2013,
+        10,
+        28
+      ],
+      [
+        2013,
+        10,
+        29
+      ],
+      [
+        2013,
+        10,
+        30
+      ],
+      [
+        2013,
+        10,
+        31
+      ],
+      [
+        2013,
+        11,
+        1
+      ],
+      [
+        2013,
+        11,
+        2
+      ],
+      [
+        2013,
+        11,
+        3
+      ],
+      [
+        2013,
+        11,
+        4
+      ],
+      [
+        2013,
+        11,
+        5
+      ],
+      [
+        2013,
+        11,
+        6
+      ],
+      [
+        2013,
+        11,
+        7
+      ],
+      [
+        2013,
+        11,
+        8
+      ],
+      [
+        2013,
+        11,
+        9
+      ],
+      [
+        2013,
+        11,
+        10
+      ],
+      [
+        2013,
+        11,
+        11
+      ],
+      [
+        2013,
+        11,
+        12
+      ],
+      [
+        2013,
+        11,
+        13
+      ],
+      [
+        2013,
+        11,
+        14
+      ],
+      [
+        2013,
+        11,
+        15
+      ],
+      [
+        2013,
+        11,
+        16
+      ],
+      [
+        2013,
+        11,
+        17
+      ],
+      [
+        2013,
+        11,
+        18
+      ],
+      [
+        2013,
+        11,
+        19
+      ],
+      [
+        2013,
+        11,
+        20
+      ],
+      [
+        2013,
+        11,
+        21
+      ],
+      [
+        2013,
+        11,
+        22
+      ],
+      [
+        2013,
+        11,
+        23
+      ],
+      [
+        2013,
+        11,
+        24
+      ],
+      [
+        2013,
+        11,
+        25
+      ],
+      [
+        2013,
+        11,
+        26
+      ],
+      [
+        2013,
+        11,
+        27
+      ],
+      [
+        2013,
+        11,
+        28
+      ],
+      [
+        2013,
+        11,
+        29
+      ],
+      [
+        2013,
+        11,
+        30
+      ],
+      [
+        2013,
+        12,
+        1
+      ],
+      [
+        2013,
+        12,
+        2
+      ],
+      [
+        2013,
+        12,
+        3
+      ],
+      [
+        2013,
+        12,
+        4
+      ],
+      [
+        2013,
+        12,
+        5
+      ],
+      [
+        2013,
+        12,
+        6
+      ],
+      [
+        2013,
+        12,
+        7
+      ],
+      [
+        2013,
+        12,
+        8
+      ],
+      [
+        2013,
+        12,
+        9
+      ],
+      [
+        2013,
+        12,
+        10
+      ],
+      [
+        2013,
+        12,
+        11
+      ],
+      [
+        2013,
+        12,
+        12
+      ],
+      [
+        2013,
+        12,
+        13
+      ],
+      [
+        2013,
+        12,
+        14
+      ],
+      [
+        2013,
+        12,
+        15
+      ],
+      [
+        2013,
+        12,
+        16
+      ],
+      [
+        2013,
+        12,
+        17
+      ],
+      [
+        2013,
+        12,
+        18
+      ],
+      [
+        2013,
+        12,
+        19
+      ],
+      [
+        2013,
+        12,
+        20
+      ],
+      [
+        2013,
+        12,
+        21
+      ],
+      [
+        2013,
+        12,
+        22
+      ],
+      [
+        2013,
+        12,
+        23
+      ],
+      [
+        2013,
+        12,
+        24
+      ],
+      [
+        2013,
+        12,
+        25
+      ],
+      [
+        2013,
+        12,
+        26
+      ],
+      [
+        2013,
+        12,
+        27
+      ],
+      [
+        2013,
+        12,
+        28
+      ],
+      [
+        2013,
+        12,
+        29
+      ],
+      [
+        2013,
+        12,
+        30
+      ],
+      [
+        2013,
+        12,
+        31
+      ],
+      [
+        1583,
+        1,
+        1
+      ],
+      [
+        1600,
+        2,
+        28
+      ],
+      [
+        1600,
+        2,
+        29
+      ],
+      [
+        1600,
+        3,
+        1
+      ],
+      [
+        1900,
+        2,
+        28
+      ],
+      [
+        1900,
+        3,
+        1
+      ],
+      [
+        2000,
+        2,
+        28
+      ],
+      [
+        2000,
+        2,
+        29
+      ],
+      [
+        2000,
+        3,
+        1
+      ],
+      [
+        2012,
+        2,
+        28
+      ],
+      [
+        2012,
+        2,
+        29
+      ],
+      [
+        2012,
+        3,
+        1
+      ],
+      [
+        2100,
+        2,
+        28
+      ],
+      [
+        2100,
+        3,
+        1
+      ],
+      [
+        2400,
+        2,
+        28
+      ],
+      [
+        2400,
+        2,
+        29
+      ],
+      [
+        2400,
+        3,
+        1
+      ],
+      [
+        2012,
+        12,
+        31
+      ],
+      [
+        2014,
+        1,
+        1
+      ]
+    ],
+    "date_routine_order": [
+      "isLeapYear",
+      "calculateDayOfYear(false/true)",
+      "General::OrdinalDay(0/1)",
+      "computeJulianDate",
+      "computeGregorianDate(from own Julian result)",
+      "calculateDayOfWeek"
+    ],
+    "february_29_nonleap_shape_calls": "not generated; paired arithmetic inputs remain valid",
+    "setup_weekday_inputs": [
+      {
+        "start_month": 1,
+        "start_day": 1,
+        "start_weekday": 3,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 0,
+        "week_days_before": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "start_month": 6,
+        "start_day": 30,
+        "start_weekday": 1,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 0,
+        "week_days_before": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "start_month": 12,
+        "start_day": 31,
+        "start_weekday": 3,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 0,
+        "week_days_before": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "start_month": 3,
+        "start_day": 1,
+        "start_weekday": 6,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 0,
+        "week_days_before": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "start_month": 3,
+        "start_day": 1,
+        "start_weekday": 5,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 1,
+        "week_days_before": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "start_month": 6,
+        "start_day": 30,
+        "start_weekday": 7,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 1,
+        "week_days_before": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "start_month": 6,
+        "start_day": 30,
+        "start_weekday": 1,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 0,
+        "week_days_before": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      },
+      {
+        "start_month": 6,
+        "start_day": 30,
+        "start_weekday": 1,
+        "end_day_of_month": [
+          31,
+          28,
+          31,
+          30,
+          31,
+          30,
+          31,
+          31,
+          30,
+          31,
+          30,
+          31
+        ],
+        "leap_year_add": 0,
+        "week_days_before": [
+          7,
+          0,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    ],
+    "call_count": 3080,
+    "routine_counts": {
+      "isLeapYear": 384,
+      "calculateDayOfYear": 764,
+      "General::OrdinalDay": 764,
+      "computeJulianDate": 384,
+      "computeGregorianDate": 384,
+      "calculateDayOfWeek": 384,
+      "SetupWeekDaysByMonth": 8,
+      "validMonthDay": 8
+    },
+    "expanded_request_sha256": "025695613ed34282376cf29cc5a2dce731f1f2bb69e6ca1c05de9fac5cbc9d4d"
+  },
+  "pairing": {
+    "direct_helpers": [
+      "isLeapYear",
+      "calculateDayOfYear",
+      "General::OrdinalDay"
+    ],
+    "unsupported_rust_helpers": "Source-only diagnostics, never counted as paired PASS",
+    "calendar": "Genuine original parsed-state and consumed daily/month-start projections; actual Rust public calendar/axis APIs",
+    "clock": "Separate representative real production invocations, native pre-report phase; prepared annual rows do not imply annual physics execution"
+  },
+  "inputs_only": true,
+  "expected_numerical_outputs": false,
+  "production_input_matrix_expanded": false,
+  "comparison_status": "not_run",
+  "gates_updated": false
+}
