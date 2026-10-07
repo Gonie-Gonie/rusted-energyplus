@@ -328,6 +328,29 @@ fn record_call(
 mod tests {
     use super::*;
     #[test]
+    fn actual_zone_capacity_hook_copies_four_arguments_without_changing_result() {
+        let inputs = [24.0_f64, 90_000.0, 21.0, 0.008];
+        let calculate = || {
+            crate::psychrometrics::energyplus_zone_air_heat_capacity_j_per_k(
+                inputs[0], inputs[1], inputs[2], inputs[3],
+            )
+            .expect("physical capacity inputs")
+        };
+        let unobserved = calculate();
+        let (observed, trace) = capture(true, calculate);
+        assert_eq!(observed.to_bits(), unobserved.to_bits());
+        let trace = trace.expect("active observer");
+        let calls = trace
+            .calls
+            .iter()
+            .filter(|call| call.routine == "RustZoneAirHeatCapacity")
+            .collect::<Vec<_>>();
+        assert_eq!(calls.len(), 1);
+        assert_eq!(calls[0].input_bits, inputs.map(f64::to_bits));
+        assert_eq!(calls[0].result_bits, observed.to_bits());
+        assert_eq!(trace.omitted_call_count, 0);
+    }
+    #[test]
     fn disabled_capture_leaves_return_value_and_tls_unchanged() {
         let (result, trace) = capture(false, || {
             let _context = zone_step(0, 1, 4, 900.0);

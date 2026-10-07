@@ -1,0 +1,171 @@
+{
+  "schema": "geo03-unit-comparison.v1",
+  "status": "pass",
+  "comparison_boundary": "bounded_actual_zone_volume_owner_states",
+  "tool": {
+    "path": "tools/porting/check_geo03_units.py",
+    "sha256": "b14cd98170747bffccf8fcf9bfc1fda3a73432e9a01bf171c5eb46e5c01024cf"
+  },
+  "provenance_tool": {
+    "path": "tools/porting/geo03_provenance.py",
+    "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "input_request": {
+    "path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+    "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+  },
+  "original_first": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "native_output": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-results.json",
+    "sha256": "d167581320454b01108d626fd24085f93b613ebc733ce25c81d2f554975bb769"
+  },
+  "original_first_review": {
+    "path": ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+    "sha256": "bc6b46a46c1e6d34aab4e8b8f701e614728c1a53839beda43aa9bc2df5723f11"
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/GEO-03/rust-candidate-02/execution.json",
+    "sha256": "4e340bb82a4eef2827c2004a0f557cf8917f969d30d36970d4e0c943b24da632"
+  },
+  "Rust_command_receipt": {
+    "path": ".runtime/porting/GEO-03/rust-candidate-02/command/receipt.json",
+    "sha256": "4f67a2a913e2935529b359102e3fe8f4bca20aa239f7c52037b20c474312db02"
+  },
+  "Rust_binary": {
+    "path": ".runtime/porting/GEO-03/builds/candidate-44fa2408-02/geo03_tuples.exe",
+    "sha256": "831d3e0ec8b6bb86067fdff86a82c417cfca7920f501690abdc455212d198ccb"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/GEO-03/builds/candidate-44fa2408-02/build-receipt.json",
+    "sha256": "e88b077600afb2658b8c79a8b306d1318744926215e0aee4ff5686505bdbbbf2"
+  },
+  "candidate_diagnostic": true,
+  "committed_source_required": false,
+  "source_worktree_clean": false,
+  "implementation_commit": null,
+  "available_Rust_source_count": 3651,
+  "source_inventory_scope": "Archived available-source inventory; compiler file selection unclaimed",
+  "actual_available_summary_fields": [],
+  "comparison_source_phase": null,
+  "missing_Zone_owner_fields": [],
+  "missing_mutable_owner_phases": [],
+  "paired_Zone_owner_fields": [
+    "volume_m3",
+    "ceiling_height_m",
+    "ceiling_height_entered",
+    "floor_area_m2",
+    "user_entered_floor_area_m2",
+    "geometric_floor_area_m2",
+    "ceiling_area_m2",
+    "geometric_ceiling_area_m2",
+    "has_floor",
+    "has_roof"
+  ],
+  "paired_owner_phases": [
+    "geometry_prepared",
+    "declared_pre_volume_read_fields",
+    "before_volume",
+    "after_volume",
+    "after_second_volume"
+  ],
+  "required_owner_phases": [
+    "geometry_prepared",
+    "before_volume",
+    "after_volume",
+    "after_second_volume"
+  ],
+  "paired_closed_helper_count": 16,
+  "source_only_helper_count": 3,
+  "source_only_unpaired": [
+    {
+      "case_id": "SOURCE-ONLY-MISSING-ROOF",
+      "original_status": "unsupported_source_only",
+      "Rust_status": "unsupported_source_only",
+      "numerical_comparison_performed": false,
+      "original_diagnostics_retained_in": "original helper result/source_state",
+      "Rust_normal_parser_admission_or_rejection_claimed": false
+    },
+    {
+      "case_id": "SOURCE-ONLY-REVERSED-WINDING",
+      "original_status": "unsupported_source_only",
+      "Rust_status": "unsupported_source_only",
+      "numerical_comparison_performed": false,
+      "original_diagnostics_retained_in": "original helper result/source_state",
+      "Rust_normal_parser_admission_or_rejection_claimed": false
+    },
+    {
+      "case_id": "SOURCE-ONLY-DUPLICATE-WALL",
+      "original_status": "unsupported_source_only",
+      "Rust_status": "unsupported_source_only",
+      "numerical_comparison_performed": false,
+      "original_diagnostics_retained_in": "original helper result/source_state",
+      "Rust_normal_parser_admission_or_rejection_claimed": false
+    }
+  ],
+  "source_only_state_unpaired": [
+    "implicit Space",
+    "global counters",
+    "warning/error IO",
+    "source scratch allocations"
+  ],
+  "checks": 2672,
+  "mismatch_count": 0,
+  "mismatch_categories": {},
+  "mismatch_examples": [],
+  "scalar_error_metrics": {
+    "m3": {
+      "count": 96,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    },
+    "m": {
+      "count": 80,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    },
+    "m2": {
+      "count": 880,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "reference_outputs_supplied_to_Rust": false,
+  "physics_executed": false,
+  "gates_updated": false,
+  "claim_limits": [
+    "Prepared helper area fields are declared input state, not normal parser producer evidence.",
+    "Actual five Rust owner phases include the separately observed declared-read stage; the four required phases remain explicit.",
+    "Own numerical 5% predicate and calculation counter do not claim source ErrCount5/global warning-counter equivalence.",
+    "Incoming face angles are codec-validated only; GEO-03 adds no angle profile or GEO-02 certification.",
+    "Original warnings/counters/implicit Space/scratch and unsupported-route fallback are unpaired.",
+    "No normal parser admission, AirPowerCap, ZON02/SYS or full physical equivalence is claimed."
+  ],
+  "comparison_command": {
+    "path": ".runtime/porting/GEO-03/candidate-comparison-command-02/receipt.json",
+    "sha256": "67fa5e9c371ad349effdc04365b8dfc040fc5e51ef77a8e5e40b66b7ea17d03f"
+  },
+  "comparison_report": {
+    "path": ".runtime/porting/GEO-03/candidate-comparison-command-02/stdout.log",
+    "sha256": "2cb4a1714a7d241494b23c768c97a89cb905e12354d940575ec8a03482427738"
+  },
+  "actual_exit_code": 0,
+  "source_bytes_match_before_and_after": true,
+  "gate_closure_claimed": false
+}

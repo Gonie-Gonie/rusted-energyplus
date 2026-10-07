@@ -917,14 +917,19 @@ fn run_with_optional_porting_scope_observed(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    let (((outcome, geometry_trace), trace), clock_trace) =
+    let ((((outcome, volume_trace), geometry_trace), trace), clock_trace) =
         ep_runtime::time_axis::clock_trace::capture(config.trace_level == TraceLevel::Full, || {
             ep_runtime::psychrometrics::production_trace::capture(
                 config.trace_level == TraceLevel::Full,
                 || {
                     ep_runtime::geometry::production_trace::capture(
                         config.trace_level == TraceLevel::Full,
-                        || run_with_optional_porting_scope_impl(config, scope),
+                        || {
+                            ep_runtime::geometry::zone_volume_trace::capture(
+                                config.trace_level == TraceLevel::Full,
+                                || run_with_optional_porting_scope_impl(config, scope),
+                            )
+                        },
                     )
                 },
             )
@@ -947,6 +952,14 @@ fn run_with_optional_porting_scope_observed(
         && config.output_dir.is_dir()
     {
         crate::geo02_trace::write_trace(config, &trace)?;
+    }
+    // Rejections are actual pre-physics owner outcomes, so retain their passive
+    // evidence too. Summary does not activate this observer.
+    if let Some(trace) = volume_trace
+        && config.output_dir.is_dir()
+        && trace.total_call_count > 0
+    {
+        crate::geo03_trace::write_trace(config, &trace)?;
     }
     outcome
 }

@@ -33,7 +33,12 @@ crates/ep_runtime/src/geometry.rs
 `independent-native-source-review.json`의 독립 사전 검토는 통과했다.
 원본 빌드와 helper 19개·일반 IDF 12개 실행 및 독립 검토를 완료했다.
 `evidence/GEO-03/original-first.json`에 실제 실행과 관측 상태를 연결했다.
-Rust 비교 전이며 아래 종료 체크는 모두 대기 상태이다.
+기존 Rust baseline은 실제 582개 검사에서 수치 불일치 3건과 미구현 관측
+192건을 기록했다. 수정한 candidate는 실제 2,672개 검사와 다섯 owner
+관측 단계에서 불일치 없이 통과했고, 체적·높이·면적의 최대오차와 RMSE는
+모두 0이다. `evidence/GEO-03/baseline.json`, `candidate-unit.json`과 각
+독립 검토에 보존했다. 최종 커밋의 단위·실행 연결 검증 전이며 아래 종료
+체크는 모두 대기 상태이다.
 
 단위 입력은 여섯 개의 유효한 사각형 면으로 닫힌 하나의 직육면체와
 명시 Zone 숫자, 준비된 면적 읽기 필드이다. 준비된 면적은 입력으로 선언하며
@@ -56,6 +61,21 @@ Rust 비교 전이며 아래 종료 체크는 모두 대기 상태이다.
 두 번째 체적 호출은 첫 호출이 쓴 현재 양수 체적을 읽으며 새 lexical 입력으로
 분류하지 않는다. Space 분배·경고 카운터·임시 버퍼는 대응 Rust 소유자가
 검증되기 전까지 원본 관찰로만 남긴다.
+
+Rust는 `geometry/zone_volume.rs`와 `zone_volume/topology.rs`에서 실제
+mutable owner와 폐합 면의 부호 있는 합을 구현한다. 정상 IDF 면의 선언
+순서는 검증된 RawModel overlay로 보존하고, 체적 합은 Wall/Floor/Roof별
+원본 순서를 따른다. 초기화 반환값의 열 가지 필드를 관찰하며, 이후 존
+상태에 저장·소비되는 연결 검증 대상은 체적이다. 공기 열용량의 실제 상태
+갱신 호출은 `zone_air_heat_capacity_update` 관측 구간으로 보고용 재계산과
+구분한다. 이 관측 구간은 계산식이나 source stage를 변경하지 않는다.
+
+첫 전체 회귀시험의 실제 종료 코드 101과 69개 실패를 보존했다. 공용 열
+시험 fixture는 안쪽 winding에서 bbox로 얻던 1m³를 전제했다. 해당 fixture의
+체적만 1m³로 명시하고 좌표·높이/바닥 자동값·기존 열 검증을 유지했다.
+같은 형상의 양수 명시 체적 유지와 자동 체적 거부를 확인하는 별도 회귀
+검사도 추가했다. 계산 소스와 source 비교 입력·허용치는 변경하지 않았다.
+`evidence/GEO-03/independent-fixture-review.json`에 수정 범위 검토를 연결했다.
 
 ## 호출 시점
 

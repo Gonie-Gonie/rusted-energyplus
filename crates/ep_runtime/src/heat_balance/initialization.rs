@@ -11,7 +11,7 @@ pub use schedule_cache::{
 };
 
 use crate::error::RuntimeError;
-use crate::geometry::zone_volume_m3;
+use crate::geometry::zone_geometry_properties;
 use crate::heat_balance::ctf::{
     ConstructionCtfCoefficientOverride, construction_ctf_coefficients_by_name,
     steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
@@ -43,10 +43,14 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {
-        let volume_m3 =
-            zone_volume_m3(&model.typed, zone).ok_or_else(|| RuntimeError::MissingZoneVolume {
+        let geometry = zone_geometry_properties(&model.typed, zone);
+        crate::geometry::zone_volume_trace::record(zone.id, &zone.name.0, &geometry);
+        let volume_m3 = geometry
+            .map_err(|error| RuntimeError::UnsupportedZoneVolumeGeometry {
                 zone_name: zone.name.0.clone(),
-            })?;
+                reason: error.to_string(),
+            })?
+            .volume_m3;
         zones.push(ZoneHeatBalanceState {
             zone_id: zone.id,
             zone_name: zone.name.0.clone(),

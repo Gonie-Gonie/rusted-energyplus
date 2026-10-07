@@ -1,0 +1,55 @@
+{
+  "schema": "geo03-independent-canonical-source-review-summary.v1",
+  "status": "pass-static-bounded-source-before-candidate-numerical-comparison",
+  "raw_independent_review": {
+    "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/review.json",
+    "sha256": "70fc4fad0a8a22e92a8698c51c8dba334dafabec41903b5b3ca5375667bf9ee1"
+  },
+  "review_completed_utc": "2026-10-07T22:44:16.773428+00:00",
+  "reviewed_Rust_source_count": 18,
+  "reviewed_contracts": {
+    "source": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/source/contracts/GEO-03-source.json",
+        "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+      }
+    },
+    "cases": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/source/contracts/GEO-03-cases.json",
+        "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+      }
+    },
+    "tolerances": {
+      "historical_path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/source/contracts/GEO-03-tolerances.json",
+        "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+      }
+    },
+    "helper_request": {
+      "historical_path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+      "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/source/contracts/helper-request.json",
+        "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+      }
+    }
+  },
+  "scope_limits": [
+    "Automatic route is bounded to six initially closed, consistently wound quadrilaterals (4Wall/1Floor/1Roof) and positive signed result.",
+    "Source repair/open fallback, reversed/nonpositive10m3 fallback, implicit Space, source warning IO/counters and scratch lifecycle remain unpaired.",
+    "Positive supplied-volume behavior outside the admitted surface domain is not certified as general parser/height compatibility; existing surface initialization remains a separate admission.",
+    "No genuine C++ local volume/method trace is invented from auxiliary helper results.",
+    "Static geometry and stored-volume capacity connection do not certify AirPowerCap W/K, multipliers, system timing, ZON02/SYS or whole physics.",
+    "Current observer labels describe actual Rust phase/context only; no original system ordering or global flag ownership is inferred."
+  ],
+  "material_blockers": [],
+  "compiled_or_numerical_certification": false,
+  "scientific_gates_updated": false
+}

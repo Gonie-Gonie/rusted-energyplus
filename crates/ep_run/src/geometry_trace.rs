@@ -1,7 +1,7 @@
 //! Output-only projections of compiled coordinates and actual runtime consumers.
 
 use crate::{RunConfig, RunError, RunExitCode, TraceLevel};
-use ep_model::{Point3, TypedModel};
+use ep_model::{AutoOrNumber, Point3, TypedModel};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
 use ep_runtime::heat_balance::HeatBalanceState;
 use serde_json::{Value, json};
@@ -26,6 +26,15 @@ fn point_bits(point: &Point3) -> Value {
 
 fn bits(value: f64) -> String {
     format!("{:016x}", value.to_bits())
+}
+
+fn declared_number(value: AutoOrNumber) -> Value {
+    match value {
+        AutoOrNumber::AutoCalculate => json!({"kind":"AutoCalculate"}),
+        AutoOrNumber::Value(value) => {
+            json!({"kind":"Value","value":value,"value_bits":bits(value)})
+        }
+    }
 }
 
 // RawModel stores numerical lexemes until the compiler parses them as f64.
@@ -136,13 +145,17 @@ fn compiled_projection(
             },
             "geometry_rules_origin":if model.global_geometry_rules.is_some(){"actual typed GlobalGeometryRules"}else{"existing Rust GlobalGeometryRules::default used by compiler"},
         },
-        "order_semantics":"Rust compiler/model collection iteration; not original IDF declaration order or native EnergyPlus IDs/order",
+        "order_semantics":"actual Rust compiler/model iteration; validated IDF declaration overlay for BuildingSurface:Detailed when present, native epJSON map order otherwise; typed IDs remain independent of EnergyPlus IDs",
+        "surface_idf_declaration_overlay":raw.has_idf_declaration_order("BuildingSurface:Detailed"),
         "zones":model.zones.iter().enumerate().map(|(index,zone)|json!({
             "id":zone.id.0, "name":zone.name.0,
             "compiler_iteration_order":index+1,
             "relative_north_deg":zone.direction_of_relative_north_deg,
             "relative_north_bits":bits(zone.direction_of_relative_north_deg),
             "origin_m":point(&zone.origin), "origin_bits":point_bits(&zone.origin),
+            "declared_ceiling_height":declared_number(zone.ceiling_height),
+            "declared_volume":declared_number(zone.volume),
+            "declared_floor_area":declared_number(zone.floor_area),
         })).collect::<Vec<_>>(),
         "surfaces":model.surfaces.iter().enumerate().map(|(index,surface)|json!({
             "id":surface.id.0, "name":surface.name.0, "zone_id":surface.zone.0,

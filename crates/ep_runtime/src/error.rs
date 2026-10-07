@@ -36,6 +36,13 @@ pub enum RuntimeError {
         /// Zone name.
         zone_name: String,
     },
+    /// The automatic-volume geometry lies outside the admitted closed-face path.
+    UnsupportedZoneVolumeGeometry {
+        /// Actual typed zone name.
+        zone_name: String,
+        /// Geometry-owner failure; no source diagnostic-string parity is claimed.
+        reason: String,
+    },
     /// A surface references a construction that is not available.
     MissingConstruction {
         /// Surface name.
@@ -126,6 +133,10 @@ impl Display for RuntimeError {
             Self::MissingZoneVolume { zone_name } => write!(
                 formatter,
                 "could not derive a positive volume for zone {zone_name}"
+            ),
+            Self::UnsupportedZoneVolumeGeometry { zone_name, reason } => write!(
+                formatter,
+                "zone {zone_name} automatic-volume geometry is unsupported: {reason}"
             ),
             Self::MissingConstruction { surface_name } => write!(
                 formatter,

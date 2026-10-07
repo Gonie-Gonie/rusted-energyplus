@@ -219,7 +219,18 @@ pub fn energyplus_zone_air_heat_capacity_j_per_k(
     )?;
     let specific_heat_j_per_kg_k = energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio);
 
-    Some(volume_m3 * density_kg_per_m3 * specific_heat_j_per_kg_k)
+    let capacity = volume_m3 * density_kg_per_m3 * specific_heat_j_per_kg_k;
+    production_trace::record(
+        "RustZoneAirHeatCapacity",
+        &[
+            volume_m3,
+            atmospheric_pressure_pa,
+            dry_bulb_c,
+            humidity_ratio,
+        ],
+        capacity,
+    );
+    Some(capacity)
 }
 
 /// Returns EnergyPlus-style zone air heat capacity at standard pressure.

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Compare preserved GEO-03 helper artifacts without launching any tools.
 
-The baseline compares only the current public summary's volume/floor outputs.
-Missing mutable Zone fields and owner phases explicitly fail completeness. No
+The explicit baseline compares only the former public summary's volume/floor
+outputs and preserves its incomplete-state failure. Canonical mode compares
+actual bounded owned Zone states and ordered incoming face observations. No
 geometry formula, expected-answer injection, tolerance change or gate write is
 performed. Reports go to stdout; original-only diagnostics stay unpaired.
 """
@@ -42,6 +43,15 @@ BASELINE_UNIMPLEMENTED = [
     "mutable_before_after_second_volume_state",
 ]
 SOURCE_ONLY_UNPAIRED = ["implicit Space", "global counters", "warning/error IO", "source scratch allocations"]
+CLASS_CODES = {"Wall": 1, "Floor": 2, "Roof": 3}
+DECLARED_PHASE = "declared_pre_volume_read_fields"
+RUST_PHASE_LABELS = {
+    "geometry_prepared": "after-own-geometry-before-declared-zone-inputs",
+    DECLARED_PHASE: "declared-input-only-prepared-read-fields",
+    "before_volume": "after-own-height-before-first-volume",
+    "after_volume": "after-first-own-volume",
+    "after_second_volume": "after-second-own-volume-without-height-repeat",
+}
 HEX64 = re.compile(r"[0-9a-f]{16}\Z")
 
 
@@ -184,7 +194,7 @@ def verify_original_review(review_ref, helper_ref, refs, helper_finished, bindin
     return completed
 
 
-def verify_rust(execution_ref, request_ref, helper_ref, review_ref, original_completed, baseline, bindings):
+def verify_rust(execution_ref, request_ref, helper_ref, review_ref, original_completed, baseline, candidate, bindings):
     wrapper = read(bindings.check(execution_ref))
     require(wrapper["schema"] == "geo03-Rust-helper-execution.v1"
             and wrapper["reference_outputs_supplied"] is False and wrapper["gates_updated"] is False,
@@ -193,8 +203,11 @@ def verify_rust(execution_ref, request_ref, helper_ref, review_ref, original_com
         require(same_binding(wrapper[key], expected), "Rust proof/input binding differs: " + key)
         bindings.check(wrapper[key])
     bindings.check(wrapper["executed_launcher"])
+    required = {"crates/ep_runtime/examples/geo03_tuples.rs", "crates/ep_runtime/src/geometry.rs"}
+    if not baseline:
+        required |= {"crates/ep_runtime/src/geometry/zone_volume.rs", "crates/ep_runtime/src/geometry/zone_volume/topology.rs"}
     build, available, compilation = verify_rust_build(wrapper["build"], bindings, kind="example", example="geo03_tuples",
-        committed=not baseline, required_sources={"crates/ep_runtime/examples/geo03_tuples.rs", "crates/ep_runtime/src/geometry.rs"})
+        committed=not (baseline or candidate), required_sources=required)
     require(same_binding(build["binary"], wrapper["binary"]), "Rust invoked binary differs from archived build")
     execution = read(bindings.check(wrapper["command_receipt"]))
     require(execution["schema"] == "recorded-porting-command.v1" and execution["launch_error"] is None
@@ -269,12 +282,198 @@ def verify_baseline_row(row, supplied, original, comparison):
     return source_zones[0]
 
 
+def verify_ordered_faces(state, supplied, source, comparison, label):
+    """Bind actual independent IDs/order/vertices before numerical comparison."""
+    zones, surfaces = state["zones"], state["surfaces"]
+    require(type(zones) is list and len(zones) == 1 and type(surfaces) is list
+            and len(surfaces) == len(supplied["surfaces"]) == 6, "Canonical owner cardinality differs")
+    zone = zones[0]
+    zone_id = integer(zone["id"], "Rust own ZoneId")
+    require(type(zone["name"]) is str and zone["name"].upper() == source["zones"][0]["name"].upper()
+            and integer(zone["surface_count"], "Rust owned surface count") == len(surfaces),
+            "Canonical Zone name/surface ownership differs")
+    require(type(source["surfaces"]) is list and len(source["surfaces"]) == len(surfaces),
+            "Original surface count differs")
+    identifiers, source_ids = set(), set()
+    for position, (owned, reference, face) in enumerate(zip(surfaces, source["surfaces"], supplied["surfaces"]), 1):
+        own_id = integer(owned["id"], "Rust own SurfaceId")
+        native_id = integer(reference["id"], "Original own SurfaceId", 1)
+        require(own_id not in identifiers and native_id not in source_ids, "Duplicate owned SurfaceId")
+        identifiers.add(own_id)
+        source_ids.add(native_id)
+        require(integer(owned["zone_id"], "Rust owning ZoneId") == zone_id
+                and integer(reference["zone_id"], "Original owning ZoneId", 1) == source["zones"][0]["id"],
+                "Actual face has a different owning Zone")
+        require(type(owned["name"]) is str and type(reference["name"]) is str
+                and owned["name"].upper() == reference["name"].upper() == face["name"].upper()
+                and owned["class"] == face["class"] and type(owned["class"]) is str
+                and type(reference["class"]) is int and reference["class"] == CLASS_CODES[face["class"]]
+                and integer(owned["sides"], "Rust sides", 1) == integer(reference["sides"], "Original sides", 1) == 4,
+                "Actual face order/name/class/cardinality differs")
+        require(exact(owned["world_vertex_bits"], face["input_vertex_bits"])
+                and exact(reference["world_vertex_bits"], face["input_vertex_bits"]),
+                "Actual kernel vertices differ from frozen inputs before numerical comparison")
+        comparison.metadata(owned["name"].upper(), reference["name"].upper(), label+"/face_name/"+str(position))
+        comparison.metadata(owned["world_vertex_bits"], reference["world_vertex_bits"], label+"/ordered_face_vertices/"+str(position))
+    orders, reference_orders = state["ordered_volume_base_faces"], source["ordered_volume_base_faces"]
+    require(type(orders) is list and len(orders) == 1 and integer(orders[0]["own_zone_id"], "Ordered owning Zone") == zone_id
+            and type(reference_orders) is list and len(reference_orders) == 1,
+            "Actual volume base-face owner differs")
+    ordered = orders[0]["faces"]
+    require(type(ordered) is list and len(ordered) == len(surfaces)
+            and type(reference_orders[0]["faces"]) is list and len(reference_orders[0]["faces"]) == len(surfaces),
+            "Actual volume face order count differs")
+    for owned, reference, surface, native_surface in zip(ordered, reference_orders[0]["faces"], surfaces, source["surfaces"]):
+        require(integer(owned["own_surface_id"], "Ordered SurfaceId") == surface["id"]
+                and integer(reference["own_surface_id"], "Original ordered SurfaceId", 1) == native_surface["id"]
+                and owned["name"].upper() == surface["name"].upper()
+                and reference["name"].upper() == native_surface["name"].upper()
+                and exact(owned["class"], surface["class"]) and exact(reference["class"], native_surface["class"]),
+                "Volume summation order is not bound to actual owned faces")
+    origin, native_origin = state["own_origin_m"], source["native_only_state"]["p0_m"]
+    require(type(origin) is list and len(origin) == len(native_origin) == 3, "Actual volume origin observation differs")
+    require(exact([scalar_token(x) for x in origin], [scalar_token(x) for x in native_origin]),
+            "Actual volume origin bits differ; translating the sum is outside scope")
+    return zone
+
+
+def compare_zone_fields(owned, source, frozen_profiles, comparison, label):
+    for field, profile in FIELDS.items():
+        require(field in owned and field in source, "Required actual Zone field missing: " + field)
+        if profile is None:
+            require(type(owned[field]) is bool and type(source[field]) is bool, "Zone flag is not a typed boolean")
+            comparison.metadata(owned[field], source[field], label+"/"+field)
+        else:
+            comparison.numeric(owned[field], source[field], frozen_profiles[profile], label+"/"+field)
+
+
+def compare_face_properties(owned, source, frozen_profiles, comparison, label):
+    for position, (surface, original) in enumerate(zip(owned["surfaces"], source["surfaces"]), 1):
+        for field in ("area_m2", "gross_area_m2"):
+            comparison.numeric(surface[field], original[field], frozen_profiles["area_m2"], label+"/face/"+str(position)+"/"+field)
+        av, rv = surface["newell_area_vector_m2"], original["newell_area_vector_m2"]
+        require(type(av) is list and len(av) == len(rv) == 3, "Newell area vector cardinality differs")
+        for axis, (actual, reference) in enumerate(zip(av, rv)):
+            comparison.numeric(actual, reference, frozen_profiles["area_m2"], label+"/face/"+str(position)+"/Newell/"+str(axis))
+        # GEO-03 has no angle profile. Retain valid incoming scalar coding, not a new GEO-02 claim.
+        scalar_token(surface["tilt_deg"])
+        scalar_token(original["tilt_deg"])
+
+
+def verify_prepared_reads(states, supplied, source, comparison):
+    """Prepared operands are exact input bits, not tolerance-derived results."""
+    label = supplied["case_id"]
+    default = states["geometry_prepared"]["zones"][0]
+    original_default = source["source_state"]["geometry_prepared"]["zones"][0]
+    declared = states[DECLARED_PHASE]["zones"][0]
+    original_declared = source["source_state"][DECLARED_PHASE]["zones"][0]
+    for field, profile in FIELDS.items():
+        a, r = default[field], original_default[field]
+        if profile is None:
+            require(type(a) is bool and type(r) is bool, "Constructor flag is not boolean")
+            comparison.metadata(a, r, label+"/actual_constructor_default/"+field)
+        else:
+            comparison.metadata(scalar_token(a), scalar_token(r), label+"/actual_constructor_default_bits/"+field)
+    for group in ("zone_input", "prepared_zone"):
+        for field, operand in supplied[group].items():
+            require(field in FIELDS, "Prepared operand has no declared Zone field")
+            if type(operand) is bool:
+                require(type(declared[field]) is bool and exact(declared[field], operand)
+                        and exact(original_declared[field], operand), "Prepared boolean reads differ from request")
+                comparison.metadata(declared[field], original_declared[field], label+"/exact_prepared_boolean/"+field)
+            else:
+                if operand == "AutoCalculate":
+                    expected = bits(-99999.0)  # Actual pinned AutoCalculate constructor constant.
+                    require(scalar_token(original_default[field]) == expected, "Original AutoCalculate declaration/default differs")
+                else:
+                    expected = supplied["input_scalar_bits"][group][field]
+                    require(bits(operand) == expected, "Prepared operand companion bits differ")
+                require(scalar_token(declared[field]) == scalar_token(original_declared[field]) == expected,
+                        "Actual owner prepared reads differ from authoritative frozen input bits")
+                comparison.metadata(scalar_token(declared[field]), scalar_token(original_declared[field]),
+                    label+"/exact_prepared_operand_bits/"+field)
+
+
+def verify_canonical_row(row, supplied, source, frozen_profiles, comparison):
+    label = supplied["case_id"]
+    paired = supplied["kind"] == "closed_box"
+    require(row["status"] == ("source_complete" if paired else "unsupported_source_only")
+            and row["route"] == ("ep_runtime::geometry::prepare_zone_height + calculate_zone_volume" if paired
+                                  else "unsupported-source-only-original-diagnostic"), "Canonical route/status differs")
+    for key in ("canonical_coordinate_conversion_claimed", "original_parser_admission_claimed", "physics_executed"):
+        require(row[key] is False, "Helper manufactured ordinary parser/physical coverage: " + key)
+    for key in ("prepared_read_fields_consumed", "admission_checked", "source_state_observed"):
+        require(exact(row[key], paired), "Canonical owner availability differs: " + key)
+    require(row["numeric_input_identity_checked"] is True
+            and exact(row["unconsumed_prepared_input_groups"], ["prepared_implicit_space"])
+            and exact(row["source_only_state_unpaired"], SOURCE_ONLY_UNPAIRED), "Prepared/source-only scope differs")
+    owned = row["typed_surface_order"]
+    require(type(owned) is list and len(owned) == len(supplied["surfaces"]), "Actual typed input count differs")
+    identifiers, zone_ids = set(), set()
+    for position, (surface, face) in enumerate(zip(owned, supplied["surfaces"]), 1):
+        own_id = integer(surface["id"], "Typed own SurfaceId")
+        zone_ids.add(integer(surface["zone_id"], "Typed owning ZoneId"))
+        require(own_id not in identifiers and integer(surface["request_ordinal"], "request ordinal", 1) == position
+                and type(surface["name"]) is str and surface["name"].upper() == face["name"].upper()
+                and exact(surface["class"], face["class"]) and exact(surface["input_vertex_bits"], face["input_vertex_bits"]),
+                "Actual typed helper input/order differs before comparison")
+        identifiers.add(own_id)
+    require(len(zone_ids) == 1, "Actual helper typed input spans multiple zones")
+    if not paired:
+        require(row["zone"] is None and row["source_state"] is None and row["auxiliary_rust_helpers"] is None
+                and exact(row["unavailable_source_state_phases"], list(RUST_PHASE_LABELS))
+                and exact(row["unimplemented_fields"], ["source-only open/reversed/duplicated topology fallback and diagnostics"]),
+                "Source-only helper acquired an invented paired owner")
+        return
+    require(row["unavailable_source_state_phases"] == [] and row["unimplemented_fields"] == [], "Canonical required observations missing")
+    states = row["source_state"]
+    require(type(states) is dict and set(states) == set(RUST_PHASE_LABELS), "Actual owner phase set differs")
+    verify_prepared_reads(states, supplied, source, comparison)
+    first = states["geometry_prepared"]
+    for phase, phase_label in RUST_PHASE_LABELS.items():
+        state, original = states[phase], source["source_state"][phase]
+        require(state["phase"] == phase_label
+                and state["method"] == "copy actual Rust owner fields; no geometry or source-state reconstruction",
+                "Actual owner phase label/copy route differs")
+        zone = verify_ordered_faces(state, supplied, original, comparison, label+"/"+phase)
+        require(zone["id"] in zone_ids and {x["id"] for x in state["surfaces"]} == identifiers,
+                "Observed owner is not bound to actual typed input")
+        require(all(x["id"] == y["id"] for x, y in zip(state["surfaces"], owned)), "Owned name/ID mapping differs from typed input")
+        require(exact(state["surfaces"], first["surfaces"])
+                and exact(state["ordered_volume_base_faces"], first["ordered_volume_base_faces"])
+                and exact(state["own_origin_m"], first["own_origin_m"]), "Incoming owned geometry mutated across volume calls")
+        compare_zone_fields(zone, original["zones"][0], frozen_profiles, comparison, label+"/"+phase+"/Zone")
+        expected_calls = {"after_volume": 1, "after_second_volume": 2}.get(phase, 0)
+        require(integer(state["volume_calculation_count"], "Actual own volume calls") == expected_calls
+                and type(state["volume_differs_by_more_than_five_percent"]) is bool,
+                "Actual owner invocation count or local diagnostic type differs")
+    compare_face_properties(first, source["source_state"]["geometry_prepared"], frozen_profiles, comparison, label+"/incoming_geometry")
+    require(exact(row["zone"], states["after_second_volume"]["zones"][0]), "Final Zone summary is not the actual owner snapshot")
+    comparison.metadata(scalar_token(states["after_volume"]["zones"][0]["volume_m3"]),
+        scalar_token(states["after_second_volume"]["zones"][0]["volume_m3"]), label+"/positive_current_volume_second_call_retention")
+    auxiliary, native_aux = row["auxiliary_rust_helpers"], source["auxiliary_original_helpers"]
+    require(auxiliary["method"] == "actual Rust owner numerical observations; not C++ internal local trace or warning counters"
+            and auxiliary["initial_edges_not_used_twice"] == [] and native_aux["initial_edges_not_used_twice"] == []
+            and auxiliary["topology_rejection"] is None and auxiliary["edges_winding_consistent"] is True
+            and integer(auxiliary["volume_calculation_count"], "Auxiliary own volume calls") == 2,
+            "Paired helper needs repair, rejects topology or claims unavailable diagnostics")
+    comparison.metadata(integer(auxiliary["initial_unique_vertex_count"], "Own initial unique vertices", 1),
+        integer(native_aux["initial_unique_vertex_count"], "Original initial unique vertices", 1), label+"/initial_unique_vertex_count")
+    for field in ("enclosed", "floor_horizontal", "roof_horizontal", "walls_vertical", "same_wall_height"):
+        require(type(auxiliary[field]) is bool and type(native_aux[field]) is bool, "Helper predicate is not boolean")
+        comparison.metadata(auxiliary[field], native_aux[field], label+"/actual_helper_observation/"+field)
+    require(auxiliary["enclosed"] is True and auxiliary["signed_polyhedron_volume_m3"] is not None,
+            "Canonical paired volume did not observe an initially closed signed-volume route")
+    comparison.numeric(auxiliary["signed_polyhedron_volume_m3"], native_aux["signed_polyhedron_volume_m3"],
+        frozen_profiles["volume_m3"], label+"/actual_helper_observation/signed_polyhedron_volume_m3")
+
+
 def compare_results(request, native, rust, frozen_profiles, baseline):
-    require(baseline, "Canonical owner DTO is not enabled before its reviewed implementation; use explicit --baseline")
-    require(rust["schema"] == "geo03-helper-results.v1" and rust["implementation_stage"] == "baseline_public_summary"
+    require(rust["schema"] == "geo03-helper-results.v1"
+            and rust["implementation_stage"] == ("baseline_public_summary" if baseline else "canonical_owned_state")
             and rust["reference_outputs_supplied_to_Rust"] is False and rust["expected_answers_supplied"] is False
             and rust["original_parser_admission_claimed"] is False and rust["physics_executed"] is False
-            and rust["gates_updated"] is False, "Baseline result input/proof boundary differs")
+            and rust["gates_updated"] is False, "Helper result input/proof boundary differs")
     require(type(rust["cases"]) is list and len(rust["cases"]) == len(native["cases"]) == len(request["cases"]) == 19,
             "Helper result cardinality differs")
     comparison, unpaired, paired = Comparison(), [], 0
@@ -282,20 +481,23 @@ def compare_results(request, native, rust, frozen_profiles, baseline):
         label = supplied["case_id"]
         require(actual["case_id"] == source["case_id"] == label and actual["kind"] == source["kind"] == supplied["kind"]
                 and exact(actual["input"], supplied), "Rust request echo/case order differs")
-        observed = verify_baseline_row(actual, supplied, source, comparison)
+        observed = verify_baseline_row(actual, supplied, source, comparison) if baseline else None
+        if not baseline:
+            verify_canonical_row(actual, supplied, source, frozen_profiles, comparison)
         if supplied["kind"] != "closed_box":
             unpaired.append({"case_id": label, "original_status": source["status"], "Rust_status": actual["status"],
                 "numerical_comparison_performed": False, "original_diagnostics_retained_in": "original helper result/source_state",
                 "Rust_normal_parser_admission_or_rejection_claimed": False})
             continue
         paired += 1
-        for field in FIELDS:
-            if field not in BASELINE_FIELDS or actual["zone"][field] is None:
-                comparison.missing(label+"/Zone/"+field)
-            else:
-                comparison.numeric(actual["zone"][field], observed[field], frozen_profiles[FIELDS[field]], label+"/available_summary/"+field)
-        for phase in PHASES:
-            comparison.missing(label+"/actual_mutable_owner_state/"+phase)
+        if baseline:
+            for field in FIELDS:
+                if field not in BASELINE_FIELDS or actual["zone"][field] is None:
+                    comparison.missing(label+"/Zone/"+field)
+                else:
+                    comparison.numeric(actual["zone"][field], observed[field], frozen_profiles[FIELDS[field]], label+"/available_summary/"+field)
+            for phase in PHASES:
+                comparison.missing(label+"/actual_mutable_owner_state/"+phase)
     require(paired == 16 and len(unpaired) == 3, "Actual pairing partition differs")
     return comparison, unpaired
 
@@ -306,7 +508,9 @@ def main():
     parser.add_argument("--native-output", required=True, help="Original helper JSON bound by that receipt")
     parser.add_argument("--original-review", required=True, help="Actual raw independent original-data review bound by the Rust wrapper")
     parser.add_argument("--rust-execution", required=True, help="Root wrapper binding actual recorded command/build/request")
-    parser.add_argument("--baseline", action="store_true", help="Only current summary fields; incomplete owner coverage explicitly fails")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--baseline", action="store_true", help="Only current summary fields; incomplete owner coverage explicitly fails")
+    mode.add_argument("--candidate", action="store_true", help="Explicit non-gate canonical diagnosis; archived candidate source build permitted")
     args = parser.parse_args()
     bindings = Bindings()
     provenance_ref = ref(Path(__file__).with_name("geo03_provenance.py"))
@@ -325,28 +529,39 @@ def main():
     review_ref = ref(path_of(args.original_review))
     completed = verify_original_review(review_ref, original_ref, refs, finished, bindings)
     rust_ref = ref(path_of(args.rust_execution))
-    rust, build, execution, wrapper = verify_rust(rust_ref, request_ref, original_ref, review_ref, completed, args.baseline, bindings)
+    rust, build, execution, wrapper = verify_rust(rust_ref, request_ref, original_ref, review_ref, completed, args.baseline, args.candidate, bindings)
     comparison, unpaired = compare_results(request, native, rust, frozen_profiles, args.baseline)
     bindings.unchanged()
     result = comparison.report()
     status = "fail-incomplete" if args.baseline else ("pass" if result["mismatch_count"] == 0 else "fail")
     report = {"schema": "geo03-unit-comparison.v1", "status": status,
-        "comparison_boundary": "current_public_zone_summary_baseline",
+        "comparison_boundary": "current_public_zone_summary_baseline" if args.baseline else "bounded_actual_zone_volume_owner_states",
         "tool": ref(Path(__file__)), "provenance_tool": provenance_ref, "contracts": refs,
         "input_request": request_ref, "original_first": original_ref, "native_output": native_ref,
         "original_first_review": review_ref, "Rust_execution": rust_ref,
         "Rust_command_receipt": wrapper["command_receipt"], "Rust_binary": wrapper["binary"], "Rust_build": wrapper["build"],
+        "candidate_diagnostic": args.candidate,
+        "committed_source_required": not (args.baseline or args.candidate),
         "source_worktree_clean": build["source_worktree_clean"], "implementation_commit": build["implementation_commit"],
         "available_Rust_source_count": len(build["available_Rust_sources"]),
         "source_inventory_scope": "Archived available-source inventory; compiler file selection unclaimed",
-        "actual_available_summary_fields": sorted(BASELINE_FIELDS), "comparison_source_phase": "after_volume",
-        "missing_Zone_owner_fields": sorted(set(FIELDS)-BASELINE_FIELDS), "missing_mutable_owner_phases": PHASES,
+        "actual_available_summary_fields": sorted(BASELINE_FIELDS) if args.baseline else [],
+        "comparison_source_phase": "after_volume" if args.baseline else None,
+        "missing_Zone_owner_fields": sorted(set(FIELDS)-BASELINE_FIELDS) if args.baseline else [],
+        "missing_mutable_owner_phases": PHASES if args.baseline else [],
+        "paired_Zone_owner_fields": [] if args.baseline else list(FIELDS),
+        "paired_owner_phases": [] if args.baseline else list(RUST_PHASE_LABELS),
+        "required_owner_phases": PHASES,
         "paired_closed_helper_count": 16, "source_only_helper_count": 3, "source_only_unpaired": unpaired,
         "source_only_state_unpaired": SOURCE_ONLY_UNPAIRED, **result, "checked_artifact_bindings": bindings.report(),
         "reference_outputs_supplied_to_Rust": False, "physics_executed": False, "gates_updated": False,
-        "claim_limits": ["Prepared helper area fields are declared input state, not normal parser producer evidence.",
-            "The current public summary does not consume prepared area/Space groups or own mutable volume state.",
-            "Baseline comparison cannot pass completeness even if all available numerical outputs agree.",
+        "claim_limits": ["Prepared helper area fields are declared input state, not normal parser producer evidence."]
+            + (["The baseline public summary does not consume prepared area/Space groups or own mutable volume state.",
+                "Baseline comparison cannot pass completeness even if all available numerical outputs agree."] if args.baseline else [
+                "Actual five Rust owner phases include the separately observed declared-read stage; the four required phases remain explicit.",
+                "Own numerical 5% predicate and calculation counter do not claim source ErrCount5/global warning-counter equivalence.",
+                "Incoming face angles are codec-validated only; GEO-03 adds no angle profile or GEO-02 certification."])
+            + [
             "Original warnings/counters/implicit Space/scratch and unsupported-route fallback are unpaired.",
             "No normal parser admission, AirPowerCap, ZON02/SYS or full physical equivalence is claimed."]}
     print(json.dumps(report, indent=2, allow_nan=False))

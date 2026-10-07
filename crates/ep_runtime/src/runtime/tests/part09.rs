@@ -83,7 +83,9 @@
             list_multiplier: 1,
             list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
-            volume: AutoOrNumber::AutoCalculate,
+            // Fixed thermal volume; this prepared fixture retains inward vertex winding.
+            // Automatic volume admits the separate source-backed outward closed domain.
+            volume: AutoOrNumber::Value(1.0),
             floor_area: AutoOrNumber::AutoCalculate,
             inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
                 ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
@@ -114,6 +116,31 @@
         });
         model.surfaces.extend(cube_surfaces());
         model
+    }
+
+    #[test]
+    fn positive_entered_volume_retains_inward_thermal_fixture_while_auto_is_rejected()
+    -> Result<(), Box<dyn std::error::Error>> {
+        use crate::geometry::{ZoneVolumeError, zone_geometry_properties};
+
+        let mut typed = cube_model();
+        let supplied_volume_m3 = match typed.zones[0].volume {
+            AutoOrNumber::Value(value) => value,
+            AutoOrNumber::AutoCalculate => return Err("fixture must declare its thermal volume".into()),
+        };
+        let geometry = zone_geometry_properties(&typed, &typed.zones[0])?;
+        assert_eq!(geometry.volume_m3.to_bits(), supplied_volume_m3.to_bits());
+        assert!(geometry.diagnostics.initially_closed);
+        assert!(geometry.diagnostics.signed_polyhedron_volume_m3
+            .is_some_and(|volume| volume <= 0.0));
+
+        typed.zones[0].volume = AutoOrNumber::AutoCalculate;
+        let error = zone_geometry_properties(&typed, &typed.zones[0])
+            .expect_err("automatic inward volume must not use a bounding box or absolute value");
+        assert!(matches!(error, ZoneVolumeError::UnsupportedTopology(reason)
+            if reason.contains("signed polyhedron volume is nonpositive")));
+        // The original open/reversed fallback and warning IO stay source-only.
+        Ok(())
     }
 
     fn two_zone_interzone_model() -> TypedModel {

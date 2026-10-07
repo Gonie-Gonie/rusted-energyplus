@@ -1,0 +1,141 @@
+{
+  "schema": "geo03-independent-baseline-data-review.v1",
+  "status": "pass-baseline-evidence-integrity-card-remains-incomplete",
+  "review_completed_utc": "2026-10-07T22:29:20.884569+00:00",
+  "reviewed_actual_comparison_command": {
+    "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/receipt.json",
+    "sha256": "9f4e909188a95849b4c09459372a745b4ad96b710030f2da2f9e93f7a3659c06"
+  },
+  "reviewed_actual_comparison_stdout": {
+    "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/stdout.log",
+    "sha256": "1554a5dc06abc41ec66590630e32ce1dd7b58d14892df3132f3da15b46cfef1b"
+  },
+  "actual_comparator_exit_code": 1,
+  "actual_comparison_status": "fail-incomplete",
+  "reviewed_actual_Rust_execution": {
+    "path": ".runtime/porting/GEO-03/rust-baseline-01/execution.json",
+    "sha256": "09fe61ff53fe6b5035559dcf12fb62714e7054e77c2d32672acceb294d909d91"
+  },
+  "actual_Rust_example_exit_code": 0,
+  "reviewed_build": {
+    "path": ".runtime/porting/GEO-03/builds/baseline-ffb0ef4e-01/build-receipt.json",
+    "sha256": "7f0192f8aa2ab09bd5e5a64c541217a9f1e40ffe729dda614b6c5824f52468d0"
+  },
+  "archived_binary": {
+    "path": ".runtime/porting/GEO-03/builds/baseline-ffb0ef4e-01/geo03_tuples.exe",
+    "sha256": "8606496bebb6690ebc92f29128ab49fced914208e71eb978faf70659f5425c17"
+  },
+  "reviewed_original_first": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "reviewed_original_data_review": {
+    "path": ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+    "sha256": "bc6b46a46c1e6d34aab4e8b8f701e614728c1a53839beda43aa9bc2df5723f11"
+  },
+  "prior_actual_build_review": {
+    "path": ".runtime/porting/GEO-03/independent-baseline-build-review-01/review.json",
+    "sha256": "a0eb9ef4de94875c1a84d03d3b85945a40a25c4d851eb41c4d623ccc9841146d"
+  },
+  "prior_static_tool_review": {
+    "path": ".runtime/porting/GEO-03/independent-unit-tool-review-02/review.json",
+    "sha256": "ab5cb734216cee39e6ff6b5d1dc8cb34f4de634942cf96fa4e5a4a4a80b0473a"
+  },
+  "executed_comparison_sources": [
+    {
+      "historical_path": "tools/porting/check_geo03_units.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-baseline-data-review-01/check_geo03_units.py",
+        "sha256": "4b8774e6f4ccb792b6446f4af7c13d8d6b29a43e67f36ba153b9a4a3b566214d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-baseline-data-review-01/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "frozen_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "frozen_input_request": {
+    "path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+    "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+  },
+  "actual_checks": 582,
+  "actual_mismatches": 195,
+  "missing_required_owner_observations": 192,
+  "numerical_tolerance_mismatches": [
+    {
+      "category": "numerical_tolerance",
+      "field": "AUTO-CUBOID-Z45/available_summary/volume_m3",
+      "actual": "4049000000000001",
+      "reference": "4038000000000000"
+    },
+    {
+      "category": "numerical_tolerance",
+      "field": "AUTO-VOLUME-ENTERED-HEIGHT/available_summary/volume_m3",
+      "actual": "3ff0000000000000",
+      "reference": "4000000000000000"
+    },
+    {
+      "category": "numerical_tolerance",
+      "field": "AUTO-VOLUME-ENTERED-HEIGHT-FLOOR/available_summary/volume_m3",
+      "actual": "3ff0000000000000",
+      "reference": "4018000000000000"
+    }
+  ],
+  "retained_actual_scalar_error_metrics": {
+    "m3": {
+      "count": 16,
+      "maximum_absolute_error": 26.000000000000007,
+      "rmse": 6.623820649745887
+    },
+    "m2": {
+      "count": 16,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "actual_compared_scalar_rows": 32,
+  "paired_closed_helpers": 16,
+  "source_only_helpers": 3,
+  "source_worktree_clean": false,
+  "committed_source_certification": false,
+  "available_Rust_source_count": 3647,
+  "reference_occurrences_hash_checked": 7495,
+  "distinct_hash_checked_files": 3795,
+  "scope_limits": [
+    "This PASS certifies integrity of the preserved negative baseline proof; it is not a GEO-03 numerical/card/gate PASS.",
+    "The current actual public summary remains missing eight Zone fields and four mutable owner phases per paired case.",
+    "Reported max error/RMSE and frozen tolerance outcomes were preserved; this review did not re-execute the comparer, recompute geometry formulas or change numerical policy.",
+    "Additional source-only routes, warnings/global counters/implicit Space/scratch and ordinary admission were not promoted by baseline comparison.",
+    "Available archived source inventory is not claimed to be the compiler-selected file set. Dirty baseline build has no implementation commit certification."
+  ],
+  "engines_executed_by_review": false,
+  "scientific_comparer_executed_by_review": false,
+  "geometry_math_recomputed_by_review": false,
+  "reference_outputs_supplied_to_Rust": false,
+  "gates_updated": false,
+  "executed_independent_data_reader": {
+    "path": ".runtime/porting/GEO-03/independent-baseline-data-review-01/review_data.py",
+    "sha256": "b2ed0934ef6368ba1c3fe0e690aedeada38c8456cc0f7f0cb4a6f9273b9a7ac8"
+  },
+  "raw_independent_review": {
+    "path": ".runtime/porting/GEO-03/independent-baseline-data-review-01/review.json",
+    "sha256": "efd5a92545c2b1f9ac290d56389b16922b90707d9f2e0c56a99179fef789b669"
+  }
+}

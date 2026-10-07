@@ -84,7 +84,9 @@ pub(crate) fn update_single_zone_air_heat_capacity_from_weather_context(
     _fallback_dry_bulb_c: f64,
 ) {
     if let Some(air_heat_capacity_j_per_k) =
-        weather_context_zone_air_heat_capacity_j_per_k(zone, context)
+        crate::psychrometrics::production_trace::in_phase("zone_air_heat_capacity_update", || {
+            weather_context_zone_air_heat_capacity_j_per_k(zone, context)
+        })
     {
         zone.air_heat_capacity_j_per_k = air_heat_capacity_j_per_k;
     }
@@ -96,9 +98,10 @@ pub(crate) fn update_zone_air_heat_capacities_from_weather_context(
     _fallback_dry_bulb_c: f64,
 ) {
     for zone in zones {
-        if let Some(air_heat_capacity_j_per_k) =
-            weather_context_zone_air_heat_capacity_j_per_k(zone, context)
-        {
+        if let Some(air_heat_capacity_j_per_k) = crate::psychrometrics::production_trace::in_phase(
+            "zone_air_heat_capacity_update",
+            || weather_context_zone_air_heat_capacity_j_per_k(zone, context),
+        ) {
             zone.air_heat_capacity_j_per_k = air_heat_capacity_j_per_k;
         }
     }

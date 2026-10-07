@@ -61,6 +61,7 @@ pub(crate) fn write_production_trace(
             "PsyCpAirFnW": ["W_kg_kg"], "PsyCpAirFnW_fast": ["W_kg_kg"],
             "PsyHFnTdbW": ["T_C", "W_kg_kg"], "PsyHFnTdbW_fast": ["T_C", "W_kg_kg"],
             "PsyTdbFnHW": ["H_J_kg", "W_kg_kg"], "PsyWFnTdbH": ["T_C", "H_J_kg"],
+            "RustZoneAirHeatCapacity": ["Volume_m3", "P_Pa", "T_C", "W_kg_kg"],
         }),
         event_limit: trace.event_limit,
         unique_tuple_limit: trace.unique_tuple_limit,

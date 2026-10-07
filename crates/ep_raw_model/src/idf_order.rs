@@ -62,6 +62,12 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneProperty:LocalEnvironment",
         name_field_index: 0,
     },
+    // SurfaceGeometry::GetSurfaceData preserves IDF declaration order within
+    // its Wall/Floor/Roof groups. Native epJSON keeps its own map order.
+    IdfOrderTarget {
+        object_type: "BuildingSurface:Detailed",
+        name_field_index: 0,
+    },
 ];
 
 /// Error returned when staged IDF declaration order cannot be recovered safely.
@@ -508,6 +514,33 @@ mod tests {
             ordered_names(&model)?,
             vec!["Alpha Later Custom", "Zulu Earlier Holiday"]
         );
+        Ok(())
+    }
+
+    #[test]
+    fn surface_declaration_order_survives_conversion_without_changing_native_epjson()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let epjson = r#"{"BuildingSurface:Detailed": {
+            "Zulu Wall": {"surface_type":"Wall"},
+            "Alpha Floor": {"surface_type":"Floor"},
+            "Beta Roof": {"surface_type":"Roof"}
+        }}"#;
+        let idf = "BuildingSurface:Detailed,ZULU WALL,Wall;\n\
+                   BuildingSurface:Detailed,beta roof,Roof;\n\
+                   BuildingSurface:Detailed,Alpha Floor,Floor;";
+        let staged = parse_epjson_str_with_idf_order(epjson, idf)?;
+        let native = parse_epjson_str(epjson)?;
+        let names = |model: &crate::RawModel| -> Result<Vec<String>, crate::EpJsonError> {
+            Ok(model
+                .ordered_instances("BuildingSurface:Detailed")?
+                .into_iter()
+                .map(|(name, _)| name.0.clone())
+                .collect())
+        };
+        assert_eq!(names(&staged)?, ["Zulu Wall", "Beta Roof", "Alpha Floor"]);
+        assert_eq!(names(&native)?, ["Alpha Floor", "Beta Roof", "Zulu Wall"]);
+        assert_eq!(staged.objects, native.objects);
+        assert!(staged.has_idf_declaration_order("BuildingSurface:Detailed"));
         Ok(())
     }
 

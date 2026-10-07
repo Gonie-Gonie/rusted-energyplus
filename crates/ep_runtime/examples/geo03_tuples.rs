@@ -1,8 +1,8 @@
-//! Input-only GEO-03 baseline through the current public zone-summary owner.
+//! Input-only GEO-03 dispatch through actual mutable zone-geometry ownership.
 //!
-//! Native results are never read. Prepared area/Space fields are input provenance
-//! only in this baseline; absent height, topology and mutable-state owners remain
-//! explicitly unimplemented until a later canonical implementation is authorized.
+//! Native results are never read. Zone area reads are declared preparation;
+//! Space/global/warning lifecycles remain unpaired. Height executes once and
+//! actual volume selection executes twice on the same owner and ordered faces.
 
 use ep_model::{
     AutoOrNumber, ConstructionId, InsideSurfaceConvectionAlgorithm, NormalizedName,
@@ -10,7 +10,10 @@ use ep_model::{
     Surface, SurfaceId, SurfaceType, TypedModel, WindExposure, Zone, ZoneConvectionAlgorithm,
     ZoneId,
 };
-use ep_runtime::geometry::zone_geometry_summaries;
+use ep_runtime::geometry::{
+    ZoneGeometryProperties, ZoneVolumeFace, calculate_zone_volume, prepare_zone_height,
+    zone_geometry_input_value,
+};
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, error::Error, io::Read};
 
@@ -218,6 +221,114 @@ fn model(case: &Value, paired: bool) -> Result<TypedModel, String> {
     Ok(model)
 }
 
+fn zone_json(state: &ZoneGeometryProperties, typed: &TypedModel) -> Value {
+    json!({"id":typed.zones[0].id.0,"name":typed.zones[0].name.0,
+        "surface_count":state.faces.len(),
+        "volume_m3":scalar(state.volume_m3),
+        "ceiling_height_m":scalar(state.ceiling_height_m),
+        "ceiling_height_entered":state.ceiling_height_entered,
+        "floor_area_m2":scalar(state.floor_area_m2),
+        "user_entered_floor_area_m2":scalar(state.user_entered_floor_area_m2),
+        "geometric_floor_area_m2":scalar(state.geometric_floor_area_m2),
+        "ceiling_area_m2":scalar(state.ceiling_area_m2),
+        "geometric_ceiling_area_m2":scalar(state.geometric_ceiling_area_m2),
+        "has_floor":state.has_floor,"has_roof":state.has_roof})
+}
+
+fn vector(value: [f64; 3]) -> Value {
+    json!(value.map(scalar))
+}
+
+fn owner_snapshot(state: &ZoneGeometryProperties, typed: &TypedModel, phase: &str) -> Value {
+    let surfaces: Vec<Value> = state.faces.iter().map(|face| json!({
+        "id":face.surface_id.0,"name":face.name,"zone_id":typed.zones[0].id.0,
+        "class":format!("{:?}",face.surface_type),"sides":face.vertices.len(),
+        "world_vertex_bits":face.vertices.iter().map(|p| [bits(p.x_m),bits(p.y_m),bits(p.z_m)]).collect::<Vec<_>>(),
+        "area_m2":scalar(face.area_m2),"gross_area_m2":scalar(face.gross_area_m2),
+        "newell_area_vector_m2":vector(face.newell_area_vector_m2),"tilt_deg":scalar(face.tilt_deg)
+    })).collect();
+    let faces: Vec<Value> = state.faces.iter().map(|face| json!({
+        "own_surface_id":face.surface_id.0,"name":face.name,"class":format!("{:?}",face.surface_type)
+    })).collect();
+    json!({"phase":phase,"zones":[zone_json(state,typed)],"surfaces":surfaces,
+        "ordered_volume_base_faces":[{"own_zone_id":typed.zones[0].id.0,"faces":faces}],
+        "own_origin_m":vector([state.p0_m.x_m,state.p0_m.y_m,state.p0_m.z_m]),
+        "volume_calculation_count":state.volume_calculation_count,
+        "volume_differs_by_more_than_five_percent":state.diagnostics.volume_differs_by_more_than_five_percent,
+        "method":"copy actual Rust owner fields; no geometry or source-state reconstruction"})
+}
+
+fn prepared_read_fields(state: &mut ZoneGeometryProperties, case: &Value) -> Result<(), String> {
+    let input = &case["zone_input"];
+    state.ceiling_height_m = zone_geometry_input_value(auto_or_number(&input["ceiling_height_m"])?);
+    state.volume_m3 = zone_geometry_input_value(auto_or_number(&input["volume_m3"])?);
+    state.user_entered_floor_area_m2 =
+        zone_geometry_input_value(auto_or_number(&input["user_entered_floor_area_m2"])?);
+    let prepared = &case["prepared_zone"];
+    state.floor_area_m2 = number(&prepared["floor_area_m2"])?;
+    state.geometric_floor_area_m2 = number(&prepared["geometric_floor_area_m2"])?;
+    state.ceiling_area_m2 = number(&prepared["ceiling_area_m2"])?;
+    state.geometric_ceiling_area_m2 = number(&prepared["geometric_ceiling_area_m2"])?;
+    state.has_floor = prepared["has_floor"]
+        .as_bool()
+        .ok_or("expected boolean has_floor")?;
+    state.has_roof = prepared["has_roof"]
+        .as_bool()
+        .ok_or("expected boolean has_roof")?;
+    Ok(())
+}
+
+fn execute_owner(case: &Value, typed: &TypedModel) -> Result<(Value, Value, Value), String> {
+    // This factory preserves request order; no normal-parser W/F/R sorting.
+    let mut state = ZoneGeometryProperties {
+        faces: typed
+            .surfaces
+            .iter()
+            .map(ZoneVolumeFace::from_surface)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| error.to_string())?,
+        ..ZoneGeometryProperties::default()
+    };
+    let mut snapshots = json!({"geometry_prepared":owner_snapshot(&state,typed,"after-own-geometry-before-declared-zone-inputs")});
+    prepared_read_fields(&mut state, case)?;
+    snapshots["declared_pre_volume_read_fields"] =
+        owner_snapshot(&state, typed, "declared-input-only-prepared-read-fields");
+    prepare_zone_height(&mut state).map_err(|error| error.to_string())?;
+    snapshots["before_volume"] =
+        owner_snapshot(&state, typed, "after-own-height-before-first-volume");
+    calculate_zone_volume(&mut state).map_err(|error| error.to_string())?;
+    snapshots["after_volume"] = owner_snapshot(&state, typed, "after-first-own-volume");
+    calculate_zone_volume(&mut state).map_err(|error| error.to_string())?;
+    snapshots["after_second_volume"] = owner_snapshot(
+        &state,
+        typed,
+        "after-second-own-volume-without-height-repeat",
+    );
+    let d = &state.diagnostics;
+    let edges: Vec<Value> = d
+        .initial_edges_not_used_twice
+        .iter()
+        .map(|edge| {
+            json!({
+                "surface_id":edge.surface_id.0,"count":edge.count,
+                "start_m":vector([edge.start_m.x_m,edge.start_m.y_m,edge.start_m.z_m]),
+                "end_m":vector([edge.end_m.x_m,edge.end_m.y_m,edge.end_m.z_m]),
+                "other_surface_ids":edge.other_surface_ids.iter().map(|id|id.0).collect::<Vec<_>>()
+            })
+        })
+        .collect();
+    let auxiliary = json!({"initial_unique_vertex_count":d.initial_unique_vertex_count,
+        "initial_edges_not_used_twice":edges,"enclosed":d.initially_closed,
+        "edges_winding_consistent":d.edges_winding_consistent,
+        "floor_horizontal":d.floor_horizontal,"roof_horizontal":d.roof_horizontal,
+        "walls_vertical":d.walls_vertical,"same_wall_height":d.same_wall_height,
+        "signed_polyhedron_volume_m3":d.signed_polyhedron_volume_m3.map(scalar),
+        "topology_rejection":d.topology_rejection,
+        "volume_calculation_count":state.volume_calculation_count,
+        "method":"actual Rust owner numerical observations; not C++ internal local trace or warning counters"});
+    Ok((zone_json(&state, typed), snapshots, auxiliary))
+}
+
 fn execute(input: &Value) -> Result<Value, String> {
     if input["schema"] != "geo03-helper-cases.v1" {
         return Err("expected schema geo03-helper-cases.v1".into());
@@ -254,34 +365,28 @@ fn execute(input: &Value) -> Result<Value, String> {
             "name":surface.name.0,"class":format!("{:?}",surface.surface_type),
             "input_vertex_bits":surface.vertices.iter().map(|p| [bits(p.x_m),bits(p.y_m),bits(p.z_m)]).collect::<Vec<_>>()
         })).collect();
-        let summary = if paired {
-            zone_geometry_summaries(&typed).into_iter().next()
+        let (zone, source_state, auxiliary) = if paired {
+            execute_owner(case, &typed)?
         } else {
-            None
+            (Value::Null, Value::Null, Value::Null)
         };
-        let zone = summary.map(|summary| json!({
-            "id":summary.zone_id.0,"name":summary.zone_name,"surface_count":summary.surface_count,
-            "volume_m3":summary.volume_m3.map(scalar),"floor_area_m2":scalar(summary.floor_area_m2)
-        }));
         results.push(json!({
             "case_id":case_id,"kind":kind,"input":case,
-            "status":if paired {"baseline_partial"} else {"unsupported_source_only"},
-            "route":"ep_runtime::geometry::zone_geometry_summaries",
+            "status":if paired {"source_complete"} else {"unsupported_source_only"},
+            "route":if paired {"ep_runtime::geometry::prepare_zone_height + calculate_zone_volume"} else {"unsupported-source-only-original-diagnostic"},
             "zone":zone,"typed_surface_order":typed_surface_order,
             "numeric_input_identity_checked":true,"canonical_coordinate_conversion_claimed":false,
-            "prepared_read_fields_consumed":false,"original_parser_admission_claimed":false,
-            "admission_checked":false,"source_state_observed":false,"physics_executed":false,
-            "unconsumed_prepared_input_groups":["prepared_zone","prepared_implicit_space"],
-            "source_state":null,
-            "unavailable_source_state_phases":["geometry_prepared","before_volume","after_volume","after_second_volume"],
-            "unimplemented_fields":["ceiling_height_m","ceiling_height_entered","user_entered_floor_area_m2",
-                "geometric_floor_area_m2","ceiling_area_m2","geometric_ceiling_area_m2","has_floor","has_roof",
-                "closed_topology_admission","mutable_before_after_second_volume_state"],
+            "prepared_read_fields_consumed":paired,"original_parser_admission_claimed":false,
+            "admission_checked":paired,"source_state_observed":paired,"physics_executed":false,
+            "unconsumed_prepared_input_groups":["prepared_implicit_space"],
+            "source_state":source_state,"auxiliary_rust_helpers":auxiliary,
+            "unavailable_source_state_phases":if paired {json!([])} else {json!(["geometry_prepared","declared_pre_volume_read_fields","before_volume","after_volume","after_second_volume"])},
+            "unimplemented_fields":if paired {json!([])} else {json!(["source-only open/reversed/duplicated topology fallback and diagnostics"])},
             "source_only_state_unpaired":["implicit Space","global counters","warning/error IO","source scratch allocations"]
         }));
     }
     Ok(
-        json!({"schema":"geo03-helper-results.v1","implementation_stage":"baseline_public_summary",
+        json!({"schema":"geo03-helper-results.v1","implementation_stage":"canonical_owned_state",
         "cases":results,"reference_outputs_supplied_to_Rust":false,"expected_answers_supplied":false,
         "original_parser_admission_claimed":false,"physics_executed":false,"gates_updated":false}),
     )

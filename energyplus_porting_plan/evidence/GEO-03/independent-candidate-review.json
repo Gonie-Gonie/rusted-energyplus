@@ -1,0 +1,139 @@
+{
+  "schema": "geo03-independent-candidate-data-review.v1",
+  "status": "pass-candidate-data-integrity-no-committed-card-certification",
+  "review_completed_utc": "2026-10-07T22:52:41.443765+00:00",
+  "reviewed_actual_comparison_command": {
+    "path": ".runtime/porting/GEO-03/candidate-comparison-command-02/receipt.json",
+    "sha256": "67fa5e9c371ad349effdc04365b8dfc040fc5e51ef77a8e5e40b66b7ea17d03f"
+  },
+  "reviewed_actual_comparison_stdout": {
+    "path": ".runtime/porting/GEO-03/candidate-comparison-command-02/stdout.log",
+    "sha256": "2cb4a1714a7d241494b23c768c97a89cb905e12354d940575ec8a03482427738"
+  },
+  "actual_comparator_exit_code": 0,
+  "actual_comparison_status": "pass",
+  "reviewed_actual_Rust_execution": {
+    "path": ".runtime/porting/GEO-03/rust-candidate-02/execution.json",
+    "sha256": "4e340bb82a4eef2827c2004a0f557cf8917f969d30d36970d4e0c943b24da632"
+  },
+  "actual_Rust_example_exit_code": 0,
+  "reviewed_build": {
+    "path": ".runtime/porting/GEO-03/builds/candidate-44fa2408-02/build-receipt.json",
+    "sha256": "e88b077600afb2658b8c79a8b306d1318744926215e0aee4ff5686505bdbbbf2"
+  },
+  "archived_binary": {
+    "path": ".runtime/porting/GEO-03/builds/candidate-44fa2408-02/geo03_tuples.exe",
+    "sha256": "831d3e0ec8b6bb86067fdff86a82c417cfca7920f501690abdc455212d198ccb"
+  },
+  "prior_actual_build_review": {
+    "path": ".runtime/porting/GEO-03/independent-candidate-build-review-02/review.json",
+    "sha256": "d685f965ea01530b6748f6ed10b87c78450a101318399dbf1a946cbbc9898add"
+  },
+  "prior_static_tool_review": {
+    "path": ".runtime/porting/GEO-03/independent-unit-tool-review-03/review.json",
+    "sha256": "50050363ec271b045f658b749e0d2f184ae10030fc4d5955e7d069a29e43c05b"
+  },
+  "prior_canonical_source_review": {
+    "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/review.json",
+    "sha256": "70fc4fad0a8a22e92a8698c51c8dba334dafabec41903b5b3ca5375667bf9ee1"
+  },
+  "executed_comparison_sources": [
+    {
+      "historical_path": "tools/porting/check_geo03_units.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-candidate-data-review-02/source/check_geo03_units.py",
+        "sha256": "b14cd98170747bffccf8fcf9bfc1fda3a73432e9a01bf171c5eb46e5c01024cf"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/independent-candidate-data-review-02/source/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "frozen_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "frozen_input_request": {
+    "path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+    "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+  },
+  "reviewed_original_first": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "reviewed_original_data_review": {
+    "path": ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+    "sha256": "bc6b46a46c1e6d34aab4e8b8f701e614728c1a53839beda43aa9bc2df5723f11"
+  },
+  "actual_comparison_checks": 2672,
+  "actual_comparison_mismatches": 0,
+  "retained_actual_scalar_error_metrics": {
+    "m3": {
+      "count": 96,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    },
+    "m": {
+      "count": 80,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    },
+    "m2": {
+      "count": 880,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "paired_closed_helpers": 16,
+  "source_only_helpers": 3,
+  "actual_owner_phase_count": 5,
+  "exact_observed_Zone_scalar_bit_pairs": 560,
+  "typed_Zone_flag_pairs": 240,
+  "exact_observed_incoming_area_Gross_Newell_pairs": 480,
+  "exact_auxiliary_signed_volume_bit_pairs": 16,
+  "exact_ordered_coordinate_bit_pairs": 5760,
+  "unpaired_source_only_case_ids": [
+    "SOURCE-ONLY-MISSING-ROOF",
+    "SOURCE-ONLY-REVERSED-WINDING",
+    "SOURCE-ONLY-DUPLICATE-WALL"
+  ],
+  "source_worktree_clean": false,
+  "committed_source_certification": false,
+  "implementation_commit": null,
+  "available_Rust_source_count": 3651,
+  "reference_occurrences_hash_checked": 7529,
+  "distinct_hash_checked_files": 3818,
+  "scope_limits": [
+    "This is actual dirty-candidate numerical evidence, not final committed card/gate certification or actual normal CLI physics proof.",
+    "Only observed bit/type/input/state/order identities were independently read. Reported max errors/RMSE and fixed-tolerance outcomes were retained without rerunning the comparer or recomputing geometry.",
+    "Prepared areas remain declared input reads; original normal parser producer/consumer proof is separate.",
+    "Source-only3, implicit Space, original ErrCount5/global/warning IO/scratch and fallback lifetimes remain unpaired; no source counters were inferred.",
+    "Available source inventory is not compiler file-selection evidence. Incoming angles were codec-checked only, not newly scientifically paired."
+  ],
+  "engines_Cargo_Git_or_scientific_comparers_executed_by_review": false,
+  "geometry_math_recomputed_by_review": false,
+  "reference_outputs_supplied_to_Rust": false,
+  "gates_updated": false,
+  "executed_independent_data_reader": {
+    "path": ".runtime/porting/GEO-03/independent-candidate-data-review-02/review_data.py",
+    "sha256": "4081138a09e9395dbae929dcc4572e3f692f23c825a71810a57f6b7258b3c29f"
+  },
+  "raw_independent_review": {
+    "path": ".runtime/porting/GEO-03/independent-candidate-data-review-02/review.json",
+    "sha256": "3127ee9b45aab837bb20b28a885a72c55cd74f60871eb59a9a66b65a4a22d4fb"
+  }
+}

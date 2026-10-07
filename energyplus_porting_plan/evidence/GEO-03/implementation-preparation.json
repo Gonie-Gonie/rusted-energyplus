@@ -1,0 +1,98 @@
+{
+  "schema": "geo03-implementation-preparation.v1",
+  "card": "GEO-03",
+  "checks": {
+    "workspace_tests": {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "-j",
+        "2"
+      ],
+      "actual_exit_code": 0,
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-02/receipt.json",
+        "sha256": "7ff785832dfac9e45eebf0b44b360152300930de2a889a820ed2fb92843279b4"
+      }
+    },
+    "clippy": {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "actual_exit_code": 0,
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/clippy-01/receipt.json",
+        "sha256": "184fd6d91e63becc3c09dfbd0ab14d6b90cddf57e776c7c470d5267556e26f9a"
+      }
+    },
+    "source_quality": {
+      "command": [
+        ".\\scripts\\dev.cmd",
+        "source-quality-gate"
+      ],
+      "actual_exit_code": 0,
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/source-quality-02/receipt.json",
+        "sha256": "d4ce22d80d8d65fd8c7a9edbc882453a4368bf3430ff5c7a6d47cf6dd33e309c"
+      }
+    },
+    "heat_balance_structure": {
+      "command": [
+        ".\\scripts\\dev.cmd",
+        "heat-balance-structure-audit"
+      ],
+      "actual_exit_code": 0,
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/structure-audit-01/receipt.json",
+        "sha256": "419375a407e82c1057e1f38fce86bcc813428b603f21b3b344b7e30adf5b90e7"
+      }
+    }
+  },
+  "workspace_tests_passed": 4548,
+  "workspace_tests_failed": 0,
+  "candidate_unit": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/candidate-unit.json",
+    "sha256": "3c9273ee44658539ed5af0f33b8c9ddf74903f6004165f860c9617ba4633924f"
+  },
+  "candidate_independent_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-candidate-review.json",
+    "sha256": "8bec4a625ba67f3e01597f6cd92dbab6432e0d44825799ea595286e14c774662"
+  },
+  "canonical_source_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-canonical-source-review.json",
+    "sha256": "8227d6a62451eb2dfcbfd0be1d02147eaacbbe6b8b027570cedf00a905d1620e"
+  },
+  "fixture_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-fixture-review.json",
+    "sha256": "34e3286844a64ee8d94c8f744154bd3cff2f2556f1a9aad0ea0e6d3dd5fc2747"
+  },
+  "integration_review": {
+    "path": ".runtime/porting/GEO-03/independent-root-integration-review-01/review.json",
+    "sha256": "19b1b2f0df3997625d7000b93b496b58b9ebe3a36de29ac195d7a57952d4bb64"
+  },
+  "unit_tool_review": {
+    "path": ".runtime/porting/GEO-03/independent-unit-tool-review-03/review.json",
+    "sha256": "50050363ec271b045f658b749e0d2f184ae10030fc4d5955e7d069a29e43c05b"
+  },
+  "production_tool_review": {
+    "path": ".runtime/porting/GEO-03/independent-production-tool-review-01/review.json",
+    "sha256": "2f8b656b114a497e8eee6f09855d2ae6d54a557787aa577a6e575642b4f29335"
+  },
+  "Rust_launcher_review": {
+    "path": ".runtime/porting/GEO-03/independent-Rust-launcher-review-01/review.json",
+    "sha256": "d8ecf9cebc3ee8b0754236f41691413db83f520c8ce627306573567793523fbb"
+  },
+  "final_committed_unit_pending": true,
+  "final_committed_production_pending": true,
+  "gates_updated": false,
+  "claim_boundary": "Prepared implementation and non-gate candidate mathematical evidence; final committed scientific execution is pending."
+}

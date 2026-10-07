@@ -1,0 +1,58 @@
+{
+  "schema": "geo03-independent-legacy-fixture-static-review.v1",
+  "status": "pass-fixture-only-amendment-before-Root-test-rerun",
+  "review_completed_utc": "2026-10-07T22:56:14.049282+00:00",
+  "reviewed_amendment": {
+    "path": ".runtime/porting/GEO-03/legacy-fixture-amendment-01/classification.json",
+    "sha256": "43e1cf5bebb2542bb98a8e18b82652109a72c96b4837998064b8a671a33c3674"
+  },
+  "reviewed_failed_workspace_command": {
+    "path": ".runtime/porting/GEO-03/workspace-tests-01/receipt.json",
+    "sha256": "30596cadd1f4ae9574f789dfbc63cb4a7d42d7f0b020eff63afef457bcd6b6fb"
+  },
+  "actual_prior_test_exit": 101,
+  "actual_prior_runtime_passed": 2870,
+  "actual_prior_runtime_failed": 69,
+  "observed_failure_categories": {
+    "inconsistent_edge_winding": 5,
+    "missing_summary_volume": 3,
+    "nonpositive_signed_volume": 57,
+    "masked_construction_or_material_error_assertion": 4
+  },
+  "changed_owner": "crates/ep_runtime/src/runtime/tests/part09.rs",
+  "prior_source_snapshot_fixture_bytes_match": true,
+  "exact_byte_conservation_after_removing_one_fixture_declaration_change_and_new_regression": true,
+  "unchanged_prior_canonical_source_review": {
+    "path": ".runtime/porting/GEO-03/independent-canonical-source-review-01/review.json",
+    "sha256": "70fc4fad0a8a22e92a8698c51c8dba334dafabec41903b5b3ca5375667bf9ee1"
+  },
+  "unchanged_canonical_source_count": 17,
+  "separate_Root_test_only_lint_annotation": {
+    "historical_path": "crates/ep_runtime/src/geometry/zone_volume_trace.rs",
+    "sha256": "9b34b265d79d002baf7e2eee6b547c9755aedd01235f8b6ba3436549091d216e",
+    "production_body_unchanged": true,
+    "change": "clippy::panic reason on the existing caller-unwind observer test only"
+  },
+  "preserved_initial_conservation_reader": {
+    "path": ".runtime/porting/GEO-03/independent-legacy-fixture-review-01/review_fixture.py",
+    "sha256": "3e712f9df1a56cb62e61526efc171f33a809e4d158ffc747c6c687c9d4c49b6b"
+  },
+  "initial_reader_failure": "Broader18-file byte identity correctly detected the separate Root test-only clippy annotation; the new scoped review preserves that distinction.",
+  "candidate_math_evidence_retains_its_pre_amendment_source_snapshot": {
+    "path": ".runtime/porting/GEO-03/independent-candidate-data-review-02/review.json",
+    "sha256": "3127ee9b45aab837bb20b28a885a72c55cd74f60871eb59a9a66b65a4a22d4fb"
+  },
+  "scope_limits": [
+    "Static fixture review is not test rerun success, final committed numerical/production evidence or a gate update.",
+    "Original open/inward fallback and warning/Space/global state remain unpaired; ordinary original duplicate-wall fallback is not made a Rust error-parity claim.",
+    "No source contract/tolerance/reference case/production formula changed."
+  ],
+  "tests_or_engines_Cargo_Git_executed_by_review": false,
+  "geometry_math_recomputed_by_review": false,
+  "gates_updated": false,
+  "material_blockers": [],
+  "raw_independent_review": {
+    "path": ".runtime/porting/GEO-03/independent-legacy-fixture-review-02/review.json",
+    "sha256": "ac2fa0a5b6a2f389c3b8486c6e32d94cf1f322ee65fe123d50f20ef27ff66f0e"
+  }
+}

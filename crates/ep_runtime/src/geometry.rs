@@ -3,9 +3,16 @@
 pub(crate) mod centroid_precision;
 pub mod production_trace;
 mod source_geometry;
+mod zone_volume;
+pub mod zone_volume_trace;
 pub use source_geometry::{
     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
     surface_geometry_properties,
+};
+pub use zone_volume::{
+    ZONE_GEOMETRY_AUTO_CALCULATE, ZoneGeometryProperties, ZoneVolumeDiagnostics, ZoneVolumeEdge,
+    ZoneVolumeError, ZoneVolumeFace, calculate_zone_volume, prepare_zone_height,
+    zone_geometry_input_value, zone_geometry_properties,
 };
 /// Actual original product precision observed for the bounded centroid owner.
 pub const SOURCE_CENTROID_PRODUCT_PRECISION_BITS: u32 =
@@ -93,64 +100,9 @@ fn exterior_wall_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
 }
 
 pub(crate) fn zone_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
-    if let AutoOrNumber::Value(volume_m3) = zone.volume
-        && volume_m3 > 0.0
-    {
-        return Some(volume_m3);
-    }
-
-    if let Some(volume_m3) = bounding_box_volume_m3(model, zone)
-        && volume_m3 > 0.0
-    {
-        return Some(volume_m3);
-    }
-
-    let AutoOrNumber::Value(ceiling_height_m) = zone.ceiling_height else {
-        return None;
-    };
-    if ceiling_height_m <= 0.0 {
-        return None;
-    }
-    let floor_area_m2 = zone_floor_area_m2(model, zone);
-    if floor_area_m2 > 0.0 {
-        Some(floor_area_m2 * ceiling_height_m)
-    } else {
-        None
-    }
-}
-
-fn bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
-    let mut bounds: Option<(f64, f64, f64, f64, f64, f64)> = None;
-    for surface in model
-        .surfaces
-        .iter()
-        .filter(|surface| surface.zone == zone.id)
-    {
-        for vertex in &surface.vertices {
-            let x = vertex.x_m + zone.origin.x_m;
-            let y = vertex.y_m + zone.origin.y_m;
-            let z = vertex.z_m + zone.origin.z_m;
-            bounds = Some(match bounds {
-                Some((min_x, max_x, min_y, max_y, min_z, max_z)) => (
-                    min_x.min(x),
-                    max_x.max(x),
-                    min_y.min(y),
-                    max_y.max(y),
-                    min_z.min(z),
-                    max_z.max(z),
-                ),
-                None => (x, x, y, y, z, z),
-            });
-        }
-    }
-
-    let (min_x, max_x, min_y, max_y, min_z, max_z) = bounds?;
-    let volume_m3 = (max_x - min_x) * (max_y - min_y) * (max_z - min_z);
-    if volume_m3 > 0.0 {
-        Some(volume_m3)
-    } else {
-        None
-    }
+    zone_geometry_properties(model, zone)
+        .ok()
+        .map(|state| state.volume_m3)
 }
 
 /// Calculates a polygon surface area from 3D vertices in square meters.
