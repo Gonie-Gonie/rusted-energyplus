@@ -1,0 +1,1194 @@
+{
+  "card": "GEO-03",
+  "created_utc": "2026-10-07T23:25:12.312186+00:00",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-03/final-evidence-writer-01/write_final_evidence.51342c8f.py",
+    "sha256": "51342c8f771a567a419c085ebccba35365259be3d99cd08dcc25ec8348002357"
+  },
+  "metadata_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    ".runtime/porting/GEO-03/final-evidence-writer-01/write_final_evidence.51342c8f.py",
+    "--unit-command",
+    ".runtime/porting/GEO-03/final-unit-comparison-command-01/receipt.json",
+    "--unit-report",
+    ".runtime/porting/GEO-03/final-unit-comparison-command-01/stdout.log",
+    "--unit-execution",
+    ".runtime/porting/GEO-03/rust-final-966af17a-01/execution.json",
+    "--production-command",
+    ".runtime/porting/GEO-03/production-comparison-command-03/receipt.json",
+    "--production-report",
+    ".runtime/porting/GEO-03/production-comparison-command-03/stdout.log",
+    "--matrix",
+    ".runtime/porting/GEO-03/production-966af17a-01/matrix.json",
+    "--unit-build",
+    ".runtime/porting/GEO-03/builds/final-966af17a-example-01/build-receipt.json",
+    "--cli-build",
+    ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+    "--final-build-review",
+    ".runtime/porting/GEO-03/independent-final-build-review-01/review.json",
+    "--final-data-review",
+    ".runtime/porting/GEO-03/independent-final-data-review-01/review.json",
+    "--final-handoff-review",
+    ".runtime/porting/GEO-03/independent-final-handoff-review-01/review.json",
+    "--unit-reader-archives",
+    ".runtime/porting/GEO-03/final-unit-reader-archives-01",
+    "--production-reader-archives",
+    ".runtime/porting/GEO-03/final-production-reader-archives-01",
+    "--preserved-reader-failure",
+    ".runtime/porting/GEO-03/production-comparison-command-01/receipt.json",
+    "--preserved-reader-failure",
+    ".runtime/porting/GEO-03/production-comparison-command-02/receipt.json",
+    "--reader-amendment-review",
+    ".runtime/porting/GEO-03/independent-production-phase-reader-review-01/review.json",
+    "--reader-amendment-review",
+    ".runtime/porting/GEO-03/independent-production-declared-volume-reader-review-01/review.json",
+    "--output-dir",
+    ".runtime/porting/GEO-03/final-evidence-01",
+    "--write-tracked"
+  ],
+  "implementation_commit": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+  "crates_tree": "c5120d6a1b6210c0badca9df98e46fa756f762dc",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "scientific_gates_updated": false,
+  "reference_outputs_supplied_to_Rust": false,
+  "schema": "geo03-actual-command-evidence.v1",
+  "status": "recorded-only",
+  "comparison_commands": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/final-unit-comparison-command-01/receipt.json",
+        "sha256": "9e46117a4e13d1c11a5f186ddca605043dfe82209f814414564645870d96b216"
+      },
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/porting/check_geo03_units.py",
+        "--original-first",
+        ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+        "--native-output",
+        ".runtime/porting/GEO-03/original-helper-first-01/helper-results.json",
+        "--original-review",
+        ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+        "--rust-execution",
+        ".runtime/porting/GEO-03/rust-final-966af17a-01/execution.json"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/final-unit-comparison-command-01/stdout.log",
+        "sha256": "3197655c808bfe283c4d6cb43e74c684798fe099c91a189d8b0948e38f60b9f4"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/final-unit-comparison-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      }
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/production-comparison-command-03/receipt.json",
+        "sha256": "fdff675395e4a65b2449218b1fef119bf6ff5a1015d20b9f678cf0442823e8b8"
+      },
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/porting/check_geo03_production.py",
+        "--matrix",
+        ".runtime/porting/GEO-03/production-966af17a-01/matrix.json"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-comparison-command-03/stdout.log",
+        "sha256": "8552f3947933f5ea87c233d34c6c56a05f51d5437b1d3085ebd9c901aa995da3"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-comparison-command-03/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": false
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": false
+        }
+      }
+    }
+  ],
+  "builds": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-example-01/build-receipt.json",
+        "sha256": "8091837ec3377a9c94a06a3014b1c5211e42d2c656fd1e8d8b76b4ed26e9c41d"
+      },
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-example-01/geo03_tuples.exe",
+        "sha256": "b49d34da55633ef22d5a9c98397a15c103c8f21e29f9746c2860d6b3cdac7ee1"
+      },
+      "kind": "example",
+      "implementation_commit": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+      "crates_tree": "c5120d6a1b6210c0badca9df98e46fa756f762dc",
+      "source_worktree_clean": true,
+      "committed_source_certification": true,
+      "actual_build_command": [
+        "cargo",
+        "build",
+        "-p",
+        "ep_runtime",
+        "--example",
+        "geo03_tuples",
+        "-j",
+        "2",
+        "--message-format=json-render-diagnostics"
+      ],
+      "build_command": {
+        "path": ".runtime/porting/GEO-03/final-example-cargo-command-01/receipt.json",
+        "sha256": "b28522a9ad1d38cd094c8683c863bea2b003ccb37f135f9daae406ec06b85421"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "available_Rust_source_count": 3651,
+      "archived_source_vs_committed_blobs": {
+        "source_count": 3651,
+        "exact_byte_matches": 3650,
+        "line_ending_only_differences": [
+          {
+            "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+            "archive": {
+              "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+              "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+            },
+            "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+            "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+            "difference": "Working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+          }
+        ],
+        "all_other_content_exact": true,
+        "scope": "Archived available Rust-source inventory versus committed blobs; not compiler file-selection evidence"
+      },
+      "source_inventory_scope": "Archived available Rust source; compiler file selection unclaimed"
+    },
+    {
+      "receipt": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "kind": "cli",
+      "implementation_commit": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+      "crates_tree": "c5120d6a1b6210c0badca9df98e46fa756f762dc",
+      "source_worktree_clean": true,
+      "committed_source_certification": true,
+      "actual_build_command": [
+        "cargo",
+        "build",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "-j",
+        "2",
+        "--message-format=json-render-diagnostics"
+      ],
+      "build_command": {
+        "path": ".runtime/porting/GEO-03/final-cli-cargo-command-01/receipt.json",
+        "sha256": "9e6ff6e1643a0c6e80580cdcd9a83840a1606e43a769d4a39d4de61256c5d6ab"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "available_Rust_source_count": 3651,
+      "archived_source_vs_committed_blobs": {
+        "source_count": 3651,
+        "exact_byte_matches": 3650,
+        "line_ending_only_differences": [
+          {
+            "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+            "archive": {
+              "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+              "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+            },
+            "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+            "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+            "difference": "Working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+          }
+        ],
+        "all_other_content_exact": true,
+        "scope": "Archived available Rust-source inventory versus committed blobs; not compiler file-selection evidence"
+      },
+      "source_inventory_scope": "Archived available Rust source; compiler file selection unclaimed"
+    }
+  ],
+  "actual_engine_commands": [
+    {
+      "kind": "unit-helper",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/rust-final-966af17a-01/execution.json",
+        "sha256": "13062883e17ffe6be1c8af081d1437ca410b18c2a4377d5dcb2182537ec4ec66"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/rust-final-966af17a-01/command/receipt.json",
+        "sha256": "cb07cda46fd34279930d27dbb191dbb327d07d382a09a3ca7c92d99e096bf26f"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-example-01\\geo03_tuples.exe",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\GEO-03\\helper-request.json"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:07:28.438477+00:00",
+      "finished_utc": "2026-10-07T23:07:29.418684+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-example-01/geo03_tuples.exe",
+        "sha256": "b49d34da55633ef22d5a9c98397a15c103c8f21e29f9746c2860d6b3cdac7ee1"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-example-01/build-receipt.json",
+        "sha256": "8091837ec3377a9c94a06a3014b1c5211e42d2c656fd1e8d8b76b4ed26e9c41d"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/rust-final-966af17a-01/command/stdout.log",
+        "sha256": "e668dcace4745bb4d6be9557ba79531240062c3df1582102e90dbe4d44927c78"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/rust-final-966af17a-01/command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/rust-final-966af17a-01/run_unit.py",
+        "sha256": "2d303f9c7f162b9b0be33147fbee8d67e0f03f2c88ab3cb58e7fe5ceb447f9d8"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "input_request": {
+        "path": "energyplus_porting_plan/cases/GEO-03/helper-request.json",
+        "sha256": "8b02d3d8a15ce8d782da5a5e6bae07a57d9e94c18a7f524aa45b2a4f533561d6"
+      }
+    },
+    {
+      "kind": "physical",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/full-execution.json",
+        "sha256": "c3843044b62216a98b2206e9dc03f8104e0dee076576056e30521ee68f5cdff4"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/full-command/receipt.json",
+        "sha256": "e88e99e9f740a200c63481de4926c32f0001961c7dbb1b5a386cd34f2fa5b697"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\A-24H\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:08:11.179925+00:00",
+      "finished_utc": "2026-10-07T23:08:12.770716+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/full-command/stdout.log",
+        "sha256": "33823b2ebbf4baa84e5d6b7a7c5c08a5eb312a2d0e12d763747d62d927d10403"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "A-24H",
+      "trace_level": "Full",
+      "configured_porting_scope": "A",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/full/run-summary.json",
+        "sha256": "ac2ec927ce85becbc5488316dce0671c8da83199deeb875c41429ebb27c3bc59"
+      },
+      "status": "success",
+      "message": "arbitrary run completed"
+    },
+    {
+      "kind": "physical",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/summary-execution.json",
+        "sha256": "b39ef1274c7f7464c364042e2f57985f2895612ac222d9c39c3df8184924d006"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/summary-command/receipt.json",
+        "sha256": "63836411040c18707dd8aab8ddbb3e6f193894033dd20013b9d7ef4053f18df3"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\A-24H\\summary",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:08:24.443180+00:00",
+      "finished_utc": "2026-10-07T23:08:24.940363+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/summary-command/stdout.log",
+        "sha256": "3dddb9bcdd114bab6f9c50cab0466a4de1f6c9a7afdf84a0a28e276b55fe9b1e"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/summary-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "A-24H",
+      "trace_level": "Summary",
+      "configured_porting_scope": "A",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/summary/run-summary.json",
+        "sha256": "4f6170502bb5971434a424962825ade6bb6423637184f516073c085aafa7aa1c"
+      },
+      "status": "success",
+      "message": "arbitrary run completed"
+    },
+    {
+      "kind": "physical",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/full-execution.json",
+        "sha256": "039d7e23cb72dad7fb176a672caf6910d7c2c44941cc4693678cbbb06e69e2ca"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/full-command/receipt.json",
+        "sha256": "f50dcaa9ad1dbe69bbbefd7ffb4b31e2f3054809c6c69e0a93f0efae9e43813e"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\A-72H\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:08:36.626155+00:00",
+      "finished_utc": "2026-10-07T23:08:37.995697+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/full-command/stdout.log",
+        "sha256": "45b80996c1da6bf22dc96ae714290eee6a4f7bc3430c9d08c712b8a499f95dbd"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "A-72H",
+      "trace_level": "Full",
+      "configured_porting_scope": "A",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/full/run-summary.json",
+        "sha256": "e55817ba374680f318f9a4a6834b0bb5bc8b8b6ed87d3e9228fb39e58c538614"
+      },
+      "status": "success",
+      "message": "arbitrary run completed"
+    },
+    {
+      "kind": "physical",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/summary-execution.json",
+        "sha256": "63ea9c9882967242f357e75a9f50f3e7136dbd3a9ca52950c7c4cec842bea25b"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/summary-command/receipt.json",
+        "sha256": "e413d35ae2861ced72cdb5b4530d1218b99b1f9d80421ccb6b069785168d8d4d"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\A-72H\\summary",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:08:49.625962+00:00",
+      "finished_utc": "2026-10-07T23:08:50.175843+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/summary-command/stdout.log",
+        "sha256": "e0b39d189baf5194afe3530083368aa7dda5cd3afb7e9dd106bc8ca1ceb6ec68"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/summary-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "A-72H",
+      "trace_level": "Summary",
+      "configured_porting_scope": "A",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/summary/run-summary.json",
+        "sha256": "95d0e89a57d5a466de529151710f4210d6f490e1ed9a3c2407a7d56147d2b446"
+      },
+      "status": "success",
+      "message": "arbitrary run completed"
+    },
+    {
+      "kind": "physical",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/full-execution.json",
+        "sha256": "b791f4945e925cb2c9556eea4d89a362e2aae1badff7d9502848ae95f0501702"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/full-command/receipt.json",
+        "sha256": "8506f707e00646876eb7e4be01b95539ba3f4868b2f7896e93980ffddb25e949"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\B-BOTH-24H\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "B"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:09:01.673671+00:00",
+      "finished_utc": "2026-10-07T23:11:20.651395+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/full-command/stdout.log",
+        "sha256": "4def1d14ca37dfe6db9162b1149bfe975dd9c0ba40c4d6f3422a095a9de84e13"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Full",
+      "configured_porting_scope": "B",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/full/run-summary.json",
+        "sha256": "ffb75bad530a385d03a78cd7eb4a7b71ae9207c051337f9b50503d31a914db94"
+      },
+      "status": "success",
+      "message": "arbitrary run completed"
+    },
+    {
+      "kind": "physical",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/summary-execution.json",
+        "sha256": "279aed8d577bd6a03e1b106b188f7d9ba878ff46f7588de0cf4e5da75c9592d8"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/summary-command/receipt.json",
+        "sha256": "e6a9ce63b43e156574fccb6ae482f8c37cd29b9d652e58e8734d4e53c32ad8c6"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\B-BOTH-24H\\summary",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary",
+        "--porting-scope",
+        "B"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-07T23:11:32.220687+00:00",
+      "finished_utc": "2026-10-07T23:13:02.940570+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/summary-command/stdout.log",
+        "sha256": "83b51e0d12c81d5327584290b48ad7933bbd78056ca36f4ed8dc4d5660bb4773"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/summary-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Summary",
+      "configured_porting_scope": "B",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/summary/run-summary.json",
+        "sha256": "c6cff5ab303ae28a766f615ae0884bd16e10301c54534307773317c4719b2402"
+      },
+      "status": "success",
+      "message": "arbitrary run completed"
+    },
+    {
+      "kind": "ordinary-topology-negative",
+      "execution": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/GEO03-A-TOPOLOGY-DUPLICATE-WALL/full-execution.json",
+        "sha256": "5d2c73c71972b3119747e32d62b6fe6c8b1a67842aa76ef8536f2d46e6b42ad1"
+      },
+      "command_receipt": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/GEO03-A-TOPOLOGY-DUPLICATE-WALL/full-command/receipt.json",
+        "sha256": "d617d618255b0d709727ed631c718022271da565e2edababc04cc3090b835ee3"
+      },
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\builds\\final-966af17a-cli-01\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\GEO-03\\GEO03-A-TOPOLOGY-DUPLICATE-WALL\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\GEO-03\\production-966af17a-01\\GEO03-A-TOPOLOGY-DUPLICATE-WALL\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 6,
+      "started_utc": "2026-10-07T23:13:14.540684+00:00",
+      "finished_utc": "2026-10-07T23:13:15.074968+00:00",
+      "binary": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+        "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+      },
+      "build": {
+        "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+        "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+      },
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/GEO03-A-TOPOLOGY-DUPLICATE-WALL/full-command/stdout.log",
+        "sha256": "a8c2a77336b4d11d04044cf47eb750d97e275e290a234838a66497fc12296eef"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/GEO03-A-TOPOLOGY-DUPLICATE-WALL/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "source_capture": {
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+          "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+        },
+        "source_bytes_match_before_and_after": true,
+        "repository_before": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        },
+        "repository_after": {
+          "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+          "worktree_clean": true
+        }
+      },
+      "executed_launcher": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/source/run_geo03_rust.py",
+        "sha256": "6f865212391fa8f102b75c6da5895c34a5fe72dea6392f7aead4dfd8547569e0"
+      },
+      "actual_executed_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "case_id": "GEO03-A-TOPOLOGY-DUPLICATE-WALL",
+      "trace_level": "Full",
+      "configured_porting_scope": "A",
+      "input": {
+        "path": "energyplus_porting_plan/cases/GEO-03/GEO03-A-TOPOLOGY-DUPLICATE-WALL/input.idf",
+        "sha256": "84cb81aacd5ccb92cd1c3f15168d3c211ee86b9346f3e0a37745a536d82f2898"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/GEO-03/GEO03-A-TOPOLOGY-DUPLICATE-WALL/metadata.json",
+        "sha256": "8c50972c35f2eeabb95d3874a7391d4724e15932dfad5d54994ef85b6d6d34d4"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/GEO03-A-TOPOLOGY-DUPLICATE-WALL/full/run-summary.json",
+        "sha256": "831de0f9794e244c39af2c7d5a7356fe2aaa922e78c23418b1194025a892fe82"
+      },
+      "status": "runtime",
+      "message": "Rust runtime failed"
+    }
+  ],
+  "actual_ordinary_CLI_command_count": 7,
+  "actual_helper_command_count": 1,
+  "preserved_history": {
+    "retained_compact_history": {
+      "baseline.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/baseline.json",
+        "sha256": "3e8cc53dc40ceee6f2524be5ff26367006516387a614f5a7afec30c07e781e7d"
+      },
+      "candidate-unit.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/candidate-unit.json",
+        "sha256": "3c9273ee44658539ed5af0f33b8c9ddf74903f6004165f860c9617ba4633924f"
+      },
+      "implementation-preparation.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/implementation-preparation.json",
+        "sha256": "7e1ba804bb6543faacd175efad0a179eb176e40c29a727df8942f202e1099f01"
+      },
+      "original-first.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/original-first.json",
+        "sha256": "87c65c223f73532f3052b8a8dbceee7c91fb615eb7c40c3ce14373689c93ffd0"
+      },
+      "independent-fixture-review.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/independent-fixture-review.json",
+        "sha256": "34e3286844a64ee8d94c8f744154bd3cff2f2556f1a9aad0ea0e6d3dd5fc2747"
+      }
+    },
+    "baseline_comparison": {
+      "status": "fail-incomplete",
+      "actual_exit_code": 1,
+      "checks": 582,
+      "mismatch_count": 195,
+      "mismatch_categories": {
+        "missing_required_owner_observation": 192,
+        "numerical_tolerance": 3
+      },
+      "scalar_error_metrics": {
+        "m3": {
+          "count": 16,
+          "maximum_absolute_error": 26.000000000000007,
+          "rmse": 6.623820649745887
+        },
+        "m2": {
+          "count": 16,
+          "maximum_absolute_error": 0.0,
+          "rmse": 0.0
+        }
+      },
+      "recorded_command": {
+        "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/receipt.json",
+        "sha256": "9f4e909188a95849b4c09459372a745b4ad96b710030f2da2f9e93f7a3659c06"
+      },
+      "raw_report": {
+        "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/stdout.log",
+        "sha256": "1554a5dc06abc41ec66590630e32ce1dd7b58d14892df3132f3da15b46cfef1b"
+      },
+      "executed_reader_historical_resolution": {
+        "historical_path": "tools/porting/check_geo03_units.py",
+        "sha256": "4b8774e6f4ccb792b6446f4af7c13d8d6b29a43e67f36ba153b9a4a3b566214d",
+        "matching_archive": {
+          "path": ".runtime/porting/GEO-03/unit-checker-canonical-upgrade-01/check_geo03_units.4b8774e6.py",
+          "sha256": "4b8774e6f4ccb792b6446f4af7c13d8d6b29a43e67f36ba153b9a4a3b566214d"
+        },
+        "executed_path_relabelled": false
+      }
+    },
+    "initial_workspace_failure": {
+      "recorded_command": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-01/receipt.json",
+        "sha256": "30596cadd1f4ae9574f789dfbc63cb4a7d42d7f0b020eff63afef457bcd6b6fb"
+      },
+      "exit_code": 101,
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-01/stdout.log",
+        "sha256": "b3776233b48e1b118bdf943dd4f85d75f4b192ba7885e854d093f37ac6eb530f"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-01/stderr.log",
+        "sha256": "daa5db7c9cff5c584031719ba0f9775ebb9efdb8af516f62860ec553d052feaf"
+      }
+    },
+    "preserved_reader_failures": [
+      {
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-01/receipt.json",
+          "sha256": "85320ab83327e6b47ac66cfc700febcb5c7dc019bb0ea0c9cc0053003d53e89b"
+        },
+        "command": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/porting/check_geo03_production.py",
+          "--matrix",
+          ".runtime/porting/GEO-03/production-966af17a-01/matrix.json"
+        ],
+        "exit_code": 1,
+        "stdout": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-01/stdout.log",
+          "sha256": "003cd40e6cc2370ea7a811cc5a0e94834b82e5bbb09aa39f3e69fec392250671"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-01/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "source_capture": {
+          "source_snapshot": {
+            "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+            "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+          },
+          "source_bytes_match_before_and_after": true,
+          "repository_before": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": true
+          },
+          "repository_after": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": true
+          }
+        },
+        "raw_receipt_rewritten": false
+      },
+      {
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-02/receipt.json",
+          "sha256": "b0298e87c07f8a37855836a07619b9715aade40ef1fef21a20062f1d21004ede"
+        },
+        "command": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/porting/check_geo03_production.py",
+          "--matrix",
+          ".runtime/porting/GEO-03/production-966af17a-01/matrix.json"
+        ],
+        "exit_code": 1,
+        "stdout": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-02/stdout.log",
+          "sha256": "5ee670ff6de7bdff71a9542c0be96cd3b55ed3f9fb86d5e594936c49a5333fce"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-02/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "source_capture": {
+          "source_snapshot": {
+            "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+            "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+          },
+          "source_bytes_match_before_and_after": true,
+          "repository_before": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": false
+          },
+          "repository_after": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": false
+          }
+        },
+        "raw_receipt_rewritten": false
+      }
+    ],
+    "reader_amendment_reviews": [
+      {
+        "path": ".runtime/porting/GEO-03/independent-production-phase-reader-review-01/review.json",
+        "sha256": "84db22f6628f8eb39440dd35b394d41d27f8c764dc3ee77358c8805fa9289260"
+      },
+      {
+        "path": ".runtime/porting/GEO-03/independent-production-declared-volume-reader-review-01/review.json",
+        "sha256": "d7eb498ddaece65dba79a32cecceb1f835efda71c3030ac39f8cbd71b6727ce3"
+      }
+    ],
+    "historical_candidate_promoted_to_final_proof": false,
+    "raw_history_rewritten": false
+  },
+  "writer_launches_engines_or_comparers": false
+}

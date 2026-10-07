@@ -345,3 +345,60 @@ outward-normal dot products, SRC-05 atmospheric equations, native scratch/global
 state, new per-limit/B-72H/annual physics, or whole EnergyPlus conformance.
 The bounded results and actual commands are retained under
 `energyplus_porting_plan/evidence/GEO-02/`.
+
+
+## GEO-03 preserved zone-volume comparisons
+
+GEO-03 is closed for the frozen A/B projection in
+`energyplus_porting_plan/contracts/GEO-03-*.json`. Implementation
+`966af17aa5fc6bd68cddb9cfa23079dffc09ddc7` reuses owned GEO-02 geometry,
+source-ordered Wall/Floor/Roof faces and validated IDF declaration order. It
+preserves current positive volume, then entered-height/floor priority, then
+the signed binary64 pyramid sum. Bounding-box volume is no longer the
+canonical automatic owner.
+
+The genuine original helper executes 19 cases: 16 paired closed boxes and
+three source-only diagnostics. Twelve fresh original IDF lifetimes separately
+observe parser-produced areas/height flags and state retention. Original
+execution and independent review precede Rust numerical execution. Prepared
+helper areas remain declared input fields, not claims of parser producers.
+
+These read-only commands reuse existing outputs, launch no engines/Cargo and
+write no gates or comparison files:
+
+```powershell
+python -X utf8 -B tools/porting/check_geo03_units.py --original-first .runtime/porting/GEO-03/original-helper-first-01/helper-reference.json --native-output .runtime/porting/GEO-03/original-helper-first-01/helper-results.json --original-review .runtime/porting/GEO-03/independent-original-first-review-01/review.json --rust-execution .runtime/porting/GEO-03/rust-final-966af17a-01/execution.json
+python -X utf8 -B tools/porting/check_geo03_production.py --matrix .runtime/porting/GEO-03/production-966af17a-01/matrix.json
+```
+
+The committed unit comparison passes 2,672 checks with zero mismatches across
+ten Zone fields and five observed owner phases, including the four required
+phases and second-call positive-current-volume retention. Volume, area and
+height maximum error and RMSE are zero under the frozen dimensional profiles.
+The three unsafe helper routes, Space fields, source counters/IO/scratch and
+unsupported fallback remain unpaired.
+
+The actual production comparison passes 758 checks for A24/A72/BBoth24 Full
+and Summary, plus one ordinary automatic-topology diagnostic. Six successful
+CLI commands preserve ordinary output equality. Full copies ten actual
+initializer-return fields; only Volume is retained in zone state and passed
+to real capacity calculations. The actual updater phase and caller distinguish
+672 physical capacity calls covering 480 ordered zone intervals from report
+recomputation. No retained events are omitted. Summary emits no Full observer
+files and makes no direct ten-field claim.
+
+B's declared positive Volume remains exactly 1m3 despite its actual own winding
+and signed-volume diagnostics. This is explicit-volume priority, not automatic
+topology admission. The duplicate-wall automatic case rejects with Rust runtime
+exit 6 and zero actual zone hooks; the original warns and continues with exit
+0 and 96 callbacks. Exit/message/fallback equivalence is not claimed.
+
+Archived builds and available-source inventories bind the actual binaries;
+those inventories do not establish compiler file selection. The original
+baseline's missing state and three volume errors, the first 69 regression
+failures and two source-bound metadata-reader failures are retained. Reader
+repairs change no inputs, scientific kernels or tolerances. Compact final
+commands, comparisons and independent reviews are under
+`energyplus_porting_plan/evidence/GEO-03/`. They certify no general polyhedron,
+Space/global lifetime, AirPowerCap/rhoCp/multiplier/dt, ZON-02/SYS, B72/annual
+renewal or whole EnergyPlus physics.

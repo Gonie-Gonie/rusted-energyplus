@@ -21,8 +21,9 @@
 
 crates/ep_runtime/src/geometry.rs
 
-현재 Rust 기준 커밋: `d7b516627f421259012f3e61bc28cca831452468`. 위 경로는 재사용·확인할 위치이며
-이 카드의 새 검증이 통과했다는 의미가 아니다.
+계획 반입 시 재사용 기준은 `d7b516627f421259012f3e61bc28cca831452468`이었다.
+최종 구현 `966af17aa5fc6bd68cddb9cfa23079dffc09ddc7`은
+`geometry/zone_volume.rs`와 `zone_volume/topology.rs`의 실제 소유자를 사용한다.
 
 ## 입력 계약
 
@@ -37,8 +38,10 @@ crates/ep_runtime/src/geometry.rs
 192건을 기록했다. 수정한 candidate는 실제 2,672개 검사와 다섯 owner
 관측 단계에서 불일치 없이 통과했고, 체적·높이·면적의 최대오차와 RMSE는
 모두 0이다. `evidence/GEO-03/baseline.json`, `candidate-unit.json`과 각
-독립 검토에 보존했다. 최종 커밋의 단위·실행 연결 검증 전이며 아래 종료
-체크는 모두 대기 상태이다.
+독립 검토에 보존했다. 최종 커밋 단위 비교는 2,672개 검사, 실제 생산 연결
+비교는 758개 검사에서 불일치 없이 통과했다. `final-unit-comparison.json`,
+`production-comparison.json`, `actual-commands.json`, `independent-review.json`에
+원시 실행과 독립 검토를 연결했으며, 동결한 A/B 경계의 네 종료 gate를 닫았다.
 
 단위 입력은 여섯 개의 유효한 사각형 면으로 닫힌 하나의 직육면체와
 명시 Zone 숫자, 준비된 면적 읽기 필드이다. 준비된 면적은 입력으로 선언하며
@@ -89,7 +92,10 @@ CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다
 
 명시 체적/자동 체적; 동일 직육면체의 회전·이동; 비허용 형상 차단
 
-초안은 폐합 직육면체 16개와 원본 전용 진단 3개를 포함한다.
+최종 단위 비교는 폐합 직육면체 16개와 대응하지 않는 원본 전용 진단 3개를 포함한다.
+열 가지 Zone 필드, 별도 선언 읽기 단계를 포함한 다섯 관측 단계와
+두 번째 호출의 현재 양수 체적 유지를 검증했다. 체적·높이·면적의 최대오차와
+RMSE는 모두 0이며 입력 비트·플래그·면 순서는 정확히 대응한다.
 열린 존, 중복 면, 뒤집힌 winding의 원본 fallback이나 보정을 Rust의 정상 입력
 허용 또는 동일 오류 메시지로 간주하지 않는다. 뒤집힌 면 진단은 원본
 `GetVertices` 자동 방향 보정을 명시적으로 우회한 준비 상태 실험이다.
@@ -100,11 +106,18 @@ ZON-02 공기 열용량에 사용한 체적 비교
 
 실제 저장 체적이 초기화와 공기 열용량 소비자의 인수로 전달되는 연결만 검증한다.
 `AirPowerCap` 전체 식, 시스템 시간간격, 승수 및 ZON-02 수치 완료를 승격하지 않는다.
-새 실제 Rust 실행은 A-24H, A-72H, B-BOTH-24H의 Full/Summary 계획이며
+실제 Rust 실행은 A-24H, A-72H, B-BOTH-24H의 Full/Summary 여섯 명령이다.
+실제 갱신 구간·호출자·시간 문맥의 672개 공기 열용량 호출이 480개 순서 있는
+존 구간을 덮으며 누락은 없다. Full은 초기화가 반환한 열 가지 필드를 관찰하지만
+최종 존 상태에 저장되고 소비되는 필드는 체적뿐이다. Summary는 일반 출력의
+동일성과 Full 관측 파일의 부재만 확인하며 열 가지 필드의 직접 관측을 주장하지 않는다.
 B72·연간·각 제한 분기의 새 연결시험을 주장하지 않는다.
-별도의 일반 A24 중복 벽 입력은 여섯 유효 면을 유지하며 Rust의 실제
-체적 소유자가 존 물리 실행 전에 폐합되지 않은 형상을 차단해야 한다.
-원본은 경고 후 계속할 수도 있으므로 원본 종료 코드·오류 문구 일치는 요구하지 않는다.
+
+B의 양수 명시 체적 1m³는 선언·원본·반환·저장·실제 인수 비트가 같다.
+자체 진단의 winding 불일치와 부호 합 -1/3은 그대로 공개하며, 이를 자동 체적
+허용으로 해석하지 않는다. 별도의 일반 A24 중복 벽 입력은 실제 체적 소유자에서
+물리 실행 전 Runtime 종료 코드 6과 존 물리 루프 관측 0건으로 거부했다. 원본은 경고 후
+종료 코드 0과 96개 실제 콜백으로 계속했다. 종료 코드·문구·fallback 동등성은 요구하지 않는다.
 
 ## 정밀도 정책
 
@@ -116,13 +129,26 @@ B72·연간·각 제한 분기의 새 연결시험을 주장하지 않는다.
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+구현 커밋: `966af17aa5fc6bd68cddb9cfa23079dffc09ddc7`
+
+메타데이터 reader 수정 커밋: `6288c2b3153b7c4851efb387c585f0f68d56af7b`.
+실제 두 reader 실패는 보존했으며 수정은 계산·입력·허용치를 변경하지 않았다.
+
+시험 명령: `python -X utf8 -B tools/porting/check_geo03_units.py`와
+`python -X utf8 -B tools/porting/check_geo03_production.py`의 실제 인수·종료 코드는
+[actual-commands.json](../evidence/GEO-03/actual-commands.json)에 있다.
+
+증거: [source-review.md](../evidence/GEO-03/source-review.md),
+[final-unit-comparison.json](../evidence/GEO-03/final-unit-comparison.json),
+[production-comparison.json](../evidence/GEO-03/production-comparison.json),
+[independent-review.json](../evidence/GEO-03/independent-review.json).
+최종 전체 회귀시험 4,548개와 Clippy도 통과했다.
+
+최대오차/RMSE/상태 불일치: 비교한 체적·높이·면적은 0; 최종 단위 2,672개와
+생산 연결 758개 검사에서 불일치 0. Space·원본 전역 카운터·IO·임시 버퍼·보정과
+비허용 fallback은 대응하지 않으며 AirPowerCap/ZON-02/SYS·연간·전체 EP 인증으로 확장하지 않는다.

@@ -1,0 +1,598 @@
+{
+  "card": "GEO-03",
+  "created_utc": "2026-10-07T23:25:12.312186+00:00",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/GEO-03/final-evidence-writer-01/write_final_evidence.51342c8f.py",
+    "sha256": "51342c8f771a567a419c085ebccba35365259be3d99cd08dcc25ec8348002357"
+  },
+  "metadata_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    ".runtime/porting/GEO-03/final-evidence-writer-01/write_final_evidence.51342c8f.py",
+    "--unit-command",
+    ".runtime/porting/GEO-03/final-unit-comparison-command-01/receipt.json",
+    "--unit-report",
+    ".runtime/porting/GEO-03/final-unit-comparison-command-01/stdout.log",
+    "--unit-execution",
+    ".runtime/porting/GEO-03/rust-final-966af17a-01/execution.json",
+    "--production-command",
+    ".runtime/porting/GEO-03/production-comparison-command-03/receipt.json",
+    "--production-report",
+    ".runtime/porting/GEO-03/production-comparison-command-03/stdout.log",
+    "--matrix",
+    ".runtime/porting/GEO-03/production-966af17a-01/matrix.json",
+    "--unit-build",
+    ".runtime/porting/GEO-03/builds/final-966af17a-example-01/build-receipt.json",
+    "--cli-build",
+    ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+    "--final-build-review",
+    ".runtime/porting/GEO-03/independent-final-build-review-01/review.json",
+    "--final-data-review",
+    ".runtime/porting/GEO-03/independent-final-data-review-01/review.json",
+    "--final-handoff-review",
+    ".runtime/porting/GEO-03/independent-final-handoff-review-01/review.json",
+    "--unit-reader-archives",
+    ".runtime/porting/GEO-03/final-unit-reader-archives-01",
+    "--production-reader-archives",
+    ".runtime/porting/GEO-03/final-production-reader-archives-01",
+    "--preserved-reader-failure",
+    ".runtime/porting/GEO-03/production-comparison-command-01/receipt.json",
+    "--preserved-reader-failure",
+    ".runtime/porting/GEO-03/production-comparison-command-02/receipt.json",
+    "--reader-amendment-review",
+    ".runtime/porting/GEO-03/independent-production-phase-reader-review-01/review.json",
+    "--reader-amendment-review",
+    ".runtime/porting/GEO-03/independent-production-declared-volume-reader-review-01/review.json",
+    "--output-dir",
+    ".runtime/porting/GEO-03/final-evidence-01",
+    "--write-tracked"
+  ],
+  "implementation_commit": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+  "crates_tree": "c5120d6a1b6210c0badca9df98e46fa756f762dc",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "scientific_gates_updated": false,
+  "reference_outputs_supplied_to_Rust": false,
+  "schema": "geo03-production-comparison-evidence.v1",
+  "status": "pass-bounded-actual-production",
+  "comparison_command": {
+    "path": ".runtime/porting/GEO-03/production-comparison-command-03/receipt.json",
+    "sha256": "fdff675395e4a65b2449218b1fef119bf6ff5a1015d20b9f678cf0442823e8b8"
+  },
+  "raw_report": {
+    "path": ".runtime/porting/GEO-03/production-comparison-command-03/stdout.log",
+    "sha256": "8552f3947933f5ea87c233d34c6c56a05f51d5437b1d3085ebd9c901aa995da3"
+  },
+  "producer_matrix": {
+    "path": ".runtime/porting/GEO-03/production-966af17a-01/matrix.json",
+    "sha256": "b95b7350593ba66fdcea147abcab9824f8c1591fced9cce11637f32d4d280187"
+  },
+  "build": {
+    "receipt": {
+      "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/build-receipt.json",
+      "sha256": "022f7a519fb1efbf81c70e2037726817817885fc5d9d33201e1d4374297eea0e"
+    },
+    "binary": {
+      "path": ".runtime/porting/GEO-03/builds/final-966af17a-cli-01/eplus-rs.exe",
+      "sha256": "83143d65ba7c1ac2a8ec6a0579e788f06757179b027a34ffdc5f9b4971a11498"
+    },
+    "kind": "cli",
+    "implementation_commit": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+    "crates_tree": "c5120d6a1b6210c0badca9df98e46fa756f762dc",
+    "source_worktree_clean": true,
+    "committed_source_certification": true,
+    "actual_build_command": [
+      "cargo",
+      "build",
+      "-p",
+      "ep_cli",
+      "--bin",
+      "eplus-rs",
+      "-j",
+      "2",
+      "--message-format=json-render-diagnostics"
+    ],
+    "build_command": {
+      "path": ".runtime/porting/GEO-03/final-cli-cargo-command-01/receipt.json",
+      "sha256": "9e6ff6e1643a0c6e80580cdcd9a83840a1606e43a769d4a39d4de61256c5d6ab"
+    },
+    "source_capture": {
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+        "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+      },
+      "source_bytes_match_before_and_after": true,
+      "repository_before": {
+        "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+        "worktree_clean": true
+      },
+      "repository_after": {
+        "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+        "worktree_clean": true
+      }
+    },
+    "available_Rust_source_count": 3651,
+    "archived_source_vs_committed_blobs": {
+      "source_count": 3651,
+      "exact_byte_matches": 3650,
+      "line_ending_only_differences": [
+        {
+          "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+          "archive": {
+            "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+            "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+          },
+          "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+          "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+          "difference": "Working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+        }
+      ],
+      "all_other_content_exact": true,
+      "scope": "Archived available Rust-source inventory versus committed blobs; not compiler file-selection evidence"
+    },
+    "source_inventory_scope": "Archived available Rust source; compiler file selection unclaimed"
+  },
+  "executed_tool_historical_resolution": [
+    {
+      "historical_binding": {
+        "historical_path": "tools/porting/check_geo03_production.py",
+        "sha256": "dc8475fa3944f03bf3d4d6296bff8dee8ef1801e6d78e112be8c91d2e253393a"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/GEO-03/final-production-reader-archives-01/check_geo03_production.py",
+        "sha256": "dc8475fa3944f03bf3d4d6296bff8dee8ef1801e6d78e112be8c91d2e253393a"
+      },
+      "executed_path_relabelled": false
+    },
+    {
+      "historical_binding": {
+        "historical_path": "tools/porting/geo03_production_provenance.py",
+        "sha256": "e474289c93c55a00e82c200aed9114ae5e547dee08bdb3b11a243a3394f0927f"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/GEO-03/final-production-reader-archives-01/geo03_production_provenance.py",
+        "sha256": "e474289c93c55a00e82c200aed9114ae5e547dee08bdb3b11a243a3394f0927f"
+      },
+      "executed_path_relabelled": false
+    },
+    {
+      "historical_binding": {
+        "historical_path": "tools/porting/check_geo03_units.py",
+        "sha256": "b14cd98170747bffccf8fcf9bfc1fda3a73432e9a01bf171c5eb46e5c01024cf"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/GEO-03/final-production-reader-archives-01/check_geo03_units.py",
+        "sha256": "b14cd98170747bffccf8fcf9bfc1fda3a73432e9a01bf171c5eb46e5c01024cf"
+      },
+      "executed_path_relabelled": false
+    },
+    {
+      "historical_binding": {
+        "historical_path": "tools/porting/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/GEO-03/final-production-reader-archives-01/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      },
+      "executed_path_relabelled": false
+    }
+  ],
+  "original_helper_execution": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "native_original_matrix": {
+    "path": ".runtime/porting/GEO-03/original-native-first-01/matrix.json",
+    "sha256": "4f6edb1834b4b5452310452d8d9253658734fac18c51d96007b0a1f465995ad4"
+  },
+  "original_first_review": {
+    "path": ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+    "sha256": "bc6b46a46c1e6d34aab4e8b8f701e614728c1a53839beda43aa9bc2df5723f11"
+  },
+  "checks": 758,
+  "mismatch_count": 0,
+  "successful_physical_commands": 6,
+  "ordinary_topology_negative_commands": 1,
+  "scalar_error_metrics": {
+    "m3": {
+      "count": 6,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    },
+    "m": {
+      "count": 3,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    },
+    "m2": {
+      "count": 105,
+      "maximum_absolute_error": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "actual_initializer_result_calls": 1,
+      "initializer_artifact": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-24H/full/geo03-zone-volume.json",
+        "sha256": "6bb0545bb66c895eebcf080a9a0f278cf08d709abbd15436ad113e28d3c3ed4b"
+      },
+      "capacity_handoff": {
+        "actual_physical_capacity_calls": 96,
+        "covered_zone_intervals": 96,
+        "updater_phase": "zone_air_heat_capacity_update",
+        "actual_caller": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+        "all_capacity_routine_calls": 97,
+        "other_capacity_calls_not_claimed_physical_updates": 1,
+        "stored_volume_argument_bits_equal": true,
+        "original_AirPowerCap_result_compared": false
+      },
+      "initializer_topology_observations": [
+        {
+          "sequence": 1,
+          "zone_name": "ZONE ONE",
+          "declared_volume": {
+            "kind": "AutoCalculate"
+          },
+          "diagnostics": {
+            "edges_winding_consistent": true,
+            "floor_horizontal": true,
+            "initial_edges_not_used_twice": [],
+            "initial_unique_vertex_count": 8,
+            "initially_closed": true,
+            "roof_horizontal": true,
+            "same_wall_height": true,
+            "signed_polyhedron_volume_m3": {
+              "value": 1061.8817472,
+              "value_bits": "40909786e8bced5c",
+              "value_class": "finite"
+            },
+            "topology_rejection": null,
+            "volume_differs_by_more_than_five_percent": false,
+            "walls_vertical": true
+          },
+          "automatic_topology_admission_claimed": true,
+          "original_local_CalcVolume_or_method_inferred": false
+        }
+      ],
+      "Full_Summary": {
+        "ordinary_outputs_equal": true,
+        "Summary_observer_files_absent": true,
+        "Summary_direct_ten_field_initializer_observation": false
+      },
+      "ten_fields_observed_at_actual_initializer_return": true,
+      "ten_fields_retained_in_Rust_physical_state_claimed": false,
+      "only_stored_volume_physically_handed_off": true,
+      "ordinary_native_local_CalcVolume_or_method_compared": false
+    },
+    {
+      "case_id": "A-72H",
+      "actual_initializer_result_calls": 1,
+      "initializer_artifact": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/A-72H/full/geo03-zone-volume.json",
+        "sha256": "6bb0545bb66c895eebcf080a9a0f278cf08d709abbd15436ad113e28d3c3ed4b"
+      },
+      "capacity_handoff": {
+        "actual_physical_capacity_calls": 288,
+        "covered_zone_intervals": 288,
+        "updater_phase": "zone_air_heat_capacity_update",
+        "actual_caller": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+        "all_capacity_routine_calls": 289,
+        "other_capacity_calls_not_claimed_physical_updates": 1,
+        "stored_volume_argument_bits_equal": true,
+        "original_AirPowerCap_result_compared": false
+      },
+      "initializer_topology_observations": [
+        {
+          "sequence": 1,
+          "zone_name": "ZONE ONE",
+          "declared_volume": {
+            "kind": "AutoCalculate"
+          },
+          "diagnostics": {
+            "edges_winding_consistent": true,
+            "floor_horizontal": true,
+            "initial_edges_not_used_twice": [],
+            "initial_unique_vertex_count": 8,
+            "initially_closed": true,
+            "roof_horizontal": true,
+            "same_wall_height": true,
+            "signed_polyhedron_volume_m3": {
+              "value": 1061.8817472,
+              "value_bits": "40909786e8bced5c",
+              "value_class": "finite"
+            },
+            "topology_rejection": null,
+            "volume_differs_by_more_than_five_percent": false,
+            "walls_vertical": true
+          },
+          "automatic_topology_admission_claimed": true,
+          "original_local_CalcVolume_or_method_inferred": false
+        }
+      ],
+      "Full_Summary": {
+        "ordinary_outputs_equal": true,
+        "Summary_observer_files_absent": true,
+        "Summary_direct_ten_field_initializer_observation": false
+      },
+      "ten_fields_observed_at_actual_initializer_return": true,
+      "ten_fields_retained_in_Rust_physical_state_claimed": false,
+      "only_stored_volume_physically_handed_off": true,
+      "ordinary_native_local_CalcVolume_or_method_compared": false
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "actual_initializer_result_calls": 1,
+      "initializer_artifact": {
+        "path": ".runtime/porting/GEO-03/production-966af17a-01/B-BOTH-24H/full/geo03-zone-volume.json",
+        "sha256": "5dc2c30d6072766bb97b9c3e69421d2cd37a4cc4097854d91443b2b6d17878af"
+      },
+      "capacity_handoff": {
+        "actual_physical_capacity_calls": 288,
+        "covered_zone_intervals": 96,
+        "updater_phase": "zone_air_heat_capacity_update",
+        "actual_caller": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+        "all_capacity_routine_calls": 385,
+        "other_capacity_calls_not_claimed_physical_updates": 97,
+        "stored_volume_argument_bits_equal": true,
+        "original_AirPowerCap_result_compared": false
+      },
+      "initializer_topology_observations": [
+        {
+          "sequence": 1,
+          "zone_name": "ZONE ONE",
+          "declared_volume": {
+            "kind": "Value",
+            "value": 1.0,
+            "value_bits": "3ff0000000000000"
+          },
+          "diagnostics": {
+            "edges_winding_consistent": false,
+            "floor_horizontal": true,
+            "initial_edges_not_used_twice": [],
+            "initial_unique_vertex_count": 8,
+            "initially_closed": true,
+            "roof_horizontal": true,
+            "same_wall_height": true,
+            "signed_polyhedron_volume_m3": {
+              "value": -0.3333333333333333,
+              "value_bits": "bfd5555555555555",
+              "value_class": "finite"
+            },
+            "topology_rejection": "base-face edge winding is inconsistent",
+            "volume_differs_by_more_than_five_percent": false,
+            "walls_vertical": true
+          },
+          "automatic_topology_admission_claimed": false,
+          "original_local_CalcVolume_or_method_inferred": false
+        }
+      ],
+      "Full_Summary": {
+        "ordinary_outputs_equal": true,
+        "Summary_observer_files_absent": true,
+        "Summary_direct_ten_field_initializer_observation": false
+      },
+      "ten_fields_observed_at_actual_initializer_return": true,
+      "ten_fields_retained_in_Rust_physical_state_claimed": false,
+      "only_stored_volume_physically_handed_off": true,
+      "ordinary_native_local_CalcVolume_or_method_compared": false
+    }
+  ],
+  "negative_cases": [
+    {
+      "case_id": "GEO03-A-TOPOLOGY-DUPLICATE-WALL",
+      "Rust_actual_exit": 6,
+      "Rust_status": "runtime",
+      "Rust_runtime_summary_null": true,
+      "actual_initializer_rejections": 1,
+      "actual_zone_hook_count": 0,
+      "physics_data_absent": true,
+      "native_actual_exit": 0,
+      "native_actual_physical_callbacks": 96,
+      "native_final_volume_observation": {
+        "value": 1061.8817472,
+        "value_bits": "40909786e8bced5c",
+        "value_class": "finite"
+      },
+      "native_warning_and_fallback_retained_in_original_receipts": true,
+      "native_Rust_exit_text_or_fallback_parity_claimed": false,
+      "missing_observers_are_not_fabricated_zero_counters": true
+    }
+  ],
+  "preserved_history": {
+    "retained_compact_history": {
+      "baseline.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/baseline.json",
+        "sha256": "3e8cc53dc40ceee6f2524be5ff26367006516387a614f5a7afec30c07e781e7d"
+      },
+      "candidate-unit.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/candidate-unit.json",
+        "sha256": "3c9273ee44658539ed5af0f33b8c9ddf74903f6004165f860c9617ba4633924f"
+      },
+      "implementation-preparation.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/implementation-preparation.json",
+        "sha256": "7e1ba804bb6543faacd175efad0a179eb176e40c29a727df8942f202e1099f01"
+      },
+      "original-first.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/original-first.json",
+        "sha256": "87c65c223f73532f3052b8a8dbceee7c91fb615eb7c40c3ce14373689c93ffd0"
+      },
+      "independent-fixture-review.json": {
+        "path": "energyplus_porting_plan/evidence/GEO-03/independent-fixture-review.json",
+        "sha256": "34e3286844a64ee8d94c8f744154bd3cff2f2556f1a9aad0ea0e6d3dd5fc2747"
+      }
+    },
+    "baseline_comparison": {
+      "status": "fail-incomplete",
+      "actual_exit_code": 1,
+      "checks": 582,
+      "mismatch_count": 195,
+      "mismatch_categories": {
+        "missing_required_owner_observation": 192,
+        "numerical_tolerance": 3
+      },
+      "scalar_error_metrics": {
+        "m3": {
+          "count": 16,
+          "maximum_absolute_error": 26.000000000000007,
+          "rmse": 6.623820649745887
+        },
+        "m2": {
+          "count": 16,
+          "maximum_absolute_error": 0.0,
+          "rmse": 0.0
+        }
+      },
+      "recorded_command": {
+        "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/receipt.json",
+        "sha256": "9f4e909188a95849b4c09459372a745b4ad96b710030f2da2f9e93f7a3659c06"
+      },
+      "raw_report": {
+        "path": ".runtime/porting/GEO-03/baseline-comparison-command-01/stdout.log",
+        "sha256": "1554a5dc06abc41ec66590630e32ce1dd7b58d14892df3132f3da15b46cfef1b"
+      },
+      "executed_reader_historical_resolution": {
+        "historical_path": "tools/porting/check_geo03_units.py",
+        "sha256": "4b8774e6f4ccb792b6446f4af7c13d8d6b29a43e67f36ba153b9a4a3b566214d",
+        "matching_archive": {
+          "path": ".runtime/porting/GEO-03/unit-checker-canonical-upgrade-01/check_geo03_units.4b8774e6.py",
+          "sha256": "4b8774e6f4ccb792b6446f4af7c13d8d6b29a43e67f36ba153b9a4a3b566214d"
+        },
+        "executed_path_relabelled": false
+      }
+    },
+    "initial_workspace_failure": {
+      "recorded_command": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-01/receipt.json",
+        "sha256": "30596cadd1f4ae9574f789dfbc63cb4a7d42d7f0b020eff63afef457bcd6b6fb"
+      },
+      "exit_code": 101,
+      "stdout": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-01/stdout.log",
+        "sha256": "b3776233b48e1b118bdf943dd4f85d75f4b192ba7885e854d093f37ac6eb530f"
+      },
+      "stderr": {
+        "path": ".runtime/porting/GEO-03/workspace-tests-01/stderr.log",
+        "sha256": "daa5db7c9cff5c584031719ba0f9775ebb9efdb8af516f62860ec553d052feaf"
+      }
+    },
+    "preserved_reader_failures": [
+      {
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-01/receipt.json",
+          "sha256": "85320ab83327e6b47ac66cfc700febcb5c7dc019bb0ea0c9cc0053003d53e89b"
+        },
+        "command": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/porting/check_geo03_production.py",
+          "--matrix",
+          ".runtime/porting/GEO-03/production-966af17a-01/matrix.json"
+        ],
+        "exit_code": 1,
+        "stdout": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-01/stdout.log",
+          "sha256": "003cd40e6cc2370ea7a811cc5a0e94834b82e5bbb09aa39f3e69fec392250671"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-01/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "source_capture": {
+          "source_snapshot": {
+            "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+            "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+          },
+          "source_bytes_match_before_and_after": true,
+          "repository_before": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": true
+          },
+          "repository_after": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": true
+          }
+        },
+        "raw_receipt_rewritten": false
+      },
+      {
+        "recorded_command": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-02/receipt.json",
+          "sha256": "b0298e87c07f8a37855836a07619b9715aade40ef1fef21a20062f1d21004ede"
+        },
+        "command": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/porting/check_geo03_production.py",
+          "--matrix",
+          ".runtime/porting/GEO-03/production-966af17a-01/matrix.json"
+        ],
+        "exit_code": 1,
+        "stdout": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-02/stdout.log",
+          "sha256": "5ee670ff6de7bdff71a9542c0be96cd3b55ed3f9fb86d5e594936c49a5333fce"
+        },
+        "stderr": {
+          "path": ".runtime/porting/GEO-03/production-comparison-command-02/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "source_capture": {
+          "source_snapshot": {
+            "path": ".runtime/porting/source-objects/34/34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf",
+            "sha256": "34a4eb3b6f0987a4c4c29f135b60e165cc7f20e351ac2458e1c16bd3ee3debdf"
+          },
+          "source_bytes_match_before_and_after": true,
+          "repository_before": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": false
+          },
+          "repository_after": {
+            "head": "966af17aa5fc6bd68cddb9cfa23079dffc09ddc7",
+            "worktree_clean": false
+          }
+        },
+        "raw_receipt_rewritten": false
+      }
+    ],
+    "reader_amendment_reviews": [
+      {
+        "path": ".runtime/porting/GEO-03/independent-production-phase-reader-review-01/review.json",
+        "sha256": "84db22f6628f8eb39440dd35b394d41d27f8c764dc3ee77358c8805fa9289260"
+      },
+      {
+        "path": ".runtime/porting/GEO-03/independent-production-declared-volume-reader-review-01/review.json",
+        "sha256": "d7eb498ddaece65dba79a32cecceb1f835efda71c3030ac39f8cbd71b6727ce3"
+      }
+    ],
+    "historical_candidate_promoted_to_final_proof": false,
+    "raw_history_rewritten": false
+  },
+  "limitations": [
+    "Ten fields are copied from the actual Rust initializer return; only Volume is stored and handed to real capacity calculations.",
+    "Native initialization/final field retention is independently observed; this is not a claim of ten retained Rust fields across timesteps.",
+    "Fresh physical scope is A24/A72/BBoth24 only, not B72/annual/per-limit renewal.",
+    "Summary ordinary outputs prove observer independence, not direct ten-field Summary observation.",
+    "Source-only Space/global ErrCount5/warning IO/scratch/fallback lifetimes remain unpaired.",
+    "No original local CalcVolume/method is inferred from a selected entered/height-priority Volume.",
+    "Explicit positive entered Volume is preserved exactly; its own local topology diagnostics do not constitute automatic-volume admission.",
+    "No AirPowerCap/rhoCp/multiplier/systemdt, ZON02/SYS or full physics equivalence is claimed.",
+    "Only actual updater phase, selected caller and real zone/system context qualify capacity physical-update coverage."
+  ]
+}

@@ -18,7 +18,8 @@ B: 단일 완전혼합 존 + 직결 IdealLoads, no-OA 현열 처리, NoLimit 또
 
 앞선 답변의 '구현 있음'과 이 계획의 '완료 인증'은 다르다.
 `기존 구현 재검증`은 재사용 후보이지 새 시험 통과 판정이 아니다.
-이번 작업에서는 전체 회귀시험·동적 비교시험을 실행하지 않았으므로 모든 인증 체크를 미확인으로 시작한다.
+계획 반입 시에는 모든 인증 체크를 미확인으로 시작했다. 이후 각 완료 행은 고정 원본·실제 실행·독립 검토 증거를 반영한다.
+범위 밖의 알고리즘이나 전체 EnergyPlus 동등성은 해당 카드의 부분 검증으로 승격하지 않는다.
 다음 4개 조건과 해당 경로의 선행 작업이 충족되어야 한 카드를 닫는다.
 
 - [ ] 범위 확정: 고정 커밋의 실제 함수/분기 및 직접 helper·읽기/쓰기 필드 확정
@@ -76,7 +77,7 @@ B에서는 그 의존성을 적용한다.
 |---|---|---|---|---|
 | [x] | [GEO-01](cards/GEO-01.md) | 좌표계와 꼭짓점 변환 | `SurfaceGeometry.cc` · `GetVertices; GetHTSurfaceData` | CON-01 |
 | [x] | [GEO-02](cards/GEO-02.md) | 면적·방위·경사·중심점 | `SurfaceGeometry.cc` · `ProcessSurfaceVertices; CalcSurfaceCentroid` | GEO-01 |
-| [ ] | [GEO-03](cards/GEO-03.md) | 대상 존의 체적 산정 | `SurfaceGeometry.cc` · `CalculateZoneVolume` | GEO-02 |
+| [x] | [GEO-03](cards/GEO-03.md) | 대상 존의 체적 산정 | `SurfaceGeometry.cc` · `CalculateZoneVolume` | GEO-02 |
 
 ### 02 시간·기상
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
