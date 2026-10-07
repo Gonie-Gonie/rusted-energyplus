@@ -1,0 +1,738 @@
+{
+  "schema": "geo03-original-first-checkpoint.v1",
+  "status": "pass-original-source-and-data-only-before-Rust",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "native_build": {
+    "path": ".runtime/porting/GEO-03/native-build-02/native-driver-build.json",
+    "sha256": "001cce0257f783ba1941913a80b88ccbe7e310900cd9f3c240abf23045a1389f"
+  },
+  "helper_execution": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "helper_results": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-results.json",
+    "sha256": "d167581320454b01108d626fd24085f93b613ebc733ce25c81d2f554975bb769"
+  },
+  "native_matrix": {
+    "path": ".runtime/porting/GEO-03/original-native-first-01/matrix.json",
+    "sha256": "4f6edb1834b4b5452310452d8d9253658734fac18c51d96007b0a1f465995ad4"
+  },
+  "independent_original_first_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-original-first-review.json",
+    "sha256": "c82e080748f46d92851b0cb39720dfa5866cf3523d00cdb8b6b373d647f30c13"
+  },
+  "independent_native_build_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-native-build-review.json",
+    "sha256": "9012db401a4f11998cc5b6626c8dc179625c264196cac4e33a8d4dd5c15df5d3"
+  },
+  "independent_provenance_tool_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-provenance-tool-review.json",
+    "sha256": "39d926f654a15dbe54264554e49e78dfdcd40cdfce066c45b095f652121b3977"
+  },
+  "metadata_verification": {
+    "path": ".runtime/porting/GEO-03/provenance-original-metadata-02/receipt.json",
+    "sha256": "f82ecfb93ed831d1ec2cc58cb4f10658366930ed9362e09124ad65c3385895a5"
+  },
+  "helper_case_count": 19,
+  "paired_helper_case_count": 16,
+  "native_case_count": 12,
+  "actual_physical_zone_callbacks": 1536,
+  "native_cases": [
+    {
+      "case_id": "A-24H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": false,
+        "ceiling_height_m": {
+          "value": 4.572,
+          "value_bits": "401249ba5e353f7d",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1061.8817472,
+          "value_bits": "40909786e8bced5c",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 288,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": false,
+        "ceiling_height_m": {
+          "value": 4.572,
+          "value_bits": "401249ba5e353f7d",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1061.8817472,
+          "value_bits": "40909786e8bced5c",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "kind": "unchanged-CON-input",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 288,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1.0,
+          "value_bits": "3ff0000000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "GEO03-A-ENTERED-HEIGHT",
+      "kind": "source-parser-diagnostic-not-CON",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 6.0,
+          "value_bits": "4018000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1393.5456,
+          "value_bits": "4095c62eb1c432ca",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "GEO03-A-ENTERED-HEIGHT-FLOOR",
+      "kind": "source-parser-diagnostic-not-CON",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 6.0,
+          "value_bits": "4018000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 300.0,
+          "value_bits": "4072c00000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": 300.0,
+          "value_bits": "4072c00000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1800.0,
+          "value_bits": "409c200000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "GEO03-A-ENTERED-VOLUME-HEIGHT-FLOOR",
+      "kind": "source-parser-diagnostic-not-CON",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": true,
+        "ceiling_height_m": {
+          "value": 6.0,
+          "value_bits": "4018000000000000",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 300.0,
+          "value_bits": "4072c00000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": 300.0,
+          "value_bits": "4072c00000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 123.0,
+          "value_bits": "405ec00000000000",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "GEO03-A-ENTERED-FLOOR-AUTOHEIGHT",
+      "kind": "source-parser-diagnostic-not-CON",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": false,
+        "ceiling_height_m": {
+          "value": 4.572,
+          "value_bits": "401249ba5e353f7d",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 300.0,
+          "value_bits": "4072c00000000000",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": 300.0,
+          "value_bits": "4072c00000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1061.8817472,
+          "value_bits": "40909786e8bced5c",
+          "value_class": "finite"
+        }
+      }
+    },
+    {
+      "case_id": "GEO03-A-TOPOLOGY-DUPLICATE-WALL",
+      "kind": "ordinary-topology-diagnostic-not-CON",
+      "wrapper_exit": 0,
+      "energyplus_exit": 0,
+      "physical_zone_callback_count": 96,
+      "retained_identity_exact": true,
+      "observed_zone": {
+        "all_surface_first": 1,
+        "all_surface_last": 6,
+        "ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "ceiling_height_entered": false,
+        "ceiling_height_m": {
+          "value": 4.572,
+          "value_bits": "401249ba5e353f7d",
+          "value_class": "finite"
+        },
+        "floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_ceiling_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "geometric_floor_area_m2": {
+          "value": 232.2576,
+          "value_bits": "406d083e425aee63",
+          "value_class": "finite"
+        },
+        "has_floor": true,
+        "has_roof": true,
+        "id": 1,
+        "name": "ZONE ONE",
+        "num_spaces": 1,
+        "space_indexes": [
+          1
+        ],
+        "user_entered_floor_area_m2": {
+          "value": -99999.0,
+          "value_bits": "c0f869f000000000",
+          "value_class": "finite"
+        },
+        "volume_m3": {
+          "value": 1061.8817472,
+          "value_bits": "40909786e8bced5c",
+          "value_class": "finite"
+        }
+      }
+    }
+  ],
+  "topology_diagnostic": "actual original exit0 and physical execution after enclosure warning; no Rust/native fatal-admission parity claim",
+  "source_only_unpaired": [
+    "implicit Space state",
+    "original warning/counter/scratch IO",
+    "three unsupported helper shapes",
+    "full AirPowerCap and SYS/warmup calculations"
+  ],
+  "original_outputs_used_as_Rust_inputs": false,
+  "Rust_numerical_comparison_performed": false,
+  "gates_updated": false
+}

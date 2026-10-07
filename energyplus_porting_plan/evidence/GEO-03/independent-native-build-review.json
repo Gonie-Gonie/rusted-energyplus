@@ -1,0 +1,187 @@
+{
+  "schema": "geo03-independent-native-build-final-review.v1",
+  "status": "pass-build-identity-before-original-numerical-execution",
+  "review_completed_utc": "2026-10-07T22:04:25.382686+00:00",
+  "reviewed_build": {
+    "path": ".runtime/porting/GEO-03/native-build-02/native-driver-build.json",
+    "sha256": "001cce0257f783ba1941913a80b88ccbe7e310900cd9f3c240abf23045a1389f"
+  },
+  "reviewed_contract_review": {
+    "path": "energyplus_porting_plan/evidence/GEO-03/independent-contract-review.json",
+    "sha256": "3439f476b7476f6e88f4efeddf2c35abfd31586b4f9922762c0a36a8313ca20f"
+  },
+  "reviewed_static_source_review": {
+    "path": ".runtime/porting/GEO-03/independent-native-source-review-01/review.json",
+    "sha256": "60483b1c4d55cb740782d951f72be349619a34c1ab0d503b1cc979c4ed9a09ca"
+  },
+  "reviewed_static_type_amendment": {
+    "path": ".runtime/porting/GEO-03/independent-native-source-amendment-01/review.json",
+    "sha256": "4e456fb21dd78b13d2e66e5b964e77a1f5c6baf07a8841e9d84f70f77401cc8e"
+  },
+  "preserved_failed_build01": {
+    "path": ".runtime/porting/GEO-03/native-build-01/build-command.json",
+    "sha256": "1c0db94eb1e23e8ae047d2c775f730eb1fa6faa5c75bcb0d63b8d2228c98ef78"
+  },
+  "executed_independent_reader": {
+    "path": ".runtime/porting/GEO-03/independent-native-build-final-review-01/review_build.py",
+    "sha256": "57d0c10087eced76e779f89e9ffd9caa0469613bbb045bd5be0beca1b5aa342c"
+  },
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "observer_binary": {
+    "path": ".runtime/porting/GEO-03/native-build-02/geo03_reference.exe",
+    "sha256": "4e4bcf739a9f8d060c8490b73460f287ba4c01de1670afbd31040cc06a850cb5"
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/GEO-03/native-build-02/geo03_reference_helper.exe",
+    "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95"
+  },
+  "verified_original_archive_rows": 13537,
+  "verified_prior_compile_rows": 650,
+  "verified_original_core_compile_rows": 643,
+  "verified_prior_executables": 7,
+  "verified_configured_GEO03_compile_rows": 2,
+  "execution_precision": "Successful retry may reuse the unchanged observer from recorded attempt01; exact reviewed source/command identity and actual verbose logs are retained separately from configured compile rows.",
+  "actual_commands": {
+    "configure": {
+      "path": ".runtime/porting/GEO-03/native-build-02/configure-command.json",
+      "sha256": "762fa88c580fcf4d7148c9964107cc8ffe5527c91b1c4c9539ff2c464fbc4084"
+    },
+    "compile_link": {
+      "path": ".runtime/porting/GEO-03/native-build-02/build-command.json",
+      "sha256": "70f1f4f857a580c486297dbbc89c11458053877d6165d0171a647848414d3b12"
+    }
+  },
+  "actual_source_archives": [
+    {
+      "historical_path": "tools/porting/geo03_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo03_reference.cpp",
+        "sha256": "303c82647526f16b2f0e35bc979c335dfb67cedc75414ce58dd9e708d5a7a917"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo03_reference_helper.cpp",
+        "sha256": "67e2472f48749b6e40a981fee9ce04b5619567b6ae4e15932d6ee47eac818dc4"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo03_reference.cmake",
+        "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo03_reference_native.py",
+        "sha256": "ddaeadbbdb7d6a1c93fbf1de681fa028c8470c200b8ee4b90afb5881592cd0a8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo02_reference_fields.hh",
+        "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo02_reference.cmake",
+        "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo01_reference.cmake",
+        "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/psy02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/psy02_reference.cmake",
+        "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490"
+      }
+    },
+    {
+      "historical_path": "tools/porting/psy02_reachability.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/psy02_reachability.cmake",
+        "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/clk01_reference.cmake",
+        "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+      }
+    }
+  ],
+  "source_fragments": {
+    "height": {
+      "artifact": {
+        "path": ".runtime/porting/GEO-03/native-build-02/source/geo03_height455-546.inc",
+        "sha256": "f36cb794194e9c2177797d4ce353e7a4e64af486ff973b3c16b175b0889c098b"
+      },
+      "source_range": {
+        "path": "src/EnergyPlus/SurfaceGeometry.cc",
+        "start": 455,
+        "end": 546,
+        "range_sha256": "f36cb794194e9c2177797d4ce353e7a4e64af486ff973b3c16b175b0889c098b",
+        "locals": {
+          "DetailedWWR": false,
+          "RoutineName": "SetUpZoneGeometry: "
+        },
+        "scope": "whole selected caller height loop, original expressions/branches/warning ordering; debug formatting branch inactive"
+      },
+      "whole_SetupZoneGeometry_claimed": false
+    },
+    "trig": {
+      "artifact": {
+        "path": ".runtime/porting/GEO-02/native-build-04/source/geo02_setup273-289.inc",
+        "sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+      },
+      "source_range": {
+        "path": "src/EnergyPlus/SurfaceGeometry.cc",
+        "symbol": "SetupZoneGeometry",
+        "start": 273,
+        "end": 289,
+        "role": "incoming-GEO01-trig-fragment",
+        "helpers": [
+          "std::sin",
+          "std::cos"
+        ],
+        "range_sha256": "1388b3613591ad441356b594eb735cccea576f6b5bd3192b07d4d5990d50dcaa"
+      },
+      "reused_without_changing_old_target_path": true
+    }
+  },
+  "reference_occurrences_verified": 81,
+  "distinct_files_hashed": 13591,
+  "findings": [
+    "Actual successful compile and link preserve inherited GCC13/O0/assertions/Werror/errorsON/statsOFF/FP-contract-OFF/non-debug ABI modes.",
+    "Observer uses the pinned genuine same-GCC API-owned private state; helper links genuine original core, not rewritten numerical routines.",
+    "Both actual new targets and immutable archives match reviewed sources and exact original fragments.",
+    "All650 prior command rows, seven prior executables, core/API/Objexx and all13537 original archive rows remain hash-identical.",
+    "Two historical GLFW Git metadata absences lie outside the archive table and do not reduce13537 actual present rows.",
+    "No numerical execution or scientific comparison is included in this build-identity PASS; Root must explicitly authorize original-first execution."
+  ],
+  "gates_updated": false,
+  "original_numerical_execution_performed": false
+}

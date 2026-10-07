@@ -1,0 +1,45 @@
+{
+  "schema": "geo03-independent-provenance-tool-static-review.v1",
+  "status": "pass-static-metadata-reader",
+  "review_completed_utc": "2026-10-07T22:11:11.935517+00:00",
+  "reviewed_tool": {
+    "historical_path": "tools/porting/geo03_provenance.py",
+    "archive": {
+      "path": ".runtime/porting/GEO-03/independent-review-metadata-01/geo03_provenance.5ca27645.py",
+      "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+    }
+  },
+  "historical_static_candidate": {
+    "path": ".runtime/porting/GEO-03/provenance-original-metadata-01/geo03_provenance.b1880b01.py",
+    "sha256": "b1880b01406fbf8f85c4bb0de3bc24a9e96f1ee88d927f7cc13fb3ca7749b17e"
+  },
+  "preserved_schema_failure": {
+    "path": ".runtime/porting/GEO-03/provenance-original-metadata-01/receipt.json",
+    "sha256": "5edcfa095f319fac79e8b7e00419f9ad0aa2ced40de51f4717a73b3881d8ce68"
+  },
+  "actual_owner_metadata_retry": {
+    "path": ".runtime/porting/GEO-03/provenance-original-metadata-02/receipt.json",
+    "sha256": "f82ecfb93ed831d1ec2cc58cb4f10658366930ed9362e09124ad65c3385895a5"
+  },
+  "amendment": "One equality correction for genuine native core extra_warning_waivers:false; no numerical policy/source contract changed.",
+  "verified_static_guards": [
+    "Typed recursive metadata identity and IEEE signed-zero equality; no bool/int conflation.",
+    "Exact immutable archive references and contained artifact paths; hashes memoized but each reference equality still checked.",
+    "Actual Cargo target emitted uniquely in preserved JSON stdout, sampled executable SHA and matching immutable binary archive.",
+    "Captured artifact timestamp follows subprocess completion; clean-source certification remains distinct from available source inventory.",
+    "Independent contract review precedes configure; build review follows successful link and precedes original execution; original completion gates future scientific Rust execution.",
+    "Helper input/phase declarations and full native case identities remain separate from any future numerical comparison.",
+    "No subprocess/Git/engine/build invocation or report-writing path in this metadata module."
+  ],
+  "precision_limits": [
+    "Static review of the module plus the owner recorded metadata retry; this independent reviewer did not execute that module or a scientific comparer.",
+    "Scalar/FPU/geometry-state scientific observation coverage is supplied separately by the independent original-data review.",
+    "Available Rust-source archive inventory is not described as the compiler-selected file set."
+  ],
+  "gates_updated": false,
+  "scientific_comparison_performed": false,
+  "executed_metadata_publisher": {
+    "path": ".runtime/porting/GEO-03/independent-review-metadata-01/publish_reviews.py",
+    "sha256": "e0931c062b1b6992978d0391a6215e1b590fe246a318ae02daf783fa4e2d6699"
+  }
+}

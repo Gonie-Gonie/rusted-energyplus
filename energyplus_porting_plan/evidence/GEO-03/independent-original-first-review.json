@@ -1,0 +1,83 @@
+{
+  "schema": "geo03-independent-original-first-review.v1",
+  "status": "pass-source-provenance-before-Rust-numerical-execution",
+  "review_completed_utc": "2026-10-07T22:09:59.366336+00:00",
+  "reviewed_helper_reference": {
+    "path": ".runtime/porting/GEO-03/original-helper-first-01/helper-reference.json",
+    "sha256": "339cb2bc39f0f4b95bcfebb1965d6b15b17f8fee3965e12d1480ff9601a6c1a5"
+  },
+  "reviewed_native_matrix": {
+    "path": ".runtime/porting/GEO-03/original-native-first-01/matrix.json",
+    "sha256": "4f6edb1834b4b5452310452d8d9253658734fac18c51d96007b0a1f465995ad4"
+  },
+  "reviewed_build_identity": {
+    "path": ".runtime/porting/GEO-03/independent-native-build-final-review-01/review.json",
+    "sha256": "9012db401a4f11998cc5b6626c8dc179625c264196cac4e33a8d4dd5c15df5d3"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-cases.json",
+      "sha256": "ba21724f2d0cda4ffe92a382178d20e3618d293bf5457c1b1561967f6f561e97"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-tolerances.json",
+      "sha256": "f636d6d59bf152b3a5ae8b8cdc6dc57b89f6825a410703ab05a24e2fb2ca592b"
+    }
+  },
+  "original_completed_utc": "2026-10-07T22:06:30.615306+00:00",
+  "helper_case_count": 19,
+  "paired_closed_helpers": 16,
+  "source_only_helpers": 3,
+  "native_case_count": 12,
+  "strict_positive_native_cases": 11,
+  "unpredetermined_topology_native_cases": 1,
+  "actual_physical_zone_callbacks": 1536,
+  "actual_warmup_zone_callbacks": 15840,
+  "typed_ieee_and_floating_environment_checks": {
+    "reference_occurrences": 532,
+    "scalar_bit_rows": 9711,
+    "floating_environments": 193,
+    "helper_coordinate_bits": 6840,
+    "native_coordinate_bits": 4320
+  },
+  "distinct_hash_checked_files": 147,
+  "scope_limits": [
+    "Only original observations and input/state/provenance were reviewed; no Rust result or original numerical formula was evaluated.",
+    "Prepared helper floor/ceiling/space read fields are declared input state, not full parser producer proof.",
+    "Auxiliary closure/signed-volume helper calls are additional original calls, not CalculateZoneVolume internal-local method/branch instrumentation.",
+    "Original full ordinary duplicate-wall input warned and continued; it is not an original fatal-admission proof or prescribed Rust exit-code match.",
+    "Source static geometry lifetime and actual source face order do not establish complete HVAC/system call-order or AirPowerCap equivalence.",
+    "Prior build review supplies all original archive/compile-row preservation evidence; these 13,537 source rows were not rehashed again in this data review."
+  ],
+  "Rust_compared": false,
+  "scientific_reference_math_recomputed": false,
+  "engines_executed_by_review": false,
+  "gates_updated": false,
+  "raw_independent_review": {
+    "path": ".runtime/porting/GEO-03/independent-original-first-review-01/review.json",
+    "sha256": "bc6b46a46c1e6d34aab4e8b8f701e614728c1a53839beda43aa9bc2df5723f11"
+  },
+  "source_observations": {
+    "height_owner": "Declared positive height sets ceiling_height_entered before automatic derivation; positive derived height does not set it.",
+    "second_call": "Height fragment executes once. Second whole CalculateZoneVolume call retains the first current positive Zone volume; ErrCount5 may increment again.",
+    "face_order": "Actual full IDF source faces are Wall/Wall/Wall/Wall/Floor/Roof, with original parser ordinal retained within class. Direct prepared helper enumeration remains its own frozen request order.",
+    "boundary_warning": "DIFF5-EQUAL and BELOW have observed ErrCount5 0→0→0; ABOVE has 0→1→2. These are original observations, not injected Rust answers.",
+    "topology_diagnostic": {
+      "case_id": "GEO03-A-TOPOLOGY-DUPLICATE-WALL",
+      "source_exit_code": 0,
+      "physical_zone_callbacks": 96,
+      "source_warning": "zone is not fully enclosed",
+      "source_volume_m3": 1061.8817472,
+      "original_fatal_admission_claimed": false
+    },
+    "floating_environment": "All 193 observed helper/native phases decode x87 PC64 and round-to-nearest; MXCSR sticky exception bits are retained separately from unchanged controls."
+  },
+  "executed_metadata_publisher": {
+    "path": ".runtime/porting/GEO-03/independent-review-metadata-01/publish_reviews.py",
+    "sha256": "e0931c062b1b6992978d0391a6215e1b590fe246a318ae02daf783fa4e2d6699"
+  }
+}

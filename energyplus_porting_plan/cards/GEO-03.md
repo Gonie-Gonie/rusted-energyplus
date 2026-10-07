@@ -31,7 +31,9 @@ crates/ep_runtime/src/geometry.rs
 착수 계약은 `contracts/GEO-03-source.json`, `GEO-03-cases.json`,
 `GEO-03-tolerances.json`에 동결했다. `evidence/GEO-03/independent-contract-review.json`과
 `independent-native-source-review.json`의 독립 사전 검토는 통과했다.
-원본 빌드·수치 실행과 Rust 비교 전이며 아래 종료 체크는 모두 대기 상태이다.
+원본 빌드와 helper 19개·일반 IDF 12개 실행 및 독립 검토를 완료했다.
+`evidence/GEO-03/original-first.json`에 실제 실행과 관측 상태를 연결했다.
+Rust 비교 전이며 아래 종료 체크는 모두 대기 상태이다.
 
 단위 입력은 여섯 개의 유효한 사각형 면으로 닫힌 하나의 직육면체와
 명시 Zone 숫자, 준비된 면적 읽기 필드이다. 준비된 면적은 입력으로 선언하며
