@@ -1,4 +1,24 @@
-# CON-01 input preparation and reference observations
+# Porting reference and verification tools
+
+## Record actual commands without duplicating source archives
+
+```powershell
+python -B tools/porting/record_command.py --output-dir .runtime/porting/<CARD>/<FRESH-RUN> -- cargo test -p ep_runtime --lib -j 2
+```
+
+The recorder runs the supplied command from the repository root and preserves its
+actual arguments, exit, logs, timestamps and repository state. It archives exact
+Rust/Cargo source bytes in a SHA256 object store, so unchanged files are reused
+across validation commands. The source manifest retains historical paths and
+checks exact source equality before and after execution. It cannot detect
+temporary edits between those snapshots or certify which bytes a compiler used.
+Each output directory must be
+new and inside `.runtime/porting`. The recorded launcher bytes are immutable;
+existing historical receipts are not rewritten. This is command provenance,
+and the recorder itself does not compute scientific reference values or update
+card gates. The invoked command's behavior needs its own review.
+
+## CON-01 input preparation and reference observations
 
 From the repository root:
 
