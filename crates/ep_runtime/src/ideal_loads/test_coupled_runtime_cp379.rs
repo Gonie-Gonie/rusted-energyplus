@@ -63,7 +63,7 @@ fn cp379_follows_cp378_records_four_sites_and_uses_the_canonical_helper() {
 }
 
 #[test]
-fn cp379_rejects_evidence_corruption_but_does_not_reconcile_numerical_enthalpy() {
+fn cp379_rejects_evidence_corruption_and_keeps_numerical_mutation_independent() {
     let (model, output, lifecycle, humidity, temperature) = validator_fixture(101_325.0, 0.0);
     let binding = bind_direct_zone_purchased_air_model(&model).expect("direct binding");
     let snapshot = output.calculation_cooling_supply_enthalpy_post_saturation_assignment;
@@ -75,7 +75,7 @@ fn cp379_rejects_evidence_corruption_but_does_not_reconcile_numerical_enthalpy()
         .purchased_air
         .calculation
         .supply_enthalpy_j_per_kg;
-    assert_ne!(canonical.to_bits(), numerical.to_bits());
+    assert_eq!(canonical.to_bits(), numerical.to_bits());
     assert!(snapshot_matches_release(&output, 1, &binding));
 
     let mut changed_numerical = output;

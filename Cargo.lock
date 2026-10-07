@@ -71,6 +71,7 @@ name = "ep_runtime"
 version = "0.1.0"
 dependencies = [
  "ep_model",
+ "serde_json",
 ]
 
 [[package]]

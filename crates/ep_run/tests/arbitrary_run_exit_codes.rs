@@ -118,6 +118,48 @@ fn output_path_file_returns_output_export_failure() -> Result<(), Box<dyn std::e
     Ok(())
 }
 
+#[test]
+fn full_trace_preserves_nonempty_output_directory_when_overwrite_is_denied()
+-> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("full-trace-no-overwrite")?;
+    let input_path = case_dir.join("one-zone.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, ONE_ZONE_EPJSON)?;
+    std::fs::create_dir_all(&output_dir)?;
+    let existing_path = output_dir.join("existing-result.json");
+    let existing_bytes = b"{\"preserve\":true}\n";
+    std::fs::write(&existing_path, existing_bytes)?;
+
+    let error = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: false,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Full,
+        trace_selection: TraceSelection::default(),
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })
+    .expect_err("nonempty output must require explicit overwrite");
+
+    assert_eq!(error.exit_code, RunExitCode::Args);
+    assert!(error.message.contains("output directory is not empty"));
+    assert_eq!(std::fs::read(&existing_path)?, existing_bytes);
+    assert!(!output_dir.join("psychrometrics-calls.json").exists());
+    assert_eq!(std::fs::read_dir(&output_dir)?.count(), 1);
+    std::fs::remove_dir_all(&case_dir)?;
+    Ok(())
+}
+
 fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
     let path = std::env::temp_dir().join(format!(

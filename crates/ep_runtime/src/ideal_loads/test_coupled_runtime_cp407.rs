@@ -35,7 +35,7 @@ fn cp407_preserves_three_partitions_and_uses_only_cp378_cp385_operands() {
     let mut saw_inherited_inactive = false;
     for (limit, humidity_ratio, maximum_capacity_w, availability) in [
         (IdealLoadsLimit::LimitCapacity, 0.020, 500.0, 1.0),
-        (IdealLoadsLimit::LimitCapacity, 0.020, 1.0e-100, 1.0),
+        (IdealLoadsLimit::LimitCapacity, 0.024, 1.0e-100, 1.0),
         (IdealLoadsLimit::NoLimit, 0.008, 5_000.0, 0.0),
     ] {
         let (model, output, lifecycle, predecessor, humidity, enthalpy) =

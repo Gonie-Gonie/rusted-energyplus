@@ -1,0 +1,614 @@
+{
+  "schema": "psy01-source-reference.v1",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "execution_repository_head": "f62aeed0596be61b4084527dcbca6901f1c19dbe",
+  "contracts": [
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-source.json",
+      "sha256": "c4652cfeb8fbc1629444fa6c246892f4ea2dfe8d45dade76f0bf7261ea464e82"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-cases.json",
+      "sha256": "e9a19f51d09ee24eb9240c336e3157db846d95d87144ddb9ec31b3955e204949"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+      "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+    }
+  ],
+  "reference_build": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\llvm-mingw-20260616\\llvm-mingw-20260616-ucrt-x86_64\\bin\\clang++.exe",
+      "-std=c++20",
+      "-O0",
+      "-ffp-contract=off",
+      "-UEP_psych_errors",
+      "-UEP_psych_stats",
+      "-UNDEBUG",
+      "-MMD",
+      "-MF",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\reference.d",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\ObjexxFCL\\src",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\fmt-8.0.1\\include",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\valijson\\include",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\psy01_reference.cpp",
+      "-o",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\psy01_reference.exe"
+    ],
+    "exit_code": 0,
+    "artifacts": [
+      {
+        "path": ".runtime/porting/PSY-01/build-command.json",
+        "sha256": "20a04405e736c56545a40b8fee129a113183330a7a5d8f80d7a72019f5ecb7fb"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/build-stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/build-stderr.log",
+        "sha256": "6e9cc225f04cf6db9130d122b2b6192116cad717ad208206f004d275fbc7db19"
+      }
+    ],
+    "compiler": {
+      "path": ".runtime/reference-tools/llvm-mingw-20260616/llvm-mingw-20260616-ucrt-x86_64/bin/clang++.exe",
+      "sha256": "a8b7a614eeadd9105f814be3701a7f312cda4cea51751b75b408c16100c94e85"
+    },
+    "tool_manifest": {
+      "path": "tools/porting/reference_tools.json",
+      "sha256": "087f7498faf6bedea61aaf4c819e9563218f58d7e558d35e5c30358a7f46d77c"
+    },
+    "source": {
+      "path": "tools/porting/psy01_reference.cpp",
+      "sha256": "a3bc0008540c206d21433e8b28b9598baf7c2ba5bde8a326736159c82edeaaa8"
+    },
+    "instrumented_original_header": {
+      "path": ".runtime/porting/PSY-01/psy01_original_instrumented.hh",
+      "sha256": "02838a0c8e0d3b474cc006f9af689858a225f53fabaa211184f4407eb5509a03"
+    },
+    "dependency_file": {
+      "path": ".runtime/porting/PSY-01/reference.d",
+      "sha256": "b3c2a219188c8e13ea6dbe77056ad92996dbaf73c046b2ec1d7d5039f7764c57"
+    },
+    "binary": {
+      "path": ".runtime/porting/PSY-01/psy01_reference.exe",
+      "sha256": "a72981ee6c9f2a74623bc2748637972653333861ace1f4f7b4dd699af41bb65d"
+    },
+    "dependency_manifest": {
+      "path": ".runtime/porting/PSY-01/reference-dependencies.json",
+      "sha256": "e7a6fe516dc82f1601f91187e0ea3f20b0123b708602d290e74e0177017328c3"
+    },
+    "dependency_count": 91,
+    "flags": {
+      "assertions_enabled": true,
+      "EP_psych_errors": false,
+      "EP_psych_stats": false,
+      "fp_contraction": "off",
+      "optimization": "O0"
+    }
+  },
+  "state_library": {
+    "path": ".runtime/energyplus/26.1.0/energyplusapi.dll",
+    "sha256": "bbe6f66240d108df9f51a03b9beb968808a2173234253574d27a31605aec2aa2"
+  },
+  "python_tool": {
+    "path": "tools/porting/psy01_reference.py",
+    "sha256": "f6da63b83967e78796d93264cc15b15203ba22f9140e0e38eeef97a8d5a56d0c"
+  },
+  "results": [
+    {
+      "process_id": "normal-boundary-and-ieee",
+      "call_count": 381,
+      "tuples": {
+        "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-tuples.json",
+        "sha256": "2d6e738de704197b58917d7548e67831c1e1e0de2d2882de533623b4c502e71e"
+      },
+      "original_results": {
+        "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference.json",
+        "sha256": "f21594fb8d2894327b424f04a65a99444720333c170430fe65ec74835c803980"
+      },
+      "execution": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\psy01_reference.exe",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\normal-boundary-and-ieee-tuples.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\normal-boundary-and-ieee-reference.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\energyplusapi.dll"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference-command.json",
+            "sha256": "aaea80f9983893520e7520c6a8970629b99b3072d61e007faa792c5235c41684"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/normal-boundary-and-ieee-reference-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "process_id": "cold-cp-sentinel",
+      "call_count": 13,
+      "tuples": {
+        "path": ".runtime/porting/PSY-01/cold-cp-sentinel-tuples.json",
+        "sha256": "7ebf25953e824f1181763de2c1369014992b0bc530d8dffaba90ea8d0c0860df"
+      },
+      "original_results": {
+        "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference.json",
+        "sha256": "11c899881c5578b34f5f3df55181aab16cc4126eb757b969466d2d4603121924"
+      },
+      "execution": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\psy01_reference.exe",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\cold-cp-sentinel-tuples.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\cold-cp-sentinel-reference.json",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\energyplusapi.dll"
+        ],
+        "exit_code": 0,
+        "artifacts": [
+          {
+            "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference-command.json",
+            "sha256": "61c2dfe96a184b832fe3ef13442fb4df6627821e38e05deb5f12ee2d23669f24"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": ".runtime/porting/PSY-01/cold-cp-sentinel-reference-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "cold_cache_observations": [
+        {
+          "cache_after": {
+            "cpa_save": -100.0,
+            "cpa_save_bits": "c059000000000000",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_before": {
+            "cpa_save": -100.0,
+            "cpa_save_bits": "c059000000000000",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_hit": true,
+          "call_index": 0,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": -100.0,
+          "value_bits": "c059000000000000",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": -100.0,
+            "cpa_save_bits": "c059000000000000",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_before": {
+            "cpa_save": -100.0,
+            "cpa_save_bits": "c059000000000000",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_hit": true,
+          "call_index": 1,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": -100.0,
+          "value_bits": "c059000000000000",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1019.7116000000001,
+            "cpa_save_bits": "408fddb15b573eac",
+            "dw_save": 0.008,
+            "dw_save_bits": "3f80624dd2f1a9fc"
+          },
+          "cache_before": {
+            "cpa_save": -100.0,
+            "cpa_save_bits": "c059000000000000",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_hit": false,
+          "call_index": 2,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": 0.008
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": 0.008
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1019.7116000000001,
+          "value_bits": "408fddb15b573eac",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_before": {
+            "cpa_save": 1019.7116000000001,
+            "cpa_save_bits": "408fddb15b573eac",
+            "dw_save": 0.008,
+            "dw_save_bits": "3f80624dd2f1a9fc"
+          },
+          "cache_hit": false,
+          "call_index": 3,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1004.8585895,
+          "value_bits": "408f66de642bf983",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_before": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_hit": true,
+          "call_index": 4,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": -100.0
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1004.8585895,
+          "value_bits": "408f66de642bf983",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -0.0,
+            "dw_save_bits": "8000000000000000"
+          },
+          "cache_before": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_hit": false,
+          "call_index": 5,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": -0.0
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": -0.0
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1004.8585895,
+          "value_bits": "408f66de642bf983",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -0.0,
+            "dw_save_bits": "8000000000000000"
+          },
+          "cache_before": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -0.0,
+            "dw_save_bits": "8000000000000000"
+          },
+          "cache_hit": true,
+          "call_index": 6,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": 0.0
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": 0.0
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1004.8585895,
+          "value_bits": "408f66de642bf983",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": "NaN",
+            "cpa_save_bits": "7ff8000000000000",
+            "dw_save": "NaN",
+            "dw_save_bits": "7ff8000000000000"
+          },
+          "cache_before": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": -0.0,
+            "dw_save_bits": "8000000000000000"
+          },
+          "cache_hit": false,
+          "call_index": 7,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": "NaN"
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": "NaN"
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": "NaN",
+          "value_bits": "7ff8000000000000",
+          "value_class": "nan"
+        },
+        {
+          "cache_after": {
+            "cpa_save": "NaN",
+            "cpa_save_bits": "7ff8000000000000",
+            "dw_save": "NaN",
+            "dw_save_bits": "7ff8000000000000"
+          },
+          "cache_before": {
+            "cpa_save": "NaN",
+            "cpa_save_bits": "7ff8000000000000",
+            "dw_save": "NaN",
+            "dw_save_bits": "7ff8000000000000"
+          },
+          "cache_hit": false,
+          "call_index": 8,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-cp-sentinel",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW",
+          "inputs": {
+            "w_kg_per_kg": "NaN"
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": "NaN"
+          },
+          "sequence_id": "cold-normal-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": "NaN",
+          "value_bits": "7ff8000000000000",
+          "value_class": "nan"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1019.7116000000001,
+            "cpa_save_bits": "408fddb15b573eac",
+            "dw_save": 0.008,
+            "dw_save_bits": "3f80624dd2f1a9fc"
+          },
+          "cache_before": {
+            "cpa_save": -100.0,
+            "cpa_save_bits": "c059000000000000",
+            "dw_save": -100.0,
+            "dw_save_bits": "c059000000000000"
+          },
+          "cache_hit": false,
+          "call_index": 9,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-fast-cp-cache",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW_fast",
+          "inputs": {
+            "w_kg_per_kg": 0.008
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": 0.008
+          },
+          "sequence_id": "independent-cold-fast-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1019.7116000000001,
+          "value_bits": "408fddb15b573eac",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1019.7116000000001,
+            "cpa_save_bits": "408fddb15b573eac",
+            "dw_save": 0.008,
+            "dw_save_bits": "3f80624dd2f1a9fc"
+          },
+          "cache_before": {
+            "cpa_save": 1019.7116000000001,
+            "cpa_save_bits": "408fddb15b573eac",
+            "dw_save": 0.008,
+            "dw_save_bits": "3f80624dd2f1a9fc"
+          },
+          "cache_hit": true,
+          "call_index": 10,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-fast-cp-cache",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW_fast",
+          "inputs": {
+            "w_kg_per_kg": 0.008
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": 0.008
+          },
+          "sequence_id": "independent-cold-fast-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1019.7116000000001,
+          "value_bits": "408fddb15b573eac",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": 1e-05,
+            "dw_save_bits": "3ee4f8b588e368f1"
+          },
+          "cache_before": {
+            "cpa_save": 1019.7116000000001,
+            "cpa_save_bits": "408fddb15b573eac",
+            "dw_save": 0.008,
+            "dw_save_bits": "3f80624dd2f1a9fc"
+          },
+          "cache_hit": false,
+          "call_index": 11,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-fast-cp-cache",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW_fast",
+          "inputs": {
+            "w_kg_per_kg": 1e-05
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": 1e-05
+          },
+          "sequence_id": "independent-cold-fast-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1004.8585895,
+          "value_bits": "408f66de642bf983",
+          "value_class": "finite"
+        },
+        {
+          "cache_after": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": 1e-05,
+            "dw_save_bits": "3ee4f8b588e368f1"
+          },
+          "cache_before": {
+            "cpa_save": 1004.8585895,
+            "cpa_save_bits": "408f66de642bf983",
+            "dw_save": 1e-05,
+            "dw_save_bits": "3ee4f8b588e368f1"
+          },
+          "cache_hit": true,
+          "call_index": 12,
+          "context": {
+            "caller": "PSY-01.unit",
+            "case_id": "cold-fast-cp-cache",
+            "phase": "unit"
+          },
+          "function": "PsyCpAirFnW_fast",
+          "inputs": {
+            "w_kg_per_kg": 1e-05
+          },
+          "resolved_inputs": {
+            "w_kg_per_kg": 1e-05
+          },
+          "sequence_id": "independent-cold-fast-cp-cache",
+          "unit": "J/(kg*K)",
+          "value": 1004.8585895,
+          "value_bits": "408f66de642bf983",
+          "value_class": "finite"
+        }
+      ]
+    }
+  ],
+  "reference_processes": 2,
+  "production_trace": null,
+  "comparisons_executed": false,
+  "checks_passed": true,
+  "gates_updated": false,
+  "limitations": [
+    "warning aggregation/I/O excluded",
+    "unit IEEE probes don't expand A/B admitted inputs",
+    "downstream ZON-02/HVAC-04/05 numerical gates require their actual same-tuple/call-order traces"
+  ]
+}

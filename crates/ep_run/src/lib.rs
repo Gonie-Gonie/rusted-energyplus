@@ -14,6 +14,7 @@ mod oracle;
 mod outputs;
 mod pipeline;
 mod porting_scope;
+mod psychrometrics_trace;
 mod support;
 mod support_registry;
 

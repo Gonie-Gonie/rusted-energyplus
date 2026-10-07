@@ -33,7 +33,7 @@ fn cp403_preserves_observed_routes_and_assigns_temperature_on_true_body() {
     for (limit, humidity_ratio, maximum_capacity_w, availability) in [
         (
             IdealLoadsLimit::LimitCapacity,
-            0.020,
+            0.024,
             f64::MIN_POSITIVE,
             1.0,
         ),
@@ -156,7 +156,7 @@ fn cp403_preserves_observed_routes_and_assigns_temperature_on_true_body() {
 fn cp403_rejects_cp329_owner_and_cp402_corroborator_drift() {
     let (model, output, lifecycle, predecessor, mixed_air_owner) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,
@@ -207,7 +207,7 @@ fn cp403_rejects_cp329_owner_and_cp402_corroborator_drift() {
 fn cp403_rejects_non_direct_route_accounting() {
     let (model, output, lifecycle, predecessor, mixed_air_owner) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,
@@ -266,7 +266,7 @@ fn cp403_rejects_non_direct_route_accounting() {
 fn cp403_validation_has_no_numerical_coupling_dto_feed() {
     let (model, mut output, lifecycle, predecessor, mixed_air_owner) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,

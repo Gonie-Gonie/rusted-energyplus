@@ -208,7 +208,7 @@ fn psy_cp_repeated_and_alternating_calls_are_output_stable() {
         (0.008, 0x408f_ddb1_5b57_3eac),
         (0.007, 0x408f_ced2_3a29_c77a),
         (0.0085, 0x408f_e520_ebed_fa44),
-        // The pure numerical path floors the upstream cache's invalid sentinel.
+        // A valid call has already replaced the source's cold-cache sentinel.
         (-100.0, 0x408f_66de_642b_f983),
         (-0.0, 0x408f_66de_642b_f983),
         (0.0, 0x408f_66de_642b_f983),

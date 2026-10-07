@@ -150,10 +150,7 @@ fn public_true_route_reads_retained_rhs_and_assigns_result_bit_exact() {
         snapshot.assigned_cooling_sensible_output_w,
         snapshot.resulting_cooling_sensible_output_w,
     ] {
-        assert_eq!(
-            value.map(f64::to_bits),
-            Some(expected_maximum.to_bits())
-        );
+        assert_eq!(value.map(f64::to_bits), Some(expected_maximum.to_bits()));
     }
     assert!(
         completed_direct_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_is_consistent(
@@ -173,23 +170,13 @@ fn public_true_route_reads_retained_rhs_and_assigns_result_bit_exact() {
 #[test]
 fn full_public_nan_chain_preserves_payload_without_rhs_read_or_write() {
     let (mut runtime, system, predecessor) =
-        completed_cp340_case_with_zone_temperature(
-            -f64::MAX,
-            1.0,
-            true,
-            0.008,
-            13.000_02,
-        );
+        completed_cp340_case_with_zone_temperature(-f64::MAX, 1.0, true, 0.008, 13.000_02);
     let retained_nan = predecessor
         .cooling_sensible_output_w
         .expect("CP340 retained CP339 output");
     assert!(retained_nan.is_nan());
-    assert!(
-        predecessor.capacity_limit_sensible_output_guard_false_fallthrough
-    );
-    assert!(
-        !predecessor.capacity_limit_sensible_output_adjustment_body_entered
-    );
+    assert!(predecessor.capacity_limit_sensible_output_guard_false_fallthrough);
+    assert!(!predecessor.capacity_limit_sensible_output_adjustment_body_entered);
 
     let snapshot =
         advance_direct_no_oa_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment(
@@ -220,7 +207,7 @@ fn full_public_nan_chain_preserves_payload_without_rhs_read_or_write() {
 #[test]
 fn full_public_positive_infinity_chain_assigns_finite_retained_maximum() {
     let (mut runtime, system, predecessor) =
-        completed_cp340_case(-f64::MAX, 1.0, true);
+        completed_cp340_case_with_zone_temperature(-f64::MAX, 1.0, true, 0.008, 24.0);
     let retained_output = predecessor
         .cooling_sensible_output_w
         .expect("CP340 retained CP339 output");
@@ -229,9 +216,7 @@ fn full_public_positive_infinity_chain_assigns_finite_retained_maximum() {
         .expect("CP340 retained maximum capacity");
     assert_eq!(retained_output, f64::INFINITY);
     assert!(retained_maximum.is_finite() && retained_maximum > 0.0);
-    assert!(
-        predecessor.capacity_limit_sensible_output_adjustment_body_entered
-    );
+    assert!(predecessor.capacity_limit_sensible_output_adjustment_body_entered);
 
     let snapshot =
         advance_direct_no_oa_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment(
@@ -254,10 +239,7 @@ fn full_public_positive_infinity_chain_assigns_finite_retained_maximum() {
         snapshot.assigned_cooling_sensible_output_w,
         snapshot.resulting_cooling_sensible_output_w,
     ] {
-        assert_eq!(
-            value.map(f64::to_bits),
-            Some(retained_maximum.to_bits())
-        );
+        assert_eq!(value.map(f64::to_bits), Some(retained_maximum.to_bits()));
     }
 }
 
@@ -324,11 +306,9 @@ fn supplied_public_and_private_cp340_drift_are_transactional() {
         .cooling_positive_supply_capacity_limit_sensible_output_guard_latest_witness(system.id)
         .expect("CP340 witness");
     witness.cooling_sensible_output_w = Some(456.0);
-    private
-        .set_cooling_positive_supply_capacity_limit_sensible_output_guard_latest_witness(
-            system.id,
-            witness,
-        );
+    private.set_cooling_positive_supply_capacity_limit_sensible_output_guard_latest_witness(
+        system.id, witness,
+    );
     assert_rejected_transactionally(&mut private, &system, predecessor);
 }
 
@@ -350,11 +330,10 @@ fn forged_nonpositive_and_nonfinite_active_capacities_are_rejected() {
             .expect("known unit")
             .calc_cooling_positive_supply_capacity_limit_sensible_output_guard
             .latest = Some(predecessor);
-        runtime
-            .set_cooling_positive_supply_capacity_limit_sensible_output_guard_latest_witness(
-                system.id,
-                predecessor,
-            );
+        runtime.set_cooling_positive_supply_capacity_limit_sensible_output_guard_latest_witness(
+            system.id,
+            predecessor,
+        );
         assert_rejected_transactionally(&mut runtime, &system, predecessor);
     }
 }
@@ -366,11 +345,9 @@ fn recursive_cp339_private_witness_corruption_is_rejected_before_mutation() {
         .cooling_positive_supply_capacity_limit_sensible_output_assignment_latest_witness(system.id)
         .expect("CP339 witness");
     witness.source = "forged-cp339-private";
-    runtime
-        .set_cooling_positive_supply_capacity_limit_sensible_output_assignment_latest_witness(
-            system.id,
-            witness,
-        );
+    runtime.set_cooling_positive_supply_capacity_limit_sensible_output_assignment_latest_witness(
+        system.id, witness,
+    );
     assert_rejected_transactionally(&mut runtime, &system, predecessor);
 }
 
@@ -386,8 +363,7 @@ fn every_assignment_counter_increment_is_preflighted_transactionally() {
         match counter {
             0 => state.transition_count = usize::MAX,
             1 => {
-                state.capacity_limit_sensible_output_maximum_capacity_assignment_count =
-                    usize::MAX
+                state.capacity_limit_sensible_output_maximum_capacity_assignment_count = usize::MAX
             }
             2 => state.source_site_execution_count = usize::MAX - 1,
             3 => state.maximum_total_cooling_capacity_read_count = usize::MAX,
@@ -432,19 +408,10 @@ fn every_nonassignment_route_counter_increment_is_preflighted_transactionally() 
             0 => state.unit_off_skip_count = usize::MAX,
             1 => state.non_cooling_skip_count = usize::MAX,
             2 => state.positive_guard_false_fallthrough_skip_count = usize::MAX,
-            3 => {
-                state.witnessed_positive_guard_false_fallthrough_skip_count =
-                    usize::MAX
-            }
+            3 => state.witnessed_positive_guard_false_fallthrough_skip_count = usize::MAX,
             4 => state.capacity_limit_guard_false_fallthrough_skip_count = usize::MAX,
-            5 => {
-                state.witnessed_capacity_limit_guard_false_fallthrough_skip_count =
-                    usize::MAX
-            }
-            6 => {
-                state.capacity_limit_sensible_output_guard_false_fallthrough_count =
-                    usize::MAX
-            }
+            5 => state.witnessed_capacity_limit_guard_false_fallthrough_skip_count = usize::MAX,
+            6 => state.capacity_limit_sensible_output_guard_false_fallthrough_count = usize::MAX,
             7 => {
                 state.witnessed_capacity_limit_sensible_output_guard_false_fallthrough_count =
                     usize::MAX

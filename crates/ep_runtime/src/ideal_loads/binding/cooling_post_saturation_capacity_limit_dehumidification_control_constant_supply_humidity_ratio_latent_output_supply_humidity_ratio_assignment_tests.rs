@@ -14,7 +14,7 @@ fn binding_places_cp404_after_cp403_before_unchanged_numerical_coupling() {
     for (limit, humidity_ratio, availability, capacity) in [
         (
             IdealLoadsLimit::LimitCapacity,
-            0.020,
+            0.024,
             1.0,
             f64::MIN_POSITIVE,
         ),

@@ -32,7 +32,7 @@ fn cp405_preserves_all_route_classes_and_bit_copies_maximum_capacity() {
     for (limit, humidity_ratio, maximum_capacity_w, availability) in [
         (
             IdealLoadsLimit::LimitCapacity,
-            0.020,
+            0.024,
             f64::MIN_POSITIVE,
             1.0,
         ),
@@ -156,7 +156,7 @@ fn cp405_preserves_all_route_classes_and_bit_copies_maximum_capacity() {
 fn cp405_rejects_cp404_retained_capacity_drift() {
     let (model, output, lifecycle, predecessor) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,
@@ -178,7 +178,7 @@ fn cp405_rejects_cp404_retained_capacity_drift() {
 fn cp405_rejects_non_direct_route_accounting() {
     let (model, output, lifecycle, predecessor) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,
@@ -212,7 +212,7 @@ fn cp405_rejects_non_direct_route_accounting() {
 fn cp405_validation_has_no_numerical_coupling_dto_feed() {
     let (model, mut output, lifecycle, predecessor) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,

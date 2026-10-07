@@ -13,7 +13,7 @@ fn binding_places_cp413_after_cp412_before_unchanged_numerical_coupling() {
 
     for (limit, humidity_ratio, availability, capacity) in [
         (IdealLoadsLimit::LimitCapacity, 0.020, 1.0, 500.0),
-        (IdealLoadsLimit::LimitCapacity, 0.020, 1.0, 1.0e-100),
+        (IdealLoadsLimit::LimitCapacity, 0.024, 1.0, 1.0e-100),
         (IdealLoadsLimit::NoLimit, 0.008, 0.0, 5_000.0),
     ] {
         let (_runtime, output) = super::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_tests::run_case(

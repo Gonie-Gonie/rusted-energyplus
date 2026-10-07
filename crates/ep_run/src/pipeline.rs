@@ -897,6 +897,24 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
+    let (outcome, trace) = ep_runtime::psychrometrics::production_trace::capture(
+        config.trace_level == TraceLevel::Full,
+        || run_with_optional_porting_scope_impl(config, scope),
+    );
+    if let Some(trace) = trace {
+        // The collector starts before runtime input preparation or any possible
+        // Cp cache priming on this execution thread. Export only an observation.
+        if outcome.is_ok() && config.output_dir.is_dir() {
+            crate::psychrometrics_trace::write_production_trace(config, &trace)?;
+        }
+    }
+    outcome
+}
+
+fn run_with_optional_porting_scope_impl(
+    config: &RunConfig,
+    scope: Option<crate::PortingScope>,
+) -> Result<RunOutcome, RunError> {
     let total_start = Instant::now();
     prepare_output_dir(&config.output_dir, config.overwrite)?;
     create_output_layout(&config.output_dir)
@@ -1225,10 +1243,9 @@ fn run_with_optional_porting_scope(
             }
         };
         let runtime_setup_start = Instant::now();
-        let runtime_inputs = match prepare_runtime_inputs(
-            config,
-            simulation_model.as_ref(),
-            assessment.runtime_class,
+        let runtime_inputs = match ep_runtime::psychrometrics::production_trace::in_phase(
+            "rust_runtime_setup",
+            || prepare_runtime_inputs(config, simulation_model.as_ref(), assessment.runtime_class),
         ) {
             Ok(inputs) => inputs,
             Err(error) => {
@@ -1259,12 +1276,14 @@ fn run_with_optional_porting_scope(
         let runtime_start = Instant::now();
         match validate_runtime_selection(assessment.run_result_state, assessment.runtime_class)
             .and_then(|()| {
-                execute_rust_runtime(
-                    simulation_model.as_ref(),
-                    assessment.runtime_class,
-                    source_order_gate,
-                    &runtime_inputs,
-                )
+                ep_runtime::psychrometrics::production_trace::in_phase("rust_runtime", || {
+                    execute_rust_runtime(
+                        simulation_model.as_ref(),
+                        assessment.runtime_class,
+                        source_order_gate,
+                        &runtime_inputs,
+                    )
+                })
             })
             .and_then(|result| {
                 validate_runtime_demand_provenance(
@@ -3296,6 +3315,9 @@ fn prepare_runtime_inputs(
                     .into_iter()
                     .next()
                     .ok_or_else(|| "no zone-timestep environment axis was available".to_string())?;
+                    ep_runtime::psychrometrics::production_trace::register_environment_axis(
+                        &environment_axis,
+                    );
                     Some(precompute_schedule_cache_for_environment_time_axis(
                         &model.typed,
                         &environment_axis,
@@ -3321,6 +3343,7 @@ fn prepare_runtime_inputs(
         runtime_class_requires_weather(runtime_class),
     )?;
     let schedule_cache = precompute_schedule_cache_for_time_axis(&model.typed, &time_axis);
+    ep_runtime::psychrometrics::production_trace::register_time_axis(&time_axis);
 
     Ok(PreparedRuntimeInputs {
         sample_count,

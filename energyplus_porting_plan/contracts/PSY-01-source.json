@@ -1,0 +1,301 @@
+{
+  "schema": "psy01-source-contract.v1",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "named_card_functions": [
+    "PsyCpAirFnW",
+    "PsyRhoAirFnPbTdbW",
+    "PsyHFnTdbW",
+    "PsyTdbFnHW"
+  ],
+  "induced_integration_helpers": [
+    {
+      "function": "PsyWFnTdbH",
+      "reason": "Existing H-to-W consumers must use original J-based expression and negative-result guard after canonical H delegation",
+      "not_a_PSY_02_completion_claim": true,
+      "caller_branches": "Source boundaries document existing consumers; CSHR/dehumidification remains outside CON-01 B admitted None controls"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+    },
+    {
+      "path": "src/EnergyPlus/api/TypeDefs.h",
+      "sha256": "8fff8cf997e09d396357b0b63762ec7f532490b7ae0d1a3d0395359e627e5a32"
+    },
+    {
+      "path": "src/EnergyPlus/api/func.cc",
+      "sha256": "78cff481145ac70564101b102748d87da9bd1b964783d27891df162e3cd1e0c9"
+    },
+    {
+      "path": "src/EnergyPlus/api/state.cc",
+      "sha256": "ee6d3ef12048ea82bd1cb942f2bdb7755fe4a39cdcb91272a37aee742ad3b639"
+    },
+    {
+      "path": "src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+    },
+    {
+      "path": "src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyRhoAirFnPbTdbW state overload",
+      "start_line": 512,
+      "end_line": 547,
+      "range_sha256": "ebdb4af3f3c4dbef51ec96ebc9a37c5ee6bf316555312774df6c15f302b0dd9e"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyRhoAirFnPbTdbW constexpr overload",
+      "start_line": 549,
+      "end_line": 574,
+      "range_sha256": "92b2e5cf6679eaec26da0297347e67aa8b316a295f80f1464c210348ed98f2a1"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyRhoAirFnPbTdbW_fast",
+      "start_line": 576,
+      "end_line": 591,
+      "range_sha256": "a0b317d05a61af5294a17dd0272f04fe442ed190f382c5525913a74650dde821"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyHFnTdbW",
+      "start_line": 648,
+      "end_line": 666,
+      "range_sha256": "9098e1862ca09275a9d8a83d29c12b21964e5676dcaf137123a9b169338bdf64"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyHFnTdbW_fast",
+      "start_line": 668,
+      "end_line": 677,
+      "range_sha256": "15cd4db8bd754da09e479e69858b0b542d91c9b98dcb1ab0bacb46096bc02f2d"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyCpAirFnW",
+      "start_line": 679,
+      "end_line": 716,
+      "range_sha256": "eb9a93e46b4f387bd8793b3dd603d4321fbded041a4ccdfed1e550261d4fa09d"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyCpAirFnW_fast",
+      "start_line": 718,
+      "end_line": 741,
+      "range_sha256": "3bf8c6ab6ad79b61632ec4e08c3be0d792baa3c36248e3c7dbb34743eb8c22b7"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyTdbFnHW",
+      "start_line": 743,
+      "end_line": 762,
+      "range_sha256": "917e3764e3be677c4eb5b9e97cbc303915953bb9b44a4db16d32d1ed59f64e05"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyWFnTdbH induced consumer compatibility helper",
+      "start_line": 962,
+      "end_line": 998,
+      "range_sha256": "e0b218f02e04d69006da337d9f8817fecc3ea0302aa7e92939c8e2e90ba826cc"
+    },
+    {
+      "file": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "positive-flow cooling supply H and sensible capacity inverse T",
+      "start_line": 2191,
+      "end_line": 2204,
+      "range_sha256": "e0a8d49ce697b231cf03d31dbd92a6ba96f3af002e038b0473b2e135e4bd2424"
+    },
+    {
+      "file": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "ConstantSensibleHeatRatio initial H-to-W consumer",
+      "start_line": 2213,
+      "end_line": 2227,
+      "range_sha256": "9062e93f4c9f4b9a7cac8a210f8b2ab4c68664b55282cbb826c18937c2399ced"
+    },
+    {
+      "file": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "dehumidifying capacity consumer control branches",
+      "start_line": 2263,
+      "end_line": 2306,
+      "range_sha256": "596e846b1d3cf3782ffaf1f475e1e3ae9ad845cb88474b575580204c550fa6b6"
+    },
+    {
+      "file": "src/EnergyPlus/PurchasedAirManager.cc",
+      "symbol": "post-saturation H-to-W-to-H consumer (upstream saturation excluded)",
+      "start_line": 2313,
+      "end_line": 2325,
+      "range_sha256": "78dd1a17d66b1069300b7719f45990e9c11d0559ffc29cef1bbefb476d6364ae"
+    },
+    {
+      "file": "src/EnergyPlus/DataGlobalConstants.hh",
+      "symbol": "Constant::Kelvin",
+      "start_line": 611,
+      "end_line": 611,
+      "range_sha256": "cdb2a6aa005c6d56ca71fedfc2719eba5439d8110315913d0cdcd4876989417c"
+    },
+    {
+      "file": "src/EnergyPlus/api/TypeDefs.h",
+      "symbol": "Real64",
+      "start_line": 52,
+      "end_line": 52,
+      "range_sha256": "1670daded619c69877dcb18f1eba79ec2213721ce211f9b8875a5e48251e29ed"
+    },
+    {
+      "file": "src/EnergyPlus/EnergyPlus.hh",
+      "symbol": "using ObjexxFCL::max",
+      "start_line": 165,
+      "end_line": 165,
+      "range_sha256": "3b6c82963c31ae5dfbe11d90129295cb4f2b8724e6a1fb9733549c8282968d01"
+    },
+    {
+      "file": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "symbol": "max(double,double)",
+      "start_line": 338,
+      "end_line": 344,
+      "range_sha256": "adac2895827d687dfeacca560aec41f77eb548a1d8c0a0d55b2950032928749a"
+    },
+    {
+      "file": "src/EnergyPlus/api/func.cc",
+      "symbol": "native API dispatcher",
+      "start_line": 165,
+      "end_line": 199,
+      "range_sha256": "ec3751f2abb233d6ad6629a88838984445de68165a5652b18f5c14ce565baccd"
+    },
+    {
+      "file": "src/EnergyPlus/api/state.cc",
+      "symbol": "stateNew",
+      "start_line": 56,
+      "end_line": 60,
+      "range_sha256": "f929e4d41512466b3a9979f781d55ddb1eb79b3f1845900bd464f36545e7893e"
+    },
+    {
+      "file": "src/EnergyPlus/api/state.cc",
+      "symbol": "stateDelete",
+      "start_line": 76,
+      "end_line": 79,
+      "range_sha256": "8c5088aeade2974cccded5bf7af48d8d5a2cbddc61592f09361d4ea4a38ea3d1"
+    }
+  ],
+  "reference": {
+    "method": "full original header with read-only Cp cache observers",
+    "copy_sha256": "02838a0c8e0d3b474cc006f9af689858a225f53fabaa211184f4407eb5509a03",
+    "patches": [
+      {
+        "operation": "insert_before_original_line",
+        "line": 701,
+        "original_line": "",
+        "inserted_text": "        ::psy01::observe_before(false, dwSave, cpaSave);\n"
+      },
+      {
+        "operation": "insert_before_original_line",
+        "line": 704,
+        "original_line": "            return cpaSave;",
+        "inserted_text": "            ::psy01::observe_after(false, dwSave, cpaSave, true);\n"
+      },
+      {
+        "operation": "insert_before_original_line",
+        "line": 715,
+        "original_line": "        return cpa;",
+        "inserted_text": "        ::psy01::observe_after(false, dwSave, cpaSave, false);\n"
+      },
+      {
+        "operation": "insert_before_original_line",
+        "line": 727,
+        "original_line": "",
+        "inserted_text": "        ::psy01::observe_before(true, dwSave, cpaSave);\n"
+      },
+      {
+        "operation": "insert_before_original_line",
+        "line": 730,
+        "original_line": "            return cpaSave;",
+        "inserted_text": "            ::psy01::observe_after(true, dwSave, cpaSave, true);\n"
+      },
+      {
+        "operation": "insert_before_original_line",
+        "line": 740,
+        "original_line": "        return cpa;",
+        "inserted_text": "        ::psy01::observe_after(true, dwSave, cpaSave, false);\n"
+      }
+    ],
+    "original_byte_restoration_checked": true,
+    "state_provider": {
+      "path": ".runtime/energyplus/26.1.0/energyplusapi.dll",
+      "sha256": "bbe6f66240d108df9f51a03b9beb968808a2173234253574d27a31605aec2aa2",
+      "exports": [
+        "stateNew",
+        "stateDelete"
+      ],
+      "abi": "Opaque DLL-owned state; compiled rho/W bodies never dereference fields with EP_psych_errors and EP_psych_stats undefined"
+    }
+  },
+  "numerical_contract": {
+    "real_type": "IEEE-754 binary64 (original Real64 typedef double)",
+    "humidity_floor_kg_per_kg": 1e-05,
+    "kelvin_offset": 273.15,
+    "density_constants": {
+      "dry_air_gas_constant": 287.0,
+      "water_air_mass_ratio": 1.6077687
+    },
+    "enthalpy_constants": {
+      "dry_air_cp": 1004.84,
+      "vapor_enthalpy_intercept": 2500940.0,
+      "vapor_cp": 1858.95
+    },
+    "normal_humidity": "ObjexxFCL max: (a < b ? b : a); negative/zero W floors, NaN remains NaN",
+    "fast_precondition": "W >= 1e-5 asserted; NaN and -Infinity fail; no pre-floor inserted by dispatcher",
+    "induced_inverse_humidity": {
+      "expression_grouping": "(H - 1004.84*T) / (2500940 + 1858.95*T)",
+      "guard": "Only computed W<0 returns1e-5; zero, positive subfloor and NaN are returned unchanged",
+      "mutable_state": "none with warning/statistics aggregation excluded"
+    },
+    "cp_state": {
+      "normal_and_fast": "independent process-static last-input/last-output pairs",
+      "initial_dw_save": -100.0,
+      "initial_cpa_save": -100.0,
+      "key": "raw W exact floating equality before floor; -0 == +0, NaN != NaN",
+      "cold_sentinel": "First normal W=-100 returns -100 before floor; after another W it computes floor Cp",
+      "timing": "read cache -> hit return, or compute -> save raw input/output -> return",
+      "reset": "fresh reference process only; sequence IDs don't reset state",
+      "thread_contract": "single bounded execution thread; original cross-thread data race outside scope"
+    }
+  },
+  "native_api": {
+    "rho": "fast",
+    "enthalpy": "fast",
+    "cp": "normal",
+    "inverse_temperature": "normal",
+    "negative_or_subfloor_rho_h_not_valid_reference": true
+  },
+  "production_replay": {
+    "input_schema": "psy01-tuples.v2",
+    "output_schema": "psy01-results.v2",
+    "storage": "lossless dictionaries and ordered u32 indices; event sequence=index+1",
+    "execution": "Every ordered event invokes the original body; dictionary duplicates/cache hits are never skipped",
+    "reference_intern_key": "source input ID plus computed result bits and actual before/after Cp cache bits/hit",
+    "state": "no from_call or per-event previous-output map in production; original caches persist",
+    "comparison": "exact ordered input identity; unique actual/reference pair counts weight errors/RMSE by real event repetitions",
+    "unit_protocol_unchanged": "394 calls, psy01-tuples.v1/psy01-results.v1"
+  },
+  "exclusions": [
+    "file I/O/warning/statistics aggregation/EP_psych_errors/EP_psych_stats",
+    "PSY-02 saturation/relative humidity helpers",
+    "invalid fast arguments",
+    "production scope admission of arbitrary IEEE/helper-domain probes",
+    "cross-thread original static cache behavior"
+  ]
+}

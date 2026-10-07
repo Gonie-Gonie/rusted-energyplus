@@ -12,6 +12,7 @@ use crate::ideal_loads::{
     DirectZonePurchasedAirScheduledCouplingInput, DirectZonePurchasedAirScheduledCouplingOutput,
     PurchasedAirRuntimeState, couple_model_bound_direct_zone_purchased_air,
 };
+use crate::psychrometrics::production_trace::system_call as trace_system_call;
 use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache};
 use crate::weather::{
     HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
@@ -86,6 +87,11 @@ pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased
                         })
                     })
                     .unwrap_or(binding.limit_context);
+                let _trace_scope = trace_system_call(
+                    coupling_schedule_sample_index,
+                    begin_environment,
+                    input.timestep_seconds,
+                );
                 couple_model_bound_direct_zone_purchased_air(
                     DirectZonePurchasedAirScheduledCouplingInput {
                         binding,

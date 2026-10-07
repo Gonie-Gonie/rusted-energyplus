@@ -167,7 +167,8 @@ fn full_public_cp339_nan_chain_skips_arithmetic_and_preserves_supply_enthalpy() 
 
 #[test]
 fn full_public_cp339_positive_infinity_chain_uses_cp341_finite_maximum() {
-    let (mut runtime, system, predecessor) = completed_cp341_case(-f64::MAX, 1.0, true);
+    let (mut runtime, system, predecessor) =
+        completed_cp341_case_with_zone_temperature(-f64::MAX, 1.0, true, 0.008, 24.0);
     let cp339 = runtime
         .units
         .get(&system.id)

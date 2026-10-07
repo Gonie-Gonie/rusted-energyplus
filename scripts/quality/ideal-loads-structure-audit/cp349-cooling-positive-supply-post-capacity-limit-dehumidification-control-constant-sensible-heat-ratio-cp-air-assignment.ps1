@@ -269,7 +269,7 @@ Assert-Cp349RuntimeContract -Text $cp349RuntimeText
 Assert-Cp349BindingContract -Text $cp349BindingText
 Assert-Cp349PipelineRootContract -Text $cp349PipelineRootText
 Assert-Cp349SerializationContract -Text $cp349SnapshotSerializationText
-Assert-Contains -Path $cp349Psychrometrics -Pattern 'pub fn energyplus_psy_cp_air_fn_w\s*\(' -Description "canonical stateless CpAir helper"
+Assert-Contains -Path $cp349Psychrometrics -Pattern 'pub fn energyplus_psy_cp_air_fn_w\s*\(' -Description "canonical stateful CpAir helper"
 Assert-Contains -Path $cp349Prefix -Pattern 'owner\.mixed_air_humidity_ratio' -Description "CP329-owned operand"
 Assert-Contains -Path $cp349Prefix -Pattern 'cooling_mixed_air_call_snapshots_match_bit_exact\(owner,\s*owner_witness\)' -Description "CP329 latest/private parity"
 Assert-Contains -Path $cp349Prefix -Pattern '(?s)operand\.is_finite\(\).*?operand\s*>=\s*0\.0.*?energyplus_psy_cp_air_fn_w\(operand\)\.is_finite\(\)' -Description "private K physical-domain gate"

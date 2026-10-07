@@ -86,3 +86,76 @@ EnergyPlus simulation and Rust numerical comparison remain unexecuted.
 The runner records implementation artifacts and reference DLL hashes as well as
 the repository revision. Evidence created from an uncommitted working tree is
 identified by those exact hashes. Review and gate promotion remain explicit.
+
+# PSY-01 original psychrometric reference
+
+```powershell
+python tools/porting/psy01_reference.py --prepare
+python tools/porting/psy01_reference.py --check
+python tools/porting/psy01_reference.py
+python tools/porting/psy01_reference_compression_check.py
+cargo build -p ep_runtime --example psy01_tuples
+python tools/porting/psy01_reference.py --rust-runner target/debug/examples/psy01_tuples.exe
+```
+
+`--prepare` deterministically writes the source, cases, and per-output tolerance
+contracts for review **before comparison**. `--check` verifies exact original
+source/DLL pins and frozen contract bytes without compiling or writing. The
+default reference executes 394 ordered calls in two fresh processes. Each process
+preserves both independent normal/fast Cp caches across descriptive sequence IDs;
+the cold process begins with W=-100, exercising the original initial-cache return.
+Inverse-temperature and induced inverse-humidity calls with
+`h_j_per_kg: {from_call: N}` consume their own implementation's preceding enthalpy
+result, rather than an expected-value fixture. `PsyWFnTdbH` is the sole induced
+consumer-compatibility helper: existing H-to-W consumers must preserve the original
+J-based grouping and negative-result guard after canonical H delegation. Its
+31 additional calls cover independent zero/negative/subfloor W boundaries and
+own-result chains. The named PSY-01 four-function scope remains unchanged; this
+addition does not certify PSY-02 or add CSHR/dehumidification to CON-01 B inputs.
+
+The portable compiler from `reference_tools.json` includes the entire original
+`Psychrometrics.hh`. The runtime-only header copy adds six read-only observers
+to Cp cache states; removing those exact insertions must restore every original
+byte. The tool records original/copy/range hashes, patch records, compiler flags,
+all compile dependency hashes, commands, logs, outputs and DLL/binary hashes.
+The original `stateNew`/`stateDelete` exports provide an opaque valid state for
+the original density overloads and inverse-humidity helper. With warning and
+statistics aggregation disabled, these inline bodies don't access state fields.
+All formulas, cache branches and assignments
+come from the original source. Fast W>=1e-5 assertions remain enabled. The native
+functional API uses fast density/enthalpy and is therefore unsuitable for the
+card's negative/subfloor W normal-function cases.
+
+Replay concrete actual inputs with `--calls INPUT.json` (`psy01-tuples.v1`).
+Optional `--rust-results RESULTS.json` compares an existing single result file;
+`--rust-runner` invokes the Rust helper runner without expected-output input.
+Finite outputs use the previously frozen units and individual atol/rtol rows.
+Classification, call identity/order, context, cache hit and raw cache W are exact;
+signed zero is exact, while NaN payload bits are recorded without requiring equality.
+
+For production observations, execute each normal CLI run in a fresh process with
+`--trace-level full`, then replay its observed input bits and compare its actual
+recorded result/cache bits directly:
+
+```powershell
+python tools/porting/psy01_reference.py --production-trace .runtime/porting/PSY-01/production/A/psychrometrics-calls.json --output-dir .runtime/porting/PSY-01/replay/A
+```
+
+Production replay preserves the actual Rust caller and pipeline phase; it doesn't
+claim those phases are EnergyPlus stages. The recorded prefix and omitted-call
+counts remain explicit. It accepts lossless `psychrometrics-calls.v2` dictionary
+rows and ordered u32 indices, including opaque actual zone/system invocation
+context. Each event invokes the original C++ body in sequence, including cache
+hits; reference results are interned by input identity plus computed result and
+actual Cp cache state. Changed source results/cache states create distinct output
+variants. Both sides remain reconstructable at every event without expanding
+millions of duplicate JSON rows. Exact input/context/cache/order checks and
+per-variable error/RMSE use real event repetition counts. Python stores indices
+as packed u32 arrays and streams them to the wrapper. The reference-only
+compression check replays all 394 original unit results and independently forces
+multiple cache-state variants for a repeated input ID; it is not a Rust comparison.
+A synthetic Rust helper rerun cannot replace the actual
+observed production results. Fast variants that aren't called by production
+remain unit-only coverage. Raw arrays/logs and compiled tools remain `.runtime`;
+compact source receipts live in `evidence/PSY-01`. This workflow does not update
+cards or gates and does not certify downstream ZON-02/HVAC-04/05 physics.

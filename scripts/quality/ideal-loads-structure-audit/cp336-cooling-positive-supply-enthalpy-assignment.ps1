@@ -107,7 +107,7 @@ Assert-PatternsInOrder -Path $cp336Transition -Patterns @(
 Assert-NotContains -Path $cp336Transition -Pattern 'moist_air_enthalpy_j_per_kg|energyplus_psy_h_fn_tdb_w_fast|energyplus_psy_h_fn_tdb_w_raw|1\.004_84e3|2\.500_94e6|f64::max|\.max\(' -Description "CP336 forbidden alternate or regrouped transition helper"
 Assert-Contains -Path $cp336Psychrometrics -Pattern 'const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1\.0e-5;' -Description "canonical EnergyPlus humidity floor constant"
 Assert-Contains -Path $cp336Psychrometrics -Pattern '(?s)fn energyplus_humidity_ratio_floor\(humidity_ratio: f64\).*?if humidity_ratio < ENERGYPLUS_MIN_HUMIDITY_RATIO \{\s*ENERGYPLUS_MIN_HUMIDITY_RATIO\s*\} else \{\s*humidity_ratio\s*\}' -Description "canonical source max humidity-floor behavior"
-Assert-Contains -Path $cp336Psychrometrics -Pattern '(?s)pub fn energyplus_psy_h_fn_tdb_w\(dry_bulb_c: f64, humidity_ratio: f64\) -> f64 \{\s*energyplus_psy_h_fn_tdb_w_raw\(dry_bulb_c, energyplus_humidity_ratio_floor\(humidity_ratio\)\)\s*\}' -Description "canonical enthalpy helper uses source floor"
+Assert-Contains -Path $cp336Psychrometrics -Pattern '(?s)pub fn energyplus_psy_h_fn_tdb_w\(dry_bulb_c: f64, humidity_ratio: f64\) -> f64 \{\s*let result =\s*energyplus_psy_h_fn_tdb_w_raw\(dry_bulb_c,\s*energyplus_humidity_ratio_floor\(humidity_ratio\)\);\s*production_trace::record\("PsyHFnTdbW",\s*&\[dry_bulb_c, humidity_ratio\],\s*result\);\s*result\s*\}' -Description "canonical enthalpy helper uses source floor"
 
 foreach ($cp336Route in @(
         'UnitOff',

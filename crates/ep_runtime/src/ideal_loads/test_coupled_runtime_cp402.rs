@@ -30,6 +30,9 @@ use super::super::cooling_post_saturation_capacity_limit_dehumidification_contro
 
 #[test]
 fn cp402_executes_public_routes_with_raw_greater_than_or_equal_comparison() {
+    // The tiny-capacity W=0.024 case has a pinned H -> T result above
+    // Tmix=22 C, so the source mixed-air clamp makes sensible output zero.
+    // The true raw >= branch therefore exercises exact latent/capacity equality.
     let mut saw_active = false;
     let mut saw_inactive = false;
     let mut saw_body = false;
@@ -39,7 +42,7 @@ fn cp402_executes_public_routes_with_raw_greater_than_or_equal_comparison() {
         (IdealLoadsLimit::NoLimit, 0.020, 5_000.0, 1.0),
         (
             IdealLoadsLimit::LimitCapacity,
-            0.020,
+            0.024,
             f64::MIN_POSITIVE,
             1.0,
         ),
@@ -90,6 +93,13 @@ fn cp402_executes_public_routes_with_raw_greater_than_or_equal_comparison() {
                 .maximum_total_cooling_capacity_w
                 .expect("active CP402 capacity operand");
             let result = latent >= maximum;
+            if result {
+                assert_eq!(
+                    latent.to_bits(),
+                    maximum.to_bits(),
+                    "the zero-sensible fixture must exercise source guard equality",
+                );
+            }
             assert_eq!(
                 snapshot
                     .cooling_latent_output_greater_than_or_equal_to_maximum_total_cooling_capacity,

@@ -601,6 +601,62 @@ fn zero_capacity_limit_disables_sensible_branch_flow() {
     assert_eq!(result.zone_total_heating_rate_w, 0.0);
 }
 
+#[test]
+fn cooling_capacity_source_guard_consumes_the_actual_enthalpy_inverse_result() {
+    use crate::psychrometrics::{energyplus_psy_h_fn_tdb_w, production_trace::capture};
+
+    let mut system = test_system();
+    let zone = IdealLoadsZoneState {
+        air_temperature_c: 25.0,
+        air_humidity_ratio: 0.008,
+    };
+    let demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -2400.0);
+    let context = IdealLoadsSensibleLimitContext::default();
+    let unlimited = calc_no_oa_sensible_with_limits_compat(&system, zone, demand, true, context);
+    let source_guard_value = unlimited.supply_mass_flow_rate_kg_per_s
+        * (energyplus_psy_h_fn_tdb_w(zone.air_temperature_c, zone.air_humidity_ratio)
+            - energyplus_psy_h_fn_tdb_w(unlimited.supply_temperature_c, zone.air_humidity_ratio));
+    system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+    for (maximum, expected_inverse_count) in [
+        (source_guard_value * 2.0, 0),
+        (source_guard_value, 1),
+        (1000.0, 1),
+    ] {
+        system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(maximum));
+        let (result, trace) = capture(true, || {
+            calc_no_oa_sensible_with_limits_compat(&system, zone, demand, true, context)
+        });
+        let calls = trace.expect("enabled actual-kernel capture").calls;
+        let inverses: Vec<_> = calls
+            .iter()
+            .filter(|call| call.routine == "PsyTdbFnHW")
+            .collect();
+        assert_eq!(inverses.len(), expected_inverse_count);
+        assert_eq!(
+            result.supply_mass_flow_rate_kg_per_s.to_bits(),
+            unlimited.supply_mass_flow_rate_kg_per_s.to_bits()
+        );
+        if let Some(inverse) = inverses.first() {
+            assert!(
+                inverse.caller.file.ends_with("ideal_loads/calc/no_oa.rs")
+                    || inverse.caller.file.ends_with("ideal_loads\\calc\\no_oa.rs")
+            );
+            let actual_returned_temperature = f64::from_bits(inverse.result_bits);
+            assert_eq!(
+                result.supply_temperature_c.to_bits(),
+                actual_returned_temperature
+                    .min(zone.air_temperature_c)
+                    .to_bits()
+            );
+        } else {
+            assert_eq!(
+                result.supply_temperature_c.to_bits(),
+                unlimited.supply_temperature_c.to_bits()
+            );
+        }
+    }
+}
+
 fn assert_close(actual: f64, expected: f64, tolerance: f64) {
     assert!(
         (actual - expected).abs() <= tolerance,

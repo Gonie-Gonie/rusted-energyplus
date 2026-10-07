@@ -1,5 +1,12 @@
 //! EnergyPlus psychrometric helper functions used by runtime and IdealLoads.
 
+mod cp_cache;
+
+pub use cp_cache::{EnergyPlusCpAirCache, EnergyPlusCpAirCacheState};
+
+/// Opt-in observations of actual production psychrometric calls.
+pub mod production_trace;
+
 #[path = "psychrometrics_spline_tables.rs"]
 mod spline_tables;
 
@@ -148,6 +155,7 @@ fn energyplus_general_iterate(
 /// This mirrors the moist-air density and specific-heat terms EnergyPlus uses
 /// when building zone-air `AirPowerCap`; callers must provide the owning zone
 /// humidity ratio.
+#[track_caller]
 pub fn energyplus_zone_air_heat_capacity_j_per_k(
     volume_m3: f64,
     atmospheric_pressure_pa: f64,
@@ -168,6 +176,7 @@ pub fn energyplus_zone_air_heat_capacity_j_per_k(
 }
 
 /// Returns EnergyPlus-style zone air heat capacity at standard pressure.
+#[track_caller]
 pub fn energyplus_standard_zone_air_heat_capacity_j_per_k(
     volume_m3: f64,
     dry_bulb_c: f64,
@@ -189,16 +198,23 @@ pub fn energyplus_standard_zone_air_heat_capacity_j_per_k(
 /// fatal branch is a separate, deferred error-reporting boundary.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_rho_air_fn_pb_tdb_w(
     atmospheric_pressure_pa: f64,
     dry_bulb_c: f64,
     humidity_ratio: f64,
 ) -> f64 {
-    energyplus_psy_rho_air_fn_pb_tdb_w_raw(
+    let result = energyplus_psy_rho_air_fn_pb_tdb_w_raw(
         atmospheric_pressure_pa,
         dry_bulb_c,
         energyplus_humidity_ratio_floor(humidity_ratio),
-    )
+    );
+    production_trace::record(
+        "PsyRhoAirFnPbTdbW",
+        &[atmospheric_pressure_pa, dry_bulb_c, humidity_ratio],
+        result,
+    );
+    result
 }
 
 /// Canonical EnergyPlus 26.1 `PsyRhoAirFnPbTdbW_fast` numerical path.
@@ -208,13 +224,21 @@ pub fn energyplus_psy_rho_air_fn_pb_tdb_w(
 /// diagnostic and fatal-error path remains a separate, deferred state boundary.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_rho_air_fn_pb_tdb_w_fast(
     atmospheric_pressure_pa: f64,
     dry_bulb_c: f64,
     humidity_ratio: f64,
 ) -> f64 {
     debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
-    energyplus_psy_rho_air_fn_pb_tdb_w_raw(atmospheric_pressure_pa, dry_bulb_c, humidity_ratio)
+    let result =
+        energyplus_psy_rho_air_fn_pb_tdb_w_raw(atmospheric_pressure_pa, dry_bulb_c, humidity_ratio);
+    production_trace::record(
+        "PsyRhoAirFnPbTdbW_fast",
+        &[atmospheric_pressure_pa, dry_bulb_c, humidity_ratio],
+        result,
+    );
+    result
 }
 
 /// Canonical EnergyPlus 26.1 `PsyHfgAirFnWTdb` heat of vaporization in J/kg.
@@ -241,8 +265,12 @@ pub fn energyplus_psy_hg_air_fn_w_tdb(_humidity_ratio: f64, dry_bulb_c: f64) -> 
 /// Canonical EnergyPlus 26.1 `PsyHFnTdbW` moist-air enthalpy in J/kg.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_h_fn_tdb_w(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
-    energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c, energyplus_humidity_ratio_floor(humidity_ratio))
+    let result =
+        energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c, energyplus_humidity_ratio_floor(humidity_ratio));
+    production_trace::record("PsyHFnTdbW", &[dry_bulb_c, humidity_ratio], result);
+    result
 }
 
 /// Canonical EnergyPlus 26.1 `PsyHFnTdbW_fast` numerical path.
@@ -251,44 +279,56 @@ pub fn energyplus_psy_h_fn_tdb_w(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
 /// the precondition is checked only when debug assertions are enabled.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_h_fn_tdb_w_fast(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
     debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
-    energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c, humidity_ratio)
+    let result = energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c, humidity_ratio);
+    production_trace::record("PsyHFnTdbW_fast", &[dry_bulb_c, humidity_ratio], result);
+    result
 }
 
-/// Canonical, stateless EnergyPlus 26.1 `PsyCpAirFnW` calculation.
+/// Canonical EnergyPlus 26.1 `PsyCpAirFnW`, including last-call state.
 ///
-/// EnergyPlus wraps this expression in a last-call cache whose physical-domain
-/// behavior is output-neutral. This pure function intentionally ports the
-/// numerical result without mutable cache or sentinel state; cache accounting
-/// and performance parity are separate, deferred work.
+/// The normal and fast variants own independent thread-local saved values,
+/// retained across same-thread environments. This matches source call order
+/// for the bounded single-thread executor, including the cold `-100` sentinel.
+/// EnergyPlus's unsynchronized process-global cross-thread behavior is excluded.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_cp_air_fn_w(humidity_ratio: f64) -> f64 {
-    energyplus_psy_cp_air_fn_w_raw(energyplus_humidity_ratio_floor(humidity_ratio))
+    let (result, before, after) = cp_cache::normal(humidity_ratio);
+    production_trace::record_cp("PsyCpAirFnW", &[humidity_ratio], result, before, after);
+    result
 }
 
 /// Canonical EnergyPlus 26.1 `PsyCpAirFnW_fast` numerical path.
 ///
 /// The caller must provide `humidity_ratio >= 1.0e-5`; debug builds assert the
-/// precondition before evaluating the pure numerical path.
+/// precondition before accessing the independent last-call cache.
 ///
-/// EnergyPlus wraps this expression in a function-local last-call cache. This
-/// pure function preserves the output-neutral valid-domain calculation while
-/// deferring cache identity, hit/miss history, sentinel, and concurrency policy.
+/// Its thread-local saved input and result are independent of the normal
+/// variant; see [`energyplus_psy_cp_air_fn_w`] for the execution boundary.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_cp_air_fn_w_fast(humidity_ratio: f64) -> f64 {
     debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
-    energyplus_psy_cp_air_fn_w_raw(humidity_ratio)
+    let (result, before, after) = cp_cache::fast(humidity_ratio);
+    production_trace::record_cp("PsyCpAirFnW_fast", &[humidity_ratio], result, before, after);
+    result
 }
 
 /// Canonical EnergyPlus 26.1 `PsyTdbFnHW` dry-bulb inversion in Celsius.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_tdb_fn_h_w(enthalpy_j_per_kg: f64, humidity_ratio: f64) -> f64 {
-    let humidity_ratio = energyplus_humidity_ratio_floor(humidity_ratio);
-    (enthalpy_j_per_kg - 2.500_94e6 * humidity_ratio) / (1.004_84e3 + 1.858_95e3 * humidity_ratio)
+    let effective_humidity_ratio = energyplus_humidity_ratio_floor(humidity_ratio);
+    let result = (enthalpy_j_per_kg - 2.500_94e6 * effective_humidity_ratio)
+        / (1.004_84e3 + 1.858_95e3 * effective_humidity_ratio);
+    production_trace::record("PsyTdbFnHW", &[enthalpy_j_per_kg, humidity_ratio], result);
+    result
 }
 
 /// Canonical EnergyPlus 26.1 `PsyRhovFnTdbRhLBnd0C` vapor density in kg/m3.
@@ -394,15 +434,18 @@ pub fn energyplus_psy_v_fn_tdb_w_pb(
 /// this pure helper.
 #[must_use]
 #[inline]
+#[track_caller]
 pub fn energyplus_psy_w_fn_tdb_h(dry_bulb_c: f64, enthalpy_j_per_kg: f64) -> f64 {
     let humidity_ratio =
         (enthalpy_j_per_kg - 1.004_84e3 * dry_bulb_c) / (2.500_94e6 + 1.858_95e3 * dry_bulb_c);
 
-    if humidity_ratio < 0.0 {
+    let result = if humidity_ratio < 0.0 {
         ENERGYPLUS_MIN_HUMIDITY_RATIO
     } else {
         humidity_ratio
-    }
+    };
+    production_trace::record("PsyWFnTdbH", &[dry_bulb_c, enthalpy_j_per_kg], result);
+    result
 }
 
 /// Returns guarded EnergyPlus-style moist-air density in kg/m3.
@@ -410,6 +453,7 @@ pub fn energyplus_psy_w_fn_tdb_h(dry_bulb_c: f64, enthalpy_j_per_kg: f64) -> f64
 /// This compatibility wrapper retains its pre-existing validation contract and
 /// NaN-humidity normalization; use [`energyplus_psy_rho_air_fn_pb_tdb_w`] for
 /// the canonical unguarded EnergyPlus numerical semantics.
+#[track_caller]
 pub fn energyplus_moist_air_density_kg_per_m3(
     atmospheric_pressure_pa: f64,
     dry_bulb_c: f64,
@@ -440,6 +484,7 @@ pub fn energyplus_moist_air_density_kg_per_m3(
 /// This compatibility wrapper retains its pre-existing NaN-humidity
 /// normalization; use [`energyplus_psy_cp_air_fn_w`] for the canonical
 /// EnergyPlus numerical semantics.
+#[track_caller]
 pub fn energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio: f64) -> f64 {
     energyplus_psy_cp_air_fn_w(humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO))
 }

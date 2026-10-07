@@ -1,0 +1,273 @@
+{
+  "schema": "psy01-cpp-fixture-probe-summary.v1",
+  "purpose": "Original CPP-only fixture-boundary diagnosis before approving W .020 to .024 test inputs",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "rust_executed": false,
+  "gates_updated": false,
+  "calls": {
+    "schema": "psy01-tuples.v1",
+    "calls": [
+      {
+        "sequence_id": "fixture-diagnosis",
+        "call_index": 0,
+        "function": "PsyHFnTdbW",
+        "inputs": {
+          "t_db_c": 22.0,
+          "w_kg_per_kg": 0.02
+        },
+        "context": {
+          "purpose": "CPP-only fixture diagnosis",
+          "fixture_w": 0.02
+        }
+      },
+      {
+        "sequence_id": "fixture-diagnosis",
+        "call_index": 1,
+        "function": "PsyTdbFnHW",
+        "inputs": {
+          "h_j_per_kg": {
+            "from_call": 0
+          },
+          "w_kg_per_kg": 0.02
+        },
+        "context": {
+          "purpose": "CPP-only fixture diagnosis",
+          "fixture_w": 0.02
+        }
+      },
+      {
+        "sequence_id": "fixture-diagnosis",
+        "call_index": 2,
+        "function": "PsyCpAirFnW",
+        "inputs": {
+          "w_kg_per_kg": 0.02
+        },
+        "context": {
+          "purpose": "CPP-only fixture diagnosis",
+          "fixture_w": 0.02
+        }
+      },
+      {
+        "sequence_id": "fixture-diagnosis",
+        "call_index": 3,
+        "function": "PsyHFnTdbW",
+        "inputs": {
+          "t_db_c": 22.0,
+          "w_kg_per_kg": 0.024
+        },
+        "context": {
+          "purpose": "CPP-only fixture diagnosis",
+          "fixture_w": 0.024
+        }
+      },
+      {
+        "sequence_id": "fixture-diagnosis",
+        "call_index": 4,
+        "function": "PsyTdbFnHW",
+        "inputs": {
+          "h_j_per_kg": {
+            "from_call": 3
+          },
+          "w_kg_per_kg": 0.024
+        },
+        "context": {
+          "purpose": "CPP-only fixture diagnosis",
+          "fixture_w": 0.024
+        }
+      },
+      {
+        "sequence_id": "fixture-diagnosis",
+        "call_index": 5,
+        "function": "PsyCpAirFnW",
+        "inputs": {
+          "w_kg_per_kg": 0.024
+        },
+        "context": {
+          "purpose": "CPP-only fixture diagnosis",
+          "fixture_w": 0.024
+        }
+      }
+    ]
+  },
+  "original_cpp_results": [
+    {
+      "clamped_vs_mixed": "below",
+      "cp_bits": "4090481374bc6a7f",
+      "cp_j_per_kg_k": 1042.019,
+      "h_bits": "40f1cef37ced9168",
+      "h_j_per_kg": 72943.218,
+      "inverse_t_bits": "4035fffffffffffd",
+      "inverse_t_c": 21.99999999999999,
+      "source_min_t_bits": "4035fffffffffffd",
+      "source_min_t_c": 21.99999999999999,
+      "t_mixed_c": 22.0,
+      "w_kg_per_kg": 0.02
+    },
+    {
+      "clamped_vs_mixed": "equal",
+      "cp_bits": "409065d1b71758e2",
+      "cp_j_per_kg_k": 1049.4548,
+      "h_bits": "40f44a690cb295ea",
+      "h_j_per_kg": 83110.5656,
+      "inverse_t_bits": "4036000000000001",
+      "inverse_t_c": 22.000000000000004,
+      "source_min_t_bits": "4036000000000000",
+      "source_min_t_c": 22.0,
+      "t_mixed_c": 22.0,
+      "w_kg_per_kg": 0.024
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "tools/porting/psy01_reference.py",
+        "--calls",
+        ".runtime/porting/PSY-01/fixture-probe/input.json",
+        "--output-dir",
+        ".runtime/porting/PSY-01/fixture-probe"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "-X",
+        "utf8",
+        ".runtime/porting/PSY-01/fixture-probe/collect_fixture_probe.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "consumer_build": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\llvm-mingw-20260616\\llvm-mingw-20260616-ucrt-x86_64\\bin\\clang++.exe",
+      "-std=c++20",
+      "-O0",
+      "-ffp-contract=off",
+      "-UEP_psych_errors",
+      "-UEP_psych_stats",
+      "-UNDEBUG",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\src",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\ObjexxFCL\\src",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\fmt-8.0.1\\include",
+      "-IC:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0\\third_party\\valijson\\include",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\fixture-probe\\source-min-consumer.cpp",
+      "-o",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\fixture-probe\\source-min-consumer.exe"
+    ],
+    "exit_code": 0,
+    "artifacts": [
+      {
+        "path": ".runtime/porting/PSY-01/fixture-probe/source-min-build-command.json",
+        "sha256": "665614a9da808c5ccd70fe870facdc367951e3f3d93e784007112159dd6b692a"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/fixture-probe/source-min-build-stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/fixture-probe/source-min-build-stderr.log",
+        "sha256": "4ef1f90beb5b411c4e9d3a1dd98532b44e66208fde9777b450c3e54428490a33"
+      }
+    ]
+  },
+  "consumer_execution": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\PSY-01\\fixture-probe\\source-min-consumer.exe"
+    ],
+    "exit_code": 0,
+    "artifacts": [
+      {
+        "path": ".runtime/porting/PSY-01/fixture-probe/source-min-consumer-command.json",
+        "sha256": "fdb8d49c4c04aea19dad34d6501728b0d9e6a569e421219c93879eded3b24055"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/fixture-probe/source-min-consumer-stdout.log",
+        "sha256": "993f6cbbf572309343758c0d43009db44296254bf0f89ee577f811201d22ef5d"
+      },
+      {
+        "path": ".runtime/porting/PSY-01/fixture-probe/source-min-consumer-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "source": {
+    "path": ".runtime/porting/PSY-01/fixture-probe/source-min-consumer.cpp",
+    "sha256": "87d77ce8e119db6a6426984567a918c537c955bb2553d065c7058cdac03f9d96"
+  },
+  "binary": {
+    "path": ".runtime/porting/PSY-01/fixture-probe/source-min-consumer.exe",
+    "sha256": "c002752a06c3b3a329045d8916f86de6176597852e0ee0f107206ae046e872a2"
+  },
+  "raw_receipt": {
+    "path": ".runtime/porting/PSY-01/fixture-probe/fixture-probe.json",
+    "sha256": "e97a28cb85e84af449a00f68d2fffcf41f3b6a4da00de24b6732c6d6a91f594f"
+  },
+  "wrapper_receipt": {
+    "path": ".runtime/porting/PSY-01/fixture-probe/source-reference.json",
+    "sha256": "0a187e4ff7f5c98d222fb362d3189940da79183f1f6006b07aef3815ffd775a9"
+  },
+  "original_range_pins": [
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 648,
+      "end_line": 666,
+      "meaning": "normal H",
+      "range_sha256": "9098e1862ca09275a9d8a83d29c12b21964e5676dcaf137123a9b169338bdf64"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 679,
+      "end_line": 716,
+      "meaning": "normal Cp",
+      "range_sha256": "eb9a93e46b4f387bd8793b3dd603d4321fbded041a4ccdfed1e550261d4fa09d"
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 743,
+      "end_line": 762,
+      "meaning": "normal Tdb",
+      "range_sha256": "917e3764e3be677c4eb5b9e97cbc303915953bb9b44a4db16d32d1ed59f64e05"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "start_line": 90,
+      "end_line": 96,
+      "meaning": "original double min",
+      "range_sha256": "e9df9b39ae0aefa1fa2738bf1a676ddde126bd15f70765f28ae6b6dc127be0f9"
+    },
+    {
+      "path": "src/EnergyPlus/PurchasedAirManager.cc",
+      "start_line": 2294,
+      "end_line": 2305,
+      "meaning": "capacity latent guard and inverse-T upper clamp",
+      "range_sha256": "36ad82aecaa3fa1b099deaf063213d2e544495b4f9988e4c6fe1bf94f281733f"
+    },
+    {
+      "path": "src/EnergyPlus/EnergyPlus.hh",
+      "start_line": 166,
+      "end_line": 166,
+      "meaning": "original global alias of ObjexxFCL::min",
+      "range_sha256": "d24a6094b7ee17bfae8c56342cc402b92e5d7773dfd87e2151d8768d2a33fe8b"
+    }
+  ],
+  "verification": {
+    "existing_wrapper_properties_match_consumer_bits": true,
+    "existing_unit_artifacts_checked_unchanged": 14,
+    "unit_receipt": {
+      "path": "energyplus_porting_plan/evidence/PSY-01/source-reference-preparation.json",
+      "sha256": "afa0f237142be053bda4ecca92d2e58c0d29c649b3bdd2b8416a6733353450bf"
+    }
+  },
+  "interpretation": "W .024 makes the original H-to-T return slightly above 22 C; the original min returns exactly 22 C. W .020 remains slightly below 22 C after that same min. This distinguishes zero and positive sensible temperature difference for the branch-provoking fixture.",
+  "limitations": [
+    "No source saturation helper executed; no supersaturation margin certified",
+    "No physical zone/HVAC gate comparison; clamp classification only"
+  ],
+  "probe_scaffolding_correction": "Initial standalone probe compilation returned 1 because min was qualified as EnergyPlus::min. Original EnergyPlus.hh aliases ObjexxFCL::min globally; the runtime-only probe was corrected to ObjexxFCL::min and compiled with exit 0. No original function body or persistent wrapper was changed."
+}

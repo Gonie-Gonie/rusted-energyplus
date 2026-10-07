@@ -673,10 +673,10 @@
         "CON-01"
       ],
       "inputs": "T[°C], W[kgWater/kgDryAir], P[Pa]",
-      "outputs": "cp[J/(kg·K)], rho[kg/m³], h[J/kg], 역산 T[°C]",
+      "outputs": "cp[J/(kg·K)], rho[kg/m³], h[J/kg], 역산 T[°C]; 정상/fast Cp의 원래 W와 저장 결과, 초기 -100 캐시 및 hit/miss 순서",
       "timing": "호출 시",
-      "unit_tests": "건조/습윤·0°C 부근·기압 변화; h↔T 왕복; 음수 W 처리",
-      "integration_test": "ZON-02와 HVAC-04/05에서 같은 입력 tuple과 호출 순서",
+      "unit_tests": "건조/습윤·0°C 부근·기압 변화; h↔T 왕복; 음수 W·하한 이웃·cold sentinel·signed zero·NaN·캐시 순서; 직접 소비 PsyWFnTdbH 추가 검증",
+      "integration_test": "ZON-02와 HVAC-04/05의 실제 kernel tuple·반환값·Cp 상태·시간 context·호출 순서; 실제 용량 제한 Tdb 반환값 소비; 전체 압축 replay와 Full/Summary 동일성. 후속 조립/SYS gate는 별도",
       "rust_candidate": "crates/ep_runtime/src/psychrometrics",
       "assessment": "기존 구현 재검증",
       "companion": "Psychrometrics.hh",

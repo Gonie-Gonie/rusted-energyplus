@@ -45,7 +45,7 @@ that the EnergyPlus routine has been ported.
 | 5 | `PsyRhoAirFnPbTdbW_fast` | moist-air density fast path | `Psychrometrics.hh:576` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rho_air_fn_pb_tdb_w_fast` | compare with the ordinary density routine and lock the fast-path input-domain preconditions |
 | 6 | `PsyHfgAirFnWTdb` | latent enthalpy | `Psychrometrics.hh:593` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_hfg_air_fn_w_tdb` | coefficient-vector and temperature/humidity boundary parity |
 | 7 | `PsyHgAirFnWTdb` | water-vapor gas enthalpy | `Psychrometrics.hh:623` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_hg_air_fn_w_tdb`; legacy one-argument wrapper: `energyplus_water_vapor_gas_enthalpy_j_per_kg` | source-vector parity including ignored-`W` semantics and temperature limits |
-| 8 | `PsyHFnTdbW` | moist-air enthalpy | `Psychrometrics.hh:648` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w`; separate partial legacy analogue: `ep_runtime::ideal_loads::calc::psychrometrics::moist_air_enthalpy_j_per_kg` | coefficient-vector parity, humidity floor/domain behavior, and inverse round trips |
+| 8 | `PsyHFnTdbW` | moist-air enthalpy | `Psychrometrics.hh:648` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w`; IdealLoads delegation: `ep_runtime::ideal_loads::calc::psychrometrics::moist_air_enthalpy_j_per_kg` | coefficient-vector parity, humidity floor/domain behavior, and inverse round trips |
 | 9 | `PsyHFnTdbW_fast` | moist-air enthalpy fast path | `Psychrometrics.hh:668` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w_fast` | ordinary/fast equivalence across the documented valid domain |
 | 10 | `PsyCpAirFnW` | moist-air specific heat | `Psychrometrics.hh:679` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w`; guarded legacy wrapper: `energyplus_moist_air_specific_heat_j_per_kg_k` | source-vector parity plus repeated, alternating, and multistate cache-isolation probes |
 | 11 | `PsyCpAirFnW_fast` | specific-heat fast path | `Psychrometrics.hh:718` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w_fast` | ordinary/fast equivalence and cache-hit/miss independence |
@@ -100,11 +100,13 @@ does not claim that an existing Rust analogue has EnergyPlus-equivalent edge
 or diagnostic behavior, and does not add external evidence, family gating,
 conformance, or a project-contract obligation. Both tickets remain under the
 parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
-The current pure numerical helpers and local bit-pattern, floor, IEEE-edge,
+The current numerical helpers and local bit-pattern, floor, IEEE-edge,
 legacy-wrapper, and call-stability tests are in
 `crates/ep_runtime/src/psychrometrics.rs` and
 `crates/ep_runtime/src/psychrometrics_tests.rs`. Those Rust-only checks are
 scaffold evidence, not an external EnergyPlus parity oracle.
+The normal and fast Cp helpers now also own the independent saved states in
+`crates/ep_runtime/src/psychrometrics/cp_cache.rs`.
 
 ### `PsyRhoAirFnPbTdbW` (`psy_rho_air_fn_pb_tdb_w`)
 
@@ -153,9 +155,14 @@ physical humidity-ratio inputs the cache changes work, not the returned
 formula. The initialization sentinel is nevertheless observable: the first
 process call with `dw == -100.0` returns the initial `cpaSave == -100.0`
 instead of evaluating the formula. The static locals are process/function
-history rather than `EnergyPlusData`-owned state. Rust currently has no mutable
-cache for this routine, so cache history, sentinel behavior, cross-simulation
-sharing, and thread/isolation policy remain deferred.
+history rather than `EnergyPlusData`-owned state. Rust now owns a safe
+thread-local pair with independent normal and fast saved states. The normal
+cache reads the original input before flooring, preserves the cold sentinel,
+and retains history across calls and environments on the same execution
+thread. A fresh explicit cache pair is available for cold-process unit
+sequences. This models the bounded single-thread call order; the source's
+unsynchronized process-wide sharing across threads, broader caller behavior,
+and the guarded wrapper's input normalization remain outside that boundary.
 
 <!-- routine-state-contract:v1 begin psy_cp_air_fn_w -->
 PsyCpAirFnW
@@ -167,25 +174,26 @@ write_state:
 - cache miss writes `dwSave = dw` and `cpaSave = 1.00484e3 + max(dw, 1.0e-5) * 1.85895e3`; cache hit writes no state
 
 history_state_ownership:
-- EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust currently owns no mutable cache for this routine
+- EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust owns the independent normal cache in a safe thread-local normal/fast pair, initialized to `-100.0` and retained across calls and same-thread environments under the bounded single-thread executor
 
 unsupported_state:
-- the function-local `dwSave`/`cpaSave` cache, including first-call `dw == -100.0` sentinel collision that returns `-100.0`
+- source process-wide cache sharing across concurrent threads and the relationship between separate Rust thread-local owners
 
 inactive_branches:
 - none; the last-call cache is unconditional in the pinned EnergyPlus 26.1.0 source
 
 unsupported_active_branches:
-- cache hit/miss history behavior, cross-simulation/process sharing, and sentinel-collision behavior; the cache is output-neutral for physical humidity-ratio inputs
+- unsynchronized cross-thread sharing and full caller/guarded-wrapper state equivalence; the guarded Cp wrapper floors input before reaching the canonical raw-input cache
 
 not_claimed_branches:
-- external EnergyPlus numerical parity, C++ last-call-cache work/history parity under repeated or alternating calls, sentinel collision, and state/thread-isolation behavior
+- external EnergyPlus numerical and ordered-cache parity pending committed paired evidence; cross-thread sharing, full caller/guarded-wrapper equivalence, and full-domain conformance
 <!-- routine-state-contract:v1 end psy_cp_air_fn_w -->
 
 ## CP56-3 Direct Formula And Fast-Path Scaffold
 
-This checkpoint adds pure Rust numerical helpers for routines 5 through 9 and
-11 in source-interface order. The helpers and their local pinned-formula,
+This checkpoint covers Rust numerical helpers for routines 5 through 9 and
+11 in source-interface order. The fast Cp helper now retains its own
+thread-local last-call state. The helpers and their local pinned-formula,
 evaluation-order, humidity-floor, ignored-argument, IEEE-edge, debug-assertion,
 release no-floor, repeated-call, and legacy-wrapper tests live in
 `crates/ep_runtime/src/psychrometrics.rs` and
@@ -195,13 +203,17 @@ oracle. The six tickets advance only to `state_mapped`; they do not advance to
 `implemented`, add conformance evidence, or change the parent algorithm's
 `status = "scaffold"` and `claim_level = "none"` boundary.
 
-The existing IdealLoads `moist_air_enthalpy_j_per_kg` helper remains separate:
-it has no `1.0e-5` humidity floor and groups the expression through kJ units,
-which can differ from the source-order formula by one ULP. Replacing its
-downstream consumers is deferred until that compatibility impact and the
-related inversion routines are handled explicitly. The existing one-argument
-water-vapor enthalpy API remains a bit-preserving wrapper over the new
-two-argument `PsyHgAirFnWTdb` numerical helper.
+The IdealLoads `moist_air_enthalpy_j_per_kg` helper now delegates to the normal
+canonical enthalpy helper, including its `1.0e-5` humidity floor and J/kg
+evaluation order. Its enthalpy-to-humidity compatibility consumer delegates to
+normal `PsyWFnTdbH`, preserving the source J/kg grouping and strictly-negative
+humidity correction. The no-OA sensible cooling-capacity branch consumes the
+actual canonical `PsyTdbFnHW` result as its supply temperature and then applies
+the mixed-air upper clamp. These narrow delegations do not establish complete
+purchased-air caller/state or HVAC assembly parity. The separate outdoor-air
+enthalpy inverse remains outside this replacement. The existing one-argument
+water-vapor enthalpy API remains a bit-preserving wrapper over the two-argument
+`PsyHgAirFnWTdb` numerical helper.
 
 ### `PsyRhoAirFnPbTdbW_fast` (`psy_rho_air_fn_pb_tdb_w_fast`)
 
@@ -378,8 +390,12 @@ evaluates `1.00484e3 + dw * 1.85895e3`, and a repeated exact input returns the
 saved result. The cache changes work and history, not valid-domain output. In
 an `NDEBUG` build, the first invalid call with `dw == -100.0` collides with both
 initial sentinels and returns `-100.0`; assertion-enabled builds terminate
-before reading the cache. Rust keeps the valid-domain numerical path pure and
-defers that cache, sentinel, sharing, and concurrency policy.
+before reading the cache. Rust now owns an independent fast saved state in
+the same safe thread-local cache pair as the normal variant, with history
+retained across same-thread environments. The fast precondition is checked
+before cache access in debug builds; valid-domain reference cases retain that
+precondition. Process-wide cross-thread sharing and exact invalid-input C++
+assertion termination remain outside the bounded single-thread model.
 
 <!-- routine-state-contract:v1 begin psy_cp_air_fn_w_fast -->
 PsyCpAirFnW_fast
@@ -391,19 +407,19 @@ write_state:
 - cache miss writes `dwSave = dw` and `cpaSave = 1.00484e3 + dw * 1.85895e3`; cache hit writes no state
 
 history_state_ownership:
-- EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust keeps the valid-domain numerical helper pure
+- EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust owns the independent fast cache in a safe thread-local normal/fast pair, initialized to `-100.0` and retained across calls and same-thread environments under the bounded single-thread executor
 
 unsupported_state:
-- the function-local `dwSave`/`cpaSave` cache, cross-simulation sharing, concurrency policy, and the `NDEBUG` first-call `dw == -100.0` sentinel collision
+- source process-wide cache sharing across concurrent threads; exact assertion-abort state and invalid-precondition behavior outside the valid fast domain
 
 inactive_branches:
 - `NDEBUG` removes the pre-cache `dw >= 1.0e-5` assertion; the last-call cache itself is unconditional
 
 unsupported_active_branches:
-- cache hit/miss history, process-wide sharing, sentinel-collision behavior, and exact assertion-enabled C++ abort versus Rust panic parity
+- unsynchronized cross-thread sharing, full caller equivalence, and assertion-enabled C++ abort versus Rust panic for invalid `dw`; valid-domain hit/miss state is modeled by the independent fast cache
 
 not_claimed_branches:
-- external EnergyPlus numerical parity, C++ cache work/history parity, sentinel collision, and state/thread-isolation behavior
+- external EnergyPlus numerical and ordered-cache parity pending committed paired evidence; cross-thread sharing, full caller equivalence, invalid fast assertion-abort behavior, and full-domain conformance
 <!-- routine-state-contract:v1 end psy_cp_air_fn_w_fast -->
 
 ## CP56-4 Dry-Bulb Inversion And Vapor-Density Scaffold
@@ -419,11 +435,15 @@ external EnergyPlus oracle. The four tickets advance only to `state_mapped`;
 they do not advance to `implemented`, add conformance evidence, or change the
 parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
 
-The existing IdealLoads moist-air enthalpy inverse remains separate. Its
-arithmetic grouping and lack of the canonical `1.0e-5` humidity floor can
-produce different results. CP343 wires the canonical helper only into the
-bounded `PurchasedAirManager.cc` physical-line-2201 direct lifecycle after
-CP342; replacing any broader downstream consumer remains deferred.
+The outdoor-air `dry_bulb_from_enthalpy_and_humidity_ratio` helper remains
+separate; its arithmetic grouping and lack of the canonical `1.0e-5` humidity
+floor can produce different results. The no-OA sensible cooling-capacity
+consumer now uses canonical normal enthalpy, the inclusive capacity guard,
+corrected enthalpy, and the actual normal `PsyTdbFnHW` return followed by the
+mixed-air upper clamp from `PurchasedAirManager.cc:2191-2204`. CP343 also wires
+the canonical helper into the bounded physical-line-2201 direct lifecycle
+after CP342. These uses do not establish broader outdoor-air inverse, full
+purchased-air caller/state, or HVAC assembly parity.
 
 ### `PsyTdbFnHW` (`psy_tdb_fn_h_w`)
 

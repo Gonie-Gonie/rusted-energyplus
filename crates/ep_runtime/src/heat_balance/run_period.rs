@@ -1,5 +1,7 @@
 //! Heat-balance run-period timestep sampling loop.
 
+use crate::psychrometrics::production_trace::zone_step as trace_zone_step;
+
 use crate::heat_balance::air_manager::{
     weather_proxy_zone_air_heat_capacity_j_per_k, zone_air_heat_balance_air_storage_rate_w,
 };
@@ -214,6 +216,7 @@ where
             BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
         for substep in 1..=steps {
+            let _trace_scope = trace_zone_step(hour_index, substep, steps, seconds_per_timestep);
             let RunPeriodWeatherSample {
                 weather_context,
                 timestep_outdoor_dry_bulb_c,

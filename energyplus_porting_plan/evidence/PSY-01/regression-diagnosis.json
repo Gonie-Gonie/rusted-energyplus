@@ -1,0 +1,47 @@
+{
+  "schema": "psy01-regression-diagnosis.v1",
+  "not_a_gate_receipt": true,
+  "execution_source": "uncommitted pre-consumer-fix working tree; exact full source snapshot was not retained",
+  "repository_parent_commit": "f62aeed0596be61b4084527dcbca6901f1c19dbe",
+  "command": "target\\debug\\deps\\ep_runtime-66fb47c0a0c3f9ea.exe --quiet",
+  "environment": {
+    "RUST_MIN_STACK": "8388608"
+  },
+  "binary": {
+    "path": ".runtime/porting/PSY-01/regression/initial-test-binary.exe",
+    "sha256": "2c209e345cf646cca27ed06df75e98a13b5d27650dfc95e58b1be92ccdbc8ea3"
+  },
+  "raw_log": {
+    "path": ".runtime/porting/PSY-01/regression/initial-full-regression.log",
+    "sha256": "96d685ea485f45212aab148499051be2605a4ab092fe30223c8d07ea02316cc7"
+  },
+  "result": {
+    "passed": 2750,
+    "failed": 154
+  },
+  "failure_classes": [
+    {
+      "count": 150,
+      "kind": "strict CP378 physical supply humidity bit mismatch",
+      "repair": "canonical H-to-T capacity consumer and canonical humidity inverse; keep numerical reconciliation unchanged"
+    },
+    {
+      "count": 2,
+      "kind": "obsolete canonical/numerical H inequality fixture",
+      "repair": "require canonical equality and retain independent corruption/mutation checks"
+    },
+    {
+      "count": 2,
+      "kind": "overflow fixture became finite under original H grouping",
+      "repair": "use source-chain inputs that really overflow; retain infinity assertions"
+    }
+  ],
+  "limitations": [
+    "This diagnostic receipt does not close a gate.",
+    "The final successful suite must be run from the committed implementation."
+  ],
+  "exit_code": 101,
+  "elapsed_seconds": 56.63,
+  "test_concurrency": "default libtest concurrency; no --test-threads override",
+  "log_capture": "combined stdout/stderr captured UTF-8 via Out-File; raw bytes retained"
+}

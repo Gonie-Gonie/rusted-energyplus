@@ -23,6 +23,7 @@ use crate::heat_balance::surface_boundary::{
 };
 use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air;
 use crate::heat_balance::trace::HeatBalanceRunPeriodSamples;
+use crate::psychrometrics::production_trace::output_step as trace_output_step;
 use crate::schedules::{
     HeatBalanceInternalGainScheduleOperationProfile, ScheduleSeriesCache,
     precompute_hour_only_internal_gain_schedule_cache_profiled,
@@ -6016,6 +6017,8 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     )?;
 
     for (timestep_index, output) in timestep_outputs.iter().enumerate() {
+        let _trace_scope =
+            trace_output_step(timestep_index, zone_steps_per_hour, seconds_per_timestep);
         if !calc_entry_snapshot_matches_release(output, timestep_index + 1, &binding) {
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::UnexpectedCalculationEntry {

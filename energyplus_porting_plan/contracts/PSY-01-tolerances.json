@@ -1,0 +1,66 @@
+{
+  "schema": "psy01-tolerances.v1",
+  "frozen_before_comparison": true,
+  "rows": [
+    {
+      "function": "PsyCpAirFnW",
+      "unit": "J/(kg*K)",
+      "atol": 1e-09,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyCpAirFnW_fast",
+      "unit": "J/(kg*K)",
+      "atol": 1e-09,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyRhoAirFnPbTdbW",
+      "unit": "kg/m3",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyRhoAirFnPbTdbW_fast",
+      "unit": "kg/m3",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyHFnTdbW",
+      "unit": "J/kg",
+      "atol": 1e-07,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyHFnTdbW_fast",
+      "unit": "J/kg",
+      "atol": 1e-07,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyTdbFnHW",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    {
+      "function": "PsyWFnTdbH",
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    }
+  ],
+  "policy": {
+    "classification": "exact",
+    "zero_sign": "exact when reference and candidate are zero",
+    "nan_payload_bits": "recorded; not required equal",
+    "identity_inputs_context_unit_order_count": "exact",
+    "cache_hit": "exact",
+    "cache_dw_save": "exact bits except NaN payload",
+    "cache_cpa_save": "Cp value tolerance/classification plus exact zero sign",
+    "from_call_resolved_h": "enthalpy tolerance; each implementation consumes its own earlier result",
+    "roundtrip_temperature_atol_degC": 1e-10,
+    "nonfinite_helper_probes": "class comparison only, no physical-validity claim"
+  }
+}

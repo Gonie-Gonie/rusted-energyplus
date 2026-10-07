@@ -2,6 +2,7 @@
 
 use crate::{
     energyplus_moist_air_specific_heat_j_per_kg_k,
+    psychrometrics::{energyplus_psy_cp_air_fn_w, energyplus_psy_tdb_fn_h_w},
     zone_equipment::{ZoneSensibleDemandInputKind, ZoneSysEnergyDemand},
 };
 use ep_model::{HumidificationControlType, IdealLoadsAirSystem};
@@ -526,20 +527,28 @@ fn cooling_result_with_limits(
         .max(system.minimum_cooling_supply_air_temperature_c)
         .min(recirculation_state.air_temperature_c);
 
-    let cp_mixed_air_j_per_kg_k =
-        energyplus_moist_air_specific_heat_j_per_kg_k(recirculation_state.air_humidity_ratio);
-    let mut cooling_coil_output_w = cooling_mass_flow_rate_kg_per_s
-        * cp_mixed_air_j_per_kg_k
-        * (recirculation_state.air_temperature_c - supply_temperature_c).max(0.0);
-
     if let Some(maximum_cooling_capacity_w) = capacity_limit_w(
         system.cooling_limit,
         sized_limits.maximum_total_cooling_capacity_w,
-    ) && cooling_coil_output_w >= maximum_cooling_capacity_w
-    {
-        cooling_coil_output_w = maximum_cooling_capacity_w;
-        supply_temperature_c = recirculation_state.air_temperature_c
-            - cooling_coil_output_w / (cooling_mass_flow_rate_kg_per_s * cp_mixed_air_j_per_kg_k);
+    ) {
+        // PurchasedAirManager.cc:2191-2203. The source Cp call remains
+        // observable through its saved state even though this RHS uses H.
+        let mixed_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+            recirculation_state.air_temperature_c,
+            recirculation_state.air_humidity_ratio,
+        );
+        let mut supply_enthalpy_j_per_kg =
+            moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
+        let _ = energyplus_psy_cp_air_fn_w(recirculation_state.air_humidity_ratio);
+        let cooling_coil_output_w = cooling_mass_flow_rate_kg_per_s
+            * (mixed_air_enthalpy_j_per_kg - supply_enthalpy_j_per_kg);
+        if cooling_coil_output_w >= maximum_cooling_capacity_w {
+            supply_enthalpy_j_per_kg = mixed_air_enthalpy_j_per_kg
+                - maximum_cooling_capacity_w / cooling_mass_flow_rate_kg_per_s;
+            supply_temperature_c =
+                energyplus_psy_tdb_fn_h_w(supply_enthalpy_j_per_kg, supply_humidity_ratio)
+                    .min(recirculation_state.air_temperature_c);
+        }
     }
 
     cooling_result_from_states(

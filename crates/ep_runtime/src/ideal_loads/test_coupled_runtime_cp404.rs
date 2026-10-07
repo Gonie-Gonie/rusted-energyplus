@@ -34,7 +34,7 @@ fn cp404_preserves_observed_routes_and_assigns_psychrometric_humidity_ratio() {
     for (limit, humidity_ratio, maximum_capacity_w, availability) in [
         (
             IdealLoadsLimit::LimitCapacity,
-            0.020,
+            0.024,
             f64::MIN_POSITIVE,
             1.0,
         ),
@@ -178,7 +178,7 @@ fn cp404_preserves_observed_routes_and_assigns_psychrometric_humidity_ratio() {
 fn cp404_rejects_cp403_temperature_and_cp385_enthalpy_owner_drift() {
     let (model, output, lifecycle, predecessor, enthalpy_owner) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,
@@ -239,7 +239,7 @@ fn cp404_rejects_cp403_temperature_and_cp385_enthalpy_owner_drift() {
 fn cp404_rejects_non_direct_route_accounting() {
     let (model, output, lifecycle, predecessor, enthalpy_owner) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,
@@ -302,7 +302,7 @@ fn cp404_rejects_non_direct_route_accounting() {
 fn cp404_validation_has_no_numerical_coupling_dto_feed() {
     let (model, mut output, lifecycle, predecessor, enthalpy_owner) = validator_fixture(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         f64::MIN_POSITIVE,
         1.0,
         1,

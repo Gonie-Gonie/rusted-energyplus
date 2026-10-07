@@ -73,7 +73,7 @@ fn binding_orders_cp378_then_cp379_and_records_the_four_source_sites() {
 }
 
 #[test]
-fn binding_keeps_cp379_canonical_enthalpy_out_of_the_unchanged_numerical_coupling() {
+fn binding_canonical_enthalpy_matches_numerical_without_sharing_evidence_state() {
     let output = run_zero_humidity_case();
     let snapshot = output.calculation_cooling_supply_enthalpy_post_saturation_assignment;
     let temperature = snapshot
@@ -93,7 +93,7 @@ fn binding_keeps_cp379_canonical_enthalpy_out_of_the_unchanged_numerical_couplin
             .map(f64::to_bits),
         Some(canonical.to_bits()),
     );
-    assert_ne!(
+    assert_eq!(
         canonical.to_bits(),
         output
             .coupling
@@ -101,7 +101,7 @@ fn binding_keeps_cp379_canonical_enthalpy_out_of_the_unchanged_numerical_couplin
             .calculation
             .supply_enthalpy_j_per_kg
             .to_bits(),
-        "CP379 evidence must not feed or reconcile the unchanged numerical calculation"
+        "PSY-01 independently canonicalizes numerical H; equality does not merge CP379 evidence state"
     );
 }
 

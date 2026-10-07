@@ -7,7 +7,6 @@ use super::super::{
     cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact,
 };
 use super::{prefix_for_route, prefix_for_route_with_psychrometrics};
-use crate::ideal_loads::calc::psychrometrics::moist_air_enthalpy_j_per_kg;
 use crate::psychrometrics::energyplus_psy_h_fn_tdb_w;
 
 #[test]
@@ -46,7 +45,9 @@ fn cp379_uses_the_canonical_humidity_floor_and_operation_order() {
     let mut state = State::new(prefix.cp378.system);
     let snapshot = advance(&mut state, prefix.cp378, prefix.input).expect("canonical grouping");
     let canonical = energyplus_psy_h_fn_tdb_w(14.0, humidity_ratio);
-    let regrouped = moist_air_enthalpy_j_per_kg(14.0, humidity_ratio);
+    // Deliberately retain the former, wrong kJ regrouping as a corruption
+    // fixture; the production convenience helper now uses the canonical path.
+    let regrouped = 1000.0 * (1.004_84 * 14.0 + humidity_ratio * (2500.94 + 1.858_95 * 14.0));
     assert_eq!(
         snapshot
             .resulting_supply_enthalpy_j_per_kg

@@ -163,7 +163,7 @@ fn active_fixture() -> (
 ) {
     super::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_tests::run_case(
         IdealLoadsLimit::LimitCapacity,
-        0.020,
+        0.024,
         1.0,
         1.0e-100,
     )
