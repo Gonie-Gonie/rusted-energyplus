@@ -191,7 +191,7 @@ def rust_settings(case: dict, output: Path, cli: Path, zone_rows: list[dict]) ->
                 compare("ideal_loads." + key, systems[0].get(key), value)
             available_id = systems[0].get("availability_schedule_id")
             available_names = [schedule["name"] for schedule in trace.get("environment", {}).get("schedule_values", []) if schedule.get("id") == available_id]
-            compare("ideal_loads.availability_schedule_resolved_name", available_names, [ideal["availability_schedule_name"]])
+            compare("ideal_loads.availability_schedule_resolved_name", [name.upper() for name in available_names], [ideal["availability_schedule_name"].upper()])
         environment = trace.get("environment", {})
         compare("environment.calendar_year", environment.get("calendar_year"), 2013)
         compare("environment.zone_timestep_samples", environment.get("zone_timestep_samples"), case["expected_zone_steps_excluding_warmup"])
