@@ -1,0 +1,45 @@
+{
+  "schema": "clk04-original-native-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-04\\native-build-02\\derivation\\derived-helper.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-04\\frozen-packet-01\\helper-request.json",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-04\\frozen-packet-01\\native-admission-contract.json",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-04\\original-first-02\\native-output"
+  ],
+  "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "exit_code": 0,
+  "started_utc": "2026-10-08T11:11:20.093262+00:00",
+  "finished_utc": "2026-10-08T11:18:36.517463+00:00",
+  "elapsed_seconds": 436.411859,
+  "runtime_path_prefix": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin",
+  "stdout": {
+    "path": ".runtime/porting/CLK-04/original-first-02/helper-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-04/original-first-02/helper-stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "binary": {
+    "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+    "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+  },
+  "request": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+    "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+    "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+  },
+  "observation_projection": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+    "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+  },
+  "native_driver_build": {
+    "path": ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+    "sha256": "1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc"
+  },
+  "spawn_error": null
+}

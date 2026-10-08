@@ -1,0 +1,192 @@
+"""Independent source-only review of the declared nullable-summary reader correction."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import ast
+import hashlib
+import json
+import shutil
+import struct
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-04'
+OLD = BASE / 'production-workflow-prep-07'
+NEW = BASE / 'production-workflow-prep-08/check_production.py'
+NEW_SHA = '0e31ee3078424e0930cbdb888a7ab1fe5c1cdd5e97af4a02302507798f41674a'
+PRIOR = {'path': '.runtime/porting/CLK-04/independent-production-workflow-source-review-03/review.json',
+    'sha256': 'ec50f050b66eb7725fbdbca582c8ddc5e3d0f34ec646412963e586cf7ade2792'}
+PRIOR_EXECUTION = {'path': '.runtime/porting/CLK-04/independent-production-workflow-source-review-command-03/receipt.json',
+    'sha256': 'b82cd512ea9b723181da4409d848909acb49c850b031c003b8783275925eee1f'}
+FAILED = {'path': '.runtime/porting/CLK-04/production-comparison-01/production-comparison.json',
+    'sha256': '703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f'}
+FAILED_EXECUTION = {'path': '.runtime/porting/CLK-04/production-comparison-command-01/receipt.json',
+    'sha256': 'bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67'}
+
+
+def need(value, message):
+    if not value: raise ValueError(message)
+
+
+def sha(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''): digest.update(block)
+    return digest.hexdigest()
+
+
+def path_of(name):
+    value = (ROOT / name).resolve()
+    need(value != ROOT and value.is_relative_to(ROOT), 'Contained artifact required'); return value
+
+
+def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path)}
+
+
+def exact(left, right):
+    if type(left) is not type(right): return False
+    if type(left) is float: return struct.pack('>d', left) == struct.pack('>d', right)
+    if type(left) is dict: return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list: return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right, strict=True))
+    return left == right
+
+
+def read(path):
+    def pairs(items):
+        value = {}
+        for key, item in items:
+            need(key not in value, 'Duplicate metadata key'); value[key] = item
+        return value
+    return json.loads(path.read_bytes(), object_pairs_hook=pairs,
+        parse_constant=lambda item: (_ for _ in ()).throw(ValueError('Nonfinite metadata constant')))
+
+
+def utc(value):
+    date = datetime.fromisoformat(value)
+    need(date.tzinfo is not None and date.utcoffset().total_seconds() == 0, 'Actual UTC required'); return date
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args(); started = datetime.now(timezone.utc).isoformat()
+    output = args.output_dir.resolve(); need(Path.cwd().resolve() == ROOT and output.is_relative_to(BASE)
+        and output != BASE and not output.exists(), 'Fresh ignored output and repository cwd required')
+    checked = {}
+    def check(binding):
+        path = path_of(binding['path']); actual = sha(path)
+        need(actual == binding['sha256'] and checked.setdefault(str(path), actual) == actual, 'Bound source/metadata bytes differ')
+        return path
+    def recorded(binding, payload, code):
+        row = read(check(binding)); need(row['schema'] == 'recorded-porting-command.v1'
+            and type(row['exit_code']) is int and row['exit_code'] == code and row['launch_error'] is None
+            and row['source_bytes_match_before_and_after'] is True and row['recorder_updates_gates'] is False
+            and row['recorder_supplies_reference_answers'] is False and Path(row['cwd']).resolve() == ROOT,
+            'Actual recorded metadata/source outcome differs')
+        need(exact(read(check(row['stdout'])), payload), 'Actual full typed stdout differs')
+        for key in ['stderr', 'source_snapshot']: check(row[key])
+        check(row['executed_launcher']['archive'])
+        return row, utc(row['started_utc']), utc(row['finished_utc'])
+    prior = read(check(PRIOR)); _, prior_start, prior_finish = recorded(PRIOR_EXECUTION, prior, 0)
+    need(prior['schema'] == 'clk04-independent-production-workflow-source-review.v1'
+        and prior['status'] == 'pass-frozen-selected-fields-and-actual-CLI-observation-before-production'
+        and prior['scientific_execution_performed'] is False
+        and prior_start <= utc(prior['review_started_utc']) <= utc(prior['review_completed_utc']) <= prior_finish,
+        'Historical pre-CLI source review differs')
+    failed = read(check(FAILED)); failed_row, _, failed_finish = recorded(FAILED_EXECUTION, failed, 1)
+    need(failed_finish <= utc(started) and failed['schema'] == 'clk04-production-comparison.v1'
+        and failed['scientific_certification_passed'] is False
+        and failed['comparison']['comparison_count'] == 3736442 and failed['comparison']['mismatch_count'] == 6,
+        'Preserved actual failure or post-output review chronology differs')
+    old_rows = prior['reviewed_sources']; old_index = {row['historical_path']: row['archive'] for row in old_rows}
+    need(len(old_rows) == len(old_index) == 15, 'Historical fifteen-source inventory required')
+    for name, binding in old_index.items():
+        need(check(binding).read_bytes() == path_of(name).read_bytes(), 'Historical source bytes changed')
+    need(ref(NEW)['sha256'] == NEW_SHA, 'Held new checker differs'); check(ref(NEW))
+    names = [NEW.relative_to(ROOT).as_posix(), *[name for name in old_index if name != (OLD / 'check_production.py').relative_to(ROOT).as_posix()]]
+    need(len(names) == len(set(names)) == 15, 'Only one checker plus fourteen unchanged dependencies required')
+    old_ast = ast.parse((OLD / 'check_production.py').read_text(encoding='utf8'))
+    new_text = NEW.read_text(encoding='utf8'); new_ast = ast.parse(new_text)
+    def locate(tree, prefix):
+        rows = [node for node in ast.walk(tree) if isinstance(node, ast.stmt) and ast.unparse(node).startswith(prefix)]
+        need(len(rows) == 1, 'Unique reviewed source block required: ' + prefix); return rows[0]
+    def same_block(prefix):
+        need(ast.dump(locate(old_ast, prefix), include_attributes=False)
+            == ast.dump(locate(new_ast, prefix), include_attributes=False), 'Scientific/source proof block changed')
+    for prefix in ['observed = modules[\'state\'].observe(', 'check.discrete(sorted(full)',
+        'check.discrete({key: value for key, value in full[\'config\']', "for name in ['results/selected-outputs.csv'",
+        "for name in ['results/result-store.json'", 'require(commands == 6']:
+        same_block(prefix)
+    old_loop = locate(old_ast, "for key in set(full) - {'artifacts'")
+    new_loop = locate(new_ast, "for key in set(full) - {'artifacts'")
+    need(ast.dump(old_loop.iter, include_attributes=False) == ast.dump(new_loop.iter, include_attributes=False)
+        and ast.dump(old_loop.body[0], include_attributes=False)
+        == ast.dump(new_loop.body[0].orelse[0], include_attributes=False), 'Nonnullable summary comparison body changed')
+    for value in ["key in {'oracle', 'comparison'}", 'full[key] is None and summary[key] is None', 'required=False',
+        "item['config']['oracle_baseline'] is False", "item['config']['compare_oracle'] is False",
+        "item['oracle_status'] == 'not-requested'", "item['compare_status'] == 'not-requested'",
+        'failed_finish <= supplemental_start', 'supplemental_finish <= utility.timestamp(started)',
+        'supplemental_ref,supplemental = authenticate_review', 'from common import ROOT',
+        "declared = plan_input", "(PRIOR/'run_production.py').read_bytes()"]:
+        need(value in new_text, 'Required declared metadata/source guard absent: ' + value)
+    need(new_text.index('supplemental_ref,supplemental = authenticate_review') < new_text.index('from common import ROOT'),
+        'Source authentication must precede historical authority import')
+    pipeline_name = 'crates/ep_run/src/pipeline.rs'
+    build = read(check(failed['Rust_build'])); snapshot = read(check(build['source_snapshot']))
+    entries = [row for row in snapshot['files'] if row['historical_path'] == pipeline_name]
+    need(len(entries) == 1, 'Actual compiled pipeline archive required'); pipeline = entries[0]['archive']
+    pipeline_text = check(pipeline).read_text(encoding='utf8')
+    need(pipeline['sha256'] == '77a0ba88568c69999cfbbb6fa93f4ce866818ed10a8436347d3cb638d5733b71', 'Actual pipeline bytes differ')
+    ranges = [[1013,1016],[1445,1446],[1486,1486],[1975,1978],[2044,2045],[2615,2618]]
+    lines = pipeline_text.splitlines()
+    need(all(1 <= start <= end <= len(lines) for start, end in ranges), 'Declared native summary source ranges invalid')
+    snippets = '\n'.join('\n'.join(lines[start-1:end]) for start, end in ranges)
+    for value in ['"not-requested"', 'oracle_summary = None', 'comparison_summary = None',
+        'config.oracle_baseline || config.compare_oracle', 'if config.compare_oracle',
+        'Option<&OracleBaselineSummary>', 'Option<&ComparisonSummary>', '"oracle": oracle_summary', '"comparison": comparison_summary']:
+        need(value in snippets, 'Declared run-summary schema/caller ranges missing source prerequisite')
+    assignment = locate(new_ast, 'amendment = ')
+    declaration = ast.literal_eval(ast.Dict(keys=assignment.value.keys,
+        values=[ast.Constant(None) if isinstance(node, ast.Name) else node for node in assignment.value.values]))
+    declaration['preserved_failed_report'] = FAILED; declaration['preserved_failed_comparison_execution'] = FAILED_EXECUTION
+    declaration['archived_run_summary_schema'] = pipeline
+    need(declaration['nullable_fields'] == ['oracle', 'comparison'] and declaration['required_flags']
+        == {'oracle_baseline': False, 'compare_oracle': False} and declaration['required_statuses']
+        == {'oracle_status': 'not-requested', 'compare_status': 'not-requested'}
+        and declaration['historical_plan_and_matrix_unchanged'] is True
+        and declaration['scientific_field_policy_changed'] is False and declaration['unavailable_counted_as_PASS'] is False,
+        'Exact passive amendment metadata differs')
+    packet = prior['reviewed_native_packet']
+    for binding in [*packet.values(), prior['reviewed_fixed_scope'], *prior['reviewed_all45_literal_references']]: check(binding)
+    need(len(prior['reviewed_all45_literal_references']) == 45, 'All45 ordered literal references required')
+    old_archives = {row['historical_path']: row['archive'] for row in failed['executed_reader_source_archives']}
+    need(set(old_archives) == set(old_index) and all(old_archives[name]['sha256'] == old_index[name]['sha256'] for name in old_index),
+        'Preserved executed checker differs from historical review')
+    before = {name: ref(path_of(name)) for name in names}; output.mkdir(); archived = []
+    for index, name in enumerate(names):
+        target = output / 'sources' / f'{index:02}-{Path(name).name}'; target.parent.mkdir(exist_ok=True)
+        shutil.copyfile(path_of(name), target); need(ref(target)['sha256'] == before[name]['sha256'], 'Source archive byte identity differs')
+        archived.append({'historical_path': name, 'archive': ref(target)})
+    for path, digest in checked.items(): need(sha(Path(path)) == digest, 'Bound metadata/source changed during review')
+    for name, binding in before.items(): need(ref(path_of(name)) == binding, 'Actual reviewed source changed during review')
+    result = {'schema': 'clk04-independent-production-reader-amendment-source-review.v1',
+        'status': 'pass-declared-null-metadata-fix-before-preserved-data-reread',
+        'review_started_utc': started, 'review_completed_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_sources': archived, 'reviewed_prior_source_review': PRIOR, 'reviewed_prior_source_review_execution': PRIOR_EXECUTION,
+        'reviewed_failed_report': FAILED, 'reviewed_failed_comparison_execution': FAILED_EXECUTION,
+        'reviewed_run_summary_schema': pipeline, 'reviewed_reader_source_amendment': declaration,
+        'reviewed_native_packet': packet, 'historical_scientific_build': failed['Rust_build'],
+        'historical_failed_scientific_exit_code': failed_row['exit_code'], 'historical_failure_relabelled_zero': False,
+        'scientific_profiles_operations_tolerances_and_all_480_selected_steps_unchanged': True,
+        'only_six_schema_declared_nullable_summary_operands_optional': True,
+        'nullable_summary_values_counted_as_PASS': False, 'prior_source_review_assumption_miss': True,
+        'fresh_review_claimed_before_historical_CLI_engines': False,
+        'scientific_execution_performed': False, 'scientific_values_compared': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None, 'numerical_PASS_claimed': False,
+        'targets_imported_or_executed': False, 'native_or_Rust_numeric_payloads_read': False,
+        'retained_comparison_report_read_as_factual_metadata': True, 'unavailable_counted_as_PASS': False, 'gates_updated': False,
+        'authorship_disclosure': 'Reviewer authored reused unit comparison code and raw cursor, not Header production checker. This source review independently authenticates the new nullable-summary metadata correction; own earlier SourceQA missed the valid null schema. Historical failed report/engines remain failed. It is not independent certification of reused numerical code or any rereread result.'}
+    with (output / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=False, allow_nan=False); stream.write('\n')
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__': main()

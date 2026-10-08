@@ -1,0 +1,59 @@
+"""Validate an archive's exact byte reassembly; never parse scientific operands."""
+from pathlib import Path
+import argparse
+import gzip
+import hashlib
+import json
+import stat
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--manifest', required=True, type=Path)
+    args = parser.parse_args()
+    manifest = args.manifest.resolve(strict=True)
+    root = manifest.parent
+    value = json.loads(manifest.read_text(encoding='utf-8'))
+    if value['schema'] != 'clk04-selected-byte-evidence-archive.v1':
+        raise ValueError('Exact byte archive schema required')
+    seen = {}
+    for row in value['rows']:
+        storage = row['storage']
+        key = storage['original_sha256']
+        if row['binding']['sha256'] != key:
+            raise ValueError('Original binding and restored storage identity differ')
+        if key in seen:
+            if storage != seen[key]:
+                raise ValueError('Repeated byte identity has contradictory storage')
+            continue
+        seen[key] = storage
+        payload = bytearray()
+        for index, part in enumerate(storage['parts']):
+            raw = root / part['relative_path']
+            info = raw.lstat()
+            path = raw.resolve(strict=True)
+            if (not path.is_relative_to(root) or not stat.S_ISREG(info.st_mode)
+                    or getattr(info, 'st_file_attributes', 0) & 0x400
+                    or index != part['index'] or part['offset'] != len(payload)):
+                raise ValueError('Contained ordered archive parts required')
+            body = path.read_bytes()
+            if len(body) != part['size_bytes'] or len(body) > 4_000_000 or hashlib.sha256(body).hexdigest() != part['sha256']:
+                raise ValueError('Stored part bytes differ')
+            payload.extend(body)
+        if len(payload) != storage['stored_payload_size_bytes'] or hashlib.sha256(payload).hexdigest() != storage['stored_payload_sha256']:
+            raise ValueError('Whole stored gzip/identity payload differs')
+        if storage['encoding'] == 'gzip':
+            body = gzip.decompress(payload)
+        elif storage['encoding'] == 'identity':
+            body = bytes(payload)
+        else:
+            raise ValueError('Unknown byte encoding')
+        if len(body) != storage['original_size_bytes'] or hashlib.sha256(body).hexdigest() != storage['original_sha256']:
+            raise ValueError('Restored original bytes differ')
+    print(json.dumps({'schema': 'clk04-byte-archive-verification.v1', 'unique_objects_verified': len(seen),
+                      'exact_original_bytes_restored': True, 'files_written': False,
+                      'scientific_operands_parsed_or_compared': False}))
+
+
+if __name__ == '__main__':
+    main()

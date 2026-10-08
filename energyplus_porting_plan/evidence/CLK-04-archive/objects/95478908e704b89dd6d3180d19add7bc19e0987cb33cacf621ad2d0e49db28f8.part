@@ -1,0 +1,31 @@
+# Dynamic original API observation target. No original sources or build flags change.
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_psy02_reachability_scheduled GLOBAL PROPERTY PSY02_REACHABILITY_SCHEDULED)
+  if(NOT _psy02_reachability_scheduled)
+    set_property(GLOBAL PROPERTY PSY02_REACHABILITY_SCHEDULED TRUE)
+    set_property(GLOBAL PROPERTY PSY02_REACHABILITY_SOURCE
+      "${CMAKE_CURRENT_LIST_DIR}/psy02_reachability.cpp")
+    function(psy02_add_original_reachability)
+      if(NOT TARGET energypluslib)
+        message(FATAL_ERROR "PSY-02 reachability requires the verified original energypluslib build")
+      endif()
+      get_property(_psy02_reachability_source GLOBAL PROPERTY PSY02_REACHABILITY_SOURCE)
+      get_target_property(_psy02_reachability_target_defs energypluslib COMPILE_DEFINITIONS)
+      get_directory_property(_psy02_reachability_directory_defs
+        DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+      if(NOT _psy02_reachability_target_defs)
+        set(_psy02_reachability_target_defs "")
+      endif()
+      set(_psy02_reachability_defs ${_psy02_reachability_target_defs} ${_psy02_reachability_directory_defs})
+      list(REMOVE_DUPLICATES _psy02_reachability_defs)
+      add_executable(psy02_reachability "${_psy02_reachability_source}")
+      target_include_directories(psy02_reachability PRIVATE
+        "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>")
+      target_compile_definitions(psy02_reachability PRIVATE ${_psy02_reachability_defs})
+      target_link_libraries(psy02_reachability PRIVATE
+        project_options project_fp_options project_warnings bcrypt)
+      target_compile_features(psy02_reachability PRIVATE cxx_std_20)
+    endfunction()
+    cmake_language(DEFER CALL psy02_add_original_reachability)
+  endif()
+endif()

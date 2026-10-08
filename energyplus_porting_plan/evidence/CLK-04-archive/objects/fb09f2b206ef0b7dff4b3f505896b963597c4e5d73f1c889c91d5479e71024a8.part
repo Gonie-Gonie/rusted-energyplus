@@ -1,0 +1,247 @@
+{
+  "schema": "clk04-independent-candidate-comparer-static-review.v1",
+  "status": "pass-frozen-selected-profile-and-authenticated-observer-before-candidate-execution",
+  "review_started_utc": "2026-10-08T13:22:57.109887+00:00",
+  "review_completed_utc": "2026-10-08T13:22:58.837186+00:00",
+  "reviewed_comparer_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/check_clk04_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/check_clk04_unit.py",
+        "sha256": "521a6a088df141df6d70d2e3197d51469549ffb77ddd961d5c695221401c5ce3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/freeze_projection.py",
+        "sha256": "ecab8c674364940e662535c48ca02ce0269fdfc0cd58bea42b82d24910ceab8d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/history.py",
+        "sha256": "27bb896f32aba14b060b05f748c5fa9f0ffbf3da350c3a111063f69c75e02467"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/metadata.py",
+        "sha256": "b90365d6754fa6b4b3cb1750bbd384d9f595c65266c25778c88bc4d706bde43d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/numeric.py",
+        "sha256": "7c408cb011db1a521c1e37f2e5c31eff182b59d3d1f1c480a7b0e124d4cfaf1e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/profile.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/profile.py",
+        "sha256": "77382e83698e66c8e3fda25bbf294ce4ecf64c12325a09f97f8b18d27f006423"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/proofs.py",
+        "sha256": "9d991b8bc91a58b271a1dadf368ea40de72c5f6f0fd834432dddd414258934ac"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/snapshots.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/snapshots.py",
+        "sha256": "e7f980aa874e4a526ac3e935b94c130d2dc7a7cebae86913bdf058a2b1f75c97"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+      "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+      "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+      "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+    }
+  },
+  "reviewed_helper_request": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+    "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+  },
+  "reviewed_native_projection": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+    "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+    "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "reviewed_pre_output_profile": {
+    "path": ".runtime/porting/CLK-04/comparison-profile-prep-01/profile.py",
+    "sha256": "77382e83698e66c8e3fda25bbf294ce4ecf64c12325a09f97f8b18d27f006423"
+  },
+  "reviewed_accepted_metadata_authorities": {
+    "native_recovery": {
+      "path": ".runtime/porting/CLK-04/original-recovery-01/recovery.json",
+      "sha256": "9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6"
+    },
+    "native_recovery_execution": {
+      "path": ".runtime/porting/CLK-04/original-recovery-command-01/receipt.json",
+      "sha256": "31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130"
+    },
+    "original_data_review": {
+      "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+      "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+    },
+    "original_data_review_execution": {
+      "path": ".runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json",
+      "sha256": "1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0"
+    },
+    "baseline_gap": {
+      "path": ".runtime/porting/CLK-04/legacy-gap-observation-01/gap.json",
+      "sha256": "5806571825a4241c43ba2585d1faf1c5eb5043eccd0be20b763b8c47e1efec3c"
+    },
+    "baseline_gap_execution": {
+      "path": ".runtime/porting/CLK-04/legacy-gap-command-01/receipt.json",
+      "sha256": "0078c4ad7a6feb532e8775bcaea2f038ff889fb0c8dbee22b19b6c7e2e89e3b7"
+    }
+  },
+  "preserved_previous_source_review": {
+    "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-01/review.json",
+    "sha256": "210e5905404f90c7434ee9a43880722eb72943f98f20e77454eb88be90bba243"
+  },
+  "preserved_previous_DTO_projection": {
+    "path": ".runtime/porting/CLK-04/candidate-dto-projection-01/projection.json",
+    "sha256": "11c19c03602a2472f981aa89130df44964de9c10a08af5af87c8b4c1fa9cea2c"
+  },
+  "preserved_previous_source_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-command-01/receipt.json",
+    "sha256": "ee64c3bb0de30a2acff7551bfc0134db723f0314feaf5029d4334f47091bcf79"
+  },
+  "historical_SourceQA01_actual_metadata_exit_code": 0,
+  "historical_SourceQA01_missed_operation_shadowing_defect": true,
+  "preserved_first_candidate_execution": {
+    "path": ".runtime/porting/CLK-04/candidate-execution-command-01/receipt.json",
+    "sha256": "a8f775b2aca6d0af55918727431ebfcd85f693f668d12d0f7d0ac686fb9f4bbd"
+  },
+  "preserved_failed_comparer_execution": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-01/receipt.json",
+    "sha256": "332cf43edf500e9bc7aaaad06e6e182fee779cef4b0d7b683de6475cc39e1e9e"
+  },
+  "preserved_root_count_amendment": {
+    "path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/amendment.json",
+    "sha256": "087990c9e679da325a02e47f4ef64714ed0e7734e380f60635ddaf1c85f44d9d"
+  },
+  "reviewed_source_amendment": {
+    "path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/amendment.json",
+    "sha256": "6c7346ddfa07b61cd81e901623ccecee9034922d092ab36446cce4140731af1f"
+  },
+  "preserved_SourceQA02": {
+    "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-02/review.json",
+    "sha256": "3d496f0005c74e5b1e652ce691b91c33d0ad6e89a86aef01aac26edb6c88ce7f"
+  },
+  "preserved_SourceQA02_execution": {
+    "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-command-02/receipt.json",
+    "sha256": "d46f9d50af84156139556a63970fb26b425071ab608ad2cb18720e8ff2ea268f"
+  },
+  "historical_SourceQA02_actual_metadata_exit_code": 0,
+  "historical_SourceQA02_missed_nullable_continuity_defect": true,
+  "preserved_DTO02": {
+    "path": ".runtime/porting/CLK-04/candidate-dto-projection-02/projection.json",
+    "sha256": "08cd46904677d771d9f0cdc7865ccec0ce753965f375adf88c2436f1cc7280bb"
+  },
+  "preserved_candidate02_execution": {
+    "path": ".runtime/porting/CLK-04/candidate-execution-command-02/receipt.json",
+    "sha256": "9c15dee8a53e0940971927b0948f1489678bf1f83a1bfb23b5a9a68ad09c1f4d"
+  },
+  "preserved_scientific_failure_report": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-02/unit-comparison.json",
+    "sha256": "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+  },
+  "preserved_scientific_failure_execution": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-02/receipt.json",
+    "sha256": "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+  },
+  "historical_reported_comparison_count": 5517963,
+  "historical_reported_mismatch_count": 3163,
+  "historical_comparer_exit_code": 1,
+  "historical_comparer_final_report_available": false,
+  "historical_metadata_failure_counted_as_numerical_PASS": false,
+  "new_source_review_claimed_before_historical_candidate01": false,
+  "required_next_candidate_execution_after_new_DTO_freeze": true,
+  "source_facts": {
+    "all_nine_held_sources_AST_parsed_without_import": true,
+    "profile_is_byte_identical_to_pre_original_source_only_profile": true,
+    "immutable_day7_current12_and_boolean_fields_preserved": true,
+    "all19_frozen_tolerance_rows_and_pure_wind_policy_copied_without_relaxation": true,
+    "seven_count_fields_six_history_fields_and_Liquid_retention_scoped": true,
+    "all3239_requested_rows_and848_selected_current_rows_kept": true,
+    "compact_full_grid_nulls_explicit_and_never_counted_as_PASS": true,
+    "required_current_unavailable_operands_mismatch_without_numeric_PASS": true,
+    "scalar_bits_class_finite_and_signed_zero_are_strict": true,
+    "numeric_literal_metadata_counts_and_field_error_metrics_are_separate": true,
+    "within_lane_daily11_grid17_transport_uses_real_available_endpoints": true,
+    "hidden_BeginEnvironment_handoff_private_hourly_and_extra_physics_are_unpaired": true,
+    "recovery0_native0_historical_wrapper1_are_distinct_and_bound": true,
+    "accepted_data_QC_and_legacy_gap_remain_metadata_only_NULL_no_PASS": true,
+    "actual_Cargo_emitted_binary_archive_commit_tree_and_full_Rust_Cargo_inventory_authenticated": true,
+    "candidate_child_is_exact_binary_plus_input_only_wrapper": true,
+    "independent_observer19_sources_and_actual_input_emission_bound": true,
+    "every_module_authenticated_before_future_target_import": true,
+    "DTO_source_profile_freeze_must_complete_before_future_candidate_execution": true,
+    "actual_python_script_follows_only_admitted_utf8_B_interpreter_controls": true,
+    "Rust_skip_wording_is_semantic_unavailability_with_original_labels_retained": true,
+    "native_root_requested_counts_captured_before_operation_local_shadowing": true,
+    "native_root_candidate_and_frozen_request_counts_remain_strict": true,
+    "historical_metadata_failure1_and_corrected_diagnosis_preserved": true,
+    "new_source_review_follows_second_scientific_failure_and_precedes_required_new_candidate_run": true,
+    "both_null_continuity_records_unavailable_without_PASS_and_one_sided_null_stays_mismatch": true,
+    "available_full17_and_required_Current848_snapshot_rules_unchanged": true,
+    "no_reference_or_expected_answers_enter_Rust_inputs": true
+  },
+  "reviewed_source_bytes_unchanged": true,
+  "executed_reader_source": {
+    "path": ".runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/source/review_source.py",
+    "sha256": "70406bc67f2bfd844a66e8cdd8b7f0b2d85f56192956b1b1368181203ca72c62"
+  },
+  "authorship_disclosure": {
+    "reviewer": "/root/clk02_baseline_audit",
+    "reviewer_authored_CLK04_native_helper_inputs_hourly_and_producer": true,
+    "reviewer_authored_CLK03_carrier_and_compatibility_producer": true,
+    "independence_scope": "Raw comparer, provenance guards, immutable policy projection and input-only freezer",
+    "own_algorithm_or_whole_physics_certified_independent": false
+  },
+  "scientific_execution_performed": false,
+  "target_modules_imported": false,
+  "comparer_or_freezer_executed": false,
+  "failed_scientific_report_metadata_read": true,
+  "native_or_Rust_numerical_operand_payloads_read": false,
+  "scientific_RHS_recomputed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "engines_Cargo_Git_or_native_compiler_executed": false,
+  "gates_updated": false
+}

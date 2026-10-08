@@ -1,0 +1,205 @@
+"""Selected frozen CLK04 state; no source physics or expected-value generation."""
+from numeric import require, scalar, unavailable
+from profile import (ALL_COUNTER_FIELDS, ALL_WEATHER_FIELDS, COUNTER_FIELDS, DAY_FIELDS,
+    DAY_DATE_FIELDS, ENVIRONMENT_INTS, GLOBAL_BOOLS, GLOBAL_INTS, HISTORY_FIELDS,
+    WEATHER_BOOLS, WEATHER_INTS, CURRENT_FIELDS)
+
+HEADER_KEYS = 'EPWHeaderTitle WeatherFileLocationTitle WeatherFileLatitude WeatherFileLongitude WeatherFileTimeZone WeatherFileElevation WFAllowsLeapYears EPWDaylightSaving EPWDST DST NumSpecialDays SpecialDays NumDataPeriods NumIntervalsPerHour DataPeriods SpecialDays_allocated DataPeriods_allocated LeapYearAdd EndDayOfMonth wvarsMissedCounts.WeathCodes'.split()
+STREAM_KEYS = ['is_open','good','eof','fail','bad','position_available','position_byte']
+DAY_SOLAR = ['SinSolarDeclinAngle','CosSolarDeclinAngle','EquationOfTime']
+GRID_KEYS = ['allocated','time_steps','hours','ordering']
+
+
+def integer(value, label):
+    require(type(value) is int and -(2**31) <= value < 2**31, 'Native i32 required: '+label)
+
+
+def typed_fields(row, keys, expected, label):
+    require(type(row) is dict and set(keys) <= set(row), 'All typed owner fields required: '+label)
+    for key in keys:
+        require(type(row[key]) is expected, 'Owner field type differs: '+label+'/'+key)
+        if expected is int:
+            integer(row[key], label+'/'+key)
+
+
+def weather_slot(row, label):
+    require(type(row) is dict and set(row) == set(ALL_WEATHER_FIELDS), 'Full17 actual carrier required: '+label)
+    typed_fields(row,['IsRain','IsSnow'],bool,label)
+    for key in ALL_WEATHER_FIELDS[2:]:
+        scalar(row[key],label+'/'+key)
+
+
+def grid(row, label, full):
+    require(type(row) is dict and set(GRID_KEYS+['slots']) <= set(row), 'Grid shape required: '+label)
+    typed_fields(row,['allocated'],bool,label)
+    typed_fields(row,['time_steps','hours'],int,label)
+    require(row['ordering'] == 'hour-major,timestep-minor', 'Grid order differs: '+label)
+    require((row['time_steps'] in [1,4] and row['hours'] == 24) if row['allocated']
+        else (row['time_steps'] == row['hours'] == 0), 'Bounded actual allocation shape required: '+label)
+    if not full:
+        require(row['slots'] is None and row['contents_available'] is False
+            and row['unavailability_reason'] == 'pre-execution declared compact unselected observation',
+            'Compact contents must remain explicitly unavailable: '+label)
+        return
+    require(type(row['slots']) is list and len(row['slots']) == row['time_steps']*row['hours'], 'Full grid cardinality differs: '+label)
+    for index,slot in enumerate(row['slots']):
+        require(type(slot) is dict and set(slot) == {'hour','time_step','value'}, 'Typed slot identity required')
+        integer(slot['hour'],label); integer(slot['time_step'],label)
+        require(slot['hour'] == index//row['time_steps']+1 and slot['time_step'] == index%row['time_steps']+1,
+            'Actual slot source order differs: '+label)
+        weather_slot(slot['value'],label+'/'+str(index))
+
+
+def chosen_slot(row, snapshot, label):
+    if row is None:
+        return
+    require(type(row) is dict and set(row) == {'hour','time_step','value'}, 'Actual selected slot identity required: '+label)
+    integer(row['hour'],label); integer(row['time_step'],label)
+    today = snapshot['today_values']
+    require(today['allocated'] is True and 1 <= row['hour'] <= today['hours']
+        and 1 <= row['time_step'] <= today['time_steps']
+        and row['hour'] == snapshot['global']['HourOfDay'] and row['time_step'] == snapshot['global']['TimeStep'],
+        'Selected Today actual owner index differs: '+label)
+    weather_slot(row['value'],label+'/value')
+
+
+def owner_shape(row, label, full):
+    require(row['native_internal_record_index_observed'] is False
+        and row['native_source_local_variables_observed'] is False, 'No invented private native observation')
+    typed_fields(row['global'],GLOBAL_BOOLS,bool,label+'/global')
+    typed_fields(row['global'],GLOBAL_INTS,int,label+'/global')
+    typed_fields(row['global'],['DayOfSimChr','CalendarYearChr'],str,label+'/global')
+    scalar(row['global']['TimeStepZone'],label+'/global/TimeStepZone')
+    typed_fields(row['environment'],ENVIRONMENT_INTS,int,label+'/environment')
+    typed_fields(row['environment'],['EndMonthFlag','EndYearFlag'],bool,label+'/environment')
+    typed_fields(row['environment'],['EnvironmentName'],str,label+'/environment')
+    typed_fields(row['weather'],WEATHER_INTS,int,label+'/weather')
+    typed_fields(row['weather'],WEATHER_BOOLS,bool,label+'/weather')
+    for key in ['ReadEPlusWeatherCurTime','TimeStepFraction','IsRainThreshold']:
+        scalar(row['weather'][key],label+'/weather/'+key)
+    for key in ['today_variables','tomorrow_variables']:
+        typed_fields(row[key],DAY_DATE_FIELDS,int,label+'/'+key)
+        for solar in DAY_SOLAR:
+            scalar(row[key][solar],label+'/'+key+'/'+solar)
+    for key in ['today_values','tomorrow_values']:
+        grid(row[key],label+'/'+key,full)
+    for key in ['last_hour','next_hour']:
+        weather_slot(row[key],label+'/'+key)
+    require(type(row['missing_values']) is dict and set(ALL_WEATHER_FIELDS) <= set(row['missing_values']), 'Actual extended missing owner required')
+    weather_slot({key:row['missing_values'][key] for key in ALL_WEATHER_FIELDS},label+'/missing_values')
+    for key in ['Visibility','Ceiling','AerOptDepth','SnowDepth']:
+        scalar(row['missing_values'][key],label+'/missing_values/'+key)
+    integer(row['missing_values']['DaysLastSnow'],label+'/missing_values/DaysLastSnow')
+    for key in ['missed_counts','out_of_range_counts']:
+        require(set(row[key]) == set(ALL_COUNTER_FIELDS), 'All19 count fields required: '+label)
+        typed_fields(row[key],ALL_COUNTER_FIELDS,int,label+'/'+key)
+    for key in ['Interpolation','SolarInterpolation']:
+        require(type(row[key+'_allocated']) is bool and type(row[key]) is list
+            and (row[key+'_allocated'] or not row[key]), 'Owned interpolation shape required')
+        for index,value in enumerate(row[key]):
+            scalar(value,label+'/'+key+'/'+str(index))
+    observed = row['clk04_observation']
+    current = observed['current_non_solar_weather']
+    require(type(current) is dict and set(current) == set(CURRENT_FIELDS), 'All actual current13 required: '+label)
+    typed_fields(current,['IsRain'],bool,label+'/current')
+    for key in CURRENT_FIELDS:
+        if key != 'IsRain':
+            scalar(current[key],label+'/current/'+key)
+    chosen_slot(observed['selected_today_slot'],row,label+'/selected_today_slot')
+    typed_fields(observed['selected_weather_control'],['UseRainValues','UseSnowValues'],bool,label+'/controls')
+    typed_fields(observed['selected_weather_control'],['NextHour','RptIsRain'],int,label+'/controls')
+    typed_fields(observed['clock'],['SimTimeSteps','MinutesInTimeStep'],int,label+'/clock')
+    for group,keys in [('weights',['WeightNow','WeightPreviousHour']), ('clock',['CurrentTime','TimeStepZoneSec'])]:
+        for key in keys:
+            scalar(observed[group][key],label+'/'+group+'/'+key)
+
+
+def selected_weather(check, actual, native, fields, label):
+    for key in fields:
+        if key == 'IsRain':
+            check.discrete(actual[key],native[key],label+'/'+key)
+        else:
+            check.numeric(actual[key],native[key],label+'/'+key,'day_grid_and_raw_hour_cache',key)
+
+
+def snapshot(check, actual, native, label, full, path_normalizer, *, current=False, pair_metadata=True):
+    for row in [actual,native]:
+        owner_shape(row,label,full)
+    if pair_metadata:
+        for key,fields in [('global',GLOBAL_BOOLS+GLOBAL_INTS+['DayOfSimChr','CalendarYearChr','TimeStepZone']),
+            ('environment',ENVIRONMENT_INTS+['EndMonthFlag','EndYearFlag','EnvironmentName','Latitude','Longitude','Elevation']),
+            ('weather',WEATHER_INTS+WEATHER_BOOLS+['ReadEPlusWeatherCurTime','TimeStepFraction','IsRainThreshold'])]:
+            for field in fields:
+                check.exact_value(actual[key][field],native[key][field],label+'/'+key+'/'+field)
+    for key in ['today_variables','tomorrow_variables']:
+        for field in DAY_DATE_FIELDS:
+            check.discrete(actual[key][field],native[key][field],label+'/'+key+'/'+field)
+    for key in ['today_values','tomorrow_values']:
+        for field in GRID_KEYS:
+            check.discrete(actual[key][field],native[key][field],label+'/'+key+'/'+field)
+        if full:
+            require(len(actual[key]['slots']) == len(native[key]['slots']), 'Paired allocated grid cardinality differs')
+            for index,(left,right) in enumerate(zip(actual[key]['slots'],native[key]['slots'],strict=True)):
+                check.discrete([left['hour'],left['time_step']],[right['hour'],right['time_step']],label+'/'+key+'/'+str(index)+'/identity')
+                selected_weather(check,left['value'],right['value'],DAY_FIELDS,label+'/'+key+'/'+str(index))
+        else:
+            check.availability(None,None,label+'/'+key+'/full_contents',False)
+    for key in ['missed_counts','out_of_range_counts']:
+        for field in COUNTER_FIELDS:
+            check.discrete(actual[key][field],native[key][field],label+'/'+key+'/'+field)
+    for field in HISTORY_FIELDS:
+        check.numeric(actual['missing_values'][field],native['missing_values'][field],label+'/missing_values/'+field,
+            'day_grid_and_raw_hour_cache',field)
+    check.literal(actual['missing_values']['LiquidPrecip'],native['missing_values']['LiquidPrecip'],label+'/missing_values/LiquidPrecip')
+    selected_weather(check,actual['last_hour'],native['last_hour'],DAY_FIELDS,label+'/last_hour')
+    selected_weather(check,actual['next_hour'],native['next_hour'],['LiquidPrecip'],label+'/next_hour')
+    check.discrete(actual['missed_counts']['WeathCodes'],native['missed_counts']['WeathCodes'],label+'/shared_raw_parser_counter')
+    if pair_metadata:
+        for key in HEADER_KEYS:
+            check.exact_value(actual['header'][key],native['header'][key],label+'/header/'+key)
+    for row in [actual['stream'],native['stream']]:
+        typed_fields(row,STREAM_KEYS[:-1],bool,label+'/stream')
+        require(row['position_available'] is (row['position_byte'] is not None), 'Actual position availability differs')
+        if row['position_byte'] is not None:
+            require(type(row['position_byte']) is int and row['position_byte'] >= 0, 'Actual source byte offset required')
+    if pair_metadata:
+        for key in STREAM_KEYS:
+            check.discrete(actual['stream'][key],native['stream'][key],label+'/stream/'+key,required=key != 'position_byte')
+        check.discrete(path_normalizer(actual['stream']['file_path']),path_normalizer(native['stream']['file_path']),label+'/stream/file_path')
+        check.discrete(actual['selected_environment_context'],source_environment(native),label+'/selected_environment_context')
+    if pair_metadata:
+        for key in ['Interpolation_allocated','Interpolation']:
+            check.exact_value(actual[key],native[key],label+'/'+key)
+        for group in ['weights','clock','selected_weather_control']:
+            check.exact_value(actual['clk04_observation'][group],native['clk04_observation'][group],label+'/clk04_observation/'+group)
+    else:
+        check.unavailable_paths.append({'location':label+'/source_preparation_metadata',
+            'reason':'allocated carriers are available; wholeFactory caller/environment/header/registry preparation is a different source phase',
+            'counted_as_PASS':False})
+    left,right = [row['clk04_observation']['selected_today_slot'] for row in [actual,native]]
+    if check.availability(left,right,label+'/selected_today_slot',False):
+        check.discrete([left['hour'],left['time_step']],[right['hour'],right['time_step']],label+'/selected_today_slot/identity')
+        selected_weather(check,left['value'],right['value'],DAY_FIELDS,label+'/selected_today_slot/value')
+    if current:
+        for key in CURRENT_FIELDS:
+            left,right = [row['clk04_observation']['current_non_solar_weather'][key] for row in [actual,native]]
+            if key == 'IsRain':
+                check.discrete(left,right,label+'/current/'+key)
+            else:
+                check.numeric(left,right,label+'/current/'+key,'current_non_solar_weather',key)
+
+
+def source_environment(row):
+    require(row['Environment_allocated'] is True, 'Actual source selected environment required')
+    rows = [value for value in row['environments'] if value['KindOfEnvrn'] == 3]
+    require(len(rows) == 1, 'Sole original RunPeriod weather environment required')
+    return {key:rows[0][key] for key in ['CurrentCycle','SetWeekDays']}
+
+
+def transport(check, before, after, label):
+    """Literal within-lane copies only at externally observed actual boundaries."""
+    for key in ['today_values','tomorrow_values']:
+        grid(before[key],label+'/before/'+key,True); grid(after[key],label+'/after/'+key,True)
+    check.exact_value(after['today_variables'],before['tomorrow_variables'],label+'/daily_full11_copy')
+    check.exact_value(after['today_values'],before['tomorrow_values'],label+'/grid_full17_copy')
+    check.transport_boundaries[label.split('/')[0]] += 1

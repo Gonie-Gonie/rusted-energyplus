@@ -1,0 +1,81 @@
+// SOURCE-ONLY DRAFT: observations, never interpolation/psychrometric answers.
+#ifndef CLK04_REFERENCE_FIELDS_HH
+#define CLK04_REFERENCE_FIELDS_HH
+#include "clk03_reference_fields.hh"
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
+namespace Clk04 {
+using Clk03::json;
+using Clk03::scalar;
+inline json current_observation(EnergyPlus::EnergyPlusData const &state)
+{
+    auto const &g = *state.dataGlobal;
+    auto const &e = *state.dataEnvrn;
+    auto const &w = *state.dataWeather;
+    auto const &rain = state.dataWaterData->RainFall;
+    json values = json::object();
+#define OBS_REAL(name) values[#name] = scalar(e.name);
+    OBS_REAL(OutDryBulbTemp) OBS_REAL(OutDewPointTemp) OBS_REAL(OutBaroPress)
+    OBS_REAL(OutRelHum) OBS_REAL(OutRelHumValue) OBS_REAL(OutHumRat)
+    OBS_REAL(OutWetBulbTemp) OBS_REAL(WindSpeed) OBS_REAL(WindDir)
+    OBS_REAL(LiquidPrecipitation) OBS_REAL(OutEnthalpy) OBS_REAL(OutAirDensity)
+#undef OBS_REAL
+    values["IsRain"] = e.IsRain;
+    json overrides = json::object();
+#define OBS_OVERRIDE(name) overrides[#name] = e.name;
+    OBS_OVERRIDE(EMSOutDryBulbOverrideOn) OBS_OVERRIDE(EMSOutDewPointTempOverrideOn)
+    OBS_OVERRIDE(EMSOutRelHumOverrideOn) OBS_OVERRIDE(EMSWindSpeedOverrideOn)
+    OBS_OVERRIDE(EMSWindDirOverrideOn) OBS_OVERRIDE(EMSDifSolarRadOverrideOn)
+    OBS_OVERRIDE(EMSBeamSolarRadOverrideOn)
+#undef OBS_OVERRIDE
+    json selected = nullptr;
+    if (w.wvarsHrTsToday.allocated() && g.TimeStep >= 1 && g.HourOfDay >= 1 &&
+        static_cast<std::size_t>(g.TimeStep) <= w.wvarsHrTsToday.size1() &&
+        static_cast<std::size_t>(g.HourOfDay) <= w.wvarsHrTsToday.size2()) {
+        selected = {{"hour", g.HourOfDay}, {"time_step", g.TimeStep},
+                    {"value", Clk03::weather(w.wvarsHrTsToday(g.TimeStep, g.HourOfDay))}};
+    }
+    return {{"current_non_solar_weather", values}, {"selected_today_slot", selected},
+            {"weights", {{"WeightNow", scalar(g.WeightNow)}, {"WeightPreviousHour", scalar(g.WeightPreviousHour)}}},
+            {"clock", {{"CurrentTime", scalar(g.CurrentTime)}, {"SimTimeSteps", g.SimTimeSteps},
+                       {"TimeStepZoneSec", scalar(g.TimeStepZoneSec)}, {"MinutesInTimeStep", g.MinutesInTimeStep}}},
+            {"selected_weather_control", {{"NextHour", w.NextHour}, {"UseRainValues", w.UseRainValues},
+                                         {"UseSnowValues", w.UseSnowValues}, {"RptIsRain", w.RptIsRain}}},
+            {"actual_ems_overrides", overrides},
+            {"unpaired_genuine_context", {
+                {"ground_models_present", {w.siteBuildingSurfaceGroundTempsPtr != nullptr,
+                    w.siteFCFactorMethodGroundTempsPtr != nullptr, w.siteShallowGroundTempsPtr != nullptr,
+                    w.siteDeepGroundTempsPtr != nullptr}},
+                {"GroundReflectances_allocated", w.GroundReflectances.allocated()},
+                {"spSiteSchedules_allocated", w.spSiteSchedules.allocated()},
+                {"ScheduleInputProcessed", state.dataSched->ScheduleInputProcessed},
+                {"RainFallModeID", static_cast<int>(rain.ModeID)},
+                {"RainFallCurrentRate", scalar(rain.CurrentRate)}, {"RainFallCurrentAmount", scalar(rain.CurrentAmount)},
+                {"WaterMainsTemp", scalar(e.WaterMainsTemp)}, {"SunIsUp", e.SunIsUp},
+                {"whole_ground_water_solar_daylight_math_paired", false}}},
+            {"native_internal_record_index_observed", false}, {"error_text_parity_claimed", false}};
+}
+inline json snapshot(EnergyPlus::EnergyPlusData const &state)
+{
+    auto result = Clk03::snapshot(state);
+    result["clk04_observation"] = current_observation(state);
+    result["full_17_field_generation_parity_claimed"] = false;
+    return result;
+}
+inline json operation_snapshot(EnergyPlus::EnergyPlusData const &state, bool full)
+{
+    auto result = snapshot(state);
+    result["observation_detail"] = full ? "full-selected-or-lifecycle-boundary" : "compact-unselected-operation";
+    result["full_grid_contents_available"] = full;
+    if (!full) for (char const *name : {"today_values", "tomorrow_values"}) {
+        // Every scalar/control/cache/count/cursor field is still observed. Only
+        // unselected whole grid contents are absent, never manufactured zeros.
+        result[name]["slots"] = nullptr;
+        result[name]["contents_available"] = false;
+        result[name]["unavailability_reason"] = "pre-execution declared compact unselected observation";
+    }
+    return result;
+}
+} // namespace Clk04
+#endif

@@ -1,0 +1,246 @@
+"""Root-invoked byte archival only; no canonical writes or scientific execution."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import gzip
+import hashlib
+import io
+import json
+import re
+import stat
+import zlib
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = '.runtime/porting/CLK-04/'
+CAP = 4_000_000
+PART = 3_500_000
+PLAIN = 512_000
+SHA = re.compile(r'[0-9a-f]{64}')
+KNOWN = {
+    'unit-comparison': ('candidate-unit-comparison-03/unit-comparison.json', 'ad547d36ac37d5e69a6ef5317f6409c09e0875de91c951e5c9532af31c1d3ac6'),
+    'unit-result-review': ('independent-unit-result-review-01/review.json', 'd7425d39aadbb5de36496ce98ec3b5c506888454fad10bbad6bb24dd2f763c9e'),
+    'preserved-failed-unit-comparison': ('candidate-unit-comparison-02/unit-comparison.json', 'efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575'),
+    'legacy-gap': ('legacy-gap-observation-01/gap.json', '5806571825a4241c43ba2585d1faf1c5eb5043eccd0be20b763b8c47e1efec3c'),
+    'unit-execution': ('candidate-unit-comparison-command-03/receipt.json', 'c9cedf230525b380d699d04b710b6044ac7b6f49e56d610d0039d0434cf78182'),
+    'unit-review-execution': ('independent-unit-result-review-command-01/receipt.json', '468245444e6d7a7e7067d7aa4ae870bff29170fe2cba82d6e361960d3cd44bac'),
+    'preserved-failed-unit-execution': ('candidate-unit-comparison-command-02/receipt.json', '15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9'),
+    'legacy-gap-execution': ('legacy-gap-command-01/receipt.json', '0078c4ad7a6feb532e8775bcaea2f038ff889fb0c8dbee22b19b6c7e2e89e3b7'),
+    'recovery-execution': ('original-recovery-command-01/receipt.json', '31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130'),
+    'original-data-review': ('independent-original-data-review-01/review.json', '164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1'),
+    'original-data-review-execution': ('independent-original-data-review-command-01/receipt.json', '1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0'),
+    'native-build': ('native-build-02/native-driver-build.json', '1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc'),
+    'native-build-execution': ('native-build-command-02/receipt.json', '4c2ca4c616cfc42ff39e3d85a4545d31d54a1a260c7e5f8c718ddbd891f3459c'),
+    'native-build-review': ('independent-native-build-review-01/review.json', '95b786ddce451f154054585e67e00106785246fd691c28ceca8d9c987e4b1400'),
+    'native-build-review-execution': ('independent-native-build-review-command-01/receipt.json', '803ff81f35a9210fd71ed7c1a83da7b69bc038cdf1c368087aa3ebc64ebc6fc5'),
+    'comparer-source-review': ('independent-candidate-comparer-static-review-03/review.json', 'fb09f2b206ef0b7dff4b3f505896b963597c4e5d73f1c889c91d5479e71024a8'),
+    'comparer-source-review-execution': ('independent-candidate-comparer-static-review-command-03/receipt.json', 'e9c3ec6cc6a7f5ad53790487615dc6cbf09dadf0e59a43b77065373eb77c0ab1'),
+    'hourly-source-amendment': ('hourly-source-review-01/source-amendment.json', '07c0841e96ee4b137564f4aefeea1cbac2c664ff706c784e119ab5d0b4699aa1'),
+    'hourly-source-amendment-execution': ('hourly-source-review-command-01/receipt.json', 'daab46c9fbbc3d119831660c1f36ad9d2e25843a7b3f4850bc55f2e0c85b4482'),
+    'candidate-build': ('candidate-build-03/build-receipt.json', '056d1e614fbd1a9e6d913d98cf7fdd7d7923cda401259a436e0478685fbaae74'),
+    'candidate-execution': ('candidate-execution-command-03/receipt.json', 'c1495d41a072b6e680dfd87b1f8e99d13e29e128a2658d555e7955011140226f'),
+    'original-native-execution': ('original-first-02/helper-command.json', '50493a818d2c2c79f08dc6deffa0cc78a327434e3a5013452588b0f71a347a93'),
+    'preserved-original-wrapper-execution': ('original-first-command-02/receipt.json', 'b28ddaa77873187959beb732915200d332dd75ff368e51eaadc0b85d0d93ec9e'),
+    'frozen-source': ('frozen-packet-01/source.json', '8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e'),
+    'frozen-cases': ('frozen-packet-01/cases.json', '99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08'),
+    'frozen-tolerances': ('frozen-packet-01/tolerances.json', 'f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5'),
+    'frozen-helper-request': ('frozen-packet-01/helper-request.json', 'db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054'),
+    'frozen-observation-projection': ('frozen-packet-01/projection.json', 'fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51'),
+    'frozen-native-admission': ('frozen-packet-01/native-admission-contract.json', 'c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1'),
+    'preserved-failed-production-comparison': ('production-comparison-01/production-comparison.json', '703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f'),
+    'preserved-failed-production-execution': ('production-comparison-command-01/receipt.json', 'bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67'),
+    'preserved-production-plan': ('production-plan-01/plan.json', '9651e7c9748c42f14324cb13c71e4417ccedf1be94531184c0562dd2244ffd22'),
+    'preserved-production-matrix': ('production-execution-01/matrix.json', 'e0c0e83c151194a5e1dea689d7d21882254b7c38bd5f0e758e8863d098b275cc'),
+    'preserved-production-plan-execution': ('production-plan-command-01/receipt.json', 'f5cfe4835f6556891ef1f1cf52c7251458ea538931e4fc72032c00affe1aa8c5'),
+    'preserved-production-matrix-execution': ('production-execution-command-01/receipt.json', '541c47be90354b93401acbb712398ac6a8727d25e6d14cdac0271a67746f8877'),
+    'historical-production-source-review': ('independent-production-workflow-source-review-03/review.json', 'ec50f050b66eb7725fbdbca582c8ddc5e3d0f34ec646412963e586cf7ade2792'),
+    'historical-production-source-review-execution': ('independent-production-workflow-source-review-command-03/receipt.json', 'b82cd512ea9b723181da4409d848909acb49c850b031c003b8783275925eee1f'),
+    'supplemental-production-source-review': ('independent-production-reader-amendment-source-review-02/review.json', '72a702cefb24bfe63075c71bb79ece8cb14be31c377562f6d082f5b59f8a81ec'),
+    'supplemental-production-source-review-execution': ('independent-production-reader-amendment-source-review-command-02/receipt.json', '6b0dff8b7e739d564ba65877f0b13160de727c752418deb27c47f11d42197130'),
+    'preserved-failed-supplemental-source-review-execution': ('independent-production-reader-amendment-source-review-command-01/receipt.json', '6db68010249538d4de04253f98273f5c7e067a1e76af0c62a73079af53247bf6'),
+    'preserved-unit-metadata-failure-execution': ('candidate-unit-comparison-command-01/receipt.json', '332cf43edf500e9bc7aaaad06e6e182fee779cef4b0d7b683de6475cc39e1e9e'),
+    'preserved-historical-clippy-execution': ('candidate-clippy-command-01/receipt.json', '8475edf40de512527ebc0a0a1937e0eb431c9ec47db845eee8951bdb68920cff'),
+    'authenticated-unit-failure-review': ('authenticated-unit-failure-review-02/review.json', '397b16a94116671b85b8f43fb1b2766e0ca4f39313b05d4868d21c8c30c73ccf'),
+    'authenticated-unit-failure-review-execution': ('authenticated-unit-failure-review-command-02/receipt.json', 'b49d86e9d059bbe65e4289419d28d74d62c0d4b83892740c332a01d40b591dad'),
+    'preserved-comparer-source-review-01': ('independent-candidate-comparer-static-review-01/review.json', '210e5905404f90c7434ee9a43880722eb72943f98f20e77454eb88be90bba243'),
+    'preserved-comparer-source-review-01-execution': ('independent-candidate-comparer-static-review-command-01/receipt.json', 'ee64c3bb0de30a2acff7551bfc0134db723f0314feaf5029d4334f47091bcf79'),
+    'preserved-comparer-source-review-02': ('independent-candidate-comparer-static-review-02/review.json', '3d496f0005c74e5b1e652ce691b91c33d0ad6e89a86aef01aac26edb6c88ce7f'),
+    'preserved-comparer-source-review-02-execution': ('independent-candidate-comparer-static-review-command-02/receipt.json', 'd46f9d50af84156139556a63970fb26b425071ab608ad2cb18720e8ff2ea268f'),
+    'production-comparison': ('production-comparison-02/production-comparison.json', '4a29c5e1bb90caf1a89e81af99c697f4d80f7ed9b92079cfcbac6e18555649a6'),
+    'production-execution': ('production-comparison-command-02/receipt.json', 'd52899a59912422f4d7cab04d21ded20d4b851f2fb29b43736ac3be7669e08d5'),
+    'production-result-review': ('independent-production-result-review-01/review.json', 'c20b44ed08809176a727d4bfa9798af31f7b9b01d23fd832dc9358a2802cf41a'),
+    'production-review-execution': ('independent-production-result-review-command-01/receipt.json', '695d6f496cfc3b0be404f540008733f181c89dbaba46a20d180fc9c8ae1daf0b'),
+}
+FUTURE_REQUIRED = {'production-comparison', 'production-result-review',
+                   'production-execution', 'production-review-execution'}
+OPTIONAL = {'production-matrix', 'production-matrix-execution', 'production-plan',
+            'production-plan-execution', 'canonical-closure', 'canonical-closure-execution',
+            'final-quality-execution', 'final-workspace-execution',
+            'preserved-original-metadata-failure-execution',
+            'final-quality-lineage-review', 'final-quality-lineage-review-execution',
+            'observer-cleanup-plan', 'observer-cleanup-execution',
+            'final-clippy-execution', 'final-format-execution',
+            'final-source-quality-execution', 'final-archival-execution',
+            'observer-cleanup-source-review', 'observer-cleanup-source-review-execution',
+            'observer-normalization-execution', 'Root-final-diff-review'}
+LOCAL_ONLY = {
+    'original-recovery-reference': ('original-recovery-01/recovery.json',
+        '9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6', 49_698_761),
+    'genuine-native-results': ('original-first-02/native-output/clk04-helper-results.json',
+        'd84b696a34c720004ede289e47719bcc3d066ee48652f4a7d1a9431a1b825dba', 678_510_427),
+}
+
+
+def need(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def regular(value):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    path = raw.resolve(strict=True)
+    need(path.is_relative_to(ROOT) and path != ROOT and stat.S_ISREG(info.st_mode)
+         and not getattr(info, 'st_file_attributes', 0) & 0x400,
+         'Contained regular non-reparse file required')
+    return path
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def bound(row):
+    need(type(row) is dict and set(row) == {'path', 'sha256'}
+         and type(row['path']) is str and type(row['sha256']) is str
+         and SHA.fullmatch(row['sha256']), 'Exact path/SHA256 binding required')
+    path = regular(row['path'])
+    body = path.read_bytes()
+    need(digest(body) == row['sha256'], 'Approved input byte hash differs')
+    return path, body
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--plan', required=True, type=Path)
+    parser.add_argument('--output-dir', required=True, type=Path)
+    args = parser.parse_args()
+    need(Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    plan_path = regular(args.plan)
+    plan = json.loads(plan_path.read_text(encoding='utf-8'))
+    need(plan['schema'] == 'clk04-selected-evidence-archive-plan.v1'
+         and plan['ready_to_archive'] is True and plan['pending_refs'] == []
+         and plan['canonical_gate_or_doc_writes_authorized'] is False,
+         'Final Root-approved complete byte-only archive plan required')
+    writer, writer_bytes = bound(plan['archive_writer'])
+    need(writer == regular(__file__), 'Plan must bind the actual executed archival source')
+    out = args.output_dir.resolve()
+    need(out.is_relative_to(ROOT / BASE) and out != ROOT / BASE and not out.exists(),
+         'Fresh ignored archive output required')
+    rows = plan['artifacts']
+    need(type(rows) is list and all(type(row) is dict and set(row) == {'role', 'binding'} for row in rows),
+         'Typed explicitly approved artifact inventory required')
+    roles = [row['role'] for row in rows]
+    need(len(roles) == len(set(roles)) and set(KNOWN) | FUTURE_REQUIRED <= set(roles)
+         and set(roles) <= set(KNOWN) | FUTURE_REQUIRED | OPTIONAL, 'Unknown, duplicate or missing artifact role')
+    prepared, monitored = [], {plan_path: digest(plan_path.read_bytes()), writer: digest(writer_bytes)}
+    excluded = plan['local_only_large_proofs']
+    need(type(excluded) is list and len(excluded) == len(LOCAL_ONLY), 'Exactly two approved local-only large proofs required')
+    need({row['role'] for row in excluded} == set(LOCAL_ONLY), 'Unknown local-only proof')
+    for row in excluded:
+        name, sha, size = LOCAL_ONLY[row['role']]
+        need(row['binding'] == {'path': BASE + name, 'sha256': sha}
+             and row['size_bytes'] == size and row['rehashed_by_archiver'] is False
+             and regular(row['binding']['path']).stat().st_size == size,
+             'Large proof metadata must retain its authenticated historical binding; no fresh hash claim')
+    for row in rows:
+        if row['role'] in KNOWN:
+            name, sha = KNOWN[row['role']]
+            need(row['binding'] == {'path': BASE + name, 'sha256': sha}, 'Known actual proof identity changed')
+        path, body = bound(row['binding'])
+        need(path.is_relative_to(ROOT / BASE) and path.suffix == '.json' and len(body) <= 64_000_000,
+             'Only scoped approved medium/small JSON documents admitted; no native output/binary')
+        prepared.append((row, body))
+        monitored[path] = digest(body)
+    source_rows = plan['source_archives']
+    need(type(source_rows) is list and len(source_rows) <= 250, 'Bounded explicit source archive list required')
+    source_ids = set()
+    for row in source_rows:
+        need(type(row) is dict and set(row) == {'historical_path', 'archive'}
+             and type(row['historical_path']) is str, 'Typed observed source binding required')
+        identity = (row['historical_path'], row['archive']['sha256'])
+        need(identity not in source_ids, 'Duplicate historical source identity')
+        source_ids.add(identity)
+        path, body = bound(row['archive'])
+        suffix = Path(row['historical_path']).suffix
+        need(suffix in {'.py', '.cpp', '.hh', '.h', '.rs', '.cmake'} and len(body) <= 1_000_000,
+             'Small reviewed/executed source only')
+        prepared.append(({'source_owner': row['historical_path'], 'binding': row['archive']}, body))
+        monitored[path] = digest(body)
+    out.mkdir()
+    objects = out / 'objects'
+    objects.mkdir()
+    saved, archived = {}, []
+
+    def save(body):
+        original_sha = digest(body)
+        if original_sha in saved:
+            return saved[original_sha]
+        encoding = 'identity'
+        compressed = body
+        if len(body) > PLAIN:
+            buffer = io.BytesIO()
+            with gzip.GzipFile(fileobj=buffer, mode='wb', filename='', mtime=0, compresslevel=9) as stream:
+                stream.write(body)
+            compressed = buffer.getvalue()
+            need(compressed[3] == 0 and compressed[4:8] == b'\0' * 4
+                 and gzip.decompress(compressed) == body, 'Deterministic gzip must restore exact original bytes')
+            encoding = 'gzip'
+        payload_sha = digest(compressed)
+        parts = []
+        chunk_size = CAP if len(compressed) <= CAP else PART
+        for index, offset in enumerate(range(0, len(compressed), chunk_size)):
+            chunk = compressed[offset:offset + chunk_size]
+            extension = '.gz' if encoding == 'gzip' and len(compressed) <= CAP else '.part'
+            name = payload_sha + ('' if len(compressed) <= CAP else f'.{index:03d}') + extension
+            target = objects / name
+            need(not target.exists(), 'Fresh content-addressed archive object required')
+            with target.open('xb') as stream:
+                stream.write(chunk)
+            need(target.read_bytes() == chunk and len(chunk) <= CAP, 'Stored archive object differs or exceeds4MB')
+            parts.append({'index': index, 'offset': offset, 'relative_path': target.relative_to(out).as_posix(),
+                          'sha256': digest(chunk), 'size_bytes': len(chunk)})
+        result = {'encoding': encoding, 'original_sha256': original_sha, 'original_size_bytes': len(body),
+                  'stored_payload_sha256': payload_sha, 'stored_payload_size_bytes': len(compressed), 'parts': parts}
+        saved[original_sha] = result
+        return result
+
+    for row, body in prepared:
+        archived.append({**row, 'storage': save(body)})
+    for path, sha in monitored.items():
+        need(digest(regular(path).read_bytes()) == sha, 'Historical input changed during byte archival')
+    manifest = {'schema': 'clk04-selected-byte-evidence-archive.v1',
+        'completed_utc': datetime.now(timezone.utc).isoformat(), 'approved_plan': {
+            'path': plan_path.relative_to(ROOT).as_posix(), 'sha256': monitored[plan_path]},
+        'rows': archived, 'manifest_directory_is_archive_root': True,
+        'original_bytes_rewritten_or_JSON_reserialized': False, 'exact_decompressed_bytes_verified': True,
+        'gzip': {'mtime': 0, 'filename': '', 'compresslevel': 9, 'zlib_version': zlib.ZLIB_VERSION},
+        'individual_stored_artifact_max_bytes': CAP, 'unique_original_documents_and_sources': len(saved),
+        'unique_stored_payload_bytes': sum(row['stored_payload_size_bytes'] for row in saved.values()),
+        'local_only_large_proofs': plan['local_only_large_proofs'],
+        'native_binary_or_full_native_trace_copied': False, 'duplicate_stdout_copied': False,
+        'scientific_comparer_or_engine_Cargo_Git_executed': False, 'gates_updated': False,
+        'canonical_plan_card_evidence_changed': False,
+        'writer_source_sha256': digest(Path(__file__).read_bytes())}
+    target = out / 'archive.json'
+    body = (json.dumps(manifest, indent=2, ensure_ascii=False, allow_nan=False) + '\n').encode('utf-8')
+    need(len(body) <= CAP, 'Compact archive manifest exceeds4MB')
+    with target.open('xb') as stream:
+        stream.write(body)
+    print(json.dumps({'archive': {'path': target.relative_to(ROOT).as_posix(), 'sha256': digest(body)},
+        'unique_objects': len(saved), 'stored_bytes': manifest['unique_stored_payload_bytes'],
+        'canonical_files_changed': False, 'scientific_execution_performed': False}, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

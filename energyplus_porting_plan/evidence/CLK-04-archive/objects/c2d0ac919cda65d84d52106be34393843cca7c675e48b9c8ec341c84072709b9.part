@@ -1,0 +1,65 @@
+"""Freeze input-only production commands and observation policy; no result reads."""
+from pathlib import Path
+import argparse
+import json
+import shutil
+from common import (ADMISSION, CASE_IDS, ROOT, boot, input_byte_map, now, require, selected_policy, source_bundle)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-review','source-review-execution','output-dir']:
+        parser.add_argument('--'+name,type=Path,required=True)
+    args = parser.parse_args()
+    utility,checked,metadata,packet,policy,request_ref,request,review_ref,review,_ = boot(args.source_review)
+    review_execution_ref = utility.ref(args.source_review_execution)
+    _,review_start,review_finish = metadata.recorded(checked,review_execution_ref,review)
+    require(review_start <= utility.timestamp(review['review_started_utc']) <= utility.timestamp(review['review_completed_utc']) <= review_finish,
+        'Actual independent source review interval required')
+    output = args.output_dir.resolve()
+    require(output.is_relative_to(ROOT/'.runtime/porting/CLK-04') and not output.exists(), 'Fresh contained production plan output required')
+    scope = utility.read(checked.check(request['fixed_scope']));indexed = {row['id']:row for row in scope['cases']}
+    lanes = [row for row in request['weather_sequences'] if row['lane'] == 'production-CON']
+    require([row['id'] for row in lanes] == CASE_IDS, 'Exactly three existing Original production lanes required')
+    rows = []
+    counts = {'GetNextEnvironment':0,'InitializeWeather':0,'SetCurrentWeather':0}
+    for lane in lanes:
+        original = indexed[lane['id']]
+        for name in ['input','weather']:
+            metadata.binding(lane[name],original[name],checked)
+        for operation in lane['operations']:
+            counts[operation['kind']] += 1
+        rows.append({'case_id':lane['id'],**{name:original[name] for name in ['scope','duration','input','weather','metadata']},
+            'trace_levels':['Full','Summary'],'native_sequence_id':lane['id']})
+    require(counts == {'GetNextEnvironment':3,'InitializeWeather':480,'SetCurrentWeather':480}, 'Existing Original production operation counts differ')
+    checked.unchanged();output.mkdir();archives = [];maps = {}
+    for row in rows:
+        key = (row['weather']['path'],row['weather']['sha256'])
+        if key not in maps:
+            path = output/('input-byte-map-'+str(len(maps)).zfill(2)+'.json')
+            with path.open('x',encoding='utf8',newline='\n') as stream:
+                json.dump(input_byte_map(row['weather'],checked),stream,indent=2,ensure_ascii=False,allow_nan=False);stream.write('\n')
+            maps[key] = utility.ref(path)
+        row['external_byte_map'] = maps[key]
+    for index,path in enumerate(source_bundle()):
+        archive = output/f'{index:02}-{path.name}';shutil.copyfile(path,archive)
+        require(archive.read_bytes() == path.read_bytes(), 'Actual frozen production source archive differs')
+        archives.append({'historical_path':path.relative_to(ROOT).as_posix(),'archive':utility.ref(archive)})
+    created = now();require(review_finish <= utility.timestamp(created), 'Actual source review must complete before plan freeze')
+    import profile
+    value = {'schema':'clk04-production-plan.v1','created_utc':created,
+        'contracts':{key:profile.FROZEN_INPUTS[key] for key in ['source','cases','tolerances']},
+        'native_request':request_ref,'native_admission_contract':ADMISSION,'native_observation_projection':profile.FROZEN_INPUTS['projection'],
+        'fixed_scope':request['fixed_scope'],'cases':rows,'actual_command_count':6,'selected_policy':selected_policy(policy),
+        'independent_sources_review':review_ref,'independent_sources_review_execution':review_execution_ref,
+        'reader_source_archives':archives,'native_results_read_by_plan_writer':False,
+        'frozen_before_Rust_production_numerical_execution':True,'frozen_before_Original_execution_claimed':False,
+        'existing_native_six_packet_rewritten':False,'expected_outputs_supplied':False,
+        'native_results_supplied_as_inputs':False,'physical_execution_performed':False,'gates_updated':False}
+    with (output/'plan.json').open('x',encoding='utf8',newline='\n') as stream:
+        json.dump(value,stream,indent=2,ensure_ascii=False,allow_nan=False);stream.write('\n')
+    checked.unchanged()
+    print(json.dumps({'plan':utility.ref(output/'plan.json'),'input_only_freeze':True,'physical_execution_performed':False,'gates_updated':False}))
+
+
+if __name__ == '__main__': main()

@@ -1,0 +1,135 @@
+"""Record Root's manually reviewed observer-only cleanup and exact source lineage.
+
+No engine, formatter, scientific comparer, Cargo, or Git invocation.
+The final five hashes are supplied only after Root reads the actual final diff.
+"""
+from datetime import datetime, timezone
+from pathlib import Path
+import argparse
+import hashlib
+import json
+import shutil
+
+ROOT = Path(__file__).resolve().parents[4]
+PLAN_SHA = '5c94092f980a2be01c06c1965e24e48479e808bcb2dd0914d3db949c8c973ce0'
+BUILD_SHA = '056d1e614fbd1a9e6d913d98cf7fdd7d7923cda401259a436e0478685fbaae74'
+
+
+def need(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def ref(path):
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest(path)}
+
+
+def checked(binding):
+    path = (ROOT / binding['path']).resolve()
+    need(path.is_relative_to(ROOT) and path != ROOT, 'Contained artifact required')
+    need(digest(path) == binding['sha256'], 'Artifact bytes differ')
+    return path
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['scientific-build', 'cleanup-plan', 'expected-final', 'normalization-execution', 'output-dir']:
+        parser.add_argument('--' + key, type=Path, required=True)
+    args = parser.parse_args()
+    started = datetime.now(timezone.utc).isoformat()
+    plan_path = args.cleanup_plan.resolve()
+    build_path = args.scientific_build.resolve()
+    expected_path = args.expected_final.resolve()
+    need(digest(plan_path) == PLAN_SHA and digest(build_path) == BUILD_SHA, 'Reviewed identities required')
+    plan = json.loads(plan_path.read_bytes())
+    build = json.loads(build_path.read_bytes())
+    expected = json.loads(expected_path.read_bytes())
+    need(expected['reviewer'] == '/root' and expected['actual_final_diff_read_in_full'] is True,
+         'Actual Root diff review required before invocation')
+    need(expected['manual_scope'] == 'five observer files only; held cleanup edits and rustfmt layout',
+         'Reviewed observer scope differs')
+    rows = plan['files']
+    paths = {row['historical_path'] for row in rows}
+    need(len(rows) == len(paths) == 5 and set(expected['final_sha256']) == paths, 'Exactly five reviewed observers required')
+    snapshot = json.loads(checked(build['source_snapshot']).read_bytes())
+    need(snapshot['bytes_normalized'] is False and len(snapshot['files']) == 3731, 'Authentic scientific inventory required')
+    original = {row['historical_path']: row for row in snapshot['files']}
+    rust = {path.relative_to(ROOT).as_posix() for path in (ROOT / 'crates').rglob('*.rs')}
+    need(rust == {key for key in original if key.endswith('.rs')} and len(rust) == 3718,
+         'No Rust files may be added or deleted by observer cleanup')
+    for key, row in original.items():
+        checked(row['archive'])
+        current = ROOT / key
+        wanted = expected['final_sha256'][key] if key in paths else row['archive']['sha256']
+        need(digest(current) == wanted, 'Scientific source/config or reviewed observer differs: ' + key)
+    for row in rows:
+        before = checked(row['before'])
+        checked(row['proposed'])
+        checked(row['source_diff'])
+        need(before.read_bytes() == checked(original[row['historical_path']]['archive']).read_bytes(),
+             'Cleanup prior source must be the actual scientific source')
+    normalization_path = args.normalization_execution.resolve()
+    normalization = json.loads(normalization_path.read_bytes())
+    need(normalization['schema'] == 'recorded-porting-command.v1'
+         and normalization['exit_code'] == 0 and normalization['launch_error'] is None
+         and normalization['source_bytes_match_before_and_after'] is True,
+         'Actual source-preserving successful formatter required')
+    normalized = expected['reviewed_normalized_proposals']
+    need(len(normalized) == 5 and {row['historical_path'] for row in normalized} == paths,
+         'Exactly five actual normalized proposal sources required')
+    need(normalization['command'][:5] == ['rustfmt', '--edition', '2024', '--config', 'skip_children=true']
+         and len(normalization['command']) == 10,
+         'Actual five-file scoped formatting invocation required')
+    operands = {(ROOT / arg).resolve() for arg in normalization['command'][5:]}
+    need(len(operands) == 5 and operands == {(ROOT / row['formatted_path']).resolve() for row in normalized},
+         'Normalized paths must be the actual formatter operands')
+    for row in normalized:
+        source = (ROOT / row['formatted_path']).resolve()
+        need(source.is_relative_to(ROOT / '.runtime/porting/CLK-04')
+             and source.read_bytes() == checked(row['archive']).read_bytes()
+             and digest(source) == expected['final_sha256'][row['historical_path']],
+             'Actual normalized proposal differs from final Root-reviewed canonical source')
+    need(datetime.fromisoformat(normalization['finished_utc']) <= datetime.fromisoformat(started),
+         'Root source read must follow actual formatting')
+    output = args.output_dir.resolve()
+    need(output.is_relative_to(ROOT / '.runtime/porting/CLK-04') and not output.exists(), 'Fresh contained output required')
+    output.mkdir()
+    archives = []
+    for index, key in enumerate(sorted(paths)):
+        destination = output / f'{index:02}-{Path(key).name}'
+        shutil.copyfile(ROOT / key, destination)
+        need(digest(destination) == expected['final_sha256'][key], 'Reviewed final archive differs')
+        archives.append({'historical_path': key, 'archive': ref(destination)})
+    value = {
+        'schema': 'clk04-independent-observer-cleanup-source-review.v1',
+        'status': 'pass-observer-only-cleanup-source-before-final-quality',
+        'review_started_utc': started,
+        'review_completed_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_cleanup_plan': ref(plan_path),
+        'reviewed_scientific_build': ref(build_path),
+        'reviewed_actual_final_diff_review': ref(expected_path),
+        'reviewed_final_sources': archives,
+        'reviewed_normalized_proposals': normalized,
+        'actual_proposal_formatting_execution': ref(normalization_path),
+        'reviewer': '/root',
+        'scientific_inventory_count': 3731,
+        'unchanged_sources_and_configuration_count': 3726,
+        'observer_files_changed': 5,
+        'scientific_values_compared': False,
+        'scientific_execution_performed': False,
+        'numerical_PASS_claimed': False,
+        'gates_updated': False,
+        'scope': expected['manual_scope'],
+        'authorship_disclosure': 'Root independently read Header-authored held and final observer diffs; this writer checks retained source bytes only, not numerical values or future quality results.',
+    }
+    path = output / 'review.json'
+    path.write_text(json.dumps(value, indent=2) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps(value))
+
+
+if __name__ == '__main__':
+    main()

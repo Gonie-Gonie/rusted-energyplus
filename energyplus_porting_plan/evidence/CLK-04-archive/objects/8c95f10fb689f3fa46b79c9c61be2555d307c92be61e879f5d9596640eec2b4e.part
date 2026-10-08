@@ -1,0 +1,1102 @@
+{
+  "card": "CLK-04",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "status": "frozen-input-and-source-before-numerical-execution",
+  "created_utc": "2026-10-08T10:33:25.119821+00:00",
+  "contracts_frozen": true,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "prospective_PASS_claimed": false,
+  "schema": "clk04-source-contract.v1",
+  "prior_source_audit": {
+    "path": ".runtime/porting/CLK-04/source-audit-01/audit.json",
+    "sha256": "c198defbf26703ad23ff87b51ee15f39114ee3c51131bc0c28d012dbda8e52db"
+  },
+  "reviewed_card": {
+    "path": "energyplus_porting_plan/cards/CLK-04.md",
+    "sha256": "42e5e2c7e6830169435f16542f6ae885ca7116e7126386f3f32056cdec2fa2a9"
+  },
+  "dependencies": {
+    "declared_card_dependencies": [
+      "CLK-03"
+    ],
+    "additional_reused_kernels": [
+      "PSY-01",
+      "PSY-02"
+    ],
+    "CLK03_completion_required_before_final_freeze_or_science": true,
+    "actual_plan_metadata_snapshot": {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/preparation-01/plan-input-snapshot.json",
+        "sha256": "1e432c806a5932256f52aa984722ba684a7699ee0a17cde0474d91f212688fb6"
+      }
+    },
+    "SRC05_complete_gate_is_not_CLK04_prerequisite": true,
+    "downstream_cards": [
+      "CLK-05",
+      "CLK-06",
+      "SRC-05"
+    ],
+    "historical_preparation_plan_snapshot": {
+      "CLK-03": {
+        "scope_review": "미확인",
+        "unit_gate": "미확인",
+        "integration_gate": "미확인",
+        "production_gate": "미확인"
+      },
+      "PSY-01": {
+        "scope_review": "통과",
+        "unit_gate": "통과",
+        "integration_gate": "통과",
+        "production_gate": "통과"
+      },
+      "PSY-02": {
+        "scope_review": "통과",
+        "unit_gate": "통과",
+        "integration_gate": "통과",
+        "production_gate": "통과"
+      }
+    },
+    "current_actual_prerequisites_complete_before_freeze": true
+  },
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/00-DataEnvironment.hh",
+        "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+      },
+      "bytes": 16816
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/01-DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+      },
+      "bytes": 13547
+    },
+    {
+      "path": "src/EnergyPlus/DataWater.hh",
+      "sha256": "e51c8034a0ecee83f7405f42b729a31730e93aff015f4805367a2221c4bf15f7",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataWater.hh",
+        "sha256": "e51c8034a0ecee83f7405f42b729a31730e93aff015f4805367a2221c4bf15f7"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/original-source/src/EnergyPlus/DataWater.hh",
+        "sha256": "e51c8034a0ecee83f7405f42b729a31730e93aff015f4805367a2221c4bf15f7"
+      },
+      "bytes": 16254
+    },
+    {
+      "path": "src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+        "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/02-EnergyPlus.hh",
+        "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+      },
+      "bytes": 7439
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.cc",
+      "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+        "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/03-Psychrometrics.cc",
+        "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f"
+      },
+      "bytes": 73171
+    },
+    {
+      "path": "src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+        "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/04-Psychrometrics.hh",
+        "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45"
+      },
+      "bytes": 108928
+    },
+    {
+      "path": "src/EnergyPlus/ScheduleManager.cc",
+      "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+        "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/original-source/src/EnergyPlus/ScheduleManager.cc",
+        "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba"
+      },
+      "bytes": 187792
+    },
+    {
+      "path": "src/EnergyPlus/ScheduleManager.hh",
+      "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+        "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/original-source/src/EnergyPlus/ScheduleManager.hh",
+        "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72"
+      },
+      "bytes": 23158
+    },
+    {
+      "path": "src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/original-source/src/EnergyPlus/SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+      },
+      "bytes": 168527
+    },
+    {
+      "path": "src/EnergyPlus/WaterManager.cc",
+      "sha256": "317a6f12ab33a88f3d003b8c1b93fd9867c25e411841059debf74cc74b93a650",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WaterManager.cc",
+        "sha256": "317a6f12ab33a88f3d003b8c1b93fd9867c25e411841059debf74cc74b93a650"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/original-source/src/EnergyPlus/WaterManager.cc",
+        "sha256": "317a6f12ab33a88f3d003b8c1b93fd9867c25e411841059debf74cc74b93a650"
+      },
+      "bytes": 104123
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/05-WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "bytes": 490422
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/06-WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "bytes": 53352
+    },
+    {
+      "path": "tst/EnergyPlus/unit/WeatherManager.unit.cc",
+      "sha256": "3e304e0fb6b42333b89036e3ec3015e79d44f190d5946339a950d0cbab1ffc7e",
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/tst/EnergyPlus/unit/WeatherManager.unit.cc",
+        "sha256": "3e304e0fb6b42333b89036e3ec3015e79d44f190d5946339a950d0cbab1ffc7e"
+      },
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/source/07-WeatherManager.unit.cc",
+        "sha256": "3e304e0fb6b42333b89036e3ec3015e79d44f190d5946339a950d0cbab1ffc7e"
+      },
+      "bytes": 161407
+    }
+  ],
+  "selected_ranges": [
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ManageWeather",
+      "start_line": 131,
+      "end_line": 157,
+      "role": "genuine-call-order InitializeWeather before SetCurrentWeather",
+      "range_sha256": "b270fcc3a18e60da68634da5454a05b95578ace5b7b1a1f088db404fb8258940",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/00-131-157.txt",
+        "sha256": "b270fcc3a18e60da68634da5454a05b95578ace5b7b1a1f088db404fb8258940"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.IsRainThreshold",
+      "start_line": 1750,
+      "end_line": 1778,
+      "role": "begin-environment selected missing defaults and threshold",
+      "range_sha256": "582a315c0506f20adf3a7e54689a1edcb6d7d2c163c1cc30f3716f412239e976",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/01-1750-1778.txt",
+        "sha256": "582a315c0506f20adf3a7e54689a1edcb6d7d2c163c1cc30f3716f412239e976"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather",
+      "start_line": 2036,
+      "end_line": 2273,
+      "role": "whole native callable; narrow paired selections only",
+      "range_sha256": "7bd272d4972df458263f5c9065e6f216635ad82d5bfecf107c6525850779f206",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/02-2036-2273.txt",
+        "sha256": "7bd272d4972df458263f5c9065e6f216635ad82d5bfecf107c6525850779f206"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.current-clock",
+      "start_line": 2085,
+      "end_line": 2092,
+      "role": "Interpolation/current clocks selected state writes",
+      "range_sha256": "dce9b9abf09f6a6cebf1ee40a0cf773e65d62f71c312532ec58610493526db1d",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/03-2085-2092.txt",
+        "sha256": "dce9b9abf09f6a6cebf1ee40a0cf773e65d62f71c312532ec58610493526db1d"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.Today-selection",
+      "start_line": 2110,
+      "end_line": 2147,
+      "role": "dry/dew/pressure/RH selection and PSY helpers/clamps",
+      "range_sha256": "1172f9f250cea18cdc5cf9ab18f8cfb541919bd2e289e3121a755a40a5f73254",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/04-2110-2147.txt",
+        "sha256": "1172f9f250cea18cdc5cf9ab18f8cfb541919bd2e289e3121a755a40a5f73254"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.wind-selection",
+      "start_line": 2188,
+      "end_line": 2195,
+      "role": "wind selection; EMS override excluded",
+      "range_sha256": "ffc7f106d08ce7ed0d7133ea72949c8ad695781b53eef2ad57f4fae5993fe616",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/05-2188-2195.txt",
+        "sha256": "ffc7f106d08ce7ed0d7133ea72949c8ad695781b53eef2ad57f4fae5993fe616"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.precipitation-rain-snow",
+      "start_line": 2209,
+      "end_line": 2232,
+      "role": "mm-to-m and enabled indicator branches; water context",
+      "range_sha256": "0352b029f3359e10af8ead65bd20c527a58eec9a15d71b1c8c9d83b6015d50e6",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/06-2209-2232.txt",
+        "sha256": "0352b029f3359e10af8ead65bd20c527a58eec9a15d71b1c8c9d83b6015d50e6"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.derived-air-state",
+      "start_line": 2250,
+      "end_line": 2260,
+      "role": "enthalpy/density and final dry/wet/dew limits",
+      "range_sha256": "fe224283730ad068a859eac56875f306812d49cba6dbf2f5050350df7e8d2dd5",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/07-2250-2260.txt",
+        "sha256": "fe224283730ad068a859eac56875f306812d49cba6dbf2f5050350df7e8d2dd5"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.report-indicators",
+      "start_line": 2262,
+      "end_line": 2272,
+      "role": "integer reporting flags exact",
+      "range_sha256": "e231cbdb3d2e5a74ab65e3cae1c474c739db652ffc5514319342c3ff76cd43e3",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/08-2262-2272.txt",
+        "sha256": "e231cbdb3d2e5a74ab65e3cae1c474c739db652ffc5514319342c3ff76cd43e3"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadWeatherForDay",
+      "start_line": 2275,
+      "end_line": 2292,
+      "role": "real public wrapper calls ReadEPlusWeatherForDay",
+      "range_sha256": "ef8acd396825acaa367bac70c05634552b60c5e6c78215a06ce88e6c48ef4361",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/09-2275-2292.txt",
+        "sha256": "ef8acd396825acaa367bac70c05634552b60c5e6c78215a06ce88e6c48ef4361"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.first-day-cache-reset",
+      "start_line": 2349,
+      "end_line": 2367,
+      "role": "same actual owner first-day resets LastHourSet",
+      "range_sha256": "04e68dd49b6ff709ab7950c7adf2415468e74fa7c7c5535fcc42e47865da7785",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/10-2349-2367.txt",
+        "sha256": "04e68dd49b6ff709ab7950c7adf2415468e74fa7c7c5535fcc42e47865da7785"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.partial-clear",
+      "start_line": 2606,
+      "end_line": 2610,
+      "role": "only source interval1 cleared before raw read",
+      "range_sha256": "619de89b4b384eb06a5cae1c2ba5a863185db774b8cb4b2fa593c5eb1cf2a98f",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/11-2606-2610.txt",
+        "sha256": "619de89b4b384eb06a5cae1c2ba5a863185db774b8cb4b2fa593c5eb1cf2a98f"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.non-solar-missing-range",
+      "start_line": 2880,
+      "end_line": 2965,
+      "role": "upstream scalar/precipitation processing required for selected production values",
+      "range_sha256": "665224b8ee8b9f275dc203d296f1f7d34f3544514bef27b632552d45956b79d5",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/12-2880-2965.txt",
+        "sha256": "665224b8ee8b9f275dc203d296f1f7d34f3544514bef27b632552d45956b79d5"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.hourly-rain-snow",
+      "start_line": 3011,
+      "end_line": 3040,
+      "role": "weather code rain default2mm and actual missing history writes",
+      "range_sha256": "89fce44a0f99c739167d52b0295a93b0a80de7502db921c51d4f9b04a193e033",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/13-3011-3040.txt",
+        "sha256": "89fce44a0f99c739167d52b0295a93b0a80de7502db921c51d4f9b04a193e033"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.pre-interpolation",
+      "start_line": 3045,
+      "end_line": 3075,
+      "role": "backspace before interpolation and hour1/hour24 cache seed",
+      "range_sha256": "3ac72e86dedd936b2f16eabef1080a8d099b6092c802739893f2438a78a3b0ff",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/14-3045-3075.txt",
+        "sha256": "3ac72e86dedd936b2f16eabef1080a8d099b6092c802739893f2438a78a3b0ff"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.linear-weights",
+      "start_line": 3078,
+      "end_line": 3080,
+      "role": "actual stored current/previous interpolation weights",
+      "range_sha256": "320c57f61a09bf9bbf0633c1f06ec727f12dc967a0b016c4ca09d1f578b9b6b8",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/15-3078-3080.txt",
+        "sha256": "320c57f61a09bf9bbf0633c1f06ec727f12dc967a0b016c4ca09d1f578b9b6b8"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.non-solar-linear-and-wind",
+      "start_line": 3102,
+      "end_line": 3111,
+      "role": "dry/dew/pressure/RH/wind and cover values",
+      "range_sha256": "5763a1ea4694613e18dc7b31084583cce2a57559485f14333399bed33a377921",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/16-3102-3111.txt",
+        "sha256": "5763a1ea4694613e18dc7b31084583cce2a57559485f14333399bed33a377921"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.calcSky-neighbor",
+      "start_line": 3112,
+      "end_line": 3120,
+      "role": "genuine adjacent call retained unpaired CLK06",
+      "range_sha256": "204b7ab44d436df5fdcf4011fdcbea036da4e8b8d33a9338f39aa73929ea5831",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/17-3112-3120.txt",
+        "sha256": "204b7ab44d436df5fdcf4011fdcbea036da4e8b8d33a9338f39aa73929ea5831"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.solar-neighbor",
+      "start_line": 3122,
+      "end_line": 3125,
+      "role": "genuine adjacent solar writes retained unpaired CLK05",
+      "range_sha256": "5dff0a5afa133b850b1b48997ee883a75a1ece910ee382665261d2817b7ec6fa",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/18-3122-3125.txt",
+        "sha256": "5dff0a5afa133b850b1b48997ee883a75a1ece910ee382665261d2817b7ec6fa"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.rain-and-cache",
+      "start_line": 3127,
+      "end_line": 3134,
+      "role": "precipitation divided by timestep count, threshold, snow copy, last-hour copy",
+      "range_sha256": "4f04e741b4b1752ef701192c2beb3bfe96115795535aa2dfbcca985d95e1d480",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/19-3127-3134.txt",
+        "sha256": "4f04e741b4b1752ef701192c2beb3bfe96115795535aa2dfbcca985d95e1d480"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "interpolateWindDirection",
+      "start_line": 3183,
+      "end_line": 3198,
+      "role": "whole genuine helper, abs/difference180 and fmod360",
+      "range_sha256": "8543df4aa6af98fa935ccc8052cd6951f7514804305a1e0b5cc3882d7a8a7203",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/20-3183-3198.txt",
+        "sha256": "8543df4aa6af98fa935ccc8052cd6951f7514804305a1e0b5cc3882d7a8a7203"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetRunPeriodData.first-hour-input",
+      "start_line": 5364,
+      "end_line": 5372,
+      "role": "Hour24 omission and Hour1 explicit source input",
+      "range_sha256": "0202e98a90164821543e0920a1014cf5508c3d2c5905ea445a4ce6f067ff130f",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/21-5364-5372.txt",
+        "sha256": "0202e98a90164821543e0920a1014cf5508c3d2c5905ea445a4ce6f067ff130f"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupInterpolationValues",
+      "start_line": 8328,
+      "end_line": 8386,
+      "role": "whole native callable; linear weights paired, solar weights CLK05",
+      "range_sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/22-8328-8386.txt",
+        "sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupEnvironmentTypes.first-hour-input",
+      "start_line": 8517,
+      "end_line": 8517,
+      "role": "actual input policy moved to selected Environment",
+      "range_sha256": "cae47b85fb8e870c631ff0945dfb41a22a333abc5946df051485731d454bd2f9",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/23-8517-8517.txt",
+        "sha256": "cae47b85fb8e870c631ff0945dfb41a22a333abc5946df051485731d454bd2f9"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "selected-function-declarations",
+      "start_line": 481,
+      "end_line": 497,
+      "role": "Update/SetCurrent/ReadDay/wind signatures",
+      "range_sha256": "69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/24-481-497.txt",
+        "sha256": "69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "SetupInterpolationValues-declaration",
+      "start_line": 666,
+      "end_line": 666,
+      "role": "actual preparation function signature",
+      "range_sha256": "937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/25-666-666.txt",
+        "sha256": "937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherVars-and-extended-values",
+      "start_line": 713,
+      "end_line": 744,
+      "role": "full17 fields and typed missing auxiliaries",
+      "range_sha256": "881571ccc8d0c3d9f12a1800cae2ddcf036bfc1761e8d0a842de6c8dd156c870",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/26-713-744.txt",
+        "sha256": "881571ccc8d0c3d9f12a1800cae2ddcf036bfc1761e8d0a842de6c8dd156c870"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "Tomorrow-and-Today-storage",
+      "start_line": 838,
+      "end_line": 860,
+      "role": "arrays and real interpolation/fraction owners",
+      "range_sha256": "2cebefc9d220a073a5b70c05dbd61bea192b597cbe3800f3cf991a3b6eacd95b",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/27-838-860.txt",
+        "sha256": "2cebefc9d220a073a5b70c05dbd61bea192b597cbe3800f3cf991a3b6eacd95b"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "raw-hour-caches-and-rain-threshold",
+      "start_line": 919,
+      "end_line": 927,
+      "role": "LastHourSet, last/next complete carriers, threshold default",
+      "range_sha256": "4b6acead754f871ccc717adbe1e795e81578ec9d00a5c5ab41ddb33f8c3a9dfd",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/28-919-927.txt",
+        "sha256": "4b6acead754f871ccc717adbe1e795e81578ec9d00a5c5ab41ddb33f8c3a9dfd"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "interpolation-clock-declarations",
+      "start_line": 103,
+      "end_line": 113,
+      "role": "WeightNow/WeightPreviousHour and clock inputs",
+      "range_sha256": "216cbe99a03a3cf5df0b9b1fa3bd9514e658aa5a18e80cf90a3e90aff8b4f6b8",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/29-103-113.txt",
+        "sha256": "216cbe99a03a3cf5df0b9b1fa3bd9514e658aa5a18e80cf90a3e90aff8b4f6b8"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "current-clock-declarations",
+      "start_line": 140,
+      "end_line": 143,
+      "role": "CurrentTime, SimTimeSteps, zone-step seconds",
+      "range_sha256": "b2da85c29030e403bdd4d113197f05a838ae655d0b1bbda09d51e1e7f70e869c",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/30-140-143.txt",
+        "sha256": "b2da85c29030e403bdd4d113197f05a838ae655d0b1bbda09d51e1e7f70e869c"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "non-solar-weather-state",
+      "start_line": 122,
+      "end_line": 154,
+      "role": "selected environmental values, indicators, override exclusions",
+      "range_sha256": "14c621de8a8ae78cac8763ecd195d8c48b1367ba486b9b7a8fcfbc8377a39b3e",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/31-122-154.txt",
+        "sha256": "14c621de8a8ae78cac8763ecd195d8c48b1367ba486b9b7a8fcfbc8377a39b3e"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyWFnTdbRhPb",
+      "start_line": 1342,
+      "end_line": 1391,
+      "role": "accepted PSY02 direct humidity helper",
+      "range_sha256": "a5dbe02712249a9ae1a03ee7df886496b732a5ab7a68b5cd2c910ac305538184",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/32-1342-1391.txt",
+        "sha256": "a5dbe02712249a9ae1a03ee7df886496b732a5ab7a68b5cd2c910ac305538184"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyWFnTdbTwbPb",
+      "start_line": 1408,
+      "end_line": 1460,
+      "role": "accepted PSY02 correction helper closure",
+      "range_sha256": "0b0be48910147c0a7654a1c8399095514b8e6ad49629d763ab3a71ed9e81682f",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/33-1408-1460.txt",
+        "sha256": "0b0be48910147c0a7654a1c8399095514b8e6ad49629d763ab3a71ed9e81682f"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "symbol": "PsyTdpFnWPb",
+      "start_line": 1529,
+      "end_line": 1552,
+      "role": "accepted PSY02 dew-point helper calls cached Pb",
+      "range_sha256": "d30ee7ba22e9b3a4f3cecb6c12073b732a7239539d3da88e4bb98a95b7ca12e3",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/34-1529-1552.txt",
+        "sha256": "d30ee7ba22e9b3a4f3cecb6c12073b732a7239539d3da88e4bb98a95b7ca12e3"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.cc",
+      "symbol": "cached-PsyTwbFnTdbWPb",
+      "start_line": 279,
+      "end_line": 351,
+      "role": "accepted PSY02 genuine cached wrapper",
+      "range_sha256": "59e28f5ad41b9b3f52e5df69761cd7ae116073b67bd6a14ec63a7866ccc47661",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/35-279-351.txt",
+        "sha256": "59e28f5ad41b9b3f52e5df69761cd7ae116073b67bd6a14ec63a7866ccc47661"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/EnergyPlus.hh",
+      "symbol": "ObjexxFCL-imports",
+      "start_line": 165,
+      "end_line": 167,
+      "role": "ordered double min/max and mod imports",
+      "range_sha256": "ae5cdf04a048d36f79cfea6514efb43f81e50c8bcbf84bfc4d26dfc4b8b4a890",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/36-165-167.txt",
+        "sha256": "ae5cdf04a048d36f79cfea6514efb43f81e50c8bcbf84bfc4d26dfc4b8b4a890"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "tst/EnergyPlus/unit/WeatherManager.unit.cc",
+      "symbol": "interpolateWindDirectionTest",
+      "start_line": 259,
+      "end_line": 326,
+      "role": "existing native test examples, not executed by this audit",
+      "range_sha256": "4052db64915060381f6e0df8080fcc161b7a9acf0c9d27d92b982baa4d8ec470",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/source-audit-01/ranges/37-259-326.txt",
+        "sha256": "4052db64915060381f6e0df8080fcc161b7a9acf0c9d27d92b982baa4d8ec470"
+      },
+      "bytes_normalized": false
+    }
+  ],
+  "whole_reference_calls": [
+    "SetupInterpolationValues",
+    "interpolateWindDirection",
+    "ReadWeatherForDay/ReadEPlusWeatherForDay",
+    "SetCurrentWeather"
+  ],
+  "paired_read_day_fields": [
+    "OutDryBulbTemp",
+    "OutDewPointTemp",
+    "OutBaroPress",
+    "OutRelHum",
+    "WindSpeed",
+    "WindDir",
+    "LiquidPrecip",
+    "IsRain"
+  ],
+  "selected_missing_and_range_fields": [
+    "OutDryBulbTemp",
+    "OutDewPointTemp",
+    "OutBaroPress",
+    "OutRelHum",
+    "WindSpeed",
+    "WindDir",
+    "LiquidPrecip"
+  ],
+  "selected_missing_history_fields": [
+    "OutDryBulbTemp",
+    "OutDewPointTemp",
+    "OutBaroPress",
+    "OutRelHum",
+    "WindSpeed",
+    "WindDir"
+  ],
+  "liquid_missing_cache_policy": "Retain actual incoming LiquidPrecip cache; no history write is present at hourly cc3027-3040.",
+  "selected_state": [
+    "Interpolation allocation/values",
+    "TimeStepFraction",
+    "IsRainThreshold",
+    "LastHourSet",
+    "selected last-hour seven numeric fields and rain flag",
+    "next-hour LiquidPrecip write",
+    "actual source byte stream/parser/header state",
+    "selected missing/range counters and cache before/after",
+    "current HourOfDay/TimeStep/DayOfSim/WarmupFlag and UseRainValues",
+    "WeightNow",
+    "WeightPreviousHour",
+    "CurrentTime",
+    "SimTimeSteps",
+    "NextHour",
+    "RptIsRain"
+  ],
+  "current_weather_fields": [
+    "OutDryBulbTemp",
+    "OutDewPointTemp",
+    "OutBaroPress",
+    "OutRelHum",
+    "OutRelHumValue",
+    "OutHumRat",
+    "OutWetBulbTemp",
+    "WindSpeed",
+    "WindDir",
+    "LiquidPrecipitation",
+    "IsRain",
+    "OutEnthalpy",
+    "OutAirDensity"
+  ],
+  "units": {
+    "OutRelHum": "percent",
+    "OutRelHumValue": "fraction",
+    "LiquidPrecip": "mm per zone timestep",
+    "LiquidPrecipitation": "m per zone timestep",
+    "OutHumRat": "kgWater/kgDryAir"
+  },
+  "source_order": [
+    "raw parse and hour admission",
+    "selected missing replacements/range counts",
+    "hourly processed writes",
+    "weather-code hourly rain/default depth",
+    "source missing history writes",
+    "optional byte backspace",
+    "copy hourly 24 slots",
+    "Hour1/Hour24 or retained previous-day seed",
+    "scalar/wind interpolation",
+    "liquid depth division/threshold",
+    "last-hour whole copy",
+    "Tomorrow to Today",
+    "current Today selection",
+    "PSY calls/corrections"
+  ],
+  "mutations_must_not_be_merged": [
+    "hourly raw parser arguments",
+    "processed Tomorrow grid",
+    "processed Today grid",
+    "EpwRecord hourly projection",
+    "current consumer WeatherTimestepSample",
+    "missing cache",
+    "missed counters",
+    "range counters"
+  ],
+  "unpaired_generation": [
+    "calcSky/IR/sky temperature CLK-06",
+    "solar interpolation/coefficients CLK-05",
+    "cloud-cover generation unless separately selected before freeze",
+    "snow-depth physical generation",
+    "Albedo/WaterPrecip generation",
+    "ground/water mains/daylighting context",
+    "full EMS/design-day or active site precipitation schedules"
+  ],
+  "literal_full17_transport": "Retain all17 fields/allslots; only within-owner whole copy and untouched canaries are exact here, not cross-native unpaired generated fields.",
+  "source_sensitive_context": "Compare caller flags/history only when actual native and Rust inputs/call phases match; unavailable interiors are never fabricated.",
+  "remaining_preparation_closure": [],
+  "frozen_before_numerical_execution": true,
+  "base_paired_source_file_count": 8,
+  "preparation_source_ranges": [
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 133,
+      "end_line": 158,
+      "raw_bytes_sha256": "5d837be50579b8a4cba4ba4a1c9ac144062311aed290dafae7618eb3ed1a922d",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/00-133-158.txt",
+        "sha256": "5d837be50579b8a4cba4ba4a1c9ac144062311aed290dafae7618eb3ed1a922d"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 2036,
+      "end_line": 2273,
+      "raw_bytes_sha256": "7bd272d4972df458263f5c9065e6f216635ad82d5bfecf107c6525850779f206",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/01-2036-2273.txt",
+        "sha256": "7bd272d4972df458263f5c9065e6f216635ad82d5bfecf107c6525850779f206"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 4275,
+      "end_line": 4338,
+      "raw_bytes_sha256": "c429a209f48769c4088f65a68b35867961389b7a840d8efc0f2fe37d32ae8155",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/02-4275-4338.txt",
+        "sha256": "c429a209f48769c4088f65a68b35867961389b7a840d8efc0f2fe37d32ae8155"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 4542,
+      "end_line": 4580,
+      "raw_bytes_sha256": "10e8f412de57dd284e3a07494bc3fea6b01b35e073a8d786fd4ad3f1df4e9a2f",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/03-4542-4580.txt",
+        "sha256": "10e8f412de57dd284e3a07494bc3fea6b01b35e073a8d786fd4ad3f1df4e9a2f"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 4818,
+      "end_line": 4844,
+      "raw_bytes_sha256": "35f0ec36972784322f55f4bb89b2894ca705382f8ea275fd328af72b9a790af0",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/04-4818-4844.txt",
+        "sha256": "35f0ec36972784322f55f4bb89b2894ca705382f8ea275fd328af72b9a790af0"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 6000,
+      "end_line": 6006,
+      "raw_bytes_sha256": "e25807432e2ba1ce7144794abd0fbcd44fd2c7dc49d67c30308407740ea49dbd",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/05-6000-6006.txt",
+        "sha256": "e25807432e2ba1ce7144794abd0fbcd44fd2c7dc49d67c30308407740ea49dbd"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 6900,
+      "end_line": 6940,
+      "raw_bytes_sha256": "c72ab80e9a467c4e152d29d9e761489d981d72ac68ec3ece50e29e8a1c58ef95",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/06-6900-6940.txt",
+        "sha256": "c72ab80e9a467c4e152d29d9e761489d981d72ac68ec3ece50e29e8a1c58ef95"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "start_line": 7303,
+      "end_line": 7353,
+      "raw_bytes_sha256": "61a8298ddb9d452dbd24f807c88e51c2a51ef71483572dc3a80b52a0e814ed11",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/07-7303-7353.txt",
+        "sha256": "61a8298ddb9d452dbd24f807c88e51c2a51ef71483572dc3a80b52a0e814ed11"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "start_line": 475,
+      "end_line": 552,
+      "raw_bytes_sha256": "a5c3c000498868fc2adf47670d51651adbe023bffb224ec9546464a8afc4baf7",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/08-475-552.txt",
+        "sha256": "a5c3c000498868fc2adf47670d51651adbe023bffb224ec9546464a8afc4baf7"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "start_line": 878,
+      "end_line": 880,
+      "raw_bytes_sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/09-878-880.txt",
+        "sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/WaterManager.cc",
+      "start_line": 947,
+      "end_line": 989,
+      "raw_bytes_sha256": "ed5cb63df75828d5493a0f471bf923f12a29597910f54301e81bdf9e8ee501a1",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/10-947-989.txt",
+        "sha256": "ed5cb63df75828d5493a0f471bf923f12a29597910f54301e81bdf9e8ee501a1"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/DataWater.hh",
+      "start_line": 275,
+      "end_line": 295,
+      "raw_bytes_sha256": "cbb74b398fd8cd37b6e20c98e78ac880be2bab9fc306d42030ee848098df1854",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/11-275-295.txt",
+        "sha256": "cbb74b398fd8cd37b6e20c98e78ac880be2bab9fc306d42030ee848098df1854"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/ScheduleManager.cc",
+      "start_line": 2465,
+      "end_line": 2491,
+      "raw_bytes_sha256": "4f86efc4ae86f02afd0b4e99037204f1c5012d883827bd2437eab7a893b926a4",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/12-2465-2491.txt",
+        "sha256": "4f86efc4ae86f02afd0b4e99037204f1c5012d883827bd2437eab7a893b926a4"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/ScheduleManager.hh",
+      "start_line": 495,
+      "end_line": 505,
+      "raw_bytes_sha256": "60831b2630ce7dadd819b5b24563fd4dc9de4d3ec2c41d4eecf65c689eaced44",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/13-495-505.txt",
+        "sha256": "60831b2630ce7dadd819b5b24563fd4dc9de4d3ec2c41d4eecf65c689eaced44"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 1705,
+      "end_line": 1724,
+      "raw_bytes_sha256": "f871681325bcd2647984497cd734ff2a6937b1df3ef4d3f4c62c54f620b2ef41",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/14-1705-1724.txt",
+        "sha256": "f871681325bcd2647984497cd734ff2a6937b1df3ef4d3f4c62c54f620b2ef41"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    },
+    {
+      "file": "src/EnergyPlus/Psychrometrics.cc",
+      "start_line": 110,
+      "end_line": 139,
+      "raw_bytes_sha256": "4702e6dda77e21ee209b1f4e93954f2440b2987b9bb85facf0ccec1b59684f07",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/preparation-ranges/15-110-139.txt",
+        "sha256": "4702e6dda77e21ee209b1f4e93954f2440b2987b9bb85facf0ccec1b59684f07"
+      },
+      "role": "genuine preparation/current-function context, not all math paired"
+    }
+  ],
+  "historical_preparation_draft": {
+    "path": ".runtime/porting/CLK-04/native-prep-02/metadata-01/manifest.json",
+    "sha256": "97259e9e27d8b159caa04027eec6b8d55f3cb171f98fda39a97865f5f17d7847"
+  },
+  "actual_CLK03_prerequisite": {
+    "closure": {
+      "path": ".runtime/porting/CLK-03/card-closure-01/closure.json",
+      "sha256": "8e4c4102be8ee482227ed9bc533c5eb19d2a1803c3df467f8433c04d1a4a0a48"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-03/card-closure-command-01/receipt.json",
+      "sha256": "409775891ba899206edc0b0158177343e3c2af3670d5f8c9f1f6a008cc9bf8a4"
+    },
+    "canonical_after": [
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-03.json",
+        "sha256": "6fc8ac1ba373a24a96af2e9bfb230f95a2719a3e8763312bc020d45a8612e825"
+      },
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "7cd069975da0fd241903f2f311c698e976f7de1bf791d89daceec4b0699887bd"
+      },
+      {
+        "path": "energyplus_porting_plan/cards/CLK-03.md",
+        "sha256": "87e52043274e56a12b3991979a3c5880380504b445d21cf1d8f82f8878ef4c05"
+      }
+    ],
+    "current_plan": {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "7cd069975da0fd241903f2f311c698e976f7de1bf791d89daceec4b0699887bd"
+    }
+  },
+  "required_retired_registry": {
+    "path": ".runtime/porting/CLK-03/retirement-01/registry-retired.json",
+    "sha256": "bfcbcc4f3b466372c9258ee013cff19a352c2c899532f7e5a5d045ab28c38547"
+  },
+  "genuine_preparation_source_context_only": true,
+  "whole_ground_water_solar_daylight_mathematics_paired": false,
+  "constructor_current_extension_available": false,
+  "native_reference_calls": [
+    "SetupInterpolationValues",
+    "interpolateWindDirection",
+    "GetNextEnvironment",
+    "InitializeWeather",
+    "SetCurrentWeather"
+  ],
+  "production_current_for_caller_source": {
+    "historical_path": "crates/ep_runtime/src/weather_day/production.rs",
+    "archive": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/caller-source/production.rs",
+      "sha256": "7ad079ee868bfecd86be556524724fb27b2f7096b5bc8161ce1aba82585560bd"
+    },
+    "selected_source_range": {
+      "start_line": 208,
+      "end_line": 235
+    }
+  },
+  "executed_source_policy_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-04/independent-preexecution-source-review-02/review.json",
+      "sha256": "2c6bf096552beda134af38a98a5aa74bc5ad1d943ef159a7b511f3aa6d56188e"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-04/independent-preexecution-source-review-command-02/receipt.json",
+      "sha256": "40dc5fc422a1e15a7615a7327673eeb6b8324dda0507934ca64cbccea379a1fc"
+    }
+  },
+  "source_helper_dependencies": [
+    {
+      "path": "tools/porting/clk03_reference_helper.cpp",
+      "sha256": "2f4fb94a04f0638016b2f458ad9a567fa8e201b57323663b7fd18cf4e21b9877"
+    },
+    {
+      "path": "tools/porting/clk03_reference_fields.hh",
+      "sha256": "6c9c43a45921c29155b81a7f5a110a1f3a75ddf21937ea06bd62a56bfb93ba66"
+    },
+    {
+      "path": "tools/porting/clk02_reference_fields.hh",
+      "sha256": "b4e886101d97651f99aec06b6d41610fd59147fe88c831c143eb12bf8729fe41"
+    }
+  ]
+}

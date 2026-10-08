@@ -1,0 +1,943 @@
+{
+  "schema": "clk04-production-plan.v1",
+  "created_utc": "2026-10-08T13:45:25.398338+00:00",
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+      "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+      "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+      "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+    }
+  },
+  "native_request": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+    "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+    "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+    "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "native_sequence_id": "A-24H",
+      "external_byte_map": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/input-byte-map-00.json",
+        "sha256": "ef1a60efb622fe27b543fbb7c89963f642b004f4af27402b1d17cfd1eb013fca"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "native_sequence_id": "A-72H",
+      "external_byte_map": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/input-byte-map-00.json",
+        "sha256": "ef1a60efb622fe27b543fbb7c89963f642b004f4af27402b1d17cfd1eb013fca"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "native_sequence_id": "B-BOTH-24H",
+      "external_byte_map": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/input-byte-map-00.json",
+        "sha256": "ef1a60efb622fe27b543fbb7c89963f642b004f4af27402b1d17cfd1eb013fca"
+      }
+    }
+  ],
+  "actual_command_count": 6,
+  "selected_policy": {
+    "schema": "clk04-production-selected-policy.v1",
+    "frozen_native_unit_selection": {
+      "schema": "clk04-numerical-comparison-profile.draft.v1",
+      "status": "source-only-before-original-results",
+      "frozen_inputs": {
+        "source": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+          "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+        },
+        "cases": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+          "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+        },
+        "tolerances": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+          "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+        },
+        "projection": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+          "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+        }
+      },
+      "requested_counts": {
+        "setup_cases": 2,
+        "wind_cases": 56,
+        "weather_sequences": 13,
+        "GetNextEnvironment": 13,
+        "InitializeWeather": 1584,
+        "SetCurrentWeather": 1584,
+        "weather_operations": 3181,
+        "total_operations": 3239
+      },
+      "ordered_sequence_ids": [
+        "RAMP-1-HOUR24",
+        "RAMP-4-HOUR24",
+        "RAMP-4-HOUR1",
+        "MISSING-HISTORY-4",
+        "RANGE-BOUNDARIES-4",
+        "RAIN-CODE-1",
+        "RAIN-DEPTH-4",
+        "PSY-CORRECTION-4",
+        "TWO-DAY-CACHE-4",
+        "WARMUP-REPLAY-4",
+        "A-24H",
+        "A-72H",
+        "B-BOTH-24H"
+      ],
+      "native_observation_policy": {
+        "schema": "clk04-native-observation-policy.v1",
+        "all_requested_operations_remain_in_literal_history": true,
+        "source_fatal_stops_future_invocation_explicitly": true,
+        "full_grid_snapshots": [
+          "GetNextEnvironment before_caller/before/after",
+          "InitializeWeather before_caller/before/after when effective declared-or-retained BeginDayFlag or BeginEnvrnFlag is true",
+          "allocated_defaults",
+          "prepared",
+          "final_state"
+        ],
+        "effective_boundary_flags": "actual incoming flags, overridden only by explicitly declared partial caller writes",
+        "other_operation_snapshots": {
+          "actual_current_non_solar_fields": [
+            "OutDryBulbTemp",
+            "OutDewPointTemp",
+            "OutBaroPress",
+            "OutRelHum",
+            "OutRelHumValue",
+            "OutHumRat",
+            "OutWetBulbTemp",
+            "WindSpeed",
+            "WindDir",
+            "LiquidPrecipitation",
+            "IsRain",
+            "OutEnthalpy",
+            "OutAirDensity"
+          ],
+          "actual_selected_today_slot": "all17 fields, actual hour/time_step; unavailable when actual storage/index unavailable",
+          "all_existing_scalar_cache_count_control_header_cursor_fields": true,
+          "grid_allocation_shape_order": true,
+          "full_grid_contents": null,
+          "missing_grid_contents_counted_as_PASS": false
+        },
+        "selected_diagnostic_hours": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          12,
+          24
+        ],
+        "selected_diagnostic_current_calls": 368,
+        "selected_production_current_calls": 480,
+        "selected_current_total": 848,
+        "production_selection": "all actual480 CON zone timesteps, with same input-only matched caller history",
+        "unselected_calls_and_history_retained": true,
+        "factory_constructor_and_constant_initialization_current_extension_available": false,
+        "genuine_preparation_snapshots": "reused Factory actual CLK03-shaped source snapshots; no fabricated CLK04 current extension",
+        "full17_generation_cross_native_parity_claimed": false,
+        "native_internal_record_index_observed": false,
+        "source_error_text_parity_claimed": false,
+        "retrospective_observation_narrowing_allowed": false
+      },
+      "profiles": [
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "OutDryBulbTemp",
+          "unit": "degC",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "OutDewPointTemp",
+          "unit": "degC",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "OutBaroPress",
+          "unit": "Pa",
+          "atol": 1e-07,
+          "rtol": 0.0
+        },
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "OutRelHum",
+          "unit": "percent",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "WindSpeed",
+          "unit": "m/s",
+          "atol": 1e-12,
+          "rtol": 0.0
+        },
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "WindDir",
+          "unit": "degree",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "day_grid_and_raw_hour_cache",
+          "field": "LiquidPrecip",
+          "unit": "mm/zone-timestep",
+          "atol": 1e-12,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutDryBulbTemp",
+          "unit": "degC",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutDewPointTemp",
+          "unit": "degC",
+          "atol": 1e-10,
+          "rtol": 1e-13,
+          "accepted_PSY_tolerance": {
+            "contract": {
+              "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+              "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+            },
+            "function": "PsyTsatFnPb"
+          }
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutBaroPress",
+          "unit": "Pa",
+          "atol": 1e-07,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutRelHum",
+          "unit": "percent",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutRelHumValue",
+          "unit": "fraction",
+          "atol": 1e-12,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutHumRat",
+          "unit": "kg/kg",
+          "atol": 1e-12,
+          "rtol": 1e-13,
+          "accepted_PSY_tolerance": {
+            "contract": {
+              "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+              "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+            },
+            "function": "PsyWFnTdbRhPb"
+          }
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutWetBulbTemp",
+          "unit": "degC",
+          "atol": 1e-10,
+          "rtol": 1e-13,
+          "accepted_PSY_tolerance": {
+            "contract": {
+              "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+              "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+            },
+            "function": "PsyTwbFnTdbWPb"
+          }
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "WindSpeed",
+          "unit": "m/s",
+          "atol": 1e-12,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "WindDir",
+          "unit": "degree",
+          "atol": 1e-10,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "LiquidPrecipitation",
+          "unit": "m/zone-timestep",
+          "atol": 1e-15,
+          "rtol": 0.0
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutEnthalpy",
+          "unit": "J/kg",
+          "atol": 1e-07,
+          "rtol": 1e-13,
+          "accepted_PSY_tolerance": {
+            "contract": {
+              "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+              "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+            },
+            "function": "PsyHFnTdbW"
+          }
+        },
+        {
+          "profile": "current_non_solar_weather",
+          "field": "OutAirDensity",
+          "unit": "kg/m3",
+          "atol": 1e-12,
+          "rtol": 1e-13,
+          "accepted_PSY_tolerance": {
+            "contract": {
+              "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+              "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+            },
+            "function": "PsyRhoAirFnPbTdbW"
+          }
+        }
+      ],
+      "pure_wind_return": {
+        "unit": "degree",
+        "atol": 1e-10,
+        "rtol": 0.0
+      },
+      "accepted_PSY_contracts": {
+        "PSY-01": {
+          "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+          "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+        },
+        "PSY-02": {
+          "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+          "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+        }
+      },
+      "numerical_criterion": "Every available numeric field abs(actual-original)<=atol+rtol*abs(original), selected per profile/field",
+      "classification": "exact IEEE class; exact zero sign when both compared outputs are zero",
+      "error_metrics": [
+        "maximum_absolute_error",
+        "RMSE",
+        "comparison_count",
+        "mismatch_count"
+      ],
+      "day_grid": {
+        "owners": [
+          "today_values",
+          "tomorrow_values"
+        ],
+        "fields": [
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutBaroPress",
+          "OutRelHum",
+          "WindSpeed",
+          "WindDir",
+          "LiquidPrecip",
+          "IsRain"
+        ],
+        "numeric_profile": "day_grid_and_raw_hour_cache",
+        "IsRain": "typed boolean exact",
+        "required_full_snapshots": [
+          "GetNextEnvironment before_caller/before/after",
+          "InitializeWeather before_caller/before/after when effective declared-or-retained BeginDayFlag or BeginEnvrnFlag is true",
+          "allocated_defaults",
+          "prepared",
+          "final_state"
+        ],
+        "slot_order": "hour-major,timestep-minor",
+        "require_all_allocated_24_by_steps_slots": true,
+        "compact_slots_are_null_unavailable_and_never_PASS": true
+      },
+      "current": {
+        "path": "clk04_observation.current_non_solar_weather",
+        "fields": [
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutBaroPress",
+          "OutRelHum",
+          "OutRelHumValue",
+          "OutHumRat",
+          "OutWetBulbTemp",
+          "WindSpeed",
+          "WindDir",
+          "LiquidPrecipitation",
+          "IsRain",
+          "OutEnthalpy",
+          "OutAirDensity"
+        ],
+        "numeric_profile": "current_non_solar_weather",
+        "IsRain": "typed boolean exact",
+        "requested_selected_diagnostic_current_calls": 368,
+        "requested_selected_production_current_calls": 480,
+        "selection": "after each declared selected SetCurrentWeather; requested mask never controls invocation",
+        "all_1584_current_history_and_scalar_snapshots_retained": true,
+        "actual_selected_today_17_retained": true,
+        "generated_cross_native_today_fields": [
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutBaroPress",
+          "OutRelHum",
+          "WindSpeed",
+          "WindDir",
+          "LiquidPrecip",
+          "IsRain"
+        ]
+      },
+      "counts": {
+        "owners": [
+          "missed_counts",
+          "out_of_range_counts"
+        ],
+        "paired_fields": [
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutBaroPress",
+          "OutRelHum",
+          "WindSpeed",
+          "WindDir",
+          "LiquidPrecip"
+        ],
+        "type": "exact native i32 integer; booleans are rejected",
+        "all_retained_fields": [
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutRelHum",
+          "OutBaroPress",
+          "WindDir",
+          "WindSpeed",
+          "BeamSolarRad",
+          "DifSolarRad",
+          "TotalSkyCover",
+          "OpaqueSkyCover",
+          "Visibility",
+          "Ceiling",
+          "LiquidPrecip",
+          "WaterPrecip",
+          "AerOptDepth",
+          "SnowDepth",
+          "DaysLastSnow",
+          "WeathCodes",
+          "Albedo"
+        ],
+        "excluded_generated_counts": [
+          "BeamSolarRad",
+          "DifSolarRad",
+          "TotalSkyCover",
+          "OpaqueSkyCover",
+          "Visibility",
+          "Ceiling",
+          "WaterPrecip",
+          "AerOptDepth",
+          "SnowDepth",
+          "DaysLastSnow",
+          "WeathCodes",
+          "Albedo"
+        ],
+        "unselected_counter_values_retained_not_counted_as_numerical_PASS": true,
+        "LiquidPrecip_out_of_range": "strict actual unchanged counter; no selected hourly increment exists",
+        "WeathCodes": "observe actual shared raw parser/header counter as source metadata; do not pair extra generated count"
+      },
+      "missing_history": {
+        "owner": "missing_values",
+        "paired_written_fields": [
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutBaroPress",
+          "OutRelHum",
+          "WindSpeed",
+          "WindDir"
+        ],
+        "numeric_profile": "day_grid_and_raw_hour_cache",
+        "selection": "every retained before_caller/before/after and full root state",
+        "LiquidPrecip": {
+          "hourly_write": false,
+          "within_owner_retention": "exact incoming bits retained when no BeginEnvironment reset",
+          "begin_environment": "source reset is distinct; compare actual matching-phase state, never treat reset as retention"
+        },
+        "history_source": "ReadEPlusWeatherForDay hourly missing/range followed by history writes",
+        "non_selected_missing_values_retained_unpaired": true
+      },
+      "raw_hour_cache": {
+        "last_hour": {
+          "paired_fields": [
+            "OutDryBulbTemp",
+            "OutDewPointTemp",
+            "OutBaroPress",
+            "OutRelHum",
+            "WindSpeed",
+            "WindDir",
+            "LiquidPrecip",
+            "IsRain"
+          ],
+          "numeric_profile": "day_grid_and_raw_hour_cache"
+        },
+        "next_hour": {
+          "paired_numeric_fields": [
+            "LiquidPrecip"
+          ],
+          "numeric_profile": "day_grid_and_raw_hour_cache"
+        },
+        "LastHourSet": "typed boolean exact at every retained owner snapshot",
+        "source_first_hour_policy_and_retained_previous_day_are_distinct": true,
+        "no_last_hour_liquid_inferred_from_divided_zone_grid": true,
+        "private_local_wvarsHr_operand_unavailable_for_direct_copy_proof": true
+      },
+      "linear_setup": {
+        "selected": [
+          "Interpolation_allocated",
+          "Interpolation"
+        ],
+        "array_allocation_shape_order_and_actual_values": "exact typed availability and binary64 bits",
+        "SolarInterpolation": "retained unpaired CLK05, never numericalPASS"
+      },
+      "exact_values": [
+        "IsRain",
+        "IsRainThreshold",
+        "TimeStepFraction",
+        "Interpolation",
+        "WeightNow",
+        "WeightPreviousHour",
+        "CurrentTime",
+        "TimeStepZone",
+        "TimeStepZoneSec",
+        "MinutesInTimeStep",
+        "SimTimeSteps",
+        "NextHour",
+        "RptIsRain"
+      ],
+      "exact_metadata": [
+        "input identity/bits/order",
+        "available call outcome/fatal/return type",
+        "flags/enums/dates/integers",
+        "header/cursor semantic position and availability",
+        "allocation/shape/order",
+        "missing/range counts",
+        "within-owner whole copy bits"
+      ],
+      "typed_owner_metadata": {
+        "global_bool": [
+          "BeginSimFlag",
+          "BeginEnvrnFlag",
+          "BeginDayFlag",
+          "BeginHourFlag",
+          "BeginTimeStepFlag",
+          "EndDayFlag",
+          "EndHourFlag",
+          "EndEnvrnFlag",
+          "EndDesignDayEnvrnsFlag",
+          "WarmupFlag",
+          "DoWeathSim",
+          "DoDesDaySim",
+          "DoOutputReporting"
+        ],
+        "global_i32": [
+          "DayOfSim",
+          "CalendarYear",
+          "PreviousHour",
+          "HourOfDay",
+          "NumOfDayInEnvrn",
+          "TimeStepsInHour",
+          "TimeStep",
+          "KindOfSim"
+        ],
+        "global_text": [
+          "DayOfSimChr",
+          "CalendarYearChr"
+        ],
+        "environment_i32": [
+          "DayOfYear",
+          "DayOfYear_Schedule",
+          "Year",
+          "Month",
+          "DayOfMonth",
+          "DayOfWeek",
+          "HolidayIndex",
+          "DSTIndicator",
+          "YearTomorrow",
+          "MonthTomorrow",
+          "DayOfMonthTomorrow",
+          "DayOfWeekTomorrow",
+          "HolidayIndexTomorrow",
+          "TotDesDays",
+          "CurEnvirNum",
+          "RunPeriodStartDayOfWeek"
+        ],
+        "environment_bool": [
+          "EndMonthFlag",
+          "EndYearFlag"
+        ],
+        "environment_text": [
+          "EnvironmentName"
+        ],
+        "weather_i32": [
+          "Envrn",
+          "NumOfEnvrn",
+          "TotRunPers",
+          "TotRunDesPers",
+          "NumDataPeriods",
+          "NumIntervalsPerHour",
+          "NumSpecialDays",
+          "LeapYearAdd",
+          "RptDayType",
+          "CurDayOfWeek",
+          "curSimDayForEndOfRunPeriod"
+        ],
+        "weather_bool": [
+          "GetBranchInputOneTimeFlag",
+          "GetEnvironmentFirstCall",
+          "FirstCall",
+          "WaterMainsParameterReport",
+          "LastHourSet",
+          "WeatherFileExists",
+          "DatesShouldBeReset",
+          "StartDatesCycleShouldBeReset",
+          "Jan1DatesShouldBeReset",
+          "RPReadAllWeatherData",
+          "UseDaylightSaving",
+          "UseSpecialDays",
+          "DaylightSavingIsActive"
+        ],
+        "daily_i32": [
+          "DayOfYear",
+          "DayOfYear_Schedule",
+          "Year",
+          "Month",
+          "DayOfMonth",
+          "DayOfWeek",
+          "DaylightSavingIndex",
+          "HolidayIndex"
+        ],
+        "stream": "actual open/good/eof/fail/bad/available byte position only",
+        "header": "existing CLK02 source-backed fields and actual WeathCodes counter, exact selected metadata",
+        "configuration": "input identity and typed RunPeriod controls; never alias absent native weather owner"
+      },
+      "same_caller_and_source_phase_required": true,
+      "whole_copy": {
+        "fields": [
+          "IsRain",
+          "IsSnow",
+          "OutDryBulbTemp",
+          "OutDewPointTemp",
+          "OutBaroPress",
+          "OutRelHum",
+          "WindSpeed",
+          "WindDir",
+          "SkyTemp",
+          "HorizIRSky",
+          "BeamSolarRad",
+          "DifSolarRad",
+          "Albedo",
+          "WaterPrecip",
+          "LiquidPrecip",
+          "TotalSkyCover",
+          "OpaqueSkyCover"
+        ],
+        "scope": "bitexact only within the same observed native or Rust owner and operation",
+        "complete_operands_available_required": true,
+        "interior_UpdateWeatherData_operand_unobserved_in_whole_Initialize": "explicit unavailable, never reconstruct as PASS",
+        "native_private_hourly_local": "explicit unavailable; selected cross-native cache profile remains required",
+        "unchanged_canaries": "compare bitexact only where source has no write and real endpoints exist",
+        "CLK03_existing_full_transport_proof_is_distinct": true
+      },
+      "required_history": {
+        "all_request_rows": 3239,
+        "weather_rows": 3181,
+        "requested_order_typed_identity": true,
+        "preserve_all_before_caller_before_after_and_available_outcomes": true,
+        "skips_and_source_fatal_must_be_actual_and_stop_dependent_invocations": true,
+        "before_caller_assignments_and_source_order_not_replaced_by_cached_outputs": true
+      },
+      "unpaired": [
+        "solar interpolation/radiation/coefficients",
+        "sky/IR/sky-temperature generation",
+        "cloud/snow/albedo/WaterPrecip generation",
+        "ground/water/daylight calculations",
+        "native private source record index",
+        "std-ios private bit flags",
+        "whole first simulation registration",
+        "error-message wording",
+        "unselected grid contents not recorded by declared compact observation"
+      ],
+      "source_unpaired_generation": [
+        "calcSky/IR/sky temperature CLK-06",
+        "solar interpolation/coefficients CLK-05",
+        "cloud-cover generation unless separately selected before freeze",
+        "snow-depth physical generation",
+        "Albedo/WaterPrecip generation",
+        "ground/water mains/daylighting context",
+        "full EMS/design-day or active site precipitation schedules"
+      ],
+      "availability": {
+        "None_equals_None_counted_as_PASS": false,
+        "metadata_type_or_availability_comparisons_are_separate_from_numeric_comparisons": true,
+        "all_unavailable_paths_have_reason_and_counted_as_PASS_false": true,
+        "available_required_bounded_numeric_fields_must_have_finite_operands": true,
+        "no_class_match_used_as_numeric_PASS_for_nonfinite_or_unavailable_operand": true
+      },
+      "source_outputs_read": false,
+      "scientific_execution_performed": false,
+      "numerical_comparison_count": null,
+      "numerical_mismatch_count": null,
+      "numerical_PASS_claimed": false,
+      "frozen_packet_or_production_code_changed": false,
+      "gates_updated": false,
+      "post_output_relaxation_allowed": false
+    },
+    "case_ids": [
+      "A-24H",
+      "A-72H",
+      "B-BOTH-24H"
+    ],
+    "trace_levels": [
+      "Full",
+      "Summary"
+    ],
+    "original_production_source_counts": {
+      "GetNextEnvironment": 3,
+      "InitializeWeather": 480,
+      "SetCurrentWeather": 480,
+      "total": 963
+    },
+    "selected_Current_source_steps": 480,
+    "selected_Current_history": "every source-declared production-CON zone step",
+    "native_mask_unchanged": true,
+    "native_inputs_or_outputs_rewritten": false,
+    "actual_cli_trace_schema": "clk03-weather-day-production-trace.v1",
+    "full_Today_transport": "within-Rust actual full11/full17 copy; cross-native frozen day8 only",
+    "current13_to_owned_sample_fields": {
+      "OutDryBulbTemp": "dry_bulb_c",
+      "OutWetBulbTemp": "wet_bulb_c",
+      "OutRelHum": "relative_humidity_percent",
+      "OutHumRat": "outdoor_humidity_ratio",
+      "OutBaroPress": "atmospheric_pressure_pa",
+      "WindSpeed": "wind_speed_m_per_s",
+      "WindDir": "wind_direction_deg"
+    },
+    "consumer_rain_owner": "actual Current IsRain and actual full Today slot",
+    "consumer_liquid_mm_owner": "actual Today LiquidPrecip; current m value separately paired",
+    "ordering_proof": "actual Initialize/SetCurrent completion prefix and consumer completed_operation_count copied at receipt; exact owner/clock identity and archived call site",
+    "joint_operation_consumer_sequence_invented": false,
+    "initial_seed_repeated_consumer": "at most one prefix duplicate hour1/TS1 shares the single actual Current step",
+    "unavailable_fields": {
+      "native_private_stream_bits_and_text": true,
+      "Rust_production_stream_file_path": true,
+      "native_whole_factory_preparation": true,
+      "independent_wallclock_event_timestamp": true
+    },
+    "unavailable_counted_as_PASS": false,
+    "post_output_relaxation_allowed": false,
+    "physical_solar_sky_other_unselected_generation_paired": false
+  },
+  "independent_sources_review": {
+    "path": ".runtime/porting/CLK-04/independent-production-workflow-source-review-03/review.json",
+    "sha256": "ec50f050b66eb7725fbdbca582c8ddc5e3d0f34ec646412963e586cf7ade2792"
+  },
+  "independent_sources_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-production-workflow-source-review-command-03/receipt.json",
+    "sha256": "b82cd512ea9b723181da4409d848909acb49c850b031c003b8783275925eee1f"
+  },
+  "reader_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-workflow-prep-07/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/00-common.py",
+        "sha256": "011195b5ea1f445bc287cc2bbe506ac73f135ff132d1b55d3dca53a5e683a3b7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-workflow-prep-07/provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/01-provenance.py",
+        "sha256": "95ab45bb209090de0a0d022653e32fa600218822cf7b86906ccd28487d4f2ef0"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-workflow-prep-07/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/02-state.py",
+        "sha256": "5e423a1397451e46f32f60a43ea99e89b7bf42d650c4e20d7e6c59307138bfaa"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-workflow-prep-07/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/03-prepare_plan.py",
+        "sha256": "c2d0ac919cda65d84d52106be34393843cca7c675e48b9c8ec341c84072709b9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-workflow-prep-07/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/04-run_production.py",
+        "sha256": "0d3a4201a70d7ddf940087b75010c1575d990827afc128cf079777856297b029"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-workflow-prep-07/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/05-check_production.py",
+        "sha256": "f9d34d1a146476d1918929419a82cf860999409624ae9226c356f99c75bfe439"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/check_clk04_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/06-check_clk04_unit.py",
+        "sha256": "521a6a088df141df6d70d2e3197d51469549ffb77ddd961d5c695221401c5ce3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/07-numeric.py",
+        "sha256": "7c408cb011db1a521c1e37f2e5c31eff182b59d3d1f1c480a7b0e124d4cfaf1e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/snapshots.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/08-snapshots.py",
+        "sha256": "e7f980aa874e4a526ac3e935b94c130d2dc7a7cebae86913bdf058a2b1f75c97"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/09-history.py",
+        "sha256": "27bb896f32aba14b060b05f748c5fa9f0ffbf3da350c3a111063f69c75e02467"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/10-metadata.py",
+        "sha256": "b90365d6754fa6b4b3cb1750bbd384d9f595c65266c25778c88bc4d706bde43d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/profile.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/11-profile.py",
+        "sha256": "77382e83698e66c8e3fda25bbf294ce4ecf64c12325a09f97f8b18d27f006423"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/12-proofs.py",
+        "sha256": "9d991b8bc91a58b271a1dadf368ea40de72c5f6f0fd834432dddd414258934ac"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-05/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/13-freeze_projection.py",
+        "sha256": "ecab8c674364940e662535c48ca02ce0269fdfc0cd58bea42b82d24910ceab8d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/production-plan-01/14-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "native_results_read_by_plan_writer": false,
+  "frozen_before_Rust_production_numerical_execution": true,
+  "frozen_before_Original_execution_claimed": false,
+  "existing_native_six_packet_rewritten": false,
+  "expected_outputs_supplied": false,
+  "native_results_supplied_as_inputs": false,
+  "physical_execution_performed": false,
+  "gates_updated": false
+}

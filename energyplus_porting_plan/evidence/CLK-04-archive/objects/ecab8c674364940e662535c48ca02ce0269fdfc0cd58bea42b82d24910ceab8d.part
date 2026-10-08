@@ -1,0 +1,117 @@
+"""Freeze authenticated input/profile/source metadata; never import a comparer."""
+from pathlib import Path
+from datetime import datetime,timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import sys
+
+sys.dont_write_bytecode = True
+OWN = Path(__file__).resolve().parent
+ROOT = OWN.parents[3]
+UTILITY = ROOT/'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+FILES = ['check_clk04_unit.py','numeric.py','snapshots.py','history.py','metadata.py','profile.py','proofs.py','freeze_projection.py']
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-review','source-review-execution','candidate-request','candidate-observer-projection',
+        'candidate-input-execution','output-dir']:
+        parser.add_argument('--'+name,type=Path,required=True)
+    args = parser.parse_args()
+    if hashlib.sha256(UTILITY.read_bytes()).hexdigest() != UTILITY_SHA:
+        raise ValueError('Authenticated metadata utility changed before import')
+    spec = importlib.util.spec_from_file_location('clk04_dto_metadata',UTILITY)
+    if spec is None or spec.loader is None:
+        raise ValueError('Metadata-only utility unavailable')
+    v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+    checked = v.Bindings()
+    need = v.require
+    need(v.ROOT == ROOT and Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    output = args.output_dir.resolve()
+    need(output.is_relative_to(ROOT/'.runtime/porting/CLK-04')
+        and output != ROOT/'.runtime/porting/CLK-04' and not output.exists(), 'Fresh ignored DTO output required')
+    review_ref = v.ref(args.source_review); review = v.read(checked.check(review_ref))
+    need(review['schema'] == 'clk04-independent-candidate-comparer-static-review.v1'
+        and review['status'] == 'pass-frozen-selected-profile-and-authenticated-observer-before-candidate-execution'
+        and review['scientific_execution_performed'] is False, 'Independent exact source/profile review required')
+    expected = {path.relative_to(ROOT).as_posix() for path in [*[OWN/name for name in FILES],UTILITY]}
+    rows = review['reviewed_comparer_sources']
+    need(type(rows) is list and len(rows) == len({row['historical_path'] for row in rows}) == len(expected)
+        and {row['historical_path'] for row in rows} == expected, 'Exact nine source archives required')
+    for row in rows:
+        need(v.path_of(row['historical_path']).read_bytes() == checked.check(row['archive']).read_bytes(),
+            'Current metadata reader/profile bytes differ from independent source review')
+    # Only the reviewed input-only policy projector is imported; comparison
+    # implementations and native/Rust results are never loaded by this writer.
+    spec = importlib.util.spec_from_file_location('clk04_declared_profile',OWN/'profile.py')
+    need(spec is not None and spec.loader is not None, 'Authenticated input-only projector unavailable')
+    profile = importlib.util.module_from_spec(spec); spec.loader.exec_module(profile)
+    values = {key:v.read(checked.check(value)) for key,value in profile.FROZEN_INPUTS.items()}
+    policy = profile.selection(values['source'],values['cases'],values['tolerances'],values['projection'])
+    request_ref = values['cases']['helper_request']; request = v.read(checked.check(request_ref))
+    need(request['expected_values_supplied'] is False and request['expected_exits_supplied'] is False
+        and request['scientific_execution_performed'] is False, 'Frozen native input-only request required')
+    for binding in [request['fixed_scope'],*request['all_45_guard_refs']]: checked.check(binding)
+    need(len(request['all_45_guard_refs']) == 45, 'All45 ordered bindings required')
+    for sequence in request['weather_sequences']:
+        for name in ['input','weather','external_byte_map']:
+            if sequence.get(name) is not None: checked.check(sequence[name])
+    wrapper_ref = v.ref(args.candidate_request); wrapper = v.read(checked.check(wrapper_ref))
+    observer_ref = v.ref(args.candidate_observer_projection); observer = v.read(checked.check(observer_ref))
+    need(wrapper['schema'] == 'clk04-candidate-observer-request.v1'
+        and wrapper['frozen_before_Rust_candidate_numerical_execution'] is True
+        and wrapper['native_results_supplied'] is False and wrapper['Rust_outputs_supplied_as_inputs'] is False
+        and observer['schema'] == 'clk04-candidate-observer-projection.v1'
+        and v.same_binding(observer['observer_request'],wrapper_ref), 'Candidate input-only projection identity differs')
+    need(v.same_binding(wrapper['native_request'],request_ref)
+        and wrapper['native_observation_policy'] == values['projection']['native_observation_policy'],
+        'Candidate must preserve frozen native request/policy')
+    for binding in [wrapper['native_admission_contract'],*wrapper['observer_sources'],
+        *wrapper['actual_public_API_sources'],*wrapper['source_authorities'].values(),wrapper['independent_source_review']]:
+        checked.check(binding)
+    for key in ['source','cases','tolerances']:
+        need(v.same_binding(wrapper['contracts'][key],profile.FROZEN_INPUTS[key]), 'Candidate contract differs')
+    def recorded(reference,payload):
+        record = v.read(checked.check(reference)); start,finish = v.execution_interval(record,checked)
+        need(record['schema'] == 'recorded-porting-command.v1' and record['launch_error'] is None
+            and record['source_bytes_match_before_and_after'] is True and record['recorder_updates_gates'] is False
+            and record['recorder_supplies_reference_answers'] is False
+            and v.exact(v.read(checked.check(record['stdout'])),payload), 'Actual metadata0/full exact stdout required')
+        checked.check(record['source_snapshot']); checked.check(record['executed_launcher']['archive'])
+        return record,start,finish
+    review_execution_ref = v.ref(args.source_review_execution)
+    _,start,finish = recorded(review_execution_ref,review)
+    need(start <= v.timestamp(review['review_started_utc']) <= v.timestamp(review['review_completed_utc']) <= finish,
+        'Actual independent source review interval differs')
+    emission_ref = v.ref(args.candidate_input_execution)
+    _,emission_start,emission_finish = recorded(emission_ref,{'observer_request':wrapper_ref,'projection':observer_ref,
+        'native_request_unchanged':True,'all_bound_inputs_unchanged':True,'input_only_emission':True,
+        'frozen_before_Rust_candidate_numerical_execution':True,'frozen_before_Original_execution_claimed':False,
+        'scientific_execution_performed':False,'gates_updated':False})
+    need(emission_start <= v.timestamp(wrapper['created_utc']) <= emission_finish,
+        'Candidate input-only emission interval differs')
+    created = datetime.now(timezone.utc).isoformat()
+    need(max(finish,emission_finish) <= v.timestamp(created), 'Source review/input emission must precede DTO freeze')
+    checked.unchanged()
+    output.mkdir()
+    projection = {'schema':'clk04-candidate-dto-projection.v1','status':'frozen-before-candidate-execution',
+        'created_utc':created,'selected_policy':policy,'contracts':{key:profile.FROZEN_INPUTS[key]
+            for key in ['source','cases','tolerances']},'helper_request':request_ref,
+        'native_observation_projection':profile.FROZEN_INPUTS['projection'],'candidate_request':wrapper_ref,
+        'candidate_observer_projection':observer_ref,'candidate_input_execution':emission_ref,
+        'source_review':review_ref,'source_review_execution':review_execution_ref,'reader_source_archives':rows,
+        'scientific_comparer_executed':False,'prospective_numerical_PASS_claimed':False,
+        'native_or_Rust_results_read':False,'gates_updated':False}
+    target = output/'projection.json'
+    with target.open('x',encoding='utf-8',newline='\n') as stream:
+        json.dump(projection,stream,indent=2,ensure_ascii=False,allow_nan=False); stream.write('\n')
+    checked.unchanged()
+    print(json.dumps({'projection':v.ref(target),'input_only_freeze':True,
+        'scientific_comparer_executed':False,'gates_updated':False},allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

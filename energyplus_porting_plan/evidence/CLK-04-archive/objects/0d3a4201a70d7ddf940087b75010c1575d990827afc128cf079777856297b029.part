@@ -1,0 +1,71 @@
+"""Root-authorized six ordinary CLI calls; no native execution or oracle inputs."""
+from pathlib import Path
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+from common import ROOT, boot, now, plan_execution, plan_input, require
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['build','unit-comparison','unit-comparison-execution','native-recovery-execution',
+        'original-data-review-execution','plan','plan-execution','source-review','source-review-execution','output-dir']:
+        parser.add_argument('--'+name,type=Path,required=True)
+    args = parser.parse_args()
+    utility,checked,metadata,packet,policy,request_ref,request,review_ref,review,modules = boot(args.source_review)
+    plan_ref = utility.ref(args.plan);declared = plan_input(plan_ref,policy,request,request_ref,checked,utility,metadata)
+    metadata.binding(declared['independent_sources_review'],review_ref,checked)
+    metadata.binding(declared['independent_sources_review_execution'],utility.ref(args.source_review_execution),checked)
+    _,review_start,review_finish = metadata.recorded(checked,utility.ref(args.source_review_execution),review)
+    require(review_start <= utility.timestamp(review['review_started_utc']) <= utility.timestamp(review['review_completed_utc']) <= review_finish,
+        'Actual independent production source review interval differs')
+    plan_execution_ref = utility.ref(args.plan_execution)
+    _,plan_start,plan_finish = plan_execution(plan_ref,declared,plan_execution_ref,review,utility,metadata,checked)
+    require(review_finish <= plan_start <= utility.timestamp(declared['created_utc']) <= plan_finish,
+        'Actual independent source review must complete before plan freeze and every child')
+    evidence = modules['provenance'].unit_and_build(args,utility,checked,metadata,packet,policy,request_ref)
+    modules['provenance'].architecture(evidence['available'],checked)
+    output = args.output_dir.resolve()
+    require(output.is_relative_to(ROOT/'.runtime/porting/CLK-04') and not output.exists(), 'Fresh contained production matrix output required')
+    output.mkdir();archive = output/'launcher.py';shutil.copyfile(Path(__file__),archive)
+    require(archive.read_bytes() == Path(__file__).read_bytes(), 'Actual production launcher archive differs')
+    matrix = {'schema':'clk04-production-matrix.v1','created_utc':now(),'build':evidence['build_ref'],
+        'unit_comparison':evidence['unit_ref'],'unit_comparison_execution':evidence['unit_execution_ref'],
+        'unit_reader_interpreter_observation':evidence['unit_reader_interpreter_observation'],
+        'native_recovery':evidence['recovery_ref'],'native_recovery_execution':utility.ref(args.native_recovery_execution),
+        'original_data_review':evidence['data_ref'],'original_data_review_execution':utility.ref(args.original_data_review_execution),
+        'declared_plan':plan_ref,'declared_plan_execution':plan_execution_ref,
+        'contracts':declared['contracts'],'independent_sources_review':review_ref,
+        'independent_sources_review_execution':utility.ref(args.source_review_execution),
+        'executed_launcher':utility.ref(archive),'implementation_commit':evidence['build']['implementation_commit'],
+        'crates_tree':evidence['build']['crates_tree'],'cases':[],'actual_command_count':0,'complete':False,
+        'original_outputs_supplied_to_Rust':False,'native_engine_executed':False,'gates_updated':False}
+    path = output/'matrix.json'
+    def update():
+        path.write_text(json.dumps(matrix,indent=2,ensure_ascii=False,allow_nan=False)+'\n',encoding='utf8',newline='\n')
+    update();recorder = ROOT/'tools/porting/record_command.py';checked.check(utility.ref(recorder))
+    for case in declared['cases']:
+        row = {key:case[key] for key in ['case_id','scope','duration','input','weather','metadata']};matrix['cases'].append(row)
+        directory = output/case['case_id'];directory.mkdir()
+        for level in case['trace_levels']:
+            destination = directory/level.lower();receipt_dir = directory/(level.lower()+'-command')
+            command = [str(checked.check(evidence['build']['binary'])),'run',str(checked.check(case['input'])),'--weather',
+                str(checked.check(case['weather'])),'--output-dir',str(destination),'--mode','compatibility','--partial','deny',
+                '--trace-level',level.lower(),'--porting-scope',case['scope'].lower()]
+            checked.unchanged()
+            completed = subprocess.run([sys.executable,'-X','utf8','-B',str(recorder),'--output-dir',str(receipt_dir),'--',*command],cwd=ROOT,check=False)
+            receipt_ref = utility.ref(receipt_dir/'receipt.json');receipt = utility.read(checked.check(receipt_ref))
+            row[level] = {'command_receipt':receipt_ref,'output_directory':destination.relative_to(ROOT).as_posix(),
+                'artifacts':[utility.ref(item) for item in sorted(destination.rglob('*')) if item.is_file()]}
+            matrix['actual_command_count'] += 1;update()
+            require(completed.returncode == receipt['exit_code'] == 0 and utility.exact(receipt['command'],command),
+                'Actual CLI failed; incomplete matrix and actual receipts retained')
+            modules['provenance'].recorded_run(case,row[level],level,evidence,plan_finish,utility,checked,set())
+            checked.unchanged();print(case['case_id']+' '+level+' actual_exit=0',flush=True)
+    matrix['complete'] = matrix['actual_command_count'] == 6;update();checked.unchanged()
+    print(json.dumps({'matrix':utility.ref(path),'actual_command_count':matrix['actual_command_count'],'complete':matrix['complete']}))
+
+
+if __name__ == '__main__': main()

@@ -1,0 +1,311 @@
+{
+  "schema": "clk04-card-completion-evidence.v1",
+  "card": "CLK-04",
+  "scopes": [
+    "A",
+    "B"
+  ],
+  "scientific_implementation_commit": "15127617dbc39ee82f0e631e3fe99a3a2fc1e87e",
+  "final_quality_commit": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+  "unit": {
+    "report": {
+      "path": ".runtime/porting/CLK-04/candidate-unit-comparison-03/unit-comparison.json",
+      "sha256": "ad547d36ac37d5e69a6ef5317f6409c09e0875de91c951e5c9532af31c1d3ac6"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-03/receipt.json",
+      "sha256": "c9cedf230525b380d699d04b710b6044ac7b6f49e56d610d0039d0434cf78182"
+    },
+    "review": {
+      "path": ".runtime/porting/CLK-04/independent-unit-result-review-01/review.json",
+      "sha256": "d7425d39aadbb5de36496ce98ec3b5c506888454fad10bbad6bb24dd2f763c9e"
+    },
+    "comparison_count": 5517963,
+    "mismatch_count": 0
+  },
+  "production": {
+    "report": {
+      "path": ".runtime/porting/CLK-04/production-comparison-02/production-comparison.json",
+      "sha256": "4a29c5e1bb90caf1a89e81af99c697f4d80f7ed9b92079cfcbac6e18555649a6"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-04/production-comparison-command-02/receipt.json",
+      "sha256": "d52899a59912422f4d7cab04d21ded20d4b851f2fb29b43736ac3be7669e08d5"
+    },
+    "review": {
+      "path": ".runtime/porting/CLK-04/independent-production-result-review-01/review.json",
+      "sha256": "c20b44ed08809176a727d4bfa9798af31f7b9b01d23fd832dc9358a2802cf41a"
+    },
+    "comparison_count": 3736442,
+    "mismatch_count": 0,
+    "actual_Current_steps": 480,
+    "actual_source_calls": 963,
+    "actual_cli_commands": 6
+  },
+  "native": {
+    "data_review": {
+      "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+      "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+    },
+    "actual_native_exit_code": 0,
+    "historical_wrapper_exit_code": 1,
+    "metadata_recovery_exit_code": 0,
+    "actual_calls": 3239,
+    "large_local_results_archived": false
+  },
+  "legacy_gap": {
+    "path": ".runtime/porting/CLK-04/legacy-gap-observation-01/gap.json",
+    "sha256": "5806571825a4241c43ba2585d1faf1c5eb5043eccd0be20b763b8c47e1efec3c"
+  },
+  "source_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+    "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+  },
+  "case_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+    "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+  },
+  "tolerance_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+    "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+  },
+  "selected_observation_projection": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+    "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+  },
+  "hourly_source_phase_amendment": {
+    "path": ".runtime/porting/CLK-04/hourly-source-review-01/source-amendment.json",
+    "sha256": "07c0841e96ee4b137564f4aefeea1cbac2c664ff706c784e119ab5d0b4699aa1"
+  },
+  "preserved_failures": {
+    "preserved-unit-metadata-failure-execution": {
+      "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-01/receipt.json",
+      "sha256": "332cf43edf500e9bc7aaaad06e6e182fee779cef4b0d7b683de6475cc39e1e9e"
+    },
+    "preserved-failed-unit-comparison": {
+      "path": ".runtime/porting/CLK-04/candidate-unit-comparison-02/unit-comparison.json",
+      "sha256": "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+    },
+    "preserved-failed-unit-execution": {
+      "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-02/receipt.json",
+      "sha256": "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+    },
+    "preserved-failed-production-comparison": {
+      "path": ".runtime/porting/CLK-04/production-comparison-01/production-comparison.json",
+      "sha256": "703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f"
+    },
+    "preserved-failed-production-execution": {
+      "path": ".runtime/porting/CLK-04/production-comparison-command-01/receipt.json",
+      "sha256": "bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67"
+    },
+    "preserved-historical-clippy-execution": {
+      "path": ".runtime/porting/CLK-04/candidate-clippy-command-01/receipt.json",
+      "sha256": "8475edf40de512527ebc0a0a1937e0eb431c9ec47db845eee8951bdb68920cff"
+    },
+    "preserved-failed-supplemental-source-review-execution": {
+      "path": ".runtime/porting/CLK-04/independent-production-reader-amendment-source-review-command-01/receipt.json",
+      "sha256": "6db68010249538d4de04253f98273f5c7e067a1e76af0c62a73079af53247bf6"
+    }
+  },
+  "compressed_full_byte_archive": {
+    "path": "energyplus_porting_plan/evidence/CLK-04-archive/archive.json",
+    "sha256": "6b13dd23e867364eb28f1101c614b04f4fe58fa307cd0390e0645b402e45e690"
+  },
+  "archive_execution": {
+    "path": ".runtime/porting/CLK-04/archive-command-01/receipt.json",
+    "sha256": "61e1c610c103d994d35e07fff34038c2f9c9ddaaba3e321c16b8c66c886c1124"
+  },
+  "archive_verification_execution": {
+    "path": ".runtime/porting/CLK-04/archive-verification-command-01/receipt.json",
+    "sha256": "a499a4199f144e4d3c044406157d14fe9eab00c8f65d22d2514d12dd92d913e1"
+  },
+  "quality_lineage": {
+    "path": ".runtime/porting/CLK-04/quality-source-lineage-01/lineage.json",
+    "sha256": "657abda88a12c6fa68ad993958df31da79bd43c828bdeda31d751c2c7cb4b68f"
+  },
+  "quality_lineage_execution": {
+    "path": ".runtime/porting/CLK-04/quality-source-lineage-command-01/receipt.json",
+    "sha256": "e303237b8e5eb5b9dee290d12589d11f939cbecaffb484f3ba56f8e402d5acc3"
+  },
+  "actual_final_quality": {
+    "workspace_tests": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-04/final-workspace-unit-command-01/receipt.json",
+        "sha256": "61fc66cabb2180f9929971fc98c5c28a63225ccb68b0e0a47148443806aee12a"
+      },
+      "started_utc": "2026-10-08T14:27:25.870058+00:00",
+      "finished_utc": "2026-10-08T14:32:24.433781+00:00",
+      "actual_exit_code": 0,
+      "repository_before": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "repository_after": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "actual_test_counts": {
+        "groups": 21,
+        "passed": 4591,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-04/final-clippy-command-01/receipt.json",
+        "sha256": "8787cfbc84b6eda03e9fabd3f8ea9c8ef013b0ce0878adc86c3d5cf96f7f46f1"
+      },
+      "started_utc": "2026-10-08T14:34:27.820070+00:00",
+      "finished_utc": "2026-10-08T14:35:49.565120+00:00",
+      "actual_exit_code": 0,
+      "repository_before": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "repository_after": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "actual_test_counts": null
+    },
+    "format_check": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-04/final-scoped-format-command-02/receipt.json",
+        "sha256": "2ad12e0ae2b4f98aee2391a156243f072cfe3625af441a496bb74cf7c4a73e0c"
+      },
+      "started_utc": "2026-10-08T14:28:14.685468+00:00",
+      "finished_utc": "2026-10-08T14:28:14.948532+00:00",
+      "actual_exit_code": 0,
+      "repository_before": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "repository_after": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "actual_test_counts": null
+    },
+    "source_quality": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-04/final-source-quality-command-03/receipt.json",
+        "sha256": "1da793aa2307728eeb107a3d4cd6c846e9a041cac1566c095c73db49828192d2"
+      },
+      "started_utc": "2026-10-08T14:28:14.996310+00:00",
+      "finished_utc": "2026-10-08T14:28:41.386969+00:00",
+      "actual_exit_code": 0,
+      "repository_before": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "repository_after": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "actual_test_counts": null
+    },
+    "structure_quality": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-04/final-structure-command-02/receipt.json",
+        "sha256": "c67477ae16027d0653b9e941f99c5964a93981877b1384e543c086d4b64c3efe"
+      },
+      "started_utc": "2026-10-08T14:28:14.997815+00:00",
+      "finished_utc": "2026-10-08T14:28:37.297412+00:00",
+      "actual_exit_code": 0,
+      "repository_before": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "repository_after": {
+        "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+        "worktree_clean": true,
+        "porcelain_v1_nul_utf8": ""
+      },
+      "actual_test_counts": null
+    }
+  },
+  "helper_granularity": [
+    {
+      "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+      "line_count": 325,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/d5/d5a12779499c6dbe7a6c553d98e6a38edbf93f9485c65709ef23313570bb5a57",
+        "sha256": "d5a12779499c6dbe7a6c553d98e6a38edbf93f9485c65709ef23313570bb5a57"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/producer.rs",
+      "line_count": 227,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/0f/0fea83ea1a130a6de92a3f4a9ccd955db253b48c0a5ce06014dcfa2dc6830c2a",
+        "sha256": "0fea83ea1a130a6de92a3f4a9ccd955db253b48c0a5ce06014dcfa2dc6830c2a"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "line_count": 499,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/13/13a2413ff277e95222f1baba43b1e488a6b0a5448cfbc657013a68f41ae982ab",
+        "sha256": "13a2413ff277e95222f1baba43b1e488a6b0a5448cfbc657013a68f41ae982ab"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "line_count": 207,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/d8/d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3",
+        "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "line_count": 340,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/56/56b174a2d43fd806ff597114075699e0f9097365b4a3be3c8f9bec7fb7382c57",
+        "sha256": "56b174a2d43fd806ff597114075699e0f9097365b4a3be3c8f9bec7fb7382c57"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/state.rs",
+      "line_count": 279,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/aa/aa34b4daa3a9136866283c76664580edddd7eb3ee0fa3d030ca19eb9c5642f5f",
+        "sha256": "aa34b4daa3a9136866283c76664580edddd7eb3ee0fa3d030ca19eb9c5642f5f"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/handoff.rs",
+      "line_count": 33,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/71/71090dad629e39a04695f723860992ee726cd87ac202fdc93e57203633eee405",
+        "sha256": "71090dad629e39a04695f723860992ee726cd87ac202fdc93e57203633eee405"
+      }
+    }
+  ],
+  "unpaired_scope": [
+    "solar interpolation/radiation/coefficients",
+    "sky/IR/sky-temperature generation",
+    "cloud/snow/albedo/WaterPrecip generation",
+    "ground/water/daylight calculations",
+    "native private source record index",
+    "std-ios private bit flags",
+    "whole first simulation registration",
+    "error-message wording",
+    "unselected grid contents not recorded by declared compact observation"
+  ],
+  "unavailable_counted_as_PASS": false,
+  "whole_physical_system_certified": false,
+  "scientific_values_recomputed_by_closure_writer": false,
+  "native_index_invented": false,
+  "authorship_limits": "Closure writer author owns carrier/hourly/producer and native input/helper work; independent comparator, result QA, hourly source amendment and final lineage remain separate actual proofs."
+}

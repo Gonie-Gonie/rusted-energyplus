@@ -1,0 +1,135 @@
+"""Stdlib artifact/receipt authentication only; no scientific imports or formulas."""
+from pathlib import Path
+from datetime import datetime
+import hashlib
+import json
+import struct
+
+ROOT = Path(__file__).resolve().parents[4]
+
+
+def need(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def path_of(name):
+    need(type(name) is str and name, 'Contained artifact path required')
+    path = (ROOT / name).resolve()
+    need(path != ROOT and path.is_relative_to(ROOT), 'Artifact escapes repository')
+    return path
+
+
+def sha(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def ref(path):
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path)}
+
+
+def read(path):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            need(key not in result, 'Duplicate JSON key'); result[key] = value
+        return result
+    def invalid(value):
+        raise ValueError('Non-finite JSON constant: ' + value)
+    return json.loads(path.read_bytes(), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def exact(left, right):
+    if type(left) is not type(right): return False
+    if type(left) is float: return struct.pack('>d', left) == struct.pack('>d', right)
+    if type(left) is dict: return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list: return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right, strict=True))
+    return left == right
+
+
+def same(left, right):
+    return path_of(left['path']) == path_of(right['path']) and left['sha256'] == right['sha256']
+
+
+def utc(value):
+    need(type(value) is str, 'UTC timestamp required')
+    date = datetime.fromisoformat(value)
+    need(date.tzinfo is not None and date.utcoffset().total_seconds() == 0, 'UTC timezone required')
+    return date
+
+
+class Bindings:
+    def __init__(self): self.rows = {}
+
+    def check(self, binding):
+        need(type(binding) is dict and type(binding.get('sha256')) is str, 'File binding required')
+        path = path_of(binding['path']); actual = sha(path)
+        need(actual == binding['sha256'] and self.rows.setdefault(str(path), actual) == actual, 'Artifact byte identity differs')
+        if 'bytes' in binding: need(type(binding['bytes']) is int and path.stat().st_size == binding['bytes'], 'Artifact size differs')
+        return path
+
+    def unchanged(self):
+        need(all(sha(Path(path)) == digest for path, digest in self.rows.items()), 'Bound bytes changed during review')
+
+
+def record(binding, checked, code=0, payload=None, *, hash_stdout=True):
+    value = read(checked.check(binding))
+    need(value['schema'] == 'recorded-porting-command.v1' and type(value['exit_code']) is int
+        and value['exit_code'] == code and value['launch_error'] is None
+        and value['source_bytes_match_before_and_after'] is True and value['recorder_updates_gates'] is False
+        and value['recorder_supplies_reference_answers'] is False, 'Actual recorder outcome/source guard differs')
+    need(Path(value['cwd']).resolve() == ROOT, 'Actual repository cwd required')
+    for key in ['source_snapshot', 'stderr']: checked.check(value[key])
+    if hash_stdout: checked.check(value['stdout'])
+    checked.check(value['executed_launcher']['archive'])
+    if payload is not None: need(exact(read(checked.check(value['stdout'])), payload), 'Actual full typed stdout differs')
+    start, finish = utc(value['started_utc']), utc(value['finished_utc'])
+    need(start <= finish, 'Actual recorded interval differs')
+    return value, start, finish
+
+
+def source_rows(rows, checked, cardinality):
+    need(type(rows) is list and len(rows) == cardinality
+        and len({row['historical_path'] for row in rows}) == cardinality, 'Unique source archive inventory differs')
+    for row in rows: checked.check(row['archive'])
+    return {row['historical_path']: row['archive'] for row in rows}
+
+
+def source_equal(left, right):
+    return set(left) == set(right) and all(left[key]['sha256'] == right[key]['sha256'] for key in left)
+
+
+def python_script(row, expected_path):
+    command = row['command']; need(type(command) is list and all(type(x) is str for x in command), 'Typed actual argv required')
+    need(Path(command[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'], 'Admitted interpreter token required')
+    index = 1
+    if command[index:index + 2] == ['-X', 'utf8']: index += 2
+    if command[index:index + 1] == ['-B']: index += 1
+    need(index < len(command) and not command[index].startswith('-')
+        and path_of(command[index]) == path_of(expected_path), 'Actual script operand differs')
+    return command[index + 1:]
+
+
+def reported_argv(row, report):
+    observed = report['actual_reader_argv']; command = row['command']
+    need(type(observed) is list and all(type(x) is str for x in observed)
+        and len(observed) == len(command) and exact(observed[1:], command[1:]), 'Actual argv tail differs')
+    need(observed and Path(observed[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'],
+        'Admitted reported interpreter token required')
+    if Path(observed[0]).is_absolute():
+        need(Path(observed[0]).resolve() == Path(row['python']['executable']).resolve(), 'Absolute interpreter token differs')
+    else:
+        need(observed[0] == command[0] == Path(observed[0]).name, 'Reported alias differs from actual recorded token')
+    return {'reported_interpreter_token': observed[0], 'child_executable_resolution_independently_observed': False,
+            'parent_executable_is_alias_resolution_proof': False, 'unavailable_resolution_counted_as_PASS': False}
+
+
+def review(binding, execution_binding, schema, status, checked):
+    value = read(checked.check(binding)); row, start, finish = record(execution_binding, checked, payload=value)
+    need(value['schema'] == schema and value['status'] == status
+        and start <= utc(value['review_started_utc']) <= utc(value['review_completed_utc']) <= finish, 'Actual reviewed metadata protocol/UTC differs')
+    return value, row, finish

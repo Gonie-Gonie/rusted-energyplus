@@ -1,0 +1,104 @@
+"""Compare retained actual production observations; never launch an engine."""
+from pathlib import Path
+from types import SimpleNamespace
+import argparse
+import json
+import shutil
+import sys
+from common import ROOT, TRACE_NAME, boot, now, plan_execution, plan_input, require, selected_policy, source_bundle
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['matrix','source-review','output-dir']:
+        parser.add_argument('--'+name,type=Path,required=True)
+    args = parser.parse_args();started = now()
+    utility,checked,metadata,packet,policy,request_ref,request,review_ref,review,modules = boot(args.source_review,comparison=True)
+    matrix_ref = utility.ref(args.matrix);matrix = utility.read(checked.check(matrix_ref))
+    require(matrix['schema'] == 'clk04-production-matrix.v1' and matrix['complete'] is True and matrix['actual_command_count'] == 6
+        and matrix['original_outputs_supplied_to_Rust'] is False and matrix['native_engine_executed'] is False
+        and matrix['gates_updated'] is False, 'Complete six actual ordinary CLI commands required')
+    metadata.binding(matrix['independent_sources_review'],review_ref,checked)
+    _,review_start,review_finish = metadata.recorded(checked,matrix['independent_sources_review_execution'],review)
+    require(review_start <= utility.timestamp(review['review_started_utc']) <= utility.timestamp(review['review_completed_utc']) <= review_finish,
+        'Actual production source review interval differs')
+    plan_ref = matrix['declared_plan'];declared = plan_input(plan_ref,policy,request,request_ref,checked,utility,metadata)
+    metadata.binding(declared['independent_sources_review'],review_ref,checked)
+    metadata.binding(declared['independent_sources_review_execution'],matrix['independent_sources_review_execution'],checked)
+    require(utility.exact(matrix['contracts'],declared['contracts']), 'Matrix frozen contract identity differs')
+    require(checked.check(matrix['executed_launcher']).read_bytes() == (Path(__file__).parent/'run_production.py').read_bytes(),
+        'Actual archived production launcher source differs')
+    _,plan_start,plan_finish = plan_execution(plan_ref,declared,matrix['declared_plan_execution'],review,utility,metadata,checked)
+    require(review_finish <= plan_start <= utility.timestamp(declared['created_utc']) <= plan_finish, 'Source review must precede actual production plan freeze')
+    evidence_args = SimpleNamespace(**{key:checked.check(matrix[key]) for key in ['build','unit_comparison','unit_comparison_execution',
+        'native_recovery_execution','original_data_review_execution']})
+    evidence = modules['provenance'].unit_and_build(evidence_args,utility,checked,metadata,packet,policy,request_ref)
+    require(utility.exact(matrix['unit_reader_interpreter_observation'],evidence['unit_reader_interpreter_observation']),
+        'Recorded unit interpreter availability observation differs')
+    architecture = modules['provenance'].architecture(evidence['available'],checked)
+    import numeric
+    check = numeric.Comparison(policy);seen = set();observations = []
+    native = {row['id']:row for row in evidence['native']['weather_sequences']}
+    inputs = {row['id']:row for row in request['weather_sequences']}
+    require(len(matrix['cases']) == len(declared['cases']) == 3, 'Exactly three cases required')
+    caller_lines = checked.check(evidence['available']['crates/ep_runtime/src/heat_balance/weather_driver.rs']).read_text(encoding='utf8').splitlines()
+    commands = 0
+    for actual,case in zip(matrix['cases'],declared['cases'],strict=True):
+        require(all(utility.exact(actual[key],case[key]) for key in ['case_id','scope','duration','input','weather','metadata']), 'Actual case identity differs')
+        summaries = {};outputs = {}
+        for level in ['Full','Summary']:
+            directory,summary,artifacts,_ = modules['provenance'].recorded_run(case,actual[level],level,evidence,plan_finish,utility,checked,seen)
+            commands += 1;summaries[level] = summary;outputs[level] = directory
+            if level == 'Full':
+                trace_ref = artifacts[directory/TRACE_NAME];trace = utility.read(checked.check(trace_ref))
+                mapping = utility.read(checked.check(case['external_byte_map']))
+                entries = [row for row in mapping['files'] if utility.same_binding(row['input'],case['weather'])]
+                require(len(entries) == 1, 'Exact external raw EPW byte map required')
+                observed = modules['state'].observe(check,trace,case,native[case['native_sequence_id']],inputs[case['native_sequence_id']],
+                    entries[0],checked.check(case['weather']).read_bytes(),caller_lines)
+                observed['actual_trace'] = trace_ref;observations.append(observed)
+        full,summary = summaries['Full'],summaries['Summary'];label = case['case_id']
+        check.discrete(sorted(full),sorted(summary),label+'/ordinary_summary_keyset')
+        for key in set(full)-{'artifacts','timing','input','config'}:
+            check.discrete(full[key],summary[key],label+'/ordinary_summary/'+key)
+        check.discrete({key:value for key,value in full['config'].items() if key != 'trace_level'},
+            {key:value for key,value in summary['config'].items() if key != 'trace_level'},label+'/ordinary_config')
+        for name in ['results/selected-outputs.csv','results/meters.csv']:
+            check.discrete(checked.check(utility.ref(outputs['Full']/name)).read_bytes() == checked.check(utility.ref(outputs['Summary']/name)).read_bytes(),
+                True,label+'/'+name+'/exact_bytes')
+        for name in ['results/result-store.json','porting_scope.json']:
+            check.discrete(utility.read(checked.check(utility.ref(outputs['Full']/name))),
+                utility.read(checked.check(utility.ref(outputs['Summary']/name))),label+'/'+name+'/typed_exact')
+    require(commands == 6 and sum(row['actual_Current_steps'] for row in observations) == 480, 'All six CLI runs and all480 Current source steps required')
+    checked.unchanged();output = args.output_dir.resolve()
+    require(output.is_relative_to(ROOT/'.runtime/porting/CLK-04') and not output.exists(), 'Fresh contained comparison output required')
+    output.mkdir();archives = []
+    for index,path in enumerate(source_bundle()):
+        archive = output/f'{index:02}-{path.name}';shutil.copyfile(path,archive)
+        require(path.read_bytes() == archive.read_bytes(), 'Actually executed reader source archive differs')
+        archives.append({'historical_path':path.relative_to(ROOT).as_posix(),'archive':utility.ref(archive)})
+    report = {'schema':'clk04-production-comparison.v1',
+        'status':'pass-selected-current-and-owned-production-handoff' if check.mismatch_count == 0 else 'fail-selected-current-or-production-handoff',
+        'scientific_certification_passed':check.mismatch_count == 0,'started_utc':started,'completed_utc':now(),
+        'actual_reader_argv':list(sys.orig_argv),'actual_reader_cwd':str(ROOT),'contracts':declared['contracts'],
+        'Rust_matrix':matrix_ref,'declared_plan':plan_ref,'declared_plan_execution':matrix['declared_plan_execution'],
+        'independent_sources_review':review_ref,'independent_sources_review_execution':matrix['independent_sources_review_execution'],
+        'Rust_build':evidence['build_ref'],'implementation_commit':evidence['build']['implementation_commit'],'crates_tree':evidence['build']['crates_tree'],
+        'unit_comparison':evidence['unit_ref'],'unit_comparison_execution':evidence['unit_execution_ref'],
+        'unit_reader_interpreter_observation':evidence['unit_reader_interpreter_observation'],
+        'native_recovery':evidence['recovery_ref'],'native_recovery_execution':matrix['native_recovery_execution'],
+        'Original_results':evidence['recovery']['results'],'Original_data_review':evidence['data_ref'],
+        'Original_data_review_execution':matrix['original_data_review_execution'],'actual_command_count':commands,
+        'comparison':check.report(),'observations':observations,'source_architecture':architecture,
+        'selected_policy':selected_policy(policy),'executed_reader_source_archives':archives,'checked_artifact_bindings':checked.report(),
+        'engines_Cargo_Git_executed_by_reader':False,'reference_outputs_supplied_to_Rust':False,'scientific_RHS_recomputed':False,
+        'physical_solar_sky_unselected_generation_parity_claimed':False,'native_thermal_callback_parity_claimed':False,
+        'unavailable_counted_as_PASS':False,'post_output_relaxation_allowed':False,'gates_updated':False,
+        'authorship_disclosure':'Header authored this production reader and observer/output trace plus earlier consumer glue; independent source and final factual data reviews must be performed by other authors. This reader certifies frozen selected source fields and actual owned payload receipts only, not unselected physics or native thermal callbacks.'}
+    with (output/'production-comparison.json').open('x',encoding='utf8',newline='\n') as stream:
+        json.dump(report,stream,indent=2,ensure_ascii=False,allow_nan=False);stream.write('\n')
+    print(json.dumps(report,ensure_ascii=False,allow_nan=False))
+    if check.mismatch_count:raise SystemExit(1)
+
+
+if __name__ == '__main__': main()

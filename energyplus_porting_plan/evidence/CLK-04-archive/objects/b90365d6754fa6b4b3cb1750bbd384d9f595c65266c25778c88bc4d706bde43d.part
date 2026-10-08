@@ -1,0 +1,251 @@
+"""Draft authenticated artifact routing; no engine, RHS, or gate mutation."""
+from geo03_provenance import (ROOT, exact, execution_interval, path_of, read, ref, require,
+    same_binding, timestamp, verify_rust_build)
+from profile import FROZEN_INPUTS, REQUESTED_COUNTS, selection
+import proofs
+
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+
+
+def binding(actual, expected, checked):
+    require(same_binding(actual,expected), 'Actual normalized path/SHA256 binding differs')
+    checked.check(actual); checked.check(expected)
+
+
+def packet(checked):
+    values = {key:read(checked.check(value)) for key,value in FROZEN_INPUTS.items()}
+    profile = selection(values['source'],values['cases'],values['tolerances'],values['projection'])
+    cases = values['cases']
+    request_ref = cases['helper_request']
+    request = read(checked.check(request_ref))
+    require(request['schema'] == 'clk04-helper-cases.v1' and request['energyplus_commit'] == PIN
+        and request['expected_values_supplied'] is False and request['expected_exits_supplied'] is False
+        and request['scientific_execution_performed'] is False, 'Exact input-only native packet required')
+    require(exact(request['requested_counts'],REQUESTED_COUNTS)
+        and exact(request['observation_policy'],values['projection']['native_observation_policy']), 'Frozen schedule/policy differs')
+    binding(values['projection']['helper_request'],request_ref,checked)
+    require(len(request['all_45_guard_refs']) == 45, 'All45 ordered bindings required, including shared weather repetitions')
+    for row in request['all_45_guard_refs']:
+        checked.check(row)
+    for row in request['weather_sequences']:
+        for key in ['input','weather','external_byte_map']:
+            if key in row:
+                checked.check(row[key])
+    for row in values['source']['source_files']:
+        checked.check(row['original']); checked.check(row['archive'])
+    for row in values['source']['selected_ranges']:
+        checked.check(row['archive'])
+    for row in values['tolerances']['reused_PSY_contracts'].values():
+        checked.check(row)
+    return values,profile,request_ref,request
+
+
+def recorded(checked, receipt_ref, stdout, code=0):
+    record = read(checked.check(receipt_ref))
+    require(record['schema'] == 'recorded-porting-command.v1' and type(record['exit_code']) is int
+        and record['exit_code'] == code and record['launch_error'] is None
+        and record['source_bytes_match_before_and_after'] is True
+        and record['recorder_updates_gates'] is False and record['recorder_supplies_reference_answers'] is False,
+        'Actual typed guarded command required')
+    start,finish = execution_interval(record,checked,exit_code=code)
+    require(path_of(record['cwd']) == ROOT and exact(read(checked.check(record['stdout'])),stdout),
+        'Actual cwd/stdout report identity differs')
+    checked.check(record['stderr']); checked.check(record['source_snapshot']); checked.check(record['executed_launcher']['archive'])
+    require(path_of(record['executed_launcher']['historical_path']) == ROOT/'tools/porting/record_command.py',
+        'Authentic generic recorder required')
+    require(checked.check(record['executed_launcher']['archive']).read_bytes()
+        == path_of(record['executed_launcher']['historical_path']).read_bytes(), 'Actual archived recorder source differs')
+    return record,start,finish
+
+
+def preserved_original(args,checked,packet_values,request_ref):
+    recovery_ref = ref(args.native_recovery)
+    recovery = read(checked.check(recovery_ref))
+    require(recovery['schema'] == 'clk04-original-recovery.v1'
+        and recovery['status'] == 'metadata-verified-actual-native0-from-preserved-wrapper1'
+        and recovery['actual_recovery_exit_code'] == recovery['actual_historical_helper_exit_code'] == 0
+        and recovery['actual_historical_launcher_exit_code'] == 1 and recovery['preservation_checks_passed'] is True,
+        'Actual recovery0/native0/historical wrapper1 must remain distinct')
+    for key in ['native_engine_reexecuted','historical_failed_wrapper_relabelled_zero',
+        'native_results_recomputed_or_modified','scientific_values_compared','numerical_PASS_claimed']:
+        require(recovery[key] is False, 'Actual recovery unavailable/science scope differs')
+    require(recovery['numerical_comparison_count'] is None and recovery['numerical_mismatch_count'] is None,
+        'Recovery metadata cannot certify numerics')
+    recovery_record,_,recovery_finish = recorded(checked,ref(args.native_recovery_execution),recovery)
+    original_ref = recovery['preserve_original_reference']
+    original = read(checked.check(original_ref))
+    require(original['schema'] == 'clk04-original-reference.v1' and original['actual_helper_exit_code'] == 0
+        and original['actual_launcher_exit_code'] == 1 and original['scientific_certification_passed'] is False,
+        'Preserved original actual outcome must remain honest')
+    compact = {'reference':original_ref,'status':original['status'],'actual_helper_exit_code':0,'actual_launcher_exit_code':1}
+    outer,outer_start,outer_finish = recorded(checked,recovery['failed_original_execution'],compact,1)
+    binding(recovery['native_execution'],original['execution'],checked)
+    binding(recovery['results'],original['results'],checked)
+    binding(recovery['actual_request'],request_ref,checked)
+    for key in ['source','cases','tolerances']:
+        binding(recovery['contracts'][key],FROZEN_INPUTS[key],checked)
+    binding(recovery['observation_projection'],FROZEN_INPUTS['projection'],checked)
+    command = read(checked.check(recovery['native_execution']))
+    require(command['schema'] == 'clk04-original-native-command.v1' and command['spawn_error'] is None,
+        'Actual native child receipt required')
+    native_start,native_finish = execution_interval(command,checked)
+    argv = command['command']
+    require(len(argv) == 5 and path_of(argv[0]) == checked.check(command['binary']) and path_of(argv[1]) == ROOT
+        and path_of(argv[2]) == checked.check(request_ref) and path_of(argv[3]) == checked.check(recovery['native_admission_contract'])
+        and path_of(argv[4]) == checked.check(recovery['results']).parent, 'Actual genuine native argc5 differs')
+    binding(command['binary'],recovery['executed_helper'],checked)
+    require(outer_start <= native_start <= native_finish <= outer_finish <= timestamp(recovery['started_utc'])
+        <= timestamp(recovery['finished_utc']) <= recovery_finish, 'Native failure/recovery chronology differs')
+    for key in ['independent_recovery_source_review','independent_recovery_source_review_execution',
+        'native_driver_build','actual_build_execution','independent_actual_build_review','independent_actual_build_review_execution']:
+        checked.check(recovery[key])
+    build = proofs.native(checked,recorded,binding,recovery,original,outer_start,outer_finish,recovery_record)
+    admission = read(checked.check(recovery['native_admission_contract']))
+    require(admission['schema'] == 'clk04-native-admission-contract.v1' and admission['frozen_before_numerical_execution'] is True,
+        'One-way source-frozen admission required')
+    binding(admission['helper_request'],request_ref,checked)
+    binding(admission['projection'],FROZEN_INPUTS['projection'],checked)
+    for key in ['source','cases','tolerances']:
+        binding(admission['contracts'][key],FROZEN_INPUTS[key],checked)
+    data_ref = ref(args.original_data_review)
+    data = read(checked.check(data_ref))
+    require(data['schema'] == 'clk04-independent-original-data-review.v1'
+        and data['status'] == 'pass-preserved-original-data-before-Rust-baseline'
+        and data['intended_native_branch_coverage_complete'] is True and data['scientific_values_compared'] is False
+        and data['actual_operation_invocations'] == 3239 and data['actual_operations_skipped'] == 0,
+        'Actual intended Original data coverage must precede Rust')
+    for key,expected in [('reviewed_reference',recovery_ref),('reviewed_execution',ref(args.native_recovery_execution)),
+        ('reviewed_original_reference',original_ref),('reviewed_failed_original_execution',recovery['failed_original_execution']),
+        ('reviewed_native_execution',recovery['native_execution']),('reviewed_results',recovery['results'])]:
+        binding(data[key],expected,checked)
+    _,data_start,data_finish = recorded(checked,ref(args.original_data_review_execution),data)
+    data_record = read(checked.check(ref(args.original_data_review_execution)))
+    data_sources = proofs.sources(checked,data['executed_reader_sources'],2)
+    proofs.script(data_record,next(archive for owner,archive in data_sources.items() if owner.endswith('/review_data.py')),checked)
+    require(data['source_unavailable_counted_as_PASS'] is False and data['numerical_PASS_claimed'] is False
+        and data['numerical_comparison_count'] is None and data['numerical_mismatch_count'] is None,
+        'Metadata initial QC must not substitute a numerical PASS')
+    for field,expected in [('reviewed_request',request_ref),('reviewed_native_admission_contract',recovery['native_admission_contract']),
+        ('reviewed_projection',FROZEN_INPUTS['projection']),('reviewed_build',recovery['native_driver_build']),
+        ('reviewed_build_review',recovery['independent_actual_build_review']),
+        ('reviewed_build_review_execution',recovery['independent_actual_build_review_execution']),
+        ('reviewed_recovery_source_review',recovery['independent_recovery_source_review']),
+        ('reviewed_contract_review',build['independent_contract_review'])]:
+        binding(data[field],expected,checked)
+    require(exact(data['reviewed_contracts'],recovery['contracts']), 'Data QC reviewed different frozen contracts')
+    require(recovery_finish <= timestamp(data['review_started_utc']) <= timestamp(data['review_completed_utc']) <= data_finish
+        and data_start <= timestamp(data['review_started_utc']), 'Actual initial data QC chronology differs')
+    return recovery_ref,recovery,data_ref,data_finish
+
+
+def candidate(args,checked,recovery_ref,recovery,data_ref,data_finish):
+    gap_ref = ref(args.baseline_gap)
+    gap = read(checked.check(gap_ref))
+    require(gap['schema'] == 'clk04-legacy-gap-observation.v1'
+        and gap['status'] == 'observed-preserved-native-and-existing-Rust-availability-gap'
+        and gap['numerical_comparison_count'] is None and gap['numerical_mismatch_count'] is None
+        and gap['numerical_PASS_claimed'] is False and gap['unavailable_counted_as_PASS'] is False,
+        'Genuine preserved disjoint legacy gap required')
+    binding(gap['reviewed_evidence']['native-reference'],recovery_ref,checked)
+    binding(gap['reviewed_evidence']['original-data-review'],data_ref,checked)
+    gap_record,gap_start,gap_finish = recorded(checked,ref(args.baseline_gap_execution),gap)
+    require(data_finish <= gap_start, 'Legacy gap must follow actual Original data QC')
+    proofs.gap(checked,recorded,binding,gap,gap_record,recovery_ref,data_ref,args,data_finish)
+    wrapper_ref = ref(args.candidate_request)
+    wrapper = read(checked.check(wrapper_ref))
+    require(wrapper['schema'] == 'clk04-candidate-observer-request.v1'
+        and wrapper['frozen_before_Rust_candidate_numerical_execution'] is True,
+        'Fresh input-only candidate wrapper must not pretend to predate already executed Original')
+    for key in ['expected_values_supplied','native_results_supplied','Rust_outputs_supplied_as_inputs','frozen_before_Original_execution_claimed']:
+        require(wrapper[key] is False, 'Candidate wrapper input-only scope differs: '+key)
+    binding(wrapper['native_request'],recovery['actual_request'],checked)
+    binding(wrapper['native_admission_contract'],recovery['native_admission_contract'],checked)
+    for key in ['source','cases','tolerances']:
+        binding(wrapper['contracts'][key],FROZEN_INPUTS[key],checked)
+    projection_ref = ref(args.candidate_observer_projection)
+    observer_projection = read(checked.check(projection_ref))
+    require(observer_projection['schema'] == 'clk04-candidate-observer-projection.v1'
+        and observer_projection['unavailable_counted_as_PASS'] is False
+        and observer_projection['complete_operation_order_retained'] is True
+        and observer_projection['mask_changes_invocations'] is False
+        and observer_projection['numerical_comparison_count'] is None
+        and observer_projection['numerical_mismatch_count'] is None
+        and observer_projection['numerical_PASS_claimed'] is False,
+        'Actual separately frozen candidate observer projection required')
+    binding(observer_projection['observer_request'],wrapper_ref,checked)
+    binding(observer_projection['native_observation_projection'],FROZEN_INPUTS['projection'],checked)
+    for key in ['observer_sources','actual_public_API_sources','native_observation_policy','contracts','requested_counts']:
+        if key == 'requested_counts':
+            require(exact(observer_projection['declared_counts'],wrapper[key]), 'Observer declared cardinality differs')
+        else:
+            require(exact(observer_projection[key],wrapper[key]), 'Observer wrapper/projection mismatch: '+key)
+    candidate_review = read(checked.check(wrapper['independent_source_review']))
+    require(candidate_review['schema'] == 'clk04-independent-candidate-observer-source-review.v1'
+        and candidate_review['status'] == 'pass-input-only-candidate-observer-and-projection-before-candidate-execution'
+        and candidate_review['scientific_execution_performed'] is False, 'Actual reviewed candidate observer sources required')
+    _,review_start,review_finish = recorded(checked,ref(args.candidate_source_review_execution),candidate_review)
+    require(review_start <= timestamp(candidate_review['review_started_utc']) <= timestamp(candidate_review['review_completed_utc'])
+        <= review_finish <= timestamp(wrapper['created_utc']), 'Candidate source review must precede input declaration')
+    reviewed = proofs.sources(checked,candidate_review['reviewed_sources'],19)
+    expected_rows = [*wrapper['observer_sources'],*wrapper['actual_public_API_sources']]
+    require(len(expected_rows) == len({row['path'] for row in expected_rows}) == 19
+        and set(reviewed) == {row['path'] for row in expected_rows}
+        and all(reviewed[row['path']]['sha256'] == row['sha256'] for row in expected_rows),
+        'Exact ten observer/shared plus nine API sources must match independent review')
+    writer = next(row for row in wrapper['observer_sources'] if row['path'].endswith('/write_candidate_inputs.py'))
+    emission_ref = ref(args.candidate_input_execution)
+    emission = read(checked.check(emission_ref))
+    expected_stdout = {'observer_request':wrapper_ref,'projection':projection_ref,'native_request_unchanged':True,
+        'all_bound_inputs_unchanged':True,'input_only_emission':True,'frozen_before_Rust_candidate_numerical_execution':True,
+        'frozen_before_Original_execution_claimed':False,'scientific_execution_performed':False,'gates_updated':False}
+    _,emission_start,emission_finish = recorded(checked,emission_ref,expected_stdout)
+    proofs.script(emission,writer,checked)
+    for flag,expected in [('--native-request',recovery['actual_request']),('--native-contract',recovery['native_admission_contract']),
+        ('--source-review',wrapper['independent_source_review'])]:
+        proofs.argument(emission,flag,expected,checked)
+    require(emission_start <= timestamp(wrapper['created_utc']) == timestamp(observer_projection['created_utc']) <= emission_finish,
+        'Actual metadata input emitter interval differs')
+    required = ['crates/ep_runtime/examples/clk04_candidate_probe.rs','crates/ep_runtime/src/weather_day/lifecycle.rs',
+        'crates/ep_runtime/src/weather_day/production.rs','crates/ep_runtime/src/weather_raw/day_read.rs']
+    build_ref = ref(args.rust_build)
+    build,available,compile_record = verify_rust_build(build_ref,checked,kind='example',example='clk04_candidate_probe',
+        committed=True,required_sources=required)
+    execution_ref = ref(args.rust_execution)
+    execution = read(checked.check(execution_ref))
+    rust = read(checked.check(execution['stdout']))
+    _,start,finish = recorded(checked,execution_ref,rust)
+    require(gap_finish <= start and timestamp(compile_record['finished_utc']) <= start
+        and emission_finish <= start, 'Candidate execution preceded actual prerequisites or input freeze')
+    require(len(execution['command']) == 2 and path_of(execution['command'][0]) == checked.check(build['binary'])
+        and path_of(execution['command'][1]) == checked.check(wrapper_ref), 'Actual candidate gets only binary plus input-only wrapper')
+    binding(execution['source_snapshot'],build['source_snapshot'],checked)
+    require(exact(execution['executed_launcher'],build['actual_executed_recorder'])
+        and execution['repository_before']['head'] == execution['repository_after']['head'] == build['implementation_commit']
+        and execution['repository_before']['worktree_clean'] is True and execution['repository_after']['worktree_clean'] is True,
+        'Committed candidate binary/source/recorder identity differs')
+    binding(rust['actual_request'],wrapper_ref,checked)
+    binding(rust['actual_native_request'],recovery['actual_request'],checked)
+    binding(rust['actual_native_admission_contract'],recovery['native_admission_contract'],checked)
+    for key in ['expected_answers_read','native_packet_rewritten_or_native_answers_supplied','native_callbacks_invoked',
+        'whole_native_constructor_observed','scientific_comparison_performed','numerical_PASS_claimed','gates_updated']:
+        require(rust[key] is False, 'Actual candidate truthful invocation/scope required: '+key)
+    require(rust['all_bound_inputs_unchanged'] is True and rust['numerical_comparison_count'] is None
+        and rust['numerical_mismatch_count'] is None, 'Actual candidate observer must not certify comparison')
+    for group in ['observer_sources','actual_public_API_sources']:
+        require(type(wrapper[group]) is list and wrapper[group], 'Actual reviewed source inventory required')
+        for row in wrapper[group]:
+            checked.check(row)
+            owner = row['path']
+            if owner.endswith('.rs') and '/candidate-observer-prep-' in owner:
+                owner = 'crates/ep_runtime/examples/'+owner.split('/candidate-observer-prep-',1)[1].split('/',1)[1]
+            if owner.startswith('crates/'):
+                require(owner in available and available[owner]['sha256'] == row['sha256'],
+                    'Compiled source differs from reviewed wrapper API/dependency: '+owner)
+    return rust,execution,{'native_recovery':recovery_ref,'Original_results':recovery['results'],
+        'Original_data_review':data_ref,'legacy_gap':gap_ref,'candidate_request':wrapper_ref,
+        'candidate_observer_projection':projection_ref,'candidate_input_execution':emission_ref,
+        'candidate_source_review':wrapper['independent_source_review'],
+        'candidate_source_review_execution':ref(args.candidate_source_review_execution),
+        'Rust_build':build_ref,'Rust_execution':execution_ref,'Rust_results':execution['stdout'],
+        'implementation_commit':build['implementation_commit'],'crates_tree':build['crates_tree'],
+        'available_source_inventory_count':len(available),'actual_Rust_finished_utc':finish.isoformat()}

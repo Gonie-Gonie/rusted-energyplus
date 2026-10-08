@@ -1,0 +1,165 @@
+#!/usr/bin/env python3
+"""Compare already recorded CLK04 results; never launch an engine or supply answers."""
+from __future__ import annotations
+import argparse
+from datetime import datetime,timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+import sys
+
+sys.dont_write_bytecode = True
+OWN = Path(__file__).resolve().parent
+ROOT = OWN.parents[3]
+UTILITY = ROOT/'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+FILES = ['check_clk04_unit.py','numeric.py','snapshots.py','history.py','metadata.py','profile.py','proofs.py','freeze_projection.py']
+
+
+def boot():
+    if hashlib.sha256(UTILITY.read_bytes()).hexdigest() != UTILITY_SHA:
+        raise ValueError('Authenticated metadata utility bytes differ before import')
+    spec = importlib.util.spec_from_file_location('geo03_provenance',UTILITY)
+    if spec is None or spec.loader is None:
+        raise ValueError('Authenticated metadata utility unavailable')
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    module.require(module.ROOT == ROOT and Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    return module,module.Bindings()
+
+
+def source_projection(args,utility,checked):
+    review_ref = utility.ref(args.source_review)
+    review = utility.read(checked.check(review_ref))
+    utility.require(review['schema'] == 'clk04-independent-candidate-comparer-static-review.v1'
+        and review['status'] == 'pass-frozen-selected-profile-and-authenticated-observer-before-candidate-execution'
+        and review['scientific_execution_performed'] is False, 'Independent exact comparer/observer source review required')
+    names = {str((OWN/name).relative_to(ROOT)).replace('\\','/') for name in FILES}
+    names.add(UTILITY.relative_to(ROOT).as_posix())
+    rows = review['reviewed_comparer_sources']
+    utility.require(type(rows) is list and len(rows) == len(names) and len({row['historical_path'] for row in rows}) == len(names)
+        and {row['historical_path'] for row in rows} == names, 'Exact nine independently reviewed reader/freezer sources required')
+    for row in rows:
+        current = utility.path_of(row['historical_path'])
+        utility.require(utility.sha(current) == row['archive']['sha256']
+            and current.read_bytes() == checked.check(row['archive']).read_bytes(), 'Reviewed source changed before reader imports')
+    # Authenticate every local module before loading any comparison implementation.
+    for name in ['profile','numeric','snapshots','history','proofs','metadata']:
+        spec = importlib.util.spec_from_file_location(name,OWN/(name+'.py'))
+        utility.require(spec is not None and spec.loader is not None, 'Authenticated local module unavailable')
+        value = importlib.util.module_from_spec(spec); sys.modules[name] = value; spec.loader.exec_module(value)
+    metadata = sys.modules['metadata']
+    packet,policy,request_ref,request = metadata.packet(checked)
+    review_execution_ref = utility.ref(args.source_review_execution)
+    record,start,finish = metadata.recorded(checked,review_execution_ref,review)
+    utility.require(start <= utility.timestamp(review['review_started_utc'])
+        <= utility.timestamp(review['review_completed_utc']) <= finish, 'Actual static review interval differs')
+    projection_ref = utility.ref(args.dto_projection)
+    projection = utility.read(checked.check(projection_ref))
+    utility.require(projection['schema'] == 'clk04-candidate-dto-projection.v1'
+        and projection['status'] == 'frozen-before-candidate-execution'
+        and projection['scientific_comparer_executed'] is False and projection['prospective_numerical_PASS_claimed'] is False
+        and projection['gates_updated'] is False and utility.exact(projection['selected_policy'],policy),
+        'Exact input-only selected policy must be frozen before candidate execution')
+    for field,expected in [('source_review',review_ref),('source_review_execution',review_execution_ref),
+        ('candidate_request',utility.ref(args.candidate_request)),('helper_request',request_ref),
+        ('candidate_observer_projection',utility.ref(args.candidate_observer_projection)),
+        ('candidate_input_execution',utility.ref(args.candidate_input_execution))]:
+        metadata.binding(projection[field],expected,checked)
+    for key in ['source','cases','tolerances']:
+        metadata.binding(projection['contracts'][key],sys.modules['profile'].FROZEN_INPUTS[key],checked)
+    metadata.binding(projection['native_observation_projection'],sys.modules['profile'].FROZEN_INPUTS['projection'],checked)
+    declared = projection['reader_source_archives']
+    utility.require(type(declared) is list and len(declared) == len(names)
+        and len({row['historical_path'] for row in declared}) == len(names)
+        and {row['historical_path'] for row in declared} == names, 'Exact pre-execution reader source archive inventory required')
+    reviewed = {row['historical_path']:row['archive'] for row in rows}
+    for row in declared:
+        checked.check(row['archive'])
+        utility.require(row['archive']['sha256'] == reviewed[row['historical_path']]['sha256'],
+            'Pre-execution source archive differs from independently reviewed bytes')
+    utility.require(finish <= utility.timestamp(projection['created_utc']), 'DTO freeze must follow actual source review')
+    projection_execution_ref = utility.ref(args.dto_projection_execution)
+    projection_record,created_start,created_finish = metadata.recorded(checked,projection_execution_ref,
+        {'projection':projection_ref,'input_only_freeze':True,'scientific_comparer_executed':False,'gates_updated':False})
+    metadata.proofs.script(projection_record,reviewed[(OWN/'freeze_projection.py').relative_to(ROOT).as_posix()],checked)
+    for name,expected in [('--source-review',review_ref),('--source-review-execution',review_execution_ref),
+        ('--candidate-request',utility.ref(args.candidate_request)),
+        ('--candidate-observer-projection',utility.ref(args.candidate_observer_projection)),
+        ('--candidate-input-execution',utility.ref(args.candidate_input_execution))]:
+        metadata.proofs.argument(projection_record,name,expected,checked)
+    utility.require(created_start <= utility.timestamp(projection['created_utc']) <= created_finish,
+        'Actual input-only DTO freeze interval differs')
+    return metadata,packet,policy,request_ref,request,projection_ref,projection,review_ref,review_execution_ref
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['native-recovery','native-recovery-execution','original-data-review','original-data-review-execution',
+        'baseline-gap','baseline-gap-execution','rust-build','rust-execution','candidate-request','candidate-observer-projection',
+        'candidate-input-execution','candidate-source-review-execution','dto-projection','dto-projection-execution',
+        'source-review','source-review-execution','output-dir']:
+        parser.add_argument('--'+name,type=Path,required=True)
+    args = parser.parse_args()
+    utility,checked = boot()
+    output = args.output_dir.resolve()
+    utility.require(output.is_relative_to(ROOT/'.runtime') and output != ROOT/'.runtime' and not output.exists(),
+        'Fresh ignored comparison output required')
+    started = datetime.now(timezone.utc).isoformat()
+    metadata,packet,policy,request_ref,request,projection_ref,projection,review_ref,review_execution_ref = source_projection(args,utility,checked)
+    metadata.proofs.authorities(args,checked,metadata.binding)
+    recovery_ref,recovery,data_ref,data_finish = metadata.preserved_original(args,checked,packet,request_ref)
+    rust,execution,identity = metadata.candidate(args,checked,recovery_ref,recovery,data_ref,data_finish)
+    utility.require(utility.timestamp(projection['created_utc']) <= utility.timestamp(execution['started_utc']),
+        'Declared observation/source projection must precede actual candidate execution')
+    projection_record = utility.read(checked.check(utility.ref(args.dto_projection_execution)))
+    utility.require(utility.timestamp(projection_record['finished_utc']) <= utility.timestamp(execution['started_utc']),
+        'Actual DTO metadata freeze must complete before candidate execution')
+    native = utility.read(checked.check(recovery['results']))
+    utility.require(native['schema'] == 'clk04-helper-results.v1' and native['complete'] is True
+        and native['energyplus_commit'] == metadata.PIN, 'Actual genuine original result required')
+    for key in ['source','cases','tolerances']:
+        metadata.binding(native['contracts'][key],sys.modules['profile'].FROZEN_INPUTS[key],checked)
+        metadata.binding(rust['contracts'][key],sys.modules['profile'].FROZEN_INPUTS[key],checked)
+    metadata.binding(native['actual_request'],request_ref,checked)
+    metadata.binding(native['actual_binary'],recovery['executed_helper'],checked)
+    checker = sys.modules['numeric'].Comparison(policy)
+    normalize = lambda name: utility.path_of(name).relative_to(ROOT).as_posix() if name else ''
+    coverage = sys.modules['history'].compare(checker,native,rust,request,normalize)
+    checked.unchanged()
+    output.mkdir()
+    sources = output/'source'; sources.mkdir()
+    archives = []
+    for current in [*[OWN/name for name in FILES],UTILITY]:
+        target = sources/current.name; shutil.copyfile(current,target)
+        utility.require(current.read_bytes() == target.read_bytes(), 'Actual comparer source archive differs')
+        archives.append({'historical_path':current.relative_to(ROOT).as_posix(),'archive':utility.ref(target)})
+    result = {'schema':'clk04-unit-comparison.v1',
+        'status':'pass-selected-day-current-state-and-source-order' if checker.mismatch_count == 0 else 'fail-selected-day-current-state-or-source-order',
+        'scientific_certification_passed':checker.mismatch_count == 0,'started_utc':started,
+        'completed_utc':datetime.now(timezone.utc).isoformat(),'actual_reader_argv':list(sys.orig_argv),
+        'actual_reader_cwd':str(Path.cwd()),'contracts':{key:sys.modules['profile'].FROZEN_INPUTS[key] for key in ['source','cases','tolerances']},
+        'native_request':request_ref,'native_observation_projection':sys.modules['profile'].FROZEN_INPUTS['projection'],
+        'declared_pre_execution_DTO_projection':projection_ref,'independent_source_review':review_ref,
+        'actual_DTO_projection_execution':utility.ref(args.dto_projection_execution),
+        'independent_source_review_execution':review_execution_ref,'selected_policy':policy,**identity,
+        'comparison':checker.report(),'coverage':coverage,'executed_reader_source_archives':archives,
+        'checked_artifact_bindings':checked.report(),'engines_Cargo_Git_executed_by_reader':False,
+        'native_results_supplied_to_Rust':False,'scientific_RHS_recomputed':False,'gates_updated':False,
+        'unavailable_counted_as_PASS':False,'post_output_relaxation_allowed':False,
+        'unpaired_scope':packet['projection']['unpaired'],
+        'authorship_disclosure':{'comparison_reader_author':'/root/clk02_raw_port',
+            'author_owned_CLK03_raw_cursor_and_CLK04_legacy_observer':True,
+            'own_numerical_code_QA_claimed_independent':False}}
+    with (output/'unit-comparison.json').open('x',encoding='utf-8',newline='\n') as stream:
+        json.dump(result,stream,indent=2,ensure_ascii=False,allow_nan=False); stream.write('\n')
+    print(json.dumps(result,ensure_ascii=False,allow_nan=False))
+    if checker.mismatch_count:
+        raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()

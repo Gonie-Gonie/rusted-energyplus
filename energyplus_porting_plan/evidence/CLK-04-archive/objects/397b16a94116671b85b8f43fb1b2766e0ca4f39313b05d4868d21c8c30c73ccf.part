@@ -1,0 +1,142 @@
+{
+  "schema": "clk04-authenticated-unit-failure-review.v1",
+  "status": "authenticated-preserved-scientific-failure-without-recomputation",
+  "review_started_utc": "2026-10-08T13:32:21.523326+00:00",
+  "review_completed_utc": "2026-10-08T13:32:28.835592+00:00",
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-02/unit-comparison.json",
+    "sha256": "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+  },
+  "reviewed_comparison_execution": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-02/receipt.json",
+    "sha256": "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+  },
+  "preserved_archives": {
+    "report": {
+      "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/report.json",
+      "sha256": "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+    },
+    "comparison_execution": {
+      "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/comparison_execution.json",
+      "sha256": "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+    },
+    "full_stdout": {
+      "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/full_stdout.json",
+      "sha256": "b2777a7df8e3b85fe3c017b2aadaea551b13b308b99ec617e4386237216e5dfa"
+    },
+    "stderr": {
+      "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "historical_source_snapshot": {
+      "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/historical_source_snapshot.json",
+      "sha256": "46ec7e73e0c3ae85f49365e62608548202eb18b0767dd282aa04a3fbb806907b"
+    }
+  },
+  "reviewed_executed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/check_clk04_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/check_clk04_unit.py",
+        "sha256": "521a6a088df141df6d70d2e3197d51469549ffb77ddd961d5c695221401c5ce3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/numeric.py",
+        "sha256": "7c408cb011db1a521c1e37f2e5c31eff182b59d3d1f1c480a7b0e124d4cfaf1e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/snapshots.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/snapshots.py",
+        "sha256": "e7f980aa874e4a526ac3e935b94c130d2dc7a7cebae86913bdf058a2b1f75c97"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/history.py",
+        "sha256": "6e3bcacddbe31b3feffe34fd28f1f6d42229c9e307e5f68b4561b947a4b01031"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/metadata.py",
+        "sha256": "b90365d6754fa6b4b3cb1750bbd384d9f595c65266c25778c88bc4d706bde43d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/profile.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/profile.py",
+        "sha256": "77382e83698e66c8e3fda25bbf294ce4ecf64c12325a09f97f8b18d27f006423"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/proofs.py",
+        "sha256": "9d991b8bc91a58b271a1dadf368ea40de72c5f6f0fd834432dddd414258934ac"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/candidate-comparer-prep-04/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/freeze_projection.py",
+        "sha256": "ecab8c674364940e662535c48ca02ce0269fdfc0cd58bea42b82d24910ceab8d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/archives/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "actual_comparison_exit_code": 1,
+  "actual_scientific_certification_passed": false,
+  "reported_interpreter_token": "python",
+  "reported_absolute_interpreter_token_available": false,
+  "recorded_parent_Python_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "child_interpreter_executable_independently_observed": false,
+  "alias_token_proves_parent_and_child_executable_identity": false,
+  "unavailable_child_executable_resolution_counted_as_PASS": false,
+  "actual_reported_comparison_count": 5517963,
+  "actual_reported_mismatch_count": 3163,
+  "retained_mismatch_payload_count": 1000,
+  "retained_payload_limit": 1000,
+  "retained_payloads_truncated": true,
+  "all_original_report_metrics_arrays_and_payload_bytes_preserved": true,
+  "mismatch_count_inferred_from_truncated_payload": false,
+  "historical_source_snapshot": {
+    "path": ".runtime/porting/source-objects/46/46ec7e73e0c3ae85f49365e62608548202eb18b0767dd282aa04a3fbb806907b",
+    "sha256": "46ec7e73e0c3ae85f49365e62608548202eb18b0767dd282aa04a3fbb806907b"
+  },
+  "historical_implementation_commit": "e79de4e618e57b488dc973601219affc85d29509",
+  "historical_crates_tree": "34deaabcdef02a318353bc67f74a6efaae83b897",
+  "historical_snapshot_file_count": 3731,
+  "historical_Rust_subset_count": 3718,
+  "current_canonical_source_or_HEAD_required_equal": false,
+  "upstream_Rust_and_Original_numeric_payloads_opened": false,
+  "fresh_scientific_values_compared": false,
+  "scientific_RHS_recomputed": false,
+  "engines_Cargo_Git_executed": false,
+  "unavailable_counted_as_PASS": false,
+  "scientific_certification_passed": false,
+  "gates_updated": false,
+  "reviewer_authorship_disclosure": {
+    "reviewer": "/root/clk02_raw_port",
+    "reviewer_authored_the_scientific_comparer": true,
+    "own_numerical_code_QA_claimed_independent": false,
+    "independent_scope": "retained artifact/receipt/source-archive factual transcription only"
+  },
+  "metadata_reader_source": {
+    "path": ".runtime/porting/CLK-04/unit-failure-review-prep-02/review_failure.py",
+    "sha256": "5ac54dac7a90436a0704c11af48520fdce86340efcf0f24ed62a6b29cdf7e916"
+  }
+}

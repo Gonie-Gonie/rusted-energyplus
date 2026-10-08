@@ -1,0 +1,190 @@
+"""Actual committed CLI/unit/native evidence, separate from scientific state."""
+from types import SimpleNamespace
+from pathlib import Path
+from common import CASE_IDS, FULL_ONLY, REQUIRED, ROOT, TRACE_NAME, require
+
+
+def unit_and_build(args, utility, checked, metadata, packet, policy, request_ref):
+    unit_ref = utility.ref(args.unit_comparison);unit = utility.read(checked.check(unit_ref))
+    require(unit['schema'] == 'clk04-unit-comparison.v1'
+        and unit['status'] == 'pass-selected-day-current-state-and-source-order'
+        and unit['scientific_certification_passed'] is True and unit['comparison']['comparison_count'] > 0
+        and unit['comparison']['mismatch_count'] == 0 and unit['unavailable_counted_as_PASS'] is False
+        and unit['gates_updated'] is False and utility.exact(unit['selected_policy'],policy), 'Actual frozen-profile unit PASS required before production')
+    unit_execution_ref = utility.ref(args.unit_comparison_execution)
+    unit_record,_,unit_finished = metadata.recorded(checked,unit_execution_ref,unit)
+    command,reported = unit_record['command'],unit['actual_reader_argv']
+    interpreters = {'python','python.exe','python3','python3.exe','python3.12','python3.12.exe'}
+    require(type(command) is list and type(reported) is list and len(command) >= 2 and len(reported) >= 2
+        and all(type(value) is str for value in command+reported)
+        and Path(command[0]).name.lower() in interpreters and Path(reported[0]).name.lower() in interpreters
+        and type(unit_record['python']['executable']) is str
+        and Path(unit_record['python']['executable']).is_absolute()
+        and utility.exact(command[1:],reported[1:]), 'Actual unit reader interpreter names and remaining argv must bind report')
+    absolute_interpreter = Path(reported[0]).is_absolute()
+    if absolute_interpreter:
+        require(Path(reported[0]).resolve() == Path(unit_record['python']['executable']).resolve(),
+            'Absolute reported unit interpreter must match authenticated recorder Python executable')
+    else:
+        require(reported[0] == Path(reported[0]).name and reported[0] == command[0],
+            'Reported interpreter alias must exactly equal the recorded command alias')
+    interpreter_observation = {'reported_argv_zero':reported[0],'recorded_command_zero':command[0],
+        'recorded_parent_python_executable':unit_record['python']['executable'],
+        'reported_interpreter_is_absolute':absolute_interpreter,
+        'child_python_executable_path':reported[0] if absolute_interpreter else None,
+        'child_python_executable_path_available':absolute_interpreter,
+        'absolute_reported_child_path_matches_recorded_parent':True if absolute_interpreter else None,
+        'parent_executable_is_proof_of_child_alias_resolution':False,
+        'unavailable_child_python_executable_counted_as_PASS':False}
+    metadata.binding(unit['native_request'],request_ref,checked)
+    import profile
+    for key in ['source','cases','tolerances']:
+        metadata.binding(unit['contracts'][key],profile.FROZEN_INPUTS[key],checked)
+    recovery_args = SimpleNamespace(native_recovery=checked.check(unit['native_recovery']),
+        native_recovery_execution=args.native_recovery_execution,
+        original_data_review=checked.check(unit['Original_data_review']),
+        original_data_review_execution=args.original_data_review_execution)
+    recovery_ref,recovery,data_ref,data_finished = metadata.preserved_original(recovery_args,checked,packet,request_ref)
+    probe_build,_,probe_compile = utility.verify_rust_build(unit['Rust_build'],checked,kind='example',
+        example='clk04_candidate_probe',committed=True,required_sources=['crates/ep_runtime/examples/clk04_candidate_probe.rs'])
+    probe_record = utility.read(checked.check(unit['Rust_execution']))
+    probe_results = utility.read(checked.check(unit['Rust_results']))
+    metadata.recorded(checked,unit['Rust_execution'],probe_results)
+    metadata.binding(probe_record['stdout'],unit['Rust_results'],checked)
+    metadata.binding(probe_record['source_snapshot'],probe_build['source_snapshot'],checked)
+    require(len(probe_record['command']) == 2
+        and utility.path_of(probe_record['command'][0]) == checked.check(probe_build['binary'])
+        and utility.path_of(probe_record['command'][1]) == checked.check(unit['candidate_request']), 'Actual unit probe argv differs')
+    require(probe_record['repository_before']['head'] == probe_record['repository_after']['head'] == probe_build['implementation_commit']
+        and probe_record['repository_before']['worktree_clean'] is True and probe_record['repository_after']['worktree_clean'] is True
+        and utility.exact(probe_record['executed_launcher'],probe_build['actual_executed_recorder']), 'Actual canonical probe commit/recorder differs')
+    metadata.binding(unit_record['source_snapshot'],probe_build['source_snapshot'],checked)
+    require(unit_record['repository_before']['head'] == unit_record['repository_after']['head'] == probe_build['implementation_commit']
+        and utility.exact(unit_record['executed_launcher'],probe_build['actual_executed_recorder']), 'Actual unit comparison source identity differs')
+    projected = utility.read(checked.check(unit['declared_pre_execution_DTO_projection']))
+    require(projected['schema'] == 'clk04-candidate-dto-projection.v1' and projected['status'] == 'frozen-before-candidate-execution'
+        and utility.exact(projected['selected_policy'],policy) and projected['scientific_comparer_executed'] is False
+        and projected['prospective_numerical_PASS_claimed'] is False and projected['gates_updated'] is False,
+        'Authentic pre-candidate selected DTO required')
+    from common import UNIT, UNIT_NAMES, UNIT_REVIEW, UNIT_REVIEW_EXECUTION, UTILITY
+    current_names = {path.relative_to(ROOT).as_posix() for path in [*[UNIT/name for name in UNIT_NAMES],UTILITY]}
+    executed_rows = unit['executed_reader_source_archives'];projected_rows = projected['reader_source_archives']
+    executed = {row['historical_path']:row['archive'] for row in executed_rows}
+    frozen = {row['historical_path']:row['archive'] for row in projected_rows}
+    require(type(executed_rows) is list and type(projected_rows) is list
+        and len(executed_rows) == len(projected_rows) == len(executed) == len(frozen) == 9
+        and set(executed) == set(frozen) == current_names, 'Actual unit and frozen nine-source inventory must be exact')
+    for owner in current_names:
+        require(checked.check(executed[owner]).read_bytes() == checked.check(frozen[owner]).read_bytes()
+            == utility.path_of(owner).read_bytes(), 'Executed unit reader differs from frozen/reviewed production numerical dependency')
+    metadata.proofs.script(unit_record,executed[(UNIT/'check_clk04_unit.py').relative_to(ROOT).as_posix()],checked)
+    for field,expected in [('source_review',UNIT_REVIEW),('source_review_execution',UNIT_REVIEW_EXECUTION)]:
+        metadata.binding(projected[field],expected,checked)
+    metadata.binding(unit['independent_source_review'],UNIT_REVIEW,checked)
+    metadata.binding(unit['independent_source_review_execution'],UNIT_REVIEW_EXECUTION,checked)
+    for field,expected in [('candidate_request',unit['candidate_request']),
+        ('candidate_observer_projection',unit['candidate_observer_projection']),
+        ('candidate_input_execution',unit['candidate_input_execution'])]:
+        metadata.binding(projected[field],expected,checked)
+    for key in ['source','cases','tolerances']:
+        metadata.binding(projected['contracts'][key],profile.FROZEN_INPUTS[key],checked)
+    metadata.binding(projected['helper_request'],request_ref,checked)
+    metadata.binding(projected['native_observation_projection'],profile.FROZEN_INPUTS['projection'],checked)
+    freeze_record,freeze_start,freeze_finish = metadata.recorded(checked,unit['actual_DTO_projection_execution'],
+        {'projection':unit['declared_pre_execution_DTO_projection'],'input_only_freeze':True,'scientific_comparer_executed':False,'gates_updated':False})
+    metadata.proofs.script(freeze_record,executed[(UNIT/'freeze_projection.py').relative_to(ROOT).as_posix()],checked)
+    require(freeze_start <= utility.timestamp(projected['created_utc']) <= freeze_finish <= utility.timestamp(probe_record['started_utc'])
+        <= utility.timestamp(probe_record['finished_utc']) <= utility.timestamp(unit['started_utc'])
+        <= utility.timestamp(unit['completed_utc']) <= unit_finished, 'Actual unit DTO/build/probe/comparison chronology differs')
+    require(data_finished <= utility.timestamp(probe_record['started_utc']) and utility.timestamp(probe_compile['finished_utc'])
+        <= utility.timestamp(probe_record['started_utc']), 'Original-first/actual build chronology differs')
+    native = utility.read(checked.check(recovery['results']))
+    require(native['schema'] == 'clk04-helper-results.v1' and native['complete'] is True
+        and native['actual_operation_invocations'] == 3239 and native['actual_operations_skipped'] == 0,
+        'Existing genuine full Original packet must remain retained')
+    build_ref = utility.ref(args.build)
+    build,available,compile_record = utility.verify_rust_build(build_ref,checked,kind='cli',committed=True,required_sources=REQUIRED)
+    require(build['implementation_commit'] == probe_build['implementation_commit'] == unit['implementation_commit']
+        and build['crates_tree'] == probe_build['crates_tree'] == unit['crates_tree'], 'Unit and CLI canonical commit/tree differ')
+    metadata.binding(build['source_snapshot'],probe_build['source_snapshot'],checked)
+    require(utility.exact(build['actual_executed_recorder'],probe_build['actual_executed_recorder']), 'Unit and CLI recorder archives differ')
+    return {'unit':unit,'unit_ref':unit_ref,'unit_execution_ref':unit_execution_ref,'build':build,'build_ref':build_ref,
+        'available':available,'native':native,'recovery':recovery,'recovery_ref':recovery_ref,'data_ref':data_ref,
+        'unit_reader_interpreter_observation':interpreter_observation,
+        'prerequisites_finished':max(unit_finished,data_finished,utility.timestamp(compile_record['finished_utc']))}
+
+
+def architecture(available, checked):
+    text = {key:checked.check(available[key]).read_text(encoding='utf8') for key in REQUIRED}
+    pipeline = text['crates/ep_run/src/pipeline.rs'];current = text['crates/ep_runtime/src/weather_day/production.rs']
+    require('ProductionWeatherTimestepSeries::from_bytes(' in pipeline
+        and 'Preview evidence remains separate from the live owner below.' in pipeline, 'Ordinary pipeline must construct independent live bytes')
+    start = current.index('pub fn current_for(');end = current.index('pub fn initial_hourly_dry_bulb_c(');body = current[start:end]
+    require(body.index('session.initialize_weather()?;') < body.index('session.set_current_weather()?;')
+        < body.index('let current_weather = session.state.environment.current_weather;')
+        < body.index('super::production_trace::record_consumer('), 'Actual archived Initialize/Current/capture source order differs')
+    require('if *self.current_step.borrow() != Some(step)' in body and '*self.current_step.borrow_mut() = Some(step);' in body,
+        'Actual same-zone initial seed reuse owner required')
+    require('owned: Some(series.current_for(record_index, zone_timestep)?)' in text['crates/ep_runtime/src/heat_balance/weather_driver.rs'],
+        'Ordinary consumer must receive copied actual current owner')
+    for key in ['crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs','crates/ep_runtime/src/heat_balance/surface_weather.rs']:
+        require('current.current_weather.is_rain' in text[key], 'Actual rain consumer must use current IsRain')
+    require('received_current_weather' in text['crates/ep_run/src/clk03_trace.rs'], 'Passive current operand receipt must be serialized')
+    trace = text['crates/ep_runtime/src/weather_day/production_trace.rs']
+    require('completed_operation_count: trace.total_operation_count' in trace
+        and '"completed_operation_count":row.completed_operation_count' in text['crates/ep_run/src/clk03_trace.rs'],
+        'Actual passive completed-operation prefix must be captured at consumer receipt')
+    return {'actual_archived_Initialize_Current_consumer_source_order':True,'actual_owned_payload_and_rain_routes':True,
+        'actual_completed_operation_count_at_consumer_receipt':True,'independent_wallclock_timestamp_available':False,
+        'wallclock_timestamp_counted_as_PASS':False,
+        'source_inventory_is_compiler_file_selection_proof':False}
+
+
+def recorded_run(case, item, level, evidence, planned, utility, checked, seen):
+    build = evidence['build'];output = utility.path_of(item['output_directory'])
+    require(output.is_dir() and output not in seen, 'Distinct actual CLI output directory required');seen.add(output)
+    receipt = utility.read(checked.check(item['command_receipt']))
+    require(receipt['schema'] == 'recorded-porting-command.v1' and receipt['launch_error'] is None
+        and receipt['source_bytes_match_before_and_after'] is True and receipt['recorder_updates_gates'] is False
+        and receipt['recorder_supplies_reference_answers'] is False, 'Actual guarded ordinary CLI required')
+    start,finish = utility.execution_interval(receipt,checked)
+    require(max(evidence['prerequisites_finished'],planned) <= start, 'CLI preceded authentic unit/build/frozen plan')
+    require(receipt['repository_before']['head'] == receipt['repository_after']['head'] == build['implementation_commit']
+        and receipt['repository_before']['worktree_clean'] is True and receipt['repository_after']['worktree_clean'] is True,
+        'Actual clean committed CLI identity differs')
+    require(utility.same_binding(receipt['source_snapshot'],build['source_snapshot'])
+        and utility.exact(receipt['executed_launcher'],build['actual_executed_recorder']), 'Actual CLI source/recorder archive differs')
+    expected = [build['binary']['path'],'run',case['input']['path'],'--weather',case['weather']['path'],
+        '--output-dir',str(output),'--mode','compatibility','--partial','deny','--trace-level',level.lower(),'--porting-scope',case['scope'].lower()]
+    utility.command_paths(receipt['command'],expected,{0,2,4,6})
+    artifacts = {}
+    for row in item['artifacts']:
+        path = checked.check(row);require(path.is_relative_to(output) and path not in artifacts, 'Foreign/duplicate CLI artifact')
+        artifacts[path] = row
+    require(set(artifacts) == {path.resolve() for path in output.rglob('*') if path.is_file()}, 'Complete actual retained CLI artifact inventory required')
+    summary = utility.read(checked.check(artifacts[output/'run-summary.json']));config = summary['config']
+    require(summary['status'] == 'success' and summary['exit_code'] == receipt['exit_code'] == 0
+        and summary['source_order_gate']['matches'] is True and summary['selected_algorithm_lane']['diagnostic_probe_used'] is False,
+        'Actual successful ordinary physical runtime required')
+    require(config['mode'] == 'compatibility' and config['partial_policy'] == 'deny' and config['trace_level'] == level.lower()
+        and config['dry_run'] is False and config['hours'] is None and config['oracle_baseline'] is False
+        and config['compare_oracle'] is False and summary['oracle'] is None and summary['comparison'] is None,
+        'EP/oracle/fixture output injection is not an ordinary production input')
+    require(summary['rust_runtime']['samples'] == (72 if case['duration'] == '72H' else 24)
+        and summary['support']['conformance_claim'] is False, 'Actual CON duration/scope differs')
+    if case['scope'] == 'B':
+        require(summary['rust_runtime']['fixture_demand_injection_used'] is False
+            and type(summary['rust_runtime']['purchased_air_coupling_call_count']) is int
+            and summary['rust_runtime']['purchased_air_coupling_call_count'] > 0, 'Actual B thermal demand coupling required')
+    else:
+        require(summary['rust_runtime']['runtime_class'] == 'one-zone-heat-balance-compatibility'
+            and summary['rust_runtime']['fixture_demand_injection_used'] is None
+            and summary['rust_runtime']['purchased_air_coupling_call_count'] is None, 'A unavailable coupling must remain unavailable')
+    scope = utility.read(checked.check(artifacts[output/'porting_scope.json']))
+    require(scope['schema'] == 'porting-scope.v1' and scope['scope'] == case['scope'] and scope['admissible'] is True
+        and scope['violations'] == [], 'Actual fixed CON scope must be admitted')
+    if level == 'Summary':
+        require(not any((output/name).exists() for name in FULL_ONLY), 'Summary must not enable Full-only observations')
+    else:
+        require(output/TRACE_NAME in artifacts, 'Full must retain actual live owner trace')
+    return output,summary,artifacts,finish

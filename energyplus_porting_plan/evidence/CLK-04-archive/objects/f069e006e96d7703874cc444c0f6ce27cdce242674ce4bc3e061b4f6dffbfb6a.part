@@ -1,0 +1,82 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-04/root-cleanup-review-prep-02/review_cleanup.py",
+    "--scientific-build",
+    ".runtime/porting/CLK-04/candidate-build-03/build-receipt.json",
+    "--cleanup-plan",
+    ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/plan.json",
+    "--expected-final",
+    ".runtime/porting/CLK-04/root-observer-final-diff-read-01/reviewed-final.json",
+    "--normalization-execution",
+    ".runtime/porting/CLK-04/observer-proposal-format-command-01/receipt.json",
+    "--output-dir",
+    ".runtime/porting/CLK-04/observer-cleanup-source-review-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-08T14:26:56.814226+00:00",
+  "finished_utc": "2026-10-08T14:27:00.278393+00:00",
+  "elapsed_seconds": 3.4642159999348223,
+  "repository_before": {
+    "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "a036b012100d2a4cd38240925a7f92f6784f1ce7",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/d1/d13e3366926fa17d32b2cb01f1ceb8e75f6a06c16a627c4f2389e5809c3c052d",
+    "sha256": "d13e3366926fa17d32b2cb01f1ceb8e75f6a06c16a627c4f2389e5809c3c052d"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-command-01/stdout.log",
+    "sha256": "86c265273955a2ca8e14c9bd896f520663029cf61517774911d04f8a892fed7a"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-08T14:27:00.278393+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

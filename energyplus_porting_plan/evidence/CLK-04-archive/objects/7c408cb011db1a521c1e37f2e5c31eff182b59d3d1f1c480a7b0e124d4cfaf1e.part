@@ -1,0 +1,142 @@
+"""Source-only comparison implementation; engine results are comparison-only operands."""
+from collections import Counter
+import math
+import re
+import struct
+
+HEX64 = re.compile(r'[0-9a-f]{16}\Z')
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def unavailable(value):
+    return value is None or (type(value) is dict and value.get('available') is False
+        and value.get('value') is None and value.get('counted_as_PASS') is False)
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is float:
+        return struct.pack('>d', left) == struct.pack('>d', right)
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def scalar(value, label):
+    require(type(value) is dict and set(value) == {'value', 'value_bits', 'value_class'}, 'Scalar DTO required: '+label)
+    bits = value['value_bits']
+    require(type(bits) is str and HEX64.fullmatch(bits), 'Binary64 bits required: '+label)
+    number = struct.unpack('>d', bytes.fromhex(bits))[0]
+    require(type(value['value']) is float and math.isfinite(number) and math.isfinite(value['value'])
+        and struct.pack('>d', value['value']).hex() == bits, 'Finite bit/value identity required: '+label)
+    kind = 'negative_zero' if bits == '8000000000000000' else 'positive_zero' if number == 0.0 else 'finite'
+    require(value['value_class'] == kind, 'Scalar classification required: '+label)
+    return number, bits, kind
+
+
+class Comparison:
+    def __init__(self, profile):
+        self.rows = {(row['profile'], row['field']): row for row in profile['profiles']}
+        require(len(self.rows) == len(profile['profiles']) == 19, 'Unique frozen per-field profiles required')
+        self.wind = profile['pure_wind_return']
+        self.metadata_count = 0
+        self.numeric_count = 0
+        self.literal_count = 0
+        self.mismatch_count = 0
+        self.categories = Counter()
+        self.errors = {}
+        self.mismatches = []
+        self.unavailable_paths = []
+        self.transport_boundaries = Counter()
+
+    def mismatch(self, label, actual, original, reason):
+        self.mismatch_count += 1
+        if len(self.mismatches) < 1000:
+            self.mismatches.append({'location':label, 'actual':actual, 'original':original, 'reason':reason})
+
+    def availability(self, actual, original, label, required):
+        missing_actual, missing_original = unavailable(actual), unavailable(original)
+        if not (missing_actual or missing_original):
+            return True
+        self.unavailable_paths.append({'location':label, 'actual_available':not missing_actual,
+            'original_available':not missing_original, 'required':required, 'counted_as_PASS':False})
+        if missing_actual != missing_original or required:
+            self.mismatch(label+'/availability', not missing_actual, not missing_original,
+                'required comparison operand unavailable' if required else 'availability differs')
+        return False
+
+    def discrete(self, actual, original, label, *, required=True, category='typed_metadata'):
+        if not self.availability(actual, original, label, required):
+            return
+        self.metadata_count += 1
+        self.categories[category] += 1
+        if not exact(actual, original):
+            self.mismatch(label, actual, original, 'typed exact metadata differs')
+
+    def literal(self, actual, original, label, *, required=True):
+        if not self.availability(actual, original, label, required):
+            return
+        left, right = scalar(actual, label+'/actual'), scalar(original, label+'/original')
+        self.literal_count += 1
+        self.categories['literal_binary64'] += 1
+        if left[1:] != right[1:]:
+            self.mismatch(label, actual, original, 'exact bits/classification differ')
+
+    def numeric(self, actual, original, label, profile, field):
+        if not self.availability(actual, original, label, True):
+            return
+        row = self.wind if profile == 'pure_wind_return' else self.rows[(profile, field)]
+        left, right = scalar(actual, label+'/actual'), scalar(original, label+'/original')
+        self.numeric_count += 1
+        key = profile+'/'+field
+        self.categories[key] += 1
+        metric = self.errors.setdefault(key, {'comparison_count':0, 'mismatch_count':0,
+            'maximum_absolute_error':0.0, 'sum_squared_error':0.0})
+        error = abs(left[0]-right[0])
+        metric['comparison_count'] += 1
+        metric['maximum_absolute_error'] = max(metric['maximum_absolute_error'], error)
+        metric['sum_squared_error'] += error*error
+        zero_sign_equal = left[1] == right[1] if left[0] == right[0] == 0.0 else True
+        passed = left[2] == right[2] and zero_sign_equal and error <= row['atol']+row['rtol']*abs(right[0])
+        if not passed:
+            metric['mismatch_count'] += 1
+            self.mismatch(label, actual, original, 'frozen field tolerance/classification/zero sign differs')
+
+    def exact_value(self, actual, original, label, *, required=True):
+        if not self.availability(actual, original, label, required):
+            return
+        if type(original) is dict and set(original) == {'value','value_bits','value_class'}:
+            self.literal(actual, original, label, required=required)
+        elif type(original) is dict:
+            require(type(actual) is dict and set(actual) == set(original), 'Exact field inventory differs: '+label)
+            for key in original:
+                self.exact_value(actual[key], original[key], label+'/'+key, required=required)
+        elif type(original) is list:
+            require(type(actual) is list, 'Actual ordered array required: '+label)
+            self.discrete(len(actual), len(original), label+'/length')
+            for index, (left, right) in enumerate(zip(actual, original)):
+                self.exact_value(left, right, label+'/'+str(index), required=required)
+        else:
+            self.discrete(actual, original, label, required=required)
+
+    def report(self):
+        metrics = {}
+        for key, value in self.errors.items():
+            count = value['comparison_count']
+            metrics[key] = {key_:number for key_,number in value.items() if key_ != 'sum_squared_error'}
+            metrics[key]['RMSE'] = math.sqrt(value['sum_squared_error']/count)
+        return {'numeric_comparison_count':self.numeric_count, 'literal_binary64_comparison_count':self.literal_count,
+            'metadata_comparison_count':self.metadata_count,
+            'comparison_count':self.numeric_count+self.literal_count+self.metadata_count,
+            'mismatch_count':self.mismatch_count, 'field_error_metrics':metrics, 'categories':dict(self.categories),
+            'mismatches':self.mismatches, 'mismatch_payload_limit':1000,
+            'mismatch_payloads_truncated':self.mismatch_count > len(self.mismatches),
+            'unavailable_paths':self.unavailable_paths, 'unavailable_counted_as_PASS':False,
+            'within_lane_transport_boundaries':dict(self.transport_boundaries)}

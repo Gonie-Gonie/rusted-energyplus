@@ -1,0 +1,162 @@
+"""Source-only CLK04 comparison selection; accepts frozen inputs, never results.
+
+No file reads, expected scientific values, engine calls or comparisons occur here.
+The eventual comparison reader must authenticate these bytes before importing.
+"""
+from copy import deepcopy
+
+FROZEN_INPUTS = {
+    'source': {'path': '.runtime/porting/CLK-04/frozen-packet-01/source.json',
+        'sha256': '8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e'},
+    'cases': {'path': '.runtime/porting/CLK-04/frozen-packet-01/cases.json',
+        'sha256': '99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08'},
+    'tolerances': {'path': '.runtime/porting/CLK-04/frozen-packet-01/tolerances.json',
+        'sha256': 'f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5'},
+    'projection': {'path': '.runtime/porting/CLK-04/frozen-packet-01/projection.json',
+        'sha256': 'fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51'},
+}
+DAY_FIELDS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum',
+    'WindSpeed', 'WindDir', 'LiquidPrecip', 'IsRain']
+COUNTER_FIELDS = DAY_FIELDS[:-1]
+HISTORY_FIELDS = COUNTER_FIELDS[:-1]
+CURRENT_FIELDS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum',
+    'OutRelHumValue', 'OutHumRat', 'OutWetBulbTemp', 'WindSpeed', 'WindDir',
+    'LiquidPrecipitation', 'IsRain', 'OutEnthalpy', 'OutAirDensity']
+ALL_COUNTER_FIELDS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutRelHum', 'OutBaroPress',
+    'WindDir', 'WindSpeed', 'BeamSolarRad', 'DifSolarRad', 'TotalSkyCover',
+    'OpaqueSkyCover', 'Visibility', 'Ceiling', 'LiquidPrecip', 'WaterPrecip',
+    'AerOptDepth', 'SnowDepth', 'DaysLastSnow', 'WeathCodes', 'Albedo']
+ALL_WEATHER_FIELDS = ['IsRain', 'IsSnow', 'OutDryBulbTemp', 'OutDewPointTemp',
+    'OutBaroPress', 'OutRelHum', 'WindSpeed', 'WindDir', 'SkyTemp', 'HorizIRSky',
+    'BeamSolarRad', 'DifSolarRad', 'Albedo', 'WaterPrecip', 'LiquidPrecip',
+    'TotalSkyCover', 'OpaqueSkyCover']
+DAY_DATE_FIELDS = ['DayOfYear', 'DayOfYear_Schedule', 'Year', 'Month', 'DayOfMonth',
+    'DayOfWeek', 'DaylightSavingIndex', 'HolidayIndex']
+GLOBAL_BOOLS = ['BeginSimFlag', 'BeginEnvrnFlag', 'BeginDayFlag', 'BeginHourFlag',
+    'BeginTimeStepFlag', 'EndDayFlag', 'EndHourFlag', 'EndEnvrnFlag',
+    'EndDesignDayEnvrnsFlag', 'WarmupFlag', 'DoWeathSim', 'DoDesDaySim', 'DoOutputReporting']
+GLOBAL_INTS = ['DayOfSim', 'CalendarYear', 'PreviousHour', 'HourOfDay',
+    'NumOfDayInEnvrn', 'TimeStepsInHour', 'TimeStep', 'KindOfSim']
+ENVIRONMENT_INTS = ['DayOfYear', 'DayOfYear_Schedule', 'Year', 'Month', 'DayOfMonth',
+    'DayOfWeek', 'HolidayIndex', 'DSTIndicator', 'YearTomorrow', 'MonthTomorrow',
+    'DayOfMonthTomorrow', 'DayOfWeekTomorrow', 'HolidayIndexTomorrow', 'TotDesDays',
+    'CurEnvirNum', 'RunPeriodStartDayOfWeek']
+WEATHER_INTS = ['Envrn', 'NumOfEnvrn', 'TotRunPers', 'TotRunDesPers', 'NumDataPeriods',
+    'NumIntervalsPerHour', 'NumSpecialDays', 'LeapYearAdd', 'RptDayType',
+    'CurDayOfWeek', 'curSimDayForEndOfRunPeriod']
+WEATHER_BOOLS = ['GetBranchInputOneTimeFlag', 'GetEnvironmentFirstCall', 'FirstCall',
+    'WaterMainsParameterReport', 'LastHourSet', 'WeatherFileExists',
+    'DatesShouldBeReset', 'StartDatesCycleShouldBeReset', 'Jan1DatesShouldBeReset',
+    'RPReadAllWeatherData', 'UseDaylightSaving', 'UseSpecialDays', 'DaylightSavingIsActive']
+REQUESTED_COUNTS = {'setup_cases': 2, 'wind_cases': 56, 'weather_sequences': 13,
+    'GetNextEnvironment': 13, 'InitializeWeather': 1584, 'SetCurrentWeather': 1584,
+    'weather_operations': 3181, 'total_operations': 3239}
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def selection(source, cases, tolerances, projection):
+    """Project only declared policy and tolerance metadata from four frozen inputs."""
+    for name, value in [('source', source), ('cases', cases), ('tolerances', tolerances)]:
+        require(value['schema'] == 'clk04-' + name + '-contract.v1'
+            and value['frozen_before_numerical_execution'] is True, 'Frozen contract schema differs')
+    require(projection['schema'] == 'clk04-observation-projection.v1'
+        and projection['frozen_before_numerical_execution'] is True, 'Frozen projection required')
+    require(source['paired_read_day_fields'] == projection['day_boundary_paired_grid_fields'] == DAY_FIELDS
+        and source['current_weather_fields'] == projection['selected_current_fields'] == CURRENT_FIELDS
+        and source['selected_missing_and_range_fields'] == COUNTER_FIELDS
+        and source['selected_missing_history_fields'] == HISTORY_FIELDS, 'Existing frozen selections must be exact')
+    require(cases['requested_counts'] == REQUESTED_COUNTS and type(cases['weather_sequences']) is list
+        and len(cases['weather_sequences']) == 13, 'Frozen complete caller-history counts differ')
+    require(len({row['id'] for row in cases['weather_sequences']}) == 13
+        and sum(row['declared_operation_count'] for row in cases['weather_sequences']) == 3181,
+        'Frozen complete ordered weather-history inventory differs')
+    require(tolerances['unavailable_counted_as_PASS'] is False
+        and tolerances['post_output_relaxation_allowed'] is False
+        and tolerances['no_generic_textual_PSY_or_unit_tolerance_fallback'] is True,
+        'Existing tolerance and unavailable policy must be preserved')
+    required_rows = {('day_grid_and_raw_hour_cache', field) for field in COUNTER_FIELDS}
+    required_rows |= {('current_non_solar_weather', field) for field in CURRENT_FIELDS if field != 'IsRain'}
+    rows = {(row['profile'], row['field']): row for row in tolerances['rows']}
+    require(len(rows) == len(tolerances['rows']) == 19 and set(rows) == required_rows,
+        'Exactly seven day/cache and twelve current tolerance rows required')
+    require(all(type(row['atol']) is float and type(row['rtol']) is float
+        and row['atol'] >= 0.0 and row['rtol'] >= 0.0 for row in rows.values()), 'Typed frozen numerical tolerance rows required')
+    return {
+        'schema': 'clk04-numerical-comparison-profile.draft.v1', 'status': 'source-only-before-original-results',
+        'frozen_inputs': deepcopy(FROZEN_INPUTS), 'requested_counts': deepcopy(REQUESTED_COUNTS),
+        'ordered_sequence_ids': [row['id'] for row in cases['weather_sequences']],
+        'native_observation_policy': deepcopy(projection['native_observation_policy']),
+        'profiles': deepcopy(tolerances['rows']), 'pure_wind_return': deepcopy(tolerances['pure_wind_return']),
+        'accepted_PSY_contracts': deepcopy(tolerances['reused_PSY_contracts']),
+        'numerical_criterion': tolerances['criterion'], 'classification': tolerances['classification'],
+        'error_metrics': deepcopy(tolerances['field_error_metrics']),
+        'day_grid': {'owners': ['today_values', 'tomorrow_values'], 'fields': DAY_FIELDS,
+            'numeric_profile': 'day_grid_and_raw_hour_cache', 'IsRain': 'typed boolean exact',
+            'required_full_snapshots': deepcopy(projection['native_observation_policy']['full_grid_snapshots']),
+            'slot_order': 'hour-major,timestep-minor', 'require_all_allocated_24_by_steps_slots': True,
+            'compact_slots_are_null_unavailable_and_never_PASS': True},
+        'current': {'path': 'clk04_observation.current_non_solar_weather', 'fields': CURRENT_FIELDS,
+            'numeric_profile': 'current_non_solar_weather', 'IsRain': 'typed boolean exact',
+            'requested_selected_diagnostic_current_calls': 368, 'requested_selected_production_current_calls': 480,
+            'selection': 'after each declared selected SetCurrentWeather; requested mask never controls invocation',
+            'all_1584_current_history_and_scalar_snapshots_retained': True,
+            'actual_selected_today_17_retained': True, 'generated_cross_native_today_fields': DAY_FIELDS},
+        'counts': {'owners': ['missed_counts', 'out_of_range_counts'], 'paired_fields': COUNTER_FIELDS,
+            'type': 'exact native i32 integer; booleans are rejected', 'all_retained_fields': ALL_COUNTER_FIELDS,
+            'excluded_generated_counts': [x for x in ALL_COUNTER_FIELDS if x not in COUNTER_FIELDS],
+            'unselected_counter_values_retained_not_counted_as_numerical_PASS': True,
+            'LiquidPrecip_out_of_range': 'strict actual unchanged counter; no selected hourly increment exists',
+            'WeathCodes': 'observe actual shared raw parser/header counter as source metadata; do not pair extra generated count'},
+        'missing_history': {'owner': 'missing_values', 'paired_written_fields': HISTORY_FIELDS,
+            'numeric_profile': 'day_grid_and_raw_hour_cache', 'selection': 'every retained before_caller/before/after and full root state',
+            'LiquidPrecip': {'hourly_write': False, 'within_owner_retention': 'exact incoming bits retained when no BeginEnvironment reset',
+                'begin_environment': 'source reset is distinct; compare actual matching-phase state, never treat reset as retention'},
+            'history_source': 'ReadEPlusWeatherForDay hourly missing/range followed by history writes',
+            'non_selected_missing_values_retained_unpaired': True},
+        'raw_hour_cache': {'last_hour': {'paired_fields': DAY_FIELDS, 'numeric_profile': 'day_grid_and_raw_hour_cache'},
+            'next_hour': {'paired_numeric_fields': ['LiquidPrecip'], 'numeric_profile': 'day_grid_and_raw_hour_cache'},
+            'LastHourSet': 'typed boolean exact at every retained owner snapshot',
+            'source_first_hour_policy_and_retained_previous_day_are_distinct': True,
+            'no_last_hour_liquid_inferred_from_divided_zone_grid': True,
+            'private_local_wvarsHr_operand_unavailable_for_direct_copy_proof': True},
+        'linear_setup': {'selected': ['Interpolation_allocated', 'Interpolation'],
+            'array_allocation_shape_order_and_actual_values': 'exact typed availability and binary64 bits',
+            'SolarInterpolation': 'retained unpaired CLK05, never numericalPASS'},
+        'exact_values': deepcopy(tolerances['exact_value_fields']),
+        'exact_metadata': deepcopy(tolerances['exact_metadata']),
+        'typed_owner_metadata': {
+            'global_bool': GLOBAL_BOOLS, 'global_i32': GLOBAL_INTS,
+            'global_text': ['DayOfSimChr', 'CalendarYearChr'], 'environment_i32': ENVIRONMENT_INTS,
+            'environment_bool': ['EndMonthFlag', 'EndYearFlag'], 'environment_text': ['EnvironmentName'],
+            'weather_i32': WEATHER_INTS, 'weather_bool': WEATHER_BOOLS,
+            'daily_i32': DAY_DATE_FIELDS, 'stream': 'actual open/good/eof/fail/bad/available byte position only',
+            'header': 'existing CLK02 source-backed fields and actual WeathCodes counter, exact selected metadata',
+            'configuration': 'input identity and typed RunPeriod controls; never alias absent native weather owner'},
+        'same_caller_and_source_phase_required': True,
+        'whole_copy': {'fields': ALL_WEATHER_FIELDS,
+            'scope': 'bitexact only within the same observed native or Rust owner and operation',
+            'complete_operands_available_required': True,
+            'interior_UpdateWeatherData_operand_unobserved_in_whole_Initialize': 'explicit unavailable, never reconstruct as PASS',
+            'native_private_hourly_local': 'explicit unavailable; selected cross-native cache profile remains required',
+            'unchanged_canaries': 'compare bitexact only where source has no write and real endpoints exist',
+            'CLK03_existing_full_transport_proof_is_distinct': True},
+        'required_history': {'all_request_rows': 3239, 'weather_rows': 3181, 'requested_order_typed_identity': True,
+            'preserve_all_before_caller_before_after_and_available_outcomes': True,
+            'skips_and_source_fatal_must_be_actual_and_stop_dependent_invocations': True,
+            'before_caller_assignments_and_source_order_not_replaced_by_cached_outputs': True},
+        'unpaired': deepcopy(projection['unpaired']),
+        'source_unpaired_generation': deepcopy(source['unpaired_generation']),
+        'availability': {'None_equals_None_counted_as_PASS': False,
+            'metadata_type_or_availability_comparisons_are_separate_from_numeric_comparisons': True,
+            'all_unavailable_paths_have_reason_and_counted_as_PASS_false': True,
+            'available_required_bounded_numeric_fields_must_have_finite_operands': True,
+            'no_class_match_used_as_numeric_PASS_for_nonfinite_or_unavailable_operand': True},
+        'source_outputs_read': False, 'scientific_execution_performed': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None, 'numerical_PASS_claimed': False,
+        'frozen_packet_or_production_code_changed': False, 'gates_updated': False,
+        'post_output_relaxation_allowed': False,
+    }

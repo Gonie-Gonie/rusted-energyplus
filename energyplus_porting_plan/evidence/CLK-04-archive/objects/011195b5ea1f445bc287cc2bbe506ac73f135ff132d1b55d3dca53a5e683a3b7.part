@@ -1,0 +1,211 @@
+"""Authenticated input/proof routing; no engine or scientific expressions."""
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+OWN = Path(__file__).resolve().parent
+UNIT = ROOT / '.runtime/porting/CLK-04/candidate-comparer-prep-05'
+UTILITY = ROOT / 'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+OWN_NAMES = ['common.py','provenance.py','state.py','prepare_plan.py','run_production.py','check_production.py']
+UNIT_NAMES = ['check_clk04_unit.py','numeric.py','snapshots.py','history.py','metadata.py','profile.py','proofs.py','freeze_projection.py']
+UNIT_REVIEW = {'path':'.runtime/porting/CLK-04/independent-candidate-comparer-static-review-03/review.json',
+    'sha256':'fb09f2b206ef0b7dff4b3f505896b963597c4e5d73f1c889c91d5479e71024a8'}
+UNIT_REVIEW_EXECUTION = {'path':'.runtime/porting/CLK-04/independent-candidate-comparer-static-review-command-03/receipt.json',
+    'sha256':'e9c3ec6cc6a7f5ad53790487615dc6cbf09dadf0e59a43b77065373eb77c0ab1'}
+ADMISSION = {'path':'.runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json',
+    'sha256':'c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1'}
+CASE_IDS = ['A-24H','A-72H','B-BOTH-24H']
+TRACE_NAME = 'clk03-weather-day-production-trace.json'
+FULL_ONLY = {TRACE_NAME,'clk02-weather-production-trace.json','clock-calls.json','psy02-calls.json',
+    'psychrometrics-calls.json','zon01-initialization.json','compiled-geometry.json','geometry-consumers.json',
+    'geo02-geometry.json','geo02-geometry-operands.json','geo03-zone-volume.json'}
+REQUIRED = ['crates/ep_run/src/pipeline.rs','crates/ep_run/src/clk03_trace.rs',
+    'crates/ep_runtime/src/weather_day/current.rs','crates/ep_runtime/src/weather_day/production.rs',
+    'crates/ep_runtime/src/weather_day/lifecycle.rs','crates/ep_runtime/src/weather_day/production_trace.rs',
+    'crates/ep_runtime/src/heat_balance/weather_driver.rs',
+    'crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs',
+    'crates/ep_runtime/src/heat_balance/surface_weather.rs']
+
+
+def require(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def source_bundle():
+    return [*[OWN/name for name in OWN_NAMES],*[UNIT/name for name in UNIT_NAMES],UTILITY]
+
+
+def raw_json(path):
+    def pairs(items):
+        result = {}
+        for key,value in items:
+            require(key not in result, 'Duplicate metadata JSON key')
+            result[key] = value
+        return result
+    def invalid(value):
+        raise ValueError('Nonfinite metadata JSON constant: '+value)
+    return json.loads(path.read_text(encoding='utf8'),object_pairs_hook=pairs,parse_constant=invalid)
+
+
+def basic_ref(path):
+    path = Path(path)
+    path = path if path.is_absolute() else ROOT/path
+    require(path.is_file() and not path.is_symlink(), 'Actual regular source required')
+    path = path.resolve(strict=True)
+    require(path.is_relative_to(ROOT) and path != ROOT, 'Source/reference escapes repository')
+    return {'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def basic_check(binding):
+    require(type(binding) is dict and set(binding) == {'path','sha256'}, 'Exact source path/hash required')
+    require(basic_ref(binding['path']) == binding, 'Actual source bytes differ')
+    return ROOT/binding['path']
+
+
+def import_file(name, path):
+    spec = importlib.util.spec_from_file_location(name,path)
+    require(spec is not None and spec.loader is not None, 'Authenticated module loader unavailable')
+    value = importlib.util.module_from_spec(spec);sys.modules[name] = value;spec.loader.exec_module(value)
+    return value
+
+
+def boot(review_path, *, comparison=False):
+    require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    require(hashlib.sha256(UTILITY.read_bytes()).hexdigest() == UTILITY_SHA, 'Metadata utility differs before import')
+    review_ref = basic_ref(review_path);review = raw_json(basic_check(review_ref))
+    require(review['schema'] == 'clk04-independent-production-workflow-source-review.v1'
+        and review['status'] == 'pass-frozen-selected-fields-and-actual-CLI-observation-before-production'
+        and review['scientific_execution_performed'] is False, 'Independent production source review required')
+    rows = review['reviewed_sources'];indexed = {row['historical_path']:row['archive'] for row in rows}
+    names = {path.relative_to(ROOT).as_posix() for path in source_bundle()}
+    require(type(rows) is list and len(rows) == len(indexed) == len(names) and set(indexed) == names,
+        'Exact unique fifteen-source production/unit dependency review required')
+    for path in source_bundle():
+        archive = indexed[path.relative_to(ROOT).as_posix()]
+        require(basic_check(archive).read_bytes() == path.read_bytes(), 'Reviewed source changed before imports')
+    # Every local or shared byte is authenticated before its module is imported.
+    utility = import_file('geo03_provenance',UTILITY);checked = utility.Bindings()
+    for name in ['profile','proofs','metadata']:
+        import_file(name,UNIT/(name+'.py'))
+    if comparison:
+        for name in ['numeric','snapshots']:
+            import_file(name,UNIT/(name+'.py'))
+    metadata = sys.modules['metadata']
+    own = {}
+    for name in (['provenance','state'] if comparison else ['provenance']):
+        own[name] = import_file('clk04_production_'+name,OWN/(name+'.py'))
+    reviewed_unit = utility.read(checked.check(UNIT_REVIEW))
+    require(reviewed_unit['schema'] == 'clk04-independent-candidate-comparer-static-review.v1'
+        and reviewed_unit['scientific_execution_performed'] is False, 'Independent frozen unit profile review required')
+    rows = reviewed_unit['reviewed_comparer_sources'];old = {row['historical_path']:row['archive'] for row in rows}
+    require(len(rows) == len(old) == 9, 'Exact actual unit source review inventory required')
+    for path in [*[UNIT/name for name in UNIT_NAMES],UTILITY]:
+        key = path.relative_to(ROOT).as_posix()
+        require(key in old and checked.check(old[key]).read_bytes() == path.read_bytes(), 'Production selected numerical source differs from reviewed unit source')
+    metadata.recorded(checked,UNIT_REVIEW_EXECUTION,reviewed_unit)
+    metadata.binding(review['reviewed_unit_comparer_source_review'],UNIT_REVIEW,checked)
+    metadata.binding(review['reviewed_unit_comparer_source_review_execution'],UNIT_REVIEW_EXECUTION,checked)
+    packet,policy,request_ref,request = metadata.packet(checked)
+    for key in ['source','cases','tolerances','projection']:
+        metadata.binding(review['reviewed_native_packet'][key],sys.modules['profile'].FROZEN_INPUTS[key],checked)
+    metadata.binding(review['reviewed_native_packet']['helper_request'],request_ref,checked)
+    metadata.binding(review['reviewed_native_packet']['native_admission_contract'],ADMISSION,checked)
+    admission = utility.read(checked.check(ADMISSION))
+    metadata.binding(admission['helper_request'],request_ref,checked)
+    metadata.binding(admission['projection'],sys.modules['profile'].FROZEN_INPUTS['projection'],checked)
+    return utility,checked,metadata,packet,policy,request_ref,request,review_ref,review,own
+
+
+def selected_policy(unit_policy):
+    return {'schema':'clk04-production-selected-policy.v1','frozen_native_unit_selection':unit_policy,
+        'case_ids':CASE_IDS,'trace_levels':['Full','Summary'],
+        'original_production_source_counts':{'GetNextEnvironment':3,'InitializeWeather':480,'SetCurrentWeather':480,'total':963},
+        'selected_Current_source_steps':480,'selected_Current_history':'every source-declared production-CON zone step',
+        'native_mask_unchanged':True,'native_inputs_or_outputs_rewritten':False,
+        'actual_cli_trace_schema':'clk03-weather-day-production-trace.v1',
+        'full_Today_transport':'within-Rust actual full11/full17 copy; cross-native frozen day8 only',
+        'current13_to_owned_sample_fields':{'OutDryBulbTemp':'dry_bulb_c','OutWetBulbTemp':'wet_bulb_c',
+            'OutRelHum':'relative_humidity_percent','OutHumRat':'outdoor_humidity_ratio',
+            'OutBaroPress':'atmospheric_pressure_pa','WindSpeed':'wind_speed_m_per_s','WindDir':'wind_direction_deg'},
+        'consumer_rain_owner':'actual Current IsRain and actual full Today slot',
+        'consumer_liquid_mm_owner':'actual Today LiquidPrecip; current m value separately paired',
+        'ordering_proof':'actual Initialize/SetCurrent completion prefix and consumer completed_operation_count copied at receipt; exact owner/clock identity and archived call site',
+        'joint_operation_consumer_sequence_invented':False,
+        'initial_seed_repeated_consumer':'at most one prefix duplicate hour1/TS1 shares the single actual Current step',
+        'unavailable_fields':{'native_private_stream_bits_and_text':True,'Rust_production_stream_file_path':True,
+            'native_whole_factory_preparation':True,'independent_wallclock_event_timestamp':True},
+        'unavailable_counted_as_PASS':False,'post_output_relaxation_allowed':False,
+        'physical_solar_sky_other_unselected_generation_paired':False}
+
+
+def frozen_sources(plan, checked):
+    rows = plan['reader_source_archives'];indexed = {row['historical_path']:row['archive'] for row in rows}
+    require(len(rows) == len(indexed) == len(source_bundle()), 'Complete unique frozen source inventory required')
+    for path in source_bundle():
+        key = path.relative_to(ROOT).as_posix()
+        require(key in indexed and checked.check(indexed[key]).read_bytes() == path.read_bytes(), 'Frozen production source changed')
+
+
+
+def input_byte_map(input_ref, checked):
+    """Source bytes only: LF getline ranges retain CR and never parse weather."""
+    data = checked.check(input_ref).read_bytes();ranges = [];position = 0
+    while position < len(data):
+        newline = data.find(b'\n',position)
+        end = len(data) if newline < 0 else newline+1
+        ranges.append((position,end));position = end
+    require(len(ranges) > 8, 'Bounded complete eight-header EPW source required')
+    records = [{'source_record_index':index,'start_byte':start,'end_byte':end,
+        'input_row_sha256':hashlib.sha256(data[start:end]).hexdigest()}
+        for index,(start,end) in enumerate(ranges[8:])]
+    return {'schema':'clk04-production-input-byte-map.v1',
+        'files':[{'input':input_ref,'header_line_count':8,'input_byte_length':len(data),'record_line_map':records}],
+        'scientific_expected_values_supplied':False,'native_internal_source_index_claimed':False}
+
+
+def plan_execution(plan_ref, declared, execution_ref, review, utility, metadata, checked):
+    record,start,finish = metadata.recorded(checked,execution_ref,
+        {'plan':plan_ref,'input_only_freeze':True,'physical_execution_performed':False,'gates_updated':False})
+    archive = next(row['archive'] for row in review['reviewed_sources']
+        if row['historical_path'] == (OWN/'prepare_plan.py').relative_to(ROOT).as_posix())
+    metadata.proofs.script(record,archive,checked)
+    metadata.proofs.argument(record,'--source-review',declared['independent_sources_review'],checked)
+    metadata.proofs.argument(record,'--source-review-execution',declared['independent_sources_review_execution'],checked)
+    require(record['command'].count('--output-dir') == 1
+        and utility.path_of(record['command'][record['command'].index('--output-dir')+1]) == checked.check(plan_ref).parent,
+        'Actual plan writer output argument differs')
+    require(start <= utility.timestamp(declared['created_utc']) <= finish, 'Actual plan writer interval differs')
+    return record,start,finish
+
+
+def plan_input(binding, policy, request, request_ref, checked, utility, metadata):
+    value = utility.read(checked.check(binding))
+    require(value['schema'] == 'clk04-production-plan.v1' and utility.exact(value['selected_policy'],selected_policy(policy))
+        and value['actual_command_count'] == 6 and value['physical_execution_performed'] is False
+        and value['native_results_supplied_as_inputs'] is False and value['gates_updated'] is False,
+        'Exact input-only six-CLI plan required')
+    metadata.binding(value['native_request'],request_ref,checked)
+    metadata.binding(value['fixed_scope'],request['fixed_scope'],checked)
+    for key in ['source','cases','tolerances']:
+        metadata.binding(value['contracts'][key],sys.modules['profile'].FROZEN_INPUTS[key],checked)
+    original = utility.read(checked.check(request['fixed_scope']));indexed = {row['id']:row for row in original['cases']}
+    require([row['case_id'] for row in value['cases']] == CASE_IDS, 'Exactly three ordered CON cases required')
+    for row in value['cases']:
+        require(row['scope'] == indexed[row['case_id']]['scope'] and row['duration'] == indexed[row['case_id']]['duration']
+            and row['trace_levels'] == ['Full','Summary'], 'Unchanged CON duration/scope/modes required')
+        for key in ['input','weather','metadata']:
+            metadata.binding(row[key],indexed[row['case_id']][key],checked)
+        require(utility.exact(utility.read(checked.check(row['external_byte_map'])),input_byte_map(row['weather'],checked)),
+            'Frozen production map must contain only exact actual input LF byte ranges')
+    frozen_sources(value,checked)
+    return value

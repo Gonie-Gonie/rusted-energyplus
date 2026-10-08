@@ -1,0 +1,313 @@
+"""SOURCE-ONLY DRAFT: bounded literal CLK04 inputs, never native/Rust answers.
+
+Not imported or executed during this source preparation. Future emission is
+metadata-only; Root alone admits/freezes inputs before any scientific child.
+"""
+from pathlib import Path
+import argparse
+import copy
+from datetime import datetime, timezone
+import hashlib
+import json
+import struct
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = ROOT / '.runtime/porting/CLK-04/preparation-01'
+GOLDEN = ROOT / '.runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw'
+GOLDEN_SHA = 'c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f'
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+PRODUCTION_CALLERS = {'path': '.runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json',
+                      'sha256': 'e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1'}
+PRODUCTION_CURRENT_CALLER_SOURCE = {'path': 'crates/ep_runtime/src/weather_day/production.rs',
+                                    'sha256': '7ad079ee868bfecd86be556524724fb27b2f7096b5bc8161ce1aba82585560bd'}
+WIND_PAIRS = [(359.0, 1.0), (1.0, 359.0), (0.0, 360.0), (360.0, 0.0),
+              (90.0, 270.0), (270.0, 90.0), (89.999, 270.0), (90.001, 270.0),
+              (270.0, 89.999), (270.0, 90.001), (0.0, 0.0), (360.0, 360.0),
+              (-0.0, 0.0), (0.0, -0.0)]
+# Actual EPW field offsets, not native engine record indices.
+SELECTED = [6, 7, 8, 9, 21, 20, 33]
+BASE = ['10', '5', '50', '90000', '1', '359', '0']
+CURRENT = ['30', '15', '70', '95000', '5', '1', '0']
+MISSING = ['99.9', '99.9', '999', '999999', '999', '999', '999']
+RANGE_ROWS = [
+    ['-90', '-90', '0', '31000', '0', '0', '0'],
+    ['70', '70', '110', '120000', '40', '360', '0'],
+    ['-90.0001', '-90.0001', '-0.0001', '30999.9999', '-0.0001', '-0.0001', '0'],
+    ['70.0001', '70.0001', '110.0001', '120000.0001', '40.0001', '360.0001', '0'],
+    ['10', '5', '50.25', '90000', '1', '180', '-0.0']]
+FAMILIES = [
+    {'id': 'RAMP-1-HOUR24', 'steps': 1, 'policy': 'Hour24'},
+    {'id': 'RAMP-4-HOUR24', 'steps': 4, 'policy': 'Hour24'},
+    {'id': 'RAMP-4-HOUR1', 'steps': 4, 'policy': 'Hour1'},
+    {'id': 'MISSING-HISTORY-4', 'steps': 4, 'policy': 'Hour24'},
+    {'id': 'RANGE-BOUNDARIES-4', 'steps': 4, 'policy': 'Hour24'},
+    {'id': 'RAIN-CODE-1', 'steps': 1, 'policy': 'Hour24'},
+    {'id': 'RAIN-DEPTH-4', 'steps': 4, 'policy': 'Hour24'},
+    {'id': 'PSY-CORRECTION-4', 'steps': 4, 'policy': 'Hour24'},
+    {'id': 'TWO-DAY-CACHE-4', 'steps': 4, 'policy': 'Hour24', 'days': 2},
+    {'id': 'WARMUP-REPLAY-4', 'steps': 4, 'policy': 'Hour24', 'warmup_days': 2}]
+OBSERVED_HOURS = [1, 2, 3, 4, 5, 6, 12, 24]
+
+
+def bits(value):
+    return {'bits': struct.pack('>d', value).hex()}
+
+
+def ref(path):
+    path = path.resolve()
+    return {'path': path.relative_to(ROOT).as_posix(),
+            'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def check(binding):
+    path = (ROOT / binding['path']).resolve()
+    if not path.is_relative_to(ROOT) or not path.is_file() or ref(path) != binding:
+        raise ValueError('Bounded input binding differs: ' + str(binding))
+    return path
+
+
+def put(out, name, payload):
+    path = out / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(payload)
+    return ref(path)
+
+
+def json_bytes(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8')
+
+
+def preparation(steps):
+    return {'lane': 'selected-prepared-environment', 'time_steps_per_hour': steps,
+            'TimeStepZone': bits(1.0 if steps == 1 else 0.25),
+            'TimeStepFraction': bits(1.0 if steps == 1 else 0.25),
+            'TimeStepZoneSec': bits(3600.0 if steps == 1 else 900.0),
+            'MinutesInTimeStep': 60 if steps == 1 else 15,
+            'whole_simulation_registration_claimed': False,
+            'genuine_calls': ['InputProcessor::processInput', 'SetupInterpolationValues',
+                              'OpenWeatherFile', 'CloseWeatherFile', 'ReadUserWeatherInput',
+                              'AllocateWeatherData', 'ResolveLocationInformation', 'CheckLocationValidity'],
+            'TimeStepFraction_assignment': 'after genuine SetupInterpolationValues, before OpenWeatherFile',
+            'positive_seconds_assignment': 'explicit caller input before whole SetCurrentWeather',
+            'BeginSimFlag': False, 'DoWeathSim': True, 'DoDesDaySim': False,
+            'GetEnvironmentFirstCall': False, 'GetBranchInputOneTimeFlag': False,
+            'WaterMainsParameterReport': False}
+
+
+def idf(family):
+    days = family.get('days', 1)
+    text = ('Version,26.1;\n'
+            f"Timestep,{family['steps']};\n"
+            'Building,CLK04 Unit,0,Suburbs,0.04,0.4,FullExterior,25,6;\n'
+            'GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;\n'
+            'Site:Location,CLK04 Golden Context,39.74,-105.18,-7.0,1829.0;\n'
+            f"RunPeriod,CLK04 Unit,7,1,2013,7,{days},2013,Monday,No,No,No,Yes,Yes,No,{family['policy']};\n")
+    return text.encode('utf-8')
+
+
+def epw(family, gold_lines):
+    header = list(gold_lines[:8])
+    header[5] = 'COMMENTS 1,input-only bounded CLK04 diagnostic derived from hashed Golden bytes'
+    header[6] = 'COMMENTS 2,no expected output values or exit status'
+    header[7] = 'DATA PERIODS,1,1,Data,Sunday,6/30,7/2'
+    rows = []
+    for text in gold_lines[8:]:
+        row = text.split(',')
+        month, day, hour = map(int, (row[1], row[2], row[3]))
+        if (month, day) not in [(6, 30), (7, 1), (7, 2)]:
+            continue
+        if len(row) != 35:
+            raise ValueError('Genuine Golden row must have35 fields')
+        row[0] = '2013'  # Explicit diagnostic year, not a computed outcome.
+        if month == 7:
+            payload = list(BASE)
+            identifier = family['id']
+            if identifier.startswith('RAMP') or identifier in ['TWO-DAY-CACHE-4', 'WARMUP-REPLAY-4']:
+                payload = list(BASE if hour == 24 else CURRENT)
+                if identifier == 'TWO-DAY-CACHE-4' and day == 2:
+                    payload = ['20', '10', '60', '92500', '3', '90', '1']
+            elif identifier == 'MISSING-HISTORY-4' and hour in [2, 3]:
+                payload = list(MISSING)
+            elif identifier == 'RANGE-BOUNDARIES-4' and hour <= len(RANGE_ROWS):
+                payload = list(RANGE_ROWS[hour - 1])
+            elif identifier == 'PSY-CORRECTION-4':
+                payload = ['5', '6', '110', '101325', '2', '180', '0']
+            if identifier == 'RAIN-CODE-1':
+                payload[-1] = {1: '0', 2: '2', 3: '0.8'}.get(hour, '0')
+                row[26], row[27] = ('0', '099999999') if hour == 1 else ('9', '999999999')
+            elif identifier == 'RAIN-DEPTH-4':
+                payload[-1] = {1: '0', 2: '0.79', 3: '0.8', 4: '0.81', 5: '2', 6: '0'}.get(hour, '0')
+                row[26], row[27] = ('0', '099999999') if hour == 6 else ('9', '999999999')
+            else:
+                row[26], row[27] = '9', '999999999'
+            for index, value in zip(SELECTED, payload, strict=True):
+                row[index] = value
+        rows.append(','.join(row))
+    if len(rows) != 72:
+        raise ValueError('Exactly3 complete24-hour input days required')
+    return ('\n'.join(header + rows) + '\n').encode('utf-8')
+
+
+def operations(family):
+    result = [{'id': 'get-next-environment', 'kind': 'GetNextEnvironment', 'caller': {}}]
+    steps = family['steps']
+    phases = [('warmup', 1, i + 1) for i in range(family.get('warmup_days', 0))]
+    phases += [('run', day, day) for day in range(1, family.get('days', 1) + 1)]
+    for phase_index, (phase, day, label) in enumerate(phases):
+        for hour in range(1, 25):
+            for step in range(1, steps + 1):
+                first = hour == 1 and step == 1
+                final = phase == 'run' and day == family.get('days', 1) and hour == 24 and step == steps
+                caller = {'DayOfSim': day, 'HourOfDay': hour, 'TimeStep': step,
+                          'BeginSimFlag': False, 'BeginEnvrnFlag': phase_index == 0 and first,
+                          'BeginDayFlag': first, 'BeginHourFlag': step == 1, 'BeginTimeStepFlag': True,
+                          'EndDayFlag': hour == 24 and step == steps, 'EndHourFlag': step == steps,
+                          'EndEnvrnFlag': final, 'WarmupFlag': phase == 'warmup'}
+                # SimulationManager stores PreviousHour after every hour loop.
+                # Initial BeginEnvrn source UpdateWeatherData supplies24 itself.
+                if step == 1 and (hour != 1 or phase_index != 0):
+                    caller['PreviousHour'] = 24 if hour == 1 else hour - 1
+                prefix = f'{phase}-{label}-h{hour:02}-s{step}'
+                # Preserve complete zone callback history; the selected observation
+                # mask limits comparison, never which genuine calls are executed.
+                sampled = hour in OBSERVED_HOURS
+                result.append({'id': prefix + '-initialize', 'kind': 'InitializeWeather', 'caller': caller,
+                               'selected_observation': sampled})
+                result.append({'id': prefix + '-current', 'kind': 'SetCurrentWeather', 'caller': caller,
+                               'selected_observation': sampled})
+    return result
+
+
+def byte_map(payload):
+    rows = []
+    offset = 0
+    for line_number, line in enumerate(payload.splitlines(keepends=True), 1):
+        if line_number > 8:
+            fields = line.decode('utf-8').rstrip('\r\n').split(',')
+            rows.append({'external_input_row_index': line_number - 9, 'line_number': line_number,
+                         'start_byte': offset, 'end_byte': offset + len(line),
+                         'date_fields': list(map(int, fields[:5]))})
+        offset += len(line)
+    return {'schema': 'clk04-external-input-byte-map.draft.v1', 'rows': rows,
+            'native_internal_record_index_observed': False, 'scientific_execution_performed': False}
+
+
+def build_request(out):
+    out = out.resolve()
+    ignored = (ROOT / '.runtime/porting/CLK-04').resolve()
+    if not out.is_relative_to(ignored) or out.exists():
+        raise ValueError('Fresh contained ignored output required')
+    cases = json.loads((PREP / 'cases-draft.json').read_text(encoding='utf-8'))
+    guards = cases['all_45_guard_refs']
+    if len(guards) != 45 or ref(GOLDEN)['sha256'] != GOLDEN_SHA:
+        raise ValueError('Fixed CON/Golden identities differ')
+    for binding in guards:
+        check(binding)
+    gold_lines = GOLDEN.read_text(encoding='utf-8').splitlines()
+    out.mkdir(parents=True)
+    sequences = []
+    for family in FAMILIES:
+        payload = epw(family, gold_lines)
+        sequences.append({'id': family['id'], 'lane': 'diagnostic', 'time_steps_per_hour': family['steps'],
+                          'prepared_environment_lane': True,
+                          'input': put(out, family['id'] + '.idf', idf(family)),
+                          'weather': put(out, family['id'] + '.epw', payload),
+                          'external_byte_map': put(out, family['id'] + '-byte-map.json', json_bytes(byte_map(payload))),
+                          'native_preparation': preparation(family['steps']), 'operations': operations(family),
+                          'run_period': {'begin_month': 7, 'begin_day': 1, 'begin_year': 2013,
+                                         'end_month': 7, 'end_day': family.get('days', 1), 'end_year': 2013,
+                                         'start_weekday': 'Monday', 'first_hour_policy': family['policy']}})
+    matched = json.loads(check(PRODUCTION_CALLERS).read_text(encoding='utf8'))
+    check(PRODUCTION_CURRENT_CALLER_SOURCE)
+    if matched['schema'] != 'clk03-production-helper-cases.v1' or matched['source_commit'] != PIN:
+        raise ValueError('Authenticated literal production caller input has wrong schema/pin')
+    if [row['id'] for row in matched['cases']] != ['A-24H', 'A-72H', 'B-BOTH-24H']:
+        raise ValueError('Exactly three existing CON production cases required')
+    for original in matched['cases']:
+        sequence = copy.deepcopy(original)
+        sequence['lane'] = 'production-CON'
+        sequence['declared_CLK03_input_caller_source'] = PRODUCTION_CALLERS
+        sequence['native_preparation'] = {**sequence['native_preparation'], **preparation(4)}
+        sequence['operations'] = []
+        if (len(original['operations']) - 1) % 96 != 0:
+            raise ValueError('Declared four-step whole-day production history required')
+        total_days = (len(original['operations']) - 1) // 96
+        for index, original_operation in enumerate(original['operations']):
+            operation = copy.deepcopy(original_operation)
+            if operation['kind'] != ('GetNextEnvironment' if index == 0 else 'InitializeWeather'):
+                raise ValueError('Actual literal production input history has unexpected operation kind')
+            operation['selected_observation'] = True
+            sequence['operations'].append(operation)
+            if index > 0:
+                # These are literal current_for caller assignments, not the
+                # earlier Initialize partial caller. No trace/output is read.
+                zone = index - 1
+                day, hour, step = zone // 96 + 1, (zone % 96) // 4 + 1, zone % 4 + 1
+                first = day == 1 and hour == 1 and step == 1
+                current_caller = {'HourOfDay': hour, 'TimeStep': step,
+                                  'BeginDayFlag': hour == 1 and step == 1,
+                                  'BeginEnvrnFlag': first, 'BeginSimFlag': first,
+                                  'BeginHourFlag': step == 1, 'BeginTimeStepFlag': True,
+                                  'EndHourFlag': step == 4, 'EndDayFlag': hour == 24 and step == 4,
+                                  'EndEnvrnFlag': day == total_days and hour == 24 and step == 4}
+                sequence['operations'].append({'id': operation['id'] + '-current', 'kind': 'SetCurrentWeather',
+                                               'caller': current_caller,
+                                               'selected_observation': True})
+        for key in ['input', 'weather']:
+            check(sequence[key])
+        sequences.append(sequence)
+    wind = [{'id': f'wind-{pair:02}-weight-{step}', 'previous': bits(previous), 'current': bits(current),
+             'current_weight': bits(weight)} for pair, (previous, current) in enumerate(WIND_PAIRS, 1)
+            for step, weight in enumerate([0.25, 0.5, 0.75, 1.0], 1)]
+    counts = {'setup_cases': 2, 'wind_cases': len(wind), 'weather_sequences': len(sequences),
+              'GetNextEnvironment': 0, 'InitializeWeather': 0, 'SetCurrentWeather': 0,
+              'weather_operations': 0, 'total_operations': 2 + len(wind)}
+    for sequence in sequences:
+        for operation in sequence['operations']:
+            counts[operation['kind']] += 1
+            counts['weather_operations'] += 1
+            counts['total_operations'] += 1
+    if counts != {'setup_cases': 2, 'wind_cases': 56, 'weather_sequences': 13,
+                  'GetNextEnvironment': 13, 'InitializeWeather': 1584, 'SetCurrentWeather': 1584,
+                  'weather_operations': 3181, 'total_operations': 3239}:
+        raise ValueError('Declared pre-output thirteen-family input cardinality differs')
+    request = {'schema': 'clk04-helper-cases.draft.v1', 'energyplus_commit': PIN,
+               'status': 'draft-not-frozen-not-numerically-executed',
+               'created_utc': datetime.now(timezone.utc).isoformat(),
+               'frozen_before_numerical_execution': False, 'expected_values_supplied': False,
+               'expected_exits_supplied': False, 'scientific_execution_performed': False, 'gates_updated': False,
+               'fixed_scope': cases['fixed_CON_scope'], 'all_45_guard_refs': guards,
+               'setup_cases': [{'id': f'SETUP-{steps}', **preparation(steps)} for steps in [1, 4]],
+               'wind_cases': wind, 'weather_sequences': sequences,
+               'requested_counts': counts, 'selected_observed_hours': OBSERVED_HOURS,
+               'declared_CLK03_production_caller_source': PRODUCTION_CALLERS,
+               'production_current_for_caller_source': PRODUCTION_CURRENT_CALLER_SOURCE,
+               'contracts': None, 'original_results_supplied_to_Rust': False,
+               'caller_scope': 'complete declared zone weather callback history; only declared hours selected for pairing; no full thermal simulation claim',
+               'unpaired_context': ['solar', 'sky generation', 'ground', 'water mains', 'daylighting', 'scheduled precipitation'],
+               'root_admission_and_independent_source_review_required_before_freeze': True}
+    for binding in guards:
+        check(binding)
+    check(PRODUCTION_CALLERS)
+    check(PRODUCTION_CURRENT_CALLER_SOURCE)
+    if ref(GOLDEN)['sha256'] != GOLDEN_SHA:
+        raise ValueError('Golden changed during input-only writing')
+    return request
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args()
+    out = args.output_dir.resolve()
+    request = build_request(out)
+    request_ref = put(out, 'helper-request-draft.json', json_bytes(request))
+    print(json.dumps({'request': request_ref, 'weather_families': len(request['weather_sequences']),
+                      'wind_calls': len(request['wind_cases']),
+                      'input_only_emission': True, 'scientific_execution_performed': False,
+                      'gates_updated': False, 'all_45_fixed_inputs_unchanged': True}))
+
+
+if __name__ == '__main__':
+    main()

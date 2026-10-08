@@ -1,0 +1,247 @@
+"""Actual owner/consumer observations; no weather RHS or reference operands enter Rust."""
+from collections import Counter
+from copy import deepcopy
+import hashlib
+from common import CASE_IDS, require
+from numeric import exact, scalar
+from profile import (ALL_COUNTER_FIELDS, ALL_WEATHER_FIELDS, COUNTER_FIELDS, CURRENT_FIELDS,
+    DAY_DATE_FIELDS, DAY_FIELDS, ENVIRONMENT_INTS, GLOBAL_BOOLS, GLOBAL_INTS, HISTORY_FIELDS,
+    WEATHER_BOOLS, WEATHER_INTS)
+from snapshots import (GRID_KEYS, HEADER_KEYS, STREAM_KEYS, owner_shape, selected_weather,
+    source_environment, transport)
+
+SAMPLE_FIELDS = {'OutDryBulbTemp':'dry_bulb_c','OutWetBulbTemp':'wet_bulb_c',
+    'OutRelHum':'relative_humidity_percent','OutHumRat':'outdoor_humidity_ratio',
+    'OutBaroPress':'atmospheric_pressure_pa','WindSpeed':'wind_speed_m_per_s','WindDir':'wind_direction_deg'}
+RAW_COPIES = {'DryBulb':'dry_bulb_c','DewPoint':'dew_point_c','RelHum':'relative_humidity_percent',
+    'AtmPress':'atmospheric_pressure_pa','IRHoriz':'horizontal_infrared_radiation_wh_per_m2',
+    'GLBHoriz':'global_horizontal_radiation_wh_per_m2','DirectRad':'direct_normal_radiation_wh_per_m2',
+    'DiffuseRad':'diffuse_horizontal_radiation_wh_per_m2','WindDir':'wind_direction_deg','WindSpeed':'wind_speed_m_per_s'}
+RAW_DATES = {'WYear':'year','WMonth':'month','WDay':'day','WHour':'hour','WMinute':'minute'}
+
+
+def dto(value, full):
+    """Rename actual stored observations to the frozen DTO; never derive weather."""
+    row = deepcopy(value)
+    require(row['native_internal_record_index_claimed'] is False, 'Native source index cannot be invented')
+    row['native_internal_record_index_observed'] = False
+    row['native_source_local_variables_observed'] = False
+    row['full_grid_contents_available'] = full
+    for name in ['today_values','tomorrow_values']:
+        grid = row[name];slots = grid['slots'];steps = grid['time_steps']
+        require(type(slots) is list and len(slots) == steps*grid['hours'], 'Actual full production grid required')
+        grid['ordering'] = 'hour-major,timestep-minor'
+        if full:
+            grid['slots'] = [{'hour':index//steps+1,'time_step':index%steps+1,'value':slot}
+                for index,slot in enumerate(slots)] if steps else []
+        else:
+            grid['slots'] = None;grid['contents_available'] = False
+            grid['unavailability_reason'] = 'pre-execution declared compact unselected observation'
+    missing = row['missing_values'];extra = missing['extra_reals']
+    require(type(extra) is list and len(extra) == 4, 'Actual extended missing storage required')
+    row['missing_values'] = {**missing['base'],**dict(zip(['Visibility','Ceiling','AerOptDepth','SnowDepth'],extra,strict=True)),
+        'DaysLastSnow':missing['DaysLastSnow']}
+    for name in ['missed_counts','out_of_range_counts']:
+        values = row[name]['declaration_order_integer_values']
+        require(type(values) is list and len(values) == len(ALL_COUNTER_FIELDS), 'Actual all19 counts required')
+        row[name] = dict(zip(ALL_COUNTER_FIELDS,values,strict=True))
+    row['selected_environment_context'] = {'CurrentCycle':row['current_cycle'],'SetWeekDays':row['set_week_days']}
+    return row
+
+
+def compare_snapshot(check, actual, original, label, full, current):
+    """Apply the unchanged unit field lists/profiles to production observations."""
+    actual = dto(actual,full)
+    for row in [actual,original]:
+        require(row['full_grid_contents_available'] is full, 'Exact native compact/full mask required')
+        owner_shape(row,label,full)
+    for group,fields in [('global',GLOBAL_BOOLS+GLOBAL_INTS+['DayOfSimChr','CalendarYearChr','TimeStepZone']),
+        ('environment',ENVIRONMENT_INTS+['EndMonthFlag','EndYearFlag','EnvironmentName','Latitude','Longitude','Elevation']),
+        ('weather',WEATHER_INTS+WEATHER_BOOLS+['ReadEPlusWeatherCurTime','TimeStepFraction','IsRainThreshold'])]:
+        for field in fields:
+            check.exact_value(actual[group][field],original[group][field],label+'/'+group+'/'+field)
+    for key in ['today_variables','tomorrow_variables']:
+        for field in DAY_DATE_FIELDS:
+            check.discrete(actual[key][field],original[key][field],label+'/'+key+'/'+field)
+    for key in ['today_values','tomorrow_values']:
+        for field in GRID_KEYS:
+            check.discrete(actual[key][field],original[key][field],label+'/'+key+'/'+field)
+        if full:
+            require(len(actual[key]['slots']) == len(original[key]['slots']), 'Paired full-grid lengths differ')
+            for index,(left,right) in enumerate(zip(actual[key]['slots'],original[key]['slots'],strict=True)):
+                check.discrete([left['hour'],left['time_step']],[right['hour'],right['time_step']],label+'/'+key+'/'+str(index)+'/identity')
+                selected_weather(check,left['value'],right['value'],DAY_FIELDS,label+'/'+key+'/'+str(index))
+        else:
+            check.availability(None,None,label+'/'+key+'/native_compact_contents',False)
+    for key in ['missed_counts','out_of_range_counts']:
+        for field in COUNTER_FIELDS:
+            check.discrete(actual[key][field],original[key][field],label+'/'+key+'/'+field)
+    for field in HISTORY_FIELDS:
+        check.numeric(actual['missing_values'][field],original['missing_values'][field],label+'/missing_values/'+field,
+            'day_grid_and_raw_hour_cache',field)
+    check.literal(actual['missing_values']['LiquidPrecip'],original['missing_values']['LiquidPrecip'],label+'/missing_liquid')
+    selected_weather(check,actual['last_hour'],original['last_hour'],DAY_FIELDS,label+'/last_hour')
+    selected_weather(check,actual['next_hour'],original['next_hour'],['LiquidPrecip'],label+'/next_hour')
+    check.discrete(actual['missed_counts']['WeathCodes'],original['missed_counts']['WeathCodes'],label+'/actual_raw_counter')
+    for key in HEADER_KEYS:
+        check.exact_value(actual['header'][key],original['header'][key],label+'/header/'+key)
+    for key in STREAM_KEYS:
+        check.discrete(actual['stream'][key],original['stream'][key],label+'/stream/'+key,required=key != 'position_byte')
+    require(type(original['stream']['file_path']) is str, 'Actual native stream path text must remain typed and retained')
+    check.unavailable_paths.append({'location':label+'/stream/file_path',
+        'reason':'actual production byte-stream observer has no file_path member; actual CLI file identity is authenticated separately',
+        'actual_available':False,'original_available':True,'counted_as_PASS':False})
+    check.discrete(actual['selected_environment_context'],source_environment(original),label+'/selected_environment_context')
+    for key in ['Interpolation_allocated','Interpolation']:
+        check.exact_value(actual[key],original[key],label+'/'+key)
+    for group in ['weights','clock','selected_weather_control']:
+        check.exact_value(actual['clk04_observation'][group],original['clk04_observation'][group],label+'/clk04_observation/'+group)
+    left,right = [row['clk04_observation']['selected_today_slot'] for row in [actual,original]]
+    if check.availability(left,right,label+'/selected_today_slot',False):
+        check.discrete([left['hour'],left['time_step']],[right['hour'],right['time_step']],label+'/selected_today_slot/identity')
+        selected_weather(check,left['value'],right['value'],DAY_FIELDS,label+'/selected_today_slot/value')
+    if current:
+        for key in CURRENT_FIELDS:
+            left,right = [row['clk04_observation']['current_non_solar_weather'][key] for row in [actual,original]]
+            if key == 'IsRain':
+                check.discrete(left,right,label+'/current/'+key)
+            else:
+                check.numeric(left,right,label+'/current/'+key,'current_non_solar_weather',key)
+
+
+def retained(check, before, after, keys, label):
+    for key in keys:
+        check.exact_value(after[key],before[key],label+'/'+key)
+
+
+def byte_map(declared, weather_bytes):
+    require(declared['header_line_count'] == 8 and declared['input_byte_length'] == len(weather_bytes), 'Actual external EPW byte map differs')
+    lookup = {}
+    for index,row in enumerate(declared['record_line_map']):
+        require(type(row['source_record_index']) is int and row['source_record_index'] == index
+            and type(row['start_byte']) is int and type(row['end_byte']) is int
+            and 0 <= row['start_byte'] < row['end_byte'] <= len(weather_bytes), 'Typed external source byte range required')
+        pair = (row['start_byte'],row['end_byte'])
+        require(pair not in lookup and hashlib.sha256(weather_bytes[pair[0]:pair[1]]).hexdigest() == row['input_row_sha256'],
+            'Frozen full-source-row hash differs')
+        lookup[pair] = row['source_record_index']
+    return lookup
+
+
+def observe(check, trace, case, native, request, mapped, weather_bytes, caller_lines):
+    label = case['case_id'];hours = 72 if case['duration'] == '72H' else 24;steps = 4;days = hours//24
+    require(label in CASE_IDS and native['id'] == request['id'] == label and request['lane'] == 'production-CON', 'Declared three-CON native lane identity required')
+    require(trace['schema'] == 'clk03-weather-day-production-trace.v1'
+        and trace['capture_source'] == 'actual-live-Rust-weather-cursor-daily-owner-and-owned-thermal-operands'
+        and trace['observer_supplies_inputs'] is False and trace['observer_recomputes_weather'] is False
+        and trace['eager_preview_values_supply_production_weather'] is False
+        and trace['added_fields_supply_inputs_or_recompute_weather'] is False
+        and trace['consumer_repeated_identities_deduplicated'] is False
+        and trace['physical_producer_numerical_parity_claimed'] is False
+        and trace['thread_coverage'] == 'collecting-thread-only' and trace['complete_on_collecting_thread'] is True
+        and trace['truncation_reason'] is None and trace['observation_limit_per_series'] == 10000, 'Complete passive actual production trace required')
+    ops = trace['operations_completion_order'];consumers = trace['consumers']
+    require(type(ops) is list and type(consumers) is list
+        and trace['total_operation_count'] == trace['retained_operation_count'] == len(ops)
+        and trace['total_consumer_count'] == trace['retained_consumer_count'] == len(consumers), 'Actual retained observation counts differ')
+    require(len(native['operations']) == len(request['operations']) == hours*steps*2+1, 'Complete actual production native source history required')
+    matched = 0;reads = [];currents = {};begin_days = Counter();initial_read = None;last_kind = None
+    for index,row in enumerate(ops):
+        loc = label+'/operations/'+str(index)
+        require(type(row['sequence']) is int and row['sequence'] == index+1 and row['kind'] in ['GetNextEnvironment','ReadEPlusWeatherForDay','InitializeWeather','SetCurrentWeather']
+            and exact(row['outcome'],{'returned':True,'source_fatal':False,'error':None}), 'Actual ordered returned source call required')
+        before,after = row['before'],row['after']
+        for snapshot in [before,after]:
+            owner_shape(dto(snapshot,True),loc,True)
+        if row['kind'] == 'ReadEPlusWeatherForDay':
+            reads.append(row)
+            if initial_read is None:initial_read = after
+            continue
+        require(matched < len(request['operations']), 'Actual production added an undeclared source call')
+        supplied = request['operations'][matched];original = native['operations'][matched];matched += 1
+        require(row['kind'] == supplied['kind'] == original['kind'] and original['id'] == supplied['id']
+            and exact(original['requested_operation'],supplied) and original['actual_source_invoked'] is True
+            and original['call_outcome']['status'] == 'source_returned' and original['call_outcome']['source_fatal'] is False,
+            'Preserved native source operation/caller/availability differs')
+        for key,value in supplied['caller'].items():
+            check.exact_value(before['global'][key],value,loc+'/literal_caller/'+key)
+        full = original['full_grid_observation_declared']
+        require(type(full) is bool, 'Actual frozen native mask required')
+        compare_snapshot(check,before,original['before'],loc+'/before',full,False)
+        compare_snapshot(check,after,original['after'],loc+'/after',full,row['kind'] == 'SetCurrentWeather')
+        check.discrete(after['available'],original['Available'],loc+'/Available')
+        check.discrete(after['errors_found'],original['ErrorsFound'],loc+'/ErrorsFound')
+        check.discrete(after['print_environment_stamp'],original['print_environment_stamp_after'],loc+'/stamp')
+        if row['kind'] == 'InitializeWeather':
+            require(before['global']['WarmupFlag'] is False, 'Fixed CON has no added warmup phase')
+            if before['global']['BeginDayFlag']:
+                day = before['global']['DayOfSim'];begin_days[day] += 1
+                incoming = initial_read if before['global']['BeginEnvrnFlag'] else before
+                require(incoming is not None, 'Actual first read must precede initial Today handoff')
+                transport(check,dto(incoming,True),dto(after,True),label+'/day-'+str(day))
+            else:
+                retained(check,before,after,['today_variables','tomorrow_variables','today_values','tomorrow_values'],loc+'/actual_no_handoff')
+        elif row['kind'] == 'SetCurrentWeather':
+            require(last_kind == 'InitializeWeather', 'Actual Initialize must complete before each Current source call')
+            retained(check,before,after,['today_variables','tomorrow_variables','today_values','tomorrow_values',
+                'missing_values','missed_counts','out_of_range_counts','last_hour','next_hour'],loc+'/actual_Current_retention')
+            key = (after['global']['DayOfSim'],after['global']['HourOfDay'],after['global']['TimeStep'])
+            require(key not in currents, 'No Current counter/value replay or duplicate native step')
+            currents[key] = {'after':after,'operation_sequence':row['sequence']}
+        last_kind = row['kind']
+    require(matched == len(native['operations']) and len(currents) == hours*steps and len(reads) == days,
+        'All actual Current steps/day reads/source invocations must be retained')
+    check.discrete(dict(begin_days),{day:1 for day in range(1,days+1)},label+'/one_actual_day_transport')
+    lookup = byte_map(mapped,weather_bytes);identities = [];source_indices = set()
+    for index,row in enumerate(consumers):
+        loc = label+'/consumer/'+str(index);record = row['record_index'];step = row['timestep']
+        require(type(record) is int and 0 <= record < hours and type(step) is int and 1 <= step <= steps
+            and type(row['sequence']) is int and row['sequence'] == index+1
+            and row['phase'] == 'Run { day: '+str(record//24+1)+' }', 'Actual ordered civil consumer identity required')
+        identities.append((record,step));key = (record//24+1,record%24+1,step);entry = currents[key];owner = entry['after']
+        completed = row['completed_operation_count']
+        require(type(completed) is int and 1 <= completed <= len(ops), 'Actual typed completed operation prefix required')
+        check.discrete(completed,entry['operation_sequence'],loc+'/actual_Current_then_consumer_prefix')
+        require(ops[completed-1]['kind'] == 'SetCurrentWeather', 'No intervening weather operation may precede this receipt')
+        if index:
+            require(consumers[index-1]['completed_operation_count'] <= completed, 'Actual consumer operation prefix must be monotonic')
+        call = row['caller'];require(set(call) == {'file','line','column'}
+            and call['file'].replace('\\','/') == 'crates/ep_runtime/src/heat_balance/weather_driver.rs'
+            and type(call['line']) is int and type(call['column']) is int and 1 <= call['line'] <= len(caller_lines)
+            and 1 <= call['column'] <= len(caller_lines[call['line']-1])+1
+            and 'series.current_for(' in caller_lines[call['line']-1], 'Actual consumer attribution must bind archived live owner caller')
+        check.exact_value(row['caller_state'],owner['global'],loc+'/actual_current_clock')
+        check.exact_value(row['received_current_weather'],owner['clk04_observation']['current_non_solar_weather'],loc+'/actual_current13_receipt')
+        slot = owner['today_values']['slots'][(record%24)*steps+step-1]
+        check.exact_value(row['received_Today_slot'],slot,loc+'/actual_full17_Today_receipt')
+        sample = row['received_sample'];require(sample['record_index'] == record and sample['zone_timestep'] == step, 'Owned sample clock differs')
+        for original,field in SAMPLE_FIELDS.items():
+            check.literal(sample[field],row['received_current_weather'][original],loc+'/current_to_sample/'+field)
+        check.literal(sample['liquid_precipitation_depth_mm'],slot['LiquidPrecip'],loc+'/Today_liquid_mm_receipt')
+        for field,value in sample.items():
+            if field not in ['record_index','zone_timestep']:scalar(value,loc+'/sample/'+field)
+        projected = row['received_hourly_record'];raw = row['received_raw']
+        for original,field in RAW_DATES.items():
+            check.discrete(projected['source_date_fields'][field],raw['date_fields'][original],loc+'/raw_date/'+field)
+        for original,field in RAW_COPIES.items():
+            check.literal(projected['legacy_fields'][field],raw['mandatory_reals'][original],loc+'/raw_literal/'+field)
+        provenance = row['actual_input_byte_range'];pair = (provenance['start_byte'],provenance['end_byte'])
+        require(pair in lookup and type(provenance['line_read_attempt']) is int and provenance['line_read_attempt'] > 0,
+            'Received raw owner must retain actual supplied EPW source byte range')
+        source_indices.add(lookup[pair]);scalar(row['local_hour'],loc+'/local_hour')
+        for key,value in row['shadowing_metadata'].items():scalar(value,loc+'/shadow/'+key)
+    expected = [(hour,step) for hour in range(hours) for step in range(1,steps+1)]
+    require(len(identities) in [len(expected),len(expected)+1], 'Only genuine single initial seed receipt may repeat')
+    if len(identities) == len(expected)+1:
+        expected = [(0,1)]+expected
+    check.discrete(identities,expected,label+'/actual_consumer_order_and_initial_reuse')
+    check.discrete(len(source_indices),hours,label+'/actual_source_hour_coverage')
+    check.discrete(consumers[-1]['caller_state']['EndEnvrnFlag'],True,label+'/final_consumer_after_terminal_Initialize')
+    return {'case_id':label,'actual_source_calls_paired':matched,'actual_Current_steps':len(currents),
+        'actual_day_reads':len(reads),'actual_consumer_receipts':len(consumers),
+        'actual_initial_seed_duplicate':len(consumers) == hours*steps+1,
+        'actual_external_source_ordinals':sorted(source_indices),
+        'actual_Current13_and_full_Today_received':True,'native_internal_source_index_invented':False,
+        'actual_completed_operation_prefix_at_consumer_receipt_available':True,
+        'independent_wallclock_event_timestamp_available':False,'wallclock_timestamp_counted_as_PASS':False,
+        'native_thermal_callback_numerical_parity_claimed':False}

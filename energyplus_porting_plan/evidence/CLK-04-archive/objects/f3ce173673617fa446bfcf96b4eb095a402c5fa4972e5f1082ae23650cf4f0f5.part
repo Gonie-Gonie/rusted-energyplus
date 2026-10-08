@@ -1,0 +1,228 @@
+{
+  "schema": "clk04-tolerances-contract.v1",
+  "card": "CLK-04",
+  "created_utc": "2026-10-08T10:33:25.119821+00:00",
+  "frozen_before_numerical_execution": true,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "rows": [
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "OutDryBulbTemp",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "OutDewPointTemp",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "OutBaroPress",
+      "unit": "Pa",
+      "atol": 1e-07,
+      "rtol": 0.0
+    },
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "OutRelHum",
+      "unit": "percent",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "WindSpeed",
+      "unit": "m/s",
+      "atol": 1e-12,
+      "rtol": 0.0
+    },
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "WindDir",
+      "unit": "degree",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "day_grid_and_raw_hour_cache",
+      "field": "LiquidPrecip",
+      "unit": "mm/zone-timestep",
+      "atol": 1e-12,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutDryBulbTemp",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutDewPointTemp",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13,
+      "accepted_PSY_tolerance": {
+        "contract": {
+          "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+          "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+        },
+        "function": "PsyTsatFnPb"
+      }
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutBaroPress",
+      "unit": "Pa",
+      "atol": 1e-07,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutRelHum",
+      "unit": "percent",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutRelHumValue",
+      "unit": "fraction",
+      "atol": 1e-12,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutHumRat",
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13,
+      "accepted_PSY_tolerance": {
+        "contract": {
+          "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+          "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+        },
+        "function": "PsyWFnTdbRhPb"
+      }
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutWetBulbTemp",
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13,
+      "accepted_PSY_tolerance": {
+        "contract": {
+          "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+          "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+        },
+        "function": "PsyTwbFnTdbWPb"
+      }
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "WindSpeed",
+      "unit": "m/s",
+      "atol": 1e-12,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "WindDir",
+      "unit": "degree",
+      "atol": 1e-10,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "LiquidPrecipitation",
+      "unit": "m/zone-timestep",
+      "atol": 1e-15,
+      "rtol": 0.0
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutEnthalpy",
+      "unit": "J/kg",
+      "atol": 1e-07,
+      "rtol": 1e-13,
+      "accepted_PSY_tolerance": {
+        "contract": {
+          "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+          "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+        },
+        "function": "PsyHFnTdbW"
+      }
+    },
+    {
+      "profile": "current_non_solar_weather",
+      "field": "OutAirDensity",
+      "unit": "kg/m3",
+      "atol": 1e-12,
+      "rtol": 1e-13,
+      "accepted_PSY_tolerance": {
+        "contract": {
+          "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+          "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+        },
+        "function": "PsyRhoAirFnPbTdbW"
+      }
+    }
+  ],
+  "pure_wind_return": {
+    "unit": "degree",
+    "atol": 1e-10,
+    "rtol": 0.0
+  },
+  "exact_value_fields": [
+    "IsRain",
+    "IsRainThreshold",
+    "TimeStepFraction",
+    "Interpolation",
+    "WeightNow",
+    "WeightPreviousHour",
+    "CurrentTime",
+    "TimeStepZone",
+    "TimeStepZoneSec",
+    "MinutesInTimeStep",
+    "SimTimeSteps",
+    "NextHour",
+    "RptIsRain"
+  ],
+  "exact_metadata": [
+    "input identity/bits/order",
+    "available call outcome/fatal/return type",
+    "flags/enums/dates/integers",
+    "header/cursor semantic position and availability",
+    "allocation/shape/order",
+    "missing/range counts",
+    "within-owner whole copy bits"
+  ],
+  "classification": "exact IEEE class; exact zero sign when both compared outputs are zero",
+  "criterion": "Every available numeric field abs(actual-original)<=atol+rtol*abs(original), selected per profile/field",
+  "field_error_metrics": [
+    "maximum_absolute_error",
+    "RMSE",
+    "comparison_count",
+    "mismatch_count"
+  ],
+  "unavailable_counted_as_PASS": false,
+  "post_output_relaxation_allowed": false,
+  "reused_PSY_contracts": {
+    "PSY-01": {
+      "path": "energyplus_porting_plan/contracts/PSY-01-tolerances.json",
+      "sha256": "e3eab2d932e0b32f31076bfc23fcd0a8fb4b9245df741b364aee1cb019163083"
+    },
+    "PSY-02": {
+      "path": "energyplus_porting_plan/contracts/PSY-02-tolerances.json",
+      "sha256": "7ad9aa21c17dbab9fa8d186b25333b5e55ac47f352be3da3f3d1766807a94af4"
+    }
+  },
+  "no_generic_textual_PSY_or_unit_tolerance_fallback": true
+}

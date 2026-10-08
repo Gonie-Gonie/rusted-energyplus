@@ -1,0 +1,340 @@
+{
+  "schema": "clk04-independent-original-data-review.v1",
+  "status": "pass-preserved-original-data-before-Rust-baseline",
+  "review_started_utc": "2026-10-08T11:38:44.754306+00:00",
+  "review_completed_utc": "2026-10-08T11:39:13.046587+00:00",
+  "reviewed_original_reference": {
+    "path": ".runtime/porting/CLK-04/original-first-02/helper-reference.json",
+    "sha256": "c146f3e6568e3e6f3337bc83f8224f7dc2d072d85e0df26e7f5b1697bbef27e0"
+  },
+  "reviewed_failed_original_execution": {
+    "path": ".runtime/porting/CLK-04/original-first-command-02/receipt.json",
+    "sha256": "b28ddaa77873187959beb732915200d332dd75ff368e51eaadc0b85d0d93ec9e"
+  },
+  "reviewed_reference": {
+    "path": ".runtime/porting/CLK-04/original-recovery-01/recovery.json",
+    "sha256": "9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6"
+  },
+  "reviewed_results": {
+    "path": ".runtime/porting/CLK-04/original-first-02/native-output/clk04-helper-results.json",
+    "sha256": "d84b696a34c720004ede289e47719bcc3d066ee48652f4a7d1a9431a1b825dba"
+  },
+  "reviewed_execution": {
+    "path": ".runtime/porting/CLK-04/original-recovery-command-01/receipt.json",
+    "sha256": "31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130"
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CLK-04/original-first-02/helper-command.json",
+    "sha256": "50493a818d2c2c79f08dc6deffa0cc78a327434e3a5013452588b0f71a347a93"
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+    "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+    "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+    "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+      "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+      "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+      "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+    "sha256": "1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc"
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CLK-04/independent-native-build-review-01/review.json",
+    "sha256": "95b786ddce451f154054585e67e00106785246fd691c28ceca8d9c987e4b1400"
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-native-build-review-command-01/receipt.json",
+    "sha256": "803ff81f35a9210fd71ed7c1a83da7b69bc038cdf1c368087aa3ebc64ebc6fc5"
+  },
+  "reviewed_recovery_source_review": {
+    "path": ".runtime/porting/CLK-04/independent-original-recovery-static-review-02/review.json",
+    "sha256": "e42eb4697ba2a9113e697157692f8a3a9d50973d9f171b6d919279dc2ef8a082"
+  },
+  "actual_historical_native_exit_code": 0,
+  "actual_historical_wrapper_exit_code": 1,
+  "actual_metadata_recovery_exit_code": 0,
+  "historical_failed_wrapper_relabelled_zero": false,
+  "native_engine_reexecuted": false,
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/CLK-04/independent-frozen-contract-review-02/review.json",
+    "sha256": "f889996140e38004fa9556fba843840e99d41f1c63d84bca0cdc53e7cb227d5f"
+  },
+  "actual_operation_invocations": 3239,
+  "actual_operations_skipped": 0,
+  "actual_source_function_counts": {
+    "SetupInterpolationValues": 2,
+    "interpolateWindDirection": 56,
+    "GetNextEnvironment": 13,
+    "InitializeWeather": 1584,
+    "SetCurrentWeather": 1584
+  },
+  "actual_source_status_counts": {
+    "source_returned": 3239
+  },
+  "intended_native_branch_coverage_complete": true,
+  "intended_native_branch_coverage": [
+    {
+      "sequence_id": "RAMP-1-HOUR24",
+      "requested_operation_count": 49,
+      "actual_invocations": 49,
+      "actual_skips": 0,
+      "actual_source_returned": 49,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 8,
+      "selected_current_invoked": 8,
+      "selected_current_returned": 8,
+      "actual_today_slot_available": 8,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-4-HOUR24",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 32,
+      "selected_current_invoked": 32,
+      "selected_current_returned": 32,
+      "actual_today_slot_available": 32,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-4-HOUR1",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 32,
+      "selected_current_invoked": 32,
+      "selected_current_returned": 32,
+      "actual_today_slot_available": 32,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "MISSING-HISTORY-4",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 32,
+      "selected_current_invoked": 32,
+      "selected_current_returned": 32,
+      "actual_today_slot_available": 32,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RANGE-BOUNDARIES-4",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 32,
+      "selected_current_invoked": 32,
+      "selected_current_returned": 32,
+      "actual_today_slot_available": 32,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAIN-CODE-1",
+      "requested_operation_count": 49,
+      "actual_invocations": 49,
+      "actual_skips": 0,
+      "actual_source_returned": 49,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 8,
+      "selected_current_invoked": 8,
+      "selected_current_returned": 8,
+      "actual_today_slot_available": 8,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAIN-DEPTH-4",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 32,
+      "selected_current_invoked": 32,
+      "selected_current_returned": 32,
+      "actual_today_slot_available": 32,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "PSY-CORRECTION-4",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 32,
+      "selected_current_invoked": 32,
+      "selected_current_returned": 32,
+      "actual_today_slot_available": 32,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CACHE-4",
+      "requested_operation_count": 385,
+      "actual_invocations": 385,
+      "actual_skips": 0,
+      "actual_source_returned": 385,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 64,
+      "selected_current_invoked": 64,
+      "selected_current_returned": 64,
+      "actual_today_slot_available": 64,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "WARMUP-REPLAY-4",
+      "requested_operation_count": 577,
+      "actual_invocations": 577,
+      "actual_skips": 0,
+      "actual_source_returned": 577,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 96,
+      "selected_current_invoked": 96,
+      "selected_current_returned": 96,
+      "actual_today_slot_available": 96,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "A-24H",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 96,
+      "selected_current_invoked": 96,
+      "selected_current_returned": 96,
+      "actual_today_slot_available": 96,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "A-72H",
+      "requested_operation_count": 577,
+      "actual_invocations": 577,
+      "actual_skips": 0,
+      "actual_source_returned": 577,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 288,
+      "selected_current_invoked": 288,
+      "selected_current_returned": 288,
+      "actual_today_slot_available": 288,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "requested_operation_count": 193,
+      "actual_invocations": 193,
+      "actual_skips": 0,
+      "actual_source_returned": 193,
+      "actual_source_fatal": 0,
+      "preparation_completed": true,
+      "selected_current_requested": 96,
+      "selected_current_invoked": 96,
+      "selected_current_returned": 96,
+      "actual_today_slot_available": 96,
+      "intended_branch_covered": true
+    }
+  ],
+  "actual_typed_storage_shapes": {
+    "daily11": 19640,
+    "weather17": 62945,
+    "full_unallocated_grids": 346,
+    "current13": 9586,
+    "snapshots": 9820,
+    "full_allocated_grids": 394,
+    "unavailable_full_grid_contents": 18900
+  },
+  "actual_binary64_classes": {
+    "positive_zero": 1017177,
+    "finite": 1283294
+  },
+  "requested_counts": {
+    "setup_cases": 2,
+    "wind_cases": 56,
+    "weather_sequences": 13,
+    "GetNextEnvironment": 13,
+    "InitializeWeather": 1584,
+    "SetCurrentWeather": 1584,
+    "weather_operations": 3181,
+    "total_operations": 3239
+  },
+  "source_unavailable_counted_as_PASS": false,
+  "scientific_values_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "engine_compiler_Cargo_Git_executed": false,
+  "gates_updated": false,
+  "whole_grid_generation_parity_claimed": false,
+  "whole_original_inventory_rehashed_by_reader": false,
+  "recorded_whole_original_preservation_before_after_verified": true,
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-04/original-data-review-prep-05/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review_data.py",
+        "sha256": "16f4fb1f3c1f8b934a050e33893c6aff108c62ae6e341378d58dfaff639cbfbb"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/original-data-review-prep-05/shape.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-original-data-review-01/shape.py",
+        "sha256": "0ac9b81af3a214550e49565213ca94594b648fde9cceacaec98e9707ab463e5f"
+      }
+    }
+  ],
+  "checked_binding_count": 323,
+  "authorship_disclosure": "Header authored this metadata reader and CLK04 native build wrapper, and earlier header/consumer integration. Baseline independently source-reviews and executes this metadata reader, while also being the CLK04 native helper/input and CLK03 carrier/compatibility producer author. Root independently reviewed builder. Independence covers metadata integrity review/execution; whole physics certification is not claimed.",
+  "scope_limits": [
+    "solar interpolation/radiation/coefficients",
+    "sky/IR/sky-temperature generation",
+    "cloud/snow/albedo/WaterPrecip generation",
+    "ground/water/daylight calculations",
+    "native private source record index",
+    "std-ios private bit flags",
+    "whole first simulation registration",
+    "error-message wording",
+    "unselected grid contents not recorded by declared compact observation"
+  ]
+}

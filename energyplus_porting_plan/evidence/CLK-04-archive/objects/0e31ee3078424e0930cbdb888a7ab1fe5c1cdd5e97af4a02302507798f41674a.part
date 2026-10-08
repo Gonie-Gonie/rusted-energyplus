@@ -1,0 +1,198 @@
+"""Recompare preserved production observations with declared nullable metadata."""
+from pathlib import Path
+from types import SimpleNamespace
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import json
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+PRIOR = ROOT/'.runtime/porting/CLK-04/production-workflow-prep-07'
+UNIT = ROOT/'.runtime/porting/CLK-04/candidate-comparer-prep-05'
+FAILED_REPORT = {'path':'.runtime/porting/CLK-04/production-comparison-01/production-comparison.json',
+    'sha256':'703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f'}
+FAILED_EXECUTION = {'path':'.runtime/porting/CLK-04/production-comparison-command-01/receipt.json',
+    'sha256':'bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67'}
+PIPELINE_SHA = '77a0ba88568c69999cfbbb6fa93f4ce866818ed10a8436347d3cb638d5733b71'
+
+
+def reader_sources():
+    return [Path(__file__).resolve(),*[PRIOR/name for name in ['common.py','provenance.py','state.py','prepare_plan.py','run_production.py']],
+        *[UNIT/name for name in ['check_clk04_unit.py','numeric.py','snapshots.py','history.py','metadata.py','profile.py','proofs.py','freeze_projection.py']],
+        ROOT/'tools/porting/geo03_provenance.py']
+
+
+def authenticate_review(path):
+    """Authenticate all supplemental source bytes before importing old authority."""
+    def require(value,message):
+        if not value:raise ValueError(message)
+    def actual(binding):
+        require(type(binding) is dict and type(binding.get('path')) is str and type(binding.get('sha256')) is str,
+            'Actual supplemental binding required')
+        candidate = (ROOT/binding['path']).resolve(strict=True)
+        require(candidate.is_relative_to(ROOT) and candidate != ROOT and candidate.is_file()
+            and hashlib.sha256(candidate.read_bytes()).hexdigest() == binding['sha256'], 'Supplemental source binding differs')
+        return candidate
+    path = Path(path).resolve(strict=True)
+    review_ref = {'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+    def pairs(items):
+        result = {}
+        for key,value in items:
+            require(key not in result, 'Duplicate supplemental review JSON key');result[key] = value
+        return result
+    review = json.loads(actual(review_ref).read_text(encoding='utf8'),object_pairs_hook=pairs,
+        parse_constant=lambda value:(_ for _ in ()).throw(ValueError('Nonfinite supplemental review')))
+    require(review['schema'] == 'clk04-independent-production-reader-amendment-source-review.v1'
+        and review['status'] == 'pass-declared-null-metadata-fix-before-preserved-data-reread'
+        and review['scientific_execution_performed'] is False, 'Independent supplemental reader review required')
+    rows = review['reviewed_sources'];indexed = {row['historical_path']:row['archive'] for row in rows}
+    names = {source.relative_to(ROOT).as_posix() for source in reader_sources()}
+    require(type(rows) is list and len(rows) == len(indexed) == len(names) == 15 and set(indexed) == names,
+        'Exact new checker plus fourteen unchanged dependency sources required')
+    for source in reader_sources():
+        require(actual(indexed[source.relative_to(ROOT).as_posix()]).read_bytes() == source.read_bytes(), 'Reviewed supplemental source differs')
+    return review_ref,review
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['matrix','source-review','recomparison-source-review','recomparison-source-review-execution','output-dir']:
+        parser.add_argument('--'+name,type=Path,required=True)
+    args = parser.parse_args();started = datetime.now(timezone.utc).isoformat()
+    supplemental_ref,supplemental = authenticate_review(args.recomparison_source_review)
+    sys.path.insert(0,str(PRIOR))
+    from common import ROOT, TRACE_NAME, boot, now, plan_execution, plan_input, require, selected_policy
+    utility,checked,metadata,packet,policy,request_ref,request,review_ref,review,modules = boot(args.source_review,comparison=True)
+    supplemental_execution_ref = utility.ref(args.recomparison_source_review_execution)
+    _,supplemental_start,supplemental_finish = metadata.recorded(checked,supplemental_execution_ref,supplemental)
+    metadata.binding(supplemental['reviewed_prior_source_review'],review_ref,checked)
+    metadata.binding(supplemental['reviewed_failed_report'],FAILED_REPORT,checked)
+    metadata.binding(supplemental['reviewed_failed_comparison_execution'],FAILED_EXECUTION,checked)
+    failed = utility.read(checked.check(FAILED_REPORT))
+    _,_,failed_finish = metadata.recorded(checked,FAILED_EXECUTION,failed,code=1)
+    require(failed['schema'] == 'clk04-production-comparison.v1' and failed['scientific_certification_passed'] is False
+        and failed['comparison']['comparison_count'] == 3736442 and failed['comparison']['mismatch_count'] == 6,
+        'Preserved actual comparison failure differs')
+    require(failed_finish <= supplemental_start <= utility.timestamp(supplemental['review_started_utc'])
+        <= utility.timestamp(supplemental['review_completed_utc']) <= supplemental_finish <= utility.timestamp(started),
+        'Supplemental source review must follow preserved failure and precede reread')
+    for row in supplemental['reviewed_sources']:checked.check(row['archive'])
+    for source in reader_sources():checked.check(utility.ref(source))
+    matrix_ref = utility.ref(args.matrix);matrix = utility.read(checked.check(matrix_ref))
+    require(matrix['schema'] == 'clk04-production-matrix.v1' and matrix['complete'] is True and matrix['actual_command_count'] == 6
+        and matrix['original_outputs_supplied_to_Rust'] is False and matrix['native_engine_executed'] is False
+        and matrix['gates_updated'] is False, 'Complete six actual ordinary CLI commands required')
+    metadata.binding(failed['Rust_matrix'],matrix_ref,checked)
+    metadata.binding(matrix['independent_sources_review'],review_ref,checked)
+    _,review_start,review_finish = metadata.recorded(checked,matrix['independent_sources_review_execution'],review)
+    require(review_start <= utility.timestamp(review['review_started_utc']) <= utility.timestamp(review['review_completed_utc']) <= review_finish,
+        'Actual production source review interval differs')
+    plan_ref = matrix['declared_plan'];declared = plan_input(plan_ref,policy,request,request_ref,checked,utility,metadata)
+    metadata.binding(declared['independent_sources_review'],review_ref,checked)
+    metadata.binding(declared['independent_sources_review_execution'],matrix['independent_sources_review_execution'],checked)
+    require(utility.exact(matrix['contracts'],declared['contracts']), 'Matrix frozen contract identity differs')
+    require(checked.check(matrix['executed_launcher']).read_bytes() == (PRIOR/'run_production.py').read_bytes(),
+        'Actual archived production launcher source differs')
+    _,plan_start,plan_finish = plan_execution(plan_ref,declared,matrix['declared_plan_execution'],review,utility,metadata,checked)
+    require(review_finish <= plan_start <= utility.timestamp(declared['created_utc']) <= plan_finish, 'Source review must precede actual production plan freeze')
+    evidence_args = SimpleNamespace(**{key:checked.check(matrix[key]) for key in ['build','unit_comparison','unit_comparison_execution',
+        'native_recovery_execution','original_data_review_execution']})
+    evidence = modules['provenance'].unit_and_build(evidence_args,utility,checked,metadata,packet,policy,request_ref)
+    require(utility.exact(matrix['unit_reader_interpreter_observation'],evidence['unit_reader_interpreter_observation']),
+        'Recorded unit interpreter availability observation differs')
+    architecture = modules['provenance'].architecture(evidence['available'],checked)
+    pipeline = evidence['available']['crates/ep_run/src/pipeline.rs'];pipeline_bytes = checked.check(pipeline).read_bytes()
+    require(hashlib.sha256(pipeline_bytes).hexdigest() == PIPELINE_SHA, 'Compiled run-summary nullable schema source differs')
+    metadata.binding(supplemental['reviewed_run_summary_schema'],pipeline,checked)
+    text = pipeline_bytes.decode('utf8')
+    require(all(value in text for value in ['let mut oracle_status = "not-requested".to_string();',
+        'let mut compare_status = "not-requested".to_string();','let mut oracle_summary = None;',
+        'let mut comparison_summary = None;','config.oracle_baseline || config.compare_oracle',
+        'if config.compare_oracle {','oracle_summary: Option<&OracleBaselineSummary>',
+        'comparison_summary: Option<&ComparisonSummary>','"oracle": oracle_summary,','"comparison": comparison_summary,']),
+        'Source-declared nullable no-oracle summary boundary differs')
+    amendment = {'schema':'clk04-declared-null-summary-reader-amendment.v1','preserved_failed_report':FAILED_REPORT,
+        'preserved_failed_comparison_execution':FAILED_EXECUTION,'archived_run_summary_schema':pipeline,
+        'source_line_ranges':[[1013,1016],[1445,1446],[1486,1486],[1975,1978],[2044,2045],[2615,2618]],
+        'nullable_fields':['oracle','comparison'],'required_flags':{'oracle_baseline':False,'compare_oracle':False},
+        'required_statuses':{'oracle_status':'not-requested','compare_status':'not-requested'},
+        'both_null_observation':'unavailable required=false and never counted as PASS; one-sided null or unexpected value fails',
+        'historical_plan_and_matrix_unchanged':True,'scientific_field_policy_changed':False,'unavailable_counted_as_PASS':False,
+        'prior_source_review_assumption_miss':'The earlier production source review accepted required discrete comparison of schema-declared absent oracle/comparison metadata. The six actual failures remain preserved; this supplemental reader review follows those outputs and does not predate their engines.'}
+    import numeric
+    check = numeric.Comparison(policy);seen = set();observations = []
+    native = {row['id']:row for row in evidence['native']['weather_sequences']}
+    inputs = {row['id']:row for row in request['weather_sequences']}
+    require(len(matrix['cases']) == len(declared['cases']) == 3, 'Exactly three cases required')
+    caller_lines = checked.check(evidence['available']['crates/ep_runtime/src/heat_balance/weather_driver.rs']).read_text(encoding='utf8').splitlines()
+    commands = 0
+    for actual,case in zip(matrix['cases'],declared['cases'],strict=True):
+        require(all(utility.exact(actual[key],case[key]) for key in ['case_id','scope','duration','input','weather','metadata']), 'Actual case identity differs')
+        summaries = {};outputs = {}
+        for level in ['Full','Summary']:
+            directory,summary,artifacts,_ = modules['provenance'].recorded_run(case,actual[level],level,evidence,plan_finish,utility,checked,seen)
+            commands += 1;summaries[level] = summary;outputs[level] = directory
+            if level == 'Full':
+                trace_ref = artifacts[directory/TRACE_NAME];trace = utility.read(checked.check(trace_ref))
+                mapping = utility.read(checked.check(case['external_byte_map']))
+                entries = [row for row in mapping['files'] if utility.same_binding(row['input'],case['weather'])]
+                require(len(entries) == 1, 'Exact external raw EPW byte map required')
+                observed = modules['state'].observe(check,trace,case,native[case['native_sequence_id']],inputs[case['native_sequence_id']],
+                    entries[0],checked.check(case['weather']).read_bytes(),caller_lines)
+                observed['actual_trace'] = trace_ref;observations.append(observed)
+        full,summary = summaries['Full'],summaries['Summary'];label = case['case_id']
+        check.discrete(sorted(full),sorted(summary),label+'/ordinary_summary_keyset')
+        for item in [full,summary]:
+            require(item['config']['oracle_baseline'] is False and item['config']['compare_oracle'] is False
+                and type(item['oracle_status']) is str and item['oracle_status'] == 'not-requested'
+                and type(item['compare_status']) is str and item['compare_status'] == 'not-requested', 'Declared no-oracle flags/statuses required')
+        for key in set(full)-{'artifacts','timing','input','config'}:
+            if key in {'oracle','comparison'}:
+                require(full[key] is None and summary[key] is None, 'No-oracle nullable metadata must be absent in both modes')
+                check.discrete(full[key],summary[key],label+'/ordinary_summary/'+key,required=False)
+            else:check.discrete(full[key],summary[key],label+'/ordinary_summary/'+key)
+        check.discrete({key:value for key,value in full['config'].items() if key != 'trace_level'},
+            {key:value for key,value in summary['config'].items() if key != 'trace_level'},label+'/ordinary_config')
+        for name in ['results/selected-outputs.csv','results/meters.csv']:
+            check.discrete(checked.check(utility.ref(outputs['Full']/name)).read_bytes() == checked.check(utility.ref(outputs['Summary']/name)).read_bytes(),
+                True,label+'/'+name+'/exact_bytes')
+        for name in ['results/result-store.json','porting_scope.json']:
+            check.discrete(utility.read(checked.check(utility.ref(outputs['Full']/name))),
+                utility.read(checked.check(utility.ref(outputs['Summary']/name))),label+'/'+name+'/typed_exact')
+    require(commands == 6 and sum(row['actual_Current_steps'] for row in observations) == 480, 'All six CLI runs and all480 Current source steps required')
+    checked.unchanged();output = args.output_dir.resolve()
+    require(output.is_relative_to(ROOT/'.runtime/porting/CLK-04') and not output.exists(), 'Fresh contained comparison output required')
+    output.mkdir();archives = []
+    for index,path in enumerate(reader_sources()):
+        archive = output/f'{index:02}-{path.name}';shutil.copyfile(path,archive)
+        require(path.read_bytes() == archive.read_bytes(), 'Actually executed reader dependency archive differs')
+        archives.append({'historical_path':path.relative_to(ROOT).as_posix(),'archive':utility.ref(archive)})
+    report = {'schema':'clk04-production-comparison.v1',
+        'status':'pass-selected-current-and-owned-production-handoff' if check.mismatch_count == 0 else 'fail-selected-current-or-production-handoff',
+        'scientific_certification_passed':check.mismatch_count == 0,'started_utc':started,'completed_utc':now(),
+        'actual_reader_argv':list(sys.orig_argv),'actual_reader_cwd':str(ROOT),'contracts':declared['contracts'],
+        'Rust_matrix':matrix_ref,'declared_plan':plan_ref,'declared_plan_execution':matrix['declared_plan_execution'],
+        'independent_sources_review':review_ref,'independent_sources_review_execution':matrix['independent_sources_review_execution'],
+        'recomparison_source_review':supplemental_ref,'recomparison_source_review_execution':supplemental_execution_ref,
+        'reader_source_amendment':amendment,'historical_plan_source_archives':declared['reader_source_archives'],
+        'Rust_build':evidence['build_ref'],'implementation_commit':evidence['build']['implementation_commit'],'crates_tree':evidence['build']['crates_tree'],
+        'unit_comparison':evidence['unit_ref'],'unit_comparison_execution':evidence['unit_execution_ref'],
+        'unit_reader_interpreter_observation':evidence['unit_reader_interpreter_observation'],
+        'native_recovery':evidence['recovery_ref'],'native_recovery_execution':matrix['native_recovery_execution'],
+        'Original_results':evidence['recovery']['results'],'Original_data_review':evidence['data_ref'],
+        'Original_data_review_execution':matrix['original_data_review_execution'],'actual_command_count':commands,
+        'comparison':check.report(),'observations':observations,'source_architecture':architecture,
+        'selected_policy':selected_policy(policy),'executed_reader_source_archives':archives,'checked_artifact_bindings':checked.report(),
+        'engines_Cargo_Git_executed_by_reader':False,'reference_outputs_supplied_to_Rust':False,'scientific_RHS_recomputed':False,
+        'physical_solar_sky_unselected_generation_parity_claimed':False,'native_thermal_callback_parity_claimed':False,
+        'unavailable_counted_as_PASS':False,'post_output_relaxation_allowed':False,'gates_updated':False,
+        'authorship_disclosure':'Header authored this reader, its nullable metadata correction, observer/output trace and earlier consumer glue. Separate other-author source/result reviews are required. Historical07 engine/plan authority is retained; supplemental08 source review occurs after preserved outputs. No unselected physics or native thermal callback parity is certified.'}
+    with (output/'production-comparison.json').open('x',encoding='utf8',newline='\n') as stream:
+        json.dump(report,stream,indent=2,ensure_ascii=False,allow_nan=False);stream.write('\n')
+    print(json.dumps(report,ensure_ascii=False,allow_nan=False))
+    if check.mismatch_count:raise SystemExit(1)
+
+
+if __name__ == '__main__': main()

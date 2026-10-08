@@ -1,0 +1,197 @@
+"""Every frozen operation is observed in order; the mask selects comparisons only."""
+from collections import Counter
+from numeric import exact, require, unavailable
+from profile import ALL_WEATHER_FIELDS, CURRENT_FIELDS, REQUESTED_COUNTS
+from snapshots import GRID_KEYS, snapshot, transport
+
+SKIPPED = 'not-invoked-after-prior-source-outcome'
+RUST_SKIPPED = 'not-invoked-after-prior-Rust-outcome'
+
+
+def outcome(row, native):
+    key = 'actual_source_invoked' if native else 'actual_rust_invoked'
+    invoked = row[key]
+    observed = row['call_outcome']
+    require(type(invoked) is bool and type(observed) is dict, 'Typed actual invocation/outcome required')
+    status = observed['status']
+    require(status in ['source_returned','source_fatal',SKIPPED,'rust_admission_error',RUST_SKIPPED], 'Explicit actual outcome required')
+    require(status != 'rust_admission_error' or not native, 'Native outcomes cannot claim Rust admission')
+    require(status != RUST_SKIPPED or not native, 'Native skipped-call attribution cannot become Rust wording')
+    if status == RUST_SKIPPED:
+        status = SKIPPED
+    require(invoked is (status != SKIPPED) and observed['source_fatal'] is
+        (None if status == SKIPPED else status == 'source_fatal'), 'Actual outcome availability/type differs')
+    return invoked,status
+
+
+def full_boundary(row, declared):
+    caller = declared['caller']
+    global_before = row['before_caller']['global']
+    day = caller.get('BeginDayFlag',global_before['BeginDayFlag'])
+    environment = caller.get('BeginEnvrnFlag',global_before['BeginEnvrnFlag'])
+    require(type(day) is bool and type(environment) is bool, 'Typed effective source boundary required')
+    return declared['kind'] == 'GetNextEnvironment' or (declared['kind'] == 'InitializeWeather' and (day or environment))
+
+
+def callers(check, row, declared, label):
+    before,after = row['before_caller']['global'],row['before']['global']
+    require(type(declared['caller']) is dict and set(declared['caller']) <= set(after), 'Supported literal caller writes required')
+    for key,original in before.items():
+        if key not in after:
+            continue
+        expected = declared['caller'].get(key,original)
+        if type(expected) is dict and set(expected) == {'bits'}:
+            require(type(after[key]) is dict and after[key]['value_bits'] == expected['bits'], 'Literal caller binary64 write differs')
+        else:
+            check.exact_value(after[key],expected,label+'/caller/'+key)
+
+
+def continuity(check, before, after, label):
+    """Unchanged actual state between adjacent calls; no cross-native physics claim."""
+    for key in ['global','environment','weather','today_variables','tomorrow_variables',
+        'last_hour','next_hour','missing_values','missed_counts','out_of_range_counts','header','stream',
+        'Interpolation_allocated','Interpolation','SolarInterpolation_allocated','SolarInterpolation']:
+        check.exact_value(after[key],before[key],label+'/'+key)
+    for key in ['today_values','tomorrow_values']:
+        for field in GRID_KEYS:
+            check.exact_value(after[key][field],before[key][field],label+'/'+key+'/'+field)
+        if before[key]['slots'] is None or after[key]['slots'] is None:
+            check.availability(None,None,label+'/'+key+'/full_contents',False)
+        else:
+            check.exact_value(after[key]['slots'],before[key]['slots'],label+'/'+key+'/full17_slots')
+    for key in ['current_non_solar_weather','weights','clock','selected_weather_control','selected_today_slot']:
+        # Selected slot can change on a declared caller index write. This helper
+        # is used only before the next caller write, never across that write.
+        if key == 'selected_today_slot' and after['clk04_observation'][key] is None and before['clk04_observation'][key] is None:
+            check.availability(None,None,label+'/clk04_observation/'+key,False)
+        else:
+            check.exact_value(after['clk04_observation'][key],before['clk04_observation'][key],label+'/clk04_observation/'+key)
+
+
+def operation(check, actual, original, declared, label, normalizer):
+    for row in [actual,original]:
+        require(row['id'] == declared['id'] and row['kind'] == declared['kind']
+            and exact(row['requested_operation'],declared), 'Actual typed operation identity/order differs')
+    left,right = outcome(actual,False),outcome(original,True)
+    if not left[0] or not right[0]:
+        check.availability(left if left[0] else None,right if right[0] else None,label+'/outcome',False)
+        check.unavailable_paths.append({'location':label+'/skipped_call_labels',
+            'actual_status':actual['call_outcome']['status'],'original_status':original['call_outcome']['status'],
+            'semantic_status':SKIPPED,'counted_as_PASS':False})
+    else:
+        check.discrete(left,right,label+'/outcome',category='actual_call_availability')
+    full = full_boundary(original,declared)
+    require(full_boundary(actual,declared) is full and actual['full_grid_observation_declared'] is full
+        and original['full_grid_observation_declared'] is full, 'Declared compact/full source phase differs')
+    for phase in ['before_caller','before','after']:
+        for row in [actual,original]:
+            require(row[phase]['full_grid_contents_available'] is full, 'Actual compact/full snapshot availability differs')
+        selected_current = phase == 'after' and declared['kind'] == 'SetCurrentWeather' and declared['selected_observation']
+        returned = left == right == (True,'source_returned')
+        snapshot(check,actual[phase],original[phase],label+'/'+phase,full,normalizer,
+            current=selected_current and returned)
+        if selected_current and not returned:
+            check.availability(None,None,label+'/selected_Current_source_returned_operands',True)
+    for lane,row in [('Rust',actual),('original',original)]:
+        if row[('actual_rust_invoked' if lane == 'Rust' else 'actual_source_invoked')]:
+            callers(check,row,declared,lane+'/'+label)
+        if row['call_outcome']['status'] != 'source_returned':
+            continue
+        before,after = row['before'],row['after']
+        if declared['kind'] == 'InitializeWeather':
+            if before['global']['BeginDayFlag'] and not before['global']['BeginEnvrnFlag']:
+                transport(check,before,after,lane+'/'+label)
+            elif before['global']['BeginDayFlag'] and before['global']['BeginEnvrnFlag']:
+                check.unavailable_paths.append({'location':lane+'/'+label+'/interior_handoff',
+                    'reason':'whole Initialize does not expose the post-first-read/pre-handoff operand','counted_as_PASS':False})
+            if not before['global']['BeginEnvrnFlag']:
+                check.literal(after['missing_values']['LiquidPrecip'],before['missing_values']['LiquidPrecip'],lane+'/'+label+'/liquid_missing_retention')
+                check.discrete(after['out_of_range_counts']['LiquidPrecip'],before['out_of_range_counts']['LiquidPrecip'],lane+'/'+label+'/liquid_range_retention')
+            for key in ALL_WEATHER_FIELDS:
+                if key not in ['BeamSolarRad','DifSolarRad','LiquidPrecip']:
+                    check.exact_value(after['next_hour'][key],before['next_hour'][key],lane+'/'+label+'/next_hour_unchanged/'+key)
+        elif declared['kind'] == 'SetCurrentWeather':
+            for key in ['missing_values','missed_counts','out_of_range_counts','last_hour','next_hour']:
+                check.exact_value(after[key],before[key],lane+'/'+label+'/current_unchanged/'+key)
+    for key in ['returned_bool','Available','ErrorsFound','print_environment_stamp_before','print_environment_stamp_after']:
+        if key in original:
+            require(key in actual, 'Actual selected call result required: '+key)
+            check.discrete(actual[key],original[key],label+'/'+key,required=key != 'returned_bool')
+
+
+def compare(check, original, candidate, request, normalizer):
+    require(original['schema'] == 'clk04-helper-results.v1' and candidate['schema'] == 'clk04-candidate-probe-results.v1',
+        'Actual native/candidate CLK04 observation schema differs')
+    native_requested_counts = original['requested_counts']
+    counts,statuses,rust_statuses = Counter(),Counter(),Counter()
+    selected = Counter()
+    for group,kind,key in [('setup_cases','SetupInterpolationValues','requested_operation'),('wind_cases','interpolateWindDirection','inputs')]:
+        native_rows,rust_rows,inputs = original[group],candidate[group],request[group]
+        require(type(native_rows) is list and type(rust_rows) is list and len(native_rows) == len(rust_rows) == len(inputs),
+            'Actual pure ordered case cardinality differs')
+        counts[group] = len(inputs)
+        for native,rust,declared in zip(native_rows,rust_rows,inputs,strict=True):
+            require(native['id'] == rust['id'] == declared['id'] and exact(native[key],declared) and exact(rust[key],declared),
+                'Actual pure input identity differs')
+            check.discrete(outcome(rust,False),outcome(native,True),group+'/'+declared['id']+'/outcome')
+            statuses[native['call_outcome']['status']] += 1
+            rust_statuses[rust['call_outcome']['status']] += 1
+            counts[kind] += int(native['actual_source_invoked'])
+            if group == 'wind_cases':
+                check.numeric(rust['actual_return'],native['actual_return'],group+'/'+declared['id']+'/actual_return','pure_wind_return','actual_return')
+            else:
+                for phase in ['before','after']:
+                    for field in ['Interpolation_allocated','Interpolation']:
+                        check.exact_value(rust[phase][field],native[phase][field],group+'/'+declared['id']+'/'+phase+'/'+field)
+                check.unavailable_paths.append({'location':group+'/'+declared['id']+'/wholeFactory_and_solar',
+                    'reason':'pure Rust State Setup owns only selected linear allocation/array; whole Factory and Solar math are unpaired','counted_as_PASS':False})
+    native_rows,rust_rows,inputs = original['weather_sequences'],candidate['weather_sequences'],request['weather_sequences']
+    require(type(native_rows) is list and type(rust_rows) is list and len(native_rows) == len(rust_rows) == len(inputs) == 13,
+        'Actual thirteen ordered weather sequences required')
+    counts['weather_sequences'] = 13
+    for native,rust,declared in zip(native_rows,rust_rows,inputs,strict=True):
+        require(native['id'] == rust['id'] == declared['id'] and rust['lane'] == declared['lane'],
+            'Actual weather sequence/lane identity differs')
+        for key,observed_key in [('input','input'),('weather','weather_input')]:
+            require(normalizer(native[observed_key]['path']) == normalizer(declared[key]['path'])
+                and native[observed_key]['sha256'] == declared[key]['sha256']
+                and exact(rust[observed_key],declared[key]), 'Actual weather input binding differs')
+        require(exact(rust['declared_native_preparation'],declared['native_preparation'])
+            and exact(rust['declared_run_period_input'],declared['run_period']), 'Actual declared caller preparation differs')
+        label = declared['id']
+        for phase in ['constructor','after_constant_initialization','preparation_calls']:
+            require(phase in native and phase in rust, 'Retained constructor/preparation availability required')
+            check.unavailable_paths.append({'location':label+'/'+phase,
+                'reason':'whole source Factory/constant/preparation phase is not the selected Rust owner construction','counted_as_PASS':False})
+        for phase in ['allocated_defaults','prepared','final_state']:
+            snapshot(check,rust[phase],native[phase],label+'/'+phase,True,normalizer,pair_metadata=phase != 'allocated_defaults')
+        native_ops,rust_ops,declared_ops = native['operations'],rust['operations'],declared['operations']
+        require(type(native_ops) is list and type(rust_ops) is list and len(native_ops) == len(rust_ops) == len(declared_ops),
+            'Every actual declared source call must remain in order')
+        previous = {}
+        stopped = {'Rust':False,'original':False}
+        for actual,original,supplied in zip(rust_ops,native_ops,declared_ops,strict=True):
+            for lane,row in [('Rust',actual),('original',original)]:
+                invoked,status = outcome(row,lane == 'original')
+                require(not stopped[lane] or not invoked, 'Dependent source calls must stop after actual fatal/unavailable outcome')
+                if lane in previous:
+                    continuity(check,previous[lane],row['before_caller'],lane+'/'+label+'/'+supplied['id']+'/continuous_owner')
+                previous[lane] = row['after']
+                stopped[lane] |= status in ['source_fatal','rust_admission_error'] or (supplied['kind'] == 'GetNextEnvironment' and row.get('returned_bool') is False)
+            operation(check,actual,original,supplied,label+'/'+supplied['id'],normalizer)
+            counts['weather_operations'] += 1
+            counts[supplied['kind']] += int(original['actual_source_invoked'])
+            statuses[original['call_outcome']['status']] += 1
+            rust_statuses[actual['call_outcome']['status']] += 1
+            if supplied['kind'] == 'SetCurrentWeather' and supplied['selected_observation']:
+                selected[declared['lane']] += 1
+    counts['total_operations'] = counts['weather_operations']+counts['setup_cases']+counts['wind_cases']
+    requested = {key:counts[key] for key in REQUESTED_COUNTS}
+    require(exact(requested,REQUESTED_COUNTS) and dict(selected) == {'diagnostic':368,'production-CON':480},
+        'Full3239/3181 history and predeclared848 mask required')
+    check.discrete(candidate['requested_counts'],native_requested_counts,'requested_counts')
+    require(exact(native_requested_counts,request['requested_counts']), 'Actual frozen request count differs')
+    return {'actual_requested_counts':requested,'actual_native_status_counts':dict(statuses),
+        'actual_Rust_status_counts':dict(rust_statuses),
+        'selected_current_by_lane':dict(selected),'all_history_retained':True,
+        'mask_controls_invocation':False,'native_answers_supplied_to_Rust':False}

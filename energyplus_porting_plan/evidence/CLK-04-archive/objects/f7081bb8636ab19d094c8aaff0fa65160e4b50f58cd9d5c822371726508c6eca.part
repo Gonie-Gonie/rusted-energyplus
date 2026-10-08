@@ -1,0 +1,348 @@
+"""Authenticate a completed unit report and its metadata; never redo science."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import shutil
+import sys
+
+sys.dont_write_bytecode = True
+OWN = Path(__file__).resolve().parent
+ROOT = OWN.parents[3]
+UTILITY = ROOT / 'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+BASE = '.runtime/porting/CLK-04/'
+KNOWN = {
+    'native_recovery': ('original-recovery-01/recovery.json', '9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6'),
+    'recovery_execution': ('original-recovery-command-01/receipt.json', '31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130'),
+    'Original_data_review': ('independent-original-data-review-01/review.json', '164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1'),
+    'data_execution': ('independent-original-data-review-command-01/receipt.json', '1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0'),
+    'legacy_gap': ('legacy-gap-observation-01/gap.json', '5806571825a4241c43ba2585d1faf1c5eb5043eccd0be20b763b8c47e1efec3c'),
+    'gap_execution': ('legacy-gap-command-01/receipt.json', '0078c4ad7a6feb532e8775bcaea2f038ff889fb0c8dbee22b19b6c7e2e89e3b7'),
+    'independent_source_review': ('independent-candidate-comparer-static-review-03/review.json', 'fb09f2b206ef0b7dff4b3f505896b963597c4e5d73f1c889c91d5479e71024a8'),
+    'independent_source_review_execution': ('independent-candidate-comparer-static-review-command-03/receipt.json', 'e9c3ec6cc6a7f5ad53790487615dc6cbf09dadf0e59a43b77065373eb77c0ab1'),
+    'scientific_failure_report': ('candidate-unit-comparison-02/unit-comparison.json', 'efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575'),
+    'scientific_failure_execution': ('candidate-unit-comparison-command-02/receipt.json', '15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9'),
+    'hourly_source_amendment': ('hourly-source-review-01/source-amendment.json', '07c0841e96ee4b137564f4aefeea1cbac2c664ff706c784e119ab5d0b4699aa1'),
+    'hourly_source_execution': ('hourly-source-review-command-01/receipt.json', 'daab46c9fbbc3d119831660c1f36ad9d2e25843a7b3f4850bc55f2e0c85b4482'),
+}
+MATH_COMMIT = '15127617dbc39ee82f0e631e3fe99a3a2fc1e87e'
+HOURLY_SHA = 'd5a12779499c6dbe7a6c553d98e6a38edbf93f9485c65709ef23313570bb5a57'
+COUNTS = {'setup_cases': 2, 'wind_cases': 56, 'weather_sequences': 13,
+          'GetNextEnvironment': 13, 'InitializeWeather': 1584,
+          'SetCurrentWeather': 1584, 'weather_operations': 3181,
+          'total_operations': 3239}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['report', 'execution', 'output-dir']:
+        parser.add_argument('--' + name, type=Path, required=True)
+    args = parser.parse_args()
+    if hashlib.sha256(UTILITY.read_bytes()).hexdigest() != UTILITY_SHA:
+        raise ValueError('Authenticated metadata utility changed before import')
+    spec = importlib.util.spec_from_file_location('clk04_unit_result_metadata', UTILITY)
+    if spec is None or spec.loader is None:
+        raise ValueError('Metadata-only utility unavailable')
+    v = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(v)
+    check, need = v.Bindings(), v.require
+    need(v.ROOT == ROOT and Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    out = args.output_dir.resolve()
+    need(out.is_relative_to(ROOT / '.runtime/porting/CLK-04')
+         and out != ROOT / '.runtime/porting/CLK-04' and not out.exists(), 'Fresh ignored output required')
+    started = datetime.now(timezone.utc).isoformat()
+
+    def binding(actual, expected):
+        need(v.same_binding(actual, expected), 'Actual contained path/SHA identity differs')
+        check.check(actual)
+        check.check(expected)
+
+    def recorded(reference, payload, exit_code=0):
+        row = v.read(check.check(reference))
+        need(row['schema'] == 'recorded-porting-command.v1' and type(row['exit_code']) is int
+             and row['exit_code'] == exit_code and row['launch_error'] is None
+             and row['source_bytes_match_before_and_after'] is True
+             and row['recorder_updates_gates'] is False
+             and row['recorder_supplies_reference_answers'] is False, 'Actual guarded requested metadata/comparison exit required')
+        first, last = v.execution_interval(row, check, exit_code=exit_code)
+        need(v.path_of(row['cwd']) == ROOT
+             and v.exact(v.read(check.check(row['stdout'])), payload), 'Actual full JSON stdout differs')
+        check.check(row['source_snapshot'])
+        check.check(row['executed_launcher']['archive'])
+        need(v.path_of(row['executed_launcher']['historical_path']) == ROOT / 'tools/porting/record_command.py'
+             and check.check(row['executed_launcher']['archive']).read_bytes()
+             == (ROOT / 'tools/porting/record_command.py').read_bytes(), 'Actual recorder source differs')
+        need(check.check(row['stderr']).stat().st_size == 0, 'Actual recorded metadata/comparison stderr must be empty')
+        return row, first, last
+
+    refs = {key: {'path': BASE + path, 'sha256': digest} for key, (path, digest) in KNOWN.items()}
+    values = {key: v.read(check.check(reference)) for key, reference in refs.items()}
+    report_ref, execution_ref = v.ref(args.report), v.ref(args.execution)
+    report = v.read(check.check(report_ref))
+    need(report['schema'] == 'clk04-unit-comparison.v1'
+         and report['status'] == 'pass-selected-day-current-state-and-source-order'
+         and report['scientific_certification_passed'] is True, 'A genuinely completed successful selected-unit report is required')
+    record, comparison_start, comparison_finish = recorded(execution_ref, report)
+    need(comparison_start <= v.timestamp(report['started_utc'])
+         <= v.timestamp(report['completed_utc']) <= comparison_finish, 'Actual scientific report interval differs')
+    for key in ['engines_Cargo_Git_executed_by_reader', 'native_results_supplied_to_Rust',
+                'scientific_RHS_recomputed', 'gates_updated', 'unavailable_counted_as_PASS',
+                'post_output_relaxation_allowed']:
+        need(report[key] is False, 'Reported scope differs: ' + key)
+    for key in ['native_recovery', 'Original_data_review', 'legacy_gap',
+                'independent_source_review', 'independent_source_review_execution']:
+        binding(report[key], refs[key])
+
+    review = values['independent_source_review']
+    need(review['scientific_execution_performed'] is False, 'Accepted source review must remain metadata-only')
+    need(review['historical_SourceQA01_actual_metadata_exit_code'] == 0
+         and review['historical_SourceQA01_missed_operation_shadowing_defect'] is True
+         and review['historical_comparer_exit_code'] == 1
+         and review['historical_comparer_final_report_available'] is False
+         and review['historical_metadata_failure_counted_as_numerical_PASS'] is False
+         and review['new_source_review_claimed_before_historical_candidate01'] is False,
+         'Earlier metadata success/missed shadowing/failure1 chronology must remain honest')
+    prior_failure_ref = review['preserved_failed_comparer_execution']
+    prior_failure = v.read(check.check(prior_failure_ref))
+    v.execution_interval(prior_failure, check, exit_code=1)
+    need(prior_failure['source_bytes_match_before_and_after'] is True
+         and check.check(prior_failure['stdout']).stat().st_size == 0,
+         'Historical failed comparer cannot acquire a numerical report/PASS')
+    need(review['historical_SourceQA02_actual_metadata_exit_code'] == 0
+         and review['historical_SourceQA02_missed_nullable_continuity_defect'] is True
+         and review['historical_reported_comparison_count'] == 5517963
+         and review['historical_reported_mismatch_count'] == 3163,
+         'Earlier source review missed nullable continuity; scientific failure must remain preserved')
+    binding(review['preserved_scientific_failure_report'], refs['scientific_failure_report'])
+    binding(review['preserved_scientific_failure_execution'], refs['scientific_failure_execution'])
+    failure = values['scientific_failure_report']
+    need(failure['schema'] == 'clk04-unit-comparison.v1' and failure['status'] == 'fail-selected-day-current-state-or-source-order'
+         and failure['scientific_certification_passed'] is False
+         and failure['comparison']['comparison_count'] == 5517963
+         and failure['comparison']['mismatch_count'] == 3163,
+         'Actual historical scientific failure cannot be relabelled successful')
+    _, _, failure_finish = recorded(refs['scientific_failure_execution'], failure, exit_code=1)
+    old_review = v.read(check.check(review['preserved_SourceQA02']))
+    recorded(review['preserved_SourceQA02_execution'], old_review)
+    _, source_start, source_finish = recorded(refs['independent_source_review_execution'], review)
+    need(failure_finish <= source_start, 'Fresh source review must follow preserved scientific failure')
+
+    hourly = values['hourly_source_amendment']
+    need(hourly['schema'] == 'clk04-selected-hourly-source-phase-amendment.v1'
+         and hourly['status'] == 'recorded-authentic-prephase-and-independent-held-hourly-review-before-next-candidate'
+         and hourly['scientific_execution_performed'] is False
+         and hourly['numerical_PASS_claimed'] is False and hourly['gates_updated'] is False
+         and hourly['native_packet_rewritten'] is False
+         and hourly['numeric_fields_or_tolerances_or_cases_changed'] is False,
+         'Independent Header hourly amendment must remain source-only without policy changes')
+    for key in ['source_prephase_is_sentinel_conversion_not_clamping', 'raw_owner_unmodified',
+                'selected_six_history_and_count_only_branches_retained',
+                'incoming_Liquid_missing_cache_and_rain_default_distinct', 'negative_360_boundary_semantics_retained']:
+        need(hourly[key] is True, 'Source-derived hourly amendment scope differs: ' + key)
+    binding(hourly['preserved_failed_unit_report'], refs['scientific_failure_report'])
+    binding(hourly['preserved_failed_unit_execution'], refs['scientific_failure_execution'])
+    need(hourly['actual_failed_comparisons'] == 5517963 and hourly['actual_failed_mismatches'] == 3163,
+         'Independent hourly source amendment must preserve the actual failed ledger')
+    _, hourly_start, hourly_finish = recorded(refs['hourly_source_execution'], hourly)
+    need(failure_finish <= hourly_start <= hourly_finish <= source_start,
+         'Failure, independent hourly source review, and fresh comparer source review chronology differs')
+    hourly_sources = v.archive_map(hourly['reviewed_sources'], check)
+    corrected_owner = BASE + 'hourly-pre-normalization-prep-01/hourly.rs'
+    need(corrected_owner in hourly_sources and hourly_sources[corrected_owner]['sha256'] == HOURLY_SHA
+         and hourly['held_corrected_hourly']['sha256'] == HOURLY_SHA,
+         'Independent hourly source review archived corrected bytes differ')
+    need(check.check(hourly['held_corrected_hourly']).read_bytes()
+         == check.check(hourly_sources[corrected_owner]).read_bytes(), 'Corrected held/archive hourly bytes differ')
+    complete = check.check(hourly['complete_source_archive']).read_bytes()
+    need(check.check(hourly['complete_original_source']).read_bytes() == complete,
+         'Pinned complete original source differs from independent amendment archive')
+    lines = complete.splitlines(keepends=True)
+    for item in hourly['source_ranges']:
+        need(item['bytes_normalized'] is False and check.check(item['archive']).read_bytes()
+             == b''.join(lines[item['start_line'] - 1:item['end_line']]), 'Source phase archive range differs')
+    for key in ['source', 'cases', 'tolerances']:
+        binding(hourly['native_six_packet'][key], report['contracts'][key])
+    binding(hourly['native_six_packet']['helper_request'], report['native_request'])
+    binding(hourly['native_six_packet']['projection'], report['native_observation_projection'])
+    binding(hourly['native_six_packet']['native_admission_contract'], review['reviewed_native_admission_contract'])
+    reviewed = v.archive_map(review['reviewed_comparer_sources'], check)
+    executed = v.archive_map(report['executed_reader_source_archives'], check)
+    need(len(reviewed) == len(executed) == 9 and set(reviewed) == set(executed)
+         and all(reviewed[key]['sha256'] == executed[key]['sha256'] for key in reviewed), 'Executed exact nine reader sources differ')
+    for owner, archive in executed.items():
+        need(v.path_of(owner).read_bytes() == check.check(archive).read_bytes(), 'Executed reader current/archive bytes differ')
+    argv = record['command']
+    index, seen = 1, set()
+    need(Path(argv[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'], 'Admitted Python interpreter required')
+    while index < len(argv) and argv[index] in ['-X', '-B']:
+        option = argv[index]
+        need(option not in seen, 'Repeated interpreter control rejected')
+        seen.add(option)
+        index += 1
+        if option == '-X':
+            need(index < len(argv) and argv[index] == 'utf8', 'Only UTF8 interpreter control admitted')
+            index += 1
+    main_owner = next(owner for owner in executed if owner.endswith('/check_clk04_unit.py'))
+    need(index < len(argv) and v.path_of(argv[index]) == v.path_of(main_owner)
+         and v.exact(report['actual_reader_argv'][1:], argv[1:])
+         and v.path_of(report['actual_reader_cwd']) == ROOT, 'Actual scientific reader argv/cwd differs')
+
+    def argument(name, expected):
+        need(argv.count(name) == 1, 'Unique recorded argument required: ' + name)
+        position = argv.index(name)
+        need(position + 1 < len(argv) and v.path_of(argv[position + 1]) == check.check(expected), 'Recorded argument differs: ' + name)
+
+    projection_ref = report['declared_pre_execution_DTO_projection']
+    projection = v.read(check.check(projection_ref))
+    need(projection['schema'] == 'clk04-candidate-dto-projection.v1'
+         and projection['status'] == 'frozen-before-candidate-execution'
+         and projection['scientific_comparer_executed'] is False
+         and projection['prospective_numerical_PASS_claimed'] is False
+         and v.exact(report['selected_policy'], projection['selected_policy']), 'Pre-output selected policy differs')
+    projected = v.archive_map(projection['reader_source_archives'], check)
+    need(v.exact(projected, reviewed), 'Pre-output source archives differ from accepted source review')
+    binding(projection['source_review'], refs['independent_source_review'])
+    binding(projection['source_review_execution'], refs['independent_source_review_execution'])
+    projection_record, projection_start, projection_finish = recorded(report['actual_DTO_projection_execution'],
+        {'projection': projection_ref, 'input_only_freeze': True, 'scientific_comparer_executed': False, 'gates_updated': False})
+    need(source_finish <= projection_start <= v.timestamp(projection['created_utc']) <= projection_finish,
+         'Actual source review/input DTO freeze chronology differs')
+    for key in ['source', 'cases', 'tolerances']:
+        binding(report['contracts'][key], projection['contracts'][key])
+    binding(report['native_request'], projection['helper_request'])
+    binding(report['native_observation_projection'], projection['native_observation_projection'])
+    native_projection = v.read(check.check(report['native_observation_projection']))
+    need(v.exact(report['unpaired_scope'], native_projection['unpaired']), 'Unowned scope was reclassified')
+
+    recovery, data, gap = [values[key] for key in ['native_recovery', 'Original_data_review', 'legacy_gap']]
+    need(recovery['actual_historical_helper_exit_code'] == 0
+         and recovery['actual_historical_launcher_exit_code'] == 1
+         and recovery['actual_recovery_exit_code'] == 0
+         and recovery['native_engine_reexecuted'] is False
+         and recovery['historical_failed_wrapper_relabelled_zero'] is False, 'Honest original/recovery outcome distinction lost')
+    binding(report['Original_results'], recovery['results'])
+    check.check(recovery['failed_original_execution'])
+    native_command = v.read(check.check(recovery['native_execution']))
+    v.execution_interval(native_command, check)
+    _, _, recovery_finish = recorded(refs['recovery_execution'], recovery)
+    need(data['intended_native_branch_coverage_complete'] is True
+         and data['actual_operation_invocations'] == 3239 and data['actual_operations_skipped'] == 0
+         and data['scientific_values_compared'] is False, 'Accepted original coverage differs')
+    _, data_start, data_finish = recorded(refs['data_execution'], data)
+    _, gap_start, gap_finish = recorded(refs['gap_execution'], gap)
+    for row in [recovery, data, gap]:
+        need(row['numerical_comparison_count'] is None and row['numerical_mismatch_count'] is None
+             and row['numerical_PASS_claimed'] is False, 'Metadata was substituted for science')
+    need(gap['unavailable_counted_as_PASS'] is False and recovery_finish <= data_start
+         and data_finish <= gap_start <= gap_finish, 'Original-first baseline chronology differs')
+
+    build, inventory, compile_record = v.verify_rust_build(report['Rust_build'], check, kind='example',
+        example='clk04_candidate_probe', committed=True,
+        required_sources=['crates/ep_runtime/examples/clk04_candidate_probe.rs',
+                          'crates/ep_runtime/src/weather_day/hourly.rs',
+                          'crates/ep_runtime/src/weather_day/current.rs'])
+    need(build['implementation_commit'] == MATH_COMMIT
+         and 'crates/ep_runtime/src/weather_day/hourly.rs' in inventory
+         and inventory['crates/ep_runtime/src/weather_day/hourly.rs']['sha256'] == HOURLY_SHA,
+         'Candidate must use committed 15127617 and independently archived corrected hourly bytes')
+    compile_start = v.timestamp(compile_record['started_utc'])
+    need(hourly_finish <= compile_start, 'Independent hourly source review must precede actual candidate compilation')
+    candidate = v.read(check.check(report['Rust_execution']))
+    candidate_start, candidate_finish = v.execution_interval(candidate, check)
+    need(candidate['schema'] == 'recorded-porting-command.v1' and candidate['launch_error'] is None
+         and candidate['source_bytes_match_before_and_after'] is True
+         and len(candidate['command']) == 2
+         and v.path_of(candidate['command'][0]) == check.check(build['binary'])
+         and v.path_of(candidate['command'][1]) == check.check(report['candidate_request']), 'Actual candidate invocation differs')
+    binding(candidate['source_snapshot'], build['source_snapshot'])
+    binding(report['Rust_results'], candidate['stdout'])
+    need(v.exact(candidate['executed_launcher'], build['actual_executed_recorder'])
+         and candidate['repository_before']['head'] == candidate['repository_after']['head'] == build['implementation_commit']
+         and candidate['repository_before']['worktree_clean'] is True
+         and candidate['repository_after']['worktree_clean'] is True
+         and report['implementation_commit'] == build['implementation_commit']
+         and report['crates_tree'] == build['crates_tree']
+         and report['available_source_inventory_count'] == len(inventory), 'Committed authentic candidate source identity differs')
+    need(max(gap_finish, projection_finish, v.timestamp(compile_record['finished_utc']))
+         <= candidate_start <= candidate_finish <= comparison_start, 'Actual candidate/comparison chronology differs')
+    for flag, field in [('--rust-build', 'Rust_build'), ('--rust-execution', 'Rust_execution'),
+                       ('--candidate-request', 'candidate_request'), ('--dto-projection', 'declared_pre_execution_DTO_projection'),
+                       ('--dto-projection-execution', 'actual_DTO_projection_execution')]:
+        argument(flag, report[field])
+    need(argv.count('--output-dir') == 1
+         and v.path_of(argv[argv.index('--output-dir') + 1]) == check.check(report_ref).parent, 'Actual report output directory differs')
+
+    ledger, coverage = report['comparison'], report['coverage']
+    counts = [ledger[key] for key in ['numeric_comparison_count', 'literal_binary64_comparison_count', 'metadata_comparison_count']]
+    need(all(type(number) is int and number > 0 for number in counts)
+         and type(ledger['comparison_count']) is int and sum(counts) == ledger['comparison_count']
+         and type(ledger['mismatch_count']) is int and ledger['mismatch_count'] == 0
+         and ledger['mismatches'] == [] and ledger['mismatch_payloads_truncated'] is False
+         and ledger['unavailable_counted_as_PASS'] is False, 'Actual reported comparison ledger inconsistent')
+    need(sum(ledger['categories'].values()) == ledger['comparison_count'], 'Reported category count differs')
+    need(sum(row['comparison_count'] for row in ledger['field_error_metrics'].values()) == counts[0]
+         and all(row['mismatch_count'] == 0 for row in ledger['field_error_metrics'].values()), 'Reported numeric metric count differs')
+    need(all(row['counted_as_PASS'] is False for row in ledger['unavailable_paths']), 'Unavailable observations counted as pass')
+    need(v.exact(coverage['actual_requested_counts'], COUNTS)
+         and v.exact(coverage['actual_native_status_counts'], {'source_returned': 3239})
+         and v.exact(coverage['actual_Rust_status_counts'], {'source_returned': 3239})
+         and v.exact(coverage['selected_current_by_lane'], {'diagnostic': 368, 'production-CON': 480})
+         and coverage['all_history_retained'] is True and coverage['mask_controls_invocation'] is False
+         and coverage['native_answers_supplied_to_Rust'] is False, 'Actual complete history/selected coverage differs')
+    check.unchanged()
+    out.mkdir()
+    source = out / 'source'
+    source.mkdir()
+    reader = source / 'review_result.py'
+    shutil.copyfile(Path(__file__), reader)
+    result = {'schema': 'clk04-independent-unit-result-review.v1',
+        'status': 'pass-authenticated-selected-unit-result-and-honest-unavailable-scope',
+        'review_started_utc': started, 'review_completed_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_report': report_ref, 'reviewed_comparison_execution': execution_ref,
+        'reviewed_Rust_build': report['Rust_build'], 'reviewed_Rust_execution': report['Rust_execution'],
+        'reviewed_DTO_projection': projection_ref, 'reviewed_contracts': report['contracts'],
+        'reviewed_original_recovery': refs['native_recovery'], 'reviewed_original_data_review': refs['Original_data_review'],
+        'reviewed_legacy_gap': refs['legacy_gap'], 'reviewed_comparer_source_review': refs['independent_source_review'],
+        'reviewed_executed_reader_sources': report['executed_reader_source_archives'],
+        'preserved_previous_metadata_comparison_failure': prior_failure_ref,
+        'preserved_first_candidate_execution': review['preserved_first_candidate_execution'],
+        'historical_SourceQA01_missed_shadowing': True, 'historical_comparer_exit_code': 1,
+        'preserved_SourceQA02': review['preserved_SourceQA02'],
+        'preserved_SourceQA02_execution': review['preserved_SourceQA02_execution'],
+        'historical_SourceQA02_missed_nullable_continuity': True,
+        'preserved_actual_scientific_failure_report': refs['scientific_failure_report'],
+        'preserved_actual_scientific_failure_execution': refs['scientific_failure_execution'],
+        'historical_reported_comparison_count': 5517963, 'historical_reported_mismatch_count': 3163,
+        'historical_scientific_failure_counted_as_PASS': False,
+        'reviewed_independent_hourly_source_amendment': refs['hourly_source_amendment'],
+        'reviewed_independent_hourly_source_execution': refs['hourly_source_execution'],
+        'reviewed_corrected_hourly_source_archive': hourly_sources[corrected_owner],
+        'independent_hourly_source_reviewer': '/root/clk02_header_port',
+        'required_corrected_math_commit': MATH_COMMIT,
+        'reported_comparison_ledger': ledger, 'reported_coverage': coverage,
+        'implementation_commit': build['implementation_commit'], 'crates_tree': build['crates_tree'],
+        'unpaired_scope': report['unpaired_scope'], 'source_unavailable_counted_as_PASS': False,
+        'scientific_values_compared': False, 'scientific_comparer_or_engine_reexecuted': False,
+        'numerical_comparison_count_by_this_reviewer': None, 'numerical_mismatch_count_by_this_reviewer': None,
+        'whole_physical_system_certified': False, 'gates_updated': False,
+        'authorship_disclosure': {'reviewer': '/root/clk02_baseline_audit',
+            'reviewer_authored_CLK04_native_helper_inputs_hourly_producer': True,
+            'reviewer_authored_CLK03_carrier': True,
+            'independence_scope': 'Raw-authored comparer actual execution/report and frozen metadata integrity',
+            'own_numerical_algorithm_certified_independent': False,
+            'own_hourly_amendment_source_review_is_independent': False,
+            'independent_hourly_source_review_relied_on': '/root/clk02_header_port'},
+        'executed_reader': v.ref(reader), 'authenticated_metadata_utility': v.ref(UTILITY)}
+    target = out / 'review.json'
+    with target.open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=False, allow_nan=False)
+        stream.write('\n')
+    check.unchanged()
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

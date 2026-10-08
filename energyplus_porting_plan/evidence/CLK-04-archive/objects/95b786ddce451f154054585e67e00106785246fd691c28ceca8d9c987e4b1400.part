@@ -1,0 +1,378 @@
+{
+  "schema": "clk04-independent-native-build-review.v1",
+  "status": "pass-build-and-derivative-before-original-execution",
+  "review_started_utc": "2026-10-08T10:57:45.983796+00:00",
+  "review_completed_utc": "2026-10-08T10:58:32.544422+00:00",
+  "reviewed_build": {
+    "path": ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+    "sha256": "1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc"
+  },
+  "actual_build_command": {
+    "path": ".runtime/porting/CLK-04/native-build-command-02/receipt.json",
+    "sha256": "4c2ca4c616cfc42ff39e3d85a4545d31d54a1a260c7e5f8c718ddbd891f3459c"
+  },
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/CLK-04/independent-frozen-contract-review-02/review.json",
+    "sha256": "f889996140e38004fa9556fba843840e99d41f1c63d84bca0cdc53e7cb227d5f"
+  },
+  "reviewed_helper_static_review": {
+    "path": ".runtime/porting/CLK-04/independent-preexecution-source-review-02/review.json",
+    "sha256": "2c6bf096552beda134af38a98a5aa74bc5ad1d943ef159a7b511f3aa6d56188e"
+  },
+  "reviewed_builder_static_review": {
+    "path": ".runtime/porting/CLK-04/independent-builder-static-review-02/review.json",
+    "sha256": "3d5be35376e0ea76a39577157a5462d9794c070589aefe999c4db7a8a2dd0959"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+    "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+  },
+  "reviewed_helper_request": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+    "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+    "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+      "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+      "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+      "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+    }
+  },
+  "reviewed_binary": {
+    "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+    "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+    "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+  },
+  "actual_linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/clk04_reference_helper.exe",
+    "sha256": "a36a1cccc6e1ddf26f15c4ba79c84fd60936d0039af6c711ec8f233875df376f",
+    "size_bytes": 1297205477
+  },
+  "actual_independent_PE_validation": {
+    "path": ".runtime/porting/CLK-04/independent-native-build-review-01/pe-review.json",
+    "sha256": "e7ef5b1f3900528b4a9ea55164899c28bfb357eb7f848360a001cd7ac0bb5df5"
+  },
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-native-prep-01/build_native.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/00-build_native.py",
+        "sha256": "d9d3d7706905faed7e8460c49a919fc952525190b5517a39d44c7bb941bd010a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-native-prep-01/clk03_production_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/01-clk03_production_reference.cmake",
+        "sha256": "65c62ddb332f67fd7b7a75e909311dfc2973c4fbc7c003827ed135108ecc6ecd"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-native-prep-01/clk03_production_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/02-clk03_production_reference_helper.cpp",
+        "sha256": "34312a430f213fd655d7f2e91fac4e98e57681932e9bca96bb44f667be977c3c"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-builder-prep-03/build_native.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/03-build_native.py",
+        "sha256": "f65b9277aefd64eb58b4085b1074bc885770b06e833e0978638c6fdd3f18a39d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-builder-prep-03/clk04_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/04-clk04_reference.cmake",
+        "sha256": "60fd233cf5a8f7e383b2a7b1620e111b33e2ba04918fb5f471f290f0afa9709b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-builder-prep-03/registry.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/05-registry.py",
+        "sha256": "aecc19aa99b9bec2c2e78134449ac53e8df75085f96e0f23ab6132175f8287ae"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-prep-03/clk04_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/06-clk04_reference_fields.hh",
+        "sha256": "861d9438886e177dde5eb3b7923e6a3ded372928ab35ea51aca79ac0f1882cb3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-prep-03/clk04_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/07-clk04_reference_helper.cpp",
+        "sha256": "2f484e5f688c4f02e3d64b45df23aeccd43d8e4e977f2f46e5ed932295d60016"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-prep-03/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/08-freeze_packet.py",
+        "sha256": "c2f8dc27cb0aaab51a9cb2669e6abf5800cc46fa043f13686ad970688981d68a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-prep-03/packet_policy.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/09-packet_policy.py",
+        "sha256": "02a860055c2d7b8dc5e15b3a908efd945e28b3819039dfad986b6205835dc797"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-prep-03/write_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/10-write_inputs.py",
+        "sha256": "74d7490994dbb611adf14a5d2aaec5af01837a5b016cb2bdc737ea4653f03a79"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/11-clk01_reference.cmake",
+        "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/12-clk02_reference.cmake",
+        "sha256": "d3e9342f35ef9be3aa180effad190d3147ae8706e1fbe5ec7f82bef242ec11d5"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/13-clk02_reference_fields.hh",
+        "sha256": "b4e886101d97651f99aec06b6d41610fd59147fe88c831c143eb12bf8729fe41"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk02_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/14-clk02_reference_helper.cpp",
+        "sha256": "1579511f4aee58b823b57cce6795950393331e8318a8f0b6ac527f42d5c63966"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk02_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/15-clk02_reference_native.py",
+        "sha256": "a6dc2220072742c88cb23b2fd01c318d3f1c352845f8deb3ae696b54298f47f9"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/16-clk03_reference.cmake",
+        "sha256": "2bd95d8d6fcdf19b0b2e0930f9ecd99c0b935b0b7f68c7f0766d1c1e900f65a6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/17-clk03_reference_fields.hh",
+        "sha256": "6c9c43a45921c29155b81a7f5a110a1f3a75ddf21937ea06bd62a56bfb93ba66"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/18-clk03_reference_helper.cpp",
+        "sha256": "2f4fb94a04f0638016b2f458ad9a567fa8e201b57323663b7fd18cf4e21b9877"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/19-clk03_reference_native.py",
+        "sha256": "49ce5ed4dde11a45210556a802fa15bd5e707ef0e34fc821edf5a454a9fc0e4e"
+      }
+    },
+    {
+      "historical_path": "tools/porting/derive_native_helper.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/20-derive_native_helper.py",
+        "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf"
+      }
+    },
+    {
+      "historical_path": "tools/porting/freeze_native_registry.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/21-freeze_native_registry.py",
+        "sha256": "762d747f40d2e20e5b30a49b9bfb32c63a1e026c5124d86931727f5d1163b1dc"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/22-geo01_reference.cmake",
+        "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/23-geo02_reference.cmake",
+        "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/24-geo02_reference_fields.hh",
+        "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/25-geo03_reference.cmake",
+        "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/26-geo03_reference.cpp",
+        "sha256": "303c82647526f16b2f0e35bc979c335dfb67cedc75414ce58dd9e708d5a7a917"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/27-geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/28-geo03_reference_helper.cpp",
+        "sha256": "67e2472f48749b6e40a981fee9ce04b5619567b6ae4e15932d6ee47eac818dc4"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/29-geo03_reference_native.py",
+        "sha256": "ddaeadbbdb7d6a1c93fbf1de681fa028c8470c200b8ee4b90afb5881592cd0a8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/native_pe.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/30-native_pe.py",
+        "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56"
+      }
+    },
+    {
+      "historical_path": "tools/porting/psy02_reachability.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/31-psy02_reachability.cmake",
+        "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/psy02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/32-psy02_reference.cmake",
+        "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/33-zon01_reference.cmake",
+        "sha256": "64cbd5a57412e3ab135d71e03f1f24d42a37d6639ee8dbdfc2e2f9c54516aad1"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/34-zon01_reference.cpp",
+        "sha256": "27f2ace0fd6dc9e4ada4361aced7ea41d14d3b5f6541825f6817ea0108deb46b"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/35-zon01_reference_fields.hh",
+        "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/36-zon01_reference_helper.cpp",
+        "sha256": "4345e4407d953eade45c30c3555894d5adb3eba3c16381fdc0391cf5f9b8c060"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/native-build-02/source/37-zon01_reference_native.py",
+        "sha256": "7546ef8f0e44026174afed99000e87ee0c84185e135a74e743ae5cd8321a7add"
+      }
+    }
+  ],
+  "actual_compile_rows": 658,
+  "historical_compile_rows": 657,
+  "frozen_core_rows": 643,
+  "actual_configure_exit": 0,
+  "actual_link_exit": 0,
+  "actual_derive_exit": 0,
+  "recorded_original_source_guard_exact_all_stages": true,
+  "complete_original_inventory_reexecuted_by_this_reviewer": false,
+  "protected19_and_retained_pairs_independently_hashed": true,
+  "all45_input_refs_unchanged": true,
+  "metadata_PE_reader_imported_after_authentication": true,
+  "retirement_registry_guard_imported_after_authentication": true,
+  "actual_v3_retirement_and_successful_original_tombstones_verified": true,
+  "reviewed_retired_registry": {
+    "path": ".runtime/porting/CLK-03/retirement-01/registry-retired.json",
+    "sha256": "bfcbcc4f3b466372c9258ee013cff19a352c2c899532f7e5a5d045ab28c38547"
+  },
+  "engine_compiler_strip_Cargo_Git_executed_by_reader": false,
+  "scientific_execution_performed": false,
+  "source_original_scientific_answers_observed": false,
+  "gates_updated": false,
+  "reviewed_bytes_unchanged_after": true,
+  "executed_reader": {
+    "path": ".runtime/porting/CLK-04/independent-native-build-review-01/review_build.py",
+    "sha256": "7fb2ffe163f68649c59ba6db35ad88f6381a63f79c1fce3d90acdd3d0bed3205"
+  },
+  "actual_reader_command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-04/native-build-review-prep-02/review_build.py",
+    "--build-receipt",
+    ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+    "--build-command",
+    ".runtime/porting/CLK-04/native-build-command-02/receipt.json",
+    "--output-dir",
+    ".runtime/porting/CLK-04/independent-native-build-review-01"
+  ],
+  "authorship_disclosure": "Header authored this reader and separate build wrapper; Root independently reviewed builder sources before actual build. A different peer independently reviews this metadata reader and may execute it; no self scientific certification is claimed.",
+  "review_scope": "Actual build provenance and binary retained-byte/ABI metadata only; future original results/physics/numerical pairing not certified."
+}

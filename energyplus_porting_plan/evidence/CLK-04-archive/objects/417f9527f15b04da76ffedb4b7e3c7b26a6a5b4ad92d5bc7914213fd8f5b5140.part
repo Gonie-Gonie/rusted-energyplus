@@ -1,0 +1,331 @@
+"""Authenticate a completed CLK04 production result; never rerun scientific code."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import shutil
+
+OWN = Path(__file__).resolve().parent
+ROOT = OWN.parents[3]
+COMMON_SHA = 'ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7'
+KNOWN = {
+    'unit': ('candidate-unit-comparison-03/unit-comparison.json', 'ad547d36ac37d5e69a6ef5317f6409c09e0875de91c951e5c9532af31c1d3ac6'),
+    'unit_execution': ('candidate-unit-comparison-command-03/receipt.json', 'c9cedf230525b380d699d04b710b6044ac7b6f49e56d610d0039d0434cf78182'),
+    'unit_review': ('independent-unit-result-review-01/review.json', 'd7425d39aadbb5de36496ce98ec3b5c506888454fad10bbad6bb24dd2f763c9e'),
+    'unit_review_execution': ('independent-unit-result-review-command-01/receipt.json', '468245444e6d7a7e7067d7aa4ae870bff29170fe2cba82d6e361960d3cd44bac'),
+    'source_review': ('independent-production-workflow-source-review-03/review.json', 'ec50f050b66eb7725fbdbca582c8ddc5e3d0f34ec646412963e586cf7ade2792'),
+    'source_review_execution': ('independent-production-workflow-source-review-command-03/receipt.json', 'b82cd512ea9b723181da4409d848909acb49c850b031c003b8783275925eee1f'),
+    'failure_review': ('authenticated-unit-failure-review-02/review.json', '397b16a94116671b85b8f43fb1b2766e0ca4f39313b05d4868d21c8c30c73ccf'),
+    'failure_review_execution': ('authenticated-unit-failure-review-command-02/receipt.json', 'b49d86e9d059bbe65e4289419d28d74d62c0d4b83892740c332a01d40b591dad'),
+    'historical_clippy': ('candidate-clippy-command-01/receipt.json', '8475edf40de512527ebc0a0a1937e0eb431c9ec47db845eee8951bdb68920cff'),
+    'production_failure': ('production-comparison-01/production-comparison.json', '703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f'),
+    'production_failure_execution': ('production-comparison-command-01/receipt.json', 'bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67'),
+}
+CASE_IDS = ['A-24H', 'A-72H', 'B-BOTH-24H']
+
+
+def boot():
+    path = OWN / 'common.py'
+    if hashlib.sha256(path.read_bytes()).hexdigest() != COMMON_SHA:
+        raise ValueError('Stdlib metadata helper changed before import')
+    spec = importlib.util.spec_from_file_location('clk04_actual_production_qa_common', path)
+    if spec is None or spec.loader is None: raise ValueError('Metadata helper unavailable')
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    value.need(value.ROOT == ROOT and Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    return value, value.Bindings()
+
+
+def source_snapshot(binding, checked, c):
+    value = c.read(checked.check(binding))
+    c.need(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
+        and type(value['files']) is list and len({row['historical_path'] for row in value['files']}) == len(value['files']),
+        'Unique actual historical source snapshot required')
+    rows = {}
+    for row in value['files']:
+        path = checked.check(row['archive'])
+        c.need(path.stat().st_size == row['size_bytes'], 'Historical source archive size differs')
+        rows[row['historical_path']] = row['archive']
+    return rows
+
+
+def source_identity(row, build, checked, c):
+    c.need(c.same(row['source_snapshot'], build['source_snapshot'])
+        and row['repository_before']['head'] == row['repository_after']['head'] == build['implementation_commit']
+        and row['repository_before']['worktree_clean'] is True and row['repository_after']['worktree_clean'] is True
+        and c.exact(row['executed_launcher'], build['actual_executed_recorder']), 'Historical science source/commit/recorder identity differs')
+    checked.check(row['executed_launcher']['archive'])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['report', 'comparison-execution', 'matrix-execution', 'output-dir']:
+        parser.add_argument('--' + name, type=Path, required=True)
+    args = parser.parse_args(); c, checked = boot()
+    output = args.output_dir.resolve()
+    c.need(output.is_relative_to(ROOT / '.runtime/porting/CLK-04') and output != ROOT / '.runtime/porting/CLK-04'
+        and not output.exists(), 'Fresh ignored metadata output required')
+    started = datetime.now(timezone.utc).isoformat()
+    refs = {key: {'path': '.runtime/porting/CLK-04/' + path, 'sha256': sha} for key, (path, sha) in KNOWN.items()}
+    report_ref, execution_ref, matrix_execution_ref = [c.ref(path.resolve())
+        for path in [args.report, args.comparison_execution, args.matrix_execution]]
+    report = c.read(checked.check(report_ref))
+    c.need(report['schema'] == 'clk04-production-comparison.v1'
+        and report['status'] == 'pass-selected-current-and-owned-production-handoff'
+        and report['scientific_certification_passed'] is True, 'Completed actual production PASS report required')
+    execution, comparison_start, comparison_finish = c.record(execution_ref, checked, payload=report)
+    c.need(comparison_start <= c.utc(report['started_utc']) <= c.utc(report['completed_utc']) <= comparison_finish
+        <= c.utc(started), 'Actual comparison/report/review chronology differs')
+    c.need(Path(report['actual_reader_cwd']).resolve() == ROOT, 'Actual reader cwd differs')
+    interpreter = c.reported_argv(execution, report)
+    comparison = report['comparison']
+    c.need(type(comparison['comparison_count']) is int and comparison['comparison_count'] > 0
+        and type(comparison['mismatch_count']) is int and comparison['mismatch_count'] == 0
+        and comparison['mismatches'] == [] and comparison['mismatch_payloads_truncated'] is False
+        and comparison['unavailable_counted_as_PASS'] is False
+        and all(row['counted_as_PASS'] is False for row in comparison['unavailable_paths']), 'Actual complete zero-mismatch/unavailable ledger required')
+    metric_keys = ['numeric_comparison_count', 'literal_binary64_comparison_count', 'metadata_comparison_count']
+    c.need(all(type(comparison[key]) is int and comparison[key] >= 0 for key in metric_keys)
+        and sum(comparison[key] for key in metric_keys) == comparison['comparison_count'], 'Actual reported count ledger differs')
+    for key in ['engines_Cargo_Git_executed_by_reader', 'reference_outputs_supplied_to_Rust', 'scientific_RHS_recomputed',
+        'physical_solar_sky_unselected_generation_parity_claimed', 'native_thermal_callback_parity_claimed',
+        'unavailable_counted_as_PASS', 'post_output_relaxation_allowed', 'gates_updated']:
+        c.need(report[key] is False, 'Actual bounded result disclosure differs')
+    source_review, _, source_finish = c.review(refs['source_review'], refs['source_review_execution'],
+        'clk04-independent-production-workflow-source-review.v1',
+        'pass-frozen-selected-fields-and-actual-CLI-observation-before-production', checked)
+    c.need(c.same(report['independent_sources_review'], refs['source_review'])
+        and c.same(report['independent_sources_review_execution'], refs['source_review_execution']), 'Actual reader source-review identity differs')
+    historical_sources = c.source_rows(source_review['reviewed_sources'], checked, 15)
+    sources = c.source_rows(report['executed_reader_source_archives'], checked, 15)
+    fresh_review, _, fresh_review_finish = c.review(report['recomparison_source_review'],
+        report['recomparison_source_review_execution'], 'clk04-independent-production-reader-amendment-source-review.v1',
+        'pass-declared-null-metadata-fix-before-preserved-data-reread', checked)
+    reviewed = c.source_rows(fresh_review['reviewed_sources'], checked, 15)
+    c.need(c.source_equal(sources, reviewed) and fresh_review_finish <= comparison_start,
+        'Executed/freshly reviewed reader identities or pre-reread chronology differ')
+    prefix = '.runtime/porting/CLK-04/production-workflow-prep-07/'
+    amended_script = '.runtime/porting/CLK-04/production-workflow-prep-08/check_production.py'
+    c.need(amended_script in sources and prefix + 'check_production.py' in historical_sources
+        and set(sources) - {amended_script} == set(historical_sources) - {prefix + 'check_production.py'}
+        and all(sources[key]['sha256'] == historical_sources[key]['sha256']
+            for key in set(sources) - {amended_script}), 'Only the declared checker may differ from historical fifteen sources')
+    tail = c.python_script(execution, amended_script)
+    expected = ['--matrix', report['Rust_matrix']['path'], '--source-review', refs['source_review']['path'],
+        '--recomparison-source-review', report['recomparison_source_review']['path'],
+        '--recomparison-source-review-execution', report['recomparison_source_review_execution']['path'],
+        '--output-dir', str(args.report.resolve().parent)]
+    c.need(len(tail) == len(expected) and tail[::2] == expected[::2]
+        and all(c.path_of(tail[i]) == c.path_of(expected[i]) for i in range(1, len(expected), 2)), 'Actual scientific reader argv differs')
+    plan_ref, matrix_ref = report['declared_plan'], report['Rust_matrix']
+    plan, matrix = c.read(checked.check(plan_ref)), c.read(checked.check(matrix_ref))
+    c.need(plan['schema'] == 'clk04-production-plan.v1' and plan['actual_command_count'] == 6
+        and plan['physical_execution_performed'] is False and plan['native_results_supplied_as_inputs'] is False
+        and plan['gates_updated'] is False and c.exact(plan['selected_policy'], report['selected_policy']), 'Exact input-only production plan differs')
+    c.need(c.source_equal(c.source_rows(plan['reader_source_archives'], checked, 15), historical_sources), 'Historical pre-execution frozen reader identities differ')
+    plan_row, plan_start, plan_finish = c.record(report['declared_plan_execution'], checked,
+        payload={'plan': plan_ref, 'input_only_freeze': True, 'physical_execution_performed': False, 'gates_updated': False})
+    c.need(source_finish <= plan_start <= c.utc(plan['created_utc']) <= plan_finish, 'Source review must precede actual plan freeze')
+    c.need(c.same(plan['independent_sources_review'], refs['source_review'])
+        and c.same(plan['independent_sources_review_execution'], refs['source_review_execution']), 'Frozen plan review refs differ')
+    plan_tail = c.python_script(plan_row, prefix + 'prepare_plan.py')
+    c.need(plan_tail == ['--source-review', refs['source_review']['path'], '--source-review-execution',
+        refs['source_review_execution']['path'], '--output-dir', plan_ref['path'].rsplit('/', 1)[0]], 'Actual plan-freeze argv differs')
+    c.need(matrix['schema'] == 'clk04-production-matrix.v1' and matrix['complete'] is True
+        and type(matrix['actual_command_count']) is int and matrix['actual_command_count'] == report['actual_command_count'] == 6
+        and [row['case_id'] for row in matrix['cases']] == CASE_IDS
+        and c.same(matrix['declared_plan'], plan_ref), 'Complete ordered actual six-command matrix differs')
+    for key in ['original_outputs_supplied_to_Rust', 'native_engine_executed', 'gates_updated']:
+        c.need(matrix[key] is False, 'Matrix must remain actual ordinary CLI execution only')
+    c.need(checked.check(matrix['executed_launcher']).read_bytes() == checked.check(historical_sources[prefix + 'run_production.py']).read_bytes(), 'Actual matrix launcher source differs')
+    unit = c.read(checked.check(refs['unit']))
+    unit_row, _, unit_finish = c.record(refs['unit_execution'], checked, payload=unit)
+    c.need(c.same(report['unit_comparison'], refs['unit']) and c.same(report['unit_comparison_execution'], refs['unit_execution'])
+        and unit['schema'] == 'clk04-unit-comparison.v1' and unit['scientific_certification_passed'] is True
+        and unit['comparison']['comparison_count'] == 5517963 and unit['comparison']['mismatch_count'] == 0,
+        'Accepted actual unit03 result identity differs')
+    unit_qa, _, unit_qa_finish = c.review(refs['unit_review'], refs['unit_review_execution'],
+        'clk04-independent-unit-result-review.v1', 'pass-authenticated-selected-unit-result-and-honest-unavailable-scope', checked)
+    c.need(c.same(unit_qa['reviewed_report'], refs['unit']) and c.same(unit_qa['reviewed_comparison_execution'], refs['unit_execution'])
+        and c.exact(unit_qa['reported_comparison_ledger'], unit['comparison'])
+        and unit_qa['scientific_values_compared'] is False and unit_qa['gates_updated'] is False, 'Actual independent unit factual QA differs')
+    policy = report['selected_policy']
+    c.need(c.exact(policy['frozen_native_unit_selection'], unit['selected_policy']) and policy['case_ids'] == CASE_IDS
+        and policy['selected_Current_source_steps'] == 480 and policy['original_production_source_counts'] == {
+            'GetNextEnvironment': 3, 'InitializeWeather': 480, 'SetCurrentWeather': 480, 'total': 963}, 'Frozen unit19 profile/mask and production source history differ')
+    c.need(c.exact(report['contracts'], unit['contracts']) and c.exact(matrix['contracts'], unit['contracts'])
+        and c.exact(plan['contracts'], unit['contracts']), 'Frozen contracts differ')
+    for binding in unit['contracts'].values(): checked.check(binding)
+    request = c.read(checked.check(unit['native_request']))
+    for binding in [request['fixed_scope'], *request['all_45_guard_refs']]: checked.check(binding)
+    c.need(len(request['all_45_guard_refs']) == 45, 'All45 ordered literal source guards required')
+    recovery = c.read(checked.check(report['native_recovery']))
+    c.need(c.same(report['native_recovery'], unit['native_recovery']) and c.same(report['Original_results'], recovery['results'])
+        and recovery['actual_historical_helper_exit_code'] == 0 and recovery['actual_historical_launcher_exit_code'] == 1
+        and recovery['actual_recovery_exit_code'] == 0 and recovery['historical_failed_wrapper_relabelled_zero'] is False,
+        'Actual native0/old wrapper1 recovery history differs')
+    recovery_row, _, recovery_finish = c.record(report['native_recovery_execution'], checked, payload=recovery)
+    data, _, data_finish = c.review(report['Original_data_review'], report['Original_data_review_execution'],
+        'clk04-independent-original-data-review.v1', 'pass-preserved-original-data-before-Rust-baseline', checked)
+    c.need(c.same(report['Original_data_review'], unit['Original_data_review'])
+        and data['scientific_values_compared'] is False and data['source_unavailable_counted_as_PASS'] is False
+        and data['intended_native_branch_coverage_complete'] is True
+        and c.same(data['reviewed_reference'], report['native_recovery'])
+        and c.same(data['reviewed_execution'], report['native_recovery_execution'])
+        and c.same(data['reviewed_results'], recovery['results']),
+        'Actual original data QC identity/scope differs')
+    build = c.read(checked.check(report['Rust_build']))
+    probe = c.read(checked.check(unit['Rust_build']))
+    compile_row, _, compile_finish = c.record(build['build_execution'], checked)
+    c.need(build['schema'] == 'porting-Rust-build.v1' and build['kind'] == 'cli'
+        and build['committed_source_certification'] is True and build['source_worktree_clean'] is True
+        and build['implementation_commit'] == unit['implementation_commit'] == report['implementation_commit']
+        and build['crates_tree'] == unit['crates_tree'] == report['crates_tree']
+        and c.same(build['source_snapshot'], probe['source_snapshot']), 'Actual compiled CLI/unit archived source identity differs')
+    checked.check(build['binary']); source_identity(execution, build, checked, c); source_identity(unit_row, build, checked, c)
+    source_identity(compile_row, build, checked, c)
+    inventory = source_snapshot(build['source_snapshot'], checked, c)
+    for api in source_review['reviewed_production_API_sources']:
+        c.need(api['historical_path'] in inventory and inventory[api['historical_path']]['sha256'] == api['archive']['sha256'], 'Reviewed production API differs from actually built archived source')
+    matrix_row, matrix_start, matrix_finish = c.record(matrix_execution_ref, checked)
+    source_identity(matrix_row, build, checked, c)
+    emitted = checked.check(matrix_row['stdout']).read_text(encoding='utf8').splitlines(); position = 0
+    matrix_tail = c.python_script(matrix_row, prefix + 'run_production.py')
+    c.need(len(matrix_tail) == 20 and matrix_tail[::2] == ['--build', '--unit-comparison', '--unit-comparison-execution',
+        '--native-recovery-execution', '--original-data-review-execution', '--plan', '--plan-execution',
+        '--source-review', '--source-review-execution', '--output-dir'], 'Actual matrix launcher protocol differs')
+    matrix_values = [report['Rust_build']['path'], refs['unit']['path'], refs['unit_execution']['path'],
+        report['native_recovery_execution']['path'], report['Original_data_review_execution']['path'], plan_ref['path'],
+        report['declared_plan_execution']['path'], refs['source_review']['path'], refs['source_review_execution']['path'],
+        matrix_ref['path'].rsplit('/', 1)[0]]
+    c.need(all(c.path_of(actual) == c.path_of(expected) for actual, expected in zip(matrix_tail[1::2], matrix_values, strict=True)),
+        'Actual matrix argv file bindings differ')
+    cli_finishes = []; seen = set(); child_refs = []
+    for case, declared in zip(matrix['cases'], plan['cases'], strict=True):
+        c.need(all(c.exact(case[key], declared[key]) for key in ['case_id', 'scope', 'duration', 'input', 'weather', 'metadata']), 'Actual case literal input identities differ')
+        checked.check(declared['external_byte_map'])
+        for level in ['Full', 'Summary']:
+            item = case[level]; child_ref = item['command_receipt']; child, child_start, child_finish = c.record(child_ref, checked)
+            source_identity(child, build, checked, c); child_refs.append(child_ref); cli_finishes.append(child_finish)
+            c.need(max(plan_finish, unit_finish, unit_qa_finish, data_finish, recovery_finish, compile_finish) <= child_start
+                and matrix_start <= child_start <= child_finish <= matrix_finish <= comparison_start,
+                'Actual original/unit/plan/build/CLI/comparison chronology differs')
+            destination = c.path_of(item['output_directory']); c.need(destination not in seen, 'Distinct output dirs required'); seen.add(destination)
+            command = child['command']; expected = [build['binary']['path'], 'run', case['input']['path'], '--weather',
+                case['weather']['path'], '--output-dir', item['output_directory'], '--mode', 'compatibility', '--partial', 'deny',
+                '--trace-level', level.lower(), '--porting-scope', case['scope'].lower()]
+            c.need(len(command) == len(expected) and all(c.path_of(command[i]) == c.path_of(expected[i]) if i in [0, 2, 4, 6]
+                else command[i] == expected[i] for i in range(len(expected))), 'Actual ordinary CLI argv differs')
+            artifacts = {str(checked.check(binding)): binding for binding in item['artifacts']}
+            c.need(len(artifacts) == len(item['artifacts']) and set(artifacts) == {str(path.resolve()) for path in destination.rglob('*') if path.is_file()}, 'Complete actual output artifact inventory differs')
+            forwarded = ''.join(checked.check(child[key]).read_bytes()[-8000:].decode('utf8', errors='replace') for key in ['stdout', 'stderr']).splitlines()
+            c.need(emitted[position:position + len(forwarded)] == forwarded, 'Authenticated recorder-forwarded CLI log tails differ'); position += len(forwarded)
+            c.need(position + 1 < len(emitted) and c.exact(json.loads(emitted[position]), {'receipt': child_ref,
+                'exit_code': 0, 'source_bytes_match_before_and_after': True})
+                and emitted[position + 1] == case['case_id'] + ' ' + level + ' actual_exit=0', 'Ordered child compact receipt/progress differs'); position += 2
+    c.need(position == len(emitted) - 1 and c.exact(json.loads(emitted[position]), {'matrix': matrix_ref,
+        'actual_command_count': 6, 'complete': True}), 'Final actual six-command matrix stdout binding differs')
+    c.need(len(report['observations']) == 3 and [row['case_id'] for row in report['observations']] == CASE_IDS, 'Actual three-case observation table required')
+    for row, hours in zip(report['observations'], [24, 72, 24], strict=True):
+        c.need(row['actual_source_calls_paired'] == hours * 8 + 1 and row['actual_Current_steps'] == hours * 4
+            and row['actual_consumer_receipts'] in [hours * 4, hours * 4 + 1]
+            and row['actual_Current13_and_full_Today_received'] is True
+            and row['actual_completed_operation_prefix_at_consumer_receipt_available'] is True
+            and row['native_internal_source_index_invented'] is False and row['wallclock_timestamp_counted_as_PASS'] is False
+            and row['native_thermal_callback_numerical_parity_claimed'] is False, 'Reported complete owned production table differs')
+    c.need(c.exact(report['unit_reader_interpreter_observation'], matrix['unit_reader_interpreter_observation']), 'Passive unit interpreter availability differs')
+    failure, _, _ = c.review(refs['failure_review'], refs['failure_review_execution'],
+        'clk04-authenticated-unit-failure-review.v1', 'authenticated-preserved-scientific-failure-without-recomputation', checked)
+    c.need(failure['actual_reported_comparison_count'] == 5517963 and failure['actual_reported_mismatch_count'] == 3163
+        and failure['actual_scientific_certification_passed'] is False and failure['retained_payloads_truncated'] is True,
+        'Historical actual scientific failure cannot be relabelled PASS')
+    c.record(refs['historical_clippy'], checked, code=101)
+    old_production = c.read(checked.check(refs['production_failure']))
+    old_row, _, old_finish = c.record(refs['production_failure_execution'], checked, code=1, payload=old_production)
+    c.need(old_production['comparison']['comparison_count'] == 3736442
+        and old_production['comparison']['mismatch_count'] == 6
+        and old_production['scientific_certification_passed'] is False,
+        'Historical actual production failure cannot be relabelled PASS')
+    source_identity(old_row, build, checked, c)
+    c.need(c.source_equal(c.source_rows(old_production['executed_reader_source_archives'], checked, 15), historical_sources)
+        and c.same(old_production['Rust_matrix'], matrix_ref) and c.same(old_production['declared_plan'], plan_ref)
+        and c.exact(old_production['selected_policy'], policy)
+        and old_finish <= c.utc(fresh_review['review_started_utc']), 'Preserved failure/plan/policy and amendment chronology differ')
+    amendment = report['reader_source_amendment']
+    c.need(amendment['schema'] == 'clk04-declared-null-summary-reader-amendment.v1'
+        and c.same(amendment['preserved_failed_report'], refs['production_failure'])
+        and c.same(amendment['preserved_failed_comparison_execution'], refs['production_failure_execution'])
+        and amendment['nullable_fields'] == ['oracle', 'comparison']
+        and amendment['historical_plan_and_matrix_unchanged'] is True
+        and amendment['scientific_field_policy_changed'] is False and amendment['unavailable_counted_as_PASS'] is False,
+        'Only authenticated declared nullable summary metadata correction is admitted')
+    c.need(c.exact(amendment, fresh_review['reviewed_reader_source_amendment']), 'Passive correction/source-range metadata differs from pre-reread review')
+    old_comparison = old_production['comparison']
+    for key in [*metric_keys, 'comparison_count', 'field_error_metrics', 'categories', 'within_lane_transport_boundaries']:
+        c.need(c.exact(comparison[key], old_comparison[key]), 'Selected numeric counts/metrics or transport categories changed')
+    nullable = {case + '/ordinary_summary/' + name for case in CASE_IDS for name in ['oracle', 'comparison']}
+    c.need(len(old_comparison['mismatches']) == 6 and {row['location'] for row in old_comparison['mismatches']}
+        == {name + '/availability' for name in nullable}
+        and all(row['actual'] is False and row['original'] is False
+            and row['reason'] == 'required comparison operand unavailable' for row in old_comparison['mismatches']),
+        'Preserved six nullable metadata failures must remain exact')
+    old_unavailable = {row['location']: row for row in old_comparison['unavailable_paths']}
+    new_unavailable = {row['location']: row for row in comparison['unavailable_paths']}
+    c.need(len(old_unavailable) == len(old_comparison['unavailable_paths'])
+        and len(new_unavailable) == len(comparison['unavailable_paths'])
+        and set(old_unavailable) == set(new_unavailable), 'Unavailable location inventory changed')
+    for location, old_value in old_unavailable.items():
+        expected_value = dict(old_value)
+        if location in nullable:
+            c.need(old_value['required'] is True and old_value['actual_available'] is False
+                and old_value['original_available'] is False and old_value['counted_as_PASS'] is False,
+                'Declared optional summary fields must actually be unavailable on both sides')
+            expected_value['required'] = False
+        c.need(c.exact(new_unavailable[location], expected_value), 'Undeclared unavailable metadata changed')
+    checked.unchanged(); output.mkdir(); archived = []
+    for path in [Path(__file__).resolve(), OWN / 'common.py']:
+        target = output / path.name; shutil.copyfile(path, target)
+        c.need(c.sha(target) == c.sha(path), 'Actual metadata reader source archive differs')
+        archived.append({'historical_path': path.relative_to(ROOT).as_posix(), 'archive': c.ref(target)})
+    result = {'schema': 'clk04-independent-production-result-review.v1',
+        'status': 'pass-authenticated-selected-production-result-and-honest-unavailable-scope',
+        'review_started_utc': started, 'review_completed_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_report': report_ref, 'comparison_execution': execution_ref, 'Rust_build': report['Rust_build'],
+        'matrix': matrix_ref, 'matrix_execution': matrix_execution_ref, 'plan': plan_ref,
+        'plan_execution': report['declared_plan_execution'], 'reviewed_unit_result': refs['unit'],
+        'reviewed_unit_result_review': refs['unit_review'], 'reviewed_unit_result_review_execution': refs['unit_review_execution'],
+        'reviewed_production_source_review': refs['source_review'], 'source_review_execution': refs['source_review_execution'],
+        'reviewed_recomparison_source_review': report['recomparison_source_review'],
+        'recomparison_source_review_execution': report['recomparison_source_review_execution'],
+        'reader_source_amendment': amendment,
+        'reviewed_original_recovery': report['native_recovery'], 'reviewed_original_data_review': report['Original_data_review'],
+        'reviewed_preserved_failure_ledger': refs['failure_review'], 'preserved_historical_Clippy101': refs['historical_clippy'],
+        'preserved_actual_production_failure': refs['production_failure'],
+        'preserved_actual_production_failure_execution': refs['production_failure_execution'],
+        'actual_reported_comparison_count': comparison['comparison_count'], 'actual_reported_mismatch_count': comparison['mismatch_count'],
+        'actual_reported_comparison_metrics': {key: comparison[key] for key in metric_keys},
+        'actual_reported_comparison_categories': comparison['categories'],
+        'actual_unavailable_path_count': len(comparison['unavailable_paths']),
+        'six_declared_nullable_summary_locations_recorded_unavailable': sorted(nullable),
+        'selected_numeric_counts_metrics_and_categories_unchanged_from_preserved_report': True,
+        'historical_failed_report_relabelled_zero': False,
+        'actual_cli_receipts': child_refs, 'actual_Current_steps': 480, 'actual_native_production_source_calls': 963,
+        'implementation_commit': report['implementation_commit'], 'crates_tree': report['crates_tree'],
+        'historical_source_snapshot': build['source_snapshot'], 'current_source_or_HEAD_equality_required': False,
+        'upstream_native_numeric_payload_opened': False, 'full_trace_JSON_parsed_for_recomparison': False,
+        'unavailable_counted_as_PASS': False, 'scientific_values_compared': False, 'numerical_comparisons_by_this_reviewer': None,
+        'scientific_comparer_or_engine_reexecuted': False, 'whole_physical_system_certified': False,
+        'child_interpreter_resolution': interpreter, 'final_quality_or_cleanup_completion_claimed': False,
+        'later_quality_and_observer_only_lineage_are_separate_closure_prerequisites': True,
+        'gates_updated': False, 'actual_metadata_reader_sources': archived,
+        'authorship_disclosure': {'verifier_author': '/root/clk02_raw_port', 'authored_reused_unit_comparer_and_raw_cursor': True,
+            'authored_Header_production_comparer': False, 'own_numerical_code_QA_claimed_independent': False,
+            'scope': 'independent actual production report/receipt/source-projection factual authentication; no numerical recomputation'}}
+    checked.unchanged()
+    with (output / 'review.json').open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=False, allow_nan=False); stream.write('\n')
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__': main()

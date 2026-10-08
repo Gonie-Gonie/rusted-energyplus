@@ -1,0 +1,128 @@
+{
+  "schema": "clk04-observation-projection.v1",
+  "card": "CLK-04",
+  "created_utc": "2026-10-08T10:33:25.119821+00:00",
+  "frozen_before_numerical_execution": true,
+  "helper_request": {
+    "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+    "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+      "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+      "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+      "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+    }
+  },
+  "native_observation_policy": {
+    "schema": "clk04-native-observation-policy.v1",
+    "all_requested_operations_remain_in_literal_history": true,
+    "source_fatal_stops_future_invocation_explicitly": true,
+    "full_grid_snapshots": [
+      "GetNextEnvironment before_caller/before/after",
+      "InitializeWeather before_caller/before/after when effective declared-or-retained BeginDayFlag or BeginEnvrnFlag is true",
+      "allocated_defaults",
+      "prepared",
+      "final_state"
+    ],
+    "effective_boundary_flags": "actual incoming flags, overridden only by explicitly declared partial caller writes",
+    "other_operation_snapshots": {
+      "actual_current_non_solar_fields": [
+        "OutDryBulbTemp",
+        "OutDewPointTemp",
+        "OutBaroPress",
+        "OutRelHum",
+        "OutRelHumValue",
+        "OutHumRat",
+        "OutWetBulbTemp",
+        "WindSpeed",
+        "WindDir",
+        "LiquidPrecipitation",
+        "IsRain",
+        "OutEnthalpy",
+        "OutAirDensity"
+      ],
+      "actual_selected_today_slot": "all17 fields, actual hour/time_step; unavailable when actual storage/index unavailable",
+      "all_existing_scalar_cache_count_control_header_cursor_fields": true,
+      "grid_allocation_shape_order": true,
+      "full_grid_contents": null,
+      "missing_grid_contents_counted_as_PASS": false
+    },
+    "selected_diagnostic_hours": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      12,
+      24
+    ],
+    "selected_diagnostic_current_calls": 368,
+    "selected_production_current_calls": 480,
+    "selected_current_total": 848,
+    "production_selection": "all actual480 CON zone timesteps, with same input-only matched caller history",
+    "unselected_calls_and_history_retained": true,
+    "factory_constructor_and_constant_initialization_current_extension_available": false,
+    "genuine_preparation_snapshots": "reused Factory actual CLK03-shaped source snapshots; no fabricated CLK04 current extension",
+    "full17_generation_cross_native_parity_claimed": false,
+    "native_internal_record_index_observed": false,
+    "source_error_text_parity_claimed": false,
+    "retrospective_observation_narrowing_allowed": false
+  },
+  "day_boundary_paired_grid_fields": [
+    "OutDryBulbTemp",
+    "OutDewPointTemp",
+    "OutBaroPress",
+    "OutRelHum",
+    "WindSpeed",
+    "WindDir",
+    "LiquidPrecip",
+    "IsRain"
+  ],
+  "selected_current_fields": [
+    "OutDryBulbTemp",
+    "OutDewPointTemp",
+    "OutBaroPress",
+    "OutRelHum",
+    "OutRelHumValue",
+    "OutHumRat",
+    "OutWetBulbTemp",
+    "WindSpeed",
+    "WindDir",
+    "LiquidPrecipitation",
+    "IsRain",
+    "OutEnthalpy",
+    "OutAirDensity"
+  ],
+  "current_weather_profile": "current_non_solar_weather",
+  "grid_weather_profile": "day_grid_and_raw_hour_cache",
+  "all_day_boundary_24_by_steps_selected_fields_required": true,
+  "pure_wind_function": "whole genuine interpolateWindDirection",
+  "linear_setup_values": "exact actual array values/shape",
+  "source_formula_order_required": true,
+  "original_results_supplied_to_Rust": false,
+  "scientific_execution_performed": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false,
+  "unpaired": [
+    "solar interpolation/radiation/coefficients",
+    "sky/IR/sky-temperature generation",
+    "cloud/snow/albedo/WaterPrecip generation",
+    "ground/water/daylight calculations",
+    "native private source record index",
+    "std-ios private bit flags",
+    "whole first simulation registration",
+    "error-message wording",
+    "unselected grid contents not recorded by declared compact observation"
+  ],
+  "existing_CLK03_whole_copy_proof_is_distinct": true,
+  "existing_observer_projection_is_separate_and_not_a_native_contract_operand": true
+}

@@ -1,0 +1,294 @@
+{
+  "schema": "clk04-selected-byte-evidence-archive.v1",
+  "supplement": true,
+  "completed_utc": "2026-10-08T15:07:45.960004+00:00",
+  "parent_archive": {
+    "path": "energyplus_porting_plan/evidence/CLK-04-archive/archive.json",
+    "sha256": "6b13dd23e867364eb28f1101c614b04f4fe58fa307cd0390e0645b402e45e690"
+  },
+  "rows": [
+    {
+      "role": "actual-closure",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/canonical-closure-02/closure-result.json",
+        "sha256": "e9f0cd2fa1265df41bbf4c7a7a03763d1f5bb08b9478fd8c054de18716d5adc7"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e9f0cd2fa1265df41bbf4c7a7a03763d1f5bb08b9478fd8c054de18716d5adc7",
+        "original_size_bytes": 3131,
+        "stored_payload_sha256": "73556b0479ed1ab62896dc164a0f3e3f22603ee55459020843f6d56869dab763",
+        "stored_payload_size_bytes": 1135,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/73556b0479ed1ab62896dc164a0f3e3f22603ee55459020843f6d56869dab763.gz",
+            "sha256": "73556b0479ed1ab62896dc164a0f3e3f22603ee55459020843f6d56869dab763",
+            "size_bytes": 1135
+          }
+        ]
+      }
+    },
+    {
+      "role": "actual-closure-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/canonical-closure-command-02/receipt.json",
+        "sha256": "34480dec68033f89c2542a6de082aa4632dabbd367c9c3af0efdced1be2b41dd"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "34480dec68033f89c2542a6de082aa4632dabbd367c9c3af0efdced1be2b41dd",
+        "original_size_bytes": 3686,
+        "stored_payload_sha256": "9b941eb599f2caf61520a99a428c655988fb486defd2cfc4f8d79fad7ebf4544",
+        "stored_payload_size_bytes": 1452,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9b941eb599f2caf61520a99a428c655988fb486defd2cfc4f8d79fad7ebf4544.gz",
+            "sha256": "9b941eb599f2caf61520a99a428c655988fb486defd2cfc4f8d79fad7ebf4544",
+            "size_bytes": 1452
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-pre-write-closure-failure",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/canonical-closure-command-01/receipt.json",
+        "sha256": "d54fa0ccdca363593d2a935bbc246f4107a204708e072f5e2f0f1ffeefc954f3"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d54fa0ccdca363593d2a935bbc246f4107a204708e072f5e2f0f1ffeefc954f3",
+        "original_size_bytes": 3488,
+        "stored_payload_sha256": "45597f6f1fbc6d72ba54fd26945ba57b00836c2eaec88b50c5323214d30a6209",
+        "stored_payload_size_bytes": 1406,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/45597f6f1fbc6d72ba54fd26945ba57b00836c2eaec88b50c5323214d30a6209.gz",
+            "sha256": "45597f6f1fbc6d72ba54fd26945ba57b00836c2eaec88b50c5323214d30a6209",
+            "size_bytes": 1406
+          }
+        ]
+      }
+    },
+    {
+      "role": "fresh02-source-close_card.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/closure-proposal-prep-02/close_card.py",
+        "sha256": "d45c1a9015d5306ce299e8a7e73e92fe504fb7925cd4cb428ec5a9c4adf648d0"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d45c1a9015d5306ce299e8a7e73e92fe504fb7925cd4cb428ec5a9c4adf648d0",
+        "original_size_bytes": 18201,
+        "stored_payload_sha256": "e713b1c527fb7d6b1f9db4ee026f327cbb681cbe7d585776335098362031e8f8",
+        "stored_payload_size_bytes": 5695,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e713b1c527fb7d6b1f9db4ee026f327cbb681cbe7d585776335098362031e8f8.gz",
+            "sha256": "e713b1c527fb7d6b1f9db4ee026f327cbb681cbe7d585776335098362031e8f8",
+            "size_bytes": 5695
+          }
+        ]
+      }
+    },
+    {
+      "role": "fresh02-source-common.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/closure-proposal-prep-02/common.py",
+        "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+        "original_size_bytes": 6308,
+        "stored_payload_sha256": "aa92ba5f77daf617ff6fa3fb661be4f14e568518fcd9101db741b2bd129379d1",
+        "stored_payload_size_bytes": 2216,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/aa92ba5f77daf617ff6fa3fb661be4f14e568518fcd9101db741b2bd129379d1.gz",
+            "sha256": "aa92ba5f77daf617ff6fa3fb661be4f14e568518fcd9101db741b2bd129379d1",
+            "size_bytes": 2216
+          }
+        ]
+      }
+    },
+    {
+      "role": "fresh02-source-bindings.json",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/closure-proposal-prep-02/bindings.json",
+        "sha256": "602c58ef90e110b6eee71c8838b85cdae8f9a7ef6f3d6e51c83996be3cfd7564"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "602c58ef90e110b6eee71c8838b85cdae8f9a7ef6f3d6e51c83996be3cfd7564",
+        "original_size_bytes": 13362,
+        "stored_payload_sha256": "1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb",
+        "stored_payload_size_bytes": 3709,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb.gz",
+            "sha256": "1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb",
+            "size_bytes": 3709
+          }
+        ]
+      }
+    },
+    {
+      "role": "fresh02-source-source-mapping.json",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/closure-proposal-prep-02/source-mapping.json",
+        "sha256": "e01ad01cec80a6d08cf8eb682038bd5219e268739a03e5ff60aad2cddff8f39a"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e01ad01cec80a6d08cf8eb682038bd5219e268739a03e5ff60aad2cddff8f39a",
+        "original_size_bytes": 5154,
+        "stored_payload_sha256": "cbe9702da17ca8ed875f4342e8053f4d25ed45c3e3e68d5abadb23cadb6790de",
+        "stored_payload_size_bytes": 1233,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/cbe9702da17ca8ed875f4342e8053f4d25ed45c3e3e68d5abadb23cadb6790de.gz",
+            "sha256": "cbe9702da17ca8ed875f4342e8053f4d25ed45c3e3e68d5abadb23cadb6790de",
+            "size_bytes": 1233
+          }
+        ]
+      }
+    },
+    {
+      "role": "fresh02-source-card-notes.md",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/closure-proposal-prep-02/card-notes.md",
+        "sha256": "fdcc288d7e7c4ad32a9e3c8e329ed07c119f32194dcfb61d6a936bd153a69779"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "fdcc288d7e7c4ad32a9e3c8e329ed07c119f32194dcfb61d6a936bd153a69779",
+        "original_size_bytes": 810,
+        "stored_payload_sha256": "47b1b7d33776883e9ea97eef332aea05f4e47fe508219a6dc1e83394c5330efb",
+        "stored_payload_size_bytes": 594,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/47b1b7d33776883e9ea97eef332aea05f4e47fe508219a6dc1e83394c5330efb.gz",
+            "sha256": "47b1b7d33776883e9ea97eef332aea05f4e47fe508219a6dc1e83394c5330efb",
+            "size_bytes": 594
+          }
+        ]
+      }
+    },
+    {
+      "role": "actual-canonical-plan.json",
+      "binding": {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "33dae5669b91ecce1d898f38686c3bd7dc3585b7e440da086a480c74578cac97"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "33dae5669b91ecce1d898f38686c3bd7dc3585b7e440da086a480c74578cac97",
+        "original_size_bytes": 529840,
+        "stored_payload_sha256": "eb4365aeaac7b49779ba6b04bcdf30e66fea42bd998a9131bf7e6b16b2df5eb8",
+        "stored_payload_size_bytes": 104827,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/eb4365aeaac7b49779ba6b04bcdf30e66fea42bd998a9131bf7e6b16b2df5eb8.gz",
+            "sha256": "eb4365aeaac7b49779ba6b04bcdf30e66fea42bd998a9131bf7e6b16b2df5eb8",
+            "size_bytes": 104827
+          }
+        ]
+      }
+    },
+    {
+      "role": "actual-canonical-CLK-04.md",
+      "binding": {
+        "path": "energyplus_porting_plan/cards/CLK-04.md",
+        "sha256": "2ed71b9abbbf2427a62cdc1674a630953d7ba895f987ec9662e849ce6b023149"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "2ed71b9abbbf2427a62cdc1674a630953d7ba895f987ec9662e849ce6b023149",
+        "original_size_bytes": 3629,
+        "stored_payload_sha256": "536bc2ba4cd84744ed13d891949d5572577d37666041962f0884f9ece38fd7fd",
+        "stored_payload_size_bytes": 2064,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/536bc2ba4cd84744ed13d891949d5572577d37666041962f0884f9ece38fd7fd.gz",
+            "sha256": "536bc2ba4cd84744ed13d891949d5572577d37666041962f0884f9ece38fd7fd",
+            "size_bytes": 2064
+          }
+        ]
+      }
+    },
+    {
+      "role": "actual-canonical-CLK-04.json",
+      "binding": {
+        "path": "energyplus_porting_plan/evidence/CLK-04.json",
+        "sha256": "1de33156d741db6d53305a17b6bf50bd824a0398b0a2abdeae68bf0faca5ab0a"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "1de33156d741db6d53305a17b6bf50bd824a0398b0a2abdeae68bf0faca5ab0a",
+        "original_size_bytes": 12865,
+        "stored_payload_sha256": "8e377a6d8d72b4234957df9bb3762ece0e2d37c6a6a703834c89c84e69b187c2",
+        "stored_payload_size_bytes": 3490,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/8e377a6d8d72b4234957df9bb3762ece0e2d37c6a6a703834c89c84e69b187c2.gz",
+            "sha256": "8e377a6d8d72b4234957df9bb3762ece0e2d37c6a6a703834c89c84e69b187c2",
+            "size_bytes": 3490
+          }
+        ]
+      }
+    },
+    {
+      "role": "executed-supplement-source",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/closure-supplement-prep-01/archive_supplement.py",
+        "sha256": "aae22d42d790e8bb3872c526b21ce0e9085d32d8d6178d211af2bc813f0923e5"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "aae22d42d790e8bb3872c526b21ce0e9085d32d8d6178d211af2bc813f0923e5",
+        "original_size_bytes": 6520,
+        "stored_payload_sha256": "7c98106940a0e6bbf69e24a545e0c75ea8b581fd124591320cf5c6ef93739bce",
+        "stored_payload_size_bytes": 2656,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7c98106940a0e6bbf69e24a545e0c75ea8b581fd124591320cf5c6ef93739bce.gz",
+            "sha256": "7c98106940a0e6bbf69e24a545e0c75ea8b581fd124591320cf5c6ef93739bce",
+            "size_bytes": 2656
+          }
+        ]
+      }
+    }
+  ],
+  "exact_decompressed_bytes_verified": true,
+  "original_bytes_rewritten_or_JSON_reserialized": false,
+  "parent_archive_changed": false,
+  "scientific_values_compared": false,
+  "canonical_files_or_gates_changed": false,
+  "native_or_binary_copy_created": false,
+  "historical_pre_write_failure_relabelled_zero": false
+}

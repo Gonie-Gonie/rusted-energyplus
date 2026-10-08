@@ -1,0 +1,259 @@
+{
+  "schema": "clk04-independent-production-result-review.v1",
+  "status": "pass-authenticated-selected-production-result-and-honest-unavailable-scope",
+  "review_started_utc": "2026-10-08T14:24:18.395584+00:00",
+  "review_completed_utc": "2026-10-08T14:24:29.184082+00:00",
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-04/production-comparison-02/production-comparison.json",
+    "sha256": "4a29c5e1bb90caf1a89e81af99c697f4d80f7ed9b92079cfcbac6e18555649a6"
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CLK-04/production-comparison-command-02/receipt.json",
+    "sha256": "d52899a59912422f4d7cab04d21ded20d4b851f2fb29b43736ac3be7669e08d5"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CLK-04/production-build-02/build-receipt.json",
+    "sha256": "d8dbc943e4b789b432e950fc0662b6ced705b9c625fe6de1ebf0312f6a4e8901"
+  },
+  "matrix": {
+    "path": ".runtime/porting/CLK-04/production-execution-01/matrix.json",
+    "sha256": "e0c0e83c151194a5e1dea689d7d21882254b7c38bd5f0e758e8863d098b275cc"
+  },
+  "matrix_execution": {
+    "path": ".runtime/porting/CLK-04/production-execution-command-01/receipt.json",
+    "sha256": "541c47be90354b93401acbb712398ac6a8727d25e6d14cdac0271a67746f8877"
+  },
+  "plan": {
+    "path": ".runtime/porting/CLK-04/production-plan-01/plan.json",
+    "sha256": "9651e7c9748c42f14324cb13c71e4417ccedf1be94531184c0562dd2244ffd22"
+  },
+  "plan_execution": {
+    "path": ".runtime/porting/CLK-04/production-plan-command-01/receipt.json",
+    "sha256": "f5cfe4835f6556891ef1f1cf52c7251458ea538931e4fc72032c00affe1aa8c5"
+  },
+  "reviewed_unit_result": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-03/unit-comparison.json",
+    "sha256": "ad547d36ac37d5e69a6ef5317f6409c09e0875de91c951e5c9532af31c1d3ac6"
+  },
+  "reviewed_unit_result_review": {
+    "path": ".runtime/porting/CLK-04/independent-unit-result-review-01/review.json",
+    "sha256": "d7425d39aadbb5de36496ce98ec3b5c506888454fad10bbad6bb24dd2f763c9e"
+  },
+  "reviewed_unit_result_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-unit-result-review-command-01/receipt.json",
+    "sha256": "468245444e6d7a7e7067d7aa4ae870bff29170fe2cba82d6e361960d3cd44bac"
+  },
+  "reviewed_production_source_review": {
+    "path": ".runtime/porting/CLK-04/independent-production-workflow-source-review-03/review.json",
+    "sha256": "ec50f050b66eb7725fbdbca582c8ddc5e3d0f34ec646412963e586cf7ade2792"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-production-workflow-source-review-command-03/receipt.json",
+    "sha256": "b82cd512ea9b723181da4409d848909acb49c850b031c003b8783275925eee1f"
+  },
+  "reviewed_recomparison_source_review": {
+    "path": ".runtime/porting/CLK-04/independent-production-reader-amendment-source-review-02/review.json",
+    "sha256": "72a702cefb24bfe63075c71bb79ece8cb14be31c377562f6d082f5b59f8a81ec"
+  },
+  "recomparison_source_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-production-reader-amendment-source-review-command-02/receipt.json",
+    "sha256": "6b0dff8b7e739d564ba65877f0b13160de727c752418deb27c47f11d42197130"
+  },
+  "reader_source_amendment": {
+    "schema": "clk04-declared-null-summary-reader-amendment.v1",
+    "preserved_failed_report": {
+      "path": ".runtime/porting/CLK-04/production-comparison-01/production-comparison.json",
+      "sha256": "703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f"
+    },
+    "preserved_failed_comparison_execution": {
+      "path": ".runtime/porting/CLK-04/production-comparison-command-01/receipt.json",
+      "sha256": "bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67"
+    },
+    "archived_run_summary_schema": {
+      "path": ".runtime/porting/source-objects/77/77a0ba88568c69999cfbbb6fa93f4ce866818ed10a8436347d3cb638d5733b71",
+      "sha256": "77a0ba88568c69999cfbbb6fa93f4ce866818ed10a8436347d3cb638d5733b71"
+    },
+    "source_line_ranges": [
+      [
+        1013,
+        1016
+      ],
+      [
+        1445,
+        1446
+      ],
+      [
+        1486,
+        1486
+      ],
+      [
+        1975,
+        1978
+      ],
+      [
+        2044,
+        2045
+      ],
+      [
+        2615,
+        2618
+      ]
+    ],
+    "nullable_fields": [
+      "oracle",
+      "comparison"
+    ],
+    "required_flags": {
+      "oracle_baseline": false,
+      "compare_oracle": false
+    },
+    "required_statuses": {
+      "oracle_status": "not-requested",
+      "compare_status": "not-requested"
+    },
+    "both_null_observation": "unavailable required=false and never counted as PASS; one-sided null or unexpected value fails",
+    "historical_plan_and_matrix_unchanged": true,
+    "scientific_field_policy_changed": false,
+    "unavailable_counted_as_PASS": false,
+    "prior_source_review_assumption_miss": "The earlier production source review accepted required discrete comparison of schema-declared absent oracle/comparison metadata. The six actual failures remain preserved; this supplemental reader review follows those outputs and does not predate their engines."
+  },
+  "reviewed_original_recovery": {
+    "path": ".runtime/porting/CLK-04/original-recovery-01/recovery.json",
+    "sha256": "9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6"
+  },
+  "reviewed_original_data_review": {
+    "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+    "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+  },
+  "reviewed_preserved_failure_ledger": {
+    "path": ".runtime/porting/CLK-04/authenticated-unit-failure-review-02/review.json",
+    "sha256": "397b16a94116671b85b8f43fb1b2766e0ca4f39313b05d4868d21c8c30c73ccf"
+  },
+  "preserved_historical_Clippy101": {
+    "path": ".runtime/porting/CLK-04/candidate-clippy-command-01/receipt.json",
+    "sha256": "8475edf40de512527ebc0a0a1937e0eb431c9ec47db845eee8951bdb68920cff"
+  },
+  "preserved_actual_production_failure": {
+    "path": ".runtime/porting/CLK-04/production-comparison-01/production-comparison.json",
+    "sha256": "703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f"
+  },
+  "preserved_actual_production_failure_execution": {
+    "path": ".runtime/porting/CLK-04/production-comparison-command-01/receipt.json",
+    "sha256": "bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67"
+  },
+  "actual_reported_comparison_count": 3736442,
+  "actual_reported_mismatch_count": 0,
+  "actual_reported_comparison_metrics": {
+    "numeric_comparison_count": 67710,
+    "literal_binary64_comparison_count": 2847603,
+    "metadata_comparison_count": 821129
+  },
+  "actual_reported_comparison_categories": {
+    "typed_metadata": 821129,
+    "literal_binary64": 2847603,
+    "day_grid_and_raw_hour_cache/OutDryBulbTemp": 8850,
+    "day_grid_and_raw_hour_cache/OutDewPointTemp": 8850,
+    "day_grid_and_raw_hour_cache/OutBaroPress": 8850,
+    "day_grid_and_raw_hour_cache/OutRelHum": 8850,
+    "day_grid_and_raw_hour_cache/WindSpeed": 8850,
+    "day_grid_and_raw_hour_cache/WindDir": 8850,
+    "day_grid_and_raw_hour_cache/LiquidPrecip": 8850,
+    "current_non_solar_weather/OutDryBulbTemp": 480,
+    "current_non_solar_weather/OutDewPointTemp": 480,
+    "current_non_solar_weather/OutBaroPress": 480,
+    "current_non_solar_weather/OutRelHum": 480,
+    "current_non_solar_weather/OutRelHumValue": 480,
+    "current_non_solar_weather/OutHumRat": 480,
+    "current_non_solar_weather/OutWetBulbTemp": 480,
+    "current_non_solar_weather/WindSpeed": 480,
+    "current_non_solar_weather/WindDir": 480,
+    "current_non_solar_weather/LiquidPrecipitation": 480,
+    "current_non_solar_weather/OutEnthalpy": 480,
+    "current_non_solar_weather/OutAirDensity": 480
+  },
+  "actual_unavailable_path_count": 5755,
+  "six_declared_nullable_summary_locations_recorded_unavailable": [
+    "A-24H/ordinary_summary/comparison",
+    "A-24H/ordinary_summary/oracle",
+    "A-72H/ordinary_summary/comparison",
+    "A-72H/ordinary_summary/oracle",
+    "B-BOTH-24H/ordinary_summary/comparison",
+    "B-BOTH-24H/ordinary_summary/oracle"
+  ],
+  "selected_numeric_counts_metrics_and_categories_unchanged_from_preserved_report": true,
+  "historical_failed_report_relabelled_zero": false,
+  "actual_cli_receipts": [
+    {
+      "path": ".runtime/porting/CLK-04/production-execution-01/A-24H/full-command/receipt.json",
+      "sha256": "1037d27808ec5adc6504dd25c49d31b68a2a7515ee13f3ea2a4392f5c1d282f7"
+    },
+    {
+      "path": ".runtime/porting/CLK-04/production-execution-01/A-24H/summary-command/receipt.json",
+      "sha256": "94b01346793630b802a858f704475b8c5e5e548c13bb0afc715557e01f5f5b91"
+    },
+    {
+      "path": ".runtime/porting/CLK-04/production-execution-01/A-72H/full-command/receipt.json",
+      "sha256": "809aac31fece66375d1b3a85e79f89f40b0fb777731c89d8bb42723e4c9e817c"
+    },
+    {
+      "path": ".runtime/porting/CLK-04/production-execution-01/A-72H/summary-command/receipt.json",
+      "sha256": "b38f74ee573978c8faf3929913768d325c6df6dcce8838c2fb294412c30e00f8"
+    },
+    {
+      "path": ".runtime/porting/CLK-04/production-execution-01/B-BOTH-24H/full-command/receipt.json",
+      "sha256": "5ee1f7efb75343fc5d3c09f44100c5959265ff78580275a40dba884d0aacb689"
+    },
+    {
+      "path": ".runtime/porting/CLK-04/production-execution-01/B-BOTH-24H/summary-command/receipt.json",
+      "sha256": "a36bb01b16525291d71e289d0f831e82d63e8e8f3d6b4d24803e218eadd29df7"
+    }
+  ],
+  "actual_Current_steps": 480,
+  "actual_native_production_source_calls": 963,
+  "implementation_commit": "15127617dbc39ee82f0e631e3fe99a3a2fc1e87e",
+  "crates_tree": "7b46dc28bef9230a13c200050ddfc9ba9ff48980",
+  "historical_source_snapshot": {
+    "path": ".runtime/porting/source-objects/50/50f732be776f2141f4afb33d9caae730d02c50d7329b24bce37cb437f9b27518",
+    "sha256": "50f732be776f2141f4afb33d9caae730d02c50d7329b24bce37cb437f9b27518"
+  },
+  "current_source_or_HEAD_equality_required": false,
+  "upstream_native_numeric_payload_opened": false,
+  "full_trace_JSON_parsed_for_recomparison": false,
+  "unavailable_counted_as_PASS": false,
+  "scientific_values_compared": false,
+  "numerical_comparisons_by_this_reviewer": null,
+  "scientific_comparer_or_engine_reexecuted": false,
+  "whole_physical_system_certified": false,
+  "child_interpreter_resolution": {
+    "reported_interpreter_token": "python",
+    "child_executable_resolution_independently_observed": false,
+    "parent_executable_is_alias_resolution_proof": false,
+    "unavailable_resolution_counted_as_PASS": false
+  },
+  "final_quality_or_cleanup_completion_claimed": false,
+  "later_quality_and_observer_only_lineage_are_separate_closure_prerequisites": true,
+  "gates_updated": false,
+  "actual_metadata_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-result-review-prep-05/review_result.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-production-result-review-01/review_result.py",
+        "sha256": "417f9527f15b04da76ffedb4b7e3c7b26a6a5b4ad92d5bc7914213fd8f5b5140"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/production-result-review-prep-05/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/independent-production-result-review-01/common.py",
+        "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7"
+      }
+    }
+  ],
+  "authorship_disclosure": {
+    "verifier_author": "/root/clk02_raw_port",
+    "authored_reused_unit_comparer_and_raw_cursor": true,
+    "authored_Header_production_comparer": false,
+    "own_numerical_code_QA_claimed_independent": false,
+    "scope": "independent actual production report/receipt/source-projection factual authentication; no numerical recomputation"
+  }
+}

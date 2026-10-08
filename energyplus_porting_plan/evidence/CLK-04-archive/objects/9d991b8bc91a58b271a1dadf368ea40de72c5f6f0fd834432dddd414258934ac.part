@@ -1,0 +1,200 @@
+"""Historical engine and observer proof authentication, never a new engine call."""
+from geo03_provenance import (ROOT, archive_map, exact, execution_interval, path_of,
+    read, require, same_binding, timestamp, verify_rust_build)
+from pathlib import Path
+
+AUTHORITIES = {
+    'native_recovery': {'path':'.runtime/porting/CLK-04/original-recovery-01/recovery.json',
+        'sha256':'9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6'},
+    'native_recovery_execution': {'path':'.runtime/porting/CLK-04/original-recovery-command-01/receipt.json',
+        'sha256':'31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130'},
+    'original_data_review': {'path':'.runtime/porting/CLK-04/independent-original-data-review-01/review.json',
+        'sha256':'164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1'},
+    'original_data_review_execution': {'path':'.runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json',
+        'sha256':'1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0'},
+    'baseline_gap': {'path':'.runtime/porting/CLK-04/legacy-gap-observation-01/gap.json',
+        'sha256':'5806571825a4241c43ba2585d1faf1c5eb5043eccd0be20b763b8c47e1efec3c'},
+    'baseline_gap_execution': {'path':'.runtime/porting/CLK-04/legacy-gap-command-01/receipt.json',
+        'sha256':'0078c4ad7a6feb532e8775bcaea2f038ff889fb0c8dbee22b19b6c7e2e89e3b7'},
+}
+
+
+def authorities(args,checked,binding):
+    """Pins only accepted metadata proofs, never selected numerical operands."""
+    from geo03_provenance import ref
+    for name,expected in AUTHORITIES.items():
+        binding(ref(getattr(args,name)),expected,checked)
+
+
+def sources(checked, rows, count=None):
+    result = archive_map(rows,checked)
+    require(count is None or len(result) == count, 'Exact source inventory cardinality differs')
+    for owner,archive in result.items():
+        require(path_of(owner).read_bytes() == checked.check(archive).read_bytes(), 'Historical source/input archive differs')
+    return result
+
+
+def script(record, archive, checked):
+    # The executed script follows only the admitted interpreter controls; a
+    # later .py data argument after Python -c/-m is never an executed script.
+    command = record['command']
+    require(len(command) >= 2 and Path(command[0]).name.lower() in
+        ['python','python.exe','python3','python3.exe','python3.12','python3.12.exe'], 'Admitted Python interpreter required')
+    index,seen = 1,set()
+    while index < len(command) and command[index] in ['-X','-B']:
+        option = command[index]
+        require(option not in seen, 'Repeated Python metadata option rejected')
+        seen.add(option); index += 1
+        if option == '-X':
+            require(index < len(command) and command[index] == 'utf8', 'Only declared Python UTF8 mode admitted')
+            index += 1
+    require(index < len(command) and not command[index].startswith('-') and command[index].endswith('.py')
+        and path_of(command[index]).read_bytes() == checked.check(archive).read_bytes(),
+        'Actually executed metadata script does not match its preserved source archive')
+
+
+def argument(record, name, expected, checked):
+    command = record['command']
+    require(command.count(name) == 1, 'Unique actual declared argument required: '+name)
+    index = command.index(name)
+    require(index+1 < len(command) and path_of(command[index+1]) == checked.check(expected),
+        'Actual metadata argument binding differs: '+name)
+
+
+def reviewed(checked, recorded, reference, execution, schema, status, not_after):
+    value = read(checked.check(reference))
+    require(value['schema'] == schema and value['status'] == status
+        and value['scientific_execution_performed'] is False, 'Required independent source/metadata review differs')
+    record,start,finish = recorded(checked,execution,value)
+    require(start <= timestamp(value['review_started_utc']) <= timestamp(value['review_completed_utc'])
+        <= finish <= not_after, 'Actual independent review chronology differs')
+    return value,record,finish
+
+
+def guard_identity(checked, left, right):
+    require(exact({key:value for key,value in left.items() if key != 'observed_utc'},
+        {key:value for key,value in right.items() if key != 'observed_utc'}),
+        'Recorded whole-source/compiler/core/registry/target preservation guards differ')
+    checked.recursive(left); checked.recursive(right)
+
+
+def native(checked, recorded, binding, recovery, original, outer_start, outer_finish, recovery_record):
+    build_ref = recovery['native_driver_build']
+    build = read(checked.check(build_ref))
+    require(build['schema'] == 'clk04-native-driver-build.v1' and build['checks_passed'] is True
+        and build['source_commit'] == recovery['energyplus_commit'] and build['target'] == 'clk04_reference_helper'
+        and build['assertions_enabled'] is True and build['fp_contract'] == 'off'
+        and build['previous_compile_row_count'] == 657 and build['frozen_core_compile_row_count'] == 643,
+        'Genuine successful cached-core build/ABI/FP identity required')
+    for key in ['scientific_source_patches','scientific_execution_performed','Cargo_or_Git_executed','gates_updated',
+        'original_removed','full_linked_original_copied','existing_unit_packet_or_actual_receipts_rewritten']:
+        require(build[key] is False, 'Actual build claim boundary differs: '+key)
+    for key in ['original_core_and_API_bytes_unchanged','same_compiler_owned_state',
+        'original_directory_and_target_definitions_inherited','existing_target_compile_commands_unchanged']:
+        require(build[key] is True, 'Actual build source preservation differs: '+key)
+    built_sources = sources(checked,build['executed_source_archives'],38)
+    historical_sources = sources(checked,original['executed_source_archives'],42)
+    require(set(built_sources) <= set(historical_sources) and all(
+        built_sources[key]['sha256'] == historical_sources[key]['sha256'] for key in built_sources),
+        'Original wrapper does not preserve actual compiled native source inventory')
+    sources(checked,original['input_archives'])
+    actual_rows = read(checked.check(build['compile_commands']))
+    prior_rows = read(checked.check(build['previous_compile_commands']))
+    core_rows = read(checked.check(build['frozen_original_build_commands']))
+    require([len(actual_rows),len(prior_rows),len(core_rows)] == [658,657,643], 'Actual compile registry cardinality differs')
+    require(all(any(exact(old,row) for row in actual_rows) for old in [*prior_rows,*core_rows]),
+        'Inherited compile registry rows changed')
+    completed = []
+    for key in ['configure','compile_link','derivation_command']:
+        _,finish = execution_interval(read(checked.check(build[key])),checked)
+        completed.append(finish)
+    actual_build,_,build_finish = recorded(checked,recovery['actual_build_execution'],
+        {'driver_build':build_ref,'checks_passed':True,'helper_binary':build['helper_binary']})
+    require(max(completed) <= build_finish, 'Native command completion exceeds recorded build')
+    peer,peer_record,_ = reviewed(checked,recorded,recovery['independent_actual_build_review'],
+        recovery['independent_actual_build_review_execution'],'clk04-independent-native-build-review.v1',
+        'pass-build-and-derivative-before-original-execution',outer_start)
+    binding(peer['reviewed_build'],build_ref,checked)
+    binding(peer['actual_build_command'],recovery['actual_build_execution'],checked)
+    require(build_finish <= timestamp(peer['review_started_utc'])
+        and exact(peer['reviewed_source_archives'],build['executed_source_archives']), 'Actual PE review/source identity differs')
+    script(peer_record,peer['executed_reader'],checked)
+    for key in ['actual_independent_PE_validation','actual_linked_original','reviewed_binary']:
+        checked.check(peer[key])
+    binding(peer['reviewed_binary'],build['helper_binary'],checked)
+    checked.recursive(read(checked.check(peer['actual_independent_PE_validation'])))
+    contract_review = read(checked.check(build['independent_contract_review']))
+    require(contract_review['schema'] == 'clk04-independent-frozen-contract-review.v1'
+        and contract_review['status'] == 'pass-frozen-input-source-policy-before-native-build', 'Frozen six independent review required')
+    for name,key in [('contract_review','independent_contract_review'),('helper_static_review','independent_helper_static_review'),
+        ('builder_review','independent_builder_static_review')]:
+        value = read(checked.check(build[key]))
+        _,start,finish = recorded(checked,build['reviewed_source_executions'][name],value)
+        require(start <= timestamp(value['review_started_utc']) <= timestamp(value['review_completed_utc'])
+            <= finish <= timestamp(build['started_utc']), 'Input/source review did not precede actual native build')
+    for key,owner in [('actual_request','helper_request'),('native_admission_contract','native_admission_contract'),
+        ('observation_projection','projection'),('executed_helper','helper_binary')]:
+        binding(recovery[key],build[owner],checked); binding(original[key],build[owner],checked)
+    require(exact(recovery['contracts'],build['contracts']) and exact(original['contracts'],build['contracts']),
+        'Native compiled/adopted contract identities differ')
+    launch,launch_record,_ = reviewed(checked,recorded,recovery['independent_launcher_source_review'],
+        recovery['independent_launcher_source_review_execution'],'clk04-independent-original-launcher-static-review.v1',
+        'pass-source-and-input-contract-before-original-execution',outer_start)
+    reviewed_launch = sources(checked,launch['reviewed_sources'],4)
+    require(set(reviewed_launch) <= set(historical_sources) and all(
+        reviewed_launch[key]['sha256'] == historical_sources[key]['sha256'] for key in reviewed_launch),
+        'Genuine original launcher source differs from independent review')
+    recovery_review,source_record,_ = reviewed(checked,recorded,recovery['independent_recovery_source_review'],
+        recovery['independent_recovery_source_review_execution'],'clk04-independent-original-recovery-static-review.v1',
+        'pass-metadata-only-adoption-of-actual-original-before-data-review',timestamp(recovery['started_utc']))
+    require(outer_finish <= timestamp(recovery_review['review_started_utc']), 'Recovery source review preceded failed wrapper')
+    actual_sources = sources(checked,recovery['executed_source_archives'],4)
+    reviewed_sources = sources(checked,recovery_review['reviewed_sources'],4)
+    require(set(actual_sources) == set(reviewed_sources) and all(actual_sources[key]['sha256']
+        == reviewed_sources[key]['sha256'] for key in actual_sources), 'Actual recovery code differs from reviewed metadata code')
+    main = next(value for owner,value in actual_sources.items() if owner.endswith('/recover.py'))
+    script(recovery_record,main,checked)
+    for key,expected in [('reviewed_failed_reference',recovery['preserve_original_reference']),
+        ('reviewed_failed_outer_execution',recovery['failed_original_execution']),
+        ('reviewed_native_execution',recovery['native_execution']),('reviewed_preserved_results',recovery['results'])]:
+        binding(recovery_review[key],expected,checked)
+    before = original['preservation_observations']['before_execution']
+    final = original['preservation_observations']['failure_final']
+    require(exact(original['preservation_observations'],recovery['original_preservation_observations']),
+        'Actual historical guards were rewritten by metadata adoption')
+    for value in [final,recovery['preservation_observations']['before_recovery'],recovery['preservation_observations']['after_recovery']]:
+        guard_identity(checked,before,value)
+    native_record = read(checked.check(recovery['native_execution']))
+    require(timestamp(before['observed_utc']) <= timestamp(native_record['started_utc'])
+        <= timestamp(native_record['finished_utc']) <= timestamp(final['observed_utc']), 'Recorded guards do not bracket native child')
+    return build
+
+
+def gap(checked, recorded, binding, value, record, recovery_ref, data_ref, args, data_finish):
+    expected = {'native-reference':recovery_ref,'native-execution':args.native_recovery_execution,
+        'original-data-review':data_ref,'original-data-review-execution':args.original_data_review_execution}
+    from geo03_provenance import ref
+    for key,item in expected.items():
+        binding(value['reviewed_evidence'][key],ref(item) if not isinstance(item,dict) else item,checked)
+    script(record,value['executed_reader'],checked)
+    checked.check(value['authenticated_metadata_utility_archive'])
+    require(value['authenticated_metadata_utility_archive']['sha256']
+        == '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5', 'Gap metadata dependency differs')
+    reviewed_evidence = value['reviewed_evidence']
+    build,available,compile_record = verify_rust_build(reviewed_evidence['rust-build'],checked,kind='example',
+        example='clk04_legacy_probe',committed=True,required_sources=['crates/ep_runtime/examples/clk04_legacy_probe.rs'])
+    legacy = read(checked.check(reviewed_evidence['legacy-execution']))
+    _,legacy_start,legacy_finish = recorded(checked,reviewed_evidence['legacy-execution'],read(checked.check(legacy['stdout'])))
+    binding(legacy['stdout'],reviewed_evidence['legacy-results'],checked)
+    binding(legacy['source_snapshot'],build['source_snapshot'],checked)
+    require(exact(legacy['executed_launcher'],build['actual_executed_recorder']) and len(legacy['command']) == 2
+        and path_of(legacy['command'][0]) == checked.check(build['binary'])
+        and path_of(legacy['command'][1]) == checked.check(value['observer_request']), 'Actual existing Rust baseline route differs')
+    require(data_finish <= legacy_start and timestamp(compile_record['finished_utc']) <= legacy_start <= legacy_finish
+        <= timestamp(value['review_started_utc']) <= timestamp(value['review_completed_utc'])
+        <= timestamp(record['finished_utc']), 'Original-first actual legacy gap chronology differs')
+    require(value['available_source_inventory_count'] == len(available)
+        and value['baseline_implementation_commit'] == build['implementation_commit']
+        and value['baseline_crates_tree'] == build['crates_tree'], 'Gap actual baseline build identity differs')
+    checked.recursive(value['preserved_pre_observer_source_snapshot'])
+    return value['reviewed_evidence']['rust-build']

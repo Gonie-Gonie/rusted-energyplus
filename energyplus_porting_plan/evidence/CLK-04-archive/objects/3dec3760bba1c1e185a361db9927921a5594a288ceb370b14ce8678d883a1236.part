@@ -1,0 +1,177 @@
+"""Authenticate pinned source and independently review the held hourly-only fix."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import json
+import shutil
+
+ROOT = Path(__file__).resolve().parents[4]
+PIN = "6f2e40d10250a105b49966baa24d843711e61048"
+SOURCE_SHA = "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+HELD = ".runtime/porting/CLK-04/hourly-pre-normalization-prep-01/hourly.rs"
+HELD_SHA = "d5a12779499c6dbe7a6c553d98e6a38edbf93f9485c65709ef23313570bb5a57"
+FAIL_SHA = "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+FAIL_EXEC_SHA = "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+FROZEN = {
+    "source": ("source.json", "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"),
+    "cases": ("cases.json", "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"),
+    "tolerances": ("tolerances.json", "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"),
+    "helper_request": ("helper-request.json", "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"),
+    "projection": ("projection.json", "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"),
+    "native_admission_contract": ("native-admission-contract.json", "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"),
+}
+RANGES = [(2727, 2737, "hour admission before normalization"), (2779, 2823, "selected five pre-missing sentinel conversions with unpaired neighbors retained"),
+    (2880, 2965, "existing missing replacement, count-only range branches and hourly writes"),
+    (3011, 3040, "existing hourly rain/default and six history writes; incoming Liquid cache retained")]
+INSERTION = """
+    // Source preconditioning follows hour/date admission and precedes the
+    // missing/range/history pass. It changes local values, never the raw owner.
+    // WeatherManager.cc:2779-2793 and 2821-2822.
+    if pressure < 0.0 {
+        pressure = 999999.0;
+    }
+    if speed < 0.0 {
+        speed = 999.0;
+    }
+    if direction < -360.0 || direction > 360.0 {
+        direction = 999.0;
+    }
+    if humidity < 0.0 {
+        humidity = 999.0;
+    }
+    if liquid < 0.0 {
+        liquid = 999.0;
+    }
+"""
+
+
+def require(value, reason):
+    if not value:
+        raise ValueError(reason)
+
+
+def ref(path):
+    path = Path(path).resolve(strict=True)
+    require(path.is_relative_to(ROOT) and path != ROOT and path.is_file() and not path.is_symlink(), "Contained actual file required")
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def checked(value):
+    require(type(value) is dict and {"path", "sha256"} <= set(value), "Typed actual reference required")
+    path = ROOT / value["path"]
+    require(ref(path)["sha256"] == value["sha256"], "Actual referenced bytes differ")
+    return path
+
+
+def read(path):
+    def pairs(rows):
+        result = {}
+        for key, value in rows:
+            require(key not in result, "Duplicate JSON key")
+            result[key] = value
+        return result
+    def invalid(value):
+        raise ValueError("Nonfinite metadata constant: " + value)
+    return json.loads(Path(path).read_text(encoding="utf8"), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def typed_same(left, right):
+    if type(left) is not type(right): return False
+    if isinstance(left, dict): return set(left) == set(right) and all(typed_same(left[key], right[key]) for key in left)
+    if isinstance(left, list): return len(left) == len(right) and all(typed_same(a, b) for a, b in zip(left, right, strict=True))
+    return left == right
+
+
+def utc(value):
+    result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    require(result.tzinfo is not None and result.utcoffset().total_seconds() == 0, "Aware UTC required")
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--failed-comparison", type=Path, required=True)
+    parser.add_argument("--failed-comparison-execution", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    args = parser.parse_args(); started = datetime.now(timezone.utc).isoformat()
+    require(Path.cwd().resolve() == ROOT, "Actual repository cwd required")
+    packet = {name: {"path": ".runtime/porting/CLK-04/frozen-packet-01/" + filename, "sha256": sha}
+        for name, (filename, sha) in FROZEN.items()}
+    for value in packet.values(): checked(value)
+    source = read(checked(packet["source"]))
+    require(source["energyplus_commit"] == PIN, "Pinned original commit differs")
+    rows = [row for row in source["source_files"] if row["path"] == "src/EnergyPlus/WeatherManager.cc"]
+    require(len(rows) == 1 and rows[0]["sha256"] == SOURCE_SHA, "Complete pinned WeatherManager source required")
+    cpp_path = checked(rows[0]["original"]); old_archive = checked(rows[0]["archive"])
+    cpp = cpp_path.read_bytes(); require(cpp == old_archive.read_bytes(), "Complete original/archive byte identity differs")
+    prior_audit = source["prior_source_audit"]; checked(prior_audit)
+    omitted = [(a, b) for a, b, _ in RANGES[:2]]
+    require(not any(row["start_line"] <= 2779 and row["end_line"] >= 2823 for row in source["selected_ranges"]),
+        "Historical audit phase omission must remain explicit")
+    held_ref = {"path": HELD, "sha256": HELD_SHA}; held_path = checked(held_ref)
+    before_path = ROOT / ".runtime/porting/CLK-04/hourly-pre-normalization-prep-01/hourly-before.rs"
+    canonical = ROOT / "crates/ep_runtime/src/weather_day/hourly.rs"
+    before = before_path.read_text(encoding="utf8"); held = held_path.read_text(encoding="utf8")
+    require(canonical.read_bytes() == before_path.read_bytes(), "Canonical hourly must remain historical before Root promotion")
+    before_body = before.split("#[cfg(test)]", 1)[0]; held_body = held.split("#[cfg(test)]", 1)[0]
+    require(held_body.count(INSERTION) == 1 and held_body.replace(INSERTION, "", 1) == before_body,
+        "Production delta must be exactly five pre-missing local sentinel conversions")
+    require(held_body.index(INSERTION) < held_body.index("if dry >= 99.9"), "Normalization must precede every missing/range/history pass")
+    require("raw: &RawEpwOutputs" in held_body and "missing.liquid_precip =" not in held_body, "Raw and incoming Liquid cache ownership must remain unchanged")
+    for token in ["negative_selected_inputs_become_missing_before_range_and_history", "minus_360_wind_remains_range_only_but_lower_values_are_missing",
+        "owner.out_of_range_counts, Default::default()", "owner.missing_values.base.liquid_precip, 0.75", "input.mandatory_reals[14], 360.0001",
+        "boundary.wind_dir, -360.0", "owner.out_of_range_counts.wind_dir, 1", "counts.liquid_precip, 19"]:
+        require(token in held, "Meaningful source-bound regression storage/counter assertion required: " + token)
+    failed_ref = ref(args.failed_comparison); execution_ref = ref(args.failed_comparison_execution)
+    require(failed_ref["sha256"] == FAIL_SHA and execution_ref["sha256"] == FAIL_EXEC_SHA, "Actual retained failed unit attempt differs")
+    failed = read(checked(failed_ref)); execution = read(checked(execution_ref))
+    require(failed["schema"] == "clk04-unit-comparison.v1" and failed["scientific_certification_passed"] is False
+        and failed["status"] == "fail-selected-day-current-state-or-source-order", "Actual scientific failure must remain failure")
+    counts = failed["comparison"]
+    require(type(counts["comparison_count"]) is int and type(counts["mismatch_count"]) is int
+        and counts["comparison_count"] == 5517963 and counts["mismatch_count"] == 3163, "Transcribed actual failure counts differ")
+    require(execution["schema"] == "recorded-porting-command.v1" and execution["exit_code"] == 1
+        and execution["launch_error"] is None and execution["source_bytes_match_before_and_after"] is True,
+        "Preserved actual failed scientific recorder required")
+    require(typed_same(read(checked(execution["stdout"])), failed), "Actual failed recorder stdout must exactly bind retained report")
+    require(utc(execution["started_utc"]) <= utc(failed["started_utc"]) <= utc(failed["completed_utc"])
+        <= utc(execution["finished_utc"]) <= utc(started), "Failure-before-amendment UTC differs")
+    bindings = [*packet.values(), rows[0]["original"], rows[0]["archive"], prior_audit, held_ref,
+        ref(before_path), ref(canonical), failed_ref, execution_ref, execution["stdout"], execution["stderr"], ref(Path(__file__))]
+    before_hashes = [ref(checked(value)) for value in bindings]
+    output = args.output_dir.resolve(); require(output.is_relative_to(ROOT / ".runtime/porting/CLK-04") and not output.exists(), "Fresh contained metadata output required")
+    output.mkdir(); archive = output / "complete-WeatherManager.cc"; archive.write_bytes(cpp)
+    lines = cpp.splitlines(keepends=True); range_rows = []
+    for index, (start, end, role) in enumerate(RANGES):
+        data = b"".join(lines[start-1:end]); path = output / ("range-" + str(index) + ".txt"); path.write_bytes(data)
+        range_rows.append({"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "ReadEPlusWeatherForDay", "start_line": start,
+            "end_line": end, "role": role, "archive": ref(path), "bytes_normalized": False})
+    source_refs = []
+    for name, path in [("held-hourly.rs", held_path), ("historical-hourly.rs", before_path), ("reviewer.py", Path(__file__))]:
+        target = output / name; shutil.copyfile(path, target); source_refs.append({"historical_path": path.relative_to(ROOT).as_posix(), "archive": ref(target)})
+    require(before_hashes == [ref(checked(value)) for value in bindings], "All accepted source/input/failure bytes must remain unchanged")
+    completed = datetime.now(timezone.utc).isoformat()
+    report = {"schema": "clk04-selected-hourly-source-phase-amendment.v1",
+        "status": "recorded-authentic-prephase-and-independent-held-hourly-review-before-next-candidate",
+        "review_started_utc": started, "review_completed_utc": completed, "energyplus_commit": PIN,
+        "native_six_packet": packet, "reviewed_historical_source_audit": prior_audit,
+        "complete_original_source": rows[0]["original"], "complete_source_archive": ref(archive), "source_ranges": range_rows,
+        "historical_source_audit_omitted_selected_prephase": True, "hour_validation_range": [2727, 2737],
+        "line_2737_is_blank_after_hour_validation": True, "source_prephase_is_sentinel_conversion_not_clamping": True,
+        "selected_prephase_fields_only": ["OutBaroPress", "WindSpeed", "WindDir", "OutRelHum", "LiquidPrecip"],
+        "raw_owner_unmodified": True, "selected_six_history_and_count_only_branches_retained": True,
+        "incoming_Liquid_missing_cache_and_rain_default_distinct": True, "negative_360_boundary_semantics_retained": True,
+        "held_corrected_hourly": held_ref, "reviewed_sources": source_refs, "regression_tests_authored_not_executed_by_reviewer": True,
+        "preserved_failed_unit_report": failed_ref, "preserved_failed_unit_execution": execution_ref,
+        "actual_failed_comparisons": counts["comparison_count"], "actual_failed_mismatches": counts["mismatch_count"],
+        "numeric_fields_or_tolerances_or_cases_changed": False, "native_packet_rewritten": False,
+        "scientific_execution_performed": False, "numerical_PASS_claimed": False, "gates_updated": False,
+        "canonical_Rust_promoted_by_reviewer": False, "native_RHS_executed_or_expected_answers_generated": False,
+        "authorship_disclosure": "Header independently reviewed Baseline's held hourly-only source correction. Header's own observer/trace/consumer/workflow code is outside this independent source review. Whole weather physics and numerical equivalence remain uncertified; Root must promote, test and run a fresh genuine candidate."}
+    with (output / "source-amendment.json").open("x", encoding="utf8", newline="\n") as stream:
+        json.dump(report, stream, indent=2, ensure_ascii=False, allow_nan=False); stream.write("\n")
+    print(json.dumps(report, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == "__main__": main()

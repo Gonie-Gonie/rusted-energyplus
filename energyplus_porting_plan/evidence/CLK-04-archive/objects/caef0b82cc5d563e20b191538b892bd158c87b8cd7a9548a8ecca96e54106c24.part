@@ -1,0 +1,191 @@
+"""Metadata only: exact observer cleanup lineage and actual final quality receipts."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+UTILITY = ROOT/'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+PLAN = ROOT/'.runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/plan.json'
+PLAN_SHA = '5c94092f980a2be01c06c1965e24e48479e808bcb2dd0914d3db949c8c973ce0'
+OLD_CLIPPY = ROOT/'.runtime/porting/CLK-04/candidate-clippy-command-01/receipt.json'
+
+
+def require(value, message):
+    if not value: raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def snapshot(binding, utility, checked):
+    value = utility.read(checked.check(binding))
+    require(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False,
+        'Authentic complete available source snapshot required')
+    rows = value['files'];indexed = utility.archive_map(rows,checked)
+    require(type(rows) is list and len(rows) == len(indexed) == 3731,'Exact 3731 complete source/config entries required')
+    require(sum(path.endswith('.rs') for path in indexed) == 3718,'Exact3718 Rust and13 Cargo/config scope required')
+    for row in rows:
+        require(type(row['size_bytes']) is int and row['size_bytes'] == checked.check(row['archive']).stat().st_size,
+            'Actual source archive size differs')
+    return indexed
+
+
+def recorded(binding, utility, checked, *, expected_exit=0):
+    receipt = utility.read(checked.check(binding))
+    require(receipt['schema'] == 'recorded-porting-command.v1' and receipt['launch_error'] is None
+        and type(receipt['exit_code']) is int and receipt['exit_code'] == expected_exit
+        and receipt['source_bytes_match_before_and_after'] is True
+        and receipt['repository_before']['worktree_clean'] is True
+        and receipt['repository_after']['worktree_clean'] is True
+        and receipt['recorder_updates_gates'] is False and receipt['recorder_supplies_reference_answers'] is False,
+        'Actual unchanged-source recorded command/exit required')
+    start,finish = utility.execution_interval(receipt,checked,exit_code=expected_exit)
+    return receipt,start,finish
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['scientific-build','workspace-tests','clippy','format-check','source-quality','structure-quality',
+        'cleanup-source-review','cleanup-source-review-execution','output-dir']:
+        parser.add_argument('--'+key,type=Path,required=True)
+    args = parser.parse_args();started = now()
+    require(Path.cwd().resolve() == ROOT and hashlib.sha256(UTILITY.read_bytes()).hexdigest() == UTILITY_SHA,
+        'Pinned execution-free metadata utility required before import')
+    require(hashlib.sha256(PLAN.read_bytes()).hexdigest() == PLAN_SHA,'Held cleanup proposal changed')
+    spec = importlib.util.spec_from_file_location('geo03_provenance',UTILITY)
+    require(spec is not None and spec.loader is not None,'Metadata loader unavailable')
+    utility = importlib.util.module_from_spec(spec);spec.loader.exec_module(utility)
+    checked = utility.Bindings();plan_ref = utility.ref(PLAN);plan = utility.read(checked.check(plan_ref))
+    require(plan['schema'] == 'clk04-proposed-observer-clippy-cleanup.v1'
+        and plan['canonical_files_written'] is False and plan['mathematical_functions_or_production_modules_changed'] is False,
+        'Genuine held observer-only cleanup plan required')
+    build_ref = utility.ref(args.scientific_build)
+    build,available,_ = utility.verify_rust_build(build_ref,checked,kind='example',example='clk04_candidate_probe',committed=True)
+    original = snapshot(build['source_snapshot'],utility,checked)
+    require(set(original) == set(available),'Actual scientific build available sources differ')
+    files = plan['files'];allowed = {row['historical_path']:row for row in files}
+    require(len(files) == len(allowed) == 5 and all(path.startswith('crates/ep_runtime/examples/clk04_') for path in allowed),
+        'Exactly five already-reviewed passive observer paths required')
+    for path,row in allowed.items():
+        require(path in original and checked.check(original[path]).read_bytes() == checked.check(row['before']).read_bytes(),
+            'Held cleanup before-source differs from actual scientific compilation archive')
+        checked.check(row['source_diff']);checked.check(row['proposed'])
+
+    review_ref = utility.ref(args.cleanup_source_review);review = utility.read(checked.check(review_ref))
+    require(review['schema'] == 'clk04-independent-observer-cleanup-source-review.v1'
+        and review['status'] == 'pass-observer-only-cleanup-source-before-final-quality'
+        and review['scientific_execution_performed'] is False
+        and utility.same_binding(review['reviewed_cleanup_plan'],plan_ref),'Independent Root/peer source read required')
+    review_execution_ref = utility.ref(args.cleanup_source_review_execution)
+    review_record,review_start,review_finish = recorded(review_execution_ref,utility,checked)
+    require(utility.exact(utility.read(checked.check(review_record['stdout'])),review), 'Actual source-review stdout must equal full report')
+    require(review_start <= utility.timestamp(review['review_started_utc']) <= utility.timestamp(review['review_completed_utc']) <= review_finish,
+        'Actual cleanup source-review interval differs')
+    review_rows = review['reviewed_final_sources'];reviewed = {row['historical_path']:row['archive'] for row in review_rows}
+    require(type(review_rows) is list and len(review_rows) == len(reviewed) == 5 and set(reviewed) == set(allowed),
+        'Independent final source review must bind exactly five formatted observer sources')
+
+    normalized_rows = review['reviewed_normalized_proposals']
+    normalized = {row['historical_path']:row for row in normalized_rows}
+    require(type(normalized_rows) is list and len(normalized_rows) == len(normalized) == 5 and set(normalized) == set(allowed),
+        'Exact Root-reviewed normalized proposal archives required')
+    normalization_ref = review['actual_proposal_formatting_execution']
+    normalization,_,normalization_finish = recorded(normalization_ref,utility,checked)
+    require(normalization['command'][:5] == ['rustfmt','--edition','2024','--config','skip_children=true']
+        and len(normalization['command'][5:]) == len(set(normalization['command'][5:])) == 5,
+        'Actual scoped five-file proposal formatter invocation required')
+    formatted_paths = {utility.path_of(row['formatted_path']) for row in normalized_rows}
+    require(len(formatted_paths) == 5
+        and formatted_paths == {utility.path_of(value) for value in normalization['command'][5:]}
+        and all(path.is_relative_to(ROOT/'.runtime/porting/CLK-04') for path in formatted_paths),
+        'Actual formatter operands must be the five ignored normalized proposals')
+    for path,row in normalized.items():
+        normalized_bytes = checked.check(row['archive']).read_bytes()
+        require(utility.path_of(row['formatted_path']).read_bytes() == normalized_bytes
+            and checked.check(reviewed[path]).read_bytes() == normalized_bytes,
+            'Root-reviewed final source must equal actual normalized proposal bytes')
+    require(normalization_finish <= review_start, 'Independent final diff read must follow actual proposal formatting')
+
+    quality = {};final_snapshot_ref = None;final = None;head = None;quality_first = None
+    for name in ['workspace_tests','clippy','format_check','source_quality','structure_quality']:
+        binding = utility.ref(getattr(args,name));receipt,start,finish = recorded(binding,utility,checked)
+        require(review_finish <= start,'Final quality preceded independent formatted cleanup source review')
+        repository = receipt['repository_before'];after = receipt['repository_after']
+        require(repository['head'] == after['head'] and repository['worktree_clean'] is True
+            and after['worktree_clean'] is True,'Actual quality requires clean source before and after')
+        if final_snapshot_ref is None:
+            final_snapshot_ref = receipt['source_snapshot'];final = snapshot(final_snapshot_ref,utility,checked);head = repository['head']
+        require(head == repository['head'] and utility.same_binding(final_snapshot_ref,receipt['source_snapshot']),
+            'All final quality checks must use the same actual HEAD/source bytes')
+        command = receipt['command']
+        if name == 'workspace_tests':
+            require(command == ['cargo','test','--workspace','-j','2'],'Whole workspace test invocation required')
+            matches = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;',
+                checked.check(receipt['stdout']).read_text(encoding='utf-8'))
+            require(bool(matches) and sum(int(row[0]) for row in matches) > 0 and all(int(row[1]) == 0 for row in matches),
+                'Actual workspace pass/failure count output required')
+            counts = {'groups':len(matches),'passed':sum(int(row[0]) for row in matches),
+                'failed':sum(int(row[1]) for row in matches),'ignored':sum(int(row[2]) for row in matches)}
+        elif name == 'clippy':
+            require(command in [['cargo','clippy','--workspace','--all-targets','--','-D','warnings'],
+                ['cargo','clippy','--workspace','--all-targets','-j','2','--','-D','warnings']], 'Actual all-targets warning-denying Clippy required')
+            counts = None
+        elif name == 'format_check':
+            require(command[:6] == ['rustfmt','--edition','2024','--check','--config','skip_children=true']
+                and len(command[6:]) == len(set(command[6:])) and set(allowed) <= set(command[6:]),
+                'Scoped real format check must include all five final observer files')
+            counts = None
+        else:
+            script = 'source-quality-gate.ps1' if name == 'source_quality' else 'heat-balance-structure-audit.ps1'
+            require(command == ['powershell','-NoProfile','-ExecutionPolicy','Bypass','-File','scripts/quality/'+script],
+                'Actual required quality script invocation differs')
+            counts = None
+        quality[name] = {'receipt':binding,'started_utc':receipt['started_utc'],'finished_utc':receipt['finished_utc'],
+            'actual_exit_code':0,'repository_before':repository,'repository_after':after,'actual_test_counts':counts}
+        quality_first = start if quality_first is None else min(quality_first,start)
+
+    require(final is not None and set(final) == set(original),'Final source/config inventory changed')
+    changed = [];unchanged = []
+    for path in original:
+        before = checked.check(original[path]).read_bytes();after = checked.check(final[path]).read_bytes()
+        require(utility.path_of(path).read_bytes() == after,'Actual current bytes differ from final quality archive')
+        if before == after:unchanged.append(path)
+        else:changed.append(path)
+        if path in allowed:
+            require(after == checked.check(reviewed[path]).read_bytes(),'Final quality source differs from independent reviewed file')
+            require(after == checked.check(normalized[path]['archive']).read_bytes(),
+                'Final cleanup must equal the actual formatter output independently read by Root')
+    require(set(changed) == set(allowed),'Only five approved observer source paths may differ')
+    old_ref = utility.ref(OLD_CLIPPY);old,_,_ = recorded(old_ref,utility,checked,expected_exit=101)
+    require(utility.same_binding(old['stderr'],plan['actual_clippy_stderr']),'Historical failed Clippy stderr differs')
+    checked.unchanged();output = args.output_dir.resolve()
+    require(output.is_relative_to(ROOT/'.runtime/porting/CLK-04') and not output.exists(),'Fresh ignored output required')
+    output.mkdir();archive = output/'verify_lineage.py';archive.write_bytes(Path(__file__).read_bytes())
+    report = {'schema':'clk04-final-quality-source-lineage.v1','status':'pass-exact-observer-only-source-lineage-and-actual-quality',
+        'review_started_utc':started,'review_completed_utc':now(),'reviewed_scientific_build':build_ref,
+        'historical_scientific_commit':build['implementation_commit'],'historical_scientific_crates_tree':build['crates_tree'],
+        'historical_scientific_source_snapshot':build['source_snapshot'],'final_quality_head_at_execution':head,
+        'final_quality_source_snapshot':final_snapshot_ref,'available_Rust_source_count':3718,'complete_source_config_count':3731,
+        'exact_changed_observer_paths':sorted(changed),'unchanged_other_source_config_count':len(unchanged),
+        'production_math_and_Cargo_bytes_unchanged':True,'whole_final_Rust_tree_claimed_identical_to_science_tree':False,
+        'reviewed_cleanup_plan':plan_ref,'independent_cleanup_source_review':review_ref,
+        'independent_cleanup_source_review_execution':review_execution_ref,'actual_final_quality':quality,
+        'reviewed_normalized_proposals':normalized_rows,'actual_proposal_formatting_execution':normalization_ref,
+        'preserved_historical_Clippy101':old_ref,'preserved_historical_Clippy_source_snapshot':old['source_snapshot'],
+        'old_failed_Clippy_relabelled_as_pass':False,'executed_metadata_source':utility.ref(archive),
+        'checked_bindings':checked.report(),'native_Rust_Cargo_tests_comparisons_Git_executed_by_verifier':False,
+        'scientific_values_compared_or_PARITY_extended':False,'numerical_PASS_claimed':False,'gates_updated':False,
+        'authorship_disclosure':'Header authored the cleanup and this metadata verifier; this is not independent certification of own edits. Root/peer independently reviewed the actual five final diffs and normalized proposal files after real formatter0 and before final quality. Actual unchanged non-observer bytes and real quality receipts establish bounded lineage only; original science reports retain their original commits and archives.'}
+    with (output/'lineage.json').open('x',encoding='utf-8',newline='\n') as stream:
+        json.dump(report,stream,indent=2,ensure_ascii=False,allow_nan=False);stream.write('\n')
+    print(json.dumps(report,ensure_ascii=False,allow_nan=False))
+
+
+if __name__ == '__main__':main()

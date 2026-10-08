@@ -1,0 +1,159 @@
+{
+  "schema": "clk04-selected-hourly-source-phase-amendment.v1",
+  "status": "recorded-authentic-prephase-and-independent-held-hourly-review-before-next-candidate",
+  "review_started_utc": "2026-10-08T13:17:55.481888+00:00",
+  "review_completed_utc": "2026-10-08T13:17:55.905143+00:00",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "native_six_packet": {
+    "source": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+      "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+      "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+      "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+    },
+    "helper_request": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+      "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+    },
+    "projection": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+      "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+    },
+    "native_admission_contract": {
+      "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+      "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+    }
+  },
+  "reviewed_historical_source_audit": {
+    "path": ".runtime/porting/CLK-04/source-audit-01/audit.json",
+    "sha256": "c198defbf26703ad23ff87b51ee15f39114ee3c51131bc0c28d012dbda8e52db"
+  },
+  "complete_original_source": {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+    "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+  },
+  "complete_source_archive": {
+    "path": ".runtime/porting/CLK-04/hourly-source-review-01/complete-WeatherManager.cc",
+    "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+  },
+  "source_ranges": [
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay",
+      "start_line": 2727,
+      "end_line": 2737,
+      "role": "hour admission before normalization",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/range-0.txt",
+        "sha256": "5cf56c871f35d60d4ea77837924372eb35a1fffbc4ead3534c8f601b8254c6e7"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay",
+      "start_line": 2779,
+      "end_line": 2823,
+      "role": "selected five pre-missing sentinel conversions with unpaired neighbors retained",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/range-1.txt",
+        "sha256": "71d7079552025e389203c6dee3fd3ec2248b86f5776e43448d76eea91ca707a9"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay",
+      "start_line": 2880,
+      "end_line": 2965,
+      "role": "existing missing replacement, count-only range branches and hourly writes",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/range-2.txt",
+        "sha256": "665224b8ee8b9f275dc203d296f1f7d34f3544514bef27b632552d45956b79d5"
+      },
+      "bytes_normalized": false
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay",
+      "start_line": 3011,
+      "end_line": 3040,
+      "role": "existing hourly rain/default and six history writes; incoming Liquid cache retained",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/range-3.txt",
+        "sha256": "89fce44a0f99c739167d52b0295a93b0a80de7502db921c51d4f9b04a193e033"
+      },
+      "bytes_normalized": false
+    }
+  ],
+  "historical_source_audit_omitted_selected_prephase": true,
+  "hour_validation_range": [
+    2727,
+    2737
+  ],
+  "line_2737_is_blank_after_hour_validation": true,
+  "source_prephase_is_sentinel_conversion_not_clamping": true,
+  "selected_prephase_fields_only": [
+    "OutBaroPress",
+    "WindSpeed",
+    "WindDir",
+    "OutRelHum",
+    "LiquidPrecip"
+  ],
+  "raw_owner_unmodified": true,
+  "selected_six_history_and_count_only_branches_retained": true,
+  "incoming_Liquid_missing_cache_and_rain_default_distinct": true,
+  "negative_360_boundary_semantics_retained": true,
+  "held_corrected_hourly": {
+    "path": ".runtime/porting/CLK-04/hourly-pre-normalization-prep-01/hourly.rs",
+    "sha256": "d5a12779499c6dbe7a6c553d98e6a38edbf93f9485c65709ef23313570bb5a57"
+  },
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-04/hourly-pre-normalization-prep-01/hourly.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/held-hourly.rs",
+        "sha256": "d5a12779499c6dbe7a6c553d98e6a38edbf93f9485c65709ef23313570bb5a57"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/hourly-pre-normalization-prep-01/hourly-before.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/historical-hourly.rs",
+        "sha256": "ad324d1255835fa3793a970466a9f105342051e790424ddff33a6f09a7d96207"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/hourly-source-review-prep-01/review_phase.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/hourly-source-review-01/reviewer.py",
+        "sha256": "3dec3760bba1c1e185a361db9927921a5594a288ceb370b14ce8678d883a1236"
+      }
+    }
+  ],
+  "regression_tests_authored_not_executed_by_reviewer": true,
+  "preserved_failed_unit_report": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-02/unit-comparison.json",
+    "sha256": "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+  },
+  "preserved_failed_unit_execution": {
+    "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-02/receipt.json",
+    "sha256": "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+  },
+  "actual_failed_comparisons": 5517963,
+  "actual_failed_mismatches": 3163,
+  "numeric_fields_or_tolerances_or_cases_changed": false,
+  "native_packet_rewritten": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "canonical_Rust_promoted_by_reviewer": false,
+  "native_RHS_executed_or_expected_answers_generated": false,
+  "authorship_disclosure": "Header independently reviewed Baseline's held hourly-only source correction. Header's own observer/trace/consumer/workflow code is outside this independent source review. Whole weather physics and numerical equivalence remain uncertified; Root must promote, test and run a fresh genuine candidate."
+}

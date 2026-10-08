@@ -1,0 +1,111 @@
+{
+  "schema": "clk04-independent-observer-cleanup-source-review.v1",
+  "status": "pass-observer-only-cleanup-source-before-final-quality",
+  "review_started_utc": "2026-10-08T14:26:56.885672+00:00",
+  "review_completed_utc": "2026-10-08T14:27:00.262246+00:00",
+  "reviewed_cleanup_plan": {
+    "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/plan.json",
+    "sha256": "5c94092f980a2be01c06c1965e24e48479e808bcb2dd0914d3db949c8c973ce0"
+  },
+  "reviewed_scientific_build": {
+    "path": ".runtime/porting/CLK-04/candidate-build-03/build-receipt.json",
+    "sha256": "056d1e614fbd1a9e6d913d98cf7fdd7d7923cda401259a436e0478685fbaae74"
+  },
+  "reviewed_actual_final_diff_review": {
+    "path": ".runtime/porting/CLK-04/root-observer-final-diff-read-01/reviewed-final.json",
+    "sha256": "84dffd300098b09e63abe56edc03a8836b584f51155f8b6dfe83d7a6dc2e5c1c"
+  },
+  "reviewed_final_sources": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_candidate_probe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-01/00-clk04_candidate_probe.rs",
+        "sha256": "42d3c3b65da93d879ad3c8ce7a985c707c4f863e23e50e347570731542183b6a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-01/01-inputs.rs",
+        "sha256": "670a606a6adec1c006e6e7efd1a63a175301ff5ebd0002a8f7f563f71a4b69a5"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_probe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-01/02-clk04_legacy_probe.rs",
+        "sha256": "9b541e8f2e95cf7c16992076ca6ecc614a27f85345151f3e49d880b66b5a67ad"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-01/03-fields.rs",
+        "sha256": "2198ce62bc2ac677f8060979f9245fd5aad1092b6d2bd57f80caa37ab80b972a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-cleanup-source-review-01/04-inputs.rs",
+        "sha256": "670a606a6adec1c006e6e7efd1a63a175301ff5ebd0002a8f7f563f71a4b69a5"
+      }
+    }
+  ],
+  "reviewed_normalized_proposals": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_candidate_probe.rs",
+      "formatted_path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_candidate_probe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_candidate_probe.rs",
+        "sha256": "42d3c3b65da93d879ad3c8ce7a985c707c4f863e23e50e347570731542183b6a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_probe.rs",
+      "formatted_path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_legacy_probe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_legacy_probe.rs",
+        "sha256": "9b541e8f2e95cf7c16992076ca6ecc614a27f85345151f3e49d880b66b5a67ad"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+      "formatted_path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+        "sha256": "2198ce62bc2ac677f8060979f9245fd5aad1092b6d2bd57f80caa37ab80b972a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+      "formatted_path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+        "sha256": "670a606a6adec1c006e6e7efd1a63a175301ff5ebd0002a8f7f563f71a4b69a5"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+      "formatted_path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-04/observer-normalized-proposals-01/crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+        "sha256": "670a606a6adec1c006e6e7efd1a63a175301ff5ebd0002a8f7f563f71a4b69a5"
+      }
+    }
+  ],
+  "actual_proposal_formatting_execution": {
+    "path": ".runtime/porting/CLK-04/observer-proposal-format-command-01/receipt.json",
+    "sha256": "605678caef63a657af94156c400a836d2127b03da7d3ecaa9a9b03996218b244"
+  },
+  "reviewer": "/root",
+  "scientific_inventory_count": 3731,
+  "unchanged_sources_and_configuration_count": 3726,
+  "observer_files_changed": 5,
+  "scientific_values_compared": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "scope": "five observer files only; held cleanup edits and rustfmt layout",
+  "authorship_disclosure": "Root independently read Header-authored held and final observer diffs; this writer checks retained source bytes only, not numerical values or future quality results."
+}

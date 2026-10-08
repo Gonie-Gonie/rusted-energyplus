@@ -1,0 +1,373 @@
+"""Independent source/archive metadata only; no target import or comparison."""
+from pathlib import Path
+from datetime import datetime, timezone
+from collections import Counter
+import argparse
+import ast
+import hashlib
+import json
+import shutil
+
+ROOT = Path(__file__).resolve().parent.parents[3]
+BASE = ROOT / '.runtime/porting/CLK-04/candidate-comparer-prep-05'
+PINS = {
+    'check_clk04_unit.py': '521a6a088df141df6d70d2e3197d51469549ffb77ddd961d5c695221401c5ce3',
+    'freeze_projection.py': 'ecab8c674364940e662535c48ca02ce0269fdfc0cd58bea42b82d24910ceab8d',
+    'history.py': '27bb896f32aba14b060b05f748c5fa9f0ffbf3da350c3a111063f69c75e02467',
+    'metadata.py': 'b90365d6754fa6b4b3cb1750bbd384d9f595c65266c25778c88bc4d706bde43d',
+    'numeric.py': '7c408cb011db1a521c1e37f2e5c31eff182b59d3d1f1c480a7b0e124d4cfaf1e',
+    'profile.py': '77382e83698e66c8e3fda25bbf294ce4ecf64c12325a09f97f8b18d27f006423',
+    'proofs.py': '9d991b8bc91a58b271a1dadf368ea40de72c5f6f0fd834432dddd414258934ac',
+    'snapshots.py': 'e7f980aa874e4a526ac3e935b94c130d2dc7a7cebae86913bdf058a2b1f75c97',
+}
+UTILITY = ROOT / 'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+DAY = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum',
+       'WindSpeed', 'WindDir', 'LiquidPrecip', 'IsRain']
+CURRENT = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum',
+    'OutRelHumValue', 'OutHumRat', 'OutWetBulbTemp', 'WindSpeed', 'WindDir',
+    'LiquidPrecipitation', 'IsRain', 'OutEnthalpy', 'OutAirDensity']
+COUNTS = {'setup_cases': 2, 'wind_cases': 56, 'weather_sequences': 13,
+    'GetNextEnvironment': 13, 'InitializeWeather': 1584, 'SetCurrentWeather': 1584,
+    'weather_operations': 3181, 'total_operations': 3239}
+SEEN = {}
+
+
+def need(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def digest(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def path_of(value):
+    path = Path(value)
+    path = (path if path.is_absolute() else ROOT / path).resolve()
+    need(path.is_relative_to(ROOT) and path.is_file(), 'Contained existing file required')
+    return path
+
+
+def ref(path):
+    path = path_of(path)
+    result = {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest(path)}
+    SEEN[path] = result['sha256']
+    return result
+
+
+def check(binding):
+    path = path_of(binding['path'])
+    need(digest(path) == binding['sha256'], 'Actual bound bytes differ: ' + binding['path'])
+    SEEN[path] = binding['sha256']
+    return path
+
+
+def read(path):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            need(key not in result, 'Duplicate metadata key')
+            result[key] = value
+        return result
+    return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=pairs,
+        parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
+
+
+def literal(tree, name):
+    rows = [node.value for node in tree.body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == name for target in node.targets)]
+    need(len(rows) == 1, 'Unique literal metadata declaration required: ' + name)
+    return ast.literal_eval(rows[0])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args()
+    need(Path.cwd().resolve() == ROOT, 'Actual workspace cwd required')
+    output = args.output_dir.resolve()
+    need(output.is_relative_to(ROOT / '.runtime/porting/CLK-04')
+        and output != ROOT / '.runtime/porting/CLK-04' and not output.exists(), 'Fresh ignored review output required')
+    started = datetime.now(timezone.utc).isoformat()
+    texts, trees = {}, {}
+    paths = [*[BASE / name for name in PINS], UTILITY]
+    for path in paths:
+        expected = UTILITY_SHA if path == UTILITY else PINS[path.name]
+        need(ref(path)['sha256'] == expected, 'Held reviewed source identity changed')
+        texts[path.name] = path.read_text(encoding='utf-8')
+        trees[path.name] = ast.parse(texts[path.name], filename=str(path))
+    # Preserve the actual first candidate and failed comparer chronology. The
+    # replacement reader is reviewed after that execution, before a NEW run.
+    previous_review_ref = {'path': '.runtime/porting/CLK-04/independent-candidate-comparer-static-review-01/review.json',
+        'sha256': '210e5905404f90c7434ee9a43880722eb72943f98f20e77454eb88be90bba243'}
+    previous_review = read(check(previous_review_ref))
+    previous_review_execution_ref = {'path': '.runtime/porting/CLK-04/independent-candidate-comparer-static-review-command-01/receipt.json',
+        'sha256': 'ee64c3bb0de30a2acff7551bfc0134db723f0314feaf5029d4334f47091bcf79'}
+    previous_review_execution = read(check(previous_review_execution_ref))
+    need(previous_review_execution['exit_code'] == 0
+        and previous_review_execution['source_bytes_match_before_and_after'] is True
+        and read(check(previous_review_execution['stdout'])) == previous_review,
+        'Historical SourceQA01 actual metadata0 remains preserved, although its manual review missed the shadowing defect')
+    need(len(previous_review['reviewed_comparer_sources']) == 9, 'Preserved original nine-source review required')
+    old_sources = {}
+    for row in previous_review['reviewed_comparer_sources']:
+        owner = path_of(row['historical_path']); archived = check(row['archive'])
+        need(owner.read_bytes() == archived.read_bytes(), 'Old reviewed sources were changed')
+        old_sources[owner.name] = owner
+    need(set(old_sources) == set(PINS) | {'geo03_provenance.py'}, 'Exact historical nine-source inventory required')
+    for name in PINS:
+        if name != 'history.py':
+            need((BASE / name).read_bytes() == old_sources[name].read_bytes(), 'Non-history metadata/science policy changed')
+    old_history = old_sources['history.py'].read_text(encoding='utf-8')
+    expected_history = old_history.replace(
+        "    counts,statuses,rust_statuses = Counter(),Counter(),Counter()",
+        "    native_requested_counts = original['requested_counts']\n    counts,statuses,rust_statuses = Counter(),Counter(),Counter()", 1)
+    expected_history = expected_history.replace(
+        "check.discrete(candidate['requested_counts'],original['requested_counts'],'requested_counts')",
+        "check.discrete(candidate['requested_counts'],native_requested_counts,'requested_counts')", 1)
+    expected_history = expected_history.replace(
+        "require(exact(original['requested_counts'],request['requested_counts']), 'Actual frozen request count differs')",
+        "require(exact(native_requested_counts,request['requested_counts']), 'Actual frozen request count differs')", 1)
+    expected_history04 = expected_history
+    exact_slot_call = "        check.exact_value(after['clk04_observation'][key],before['clk04_observation'][key],label+'/clk04_observation/'+key)"
+    nullable_slot_call = "        if key == 'selected_today_slot' and after['clk04_observation'][key] is None and before['clk04_observation'][key] is None:\n            check.availability(None,None,label+'/clk04_observation/'+key,False)\n        else:\n    " + exact_slot_call
+    need(expected_history.count(exact_slot_call) == 1, 'Unique historical continuity slot call required')
+    expected_history = expected_history.replace(exact_slot_call, nullable_slot_call, 1)
+    need(texts['history.py'] == expected_history, 'Only preserved native-count fix plus literal nullable continuity correction admitted')
+    check(previous_review['executed_reader_source'])
+    first_candidate_ref = {'path': '.runtime/porting/CLK-04/candidate-execution-command-01/receipt.json',
+        'sha256': 'a8f775b2aca6d0af55918727431ebfcd85f693f668d12d0f7d0ac686fb9f4bbd'}
+    failed_comparer_ref = {'path': '.runtime/porting/CLK-04/candidate-unit-comparison-command-01/receipt.json',
+        'sha256': '332cf43edf500e9bc7aaaad06e6e182fee779cef4b0d7b683de6475cc39e1e9e'}
+    first_candidate, failed_comparer = [read(check(row)) for row in [first_candidate_ref, failed_comparer_ref]]
+    for row, code in [(first_candidate, 0), (failed_comparer, 1)]:
+        need(row['schema'] == 'recorded-porting-command.v1' and type(row['exit_code']) is int
+            and row['exit_code'] == code and row['launch_error'] is None
+            and row['source_bytes_match_before_and_after'] is True
+            and row['recorder_updates_gates'] is False and row['recorder_supplies_reference_answers'] is False,
+            'Actual guarded original candidate/comparer outcomes required')
+        check(row['stdout']); check(row['stderr']); check(row['source_snapshot'])
+        check(row['executed_launcher']['archive'])
+    need(Path(check(failed_comparer['stdout'])).stat().st_size == 0
+        and "KeyError: 'requested_counts'" in check(failed_comparer['stderr']).read_text(encoding='utf-8'),
+        'Real metadata failure and missing final report must remain explicit')
+    need(not (ROOT / '.runtime/porting/CLK-04/candidate-unit-comparison-01/unit-comparison.json').exists(),
+        'Historical failed comparer cannot gain a fabricated result report')
+    def timestamp(value):
+        return datetime.fromisoformat(value.replace('Z', '+00:00'))
+    need(timestamp(first_candidate['started_utc']) <= timestamp(first_candidate['finished_utc'])
+        <= timestamp(failed_comparer['started_utc']) <= timestamp(failed_comparer['finished_utc'])
+        <= timestamp(started), 'New source review must honestly follow the first candidate/comparer failure')
+    historical_dto_ref = ref(ROOT / '.runtime/porting/CLK-04/candidate-dto-projection-01/projection.json')
+    historical_dto = read(check(historical_dto_ref))
+    need(historical_dto['source_review'] == previous_review_ref
+        and timestamp(historical_dto['created_utc']) <= timestamp(first_candidate['started_utc']),
+        'Old DTO remains honestly frozen before first candidate execution')
+    amendment_ref = ref(ROOT / '.runtime/porting/CLK-04/candidate-comparer-prep-04/amendment.json'); amendment = read(check(amendment_ref))
+    need(amendment['historical_failed_comparison_execution'] == failed_comparer_ref
+        and amendment['original_loop_operation_variable_shadowed_native_root'] is True
+        and amendment['native_top_requested_counts_actually_emitted'] is True
+        and amendment['scientific_profiles_selection_tolerances_snapshots_operations_unchanged'] is True
+        and amendment['scientific_values_read_or_compared'] is False,
+        'Corrected shadowing diagnosis and unchanged scientific policy must remain explicit')
+    for row in amendment['preserved_source_authorities']:
+        check(row)
+    native_source = path_of('.runtime/porting/CLK-04/native-prep-03/clk04_reference_helper.cpp').read_text(encoding='utf-8')
+    data_source = path_of('.runtime/porting/CLK-04/original-data-review-prep-05/review_data.py').read_text(encoding='utf-8')
+    need('{"requested_counts", requested}' in native_source and "exact(result['requested_counts'], COUNTS)" in data_source,
+        'Actual native schema includes root requested_counts; previous absence inference is incorrect')
+    intermediate_review_ref = {'path': '.runtime/porting/CLK-04/independent-candidate-comparer-static-review-02/review.json',
+        'sha256': '3d496f0005c74e5b1e652ce691b91c33d0ad6e89a86aef01aac26edb6c88ce7f'}
+    intermediate_execution_ref = {'path': '.runtime/porting/CLK-04/independent-candidate-comparer-static-review-command-02/receipt.json',
+        'sha256': 'd46f9d50af84156139556a63970fb26b425071ab608ad2cb18720e8ff2ea268f'}
+    intermediate_review, intermediate_execution = [read(check(row)) for row in [intermediate_review_ref, intermediate_execution_ref]]
+    need(intermediate_execution['exit_code'] == 0 and intermediate_execution['source_bytes_match_before_and_after'] is True
+        and read(check(intermediate_execution['stdout'])) == intermediate_review,
+        'Historical SourceQA02 actual metadata0 remains preserved although it missed both-null continuity')
+    need(len(intermediate_review['reviewed_comparer_sources']) == 9, 'Historical04 exact nine sources required')
+    for row in intermediate_review['reviewed_comparer_sources']:
+        owner = path_of(row['historical_path']); archived = check(row['archive'])
+        need(owner.read_bytes() == archived.read_bytes(), 'Historical reviewed04 bytes changed')
+        if owner.name == 'history.py':
+            need(owner.read_text(encoding='utf-8') == expected_history04, 'Historical capture/footer fix changed')
+        else:
+            need(owner.read_bytes() == paths[[p.name for p in paths].index(owner.name)].read_bytes(), 'Non-history05 source changed')
+    candidate02_ref = {'path': '.runtime/porting/CLK-04/candidate-execution-command-02/receipt.json',
+        'sha256': '9c15dee8a53e0940971927b0948f1489678bf1f83a1bfb23b5a9a68ad09c1f4d'}
+    scientific_failure_execution_ref = {'path': '.runtime/porting/CLK-04/candidate-unit-comparison-command-02/receipt.json',
+        'sha256': '15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9'}
+    scientific_failure_report_ref = {'path': '.runtime/porting/CLK-04/candidate-unit-comparison-02/unit-comparison.json',
+        'sha256': 'efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575'}
+    candidate02, scientific_failure = [read(check(row)) for row in [candidate02_ref, scientific_failure_execution_ref]]
+    for row, code in [(candidate02, 0), (scientific_failure, 1)]:
+        need(row['schema'] == 'recorded-porting-command.v1' and type(row['exit_code']) is int and row['exit_code'] == code
+            and row['launch_error'] is None and row['source_bytes_match_before_and_after'] is True,
+            'Actual second candidate/scientific failure outcomes must remain honest')
+        check(row['stdout']); check(row['stderr']); check(row['source_snapshot']); check(row['executed_launcher']['archive'])
+    failed_report = read(check(scientific_failure_report_ref))
+    need(read(check(scientific_failure['stdout'])) == failed_report
+        and failed_report['schema'] == 'clk04-unit-comparison.v1'
+        and failed_report['status'] == 'fail-selected-day-current-state-or-source-order'
+        and failed_report['scientific_certification_passed'] is False
+        and failed_report['comparison']['comparison_count'] == 5517963
+        and failed_report['comparison']['mismatch_count'] == 3163,
+        'Actual scientific failure report/ledger cannot be narrowed or relabelled PASS')
+    dto02_ref = ref(ROOT / '.runtime/porting/CLK-04/candidate-dto-projection-02/projection.json'); dto02 = read(check(dto02_ref))
+    need(dto02['source_review'] == intermediate_review_ref
+        and timestamp(intermediate_execution['finished_utc']) <= timestamp(dto02['created_utc'])
+        <= timestamp(candidate02['started_utc']) <= timestamp(candidate02['finished_utc'])
+        <= timestamp(scientific_failure['started_utc']) <= timestamp(scientific_failure['finished_utc'])
+        <= timestamp(started), 'QA02/DTO02/candidate02/scientificFAIL must precede fresh QA03')
+    nullable_amendment_ref = ref(BASE / 'amendment.json'); nullable_amendment = read(check(nullable_amendment_ref))
+    need(nullable_amendment['historical_failed_report'] == scientific_failure_report_ref
+        and nullable_amendment['historical_failed_comparison_execution'] == scientific_failure_execution_ref
+        and nullable_amendment['previous_independent_source_review'] == intermediate_review_ref
+        and nullable_amendment['previous_independent_review_missed_nullable_within_lane_continuity'] is True
+        and nullable_amendment['scientific_profiles_selection_tolerances_snapshots_operations_unchanged'] is True
+        and nullable_amendment['all_3239_operation_history_and_848_selected_Current_requirements_unchanged'] is True
+        and nullable_amendment['unavailable_counted_as_PASS'] is False, 'Literal nullable policy correction differs')
+    for row in nullable_amendment['authoritative_null_observer_sources']:
+        check(row)
+    # Literal AST inspection does not load/execute the profile or any target.
+    profile = trees['profile.py']
+    packet = literal(profile, 'FROZEN_INPUTS')
+    need(literal(profile, 'DAY_FIELDS') == DAY and literal(profile, 'CURRENT_FIELDS') == CURRENT
+        and literal(profile, 'REQUESTED_COUNTS') == COUNTS, 'Fixed selected field/count declarations differ')
+    values = {name: read(check(binding)) for name, binding in packet.items()}
+    source, cases, tolerance, projection = [values[name] for name in ['source', 'cases', 'tolerances', 'projection']]
+    need(projection['native_observation_policy']['other_operation_snapshots']['actual_selected_today_slot']
+        == 'all17 fields, actual hour/time_step; unavailable when actual storage/index unavailable',
+        'Pre-output contract already declares invalid-index selected slots unavailable')
+    need(source['paired_read_day_fields'] == projection['day_boundary_paired_grid_fields'] == DAY
+        and source['current_weather_fields'] == projection['selected_current_fields'] == CURRENT
+        and source['selected_missing_and_range_fields'] == DAY[:-1]
+        and source['selected_missing_history_fields'] == DAY[:-2], 'Immutable pre-output selection differs')
+    need(cases['requested_counts'] == COUNTS and tolerance['unavailable_counted_as_PASS'] is False
+        and tolerance['post_output_relaxation_allowed'] is False
+        and tolerance['no_generic_textual_PSY_or_unit_tolerance_fallback'] is True, 'Immutable numerical policy differs')
+    required = {('day_grid_and_raw_hour_cache', field) for field in DAY[:-1]}
+    required |= {('current_non_solar_weather', field) for field in CURRENT if field != 'IsRain'}
+    need(len(tolerance['rows']) == 19 and {(row['profile'], row['field']) for row in tolerance['rows']} == required,
+        'Exact original19 field profiles required')
+    original_profile = ROOT / '.runtime/porting/CLK-04/comparison-profile-prep-01/profile.py'
+    need(ref(original_profile)['sha256'] == PINS['profile.py']
+        and original_profile.read_bytes() == (BASE / 'profile.py').read_bytes(), 'Pre-output profile bytes changed')
+    request_ref = cases['helper_request']
+    request = read(check(request_ref))
+    need(request['expected_values_supplied'] is False and request['expected_exits_supplied'] is False
+        and request['requested_counts'] == COUNTS and request['observation_policy'] == projection['native_observation_policy'],
+        'Exact frozen input-only request/policy required')
+    check(request['fixed_scope'])
+    need(len(request['all_45_guard_refs']) == 45, 'All45 ordered input bindings required')
+    for binding in request['all_45_guard_refs']:
+        check(binding)
+    invoked, selected = Counter(), Counter()
+    need(len(request['weather_sequences']) == 13, 'Exact thirteen input histories required')
+    for row in request['weather_sequences']:
+        for key in ['input', 'weather', 'external_byte_map']:
+            if row.get(key) is not None:
+                check(row[key])
+        for operation in row['operations']:
+            invoked[operation['kind']] += 1
+            if operation['kind'] == 'SetCurrentWeather' and operation['selected_observation']:
+                selected[row['lane']] += 1
+    need(dict(invoked) == {key: COUNTS[key] for key in ['GetNextEnvironment', 'InitializeWeather', 'SetCurrentWeather']}
+        and dict(selected) == {'diagnostic': 368, 'production-CON': 480}, 'Fixed ordered history/mask counts differ')
+    admission_ref = ref(ROOT / '.runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json')
+    admission = read(check(admission_ref))
+    need(admission['helper_request'] == request_ref and admission['projection'] == packet['projection']
+        and admission['contracts'] == {name: packet[name] for name in ['source', 'cases', 'tolerances']},
+        'One-way input admission differs')
+    authorities = literal(trees['proofs.py'], 'AUTHORITIES')
+    for binding in authorities.values():
+        check(binding)  # Digests accepted metadata evidence; no numerical result payload is consumed.
+    imports = {node.module.split('.')[0] for tree in trees.values() for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module}
+    imports |= {alias.name.split('.')[0] for tree in trees.values() for node in ast.walk(tree)
+        if isinstance(node, ast.Import) for alias in node.names}
+    need(not imports.intersection({'subprocess', 'socket', 'requests', 'ctypes'}), 'No engine/network/native invocation modules admitted')
+    facts = {
+        'all_nine_held_sources_AST_parsed_without_import': True,
+        'profile_is_byte_identical_to_pre_original_source_only_profile': True,
+        'immutable_day7_current12_and_boolean_fields_preserved': True,
+        'all19_frozen_tolerance_rows_and_pure_wind_policy_copied_without_relaxation': True,
+        'seven_count_fields_six_history_fields_and_Liquid_retention_scoped': True,
+        'all3239_requested_rows_and848_selected_current_rows_kept': True,
+        'compact_full_grid_nulls_explicit_and_never_counted_as_PASS': True,
+        'required_current_unavailable_operands_mismatch_without_numeric_PASS': True,
+        'scalar_bits_class_finite_and_signed_zero_are_strict': True,
+        'numeric_literal_metadata_counts_and_field_error_metrics_are_separate': True,
+        'within_lane_daily11_grid17_transport_uses_real_available_endpoints': True,
+        'hidden_BeginEnvironment_handoff_private_hourly_and_extra_physics_are_unpaired': True,
+        'recovery0_native0_historical_wrapper1_are_distinct_and_bound': True,
+        'accepted_data_QC_and_legacy_gap_remain_metadata_only_NULL_no_PASS': True,
+        'actual_Cargo_emitted_binary_archive_commit_tree_and_full_Rust_Cargo_inventory_authenticated': True,
+        'candidate_child_is_exact_binary_plus_input_only_wrapper': True,
+        'independent_observer19_sources_and_actual_input_emission_bound': True,
+        'every_module_authenticated_before_future_target_import': True,
+        'DTO_source_profile_freeze_must_complete_before_future_candidate_execution': True,
+        'actual_python_script_follows_only_admitted_utf8_B_interpreter_controls': True,
+        'Rust_skip_wording_is_semantic_unavailability_with_original_labels_retained': True,
+        'native_root_requested_counts_captured_before_operation_local_shadowing': True,
+        'native_root_candidate_and_frozen_request_counts_remain_strict': True,
+        'historical_metadata_failure1_and_corrected_diagnosis_preserved': True,
+        'new_source_review_follows_second_scientific_failure_and_precedes_required_new_candidate_run': True,
+        'both_null_continuity_records_unavailable_without_PASS_and_one_sided_null_stays_mismatch': True,
+        'available_full17_and_required_Current848_snapshot_rules_unchanged': True,
+        'no_reference_or_expected_answers_enter_Rust_inputs': True,
+    }
+    # Facts above record the completed independent manual source read, not tests
+    # of the mathematical implementation or calls into comparison functions.
+    output.mkdir()
+    archived = output / 'source'; archived.mkdir()
+    rows = []
+    for path in paths:
+        target = archived / path.name
+        shutil.copyfile(path, target)
+        need(path.read_bytes() == target.read_bytes(), 'Reviewed source archive differs')
+        rows.append({'historical_path': path.relative_to(ROOT).as_posix(), 'archive': ref(target)})
+    own = archived / 'review_source.py'; shutil.copyfile(Path(__file__).resolve(), own)
+    for path, expected in SEEN.items():
+        need(digest(path) == expected, 'Reviewed metadata/source changed during inspection')
+    result = {'schema': 'clk04-independent-candidate-comparer-static-review.v1',
+        'status': 'pass-frozen-selected-profile-and-authenticated-observer-before-candidate-execution',
+        'review_started_utc': started, 'review_completed_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_comparer_sources': rows, 'reviewed_contracts': {name: packet[name] for name in ['source', 'cases', 'tolerances']},
+        'reviewed_helper_request': request_ref, 'reviewed_native_projection': packet['projection'],
+        'reviewed_native_admission_contract': admission_ref, 'fixed_scope': request['fixed_scope'],
+        'reviewed_pre_output_profile': ref(original_profile), 'reviewed_accepted_metadata_authorities': authorities,
+        'preserved_previous_source_review': previous_review_ref, 'preserved_previous_DTO_projection': historical_dto_ref,
+        'preserved_previous_source_review_execution': previous_review_execution_ref,
+        'historical_SourceQA01_actual_metadata_exit_code': 0, 'historical_SourceQA01_missed_operation_shadowing_defect': True,
+        'preserved_first_candidate_execution': first_candidate_ref, 'preserved_failed_comparer_execution': failed_comparer_ref,
+        'preserved_root_count_amendment': amendment_ref, 'reviewed_source_amendment': nullable_amendment_ref,
+        'preserved_SourceQA02': intermediate_review_ref, 'preserved_SourceQA02_execution': intermediate_execution_ref,
+        'historical_SourceQA02_actual_metadata_exit_code': 0, 'historical_SourceQA02_missed_nullable_continuity_defect': True,
+        'preserved_DTO02': dto02_ref, 'preserved_candidate02_execution': candidate02_ref,
+        'preserved_scientific_failure_report': scientific_failure_report_ref,
+        'preserved_scientific_failure_execution': scientific_failure_execution_ref,
+        'historical_reported_comparison_count': 5517963, 'historical_reported_mismatch_count': 3163,
+        'historical_comparer_exit_code': 1,
+        'historical_comparer_final_report_available': False, 'historical_metadata_failure_counted_as_numerical_PASS': False,
+        'new_source_review_claimed_before_historical_candidate01': False, 'required_next_candidate_execution_after_new_DTO_freeze': True,
+        'source_facts': facts, 'reviewed_source_bytes_unchanged': True, 'executed_reader_source': ref(own),
+        'authorship_disclosure': {'reviewer': '/root/clk02_baseline_audit',
+            'reviewer_authored_CLK04_native_helper_inputs_hourly_and_producer': True,
+            'reviewer_authored_CLK03_carrier_and_compatibility_producer': True,
+            'independence_scope': 'Raw comparer, provenance guards, immutable policy projection and input-only freezer',
+            'own_algorithm_or_whole_physics_certified_independent': False},
+        'scientific_execution_performed': False, 'target_modules_imported': False,
+        'comparer_or_freezer_executed': False, 'failed_scientific_report_metadata_read': True,
+        'native_or_Rust_numerical_operand_payloads_read': False,
+        'scientific_RHS_recomputed': False, 'numerical_comparison_count': None,
+        'numerical_mismatch_count': None, 'numerical_PASS_claimed': False,
+        'engines_Cargo_Git_or_native_compiler_executed': False, 'gates_updated': False}
+    with (output / 'review.json').open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=False, allow_nan=False); stream.write('\n')
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

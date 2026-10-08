@@ -1,0 +1,92 @@
+{
+  "schema": "clk04-proposed-observer-clippy-cleanup.v1",
+  "status": "source-only-held-after-production-use-only",
+  "created_utc": "2026-10-08T12:45:36.002460+00:00",
+  "files": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_candidate_probe.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/before/crates/ep_runtime/examples/clk04_candidate_probe.rs",
+        "sha256": "8d31a3e7ca29752cc42eeb7a9330d478fdc05f0102a3339afcdcd48a41f9ee7d"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/crates/ep_runtime/examples/clk04_candidate_probe.rs",
+        "sha256": "42d3c3b65da93d879ad3c8ce7a985c707c4f863e23e50e347570731542183b6a"
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/diff/crates/ep_runtime/examples/clk04_candidate_probe.rs.diff",
+        "sha256": "c4611dc44b6926f7454fbb39f0a4136019cba442be46f9fde92246f9183a3bb5"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_probe.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/before/crates/ep_runtime/examples/clk04_legacy_probe.rs",
+        "sha256": "89cf0192c8f91aa39b129827312bccbfac286238ae2c85ca97ee894aaf8b952a"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/crates/ep_runtime/examples/clk04_legacy_probe.rs",
+        "sha256": "61c1b4d6a552c899b671080789a2789b71aab37203c4c1a5b3403953ae1e3e23"
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/diff/crates/ep_runtime/examples/clk04_legacy_probe.rs.diff",
+        "sha256": "543ae20d0b508571f14749178a6d860914b559a1283c72fe1e1b940e2dfcce88"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/before/crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+        "sha256": "2efda50aff5edf8dcaa0e3ca91119ed0c57156b8279d9abdd175fdca0488dde1"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/crates/ep_runtime/examples/clk04_legacy_support/fields.rs",
+        "sha256": "2a5e214856def322adfd0039da086a60237c66d9ce56c2fb8052c9eec5795dc8"
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/diff/crates/ep_runtime/examples/clk04_legacy_support/fields.rs.diff",
+        "sha256": "b3da8aa461398191d5896f7b874d136dba56f1c1ad83a411104dbad09579def9"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/before/crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+        "sha256": "00ad57a3de75f9a2a4536e194dd1d779522e3647cb164e4ecdd734f01c8ff24e"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/crates/ep_runtime/examples/clk04_candidate_support/inputs.rs",
+        "sha256": "670a606a6adec1c006e6e7efd1a63a175301ff5ebd0002a8f7f563f71a4b69a5"
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/diff/crates/ep_runtime/examples/clk04_candidate_support/inputs.rs.diff",
+        "sha256": "27087d766681aa4895c058bf5532b4d0b5c60ff307d25e5d6a598ba36a79b6c6"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/before/crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+        "sha256": "fd1bf48294db0f75bc8a8dc22f5430c6525e3025cc3012d2c8c92ca0cd55f552"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/crates/ep_runtime/examples/clk04_legacy_support/inputs.rs",
+        "sha256": "71465b4d8360ae843c653eecfbea5e17f10058c77de26f296403068285c3a935"
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CLK-04/observer-clippy-cleanup-prep-01/diff/crates/ep_runtime/examples/clk04_legacy_support/inputs.rs.diff",
+        "sha256": "ba643732be3b98474e2d170d41b107e8f32ce2b4e9ae976d628c6607cc58dbf2"
+      }
+    }
+  ],
+  "actual_clippy_stderr": {
+    "path": ".runtime/porting/CLK-04/candidate-clippy-command-01/stderr.log",
+    "sha256": "ba561303e76d9bb950678df663fb4f0b93823653ef15aeaf573a3caabda63775"
+  },
+  "canonical_files_written": false,
+  "frozen_observer_pins_rewritten": false,
+  "source_review_or_quality_PASS_claimed": false,
+  "Cargo_native_Rust_executed": false,
+  "mathematical_functions_or_production_modules_changed": false,
+  "required_chronology": "Root may promote only after actual frozen production proof completes; preserve old proof receipts, sources and failed Clippy101; final QA sources need separate exact lineage and actual quality recheck, never relabel prior quality failure."
+}

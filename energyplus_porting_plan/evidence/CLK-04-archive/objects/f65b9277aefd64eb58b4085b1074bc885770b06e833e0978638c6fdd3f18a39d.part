@@ -1,0 +1,411 @@
+"""Build one genuine CLK04 whole-core dispatcher; no scientific execution.
+
+The archived actual657 registrations/core643 and publisher/compiler foundation
+are authenticated separately from accepted v3 original-file tombstones. Retired
+successful debug paths are never treated as live files or reconstructed proofs.
+"""
+from __future__ import annotations
+
+import argparse
+import copy
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+import sys
+import traceback
+
+sys.dont_write_bytecode = True
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+RAW = ROOT / '.runtime/porting/CLK-04'
+HELPER_DIR = RAW / 'native-prep-03'
+TARGET = 'clk04_reference_helper'
+PRIOR = ROOT / '.runtime/porting/CLK-03/matched-native-build-01/native-driver-build.json'
+PRIOR_SHA = 'a0fbe3ff2a6c807c33a0db14a39f518dce0514d6f1b8086ffbc3e974763d64ea'
+OLD_REVIEW = {'path': '.runtime/porting/CLK-03/independent-matched-production-native-build-review-01/review.json',
+              'sha256': '33792e1dc9c3a5fa1b7374a405d1904f97d235d6f6ce463dd96af34aef278b92'}
+LEGACY_REGISTRY = {'path': '.runtime/porting/native-retention-transition-01/registry.json',
+                   'sha256': 'f2455dc3cc74f5840fab60b58aba79b01b250bb15dcf399932915ddd6a43abc6'}
+REGISTRY_SOURCE_SHA = 'aecc19aa99b9bec2c2e78134449ac53e8df75085f96e0f23ab6132175f8287ae'
+OLD_UTILITY = ROOT / 'tools/porting/clk03_reference_native.py'
+OLD_UTILITY_SHA = '49ce5ed4dde11a45210556a802fa15bd5e707ef0e34fc821edf5a454a9fc0e4e'
+OWN = [HERE/'registry.py', HERE/'clk04_reference.cmake', Path(__file__).resolve()]
+NEW_INPUT_SOURCES = [HELPER_DIR/name for name in ['clk04_reference_helper.cpp', 'clk04_reference_fields.hh',
+                    'write_inputs.py', 'packet_policy.py', 'freeze_packet.py']]
+INCLUDED = [ROOT/'tools/porting'/name for name in
+            ['clk03_reference_helper.cpp','clk03_reference_fields.hh','clk02_reference_fields.hh']]
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def path(value):
+    item = Path(value)
+    item = (item if item.is_absolute() else ROOT/item).resolve()
+    require(item.is_relative_to(ROOT) and item != ROOT, 'Artifact escapes repository')
+    return item
+
+
+def sha(value):
+    with Path(value).open('rb') as stream:
+        return hashlib.file_digest(stream,'sha256').hexdigest()
+
+
+def read(value):
+    def pairs(items):
+        result={}
+        for key,item in items:
+            require(key not in result,'Duplicate JSON key')
+            result[key]=item
+        return result
+    return json.loads(Path(value).read_text(encoding='utf8'), object_pairs_hook=pairs,
+                      parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Nonstandard JSON '+value)))
+
+
+def verify(binding):
+    item=path(binding['path'])
+    require(item.is_file() and not item.is_symlink() and sha(item)==binding['sha256'], 'Bound bytes differ: '+str(item))
+    for key in ['size_bytes','bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and item.stat().st_size==binding[key], 'Bound size differs')
+    return item
+
+
+def ref(value):
+    item=path(value)
+    return {'path':item.relative_to(ROOT).as_posix(),'sha256':sha(item)}
+
+
+def write(value, data):
+    with Path(value).open('x',encoding='utf8',newline='\n') as stream:
+        stream.write(json.dumps(data,indent=2,allow_nan=False)+'\n')
+
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def timestamp(value):
+    item=datetime.fromisoformat(value)
+    require(item.tzinfo is not None and item.utcoffset().total_seconds()==0,'Aware UTC required')
+    return item
+
+
+def prior_sources(record):
+    rows=record['executed_source_archives']
+    require(len(rows)==30 and len({x['historical_path'] for x in rows})==30,'Actual prior source package differs')
+    for row in rows:
+        require(path(row['historical_path']).read_bytes()==verify(row['archive']).read_bytes(), 'Prior source/CMake bytes changed')
+    return rows
+
+
+# Authenticate all imported utility bytes before imports, without native actions.
+require(sha(PRIOR)==PRIOR_SHA, 'Actual matched CLK03 build receipt changed')
+prior=read(PRIOR)
+prior_sources(prior)
+require(sha(OLD_UTILITY)==OLD_UTILITY_SHA, 'Inherited genuine-core guard changed')
+require(sha(HERE/'registry.py')==REGISTRY_SOURCE_SHA, 'Own registry guard source changed')
+def load_utility(name, source):
+    spec=importlib.util.spec_from_file_location(name,source)
+    require(spec is not None and spec.loader is not None, 'Authenticated utility unavailable')
+    module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+reg=load_utility('clk04_retired_registry_guard',HERE/'registry.py')
+old=load_utility('clk04_inherited_core_guard',OLD_UTILITY)
+util=old.util
+BUILD,SOURCE,CORE,PIN=util.BUILD,util.SOURCE,util.CORE,util.PIN
+
+
+def prior_identity():
+    require(prior['schema']=='clk03-matched-production-native-build.v1' and prior['checks_passed'] is True
+            and prior['source_commit']==PIN and prior['scientific_source_patches'] is False,
+            'Actual unchanged657 whole-core build required')
+    require(verify(prior['core_build'])==CORE,'Prior genuine core identity differs')
+    rows=read(verify(prior['compile_commands']))
+    older_rows=read(verify(prior['previous_compile_commands']))
+    require(len(rows)==657 and len(older_rows)==656 and
+            [x for x in rows if Path(x['file']).name!='clk03_production_reference_helper.cpp']==older_rows,
+            'Historical656 registrations are not unchanged subset')
+    original_prior=read(verify(prior['prior_native_build']))
+    require(original_prior['schema']=='clk03-native-driver-build.v1' and original_prior['checks_passed'] is True
+            and read(verify(original_prior['compile_commands']))==older_rows,
+            'Actual prior656 archive identity differs')
+    legacy_rows=read(verify(original_prior['previous_target_compile_commands']))
+    require(len(legacy_rows)==655 and [x for x in older_rows if Path(x['file']).name!='clk03_reference_helper.cpp']==legacy_rows,
+            'Historical655 registration source/command subset differs')
+    peer=read(verify(OLD_REVIEW))
+    require(peer['schema']=='clk03-independent-matched-production-native-build-review.v1'
+            and peer['status']=='pass-build-and-derivative-before-original-execution'
+            and peer['scientific_execution_performed'] is False and peer['reviewed_build']==ref(PRIOR),
+            'Actual prior independent matched build review required')
+    verify(peer['actual_independent_PE_validation']);verify(prior['helper_binary'])
+    # linked_original is immutable historical evidence; actual absence/live19
+    # are rechecked by reg.guard, never by obsolete successful-debug live lookup.
+    require(prior['linked_original']['sha256']==reg.OLD_ORIGINALS[prior['target']][1],
+            'Prior retired original identity differs')
+    return rows,peer
+
+
+def packet(value):
+    native_ref=ref(value);native=read(verify(native_ref))
+    require(native['schema']=='clk04-native-admission-contract.v1' and native['energyplus_commit']==PIN
+            and native['frozen_before_numerical_execution'] is True, 'Frozen separate CLK04 admission required')
+    for key in ['expected_values_supplied','expected_exits_supplied','scientific_execution_performed','gates_updated']:
+        require(native[key] is False, 'Input-only native admission boundary differs: '+key)
+    require(set(native['contracts'])=={'source','cases','tolerances'}, 'Exact three contract bindings required')
+    contracts={name:read(verify(binding)) for name,binding in native['contracts'].items()}
+    for name,contract in contracts.items():
+        require(contract['schema']=='clk04-'+name+'-contract.v1' and contract['card']=='CLK-04'
+                and contract['frozen_before_numerical_execution'] is True, 'Wrong/unfrozen original contract')
+    request=read(verify(native['helper_request']));projection=read(verify(native['projection']))
+    require(request['schema']=='clk04-helper-cases.v1' and request['energyplus_commit']==PIN
+            and request['frozen_before_numerical_execution'] is True
+            and all(request[key] is False for key in ['expected_values_supplied','expected_exits_supplied','scientific_execution_performed','gates_updated']),
+            'Frozen literal input-only request required')
+    require(reg.exact(request['contracts'],{name:native['contracts'][name] for name in ['source','tolerances']})
+            and reg.exact(request['fixed_scope'],native['fixed_scope'])
+            and reg.exact(request['all_45_guard_refs'],native['all_45_guard_refs']), 'One-way request contract/scope differs')
+    cases=contracts['cases']
+    require(cases['helper_request']==native['helper_request'] and cases['source']==native['contracts']['source']
+            and cases['tolerances']==native['contracts']['tolerances']
+            and cases['fixed_CON_scope']==native['fixed_scope'] and reg.exact(cases['all_45_guard_refs'],native['all_45_guard_refs']),
+            'Cases one-way literal input identity differs')
+    require(projection['schema']=='clk04-observation-projection.v1' and projection['frozen_before_numerical_execution'] is True
+            and projection['helper_request']==native['helper_request'] and projection['contracts']==native['contracts']
+            and reg.exact(projection['native_observation_policy'],request['observation_policy'])
+            and projection['original_results_supplied_to_Rust'] is False and projection['unavailable_counted_as_PASS'] is False,
+            'Pre-execution projection identity/policy differs')
+    scope=read(verify(native['fixed_scope']))
+    literal_guard_rows=[row[name] for row in scope['cases'] for name in ['input','weather','metadata']]
+    require(len(native['all_45_guard_refs'])==45 and reg.exact(native['all_45_guard_refs'],literal_guard_rows),
+            'Exactly45 ordered literal CON references required, including repeated shared weather')
+    verify(native['fixed_scope'])
+    for binding in native['all_45_guard_refs']: verify(binding)
+    actual={'setup_cases':len(request['setup_cases']),'wind_cases':len(request['wind_cases']),
+            'weather_sequences':len(request['weather_sequences']),'GetNextEnvironment':0,'InitializeWeather':0,
+            'SetCurrentWeather':0,'weather_operations':0,'total_operations':len(request['setup_cases'])+len(request['wind_cases'])}
+    for sequence in request['weather_sequences']:
+        require(type(sequence['time_steps_per_hour']) is int and sequence['time_steps_per_hour'] in [1,4]
+                and sequence['prepared_environment_lane'] is True, 'Selected ordinary hourly1/4-step lane required')
+        for name in ['input','weather','external_byte_map']:
+            if name in sequence: verify(sequence[name])
+        for operation in sequence['operations']:
+            require(operation['kind'] in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather']
+                    and type(operation['caller']) is dict, 'Unknown source operation/caller')
+            actual[operation['kind']]+=1;actual['weather_operations']+=1;actual['total_operations']+=1
+    require(all(type(x) is int and x>=0 for x in native['requested_counts'].values())
+            and reg.exact(actual,native['requested_counts']) and reg.exact(actual,request['requested_counts'])
+            and reg.exact(actual,cases['requested_counts']), 'Actual declared packet cardinality differs')
+    for binding in cases['input_artifacts']: verify(binding)
+    verify(request['declared_CLK03_production_caller_source'])
+    caller=request['production_current_for_caller_source'];verify(caller['archive'])
+    require(sha(path(caller['historical_path']))==caller['archive']['sha256'], 'Declared caller source changed after freeze')
+    for row in contracts['source']['source_files']:
+        require(row['path']==row['original']['path'].removeprefix('.reference/energyplus-src/26.1.0/')
+                and row['sha256']==row['original']['sha256'] and (SOURCE/row['path']).resolve().is_relative_to(SOURCE),
+                'Pinned original source alias escapes')
+        verify(row['original']);verify(row['archive'])
+    require(native['required_retired_registry']['sha256']==reg.REGISTRY_SHA, 'Frozen retired registry differs')
+    return {'native_admission_contract':native_ref,'helper_request':native['helper_request'],'projection':native['projection'],
+            'contracts':native['contracts'],'fixed_scope':native['fixed_scope'],'requested_counts':actual,
+            'source_policy_review':native['source_review'],'actual_CLK03_prerequisite':native['actual_CLK03_prerequisite']}
+
+
+def reviews(args,bound,started=None):
+    refs={name:ref(getattr(args,name)) for name in ['contract_review','helper_static_review','builder_review']}
+    contract,helper,builder=[read(verify(refs[name])) for name in ['contract_review','helper_static_review','builder_review']]
+    require(contract['schema']=='clk04-independent-frozen-contract-review.v1'
+            and contract['status']=='pass-frozen-input-source-policy-before-native-build'
+            and contract['scientific_execution_performed'] is False
+            and contract['reviewed_native_admission_contract']==bound['native_admission_contract']
+            and contract['reviewed_helper_request']==bound['helper_request'] and contract['reviewed_projection']==bound['projection']
+            and contract['reviewed_contracts']==bound['contracts'], 'Actual frozen six-packet review required')
+    require(helper['schema']=='clk04-independent-preexecution-source-review.v1'
+            and helper['status']=='pass-source-input-policy-before-freeze' and helper['scientific_execution_performed'] is False
+            and refs['helper_static_review']==bound['source_policy_review']['review'], 'Accepted pre-freeze helper source review required')
+    helper_rows={row['historical_path']:row['archive'] for row in helper['reviewed_sources']}
+    expected={item.relative_to(ROOT).as_posix() for item in [*NEW_INPUT_SOURCES,*INCLUDED]}
+    require(len(helper['reviewed_sources'])==len(helper_rows)==8 and set(helper_rows)==expected, 'Exact8 reviewed helper/input/dependency sources required')
+    require(builder['schema']=='clk04-independent-native-builder-static-review.v1'
+            and builder['status']=='pass-source-and-contract-before-native-build' and builder['scientific_execution_performed'] is False
+            and builder['reviewed_contract_review']==refs['contract_review'], 'Separate actual builder/contract static review required')
+    wanted={item.relative_to(ROOT).as_posix() for item in [*OWN,*NEW_INPUT_SOURCES,*INCLUDED,OLD_UTILITY]}
+    rows={row['historical_path']:row['archive'] for row in builder['reviewed_sources']}
+    allowed={row['historical_path'] for row in prior_sources(prior)}|wanted
+    require(len(rows)==len(builder['reviewed_sources']) and wanted<=set(rows)<=allowed, 'Reviewed builder/inherited utility dependency inventory differs')
+    for owner,archive in [*helper_rows.items(),*rows.items()]:
+        require(path(owner).read_bytes()==verify(archive).read_bytes(), 'Actual reviewed source bytes differ')
+    executions={}
+    for name,item in [('contract_review',contract),('helper_static_review',helper),('builder_review',builder)]:
+        execution_ref=ref(getattr(args,name+'_execution'));execution=read(verify(execution_ref))
+        require(execution['schema']=='recorded-porting-command.v1' and type(execution['exit_code']) is int
+                and execution['exit_code']==0 and execution['launch_error'] is None
+                and execution['source_bytes_match_before_and_after'] is True
+                and reg.exact(read(verify(execution['stdout'])),item), 'Actual independent full-review metadata0 required')
+        for key in ['stderr','source_snapshot']: verify(execution[key])
+        verify(execution['executed_launcher']['archive'])
+        require(timestamp(execution['started_utc'])<=timestamp(item['review_started_utc'])
+                <=timestamp(item['review_completed_utc'])<=timestamp(execution['finished_utc'])
+                <=timestamp(started or utc()), 'Actual source/contract review must finish before build')
+        executions[name]=execution_ref
+    require(executions['helper_static_review']==bound['source_policy_review']['execution'], 'Accepted helper review command differs')
+    return {'independent_contract_review':refs['contract_review'],'independent_helper_static_review':refs['helper_static_review'],
+            'independent_builder_static_review':refs['builder_review'],'reviewed_source_executions':executions}
+
+
+def archive_sources(directory):
+    destination=directory/'source';destination.mkdir()
+    sources={path(x['historical_path']) for x in prior_sources(prior)}|set(OWN)|set(NEW_INPUT_SOURCES)
+    rows=[]
+    for index,source in enumerate(sorted(sources)):
+        archive=destination/f'{index:02}-{source.name}'
+        require(not archive.exists(),'Source archive basename collision')
+        shutil.copyfile(source,archive)
+        require(sha(source)==sha(archive),'Source changed while archiving')
+        rows.append({'historical_path':source.relative_to(ROOT).as_posix(),'archive':ref(archive)})
+    return rows
+
+
+def preservation(baseline,frozen,core,source_before,sources,registry_path):
+    registry_ref,registry,retained=reg.guard(registry_path)
+    for key in ['binary','toolchain_publisher_receipt','object_cache_publisher_receipt']: verify(core['compiler'][key])
+    current=read(BUILD/'compile_commands.json')
+    require([x for x in current if Path(x['file']).name!=TARGET+'.cpp']==baseline, 'Historical657 compile rows changed')
+    require(len(frozen)==643 and all(x in current for x in frozen), 'Frozen643 core compile rows changed')
+    guard=util.original_source_guard(core)
+    require(guard==source_before, 'Original scientific source/publisher archive guard differs')
+    for row in sources:
+        require(path(row['historical_path']).read_bytes()==verify(row['archive']).read_bytes(), 'Archived build source differs')
+    prior_identity()
+    return {'observed_utc':utc(),'protected_and_retained_count':19,'retired_successful_originals_actual_absence_verified':True,
+            'retained_CLK02_and_both_CLK03_derivatives_unchanged':True,'failed_CLK03_original02_and_derivative02_unchanged':True,
+            'historical_compile_rows_checked':len(baseline),'frozen_core_rows_checked':len(frozen),
+            'source_guard':guard,'archived_build_sources_unchanged':True,'prior_actual_build_PE_review':OLD_REVIEW,
+            'retained_registry':registry_ref,'actual_retirement':retained['actual_retirement']}
+
+
+def build_driver(args):
+    directory=path(args.output_dir)
+    require(directory.is_relative_to(RAW) and directory!=RAW and not directory.exists(),'Fresh ignored matched-build output required')
+    directory.mkdir(parents=True)
+    receipt={'schema':'clk04-native-driver-build.v1','started_utc':utc(),'actual_argv':list(sys.orig_argv),
+             'actual_cwd':str(Path.cwd().resolve()),'source_commit':PIN,'checks_passed':False,'preservation_observations':{},
+             'scientific_execution_performed':False,'scientific_source_patches':False,'Cargo_or_Git_executed':False,
+             'gates_updated':False,'original_removed':False,'full_linked_original_copied':False,
+             'existing_unit_packet_or_actual_receipts_rewritten':False,'target':TARGET,
+             'independent_actual_build_PE_review_required_before_original_execution':True}
+    sources=baseline=frozen=core=source_before=registry_path=None
+    bound=reviewed=foundation=None
+    try:
+        bound=packet(args.contract);receipt.update(bound)
+        reviewed=reviews(args,bound,receipt['started_utc']);receipt.update(reviewed)
+        registry_path=path(args.registry)
+        _,registry,_=reg.guard(registry_path)
+        legacy_path=verify(LEGACY_REGISTRY)
+        baseline,_=prior_identity()
+        foundation_args=copy.copy(args);foundation_args.registry=str(legacy_path)
+        foundation=old.old.utility_identity(foundation_args)
+        for binding in [*(value for name,value in reviewed.items() if name!='reviewed_source_executions'),*(foundation[k] for k in ['independent_review','independent_actual_review','independent_runtime_review'])]:
+            require(timestamp(read(verify(binding))['review_completed_utc'])<=timestamp(receipt['started_utc']),'Review must precede new native build')
+        core,frozen=util.verified_core(),read(util.FROZEN_CORE_ROWS)
+        source_before=util.original_source_guard(core)
+        require(not (BUILD/'Products'/(TARGET+'.exe')).exists(),'New supplemental target must not overwrite any original')
+        sources=archive_sources(directory)
+        receipt.update(core_build=ref(CORE),prior_native_build=ref(PRIOR),prior_actual_build_review=OLD_REVIEW,
+                       retained_registry=ref(registry_path),derivative_utility=foundation,
+                       executed_source_archives=sources,previous_compile_row_count=len(baseline),
+                       frozen_core_compile_row_count=len(frozen),frozen_original_build_commands=ref(util.FROZEN_CORE_ROWS))
+        observe=lambda:preservation(baseline,frozen,core,source_before,sources,registry_path)
+        receipt['preservation_observations']['before_configure']=observe()
+        write(directory/'previous-compile-commands.json',baseline)
+        receipt['previous_compile_commands']=ref(directory/'previous-compile-commands.json')
+        configured_before=read(verify(prior['configure']))
+        require(type(configured_before['exit_code']) is int and configured_before['exit_code']==0
+                and sum(x.startswith('-DCMAKE_PROJECT_INCLUDE=') for x in configured_before['command'])==1,
+                'Actual prior configure argument/source identity differs')
+        command=['-DCMAKE_PROJECT_INCLUDE='+str(HERE/'clk04_reference.cmake')
+                 if x.startswith('-DCMAKE_PROJECT_INCLUDE=') else x for x in configured_before['command']]
+        configured=util.process(command,directory,'configure');receipt['configure']=ref(directory/'configure-command.json')
+        require(configured['exit_code']==0,'Actual configure failed; logs preserved')
+        receipt['preservation_observations']['after_configure']=observe()
+        rows=read(BUILD/'compile_commands.json');own=[x for x in rows if Path(x['file']).name==TARGET+'.cpp']
+        require(len(rows)==len(baseline)+1 and len(own)==1 and path(own[0]['file'])==HELPER_DIR/(TARGET+'.cpp'),
+                'Only one fresh supplemental compile unit may be added')
+        for flag in ['-DEP_psych_errors','-UNDEBUG','-Werror','-O0','-ffp-contract=off','-Wa,-mbig-obj','-std=c++20']:
+            require(flag in own[0]['command'].split(),'Missing unchanged original compiler flag '+flag)
+        for flag in ['_GLIBCXX_DEBUG','-ffast-math','EP_psych_stats']: require(flag not in own[0]['command'],'Incorrect native ABI/mode')
+        require(own[0]['command'].startswith(str(verify(core['compiler']['binary']))),'Wrong compiler executable')
+        write(directory/'actual-compile-commands.json',own);receipt['actual_compile_commands']=ref(directory/'actual-compile-commands.json')
+        compiled=util.process([command[0],'--build',str(BUILD),'--target',TARGET,'--parallel','1','--verbose'],directory,'build')
+        receipt['compile_link']=ref(directory/'build-command.json')
+        require(compiled['exit_code']==0,'Targeted compile/link failed; actual logs preserved')
+        receipt['preservation_observations']['after_compile_link']=observe()
+        live=BUILD/'Products'/(TARGET+'.exe')
+        linked={'historical_path':live.relative_to(ROOT).as_posix(),'sha256':sha(live),'size_bytes':live.stat().st_size}
+        receipt['linked_original']=linked
+        for name in ['CMakeCache.txt','compile_commands.json']: shutil.copyfile(BUILD/name,directory/name)
+        receipt.update(cache=ref(directory/'CMakeCache.txt'),compile_commands=ref(directory/'compile_commands.json'))
+        derive=[sys.executable,'-X','utf8','-B',str(ROOT/'tools/porting/derive_native_helper.py'),'--original',str(live),
+                '--original-sha256',linked['sha256'],'--strip-tool',str(path(args.strip_tool)),'--tool-audit',str(path(args.tool_audit)),
+                '--help-receipt',str(path(args.help_receipt)),'--output-dir',str(directory/'derivation')]
+        derived=util.process(derive,directory,'derive');receipt['derivation_command']=ref(directory/'derive-command.json')
+        if (directory/'derivation/receipt.json').exists(): receipt['validated_derivative']=ref(directory/'derivation/receipt.json')
+        require(derived['exit_code']==0,'Actual authenticated derivation failed; receipt/log/maps preserved')
+        receipt['helper_binary']=old.old.validate_derivative(read(directory/'derivation/receipt.json'),linked)
+        receipt['preservation_observations']['after_derivation']=observe()
+        receipt.update(checks_passed=True,existing_target_compile_commands_unchanged=True,
+                       original_core_and_API_bytes_unchanged=True,same_compiler_owned_state=True,
+                       original_directory_and_target_definitions_inherited=True,assertions_enabled=True,fp_contract='off')
+    except Exception as error:
+        receipt['failure']={'type':type(error).__name__,'message':str(error)}
+        (directory/'failure.log').write_text(traceback.format_exc(),encoding='utf8',newline='\n')
+        receipt['failure_log']=ref(directory/'failure.log')
+    finally:
+        if sources is not None:
+            try:
+                receipt['preservation_observations']['final']=preservation(baseline,frozen,core,source_before,sources,registry_path)
+                packet(args.contract)
+                for binding in [*(value for name,value in reviewed.items() if name!='reviewed_source_executions'),*reviewed['reviewed_source_executions'].values(),*foundation.values()]: verify(binding)
+                if 'linked_original' in receipt:
+                    linked=receipt['linked_original'];live=path(linked['historical_path'])
+                    require(sha(live)==linked['sha256'] and live.stat().st_size==linked['size_bytes'],'Supplemental new original changed')
+                if 'helper_binary' in receipt: verify(receipt['helper_binary'])
+            except Exception as error:
+                receipt['checks_passed']=False
+                receipt['final_preservation_failure']={'type':type(error).__name__,'message':str(error)}
+        receipt['finished_utc']=utc();write(directory/'native-driver-build.json',receipt)
+    return {'driver_build':ref(directory/'native-driver-build.json'),'checks_passed':receipt['checks_passed'],
+            'helper_binary':receipt.get('helper_binary')}
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    mode=parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--check',action='store_true');mode.add_argument('--build-driver',action='store_true')
+    names=['contract','contract-review','contract-review-execution','helper-static-review','helper-static-review-execution',
+           'builder-review','builder-review-execution','registry','output-dir','derivation-review','derivation-validation',
+           'derivation-actual-review','derivation-runtime-validation','derivation-runtime-review','strip-tool','tool-audit','help-receipt']
+    for name in names: parser.add_argument('--'+name)
+    args=parser.parse_args()
+    require(Path.cwd().resolve()==ROOT,'Repository cwd required')
+    for name in names:
+        if args.build_driver or name in ['contract','contract-review','contract-review-execution','helper-static-review','helper-static-review-execution',
+                                                       'builder-review','builder-review-execution','registry']:
+            require(getattr(args,name.replace('-','_')),'Requires --'+name)
+    if args.check:
+        bound=packet(args.contract);reviewed=reviews(args,bound);reg.guard(args.registry);prior_identity()
+        for name,binding in reviewed.items():
+            if name=='reviewed_source_executions': continue
+            require(timestamp(read(verify(binding))['review_completed_utc'])<=timestamp(utc()), 'Review chronology differs')
+        print(json.dumps({**bound,**reviewed,'native_actions_performed':False}));return 0
+    result=build_driver(args);print(json.dumps(result));return 0 if result['checks_passed'] else 1
+
+
+if __name__=='__main__':
+    raise SystemExit(main())
