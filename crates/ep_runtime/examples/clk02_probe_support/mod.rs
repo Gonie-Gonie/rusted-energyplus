@@ -69,7 +69,7 @@ pub(super) fn run(request_path: &Path) -> Result<Value> {
     Ok(json!({
         "schema":"clk02-rust-probe-results.v1",
         "contracts":contracts,
-        "actual_request":{"path":request_path,"sha256":digest::sha256(&request_bytes)},
+        "actual_request":{"path":request_path.strip_prefix(&root)?,"sha256":digest::sha256(&request_bytes)},
         "record_sequences":sequences,"header_cases":header_cases,"fixed_epw":fixed_epw,
         "actual_wrapper_counts":{"diagnostic_raw_calls":diagnostic_calls,
             "diagnostic_header_roots":header_inputs.len(),"fixed_epw_raw_calls":fixed_epw["record_count"],
