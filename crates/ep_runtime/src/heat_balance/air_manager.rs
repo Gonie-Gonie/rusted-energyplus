@@ -146,9 +146,9 @@ pub(crate) fn seed_zone_air_humidity_ratios_from_weather_series(
     let mut preparations = capturing.then(|| Vec::with_capacity(state.zones.len()));
     for zone in &state.zones {
         let mut owner = ZoneAirInitializationState::default();
-        let constructor = capturing.then(|| owner);
+        let constructor = if capturing { Some(owner) } else { None };
         owner.bulk_reconstruct_and_current_w_seed(humidity_ratio);
-        let after_bulk = capturing.then(|| owner);
+        let after_bulk = if capturing { Some(owner) } else { None };
         let caller_temperature_inputs = ZoneAirCallerTemperatureInputs::from_legacy_zone(zone);
         owner.prepare_caller_temperature_inputs(&caller_temperature_inputs);
         if let (Some(preparations), Some(constructor), Some(after_bulk)) =

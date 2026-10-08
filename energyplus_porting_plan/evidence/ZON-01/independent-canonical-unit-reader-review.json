@@ -1,0 +1,94 @@
+{
+  "schema": "zon01-independent-canonical-unit-reader-static-review-summary.v1",
+  "status": "pass-static-canonical-DTO-and-exact-copy-reader",
+  "raw_review": {
+    "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/review.json",
+    "sha256": "6d276fea62f05cb16a0669f67675a4b91a29b0e1b9ca2acb4794923f1e2737bf"
+  },
+  "review_completed_utc": "2026-10-08T00:58:37.897679+00:00",
+  "reviewed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py",
+      "sha256": "c4e5a29081c6a85387f033898f659c08c85a2b9d97121ac82f9817b4d693ac92",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/source/check_zon01_units.py",
+        "sha256": "c4e5a29081c6a85387f033898f659c08c85a2b9d97121ac82f9817b4d693ac92"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/zon01_provenance.py",
+      "sha256": "7a07162d3809682b50eca51a98a784d825aeea1fb20cad525015f9433bdec4f4",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/source/zon01_provenance.py",
+        "sha256": "7a07162d3809682b50eca51a98a784d825aeea1fb20cad525015f9433bdec4f4"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/zon01_values.py",
+      "sha256": "79eb77526eb3056efcbcae051ccd80de458d58ee2454a059172da7635d0f63f9",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/source/zon01_values.py",
+        "sha256": "79eb77526eb3056efcbcae051ccd80de458d58ee2454a059172da7635d0f63f9"
+      }
+    }
+  ],
+  "reviewed_canonical_facade": {
+    "historical_path": "crates/ep_runtime/examples/zon01_tuples.rs",
+    "sha256": "47b9cbacaffa7ce37e4913c2a6837c8da73ba732f35a808529a95924c000a27a",
+    "archive": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/source/zon01_tuples.rs",
+      "sha256": "47b9cbacaffa7ce37e4913c2a6837c8da73ba732f35a808529a95924c000a27a"
+    }
+  },
+  "reviewed_owner_static_review": {
+    "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+    "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+  },
+  "reviewed_original_data_review": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+    "sha256": "a396421d1358f5150482c2823f773b147eddf6f7ce488d3f698fe7aeb03f3361"
+  },
+  "frozen_contracts": {
+    "source": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/packet/ZON-01-source.json",
+        "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+      }
+    },
+    "cases": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/packet/ZON-01-cases.json",
+        "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+      }
+    },
+    "tolerances": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/packet/ZON-01-tolerances.json",
+        "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+      }
+    },
+    "helper_request": {
+      "historical_path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/packet/helper-request.json",
+        "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+      }
+    }
+  },
+  "scope_limits": [
+    "Static DTO/source review only; no comparer import or scientific comparison/execution. Actual final committed build, reader command archives and unit data require the later independent unit-data review.",
+    "The generic build inventory is available source, not a claim every file compiled. Exact reviewed facade/kernel/archive identity must be checked against the actual final build.",
+    "Ordinary native callbacks are stage witnesses, not pristine14-field returns. Weather/calendar/warmup, manager siblings/Space/global/IO, later history synchronization and whole physical parity remain unpaired.",
+    "Production current/average and first3 history handoff, all physical-clock completion and Full/Summary observational equality remain future evidence. AirPowerCapW/K is not heat-capacityJ/K parity."
+  ],
+  "actual_unit_numerical_data_reviewed": false,
+  "engines_Cargo_Git_executed": false,
+  "gates_updated": false
+}

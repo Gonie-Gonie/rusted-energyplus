@@ -1,0 +1,206 @@
+{
+  "schema": "zon01-independent-canonical-source-review-compact.v1",
+  "status": "pass-static-source-and-compile-only-numerical-validation-pending",
+  "written_utc": "2026-10-08T00:59:27.774380+00:00",
+  "root_reported_current_implementation_commit_prefix": "534144cb",
+  "commit_attribution": "Root-provided current implementation commit; this metadata writer does not execute Git.",
+  "reviewed_canonical_owner": {
+    "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+    "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+  },
+  "reviewed_input_only_facade_and_passive_handoff": {
+    "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/review.json",
+    "sha256": "139dea312a343324048a20241afac564cc859d14ffc57dd7c8152e43d9b8a3f7"
+  },
+  "kernel_and_production_adapter_sources": [
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/Rust/crates__ep_runtime__src__heat_balance__zone_air_initialization.rs",
+        "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "ce0fc15586ec35ef4709c24fba8133c2655bbfb8cd323bfbb41bff476c3497a1",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/Rust/crates__ep_runtime__src__heat_balance__state.rs",
+        "sha256": "ce0fc15586ec35ef4709c24fba8133c2655bbfb8cd323bfbb41bff476c3497a1"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "cfbe0e4edb4dd1447430f96fc860042a2fd7f8d4eb6c6486c50f485333295ead",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/Rust/crates__ep_runtime__src__heat_balance__initialization__state_shell.rs",
+        "sha256": "cfbe0e4edb4dd1447430f96fc860042a2fd7f8d4eb6c6486c50f485333295ead"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+      "sha256": "90bf70b43cb2473a60b83fd450922fad766892728e687f7c79b5ca7b4f7e4148",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/Rust/crates__ep_runtime__src__heat_balance__air_manager.rs",
+        "sha256": "90bf70b43cb2473a60b83fd450922fad766892728e687f7c79b5ca7b4f7e4148"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "aa8f8fe06fab222f80c12f664af8c5d4cf5d7a756b3242512128ea6830bb4425",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/Rust/crates__ep_runtime__src__heat_balance__mod.rs",
+        "sha256": "aa8f8fe06fab222f80c12f664af8c5d4cf5d7a756b3242512128ea6830bb4425"
+      }
+    }
+  ],
+  "facade_observer_export_and_shared_entry_sources": [
+    {
+      "historical_path": "crates/ep_runtime/examples/zon01_tuples.rs",
+      "sha256": "47b9cbacaffa7ce37e4913c2a6837c8da73ba732f35a808529a95924c000a27a",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_runtime__examples__zon01_tuples.rs",
+        "sha256": "47b9cbacaffa7ce37e4913c2a6837c8da73ba732f35a808529a95924c000a27a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/zone_air_initialization_trace.rs",
+      "sha256": "6e9aac0fc4e273ae14579bf7eb856529188f4197ed3303c252fd41ad4a299c0a",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_runtime__src__heat_balance__zone_air_initialization_trace.rs",
+        "sha256": "6e9aac0fc4e273ae14579bf7eb856529188f4197ed3303c252fd41ad4a299c0a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/zone_air_initialization_trace/tests.rs",
+      "sha256": "2b2ef57232bf9c10e8373c6d3e589a0458831bf729438397a5ee8de11d10e145",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_runtime__src__heat_balance__zone_air_initialization_trace__tests.rs",
+        "sha256": "2b2ef57232bf9c10e8373c6d3e589a0458831bf729438397a5ee8de11d10e145"
+      }
+    },
+    {
+      "historical_path": "crates/ep_run/src/zon01_trace.rs",
+      "sha256": "7fcc1335fe9d32845a04a3f922e9ca5047a5dfed4969db1148ce2940319c488f",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_run__src__zon01_trace.rs",
+        "sha256": "7fcc1335fe9d32845a04a3f922e9ca5047a5dfed4969db1148ce2940319c488f"
+      }
+    },
+    {
+      "historical_path": "crates/ep_run/src/lib.rs",
+      "sha256": "cd22eae10e917a2ec62aba570fd57bf03adfb6e81897aa0f1dcd44f32d393486",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_run__src__lib.rs",
+        "sha256": "cd22eae10e917a2ec62aba570fd57bf03adfb6e81897aa0f1dcd44f32d393486"
+      }
+    },
+    {
+      "historical_path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "56946442d00dd95c1c3170b4d5ae4e7d9f64ac73529704372b4758c1283b5e5b",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_run__src__pipeline.rs",
+        "sha256": "56946442d00dd95c1c3170b4d5ae4e7d9f64ac73529704372b4758c1283b5e5b"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "c3691f65dcb4abd5d3dc11dd81ab59daecaf888c1edc84a97ef4cb143c65aff4",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/sources/crates__ep_runtime__src__heat_balance__timestep.rs",
+        "sha256": "c3691f65dcb4abd5d3dc11dd81ab59daecaf888c1edc84a97ef4cb143c65aff4"
+      }
+    }
+  ],
+  "frozen_contracts": {
+    "source": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/packet/energyplus_porting_plan__contracts__ZON-01-source.json",
+        "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+      }
+    },
+    "cases": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/packet/energyplus_porting_plan__contracts__ZON-01-cases.json",
+        "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+      }
+    },
+    "tolerances": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/packet/energyplus_porting_plan__contracts__ZON-01-tolerances.json",
+        "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+      }
+    },
+    "helper_request": {
+      "historical_path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/packet/energyplus_porting_plan__cases__ZON-01__helper-request.json",
+        "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+      }
+    }
+  },
+  "actual_compile_only_validation": {
+    "receipt": {
+      "path": ".runtime/porting/ZON-01/canonical-compile-check-command-01/receipt.json",
+      "sha256": "2644989f47fc709f674eda5a01a20947915323bae81c10187f503b510a6710bf"
+    },
+    "command": [
+      "cargo",
+      "check",
+      "--workspace",
+      "--all-targets",
+      "-j",
+      "2"
+    ],
+    "exit_code": 0,
+    "started_utc": "2026-10-08T00:52:49.322834+00:00",
+    "finished_utc": "2026-10-08T00:53:15.348441+00:00",
+    "historical_repository_head": "80caffe77d5e1461540b7b49a120bb0a2cdbfe67",
+    "historical_source_worktree_clean": false,
+    "source_bytes_match_before_and_after": true,
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+      "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+    },
+    "all_twelve_current_reviewed_sources_equal_review_and_actual_compile_archives": true,
+    "scope": "Actual Root compile-only command ran against the then dirty candidate under historical 80caffe7 HEAD; it is not relabeled as a clean 534144cb execution or numerical validation."
+  },
+  "static_scope": [
+    "Independent kernel review: selected24 actual mutable constructor/bulk/member/guard owner and real existing A/B projection; six four-slot arrays and source store order.",
+    "Separate facade review: input-only actual public API calls, own authoritative input bits and actual selected-state snapshots; no native answer input or duplicated scientific RHS.",
+    "Passive observer review: actual post-store legacy copies and borrowed shared A/B solver-entry reads; Full-only bounded prefixes, real counters and nested/unwinding restoration.",
+    "T3 is actual first-three XMAT/DSXMAT, distinct from working ZTM4. tempIndLoad/tempDepLoad/AirPowerCap project to the three existing diagnostic snapshots; W/K remains distinct from J/K capacity."
+  ],
+  "reviewer_author_limit": "CP authored the native harness and selected canonical owner/adapter. CP independently reviewed only Eff's facade/observer/export and Root's shared hook; Git's separately authored raw owner review is the independent kernel source authority.",
+  "pending_actual_numerical_proofs": {
+    "unit_state_comparison": {
+      "status": "pending",
+      "frozen_sequences": 8,
+      "frozen_operations": 34
+    },
+    "ordinary_Rust_Full_Summary_production": {
+      "status": "pending",
+      "planned_actual_commands": 6
+    },
+    "scientific_gate_promotion": "pending-actual-final-proofs"
+  },
+  "unpaired_limits": [
+    "Native ordinary weather/calendar/warmup callbacks are contextual stage witnesses, not pristine beginEnvironmentInit14 outputs or Rust weather alignment.",
+    "Full thermostat/day/demand/hybrid/Space siblings, other flags/IO and hidden native member counts remain unpaired.",
+    "Later fourth-slot/working histories, temperature/humidity evolution, AirPowerCap physical result and J/K capacity physics remain outside this initializer proof."
+  ],
+  "metadata_writer": {
+    "path": ".runtime/porting/ZON-01/canonical-source-compact-01/write_compact.py",
+    "sha256": "fa8c91e8d8df286696042817216b6016c5e3c9f9dc7cc96378344f9d3b282044"
+  },
+  "writer_executes_Cargo_engines_Git_or_comparers": false,
+  "reference_answers_supplied": false,
+  "scientific_gates_updated": false
+}

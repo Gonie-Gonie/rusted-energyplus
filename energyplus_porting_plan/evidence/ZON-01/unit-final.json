@@ -1,0 +1,271 @@
+{
+  "schema": "zon01-final-unit-evidence.v1",
+  "status": "pass-committed-selected-unit-state",
+  "written_utc": "2026-10-08T01:04:52.030497+00:00",
+  "implementation_commit": "534144cb92fac8e6bf206d41067671734e436bd0",
+  "crates_tree": "5c1c37fd487b1a5f259ed9ccda01d49d238e9b8b",
+  "comparison_report": {
+    "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.json",
+    "sha256": "2782ca80f408563bc97a5fa993f2fea699807363d0eb5ad8a3677d40c7b27da8"
+  },
+  "actual_comparison_command": {
+    "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-01/receipt.json",
+    "sha256": "5785a27c3d289bd73d1231f7c9ecd1a88e20bb82467bbec91e7c1f676555e0d4"
+  },
+  "independent_final_unit_data_review": {
+    "path": ".runtime/porting/ZON-01/independent-final-unit-data-review-01/review.json",
+    "sha256": "fbf550d5fef9615d0822cb45cde704e31481065d2ccd42a473e50197c1d36f15"
+  },
+  "independent_static_reviews": {
+    "reader_static": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/review.json",
+      "sha256": "6d276fea62f05cb16a0669f67675a4b91a29b0e1b9ca2acb4794923f1e2737bf"
+    },
+    "owner_static": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+      "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+    },
+    "facade_static": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/review.json",
+      "sha256": "139dea312a343324048a20241afac564cc859d14ffc57dd7c8152e43d9b8a3f7"
+    }
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+    }
+  },
+  "original_first": {
+    "helper_reference": {
+      "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-reference.json",
+      "sha256": "e677a24b59ddb47bbde2eecd76cdce4e99a3ffebd8ca63576c4e60a938c20d59"
+    },
+    "native_stage_matrix": {
+      "path": ".runtime/porting/ZON-01/original-native-first-01/matrix.json",
+      "sha256": "8672ce9c0a674efe1c8d46b715b2d0024f9d7004cec3d51cb8edabbfc76c0b42"
+    },
+    "independent_review": {
+      "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+      "sha256": "a396421d1358f5150482c2823f773b147eddf6f7ce488d3f698fe7aeb03f3361"
+    },
+    "original_completed_utc": "2026-10-08T00:22:29.020261+00:00",
+    "review_completed_utc": "2026-10-08T00:27:39.711415+00:00"
+  },
+  "actual_Rust_unit": {
+    "execution": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/execution.json",
+      "sha256": "aee0f25cd4515f5e4c397dfced50792151a726a430bd1454525d9445e0eeaefc"
+    },
+    "command_receipt": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/command/receipt.json",
+      "sha256": "dfb3e4e2bc577c2837f6dd2c06f47b2d6c000e3ba243a41393bd46f6e9409417"
+    },
+    "build": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-build-01/build-receipt.json",
+      "sha256": "00a026e3e51dbd963590eb8a84ccd7fd1f0b9420044ece7d45aa5e235db553ce"
+    },
+    "build_command_receipt": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-build-command-01/receipt.json",
+      "sha256": "16681a4db05c86c0caf446134e35569fecd5aa9a0d55b1c3a8145a692acdf139"
+    },
+    "binary": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-build-01/zon01_tuples.exe",
+      "sha256": "7c472d7d1af4db3ff69044c2eb12456982953c2fb5ab14d74c3b6ac0efaf3684"
+    },
+    "results": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/command/stdout.log",
+      "sha256": "4d34aa4ac4327eb63b2e335a54a6cccae732e352ea8bda14796709d1dab724c4"
+    },
+    "actual_argv": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-unit-build-01\\zon01_tuples.exe",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\ZON-01\\helper-request.json"
+    ],
+    "exit_code": 0,
+    "source_bytes_match_before_and_after": true,
+    "started_utc": "2026-10-08T00:58:57.461428+00:00",
+    "finished_utc": "2026-10-08T00:58:58.430036+00:00",
+    "committed_source_certification": true,
+    "build_source_snapshot": {
+      "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+      "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+    },
+    "execution_source_snapshot": {
+      "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+      "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+    },
+    "physics_executed": false
+  },
+  "executed_reader_sources": [
+    {
+      "historical_executed_source": {
+        "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py",
+        "sha256": "c4e5a29081c6a85387f033898f659c08c85a2b9d97121ac82f9817b4d693ac92"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/check_zon01_units.py",
+        "sha256": "c4e5a29081c6a85387f033898f659c08c85a2b9d97121ac82f9817b4d693ac92"
+      }
+    },
+    {
+      "historical_executed_source": {
+        "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/zon01_provenance.py",
+        "sha256": "7a07162d3809682b50eca51a98a784d825aeea1fb20cad525015f9433bdec4f4"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/zon01_provenance.py",
+        "sha256": "7a07162d3809682b50eca51a98a784d825aeea1fb20cad525015f9433bdec4f4"
+      }
+    },
+    {
+      "historical_executed_source": {
+        "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/zon01_values.py",
+        "sha256": "79eb77526eb3056efcbcae051ccd80de458d58ee2454a059172da7635d0f63f9"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/zon01_values.py",
+        "sha256": "79eb77526eb3056efcbcae051ccd80de458d58ee2454a059172da7635d0f63f9"
+      }
+    },
+    {
+      "historical_executed_source": {
+        "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/original_metadata.py",
+        "sha256": "1e60fd4c3c04acc99009df1af89b1f6c5a0f47a6e15791b21019b851ac6326a4"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/original_metadata.py",
+        "sha256": "1e60fd4c3c04acc99009df1af89b1f6c5a0f47a6e15791b21019b851ac6326a4"
+      }
+    },
+    {
+      "historical_executed_source": {
+        "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/original_rows.py",
+        "sha256": "f6863702605b46f34f0bbb15721ee2c1ae81a234a7cdee17b7a5d9fd5010728b"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/original_rows.py",
+        "sha256": "f6863702605b46f34f0bbb15721ee2c1ae81a234a7cdee17b7a5d9fd5010728b"
+      }
+    },
+    {
+      "historical_executed_source": {
+        "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/review_original.py",
+        "sha256": "063dd744a677b3709fd3c2c1ececcbc9053b8af0c332337ab8804a7c2f23cff3"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/review_original.py",
+        "sha256": "063dd744a677b3709fd3c2c1ececcbc9053b8af0c332337ab8804a7c2f23cff3"
+      }
+    },
+    {
+      "historical_executed_source": {
+        "historical_path": "tools/porting/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      },
+      "matching_archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-01/comparison.reader-source/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "executed_Rust_launcher_sources": [
+    {
+      "historical_path": "tools/porting/run_zon01_rust.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/source/run_zon01_rust.py",
+        "sha256": "2f1bd9514fd4224e9fb0de94b86f28ada2beba77e5359df12774c388da5d9c3d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_launch_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/source/zon01_launch_provenance.py",
+        "sha256": "fc2653afc91196677b1fe82e9381dd8a710fa597ce326acff5d61c3fd9537706"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/source/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    },
+    {
+      "historical_path": "tools/porting/record_command.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-first-01/source/record_command.py",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+      }
+    }
+  ],
+  "counts": {
+    "sequences": 8,
+    "operations": 34,
+    "selected_source_fields": 24,
+    "arrays": 6,
+    "slots_per_array": 4,
+    "snapshot_pairs": 126,
+    "scalar_bit_pairs": 5082,
+    "guard_flag_pairs": 252,
+    "guard_eligibility_pairs": 34,
+    "wrapper_count_pairs": 34,
+    "comparison_count": 5528,
+    "mismatch_count": 0,
+    "comparer_metadata_checks": 6307491
+  },
+  "equality_policy": "Exact observed selected24 IEEE bits/classes and source four-slot arrays; My/Begin booleans, source-derived eligibility and real dispatcher counts. No numerical tolerance or initializer RHS reconstruction.",
+  "source_archive_precision": {
+    "source_count": 3656,
+    "exact_byte_matches": 3655,
+    "line_ending_only_differences": [
+      {
+        "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+        "archive": {
+          "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+          "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+        },
+        "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+        "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+        "difference": "Working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+      }
+    ],
+    "all_other_content_exact": true,
+    "scope": "Archived available Rust-source inventory versus committed blobs; not compiler file-selection evidence"
+  },
+  "available_source_inventory_limit": "Archived available-source files are not evidence that every file was compiled; after-command toolchain diagnostics do not establish the earlier compiler executable/flags.",
+  "native_stage_witness_limit": "All seven native cases remain separate contextual callback witnesses; no pristine14 output, Rust weather/calendar/warmup or physical stage pairing is claimed.",
+  "metadata_author_limit": "CP authored the native harness and canonical kernel/adapter. This file transcribes actual Root unit proof and separately authored independent data/static reviews; it is not an independent numerical review by CP.",
+  "remaining_proofs_pending": [
+    "actual production owner-to-stored handoff and shared solver entry",
+    "six ordinary Full/Summary CLI commands and output independence",
+    "remaining scientific gate promotion"
+  ],
+  "unpaired_scope": [
+    "Original ordinary callbacks are separately verified stage witnesses; they are not paired as pristine14-field post-method state or numerical Rust physical observations.",
+    "Only actual selected unit state/array bits and MyEnvrnFlag/BeginEnvrnFlag are paired; other original context/manager/sibling/Space/global/IO fields remain unpaired.",
+    "External OutHumRat is an input-only provider/copy. Native weather algorithm/calendar/warmup alignment and full source HVAC orchestration are not certified.",
+    "Wrapper operation counters are actual dispatcher metadata, not inferred source member invocation counts.",
+    "The archived Rust inventory consists of available source files, not an assertion that every .rs file was compiled into the executable.",
+    "Baseline legacy_shell_return has no constructor/bulk/begin correspondence; missing ownership is reported without invented same-phase numerical errors or a scientific PASS.",
+    "Production handoff, later histories/correction/retry/CTF, AirPowerCap outputs, annual/SYS and whole-engine equivalence are outside this unit report."
+  ],
+  "metadata_writer": {
+    "path": ".runtime/porting/ZON-01/unit-final-compact-01/write_unit_final.py",
+    "sha256": "e085635ab8d33f9c4180f516239de478fe30e076a88d37776e9f81a83c79600b"
+  },
+  "metadata_writer_executes_engines_Cargo_Git_or_comparers": false,
+  "expected_answers_supplied": false,
+  "scientific_gates_updated": false
+}
