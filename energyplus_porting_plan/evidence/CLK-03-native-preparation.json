@@ -1,0 +1,132 @@
+{
+  "schema": "clk03-native-preparation-evidence.v1",
+  "card": "CLK-03",
+  "status": "native-build-complete-independent-PE-review-pending",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "frozen_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "4cb1e76005a90389b8798db6cc23c40a49ec96d1188ba15fb6db37fa286cf881"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "c7e83ab42395c65c35bf8e644a31230aeb17262bb760b7034f8f51ec95ab6dd1"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "9d5fc542d230f0d0df38be5b073f0d57251ebde7662ff2c6f66208d4f6e39d5d"
+    }
+  },
+  "frozen_helper_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "a0325f45d17ddf20b4655766bcf1dc8aaa48851f1f0ddc4c552f6ba09f1504c6"
+  },
+  "requested_counts": {
+    "handoff_sequences": 4,
+    "weather_sequences": 10,
+    "handoff_operations": 7,
+    "weather_operations": 44,
+    "total_sequences": 14,
+    "total_operations": 51
+  },
+  "independent_contract_review": {
+    "path": ".runtime/porting/CLK-03/independent-contract-review-01/review.json",
+    "sha256": "0c01b7b00114797fe5db963eb65073ac760ef1821bba1d3c55f9b877cff0d109"
+  },
+  "independent_helper_static_review": {
+    "path": ".runtime/porting/CLK-03/independent-helper-static-review-02/review.json",
+    "sha256": "b206c97fa4606332395befb1ec8779128528432b6db2e2ac35ab60b6481568fe"
+  },
+  "failed_first_build": {
+    "receipt": {
+      "path": ".runtime/porting/CLK-03/native-build-01/native-driver-build.json",
+      "sha256": "6f66e8d971234527ef97a88e5abf80e0b278424f0ce023d6cbfea7860acd924d"
+    },
+    "compile_command": {
+      "path": ".runtime/porting/CLK-03/native-build-01/build-command.json",
+      "sha256": "fd8d0392bd46d55fd1ab413ef071e99024e1c489c2e33c054e314ddb8fdc6e09"
+    },
+    "actual_exit_code": 1,
+    "failure": {
+      "type": "ValueError",
+      "message": "Targeted compile/link failed; actual receipt/logs preserved"
+    },
+    "original_or_derivative_created": false,
+    "source_archives_retained": true
+  },
+  "successful_second_build": {
+    "receipt": {
+      "path": ".runtime/porting/CLK-03/native-build-02/native-driver-build.json",
+      "sha256": "468972ca853a46ef4a002eb334c1379d4cf74e69b64e22861b2ddb4fb0cd08c6"
+    },
+    "actual_commands": {
+      "configure": {
+        "receipt": {
+          "path": ".runtime/porting/CLK-03/native-build-02/configure-command.json",
+          "sha256": "63a6d65ed0ddc4811df44ac11edbb28d3bd816c60fcf524c713303ddcb252ff6"
+        },
+        "actual_exit_code": 0
+      },
+      "compile_link": {
+        "receipt": {
+          "path": ".runtime/porting/CLK-03/native-build-02/build-command.json",
+          "sha256": "b0579c59382f5bc3bb6243ef6978567bce0b936fd4613ac864ba56da78992ce3"
+        },
+        "actual_exit_code": 0
+      },
+      "derivation_command": {
+        "receipt": {
+          "path": ".runtime/porting/CLK-03/native-build-02/derive-command.json",
+          "sha256": "440833c234ba90511aaefb25d2cc9c8f0ce9586ac5b8bea22d73cccbe31140bb"
+        },
+        "actual_exit_code": 0
+      }
+    },
+    "linked_original": {
+      "historical_path": ".runtime/ep261-gcc13-o0/Products/clk03_reference_helper.exe",
+      "sha256": "1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3",
+      "size_bytes": 1296271028
+    },
+    "retained_execution_derivative": {
+      "path": ".runtime/porting/CLK-03/native-build-02/derivation/derived-helper.exe",
+      "sha256": "4ca6866f0e6558a2fcbaf425e95ff7907f8a6e9d7740f3e82f73d6aa54929854"
+    },
+    "derivation": {
+      "path": ".runtime/porting/CLK-03/native-build-02/derivation/receipt.json",
+      "sha256": "31023e4a06fba42a30702f82bbf90a9dc0733694d308cd19bd0399bf233b23d7"
+    },
+    "actual_build_source_archive_count": 27,
+    "historical_compile_rows_preserved": 655,
+    "frozen_core_compile_rows_preserved": 643,
+    "original_source_rows_checked": 13537,
+    "protected_legacy_and_library_count": 14,
+    "full_linked_original_copied": false,
+    "retention_registry_admission_performed": false
+  },
+  "legacy_compile_only": {
+    "build_receipt": {
+      "path": ".runtime/porting/CLK-03/legacy-probe-build-01/build-receipt.json",
+      "sha256": "386b32c6f665a122548656011ab363d50c79008ebeb73f72872a2a15c362d679"
+    },
+    "actual_Cargo_command": {
+      "path": ".runtime/porting/CLK-03/legacy-probe-build-command-01/receipt.json",
+      "sha256": "ed2936c46dc90b42b7519492584e6ce1420aebff7a8ff2d15d28ed2bfe646fa9"
+    },
+    "actual_binary": {
+      "path": ".runtime/porting/CLK-03/legacy-probe-build-01/clk03_legacy_probe.exe",
+      "sha256": "9f214817643f5bb83365287a94589c47c0cb304f78da448e6962034ff286b2fe"
+    },
+    "implementation_commit": "b3e1a4ad2c63c80dfef9baa21cbb6e16599d6bcd",
+    "crates_tree": "1c29261e1a920d3cfa7cd827ff66d6f861f87d8d",
+    "available_source_inventory_count": 3690,
+    "committed_source_certification": true
+  },
+  "scientific_execution_performed": false,
+  "numerical_comparison_performed": false,
+  "card_gates_updated": false,
+  "limits": [
+    "Build and compile-only preparation; no CLK-03 unit, integration or production PASS.",
+    "Failed original adapter sources and actual failure logs remain preserved; the frozen input packet and EnergyPlus original sources are unchanged.",
+    "Independent actual build/PE review and original data review precede Rust numerical execution."
+  ]
+}
