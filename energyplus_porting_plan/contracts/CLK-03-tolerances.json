@@ -1,0 +1,25 @@
+{
+  "card": "CLK-03",
+  "status": "frozen-before-numerical-execution",
+  "frozen_before_numerical_execution": true,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "created_utc": "2026-10-08T04:44:18.209685+00:00",
+  "scientific_execution_performed": false,
+  "gates_changed": false,
+  "schema": "clk03-tolerances-contract.v1",
+  "policy": {
+    "finite_literal_binary64": "exact IEEE754 bits including signed zero; atol=0, rtol=0",
+    "discrete": "Exact type, value, order, cardinality, caller flags and available byte positions.",
+    "unavailable": "Not counted as comparison PASS; source-undefined/unwritten locals never fabricated.",
+    "native_processed_physics": "Retained diagnostically but unpaired unless literally supplied carrier copies."
+  },
+  "source_expected_answers_supplied": false,
+  "original_RHS_reconstructed": false,
+  "tolerance_widening_allowed_for_pass": false,
+  "RMSE_reconstructed": false,
+  "limits": [
+    "Hour1, duplicate-day replay, negative holiday and one-record backspace are input-only helper diagnostics, not expanded CON production.",
+    "Native processed buffers remain distinct from raw EPW records. Later numerical physics remains unpaired here.",
+    "Upstream daily solar/processed carrier numbers can certify literal handoff, not their calculation formulas."
+  ]
+}

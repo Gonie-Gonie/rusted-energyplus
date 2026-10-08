@@ -4877,7 +4877,7 @@
       "title": "기상 레코드 선택·Today/Tomorrow 인계",
       "source": "WeatherManager.cc",
       "symbols": "GetNextEnvironment; ReadEPlusWeatherForDay; UpdateWeatherData",
-      "block": "선정 비실측 RunPeriod의 시작 위치, 하루 읽기 및 오늘/내일 버퍼 교체. 관련 분기만.",
+      "block": "선정 비실측 prepared RunPeriod의 실제 stream 시작 검색·일별 읽기·Today/Tomorrow 전체 carrier 인계. Raw EPW와 처리된 timestep buffer를 구분한다.",
       "dependencies": [
         "CLK-01",
         "CLK-02"
@@ -4887,7 +4887,7 @@
       "timing": "환경 시작·일자 전환·warmup 반복",
       "unit_tests": "시작 앞에 decoy day; 24→1시; 첫날 재사용; 연도 처리 정책",
       "integration_test": "같은 타임스탬프의 Rust/EP 기상 원본 index와 값 비교",
-      "rust_candidate": "crates/ep_runtime/src/weather; ep_run 기상 선택 경로",
+      "rust_candidate": "weather_environment.rs; weather_raw input/header/parser; 새 shared cursor/day-owner; ep_run 실제 기상 준비·소비 경로",
       "assessment": "기존 구현 재검증",
       "companion": "WeatherManager.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
@@ -4897,9 +4897,31 @@
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
-      "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "source_boundary_note": "pinned source audit/입력·호출자·exact 비교 정책 동결; 원본·Rust 단위·생산 실행과 종료 gate는 아직 미확인.",
+      "numeric_policy": "선언한 typed state/stream/order와 literal finite binary64 copy는 bit exact. CLK04/06 및 solar 계산값은 별도 미검증 경계.",
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "prepared_packet": {
+        "source": {
+          "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+          "sha256": "4cb1e76005a90389b8798db6cc23c40a49ec96d1188ba15fb6db37fa286cf881"
+        },
+        "cases": {
+          "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+          "sha256": "c7e83ab42395c65c35bf8e644a31230aeb17262bb760b7034f8f51ec95ab6dd1"
+        },
+        "tolerances": {
+          "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+          "sha256": "9d5fc542d230f0d0df38be5b073f0d57251ebde7662ff2c6f66208d4f6e39d5d"
+        },
+        "request": {
+          "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+          "sha256": "a0325f45d17ddf20b4655766bcf1dc8aaa48851f1f0ddc4c552f6ba09f1504c6"
+        },
+        "input_byte_maps": {
+          "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+          "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+        }
+      }
     },
     {
       "id": "CLK-04",

@@ -1,0 +1,112 @@
+{
+  "card": "CLK-03",
+  "status": "frozen-before-numerical-execution",
+  "frozen_before_numerical_execution": true,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "created_utc": "2026-10-08T04:44:18.209685+00:00",
+  "scientific_execution_performed": false,
+  "gates_changed": false,
+  "schema": "clk03-cases-contract.v1",
+  "helper_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "a0325f45d17ddf20b4655766bcf1dc8aaa48851f1f0ddc4c552f6ba09f1504c6"
+  },
+  "fixed_CON_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "input_byte_maps": {
+    "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+    "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+  },
+  "counts": {
+    "handoff_sequences": 4,
+    "weather_sequences": 10,
+    "handoff_operations": 7,
+    "weather_operations": 44,
+    "total_sequences": 14,
+    "total_operations": 51
+  },
+  "array_layout": "4 timesteps by 24 hours; flat external order hour-major, timestep-minor.",
+  "safe_domain": "Finite typed canaries for pure full-carrier copy; complete hourly EPW day groups, one declared period, nonactual 2013 caller; stop after actual unavailable/fatal.",
+  "unit_error_policy": "Actual native returned availability/errors and defined source-fatal state retained; no expected outcomes/exits or diagnostic wording supplied.",
+  "production_case_ids": [
+    "A-24H",
+    "A-72H",
+    "B-BOTH-24H"
+  ],
+  "production_trace_levels": [
+    "Full",
+    "Summary"
+  ],
+  "production_matrix_expanded": false,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "limits": [
+    "Hour1, duplicate-day replay, negative holiday and one-record backspace are input-only helper diagnostics, not expanded CON production.",
+    "Native processed buffers remain distinct from raw EPW records. Later numerical physics remains unpaired here.",
+    "Upstream daily solar/processed carrier numbers can certify literal handoff, not their calculation formulas."
+  ],
+  "input_artifacts": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour24-02.idf",
+      "sha256": "500e4db6df588550514858908f3a5fa839926537d54cf520f3ef5bbda83c1f1d"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+      "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour1-02.idf",
+      "sha256": "3ad8701c4b654e6d4bd7cce70dc1f3409cc8cfa8beea1b1659a6e7e0ee6bd330"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/first-day-three-days-02.idf",
+      "sha256": "da9d5f0235fee85a3a289792a5141053905a469f9c6adc605fedd07429b28a0a"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/missing-match-defined-failure-02.idf",
+      "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+      "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/outside-data-period-02.idf",
+      "sha256": "6bd09229d20e9772eaff7373069b6e197bfa0706f4d55c9a2e81aa5291fae3e7"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-replay-03.idf",
+      "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+      "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-backspace-one-record-03.idf",
+      "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+      "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+    }
+  ]
+}

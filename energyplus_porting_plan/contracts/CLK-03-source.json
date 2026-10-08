@@ -1,0 +1,1954 @@
+{
+  "card": "CLK-03",
+  "status": "frozen-before-numerical-execution",
+  "frozen_before_numerical_execution": true,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "created_utc": "2026-10-08T04:44:18.209685+00:00",
+  "scientific_execution_performed": false,
+  "gates_changed": false,
+  "schema": "clk03-source-contract.v1",
+  "source_audits": [
+    {
+      "path": ".runtime/porting/CLK-03/start-selection-audit-01/audit.json",
+      "sha256": "8b8d0ce4d4d6dbf2ab54ce4833f22b1456a8c22e3937c8fc329969c9e1d0f928"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/lifecycle-source-audit-01/audit.json",
+      "sha256": "11fd38394c7d856ff798aa1b0cc76110c33c74e4a84a2fb193b19d6f7163763e"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658"
+    },
+    {
+      "path": "src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+    },
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+    },
+    {
+      "path": "src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68"
+    },
+    {
+      "path": "src/EnergyPlus/IOFiles.cc",
+      "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "sha256": "74e45dca0d71e9cd1ac37f4cdc85da6fe7780d78a5ec6cf3d304da4e770b9ea2"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.h",
+      "sha256": "0ca948f159186052b8d417150676302eb4e4d272df8186b8d40ccbc0b3c005a4"
+    },
+    {
+      "path": "src/EnergyPlus/PluginManager.cc",
+      "sha256": "4df126820bd132fa4c75ebc8479106632916aa886a3229c06f0c8f53beb1fc48"
+    },
+    {
+      "path": "src/EnergyPlus/EMSManager.cc",
+      "sha256": "b5626bf87617a9cf4d9aa523dc4975fc4a148b2d69fe2daad17d00c07f9649b4"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ResetEnvironmentCounter",
+      "start_line": 159,
+      "end_line": 162,
+      "role": "direct environment caller reset",
+      "range_sha256": "6ce150865466ef79a1d52111c1da78931e79282345836c565ca3d6a13b618936"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment signature",
+      "start_line": 348,
+      "end_line": 367,
+      "role": "whole genuine public call",
+      "range_sha256": "b7094a229475949d885bbf13872ad8af667514653e184551c01d3bd3fbd78fd1"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment one-time preparation",
+      "start_line": 704,
+      "end_line": 772,
+      "role": "caller preparation context; no blanket paired science",
+      "range_sha256": "3cc8d115d273191787ee81987ea2fae6b7f526110290ac53ef99037c30c8787a"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment environment/open selection",
+      "start_line": 774,
+      "end_line": 849,
+      "role": "selected environment transition",
+      "range_sha256": "64ead8cab1d6f044617dca94ce91ed24da0532338279e4d50ecd5f6fee67be8c"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment leap/policy context",
+      "start_line": 862,
+      "end_line": 884,
+      "role": "selected nonactual context",
+      "range_sha256": "9716e28d6780436d16bc8e5fe05cbcf132684e0b139efe95278555506578305e"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment actual exclusion and nonactual period admission",
+      "start_line": 902,
+      "end_line": 949,
+      "role": "nonactual selected branch; actual branch excluded",
+      "range_sha256": "c013dc229a4f9cce5c6c8c92867d4b036f987e360e5f6e5c0e573224dca5ec42"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment actual fatal range outcome",
+      "start_line": 951,
+      "end_line": 997,
+      "role": "observed public outcome; no error-text parity",
+      "range_sha256": "4839a4a8b5ac01988a8842a0baddaf1666277ee6ba7cdb28865f1d1185bbb869"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment year/date context",
+      "start_line": 999,
+      "end_line": 1011,
+      "role": "public environment state writes",
+      "range_sha256": "6ca4d48d1fe5dcf884b5a635bd2504f1ef1fc22f61f9bdf892f3d2e9b36dc728"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment weekday/reset policy",
+      "start_line": 1083,
+      "end_line": 1128,
+      "role": "public array/flag context",
+      "range_sha256": "f8ed5797f829e9b20eabb779b887fdc3081e021001931de2e51a42ab2a9d22ee"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetNextEnvironment return",
+      "start_line": 1209,
+      "end_line": 1216,
+      "role": "Available/ErrorsFound/result exact state",
+      "range_sha256": "d33ee26b36d228722449fdb749752344614fd5ffab813ed0944b5ed98f685110"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadWeatherForDay",
+      "start_line": 2275,
+      "end_line": 2292,
+      "role": "public-native-entry",
+      "range_sha256": "ef8acd396825acaa367bac70c05634552b60c5e6c78215a06ce88e6c48ef4361"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay start search",
+      "start_line": 2347,
+      "end_line": 2570,
+      "role": "shared with lifecycle peer; selection detail owned here",
+      "range_sha256": "35968c3b2cde22e7736424fda047ab31792788b32b40b062ac6a6b83103d3596"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay cycle/weekday after selection",
+      "start_line": 2572,
+      "end_line": 2598,
+      "role": "public postselection side effects",
+      "range_sha256": "37f759172fc3308b0574559ddf3e823be4f76ad8f7d7fbd2411ea98eeb155487"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetDayOfWeekInitialValues",
+      "start_line": 3228,
+      "end_line": 3250,
+      "role": "direct selected helper; already CLK01 source",
+      "range_sha256": "3e79dc4aef8e86433017055ad9d0e70da8b7097b42b1c3128cd03c18d0a04425"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "AllocateWeatherData",
+      "start_line": 4111,
+      "end_line": 4126,
+      "role": "genuine-native-array-allocation",
+      "range_sha256": "b6b23e6ae3c6611d1ce2acfacb4fbe003198aacad1e8917c917b02c8fdc5974b"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "OpenWeatherFile",
+      "start_line": 4336,
+      "end_line": 4352,
+      "role": "genuine initial header preparation",
+      "range_sha256": "d28135ac50f620ce5b2546857e590b4919949b541abb49d76f4280f49e962841"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "OpenEPlusWeatherFile and CloseWeatherFile",
+      "start_line": 4354,
+      "end_line": 4418,
+      "role": "already CLK02 owner; ProcessHeader=false calls SkipEPlusWFHeader",
+      "range_sha256": "3b1055c068d35dcab9e1ff4cb55c2a6c387d6dc3448ec71c03a6731e242fab12"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadUserWeatherInput selected allocation/RunPeriod call",
+      "start_line": 4734,
+      "end_line": 4798,
+      "role": "original caller preparation; other branches not paired",
+      "range_sha256": "6528cbec6d492d6fde342c92df0f6ca60fa58ab9a1d81bac052379f8869a20f8"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SkipEPlusWFHeader",
+      "start_line": 8172,
+      "end_line": 8248,
+      "role": "direct-native-stream-helper",
+      "range_sha256": "c45a3fe70dc50f5eb0bce9e87470cc66621599a2fb55efde8b0f8e49f32982bc"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupEnvironmentTypes entry",
+      "start_line": 8388,
+      "end_line": 8401,
+      "role": "genuine regular RunPeriod prerequisite",
+      "range_sha256": "66aee4e7c0abdcafbce6a0b7d8796b328d2892f0777387c233abbc76fe4ec7a9"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupEnvironmentTypes regular RunPeriod",
+      "start_line": 8438,
+      "end_line": 8519,
+      "role": "already CLK01 source; MatchYear/ActualWeather defaults distinguished",
+      "range_sha256": "de7d52041d4cfd4340b32e459a0a84233d9ec5ab6cb1ab8b57106a94dd8faec3"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "EnvironmentData",
+      "start_line": 176,
+      "end_line": 223,
+      "role": "native-environment-declarations",
+      "range_sha256": "1253807b570160efb7a3a1307f3fdb6ec2daec5a7695574634efdd0e1eef6671"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "RunPeriodData",
+      "start_line": 275,
+      "end_line": 303,
+      "role": "public caller-owned parsed input",
+      "range_sha256": "cc44e1efc149d4230e2da82338bb82b96416d49000080a2fc0fb9c847f850b45"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "DayWeatherVariables and DataPeriodData",
+      "start_line": 305,
+      "end_line": 356,
+      "role": "public year/date/header context; solar members unpaired",
+      "range_sha256": "e3dcb184c5ff7f2a73d63dc51c3c2f226cc594334a122f25cab0e7ca98a093aa"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "GetNextEnvironment declaration",
+      "start_line": 439,
+      "end_line": 441,
+      "role": "whole genuine call",
+      "range_sha256": "dcfaef3a4302aea73b8fe96afd85150600dcd9fbee8ec16c8daa0e9e4c9c467c"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "ReadWeatherForDay and ReadEPlusWeatherForDay declarations",
+      "start_line": 485,
+      "end_line": 495,
+      "role": "whole genuine calls",
+      "range_sha256": "4c1aee625f825ab697588712f882fd2214417312c7e94ff637733cbea32d10b2"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "first-call flags",
+      "start_line": 770,
+      "end_line": 775,
+      "role": "prepared branch context distinct from whole simulation initialization",
+      "range_sha256": "556314604adedd7888ef2237bbce7c10894b8984a50ca0dcb61d3a29b598d24e"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "period/calendar state",
+      "start_line": 810,
+      "end_line": 836,
+      "role": "public arrays, source flags, environment count",
+      "range_sha256": "71b92de3d84b77e222829335e266a6ee24cee7f9ed013213fa704321f5d73cee"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "month/year/reset/Today/Tomorrow context",
+      "start_line": 859,
+      "end_line": 884,
+      "role": "shared public owner declaration",
+      "range_sha256": "a96298b4b6fc6d4d083f644b3747ad5adb6664285b962ef1ba46fc49778e4c46"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "start-search persistent state",
+      "start_line": 919,
+      "end_line": 925,
+      "role": "CurDayOfWeek/current time/LastHourSet and previous-hour owners",
+      "range_sha256": "397328d6e6172d2b371eb42fc86fe512cb1a09e81a9a92e43ecbeed3bf19dfe1"
+    },
+    {
+      "file": "src/EnergyPlus/General.cc",
+      "symbol": "OrdinalDay",
+      "start_line": 705,
+      "end_line": 737,
+      "role": "accepted-calendar-native-helper-context",
+      "range_sha256": "a75944ba1e753120c50af5c3741a157e2f33c456df3f2c00c6247309b3b4e665"
+    },
+    {
+      "file": "src/EnergyPlus/General.cc",
+      "symbol": "BetweenDates",
+      "start_line": 794,
+      "end_line": 829,
+      "role": "direct admission helper",
+      "range_sha256": "6dcfda49a54da5f9e3c32825d0a809d2d4edb98816c6812c65784408d41474a4"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "primary environment caller and inactive design filtering",
+      "start_line": 368,
+      "end_line": 398,
+      "role": "real selected caller",
+      "range_sha256": "0dcb7df32f147df7754d6bdae510cdcddfc318447cfa3fcac2b88fd484fdc48f"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "primary caller environment/day warmup flags",
+      "start_line": 413,
+      "end_line": 459,
+      "role": "ordering context; warmup thermal convergence unpaired",
+      "range_sha256": "aa97f708fb9782579c3303378cfdd40c92be06711727970fa8d96f8282b59b00"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "primary caller EndDay flag and ManageWeather",
+      "start_line": 515,
+      "end_line": 536,
+      "role": "real 24 to 1 boundary and weather barrier",
+      "range_sha256": "ca2074e0f3c0c0fdd8b1686176dac5dc155bf4694869779c2c2b365263fec5b9"
+    },
+    {
+      "file": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "primary flags/year/day/time context",
+      "start_line": 77,
+      "end_line": 145,
+      "role": "public actual caller declarations",
+      "range_sha256": "6d4f4989138068126cb58c70de3c5a7f4b2d9b9d6c34c8623262c2b33e73747e"
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "day context",
+      "start_line": 101,
+      "end_line": 112,
+      "role": "public actual day declarations",
+      "range_sha256": "9de33fe33474b4c4dd9bc522d34d762e3aca4b0d701ad7815cdb8c247805d20e"
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "year/environment context",
+      "start_line": 156,
+      "end_line": 185,
+      "role": "raw/civil year and environment ordinal distinct",
+      "range_sha256": "b9720609eeca70cfb48126632313b57b9c81cd968a70fca0a90a99f953ba58d4"
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "start/end civil year and leap state",
+      "start_line": 207,
+      "end_line": 212,
+      "role": "public date policy declaration",
+      "range_sha256": "a0cc5c26b663a71108dad38d83cc9e623d9818ec348e977fb0f74bffbed6e18f"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.hh",
+      "symbol": "InputFile semantic state/cursor declarations",
+      "start_line": 415,
+      "end_line": 444,
+      "role": "direct byte input helper",
+      "range_sha256": "131fa7020a21a9237b58f45efa68c732eeab37cc0e1e50408a53d178aeac379a"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.cc",
+      "symbol": "InputFile readLine",
+      "start_line": 89,
+      "end_line": 104,
+      "role": "getline read-good/EOF distinction and terminal CR removal",
+      "range_sha256": "5f0d0d04930904a635325a1f80fc5c9f0e20ce1f57c9054f498c593271391015"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.cc",
+      "symbol": "InputFile position/open binary",
+      "start_line": 138,
+      "end_line": 149,
+      "role": "actual binary byte position owner",
+      "range_sha256": "e338731a687dac70a3f9dadc4846d70d9ee3a0ff6472011d420c28248d0516ae"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.cc",
+      "symbol": "InputFile backspace",
+      "start_line": 191,
+      "end_line": 210,
+      "role": "actual selected record backspace clears flags",
+      "range_sha256": "bb6564d0a3b2693a38525be6043fb97bd422cd430f65f9dd1189cc40f4417fb2"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ManageWeather",
+      "start_line": 131,
+      "end_line": 157,
+      "role": "shared-native-caller-and-observation-phases",
+      "range_sha256": "b270fcc3a18e60da68634da5454a05b95578ace5b7b1a1f088db404fb8258940"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather",
+      "start_line": 1725,
+      "end_line": 1992,
+      "role": "whole-native-context",
+      "range_sha256": "2dfe74bcd8414f318d64b25b5883660d58e7aaf3d8d62717707fab2bb695de49"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.first-call",
+      "start_line": 1737,
+      "end_line": 1742,
+      "role": "begin-sim-control",
+      "range_sha256": "2929210645b2b2e8c2d01ac2121705d7809acd6c7b3368cd373ad1d4181806fc"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.begin-environment",
+      "start_line": 1744,
+      "end_line": 1795,
+      "role": "missing-default-reset-and-first-day-read",
+      "range_sha256": "c00b28a778635ad9dd7327e2e83c7bc265e7f09cf9f5b6da183d38c78db2607e"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.begin-day",
+      "start_line": 1797,
+      "end_line": 1850,
+      "role": "Today-handoff-before-lookahead-read",
+      "range_sha256": "12fb629e78106e4e8033affd5aa21da5c191fac5bdb6452c2938a4b7251d737c"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.calendar-reset",
+      "start_line": 1852,
+      "end_line": 1930,
+      "role": "out-of-bounded-crossyear-and-actual-context",
+      "range_sha256": "a50bc8f43588b8721da5c6eeaa388d6ba497c5834b6e0887d297d2a2030449a2"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.DOAS",
+      "start_line": 1932,
+      "end_line": 1950,
+      "role": "excluded-active-domain",
+      "range_sha256": "b97fa18bc26f54a55db196c4461fb92533c781844f98d89212faa94f32d833e0"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.end-environment",
+      "start_line": 1954,
+      "end_line": 1979,
+      "role": "rewind-and-report-final-cursor-context",
+      "range_sha256": "e3db03d5272dccaaa6b0b62970802e50ff7839bb60f53a6533ff67b68d5758d2"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InitializeWeather.water-mains-report",
+      "start_line": 1981,
+      "end_line": 1991,
+      "role": "unpaired-reporting-context",
+      "range_sha256": "7339b2f21d0280d7e3503a7f5324a05a203cf335c3bce5326734c3358969617d"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "UpdateWeatherData",
+      "start_line": 1994,
+      "end_line": 2034,
+      "role": "whole-carrier-owner",
+      "range_sha256": "f1c9f39c75dbdcc07e5e71d11883d833dd0dc1cbb4d69ebf64d42cda361dd973"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather",
+      "start_line": 2036,
+      "end_line": 2273,
+      "role": "later-consumer-unpaired-physical-context",
+      "range_sha256": "7bd272d4972df458263f5c9065e6f216635ad82d5bfecf107c6525850779f206"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.schedule-ordinal",
+      "start_line": 2075,
+      "end_line": 2077,
+      "role": "distinct-later-clock-write",
+      "range_sha256": "2b82807d4e7edb59170a5fa93334ab1976a8626794b821da92851dd853c8f267"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetCurrentWeather.today-input",
+      "start_line": 2115,
+      "end_line": 2130,
+      "role": "actual-consumer-read-and-overrides",
+      "range_sha256": "24b945ba69b90bde8490ddbc524cb23f02ea95990a461a52dbe050c466935b18"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay",
+      "start_line": 2294,
+      "end_line": 3181,
+      "role": "whole-native-reader-context",
+      "range_sha256": "4ba47b82e0f1d37c98c2baf46c397e2a785ab47bea8abc3d1e0e0a235a1eda3a"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.local-storage",
+      "start_line": 2309,
+      "end_line": 2347,
+      "role": "non-exported-locals",
+      "range_sha256": "4ee1711097b5dd2e952f356ebc74277ee85fdf34b626836bcd8ed1343acd3782"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.first-day-selection",
+      "start_line": 2349,
+      "end_line": 2598,
+      "role": "shared-peer-start-selection-boundary",
+      "range_sha256": "5c02d587987e0ca601b89a5ae5e4c857429acd898e954cd343d7b94aa74e3f40"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.day-loop",
+      "start_line": 2600,
+      "end_line": 2736,
+      "role": "actual-read-cursor-hour-and-EOF-guards",
+      "range_sha256": "943b1b4b1f078af1b5823e426d34a81910e65fd6bf6c47214f82db2978b16542"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.sentinels",
+      "start_line": 2738,
+      "end_line": 2823,
+      "role": "unpaired-physical-processing-context",
+      "range_sha256": "9958292d410321a0982a256358f47ca6809ffd0a74101ed4e2f307a118e577a0"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.daily-header",
+      "start_line": 2825,
+      "end_line": 2873,
+      "role": "date-year-weekday-ownership-and-original-coeff-helper",
+      "range_sha256": "e3eedd9fac22569a401cc4622756354cb4f33a5f9ea7a5d8a083232dec6f3f73"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.processed-slot",
+      "start_line": 2879,
+      "end_line": 3040,
+      "role": "native-processed-fill-missing-cache-and-counts-context",
+      "range_sha256": "9fd9b1d8320fa329cf53878027c6cfd158cc43cd5efe43337b8f222e4f032fc7"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.backspace",
+      "start_line": 3048,
+      "end_line": 3050,
+      "role": "one-record-cursor-action-normal-caller-false",
+      "range_sha256": "8ddc2a631179aa14353957357f914daccc70099408cdcc7534f545c4cae694ca"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.first-hour-cache",
+      "start_line": 3052,
+      "end_line": 3066,
+      "role": "hourly-to-subhourly-gate-and-selected-first-day-seed",
+      "range_sha256": "63476a1b461f8dae63e5d249f79357e78d5f3c24a550ac2441e2ab8f7648b9d9"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.hourly-cache-loop",
+      "start_line": 3068,
+      "end_line": 3134,
+      "role": "previous-next-hour-ownership-around-unpaired-interpolation",
+      "range_sha256": "2b0aa68617862b480020c3a24086321f38d25014c784f8c044c1145304efd741"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.next-hour-writes",
+      "start_line": 3072,
+      "end_line": 3074,
+      "role": "only-three-cached-next-hour-fields",
+      "range_sha256": "9dec23d3d4151e6888f82ed9d9bc4720bdf28f4bebc21476d9135ad3fd442a63"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.interpolation",
+      "start_line": 3102,
+      "end_line": 3130,
+      "role": "unpaired-CLK04-CLK06-physical-context",
+      "range_sha256": "eb9508d534cfe0626c495a17e758f5acbf771da89b0882e7e5ecaa57ba35ce22"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.last-hour-write",
+      "start_line": 3133,
+      "end_line": 3133,
+      "role": "raw-hourly-WeatherVars-cache-lifecycle",
+      "range_sha256": "f7f1707987910694e6b5f0560ad1cff0ebc1c4f91a5644298d6081b1af3c1a36"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay.sky-property",
+      "start_line": 3137,
+      "end_line": 3180,
+      "role": "excluded-schedule-override-context",
+      "range_sha256": "3acc8b58dd8ee2eb04ae3e1e193bf1268093d8751bb5fc831995f15bfcf9dea4"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "interpolateWindDirection",
+      "start_line": 3183,
+      "end_line": 3198,
+      "role": "unpaired-CLK04-helper",
+      "range_sha256": "8543df4aa6af98fa935ccc8052cd6951f7514804305a1e0b5cc3882d7a8a7203"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "CalcSkyEmissivity",
+      "start_line": 3200,
+      "end_line": 3226,
+      "role": "unpaired-CLK06-helper",
+      "range_sha256": "2bf4d27838f76e70056afb020ce79238a7918587910222a7ba65b4d87860828e"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetDayOfWeekInitialValues",
+      "start_line": 3228,
+      "end_line": 3249,
+      "role": "direct-native-weekday-helper",
+      "range_sha256": "aac57ffb43d904a648c3b40f95ac535f41003dd481aadb831169d16620d10ddf"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "InterpretWeatherDataLine",
+      "start_line": 3266,
+      "end_line": 3492,
+      "role": "accepted-CLK02-direct-native-parser-boundary",
+      "range_sha256": "d7cfd29bde7247bcda8df92c4950c6a9af30b087285d3e9f372175633bcd3066"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "CalculateDailySolarCoeffs",
+      "start_line": 4128,
+      "end_line": 4234,
+      "role": "unpaired-daily-solar-formula-helper",
+      "range_sha256": "d7eaca9a974bb58e2481a85738816135ef9f2946e64e7a20d901504cba06b294"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "GetRunPeriodData.first-hour-choice",
+      "start_line": 5364,
+      "end_line": 5372,
+      "role": "input-default-context",
+      "range_sha256": "0202e98a90164821543e0920a1014cf5508c3d2c5905ea445a4ce6f067ff130f"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReportMissing_RangeData",
+      "start_line": 8250,
+      "end_line": 8326,
+      "role": "native-final-report-helper",
+      "range_sha256": "97d3f99f32b8d521fe57abce2e5a9d884f005c09c1e57dddab1c3c31cc7c9651"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupInterpolationValues",
+      "start_line": 8328,
+      "end_line": 8386,
+      "role": "genuine-preparation-CLK04-unpaired-weights",
+      "range_sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupEnvironmentTypes.first-hour-flag",
+      "start_line": 8517,
+      "end_line": 8517,
+      "role": "actual-input-flag-transfer",
+      "range_sha256": "cae47b85fb8e870c631ff0945dfb41a22a333abc5946df051485731d454bd2f9"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "calcSky",
+      "start_line": 8873,
+      "end_line": 8907,
+      "role": "unpaired-CLK06-helper",
+      "range_sha256": "e1d81cb01906a51ae0cb6bbae33c81044a18177d069c320c53523e69ea5aa31a"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "RunPeriodData",
+      "start_line": 281,
+      "end_line": 303,
+      "role": "first-hour-input-declaration",
+      "range_sha256": "fccb5682ee2f514b4c83b3fa6d6fce9ddadf13594525dcac2a71e16b0d028aad"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "DayWeatherVariables",
+      "start_line": 305,
+      "end_line": 319,
+      "role": "full-public-carrier-defaults",
+      "range_sha256": "acc140c75dc63cda2e47583ca57f070091dd7f95b4eb0ac04678a6cf6d218629"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherVarCounts",
+      "start_line": 373,
+      "end_line": 396,
+      "role": "full-public-counts-defaults",
+      "range_sha256": "12aff056d5ff34a04401d150d83f55174fc599963a71f44b152e6783c4d715f6"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "weather-public-entries",
+      "start_line": 477,
+      "end_line": 501,
+      "role": "genuine-call-declarations",
+      "range_sha256": "8311827d21384deb607d257c65bf91116edfe4a28ce61ac06165eb9618ace010"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherVars-ExtWeatherVars",
+      "start_line": 713,
+      "end_line": 744,
+      "role": "full-public-slot-and-missing-carrier-defaults",
+      "range_sha256": "881571ccc8d0c3d9f12a1800cae2ddcf036bfc1761e8d0a842de6c8dd156c870"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherManagerData.preparation",
+      "start_line": 775,
+      "end_line": 829,
+      "role": "native-context-owner-defaults",
+      "range_sha256": "fd62d05e12623d3b4d1069f9d4659e6464a73fa0d6ca12f6beb95638262de4b8"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherManagerData.timestep-buffers",
+      "start_line": 840,
+      "end_line": 841,
+      "role": "Today-Tomorrow-public-array-owners",
+      "range_sha256": "74734426782e9734f1aee54e65c2696246fd556b0eecf44b61c99174999915ed"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherManagerData.daily-state",
+      "start_line": 858,
+      "end_line": 891,
+      "role": "daily-carriers-interpolation-calendar-missing-count-owners",
+      "range_sha256": "7b56621efb00cf18749455dd471b1f62b141b6f495634ee52b11a0a1298c1b6a"
+    },
+    {
+      "file": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "WeatherManagerData.reader-cache",
+      "start_line": 916,
+      "end_line": 942,
+      "role": "public-previous-next-cache-and-clear-state",
+      "range_sha256": "93ed7ace75dfeffecb6d72f52044f6637936f65380b96729457ca6496f0b848c"
+    },
+    {
+      "file": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "DataGlobalsData.clock",
+      "start_line": 77,
+      "end_line": 114,
+      "role": "clock-field-types-defaults-and-independent-PreviousHour",
+      "range_sha256": "5a6a32d5e290eb6454da0e1c9cf94b9305c002f07b962f2b7b02b816ef44e164"
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "EnvironmentData.dates",
+      "start_line": 96,
+      "end_line": 157,
+      "role": "current-and-tomorrow-date-fields",
+      "range_sha256": "2c3d47349681ea42b100f503f21f764552adca8dee88d4a559ae1520d6a27605"
+    },
+    {
+      "file": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "EnvironmentData.solar",
+      "start_line": 175,
+      "end_line": 190,
+      "role": "projection-field-declarations",
+      "range_sha256": "060a4f52fb86be35c4608139ce37d1b6ac52a4a89f48b926ed341c684d1f2b42"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "ManageSimulation.environment-day",
+      "start_line": 405,
+      "end_line": 457,
+      "role": "shared-A-B-warmup-caller",
+      "range_sha256": "f848d86f4cd4be28573848ab3033348e4f25ac2ba4de6355b93824d56cf00e1e"
+    },
+    {
+      "file": "src/EnergyPlus/SimulationManager.cc",
+      "symbol": "ManageSimulation.timestep",
+      "start_line": 485,
+      "end_line": 549,
+      "role": "weather-before-heatbalance-and-clock-order",
+      "range_sha256": "b3e35ed05984d43d5f88845ea6f243bf26a3ab8b442385f3e2a63740437d2990"
+    },
+    {
+      "file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "ManageHeatBalance.callback",
+      "start_line": 189,
+      "end_line": 200,
+      "role": "later-consumer-phase",
+      "range_sha256": "64ebccca6942fd44721d988533004fa2403e7d050635d1c15b06181ba15f4db4"
+    },
+    {
+      "file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "ManageHeatBalance.warmup",
+      "start_line": 224,
+      "end_line": 238,
+      "role": "post-weather-convergence-and-DayOfSim-reset",
+      "range_sha256": "686fa41b8bc723b558c4925dc6b42c241672a7330b77f9640d65c0aaa25d0906"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.hh",
+      "symbol": "InputFile",
+      "start_line": 414,
+      "end_line": 441,
+      "role": "public-cursor-and-flag-interfaces",
+      "range_sha256": "3ed66ccd10149ae6679e2637fc72a68ce7c9c776ffc2ed2461d3c6642906c7e7"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.cc",
+      "symbol": "InputFile.position",
+      "start_line": 138,
+      "end_line": 141,
+      "role": "actual-byte-offset-observation",
+      "range_sha256": "56884db05b32d925720b5d0529997bdf13762f167bc7ec500c7e5cda267d50c7"
+    },
+    {
+      "file": "src/EnergyPlus/IOFiles.cc",
+      "symbol": "InputFile.backspace",
+      "start_line": 191,
+      "end_line": 212,
+      "role": "actual-single-line-seek-behavior",
+      "range_sha256": "b184b9c723a0f6be20e5ab3ec824a4a2bbb655b2e6d0831fd1d54662906e9928"
+    },
+    {
+      "file": "src/EnergyPlus/api/runtime.cc",
+      "symbol": "callbackBeginZoneTimestepBeforeSetCurrentWeather",
+      "start_line": 163,
+      "end_line": 173,
+      "role": "actual-callback-registration-owner",
+      "range_sha256": "829a287e04b02229ac2559ce8ae459fe92ee6a2e0059f805482b2409f99758e1"
+    },
+    {
+      "file": "src/EnergyPlus/api/runtime.h",
+      "symbol": "callbackBeginZoneTimestepBeforeSetCurrentWeather",
+      "start_line": 270,
+      "end_line": 279,
+      "role": "public-observer-declaration",
+      "range_sha256": "7fac898f60e286fc3bcef883e49a5d4ff0151b1ca841b5ca8971696141d012d1"
+    },
+    {
+      "file": "src/EnergyPlus/PluginManager.cc",
+      "symbol": "runAnyRegisteredCallbacks",
+      "start_line": 146,
+      "end_line": 165,
+      "role": "kickoff-suppression-and-genuine-callback-invocation",
+      "range_sha256": "0246221c6a9a84d37ed33be1ef63e675d6c0001b14b4fb48e7c070d6fd507283"
+    },
+    {
+      "file": "src/EnergyPlus/EMSManager.cc",
+      "symbol": "ManageEMS",
+      "start_line": 248,
+      "end_line": 284,
+      "role": "callback-activation-gate-and-native-registration-dispatch",
+      "range_sha256": "aee7436e0731cc012247c2ffafc26c3cdb08acc48c5990bb31e7de312cc850e4"
+    }
+  ],
+  "named_card_functions": [
+    "GetNextEnvironment",
+    "ReadEPlusWeatherForDay",
+    "UpdateWeatherData"
+  ],
+  "additional_lifecycle_caller": "InitializeWeather",
+  "public_field_declarations": {
+    "DayWeatherVariables": [
+      {
+        "name": "DayOfYear",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 308
+      },
+      {
+        "name": "DayOfYear_Schedule",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 309
+      },
+      {
+        "name": "Year",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 310
+      },
+      {
+        "name": "Month",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 311
+      },
+      {
+        "name": "DayOfMonth",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 312
+      },
+      {
+        "name": "DayOfWeek",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 313
+      },
+      {
+        "name": "DaylightSavingIndex",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 314
+      },
+      {
+        "name": "HolidayIndex",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 315
+      },
+      {
+        "name": "SinSolarDeclinAngle",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 316
+      },
+      {
+        "name": "CosSolarDeclinAngle",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 317
+      },
+      {
+        "name": "EquationOfTime",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 318
+      }
+    ],
+    "WeatherVars": [
+      {
+        "name": "IsRain",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 715
+      },
+      {
+        "name": "IsSnow",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 716
+      },
+      {
+        "name": "OutDryBulbTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 717
+      },
+      {
+        "name": "OutDewPointTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 718
+      },
+      {
+        "name": "OutBaroPress",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 719
+      },
+      {
+        "name": "OutRelHum",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 720
+      },
+      {
+        "name": "WindSpeed",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 721
+      },
+      {
+        "name": "WindDir",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 722
+      },
+      {
+        "name": "SkyTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 723
+      },
+      {
+        "name": "HorizIRSky",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 724
+      },
+      {
+        "name": "BeamSolarRad",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 725
+      },
+      {
+        "name": "DifSolarRad",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 726
+      },
+      {
+        "name": "Albedo",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 727
+      },
+      {
+        "name": "WaterPrecip",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 728
+      },
+      {
+        "name": "LiquidPrecip",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 729
+      },
+      {
+        "name": "TotalSkyCover",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 730
+      },
+      {
+        "name": "OpaqueSkyCover",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 731
+      }
+    ],
+    "WeatherVarCounts": [
+      {
+        "name": "OutDryBulbTemp",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 377
+      },
+      {
+        "name": "OutDewPointTemp",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 378
+      },
+      {
+        "name": "OutRelHum",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 379
+      },
+      {
+        "name": "OutBaroPress",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 380
+      },
+      {
+        "name": "WindDir",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 381
+      },
+      {
+        "name": "WindSpeed",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 382
+      },
+      {
+        "name": "BeamSolarRad",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 383
+      },
+      {
+        "name": "DifSolarRad",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 384
+      },
+      {
+        "name": "TotalSkyCover",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 385
+      },
+      {
+        "name": "OpaqueSkyCover",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 386
+      },
+      {
+        "name": "Visibility",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 387
+      },
+      {
+        "name": "Ceiling",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 388
+      },
+      {
+        "name": "LiquidPrecip",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 389
+      },
+      {
+        "name": "WaterPrecip",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 390
+      },
+      {
+        "name": "AerOptDepth",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 391
+      },
+      {
+        "name": "SnowDepth",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 392
+      },
+      {
+        "name": "DaysLastSnow",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 393
+      },
+      {
+        "name": "WeathCodes",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 394
+      },
+      {
+        "name": "Albedo",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 395
+      }
+    ],
+    "GlobalClockFields": [
+      {
+        "name": "BeginDayFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 77
+      },
+      {
+        "name": "BeginEnvrnFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 78
+      },
+      {
+        "name": "BeginHourFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 79
+      },
+      {
+        "name": "BeginSimFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 80
+      },
+      {
+        "name": "BeginTimeStepFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 81
+      },
+      {
+        "name": "DayOfSim",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 82
+      },
+      {
+        "name": "CalendarYear",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 83
+      },
+      {
+        "name": "EndEnvrnFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 85
+      },
+      {
+        "name": "EndDesignDayEnvrnsFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 86
+      },
+      {
+        "name": "AnnualSimulation",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 87
+      },
+      {
+        "name": "runReadVars",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 89
+      },
+      {
+        "name": "DDOnlySimulation",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 90
+      },
+      {
+        "name": "outputEpJSONConversion",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 91
+      },
+      {
+        "name": "outputEpJSONConversionOnly",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 92
+      },
+      {
+        "name": "isEpJSON",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 93
+      },
+      {
+        "name": "preserveIDFOrder",
+        "native_type": "bool",
+        "declared_default": "true",
+        "line": 94
+      },
+      {
+        "name": "stopSimulation",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 95
+      },
+      {
+        "name": "externalHVACManagerInitialized",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 97
+      },
+      {
+        "name": "sizingAnalysisEioHeaderDoneOnce",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 99
+      },
+      {
+        "name": "EndDayFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 100
+      },
+      {
+        "name": "EndHourFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 101
+      },
+      {
+        "name": "PreviousHour",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 102
+      },
+      {
+        "name": "HourOfDay",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 103
+      },
+      {
+        "name": "WeightPreviousHour",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 104
+      },
+      {
+        "name": "WeightNow",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 105
+      },
+      {
+        "name": "NumOfDayInEnvrn",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 106
+      },
+      {
+        "name": "OverrideTimestep",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 107
+      },
+      {
+        "name": "TimeStepsInHour",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 108
+      },
+      {
+        "name": "NumOfZones",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 109
+      },
+      {
+        "name": "numSpaces",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 110
+      },
+      {
+        "name": "numSpaceTypes",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 111
+      },
+      {
+        "name": "TimeStep",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 112
+      },
+      {
+        "name": "TimeStepZone",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 113
+      },
+      {
+        "name": "WarmupFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 114
+      }
+    ],
+    "EnvironmentFields": [
+      {
+        "name": "BeamSolarRad",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 98
+      },
+      {
+        "name": "EMSBeamSolarRadOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 99
+      },
+      {
+        "name": "EMSBeamSolarRadOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 100
+      },
+      {
+        "name": "DayOfMonth",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 101
+      },
+      {
+        "name": "DayOfMonthTomorrow",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 102
+      },
+      {
+        "name": "DayOfWeek",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 103
+      },
+      {
+        "name": "DayOfWeekTomorrow",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 104
+      },
+      {
+        "name": "DayOfYear",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 105
+      },
+      {
+        "name": "DayOfYear_Schedule",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 106
+      },
+      {
+        "name": "DifSolarRad",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 107
+      },
+      {
+        "name": "EMSDifSolarRadOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 108
+      },
+      {
+        "name": "EMSDifSolarRadOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 109
+      },
+      {
+        "name": "DSTIndicator",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 110
+      },
+      {
+        "name": "Elevation",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 111
+      },
+      {
+        "name": "EndMonthFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 112
+      },
+      {
+        "name": "EndYearFlag",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 113
+      },
+      {
+        "name": "GndReflectanceForDayltg",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 114
+      },
+      {
+        "name": "GndReflectance",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 115
+      },
+      {
+        "name": "GndSolarRad",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 116
+      },
+      {
+        "name": "GroundTempKelvin",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 117
+      },
+      {
+        "name": "HolidayIndex",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 120
+      },
+      {
+        "name": "HolidayIndexTomorrow",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 121
+      },
+      {
+        "name": "IsRain",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 122
+      },
+      {
+        "name": "IsSnow",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 123
+      },
+      {
+        "name": "Latitude",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 124
+      },
+      {
+        "name": "Longitude",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 125
+      },
+      {
+        "name": "Month",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 126
+      },
+      {
+        "name": "MonthTomorrow",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 127
+      },
+      {
+        "name": "OutBaroPress",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 128
+      },
+      {
+        "name": "OutDryBulbTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 129
+      },
+      {
+        "name": "EMSOutDryBulbOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 130
+      },
+      {
+        "name": "EMSOutDryBulbOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 131
+      },
+      {
+        "name": "OutHumRat",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 132
+      },
+      {
+        "name": "OutRelHum",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 133
+      },
+      {
+        "name": "OutRelHumValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 134
+      },
+      {
+        "name": "EMSOutRelHumOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 135
+      },
+      {
+        "name": "EMSOutRelHumOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 136
+      },
+      {
+        "name": "OutEnthalpy",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 137
+      },
+      {
+        "name": "OutAirDensity",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 138
+      },
+      {
+        "name": "OutWetBulbTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 139
+      },
+      {
+        "name": "OutDewPointTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 140
+      },
+      {
+        "name": "EMSOutDewPointTempOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 141
+      },
+      {
+        "name": "EMSOutDewPointTempOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 142
+      },
+      {
+        "name": "SkyTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 143
+      },
+      {
+        "name": "SkyTempKelvin",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 144
+      },
+      {
+        "name": "LiquidPrecipitation",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 145
+      },
+      {
+        "name": "SunIsUp",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 146
+      },
+      {
+        "name": "SunIsUpPrevTS",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 147
+      },
+      {
+        "name": "PreviousSolRadPositive",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 148
+      },
+      {
+        "name": "WindDir",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 149
+      },
+      {
+        "name": "EMSWindDirOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 150
+      },
+      {
+        "name": "EMSWindDirOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 151
+      },
+      {
+        "name": "WindSpeed",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 152
+      },
+      {
+        "name": "EMSWindSpeedOverrideOn",
+        "native_type": "bool",
+        "declared_default": "false",
+        "line": 153
+      },
+      {
+        "name": "EMSWindSpeedOverrideValue",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 154
+      },
+      {
+        "name": "WaterMainsTemp",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 155
+      },
+      {
+        "name": "Year",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 156
+      },
+      {
+        "name": "YearTomorrow",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 157
+      },
+      {
+        "name": "CurEnvirNum",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 179
+      },
+      {
+        "name": "TotDesDays",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 180
+      },
+      {
+        "name": "TotRunDesPersDays",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 181
+      },
+      {
+        "name": "CurrentOverallSimDay",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 182
+      },
+      {
+        "name": "TotalOverallSimDays",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 183
+      },
+      {
+        "name": "MaxNumberSimYears",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 184
+      },
+      {
+        "name": "RunPeriodStartDayOfWeek",
+        "native_type": "int",
+        "declared_default": "0",
+        "line": 185
+      },
+      {
+        "name": "CosSolarDeclinAngle",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 186
+      },
+      {
+        "name": "EquationOfTime",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 187
+      },
+      {
+        "name": "SinLatitude",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 188
+      },
+      {
+        "name": "CosLatitude",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 189
+      },
+      {
+        "name": "SinSolarDeclinAngle",
+        "native_type": "Real64",
+        "declared_default": "0.0",
+        "line": 190
+      }
+    ]
+  },
+  "handoff_contract": {
+    "source_range": {
+      "start": 1994,
+      "end": 2034
+    },
+    "copies": [
+      "TomorrowVariables->TodayVariables",
+      "wvarsHrTsTomorrow->wvarsHrTsToday"
+    ],
+    "projected_environment_fields": [
+      "DayOfYear",
+      "Year",
+      "Month",
+      "DayOfMonth",
+      "DayOfWeek",
+      "HolidayIndex",
+      "DSTIndicator",
+      "EquationOfTime",
+      "CosSolarDeclinAngle",
+      "SinSolarDeclinAngle"
+    ],
+    "other_write": "RptDayType from HolidayIndex>0 else DayOfWeek",
+    "conditional_clock_write": "PreviousHour=24 only when BeginEnvrnFlag",
+    "unchanged_canaries": [
+      "Environment.DayOfYear_Schedule",
+      "Environment.YearTomorrow",
+      "Environment.MonthTomorrow",
+      "Environment.DayOfMonthTomorrow",
+      "Environment.DayOfWeekTomorrow",
+      "Environment.HolidayIndexTomorrow",
+      "TomorrowVariables",
+      "wvarsHrTsTomorrow",
+      "wvarsLastHr",
+      "wvarsNextHr",
+      "LastHourSet",
+      "CurDayOfWeek",
+      "ReadEPlusWeatherCurTime",
+      "wvarsMissing",
+      "wvarsMissedCounts",
+      "wvarsOutOfRangeCounts",
+      "inputWeatherFile",
+      "Global.CalendarYear",
+      "Global.DayOfSim",
+      "Global.HourOfDay",
+      "Global.TimeStep",
+      "Global.WarmupFlag",
+      "Global.BeginDayFlag",
+      "Global.EndDayFlag",
+      "Global.EndEnvrnFlag"
+    ]
+  },
+  "reader_contract": {
+    "whole_entry": "Weather::ReadWeatherForDay -> cached genuine ReadEPlusWeatherForDay",
+    "lifecycle_entry": "Weather::InitializeWeather",
+    "same_environment_owner_required": true,
+    "read_first_day_at_begin_environment": true,
+    "whole_handoff_before_optional_next_day_read": true,
+    "warmup_retains_first_day_Tomorrow_without_next_day_read": true,
+    "last_day_does_not_prefetch_next_day": true,
+    "original_first_day_seed_is_selected_first_day_hour24_unless_input_hour1": true,
+    "wvarsLastHr_is_native_raw_hourly_WeatherVars_cache_not_raw_EPW_storage": true,
+    "cache_write_gate": "NumIntervalsPerHour==1 && TimeStepsInHour>1",
+    "wvarsLastHr_after_read": "just-read day hour24, potentially tomorrow at integrated callback",
+    "wvarsNextHr_fields_written": [
+      "BeamSolarRad",
+      "DifSolarRad",
+      "LiquidPrecip"
+    ],
+    "BackSpaceAfterRead_normal_caller": false,
+    "BackSpaceAfterRead_if_true": "one-record backspace",
+    "final_environment_stream": "rewound and header skipped before pre-current-weather callback",
+    "nonactual_selection_year_policy": "match month/day; preserve actual EPW raw year separately from civil CalendarYear"
+  },
+  "native_preparation": {
+    "lane": "selected-prepared-environment",
+    "genuine_calls": [
+      "InputProcessor::processInput",
+      "OpenWeatherFile",
+      "CloseWeatherFile",
+      "ReadUserWeatherInput",
+      "AllocateWeatherData",
+      "SetupInterpolationValues",
+      "ResolveLocationInformation",
+      "CheckLocationValidity"
+    ],
+    "GetEnvironmentFirstCall": false,
+    "GetBranchInputOneTimeFlag": false,
+    "WaterMainsParameterReport": false,
+    "BeginSimFlag": false,
+    "DoWeathSim": true,
+    "DoDesDaySim": false,
+    "Envrn_before_GetNextEnvironment": "actual-native-TotDesDays",
+    "TimeStepFraction": {
+      "bits": "3fd0000000000000"
+    },
+    "TimeStepZone": {
+      "bits": "3fd0000000000000"
+    },
+    "registered_whole_simulation_initialization_claimed": false,
+    "eio_sink": "native-output-stringstream",
+    "error_sink": "native-output-stringstream"
+  },
+  "boundary": {
+    "native_processed_buffers": "full WeatherVars timestep buffers, distinct from raw EPW day carriers",
+    "carrier_canary_unit": "all11 daily fields + all17 fields in every96 slot, plus unchanged owners; input-only distinct finite/nonzero/signed-zero canaries",
+    "unpaired_formulas": [
+      "missing/default/range/precipitation processing",
+      "daily solar coefficient calculation",
+      "CLK04 subhourly and solar interpolation",
+      "CLK06 sky calculation",
+      "optional sky-property schedule formulas"
+    ],
+    "native_calls_only_no_RHS_copy": true,
+    "production_native_values_as_operands": false,
+    "production_requires_live_mutable_day_owner_and_actual_handoff_consumer_hooks": true,
+    "selected_identity_source": "external hashed-input byte-offset mapping of actual native stream position; no fictional stored native record index",
+    "legacy_gap": "current full raw loader eagerly interprets all8760 records before selection; native interprets only first row per decoy day and chosen/read-next day records",
+    "new_environment_loader": "actual header-open cursor over same input bytes, source-backed readLine/rewind/one-line backspace/SkipEPlusWFHeader, shared raw/header owner, Interpret only in genuine source order",
+    "eager_parse_counter_delta_replay_or_raw_cached_answer_reuse": false,
+    "legacy_full_raw_loader_and_old_CLK02_proofs_preserved": true,
+    "new_raw_daily_carrier": "24 actually interpreted source-order raw records with byte provenance, distinct from upstream processed carrier"
+  },
+  "source_scope": "One prepared nonactual weather environment; source-backed day search, shared parser/input state, daily handoff and prior-hour owner lifecycle.",
+  "production_scope": [
+    "A",
+    "B"
+  ],
+  "whole_simulation_first_call_registration_certified": false,
+  "later_physics_certified": false,
+  "no_native_stored_source_index_claimed": true
+}

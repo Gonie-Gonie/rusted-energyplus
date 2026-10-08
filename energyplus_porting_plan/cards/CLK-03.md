@@ -56,6 +56,16 @@ CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
+## 동결한 계약
+
+원본 범위는 [source 계약](../contracts/CLK-03-source.json), 입력·caller는 [cases 계약](../contracts/CLK-03-cases.json), 정밀도는 [exact 비교 정책](../contracts/CLK-03-tolerances.json)에 고정한다.
+
+GetNextEnvironment의 prepared 환경 승인과 ReadDay1의 실제 시작 검색을 구분한다. 원본 byte position으로부터 입력 행 identity를 외부에서 매핑하며 native record-index 필드를 만들지 않는다. UpdateWeatherData는 11개 daily 필드와 4×24개 전체 WeatherVars carrier의 복사·변경·불변 상태를 비교한다.
+
+Warmup 첫날 재사용, 24→1시, 다음 날 lookahead, 마지막 날 no-prefetch, Hour1 대안, 첫날 검색 재호출 및 한 레코드 backspace를 별도 입력으로 둔다. 원본의 전체 prepared 함수 호출을 보존하되 결측 처리·보간·sky·solar 계산 결과와 raw EPW 저장소를 동일한 검증으로 취급하지 않는다.
+
+현재 eager full-file parser와 mutable source-order cursor의 차이를 실제 legacy baseline으로 기록한 뒤 수정한다. 모든 종료 gate는 실제 시험과 생산 연결 검증 전까지 미확인이다.
+
 ## 종료 체크
 
 - [ ] 원본 범위와 입출력·변경상태 계약 확정
