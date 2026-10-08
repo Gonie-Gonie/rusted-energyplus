@@ -1,0 +1,81 @@
+{
+  "schema": "clk02-tolerances-contract.v1",
+  "card": "CLK-02",
+  "status": "frozen-before-numerical-execution",
+  "frozen_before_numerical_execution": true,
+  "profiles": {
+    "finite_raw_scalar": {
+      "policy": "exact_ieee_binary64_bits",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "finite_header_numeric": {
+      "policy": "exact_ieee_binary64_bits",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "integer_text_boolean_arrays_order": {
+      "policy": "recursive_exact_type_and_value"
+    },
+    "finite_zero": {
+      "policy": "exact_positive_or_negative_zero_sign"
+    },
+    "copied_physical_adapter_operand": {
+      "policy": "exact_bits_when_same_named_raw_owner_field_is_copied"
+    }
+  },
+  "field_groups": {
+    "mandatory_reals": [
+      "DryBulb",
+      "DewPoint",
+      "RelHum",
+      "AtmPress",
+      "ETHoriz",
+      "ETDirect",
+      "IRHoriz",
+      "GLBHoriz",
+      "DirectRad",
+      "DiffuseRad",
+      "GLBHorizIllum",
+      "DirectNrmIllum",
+      "DiffuseHorizIllum",
+      "ZenLum",
+      "WindDir",
+      "WindSpeed",
+      "TotalSkyCover",
+      "OpaqueSkyCover",
+      "Visibility",
+      "CeilHeight"
+    ],
+    "optional_reals": [
+      "PrecipWater",
+      "AerosolOptDepth",
+      "SnowDepth",
+      "DaysSinceLastSnow",
+      "Albedo",
+      "LiquidPrecip"
+    ],
+    "date_integers": [
+      "WYear",
+      "WMonth",
+      "WDay",
+      "WHour",
+      "WMinute"
+    ],
+    "observation": "WObs",
+    "codes": "nine typed integers",
+    "header_dates_counts_weekdays": "typed exact integers"
+  },
+  "nonfinite_policy": "primary admitted values finite; safe optional nonfinite error diagnostic not paired as numeric result",
+  "source_error_IO_counter_limits": "only actual weather-code missed count paired; global warning/error indices/messages are unpaired",
+  "unpaired_downstream": [
+    "replacement/clamping",
+    "fractional RH",
+    "rain/snow",
+    "IR/sky",
+    "selection/interpolation/calendar/warmup"
+  ],
+  "failure_does_not_relax_policy": true,
+  "no_native_output_injection": true,
+  "gates_changed": false
+}

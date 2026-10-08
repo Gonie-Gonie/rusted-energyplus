@@ -1,0 +1,277 @@
+{
+  "schema": "clk02-source-contract.v1",
+  "card": "CLK-02",
+  "status": "frozen-before-numerical-execution",
+  "frozen_before_numerical_execution": true,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_audit": {
+    "path": ".runtime/porting/CLK-02/source-audit-01/freeze-02/audit.json",
+    "sha256": "2d620a79c776be461a7ef5c868ca844bec60608a6745e610410f6eb2f5212a22"
+  },
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+    },
+    {
+      "path": "src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+    },
+    {
+      "path": "src/EnergyPlus/FromChars.hh",
+      "sha256": "396abc97397a529f32e7eb33eadbf3096bec5151b71400b09e58db03bd1633cc"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658"
+    },
+    {
+      "path": "src/EnergyPlus/General.hh",
+      "sha256": "d7dcfac7390ef66dfee198739e1886110c494dd54ef953d204bad78d710eb021"
+    },
+    {
+      "path": "src/EnergyPlus/IOFiles.cc",
+      "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a"
+    },
+    {
+      "path": "src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb"
+    },
+    {
+      "path": "src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d"
+    },
+    {
+      "path": "src/EnergyPlus/ScheduleManager.cc",
+      "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba"
+    },
+    {
+      "path": "src/EnergyPlus/ScheduleManager.hh",
+      "sha256": "23810f5b6d7b8e41647bcc441bd6a82b652cdf8fe7b8ad8d9f66804cac97dd72"
+    },
+    {
+      "path": "src/EnergyPlus/StringUtilities.hh",
+      "sha256": "7e15aaf9f6f5e27e00ce788650f4d8e0761ab236b215df1e0fa7080e212c9d6f"
+    },
+    {
+      "path": "src/EnergyPlus/UtilityRoutines.cc",
+      "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2"
+    },
+    {
+      "path": "src/EnergyPlus/UtilityRoutines.hh",
+      "sha256": "e7a3a24bdc834e39564962e6af38cc631b13552109c128bb6da11da9f942a07f"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/char.functions.hh",
+      "sha256": "b191c211ba3f76eb46910860fdb54cb4aae62c78934dd9352a985bf155778130"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc",
+      "sha256": "f9d0dc7c606652c81f7db94711ce9f6ed107008943934bb70220672d1f34a418"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh",
+      "sha256": "f9276d98b79dcf4260f8daea44c577198bc12e438e24afc52076552f02775a98"
+    },
+    {
+      "path": "third_party/fast_float/fast_float.h",
+      "sha256": "24280241d934a8b0b5c50be25669c00ac1b4051182cfe4eac63d5d7d33187b71"
+    }
+  ],
+  "selected_ranges": [
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "epwHeaders", "description": "eight ordered header tokens", "start_line": 105, "end_line": 112, "role": "header-token-table", "range_sha256": "577582229864c09b607ac7af2cb4f4064ab7c896b08f42b50ee91e1142177f51"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "ManageWeather", "description": "initialize, current weather and reporting", "start_line": 131, "end_line": 157, "role": "caller-context", "range_sha256": "b270fcc3a18e60da68634da5454a05b95578ace5b7b1a1f088db404fb8258940"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "GetBranchInputOneTimeFlag", "description": "header open and later intervals admission", "start_line": 705, "end_line": 735, "role": "caller-context", "range_sha256": "8691651633f5df85576e3470b982ca53c902578c4dfb9be5f85a9ec12b8ca45e"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "SetupWeekDaysByMonth", "description": "header weekday setup, immutable CLK-01 reuse", "start_line": 1246, "end_line": 1327, "role": "direct-helper", "range_sha256": "064e426422838349aaa68060a6977ed70592244a6c78daae7605e15bb8c93daa"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "InitializeWeather", "description": "environment missing defaults and first daily read", "start_line": 1725, "end_line": 1791, "role": "excluded-context", "range_sha256": "9bf1d330b676d0bec76dec5d9afa70143456d1e4f379e4ca3db5a8a4bc311216"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "ReadWeatherForDay", "description": "daily-reader delegation", "start_line": 2275, "end_line": 2292, "role": "excluded-context", "range_sha256": "ef8acd396825acaa367bac70c05634552b60c5e6c78215a06ce88e6c48ef4361"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "RecordDateMatch", "description": "MatchYear versus source record year", "start_line": 2469, "end_line": 2477, "role": "excluded-context", "range_sha256": "3ec693816c3c4e2b603ff60372f175969f1f9d0de10e01830ce4746d42f2cd62"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "hour != WHour", "description": "daily reader hourly order check", "start_line": 2727, "end_line": 2735, "role": "excluded-context", "range_sha256": "80900e75061a8ffabe712fa2d5497bbca7223d436d7c34c3984e1137f3bf281e"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "ETHoriz", "description": "negative/missing preclassification", "start_line": 2738, "end_line": 2823, "role": "excluded-context", "range_sha256": "9958292d410321a0982a256358f47ca6809ffd0a74101ed4e2f307a118e577a0"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "TomorrowVariables.Year", "description": "Feb29 and raw source year retained", "start_line": 2825, "end_line": 2853, "role": "excluded-context", "range_sha256": "e5b829b7f2e59eb696380b3b39efdd2ae2d6ee8d5b8c92aadc258dbbd131dd4a"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "wvarsMissing", "description": "previous/default substitution, rain and sky owner", "start_line": 2879, "end_line": 3040, "role": "excluded-context", "range_sha256": "9fd9b1d8320fa329cf53878027c6cfd158cc43cd5efe43337b8f222e4f032fc7"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "ErrorInterpretWeatherDataLine", "description": "genuine fatal error route", "start_line": 3251, "end_line": 3264, "role": "direct-error-helper", "range_sha256": "b97d5cd941816103e9611e3e8f1dd511763a549f83dd99d79d4ec1369ff88af6"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "InterpretWeatherDataLine", "description": "whole unchanged raw record parser", "start_line": 3266, "end_line": 3492, "role": "primary-owner", "range_sha256": "d7cfd29bde7247bcda8df92c4950c6a9af30b087285d3e9f372175633bcd3066"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "OpenWeatherFile", "description": "existing file to full header route", "start_line": 4336, "end_line": 4352, "role": "caller-context", "range_sha256": "d28135ac50f620ce5b2546857e590b4919949b541abb49d76f4280f49e962841"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "OpenEPlusWeatherFile", "description": "actual file open and header dispatch gate", "start_line": 4354, "end_line": 4413, "role": "primary-caller", "range_sha256": "6259904acbbc7bd679836f8942f5488d0849e6b466668399fc418499cdad9ae3"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "WeatherFileLatitude", "description": "later selected Site location override", "start_line": 4434, "end_line": 4474, "role": "excluded-context", "range_sha256": "64c9eb10ac03c20b98fc39d33030732986eb14f8d1c81ef1fda9c10481478274"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "ProcessEPWHeader", "description": "whole unchanged header parser", "start_line": 7486, "end_line": 8170, "role": "primary-owner", "range_sha256": "8fcb8f3c449d35b77900e7def5154e32d0440b7971e3fef6be73a088fdfc34cd"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "EpwHeaderType::Location", "description": "LOCATION numeric and title state", "start_line": 7515, "end_line": 7583, "role": "selected-branch", "range_sha256": "a95438d1b9b56cb49650b87bd97f98ad47953b472662d974b23ee677bead4fdd"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "EpwHeaderType::TypicalExtremePeriods", "description": "genuine unused CON Typical/Extreme state", "start_line": 7584, "end_line": 7824, "role": "unpaired-context", "range_sha256": "7a8c3726f2293b3c861b40108bf743c7932b8809e94b042cde9a6e965aea7d7c"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "EpwHeaderType::GroundTemperatures", "description": "genuine unused CON ground header state", "start_line": 7825, "end_line": 7865, "role": "unpaired-context", "range_sha256": "9c3f17512ce1bc91534be31c08eda1f008262d2dd6038034e4c2619c193ffc59"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "EpwHeaderType::HolidaysDST", "description": "leap/DST/holiday header state", "start_line": 7866, "end_line": 8012, "role": "selected-branch", "range_sha256": "3393d52366cbcb40ae8ad4d211c46bf49586a324189c7173241da59094daa2b8"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "EpwHeaderType::Comments1", "description": "comments/design have no action", "start_line": 8013, "end_line": 8017, "role": "no-action-branch", "range_sha256": "7af637fca8f26c6d71af888966b1acaea418ce0da08c723e3f831b40be01a394"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "EpwHeaderType::DataPeriods", "description": "period count, dates and weekday state", "start_line": 8018, "end_line": 8164, "role": "selected-branch", "range_sha256": "6a36403dc8d2802c24d604a2bbb764337d89982afd389856ce8c1d7b9ee73245"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "SkipEPlusWFHeader", "description": "already-parsed reopen route", "start_line": 8172, "end_line": 8248, "role": "excluded-context", "range_sha256": "c45a3fe70dc50f5eb0bce9e87470cc66621599a2fb55efde8b0f8e49f32982bc"},
+    {"file": "src/EnergyPlus/WeatherManager.cc", "symbol": "computeJulianDate", "description": "year-bearing header dates, CLK-01 reuse", "start_line": 8533, "end_line": 8558, "role": "direct-helper", "range_sha256": "f394a9b0f2bc38379a940a374ea3db1c2c31f64fc7fc86fd12067c49c31d1dd3"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "EpwHeaderType", "description": "header and date enums", "start_line": 73, "end_line": 95, "role": "declarations", "range_sha256": "03b7c95750c0add16b7c41af255052e5df8a2f7c97b1e1895fb0e20793e846cf"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "DayWeatherVariables", "description": "date provenance, periods and DST defaults", "start_line": 305, "end_line": 369, "role": "state-declarations", "range_sha256": "4257b96c42e201eaad8c01a99462cce02e1f9a3227d1def98c1888f07dffdcbb"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "WeatherVarCounts", "description": "actual weather-code miss counter default", "start_line": 373, "end_line": 396, "role": "state-declarations", "range_sha256": "12aff056d5ff34a04401d150d83f55174fc599963a71f44b152e6783c4d715f6"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "InterpretWeatherDataLine", "description": "public raw output references", "start_line": 503, "end_line": 544, "role": "declarations", "range_sha256": "119a33c8a9597132423d735c87a1b16c900146f360ce95ef8a0180244136ee2f"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "WeatherVars", "description": "raw versus downstream weather owner types", "start_line": 713, "end_line": 744, "role": "excluded-state-declarations", "range_sha256": "881571ccc8d0c3d9f12a1800cae2ddcf036bfc1761e8d0a842de6c8dd156c870"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "WeatherFileLatitude", "description": "location, period count and calendar defaults", "start_line": 792, "end_line": 833, "role": "state-declarations", "range_sha256": "57bb2b6f9364b496f7bf6995eed5525ca3ed1405a817f678025d2f6d2716c7f4"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "EndDayOfMonth", "description": "date admission, arrays, counters and title defaults", "start_line": 861, "end_line": 930, "role": "state-declarations", "range_sha256": "7f94d8b0d0a6ca19afbc689fd45724db656d10728486bb4a5d69924d6ab761d9"},
+    {"file": "src/EnergyPlus/WeatherManager.hh", "symbol": "clear_state", "description": "actual WeatherManagerData reconstruction", "start_line": 940, "end_line": 943, "role": "lifecycle", "range_sha256": "166a690766eb1ba9e0396a1973fdcfef798b153233dc84594dbeacbb2e10c121"},
+    {"file": "src/EnergyPlus/General.cc", "symbol": "ProcessDateString", "description": "header date lexical owner", "start_line": 395, "end_line": 454, "role": "direct-helper", "range_sha256": "2c4e37eb626cc83aaaaec886ce76ef19b090d97f9debf4b8a285553cad3f0e49"},
+    {"file": "src/EnergyPlus/General.cc", "symbol": "DetermineDateTokens", "description": "header date tokens and year extraction", "start_line": 456, "end_line": 668, "role": "direct-helper", "range_sha256": "53959fc0f5c27d16262143ad85a976d4a66b91ea4f77bdee9a760719e2226e60"},
+    {"file": "src/EnergyPlus/General.cc", "symbol": "ValidateMonthDay", "description": "date local validation flag", "start_line": 670, "end_line": 703, "role": "direct-helper", "range_sha256": "db9d229e9ae4a1330328e9010dcf9da6eadc56a5e298836161862a642ece8b49"},
+    {"file": "src/EnergyPlus/General.cc", "symbol": "OrdinalDay", "description": "no-year period dates, CLK-01 reuse", "start_line": 705, "end_line": 737, "role": "direct-helper", "range_sha256": "a75944ba1e753120c50af5c3741a157e2f33c456df3f2c00c6247309b3b4e665"},
+    {"file": "src/EnergyPlus/General.cc", "symbol": "InvOrdinalDay", "description": "single-number date path", "start_line": 739, "end_line": 784, "role": "direct-helper", "range_sha256": "cf0a8d9486040bd689f136f66c011bf95a32d0e5207b02bb295534c851987b3e"},
+    {"file": "src/EnergyPlus/StringUtilities.hh", "symbol": "stringReader", "description": "actual stream for weather codes", "start_line": 58, "end_line": 63, "role": "direct-helper", "range_sha256": "c2e3f25ed3bef5135056d719d3d4c93e17c7ceb287ecfdebc10f157d9a232424"},
+    {"file": "src/EnergyPlus/StringUtilities.hh", "symbol": "readListItem", "description": "homogeneous lexical item parser", "start_line": 65, "end_line": 97, "role": "direct-helper", "range_sha256": "ca484af52bd4b258c99d79538bff0f1822c743eb008baf3726b91fe75ff5781c"},
+    {"file": "src/EnergyPlus/StringUtilities.hh", "symbol": "nth_occurrence", "description": "position after nth delimiter", "start_line": 146, "end_line": 164, "role": "direct-helper", "range_sha256": "21751cf061297fd8d205966cb4f9ac4109c463c5245bb12106f2da7f7ca73c64"},
+    {"file": "src/EnergyPlus/StringUtilities.hh", "symbol": "readList", "description": "last-status comma fold", "start_line": 166, "end_line": 175, "role": "direct-helper", "range_sha256": "9ea70786f553b69ba915692601debc169557062469f021f2d83568d6e0effef5"},
+    {"file": "src/EnergyPlus/FromChars.hh", "symbol": "from_chars", "description": "compiler-selected integer parse shim", "start_line": 66, "end_line": 123, "role": "direct-helper", "range_sha256": "c0bc387fcc1a8a9d3df4421731e39c3c5f890ab667ed791f5dea3647ddaa2969"},
+    {"file": "src/EnergyPlus/UtilityRoutines.cc", "symbol": "ProcessNumber", "description": "optional/header finite numeric parse", "start_line": 94, "end_line": 173, "role": "direct-helper", "range_sha256": "69d0e36ab14ac0b24cf2ef42a00a7b32bb6b5c2d7e31e6e5665d8a29edee947a"},
+    {"file": "src/EnergyPlus/UtilityRoutines.cc", "symbol": "FindNonSpace", "description": "full-file header leading-space gate", "start_line": 674, "end_line": 690, "role": "direct-helper", "range_sha256": "ec9c7abad477e3ed5fd1bc5c3aad5af0ec8fb2a02dc2e672756cedd28e7389eb"},
+    {"file": "src/EnergyPlus/UtilityRoutines.hh", "symbol": "getEnumValue", "description": "exact uppercase weekday lookup", "start_line": 665, "end_line": 673, "role": "direct-helper", "range_sha256": "eefd8872f3979e72fb935ab16bdd0077d2490267c4b71361fa7b4ee72d35aa2a"},
+    {"file": "src/EnergyPlus/UtilityRoutines.hh", "symbol": "FindItemInList", "description": "actual date-token iterator lookup", "start_line": 410, "end_line": 417, "role": "direct-helper", "range_sha256": "8729851b37f35dc89487dc569cf8e10ea6d724e6de8d445238cfaba2ebcd3a3d"},
+    {"file": "src/EnergyPlus/ScheduleManager.cc", "symbol": "dayTypeNamesUC", "description": "weekday enum names", "start_line": 137, "end_line": 149, "role": "constant-table", "range_sha256": "765ad81dea61932f62946a3eff61bc8fefcf1822108f6daf3b46dbbc1ec83ace"},
+    {"file": "src/EnergyPlus/InputProcessing/InputProcessor.cc", "symbol": "getNumObjectsFound", "description": "real zero-control input lookup", "start_line": 505, "end_line": 541, "role": "factory-helper", "range_sha256": "fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301"},
+    {"file": "src/EnergyPlus/IOFiles.cc", "symbol": "InputFile::readLine", "description": "actual line read and CR removal", "start_line": 89, "end_line": 103, "role": "direct-IO-helper", "range_sha256": "02d331bf63e9d868fece98e9e6fb9f6e69aecdd09824082b9d09799d8055a2c2"},
+    {"file": "src/EnergyPlus/IOFiles.cc", "symbol": "InputFile::open", "description": "binary fstream owner", "start_line": 143, "end_line": 149, "role": "direct-IO-helper", "range_sha256": "054013a7e8fc2b054263c5b96007378237a25b454d43ed07309a8f7edd7ea96f"},
+    {"file": "src/EnergyPlus/IOFiles.hh", "symbol": "ReadResult", "description": "actual EOF/good semantics", "start_line": 390, "end_line": 417, "role": "IO-declarations", "range_sha256": "0af0e6e87a5f6eba8d975211a8fdef19af3df51e54247098b38abc124538b37b"},
+    {"file": "src/EnergyPlus/DataEnvironment.hh", "symbol": "WeatherFileLocationTitle", "description": "actual copied location title", "start_line": 169, "end_line": 175, "role": "state-declarations", "range_sha256": "716bd751b33fb60194ea8a9c7ec0445b1db0e575f2ee07bfdba3094f9a06b184"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh", "symbol": "sign", "description": "nint bounded observation indicator", "start_line": 566, "end_line": 591, "role": "direct-helper", "range_sha256": "fc320e3a68d9ad63bb57831b545ab8502dfa72bdd14274b7bbe30c6434ccdbfb"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh", "symbol": "ModSelector", "description": "integer modulo for header field selection", "start_line": 680, "end_line": 715, "role": "direct-helper", "range_sha256": "7fc1f6b69ef19694852801faadd38117d9e276b9f445b839670bfecfea76f41c"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh", "symbol": "not_blank", "description": "date-token trailing-buffer check", "start_line": 50, "end_line": 56, "role": "direct-helper", "range_sha256": "2182cc4a80fd06d9c5f88624a75dba054bc83c90d69d4a8889ca5105360f11da"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh", "symbol": "has", "description": "weather-code digit membership", "start_line": 140, "end_line": 146, "role": "direct-helper", "range_sha256": "3029607b6611794dabdfefde723719b7887894b8a39bd3c621a84b1eff8d3d6f"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh", "symbol": "len", "description": "length and source index semantics", "start_line": 691, "end_line": 718, "role": "direct-helper", "range_sha256": "f318bfdcf042a4589028d5624cba99e4a11db7648388cdd6d021c564ae355291"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc", "symbol": "uppercase", "description": "header uppercase operation", "start_line": 23, "end_line": 32, "role": "direct-helper", "range_sha256": "2c057429f4c1404f72f258493e357e5526a34c57fcc02d3aa5057ec0a71bedc8"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc", "symbol": "strip", "description": "literal-space stripping", "start_line": 81, "end_line": 95, "role": "direct-helper", "range_sha256": "b36202f0fef7a877b36186e1daf7a03b9d201f40feabe6e24a6acae5b9cfa827"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc", "symbol": "stripped", "description": "LOCATION stripped title fragments", "start_line": 263, "end_line": 276, "role": "direct-helper", "range_sha256": "b02a2d986f68366cbd2e6f3ce3f995bfab0cfa24e10b3e7755e81c43d7ab6489"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/char.functions.hh", "symbol": "uppercase", "description": "ASCII character uppercase", "start_line": 217, "end_line": 225, "role": "direct-helper", "range_sha256": "3580eebdb35bf5c218b305625f4f2f380e332906ed21c61afe08e9d86be5679f"},
+    {"file": "third_party/ObjexxFCL/src/ObjexxFCL/char.functions.hh", "symbol": "to_upper", "description": "actual character case arithmetic", "start_line": 254, "end_line": 261, "role": "direct-helper", "range_sha256": "444da309d1238f4590d140cab9590ba8b3912987828dc89ff35baf41d7845db8"},
+    {"file": "src/EnergyPlus/EnergyPlus.hh", "symbol": "ObjexxFCL::nint", "description": "actual imported string and integer helpers", "start_line": 145, "end_line": 197, "role": "import-bindings", "range_sha256": "9b2868d3cbc27dc5716db6a22bc4d95ffe5a8b413b1141978e5b6aa7494f27b2"}
+  ],
+  "primary_functions": [
+    "InterpretWeatherDataLine",
+    "ProcessEPWHeader",
+    "OpenEPlusWeatherFile"
+  ],
+  "source_facts": {
+    "path": ".runtime/porting/CLK-02/source-audit-01/freeze-02/source-facts.md",
+    "sha256": "29bc02bac3049686d67753d8c9a4e6e601053804dcafa6fd84fa0a59c8d07fce"
+  },
+  "existing_CLK01_source_contract": {
+    "path": "energyplus_porting_plan/contracts/CLK-01-source.json",
+    "sha256": "6cd7fa8294ff5b28cfec3feb0f6efa765b9b66c1ea0495974cd61262255c9412"
+  },
+  "paired_raw_outputs": {
+    "date_integer_fields": [
+      "WYear",
+      "WMonth",
+      "WDay",
+      "WHour",
+      "WMinute"
+    ],
+    "mandatory_real_fields": [
+      "DryBulb",
+      "DewPoint",
+      "RelHum",
+      "AtmPress",
+      "ETHoriz",
+      "ETDirect",
+      "IRHoriz",
+      "GLBHoriz",
+      "DirectRad",
+      "DiffuseRad",
+      "GLBHorizIllum",
+      "DirectNrmIllum",
+      "DiffuseHorizIllum",
+      "ZenLum",
+      "WindDir",
+      "WindSpeed",
+      "TotalSkyCover",
+      "OpaqueSkyCover",
+      "Visibility",
+      "CeilHeight"
+    ],
+    "observation_integer_field": "WObs",
+    "weather_codes": 9,
+    "optional_real_fields": [
+      "PrecipWater",
+      "AerosolOptDepth",
+      "SnowDepth",
+      "DaysSinceLastSnow",
+      "Albedo",
+      "LiquidPrecip"
+    ],
+    "private_RField21_observed": false
+  },
+  "paired_header_state": [
+    "EPWHeaderTitle",
+    "WeatherFileLocationTitle",
+    "WeatherFileLatitude",
+    "WeatherFileLongitude",
+    "WeatherFileTimeZone",
+    "WeatherFileElevation",
+    "WFAllowsLeapYears",
+    "EPWDaylightSaving",
+    "EPWDST",
+    "DST",
+    "NumSpecialDays",
+    "SpecialDays",
+    "NumDataPeriods",
+    "NumIntervalsPerHour",
+    "DataPeriods"
+  ],
+  "mutable_parser_state": [
+    "wvarsMissedCounts.WeathCodes"
+  ],
+  "observed_call_context": [
+    "ErrorFound_before_after",
+    "ErrorsFound_before_after",
+    "Line_before_after",
+    "actual_stream_position_and_state"
+  ],
+  "constraints": {
+    "complete_delimiter_shape": true,
+    "complete_finite_header_continuations": true,
+    "bounded_finite_WObs_conversion": true,
+    "no_implicit_positive_count_or_interval_validation": true,
+    "raw_year_is_not_civil_year": true,
+    "full_open_gate_distinct_from_direct_enum": true,
+    "whole_error_manager_and_IO_peer_parity": false,
+    "only_defined_header_state_observed": true,
+    "uninitialized_source_locals_observed": false,
+    "DST_weekday_copy_requires_weekday_form_or_disabled_zero_route": true
+  },
+  "excluded_science": [
+    "previous/default sentinel replacement",
+    "RH percent-to-fraction normalization",
+    "rain/snow flags and rain fallback",
+    "IR/sky calculations",
+    "weather record selection",
+    "Today/Tomorrow lifecycle",
+    "timestep interpolation",
+    "civil calendar and warmup equality",
+    "general Site location override",
+    "unused Typical/Ground CON consumers"
+  ],
+  "source_only_context": [
+    "full header Typical/Extreme and Ground branches really execute",
+    "all unused numeric columns really parse",
+    "source error text/global IO remains unpaired",
+    "header input preparation is not whole simulation parser admission"
+  ],
+  "builder_policy": "same verified GNU13.2 core/API/Objexx and directory+target definitions; unchanged original functions; future debug derivative separately authenticated",
+  "references_or_fixture_outputs_supplied_as_inputs": false,
+  "gates_changed": false
+}

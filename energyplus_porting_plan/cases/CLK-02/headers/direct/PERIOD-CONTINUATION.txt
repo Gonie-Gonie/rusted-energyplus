@@ -1,0 +1,2 @@
+Second Period,Monday,7/1,12/31
+UNCONSUMED-SENTINEL

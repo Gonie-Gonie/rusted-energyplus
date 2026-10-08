@@ -1,0 +1,139 @@
+{
+  "schema": "clk02-cases-contract.v1",
+  "card": "CLK-02",
+  "status": "frozen-before-numerical-execution",
+  "frozen_before_numerical_execution": true,
+  "helper_request": {
+    "path": "energyplus_porting_plan/cases/CLK-02/helper-request.json",
+    "sha256": "06059e9be2b8e2a20dc9a5d603d061dc427bb3dfa8ba83ec2b9fca75c27a709a"
+  },
+  "fixed_CON_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "counts": {
+    "record_sequences": 40,
+    "diagnostic_raw_calls": 46,
+    "safe_error_diagnostics": 9,
+    "fixed_epw_raw_calls": 8760,
+    "total_raw_calls": 8806,
+    "direct_enum_header_cases": 18,
+    "diagnostic_full_open_header_cases": 4,
+    "fixed_epw_full_open_header_cases": 1,
+    "total_header_roots": 23,
+    "unchanged_CON_cases": 15,
+    "proposed_bounded_Rust_physical_commands": 6
+  },
+  "record_sequence_ids": [
+    "RAW-NORMAL",
+    "RAW-SENTINELS",
+    "RAW-NEGATIVE-FINITE",
+    "RAW-SIGNED-ZERO",
+    "DATE-FEB29-NONLEAP-RECORD-YEAR",
+    "DATE-DAY-ZERO",
+    "DATE-YEAR-ZERO",
+    "DATE-HOUR25-MINUTE60",
+    "DATE-HOUR24-MINUTE0",
+    "OBS-POS-BELOW",
+    "OBS-POS-TIE",
+    "OBS-NEG-BELOW",
+    "OBS-NEG-TIE",
+    "OBS-NONZERO",
+    "CODES-SAME-OWNER-SEVEN",
+    "TAIL-ABSENT-0",
+    "TAIL-ABSENT-1",
+    "TAIL-ABSENT-2",
+    "TAIL-ABSENT-3",
+    "TAIL-ABSENT-4",
+    "TAIL-ABSENT-5",
+    "TAIL-BLANK-PrecipWater",
+    "TAIL-BLANK-AerosolOptDepth",
+    "TAIL-BLANK-SnowDepth",
+    "TAIL-BLANK-DaysSinceLastSnow",
+    "TAIL-BLANK-Albedo",
+    "TAIL-BLANK-LiquidPrecip",
+    "TAIL-SPACES",
+    "TAIL-FORTRAN-D",
+    "TAIL-INVALID",
+    "TAIL-NONFINITE",
+    "TAIL-FINAL-NO-DURATION",
+    "IGNORED-DURATION-35",
+    "DATE-INVALID-MONTH0",
+    "DATE-INVALID-MONTH13",
+    "DATE-INVALID-APRIL31",
+    "DATE-INVALID-FEB30",
+    "MANDATORY-INVALID",
+    "MANDATORY-EMPTY",
+    "MANDATORY-PREFIX"
+  ],
+  "header_case_ids": [
+    "LOCATION-NORMAL",
+    "LOCATION-INVALID-RETAIN",
+    "LOCATION-CONTINUATION",
+    "HOLIDAYS-ZERO",
+    "HOLIDAYS-DST-LEAP",
+    "HOLIDAYS-INVALID-START",
+    "PERIOD-NORMAL",
+    "PERIOD-CONTINUATION",
+    "PERIOD-WRAP-LEAP",
+    "PERIOD-START-YEAR-ONLY",
+    "PERIOD-YEARS",
+    "PERIOD-INITIAL-ERROR",
+    "PERIOD-ORDINAL",
+    "PERIOD-ZERO-COUNT",
+    "PERIOD-ZERO-INTERVAL",
+    "PERIOD-INVALID-WEEKDAY",
+    "COMMENTS-NO-COMMA",
+    "DESIGN-NO-ACTION",
+    "OPEN-NORMAL",
+    "OPEN-CONTINUATION",
+    "OPEN-LOWERCASE-LOCATION",
+    "OPEN-TRUNCATED-HEADER"
+  ],
+  "native_routes": [
+    "whole unchanged raw parser",
+    "whole direct enum header with real continuation stream",
+    "whole file-open header gate"
+  ],
+  "safe_error_policy": "observe actual failure/available outputs; no predetermined exit code or error-text equivalence",
+  "admission": {
+    "all_finite_primary_raw_values": true,
+    "WObs_finite_int_range": true,
+    "header_counts_nonnegative_bounded": true,
+    "zero_count_and_zero_intervals_direct_cases_admitted": true,
+    "unterminated_continuations_excluded": true,
+    "short_delimiter_remove_prefix_precondition_violations_excluded": true
+  },
+  "native_ordinary_input_scope": "all15 frozen CON bindings remain unchanged; extra diagnostic EPWs are parser-only inputs",
+  "Rust_physical_cases": [
+    {
+      "case_id": "A-24H",
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "claim": "actual parsed raw owner and literal physical-adapter handoff; downstream science remains unpaired"
+    },
+    {
+      "case_id": "A-72H",
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "claim": "actual parsed raw owner and literal physical-adapter handoff; downstream science remains unpaired"
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "claim": "actual parsed raw owner and literal physical-adapter handoff; downstream science remains unpaired"
+    }
+  ],
+  "whole_epw_parse_is_annual_physics": false,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "gates_changed": false
+}
