@@ -1,7 +1,8 @@
-use super::{produce_day, weather_vars_from_raw};
+use super::produce_day;
+use crate::weather::day::hourly::process_hour;
 use crate::weather::day::{WeatherDayState, WeatherDayValues, WeatherVars};
 use crate::weather::raw::{
-    RawEpwInput, RawEpwOutputs, RawReadProvenance, RawWeatherDay, RawWeatherSlot,
+    RawEpwInput, RawEpwOutputs, RawReadProvenance, RawWeatherDay, RawWeatherSlot, project_record,
 };
 use crate::weather::{WeatherTimestepSample, WeatherTimestepSeries};
 use ep_model::FirstHourInterpolationStartingValues;
@@ -42,18 +43,30 @@ fn raw_day(day: i32) -> RawWeatherDay {
 }
 
 fn state(steps: usize) -> WeatherDayState {
-    WeatherDayState {
+    let mut owner = WeatherDayState {
         tomorrow_values: WeatherDayValues::allocated(steps).unwrap(),
         ..WeatherDayState::default()
+    };
+    owner.global.time_steps_in_hour = steps as i32;
+    owner.setup_interpolation_values().unwrap();
+    owner.weather.is_rain_threshold = 0.8 / steps as f64;
+    owner
+}
+
+fn prepare_hourly(raw: &RawWeatherDay, owner: &mut WeatherDayState) {
+    for (index, slot) in raw.hours.iter().enumerate() {
+        let record = project_record(&slot.raw, slot.provenance.line_read_attempt).unwrap();
+        let hourly = process_hour(&slot.raw, record, owner);
+        owner.tomorrow_values.hour_mut(index + 1).unwrap()[0] = hourly;
     }
 }
 
-fn sample_bits(sample: &WeatherTimestepSample) -> [u64; 12] {
+// Compatibility scalar previews preserve their explicit raw-record predecessor.
+// Their separate PSY cache lifetime is not a cross-day physical parity claim.
+fn sample_bits(sample: &WeatherTimestepSample) -> [u64; 10] {
     [
         sample.dry_bulb_c,
-        sample.wet_bulb_c,
         sample.relative_humidity_percent,
-        sample.outdoor_humidity_ratio,
         sample.atmospheric_pressure_pa,
         sample.horizontal_infrared_radiation_w_per_m2,
         sample.global_horizontal_radiation_w_per_m2,
@@ -73,9 +86,17 @@ fn explicit_predecessor_retains_existing_samples_across_day_boundary() {
         FirstHourInterpolationStartingValues::Hour24,
     ] {
         let mut owner = state(4);
-        let first = produce_day(&raw_day(1), None, 4, policy, &mut owner).unwrap();
+        let first_raw = raw_day(1);
+        prepare_hourly(&first_raw, &mut owner);
+        let first = produce_day(&first_raw, None, 4, policy, &mut owner).unwrap();
+        let second_raw = raw_day(2);
+        prepare_hourly(&second_raw, &mut owner);
+        let before_counts = owner.missed_counts;
+        let before_history = owner.missing_values;
         let second =
-            produce_day(&raw_day(2), Some(first.records[23]), 4, policy, &mut owner).unwrap();
+            produce_day(&second_raw, Some(first.records[23]), 4, policy, &mut owner).unwrap();
+        assert_eq!(owner.missed_counts, before_counts);
+        assert_eq!(owner.missing_values, before_history);
         let records = first
             .records
             .iter()
@@ -97,9 +118,7 @@ fn explicit_predecessor_retains_existing_samples_across_day_boundary() {
         assert_eq!(second.samples[0].record_index, 0);
         assert_eq!(
             owner.last_hour.real_values().map(f64::to_bits),
-            weather_vars_from_raw(&raw_day(2).hours[23].raw, second.records[23])
-                .real_values()
-                .map(f64::to_bits)
+            second.hourly_values[23].real_values().map(f64::to_bits)
         );
     }
 }
@@ -132,6 +151,7 @@ fn solar_next_hour_wraps_within_the_real_day_and_preserves_cache_canaries() {
         opaque_sky_cover: 105.0,
     };
     let before = owner.next_hour;
+    prepare_hourly(&raw, &mut owner);
     let result = produce_day(
         &raw,
         None,
@@ -186,6 +206,7 @@ fn producer_admission_preserves_preexisting_owners_and_one_step_caches() {
     );
     let mut owner = state(1);
     owner.last_hour = before.last_hour;
+    prepare_hourly(&raw, &mut owner);
     let previous = owner.clone();
     produce_day(
         &raw,
@@ -201,4 +222,59 @@ fn producer_admission_preserves_preexisting_owners_and_one_step_caches() {
     );
     assert_eq!(owner.next_hour, previous.next_hour);
     assert_eq!(owner.weather.last_hour_set, previous.weather.last_hour_set);
+}
+
+#[test]
+fn producer_retains_processed_hourly_values_without_replaying_missing_counts() {
+    let mut raw = raw_day(1);
+    raw.hours[3].raw.mandatory_reals[0] = 99.9;
+    raw.hours[3].raw.optional_reals[5] = 999.0;
+    let mut owner = state(4);
+    owner.missing_values.base.liquid_precip = 0.75;
+    prepare_hourly(&raw, &mut owner);
+    assert_eq!(owner.missed_counts.out_dry_bulb_temp, 1);
+    assert_eq!(owner.missed_counts.liquid_precip, 1);
+    let counts = owner.missed_counts;
+    let history = owner.missing_values;
+    let processed = owner.tomorrow_values.hour(4).unwrap()[0];
+    let produced = produce_day(
+        &raw,
+        None,
+        4,
+        FirstHourInterpolationStartingValues::Hour24,
+        &mut owner,
+    )
+    .unwrap();
+    assert_eq!(produced.records[3].dry_bulb_c, 99.9);
+    assert_eq!(produced.hourly_values[3], processed);
+    assert_eq!(produced.hourly_values[3].out_dry_bulb_temp, 11.3);
+    assert_eq!(produced.hourly_values[3].liquid_precip, 0.75);
+    assert_eq!(
+        owner.tomorrow_values.hour(4).unwrap()[3].out_dry_bulb_temp,
+        11.3
+    );
+    assert_eq!(owner.missed_counts, counts);
+    assert_eq!(owner.missing_values, history);
+}
+
+#[test]
+fn missing_setup_is_an_admission_failure_without_cache_or_grid_writes() {
+    let raw = raw_day(1);
+    let mut owner = state(4);
+    prepare_hourly(&raw, &mut owner);
+    owner.weather.interpolation = None;
+    owner.last_hour.wind_dir = -0.0;
+    let before = owner.clone();
+    assert!(
+        produce_day(
+            &raw,
+            None,
+            4,
+            FirstHourInterpolationStartingValues::Hour24,
+            &mut owner,
+        )
+        .is_err()
+    );
+    assert_eq!(owner, before);
+    assert_eq!(owner.last_hour.wind_dir.to_bits(), (-0.0_f64).to_bits());
 }

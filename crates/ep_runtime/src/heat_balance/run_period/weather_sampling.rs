@@ -85,7 +85,7 @@ pub(super) fn sample_run_period_weather<'weather>(
         .map(|context| {
             let is_raining = context
                 .owned
-                .map(|current| current.weather.is_rain)
+                .map(|current| current.current_weather.is_rain)
                 .unwrap_or_else(|| {
                     context
                         .sample_value()

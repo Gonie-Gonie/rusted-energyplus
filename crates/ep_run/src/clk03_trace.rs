@@ -5,7 +5,9 @@ use crate::{RunConfig, RunError, RunExitCode};
 use ep_runtime::weather::day::production_trace::{
     OBSERVATION_LIMIT, WeatherDayProductionTrace, WeatherSessionSnapshot,
 };
-use ep_runtime::weather::day::{DailyWeatherVariables, WeatherGlobalState, WeatherVars};
+use ep_runtime::weather::day::{
+    CurrentWeatherState, DailyWeatherVariables, WeatherDayState, WeatherGlobalState, WeatherVars,
+};
 use serde_json::{Value, json};
 use std::io::{BufWriter, Write};
 
@@ -26,6 +28,41 @@ fn weather(value: WeatherVars) -> Value {
         "DifSolarRad":scalar(value.dif_solar_rad),"Albedo":scalar(value.albedo),
         "WaterPrecip":scalar(value.water_precip),"LiquidPrecip":scalar(value.liquid_precip),
         "TotalSkyCover":scalar(value.total_sky_cover),"OpaqueSkyCover":scalar(value.opaque_sky_cover)})
+}
+
+// Observe the actual current owner; selecting/deriving weather is never done here.
+fn current_weather(value: CurrentWeatherState) -> Value {
+    json!({"IsRain":value.is_rain,
+        "OutDryBulbTemp":scalar(value.out_dry_bulb_temp),"OutDewPointTemp":scalar(value.out_dew_point_temp),
+        "OutBaroPress":scalar(value.out_baro_press),"OutRelHum":scalar(value.out_rel_hum),
+        "OutRelHumValue":scalar(value.out_rel_hum_value),"OutHumRat":scalar(value.out_hum_rat),
+        "OutWetBulbTemp":scalar(value.out_wet_bulb_temp),"WindSpeed":scalar(value.wind_speed),
+        "WindDir":scalar(value.wind_dir),"LiquidPrecipitation":scalar(value.liquid_precipitation),
+        "OutEnthalpy":scalar(value.out_enthalpy),"OutAirDensity":scalar(value.out_air_density)})
+}
+
+fn current_observation(state: &WeatherDayState) -> Value {
+    let global = &state.global;
+    let weather_owner = &state.weather;
+    let selected = usize::try_from(global.hour_of_day).ok().and_then(|hour| {
+        usize::try_from(global.time_step).ok().and_then(|step| {
+            state.today_values.hour(hour).ok().and_then(|values| {
+                step.checked_sub(1)
+                    .and_then(|index| values.get(index))
+                    .copied()
+                    .map(|value| json!({"hour":hour,"time_step":step,"value":weather(value)}))
+            })
+        })
+    });
+    json!({"current_non_solar_weather":current_weather(state.environment.current_weather),
+        "selected_today_slot":selected,
+        "weights":{"WeightNow":scalar(global.weight_now),"WeightPreviousHour":scalar(global.weight_previous_hour)},
+        "clock":{"CurrentTime":scalar(global.current_time),"SimTimeSteps":global.sim_time_steps,
+            "TimeStepZoneSec":scalar(global.time_step_zone_sec),"MinutesInTimeStep":global.minutes_in_time_step},
+        "selected_weather_control":{"NextHour":weather_owner.next_hour,"RptIsRain":weather_owner.rpt_is_rain,
+            "UseRainValues":weather_owner.use_rain_values,"UseSnowValues":weather_owner.use_snow_values},
+        "native_internal_record_index_observed":false,"error_text_parity_claimed":false,
+        "observation_scope":"actual owned non-solar current state and selected Today; EMS/ground/water/sky/solar/daylight unpaired"})
 }
 
 fn global(value: &WeatherGlobalState) -> Value {
@@ -94,7 +131,15 @@ fn snapshot(value: &WeatherSessionSnapshot) -> Value {
         "actual_Rust_interpret_count":value.interpret_count,"native_internal_record_index_claimed":false,
         "available":value.available,"errors_found":value.errors_found,
         "print_environment_stamp":value.print_environment_stamp,
-        "current_cycle":value.current_cycle,"set_week_days":value.set_week_days})
+        "current_cycle":value.current_cycle,"set_week_days":value.set_week_days,
+        "Interpolation_allocated":owner.interpolation.is_some(),
+        "Interpolation_length":owner.interpolation.as_ref().map(Vec::len),
+        "Interpolation":owner.interpolation.as_ref().map(|values|values.iter().copied().map(scalar).collect::<Vec<_>>()).unwrap_or_default(),
+        "SolarInterpolation_allocated":owner.solar_interpolation.is_some(),
+        "SolarInterpolation_length":owner.solar_interpolation.as_ref().map(Vec::len),
+        "SolarInterpolation":owner.solar_interpolation.as_ref().map(|values|values.iter().copied().map(scalar).collect::<Vec<_>>()).unwrap_or_default(),
+        "solar_interpolation_numerical_parity_claimed":false,
+        "clk04_observation":current_observation(state)})
 }
 
 pub(crate) fn write_trace(
@@ -124,9 +169,12 @@ pub(crate) fn write_trace(
                 "line_read_attempt":row.provenance.line_read_attempt},
             "received_hourly_record":projected(&row.context.record),"received_sample":sample(&row.context.sample),
             "received_Today_slot":weather(row.context.weather),"local_hour":scalar(row.context.local_hour),
+            "received_current_weather":current_weather(row.context.current_weather),
             "shadowing_metadata":{"sin_declination":scalar(row.context.solar.sin_declination),
                 "cos_declination":scalar(row.context.solar.cos_declination),
                 "equation_of_time_hours":scalar(row.context.solar.equation_of_time_hours)} })).collect::<Vec<_>>(),
+        "additional_observation_scope":"CLK-04 actual current13, source-owned arrays and clock/control state; original CLK-03 schema and fields retained",
+        "added_fields_supply_inputs_or_recompute_weather":false,
         "physical_producer_numerical_parity_claimed":false,
         "raw_source_year_equals_civil_calendar_year_claimed":false,
         "consumer_repeated_identities_deduplicated":false,

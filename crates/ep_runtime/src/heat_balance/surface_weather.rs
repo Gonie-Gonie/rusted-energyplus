@@ -42,7 +42,11 @@ pub(crate) fn energyplus_exterior_wet_context_fraction(
     }
 
     if let Some(current) = context.owned {
-        return if current.weather.is_rain { 1.0 } else { 0.0 };
+        return if current.current_weather.is_rain {
+            1.0
+        } else {
+            0.0
+        };
     }
     let steps = context.zone_steps_per_hour.max(1);
     if let Some(sample) = context.sample_value() {

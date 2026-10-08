@@ -2,7 +2,8 @@
 
 pub use super::configuration::WeatherEnvironmentConfiguration;
 use super::configuration::{between, ordinal, weekday_index};
-use super::producer::{ProducedWeatherDay, produce_day, weather_vars_from_raw};
+use super::hourly::process_hour;
+use super::producer::{ProducedWeatherDay, produce_day};
 use super::{
     DailyWeatherVariables, WeatherDayError, WeatherDayPhase, WeatherDayState, WeatherDayValues,
     WeatherVars, update_weather_data,
@@ -57,6 +58,10 @@ impl WeatherSession {
         state.tomorrow_values = WeatherDayValues::allocated(configuration.steps() as usize)?;
         state.global.time_steps_in_hour = configuration.steps() as i32;
         state.global.time_step_zone = 1.0 / f64::from(configuration.steps());
+        state.global.time_step_zone_sec = state.global.time_step_zone * 3600.0;
+        state.global.minutes_in_time_step = 60 / configuration.steps() as i32;
+        // Genuine prepared caller order: SetupInterpolationValues, then fraction.
+        state.setup_interpolation_values()?;
         state.global.do_weath_sim = true;
         state.weather.time_step_fraction = state.global.time_step_zone;
         state.weather.weather_file_exists = true;
@@ -158,6 +163,14 @@ impl WeatherSession {
             .configuration
             .run_period
             .use_weather_file_holidays_and_special_days;
+        self.state.weather.use_rain_values = self
+            .configuration
+            .run_period
+            .use_weather_file_rain_indicators;
+        self.state.weather.use_snow_values = self
+            .configuration
+            .run_period
+            .use_weather_file_snow_indicators;
         if header.intervals_per_hour != 1 {
             return Err(WeatherDayError::admission(
                 "live weather currently admits one record per hour",
@@ -469,10 +482,11 @@ impl RawDayReadCallbacks for DayReadSink<'_> {
                 equation_of_time: equation,
             };
         }
+        let hourly = process_hour(raw, record, self.state);
         self.state
             .tomorrow_values
             .hour_mut(hour)
-            .map_err(|error| error.to_string())?[0] = weather_vars_from_raw(raw, record);
+            .map_err(|error| error.to_string())?[0] = hourly;
         Ok(())
     }
     fn complete_day(

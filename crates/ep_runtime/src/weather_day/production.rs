@@ -1,6 +1,9 @@
 //! Fallible production weather access without borrowed cursor guards.
 
-use super::{WeatherDayError, WeatherEnvironmentConfiguration, WeatherSession, WeatherVars};
+use super::{
+    CurrentWeatherState, WeatherDayError, WeatherEnvironmentConfiguration, WeatherSession,
+    WeatherVars,
+};
 use crate::weather::{EpwRecord, WeatherTimestepSample};
 use ep_model::FirstHourInterpolationStartingValues;
 use std::cell::RefCell;
@@ -36,10 +39,12 @@ pub struct ProductionSolarMetadata {
 pub struct ProductionWeatherContext {
     /// Actual raw-hour projection, separate from civil calendar identity.
     pub record: EpwRecord,
-    /// Compatibility psychrometric and scalar sample from the current day.
+    /// Actual selected current values with separate sky and solar samples.
     pub sample: WeatherTimestepSample,
     /// Complete processed Today slot, directly used by sky/rain/solar consumers.
     pub weather: WeatherVars,
+    /// Actual selected environment after SetCurrentWeather.
+    pub current_weather: CurrentWeatherState,
     /// Existing calendar-derived shadowing metadata, not weather-preview values.
     pub solar: ProductionSolarMetadata,
     /// Actual raw-hour ending clock at the current zone timestep.
@@ -56,6 +61,7 @@ pub struct ProductionWeatherTimestepSeries {
     prepared_phase: RefCell<Option<WeatherDayPhase>>,
     current_phase: RefCell<Option<WeatherDayPhase>>,
     last_consumed: RefCell<Option<(usize, u32)>>,
+    current_step: RefCell<Option<(WeatherDayPhase, usize, u32)>>,
 }
 
 impl ProductionWeatherTimestepSeries {
@@ -69,6 +75,7 @@ impl ProductionWeatherTimestepSeries {
             prepared_phase: RefCell::new(None),
             current_phase: RefCell::new(None),
             last_consumed: RefCell::new(None),
+            current_step: RefCell::new(None),
         })
     }
 
@@ -169,6 +176,34 @@ impl ProductionWeatherTimestepSeries {
             ));
         }
         let hour_zero = record_index % 24;
+        let step = (phase, record_index, timestep);
+        if *self.current_step.borrow() != Some(step) {
+            let hour = hour_zero as i32 + 1;
+            if session.state.global.hour_of_day != hour {
+                session.state.global.previous_hour = session.state.global.hour_of_day;
+            }
+            session.state.global.hour_of_day = hour;
+            session.state.global.time_step = timestep as i32;
+            session.state.global.begin_day_flag = hour_zero == 0 && timestep == 1;
+            session.state.global.begin_envrn_flag &= hour_zero == 0 && timestep == 1;
+            session.state.global.begin_sim_flag &= hour_zero == 0 && timestep == 1;
+            session.state.global.begin_hour_flag = timestep == 1;
+            session.state.global.begin_time_step_flag = true;
+            session.state.global.end_hour_flag = timestep == steps;
+            session.state.global.end_day_flag = hour_zero == 23 && timestep == steps;
+            session.state.global.end_envrn_flag = matches!(phase, WeatherDayPhase::Run { .. })
+                && record_index + 1 == session.configuration.time_axis.points.len()
+                && timestep == steps;
+            // The shared day hook has already executed BeginDay Initialize.
+            if !session.state.global.begin_day_flag {
+                session.initialize_weather()?;
+            }
+            session.set_current_weather()?;
+            // The initial humidity seed and first thermal consumer share one
+            // zone step. Both consumer calls remain observable; the accepted
+            // current owner is calculated once for this phase/hour/timestep.
+            *self.current_step.borrow_mut() = Some(step);
+        }
         let produced = session
             .today_produced
             .as_ref()
@@ -176,7 +211,18 @@ impl ProductionWeatherTimestepSeries {
         let record = produced.records[hour_zero];
         let mut sample = produced.samples[hour_zero * steps as usize + timestep as usize - 1];
         sample.record_index = record_index;
+        let current_weather = session.state.environment.current_weather;
+        sample.dry_bulb_c = current_weather.out_dry_bulb_temp;
+        sample.wet_bulb_c = current_weather.out_wet_bulb_temp;
+        sample.relative_humidity_percent = current_weather.out_rel_hum;
+        sample.outdoor_humidity_ratio = current_weather.out_hum_rat;
+        sample.atmospheric_pressure_pa = current_weather.out_baro_press;
+        sample.wind_speed_m_per_s = current_weather.wind_speed;
+        sample.wind_direction_deg = current_weather.wind_dir;
         let weather = session.state.today_values.hour(hour_zero + 1)?[timestep as usize - 1];
+        // The sample contract is mm, while the current owner is m. Preserve
+        // the actual Today depth instead of a lossy m-to-mm round trip.
+        sample.liquid_precipitation_depth_mm = weather.liquid_precip;
         let period_start = ((day - 1) / 20) * 20;
         let period_days = 20
             .min(session.configuration.total_days() - period_start)
@@ -202,6 +248,7 @@ impl ProductionWeatherTimestepSeries {
             record,
             sample,
             weather,
+            current_weather,
             solar: ProductionSolarMetadata {
                 sin_declination,
                 cos_declination,
@@ -210,27 +257,6 @@ impl ProductionWeatherTimestepSeries {
             local_hour: f64::from(record.hour.saturating_sub(1))
                 + f64::from(timestep) / f64::from(steps),
         };
-        let hour = hour_zero as i32 + 1;
-        if session.state.global.hour_of_day != hour {
-            session.state.global.previous_hour = session.state.global.hour_of_day;
-        }
-        session.state.global.hour_of_day = hour;
-        session.state.global.time_step = timestep as i32;
-        session.state.global.begin_day_flag = hour_zero == 0 && timestep == 1;
-        session.state.global.begin_envrn_flag &= hour_zero == 0 && timestep == 1;
-        session.state.global.begin_sim_flag &= hour_zero == 0 && timestep == 1;
-        session.state.global.begin_hour_flag = timestep == 1;
-        session.state.global.begin_time_step_flag = true;
-        session.state.global.end_hour_flag = timestep == steps;
-        session.state.global.end_day_flag = hour_zero == 23 && timestep == steps;
-        session.state.global.end_envrn_flag = matches!(phase, WeatherDayPhase::Run { .. })
-            && record_index + 1 == session.configuration.time_axis.points.len()
-            && timestep == steps;
-        // InitializeWeather runs before current weather reaches the thermal
-        // consumer. BeginDay was already performed by the shared day hook.
-        if !session.state.global.begin_day_flag {
-            session.initialize_weather()?;
-        }
         super::production_trace::record_consumer(record_index, timestep, phase, context, &session);
         *self.last_consumed.borrow_mut() = Some((record_index, timestep));
         Ok(context)
@@ -242,7 +268,7 @@ impl ProductionWeatherTimestepSeries {
         session
             .today_produced
             .as_ref()
-            .map(|day| day.records[0].dry_bulb_c)
+            .map(|day| day.hourly_values[0].out_dry_bulb_temp)
             .ok_or_else(|| WeatherDayError::admission("initial Today record is unavailable"))
     }
 

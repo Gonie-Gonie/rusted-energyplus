@@ -1,17 +1,16 @@
-//! Explicit compatibility producer between actual raw records and daily transport.
+//! Selected source interpolation between processed hourly and daily transport.
 //!
-//! Existing scalar, wind, psychrometric and sky equations are retained. Physical
-//! missing-value, precipitation, albedo, snow, radiation and sky policies remain
-//! unpaired here pending their own weather cards; no native outputs are inputs.
+//! Hourly missing/range/history processing already ran in the reader callback.
+//! Sky, solar, snow and optional compatibility fields retain their separate
+//! unpaired policies. No native outputs are inputs to this owner.
 
+use super::hourly::interpolate_wind_direction;
 use super::{WeatherDayError, WeatherDayState, WeatherVars};
 use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
 use crate::heat_balance::solar::{solar_weather_interpolation_weights, weighted_solar_value};
+use crate::psychrometrics::with_fresh_psychrometric_state;
 use crate::weather::raw::{RawEpwOutputs, RawWeatherDay, project_record};
-use crate::weather::{
-    EpwRecord, WeatherTimestepSample, energyplus_weather_interpolation_weight,
-    weather_timestep_sample_with_neighbors,
-};
+use crate::weather::{EpwRecord, WeatherTimestepSample, weather_timestep_sample_with_neighbors};
 use ep_model::FirstHourInterpolationStartingValues;
 
 /// A successfully produced day, retaining actual projected hourly records.
@@ -19,15 +18,18 @@ use ep_model::FirstHourInterpolationStartingValues;
 pub struct ProducedWeatherDay {
     /// The actual 24 raw rows' existing compatibility projection in source order.
     pub records: [EpwRecord; 24],
+    /// Actual processed interval-one carriers, saved before interpolation.
+    /// These are Rust storage, not observations of native private hourly locals.
+    pub hourly_values: [WeatherVars; 24],
     /// Samples in hour-major order; record_index is local to this produced day.
     pub samples: Vec<WeatherTimestepSample>,
 }
 
-/// Full hourly compatibility carrier, reusable for actual partial-read writes.
+/// Base carrier for the selected hourly processing callback.
 ///
-/// Precipitation normalization is already performed by the existing raw record
-/// projection. Rain and sky retain existing consumer policy. The raw optional
-/// fields and cover values are literal carrier inputs, without native parity.
+/// The callback replaces the seven selected raw scalar fields and rain flag.
+/// Sky and raw optional fields here remain compatibility policy, without native
+/// parity. The raw EpwRecord projection itself is retained separately.
 pub fn weather_vars_from_raw(raw: &RawEpwOutputs, record: EpwRecord) -> WeatherVars {
     WeatherVars {
         is_rain: record.liquid_precipitation_depth_mm >= 0.8,
@@ -77,6 +79,13 @@ pub fn produce_day(
             "prepared tomorrow allocation differs from producer timestep shape",
         ));
     }
+    let weights = state
+        .weather
+        .interpolation
+        .as_ref()
+        .filter(|values| values.len() == steps as usize)
+        .ok_or_else(|| WeatherDayError::admission("prepared interpolation owner unavailable"))?
+        .clone();
     let projected = raw_day
         .hours
         .iter()
@@ -88,9 +97,17 @@ pub fn produce_day(
     let records: [EpwRecord; 24] = projected
         .try_into()
         .map_err(|_| WeatherDayError::admission("projected weather day does not have 24 hours"))?;
-    let hourly: [WeatherVars; 24] = std::array::from_fn(|index| {
-        weather_vars_from_raw(&raw_day.hours[index].raw, records[index])
-    });
+    // Do not replay hourly processing: its writes and counts are observable
+    // after every read, including a later record's failure.
+    let mut hourly = [WeatherVars::default(); 24];
+    for (index, value) in hourly.iter_mut().enumerate() {
+        *value = state
+            .tomorrow_values
+            .hour(index + 1)?
+            .first()
+            .copied()
+            .ok_or_else(|| WeatherDayError::admission("processed hourly interval unavailable"))?;
+    }
     let seed_index = match first_policy {
         FirstHourInterpolationStartingValues::Hour1 => 0,
         FirstHourInterpolationStartingValues::Hour24 => 23,
@@ -105,13 +122,25 @@ pub fn produce_day(
     } else {
         hourly[seed_index]
     };
-    let mut samples = Vec::with_capacity(24 * steps as usize);
+    // Compatibility preview sampling invokes PSY caches. It has a separate
+    // lifetime from genuine SetCurrentWeather so it cannot seed that owner.
+    let samples = with_fresh_psychrometric_state(|| {
+        let mut samples = Vec::with_capacity(24 * steps as usize);
+        for (index, current) in records.iter().enumerate() {
+            let previous = if index == 0 {
+                &initial_record
+            } else {
+                &records[index - 1]
+            };
+            for timestep in 1..=steps {
+                samples.push(weather_timestep_sample_with_neighbors(
+                    previous, current, index, steps, timestep,
+                ));
+            }
+        }
+        samples
+    });
     for index in 0..24 {
-        let previous_record = if index == 0 {
-            &initial_record
-        } else {
-            &records[index - 1]
-        };
         let next_index = if index == 23 { 0 } else { index + 1 };
         if steps > 1 {
             state.next_hour.beam_solar_rad = hourly[next_index].beam_solar_rad;
@@ -119,26 +148,28 @@ pub fn produce_day(
             state.next_hour.liquid_precip = hourly[next_index].liquid_precip;
         }
         for timestep in 1..=steps {
-            let sample = weather_timestep_sample_with_neighbors(
-                previous_record,
-                &records[index],
-                index,
-                steps,
-                timestep,
-            );
+            let sample = &samples[index * steps as usize + timestep as usize - 1];
             let mut value = hourly[index];
             if steps > 1 {
-                let weight = energyplus_weather_interpolation_weight(steps, timestep);
+                let weight = weights[timestep as usize - 1];
                 let scalar = |before: f64, now: f64| before * (1.0 - weight) + now * weight;
-                value.out_dry_bulb_temp = sample.dry_bulb_c;
+                value.out_dry_bulb_temp = scalar(
+                    previous_values.out_dry_bulb_temp,
+                    hourly[index].out_dry_bulb_temp,
+                );
                 value.out_dew_point_temp = scalar(
                     previous_values.out_dew_point_temp,
                     hourly[index].out_dew_point_temp,
                 );
-                value.out_baro_press = sample.atmospheric_pressure_pa;
-                value.out_rel_hum = sample.relative_humidity_percent;
-                value.wind_speed = sample.wind_speed_m_per_s;
-                value.wind_dir = sample.wind_direction_deg;
+                value.out_baro_press =
+                    scalar(previous_values.out_baro_press, hourly[index].out_baro_press);
+                value.out_rel_hum = scalar(previous_values.out_rel_hum, hourly[index].out_rel_hum);
+                value.wind_speed = scalar(previous_values.wind_speed, hourly[index].wind_speed);
+                value.wind_dir = interpolate_wind_direction(
+                    previous_values.wind_dir,
+                    hourly[index].wind_dir,
+                    weight,
+                );
                 value.total_sky_cover = scalar(
                     previous_values.total_sky_cover,
                     hourly[index].total_sky_cover,
@@ -150,7 +181,9 @@ pub fn produce_day(
                 value.horiz_ir_sky = sample.horizontal_infrared_radiation_w_per_m2;
                 value.sky_temp = horizontal_infrared_sky_temperature_c(
                     value.horiz_ir_sky,
-                    value.out_dry_bulb_temp,
+                    // Keep the existing raw-preview sky policy separate from
+                    // the selected processed dry-bulb interpolation.
+                    sample.dry_bulb_c,
                 );
                 let (prior_weight, current_weight, next_weight) =
                     solar_weather_interpolation_weights(steps, timestep);
@@ -170,19 +203,23 @@ pub fn produce_day(
                     current_weight,
                     next_weight,
                 );
-                // Existing compatibility rain/precipitation policy is intentionally unpaired.
-                value.liquid_precip = sample.liquid_precipitation_depth_mm;
-                value.is_rain = value.liquid_precip >= 0.8;
+                value.liquid_precip =
+                    scalar(previous_values.liquid_precip, hourly[index].liquid_precip);
+                value.liquid_precip /= f64::from(steps);
+                value.is_rain = value.liquid_precip >= state.weather.is_rain_threshold;
             }
             state.tomorrow_values.hour_mut(index + 1)?[timestep as usize - 1] = value;
-            samples.push(sample);
         }
         if steps > 1 {
             state.last_hour = hourly[index];
             previous_values = hourly[index];
         }
     }
-    Ok(ProducedWeatherDay { records, samples })
+    Ok(ProducedWeatherDay {
+        records,
+        hourly_values: hourly,
+        samples,
+    })
 }
 
 #[cfg(test)]

@@ -1077,7 +1077,7 @@ pub(crate) fn energyplus_interpolate_wind_direction_deg(
         }
     }
 
-    (previous + (current - previous) * current_hour_weight).rem_euclid(360.0)
+    (previous + (current - previous) * current_hour_weight) % 360.0
 }
 
 pub(crate) fn energyplus_weather_interpolation_weight(

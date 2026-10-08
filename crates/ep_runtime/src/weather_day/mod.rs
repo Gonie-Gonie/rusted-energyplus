@@ -1,17 +1,21 @@
 //! Live weather-file cursor, daily transport and production weather operands.
 //!
 //! The raw cursor and complete daily copy have separate owners. Existing weather
-//! physics remains an explicit compatibility producer until its own source cards.
+//! Selected non-solar hourly processing and current weather use source-owned
+//! state. Sky and solar generation retain separate compatibility boundaries.
 
 mod configuration;
+mod current;
 mod error;
 pub mod handoff;
+mod hourly;
 mod lifecycle;
 mod producer;
 mod production;
 pub mod production_trace;
 pub mod state;
 
+pub use current::CurrentWeatherState;
 pub use error::WeatherDayError;
 pub use handoff::update_weather_data;
 pub use lifecycle::{WeatherEnvironmentConfiguration, WeatherSession};
@@ -25,6 +29,8 @@ pub use state::{
     WeatherVarCounts, WeatherVars,
 };
 
+#[cfg(test)]
+mod current_tests;
 #[cfg(test)]
 pub(crate) mod lifecycle_tests;
 #[cfg(test)]

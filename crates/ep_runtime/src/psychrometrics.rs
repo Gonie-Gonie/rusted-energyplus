@@ -18,6 +18,11 @@ pub use cp_cache::{EnergyPlusCpAirCache, EnergyPlusCpAirCacheState};
 /// Opt-in observations of actual production psychrometric calls.
 pub mod production_trace;
 
+/// Synchronizes the weather caller control without replacing the cache owner.
+pub(crate) fn set_psychrometric_warmup(warmup: bool) {
+    psy02_state::with_state(|state| state.set_controls(Some(warmup), None));
+}
+
 #[track_caller]
 fn invoke_psy02(function: EnergyPlusPsychrometricFunction, inputs: &[f64]) -> f64 {
     let _guard = psy02_trace::enter();

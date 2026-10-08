@@ -3,7 +3,8 @@
 use crate::weather::WeatherTimestepSeries;
 use crate::weather::day::lifecycle_tests::{DECOY_BYTES, configuration, site};
 use crate::weather::day::{
-    ProductionSolarMetadata, ProductionWeatherContext, ProductionWeatherTimestepSeries, WeatherVars,
+    CurrentWeatherState, ProductionSolarMetadata, ProductionWeatherContext,
+    ProductionWeatherTimestepSeries, WeatherVars,
 };
 
 #[test]
@@ -38,6 +39,10 @@ fn owned_today_drives_solar_rain_and_sky_with_no_legacy_record_array()
             is_rain: true,
             sky_temp: -60.0,
             ..WeatherVars::default()
+        },
+        current_weather: CurrentWeatherState {
+            is_rain: true,
+            ..CurrentWeatherState::default()
         },
         solar: ProductionSolarMetadata {
             sin_declination,

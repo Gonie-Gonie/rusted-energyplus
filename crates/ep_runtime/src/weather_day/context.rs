@@ -3,6 +3,8 @@
 //! Defaults follow DataGlobals.hh, DataEnvironment.hh and WeatherManager.hh;
 //! this is selected storage, not a complete EnergyPlus state constructor.
 
+use super::super::CurrentWeatherState;
+
 /// Selected global caller flags and clocks, including fields the handoff preserves.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WeatherGlobalState {
@@ -50,6 +52,18 @@ pub struct WeatherGlobalState {
     pub do_output_reporting: bool,
     /// Source zone timestep duration, carried without arithmetic.
     pub time_step_zone: f64,
+    /// Zone timestep duration in seconds, prepared by the actual caller.
+    pub time_step_zone_sec: f64,
+    /// Integer minutes in the declared zone timestep.
+    pub minutes_in_time_step: i32,
+    /// Current stored interpolation weight.
+    pub weight_now: f64,
+    /// Previous-hour interpolation weight.
+    pub weight_previous_hour: f64,
+    /// Source zone-step clock in hours.
+    pub current_time: f64,
+    /// Source one-based cumulative zone-step number.
+    pub sim_time_steps: i32,
     /// Source report string for simulation day; native constructor is "0".
     pub day_of_sim_chr: String,
     /// Source report string for calendar year.
@@ -81,6 +95,12 @@ impl Default for WeatherGlobalState {
             do_des_day_sim: false,
             do_output_reporting: false,
             time_step_zone: 0.0,
+            time_step_zone_sec: 0.0,
+            minutes_in_time_step: 0,
+            weight_now: 0.0,
+            weight_previous_hour: 0.0,
+            current_time: 0.0,
+            sim_time_steps: 0,
             day_of_sim_chr: "0".into(),
             calendar_year_chr: String::new(),
         }
@@ -90,6 +110,8 @@ impl Default for WeatherGlobalState {
 /// Selected current and tomorrow environment fields from DataEnvironment.hh.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WeatherEnvironmentState {
+    /// Selected mutable environment after SetCurrentWeather.
+    pub current_weather: CurrentWeatherState,
     /// Current weather ordinal.
     pub day_of_year: i32,
     /// Schedule ordinal; pure UpdateWeatherData does not write this member.
@@ -147,6 +169,7 @@ pub struct WeatherEnvironmentState {
 impl Default for WeatherEnvironmentState {
     fn default() -> Self {
         Self {
+            current_weather: CurrentWeatherState::default(),
             day_of_year: 0,
             day_of_year_schedule: 0,
             year: 0,
@@ -250,6 +273,18 @@ pub struct WeatherOwnerState {
     pub time_step_fraction: f64,
     /// Source rain threshold, retained without division by this carrier.
     pub is_rain_threshold: f64,
+    /// Allocated weights written by SetupInterpolationValues.
+    pub interpolation: Option<Vec<f64>>,
+    /// Solar weights, retained separately for CLK-05.
+    pub solar_interpolation: Option<Vec<f64>>,
+    /// Source next hour, wrapping hour 24 to 1.
+    pub next_hour: i32,
+    /// Source rain report indicator.
+    pub rpt_is_rain: i32,
+    /// Selected environment's rain-indicator control.
+    pub use_rain_values: bool,
+    /// Selected environment's snow-indicator control.
+    pub use_snow_values: bool,
 }
 
 impl Default for WeatherOwnerState {
@@ -282,6 +317,12 @@ impl Default for WeatherOwnerState {
             read_e_plus_weather_cur_time: 1.0,
             time_step_fraction: 0.0,
             is_rain_threshold: 0.8,
+            interpolation: None,
+            solar_interpolation: None,
+            next_hour: 1,
+            rpt_is_rain: 0,
+            use_rain_values: true,
+            use_snow_values: true,
         }
     }
 }
