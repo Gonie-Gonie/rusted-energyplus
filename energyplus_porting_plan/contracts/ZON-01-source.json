@@ -1,0 +1,605 @@
+{
+  "schema": "zon01-source-contract.v1",
+  "card": "ZON-01",
+  "status": "frozen-before-scientific-execution",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa"
+    },
+    {
+      "path": "src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "sha256": "bd111315b3d8695df31f722088c9ae08d7369d40f3d445bb96d976d4f9c875b7"
+    },
+    {
+      "path": "src/EnergyPlus/HVACManager.cc",
+      "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "sha256": "74e45dca0d71e9cd1ac37f4cdc85da6fe7780d78a5ec6cf3d304da4e770b9ea2"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.h",
+      "sha256": "0ca948f159186052b8d417150676302eb4e4d272df8186b8d40ccbc0b3c005a4"
+    }
+  ],
+  "selected_ranges": [
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "symbol": "ZoneSpaceHeatBalanceData",
+      "start": 102,
+      "end": 145,
+      "role": "selected-constructor-defaults-and-four-slot-history-declarations",
+      "helpers": [],
+      "range_sha256": "113869602c09c5ae778393c5d40f95622ecccaf8d589b802250cab1e0fcd34ae"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "symbol": "ZoneSpaceHeatBalanceData",
+      "start": 204,
+      "end": 213,
+      "role": "selected-load-humidity-powercap-defaults-and-member-declaration",
+      "helpers": [],
+      "range_sha256": "d716d4710c810e9445c87227a6baba563a12aff1e9394335f247b24b9369118c"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "symbol": "ZoneHeatBalanceData",
+      "start": 252,
+      "end": 260,
+      "role": "genuine-concrete-owner-derived-from-selected-base",
+      "helpers": [],
+      "range_sha256": "ccb8fe305740a95fcb4a3ffa3c3e346ba86f17508ddf72ce10be7bae0393f2e3"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "symbol": "ManageZoneAirUpdates",
+      "start": 264,
+      "end": 276,
+      "role": "public-caller-and-guard-declarations",
+      "helpers": [],
+      "range_sha256": "4e6ad0a1b60d073f0c553a0b601345baec68fa4a815a5856a613d3ccc51d2da9"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "symbol": "MyEnvrnFlag",
+      "start": 408,
+      "end": 431,
+      "role": "module-one-time-environment-guard-default-and-owner-container",
+      "helpers": [],
+      "range_sha256": "bc61949a4ee1ff0c4b901141d7aa2595f1cb46c3d2f7185a210ebf09b9fd9f4a"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "ManageZoneAirUpdates",
+      "start": 195,
+      "end": 230,
+      "role": "normal-call-of-InitZoneAirSetPoints-before-dispatch",
+      "helpers": [
+        "InitZoneAirSetPoints"
+      ],
+      "range_sha256": "2e5b4c866ad96f44ee0c62a9a2868f4d6da209304a05d78249b1448db17aa3d9"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "InitZoneAirSetPoints",
+      "start": 2350,
+      "end": 2376,
+      "role": "genuine-whole-guard-caller-context",
+      "helpers": [],
+      "range_sha256": "d545f485230949bbc3185152ef7cac3e039c54f0ec349969eb6b2c7082625194"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "InitZoneAirSetPoints",
+      "start": 2378,
+      "end": 2420,
+      "role": "source-required-array-preparation-context-one-time-branch-inactive-in-helper",
+      "helpers": [],
+      "range_sha256": "a83ad33494d9dd128a7258035d1b7f518f126d1d18e9e6c2cbea315388d24414"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "InitZoneAirSetPoints",
+      "start": 2618,
+      "end": 2670,
+      "role": "whole-genuine-environment-guard-owner-calls-sibling-resets-and-rearm",
+      "helpers": [
+        "ZoneSpaceHeatBalanceData::beginEnvironmentInit"
+      ],
+      "range_sha256": "ee307a6f88f4f37e35b5bdeee15ce69bd0da4329c84f19aa018699abd3a4b73b"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "InitZoneAirSetPoints",
+      "start": 2672,
+      "end": 2684,
+      "role": "day-and-zero-controller-branches-source-only",
+      "helpers": [],
+      "range_sha256": "0685586aae6796ba147a94e97d75c583b08a67cdcd105ae494a28d68b239ee0f"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "InitZoneAirSetPoints",
+      "start": 2809,
+      "end": 2816,
+      "role": "helper-errors-and-equipment-tail-prerequisites-inactive",
+      "helpers": [],
+      "range_sha256": "a7680fe17dd3ce1f4e5c7c9dee2daa662ca031661d9d098c5ecb69f150dd0647"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "ZoneSpaceHeatBalanceData::beginEnvironmentInit",
+      "start": 2818,
+      "end": 2836,
+      "role": "primary-four-array-and-ten-scalar-write-owner",
+      "helpers": [],
+      "range_sha256": "2b633ddef807e1c64225c5744caa89a4117b853e654c44f66975dd2d4357ea10"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "correctAirTemp",
+      "start": 3893,
+      "end": 3900,
+      "role": "later-consumer-semantic-map-only-not-ZON04-closure",
+      "helpers": [],
+      "range_sha256": "2cff9f5cf717c98a494c86e20adb261be6cb1bf8469c5db2113b985dbebcfecf"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "pushZoneTimestepHistories",
+      "start": 4194,
+      "end": 4205,
+      "role": "later-XMAT-WPrev-history-semantic-map-only-not-ZON05-closure",
+      "helpers": [],
+      "range_sha256": "df378c8567a748dd26f81c4c4fc33b2b6a00c0988d6d0bd972c4c13ce03abea6"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "pushSystemTimestepHistories",
+      "start": 4297,
+      "end": 4305,
+      "role": "later-DSXMAT-DSW-history-semantic-map-only-not-ZON05-closure",
+      "helpers": [],
+      "range_sha256": "d0e30b8799b5ec5e27ad3fbfb77d04163d477ab3e1b3f6165b1414c0611f5d26"
+    },
+    {
+      "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "symbol": "predictSystemLoad",
+      "start": 6825,
+      "end": 6832,
+      "role": "later-working-buffer-selection-map-only",
+      "helpers": [],
+      "range_sha256": "8775639c79718ccac36238cd04afd0efa2fcb55957b2399c070991c75deaba70"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "ZoneInitialTemp",
+      "start": 426,
+      "end": 431,
+      "role": "source-temperature-default-constant",
+      "helpers": [],
+      "range_sha256": "fa35d318f54a03fa4180cc67a85dd8ed01ae4fcde79ce8b7323c57a6e5e7bc01"
+    },
+    {
+      "path": "src/EnergyPlus/DataHeatBalance.hh",
+      "symbol": "doSpaceHeatBalance",
+      "start": 1833,
+      "end": 1838,
+      "role": "space-heat-balance-disabled-source-branch-declaration",
+      "helpers": [],
+      "range_sha256": "ccc35b3fe14c7419f84836278ecf0c9f76a03af2a960d5cd5c41eb4d0cef331a"
+    },
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "symbol": "OutHumRat",
+      "start": 126,
+      "end": 134,
+      "role": "external-humidity-input-owner-default",
+      "helpers": [],
+      "range_sha256": "90cc0b583c2f7aca52b5e27b0c9a1bd3b157ec6762ea8b21826025296b8e65fb"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "BeginEnvrnFlag",
+      "start": 74,
+      "end": 82,
+      "role": "actual-environment-and-day-control-declarations",
+      "helpers": [],
+      "range_sha256": "114bee48de661002c32da1d765f8cf757523697bfba78d887b49399e9943b3fc"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "symbol": "NumOfZones",
+      "start": 107,
+      "end": 115,
+      "role": "genuine-one-zone-and-source-warmup-observation-declarations",
+      "helpers": [],
+      "range_sha256": "c85efa6dcb4644fe6b058a01fbde6fdcb02d0687dc0f93f6a2b30db63e8dc97f"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "symbol": "InitSurfaceHeatBalance",
+      "start": 378,
+      "end": 384,
+      "role": "incoming-bulk-reconstruction-guard",
+      "helpers": [
+        "InitThermalAndFluxHistories"
+      ],
+      "range_sha256": "376b2aa8db625d85c4ab44dfbc686885907b32ca44a2051bd78d341562e9e150"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "symbol": "InitThermalAndFluxHistories",
+      "start": 2208,
+      "end": 2239,
+      "role": "incoming-zone-only-constructor-reconstruction-and-current-W-seed-context",
+      "helpers": [],
+      "range_sha256": "e8a9ed80fe167436f91d92bec10b7363b0666e9d62eea02191b41557cd111f29"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "symbol": "InitThermalAndFluxHistories",
+      "start": 2231,
+      "end": 2239,
+      "role": "byte-exact-zone-only-bulk-fragment",
+      "helpers": [],
+      "range_sha256": "0841ec2b11d0dcf592b0bc1d3e16f1d0a64e095d29df1d7d2377f4822486b770"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "symbol": "ManageHeatBalance",
+      "start": 191,
+      "end": 210,
+      "role": "after-init-HB-callback-precedes-surface-bulk-initialization",
+      "helpers": [],
+      "range_sha256": "95d019deb4fbc877bc4b112e8f319c71047153903879d8024f3f400d54d007f8"
+    },
+    {
+      "path": "src/EnergyPlus/HVACManager.cc",
+      "symbol": "ManageHVAC",
+      "start": 165,
+      "end": 176,
+      "role": "pre-predictor-current-temperature-and-average-clears-stage-context",
+      "helpers": [],
+      "range_sha256": "e0f87be59a40ba50ec24f043b1eca35f26c22161d089ad296b8fd43f4f922566"
+    },
+    {
+      "path": "src/EnergyPlus/HVACManager.cc",
+      "symbol": "ManageHVAC",
+      "start": 194,
+      "end": 229,
+      "role": "actual-system-context-and-before-predictor-callback-before-owner-call",
+      "helpers": [
+        "ManageZoneAirUpdates"
+      ],
+      "range_sha256": "0bb3dc43fd5bb6371fcb20118a4937a31f2b63c05aaea7fb3bf6b0c6aee356f3"
+    },
+    {
+      "path": "src/EnergyPlus/HVACManager.cc",
+      "symbol": "ManageHVAC",
+      "start": 262,
+      "end": 267,
+      "role": "PredictStep-before-after-predictor-observer",
+      "helpers": [
+        "ManageZoneAirUpdates"
+      ],
+      "range_sha256": "e5d7e7bd9977f7cf010838e31bee948a5057ba1d1f19de3f39ef20e5e8ca90b9"
+    },
+    {
+      "path": "src/EnergyPlus/HVACManager.cc",
+      "symbol": "SimHVAC",
+      "start": 840,
+      "end": 846,
+      "role": "real-after-predictor-before-HVAC-callback-context",
+      "helpers": [],
+      "range_sha256": "5acbc65b4b736de71cea1d6149dff489547ff9653b6677af6d423453a063adf8"
+    },
+    {
+      "path": "src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "symbol": "ZoneSystemSensibleDemand::beginEnvironmentInit",
+      "start": 57,
+      "end": 75,
+      "role": "genuine-whole-guard-sibling-reset-source-only",
+      "helpers": [],
+      "range_sha256": "45ed8cda46a41c02447dd6b9492b0f0a6a4c7155e02a818d2ca249b3dbcf7e05"
+    },
+    {
+      "path": "src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "symbol": "ZoneSystemMoistureDemand::beginEnvironmentInit",
+      "start": 77,
+      "end": 95,
+      "role": "genuine-whole-guard-sibling-reset-source-only",
+      "helpers": [],
+      "range_sha256": "7a788d434b1adf98f2d2dd8488877873ccbd21f4ae9837b04f8150a42067bcaa"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "symbol": "callbackBeginZoneTimeStepAfterInitHeatBalance",
+      "start": 199,
+      "end": 209,
+      "role": "actual-readonly-after-init-HB-callback-registration",
+      "helpers": [],
+      "range_sha256": "430b593c1785d010866edf91be64f06a85df6bd438e4b14b05afd9aec3c7116f"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "symbol": "callbackBeginTimeStepBeforePredictor",
+      "start": 211,
+      "end": 221,
+      "role": "actual-readonly-pre-owner-callback-registration",
+      "helpers": [],
+      "range_sha256": "35621989c5d76ff162b477e700c42753e23a449bccb652304b0677bf13691f4f"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "symbol": "callbackAfterPredictorBeforeHVACManagers",
+      "start": 223,
+      "end": 233,
+      "role": "actual-readonly-evolved-after-predictor-callback-registration",
+      "helpers": [],
+      "range_sha256": "78dfd55f09c4e5b92324e48567565685ba23cf19c4232d41ccfe06e74d50d098"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.h",
+      "symbol": "callbackBeginZoneTimeStepAfterInitHeatBalance",
+      "start": 249,
+      "end": 269,
+      "role": "public-pre-HVAC-stage-callback-declarations",
+      "helpers": [],
+      "range_sha256": "9bedd3f66ef3dbc195e9872eee3ad282cb216320a7ba0a0ea6a63c332ed1799a"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.h",
+      "symbol": "callbackAfterPredictorBeforeHVACManagers",
+      "start": 280,
+      "end": 289,
+      "role": "public-evolved-after-predictor-callback-declaration",
+      "helpers": [],
+      "range_sha256": "950659219fce9e95cfe4f0ac357e67eacc3d8028b708f04188db44912fc5c992"
+    }
+  ],
+  "primary_owner": "ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData::beginEnvironmentInit",
+  "dependencies": [
+    "CON-01",
+    "GEO-03"
+  ],
+  "paired_projection": {
+    "written_fields": [
+      "ZTM",
+      "WPrevZoneTS",
+      "DSWPrevZoneTS",
+      "WPrevZoneTSTemp",
+      "WTimeMinusP",
+      "W1",
+      "WMX",
+      "WM2",
+      "airHumRatTemp",
+      "tempIndLoad",
+      "tempDepLoad",
+      "airRelHum",
+      "AirPowerCap",
+      "T1"
+    ],
+    "retained_fields": [
+      "MAT",
+      "ZT",
+      "ZTAV",
+      "XMPT",
+      "XMAT",
+      "DSXMAT",
+      "TMX",
+      "TM2",
+      "airHumRat",
+      "airHumRatAvg"
+    ],
+    "four_slot_arrays": [
+      "XMAT",
+      "DSXMAT",
+      "ZTM",
+      "WPrevZoneTS",
+      "DSWPrevZoneTS",
+      "WPrevZoneTSTemp"
+    ],
+    "field_units": {
+      "MAT": "degC",
+      "ZT": "degC",
+      "ZTAV": "degC",
+      "XMPT": "degC",
+      "XMAT": "degC",
+      "DSXMAT": "degC",
+      "TMX": "degC",
+      "TM2": "degC",
+      "T1": "degC",
+      "ZTM": "degC",
+      "airHumRat": "kg/kg",
+      "airHumRatAvg": "kg/kg",
+      "airHumRatTemp": "kg/kg",
+      "WPrevZoneTS": "kg/kg",
+      "DSWPrevZoneTS": "kg/kg",
+      "WPrevZoneTSTemp": "kg/kg",
+      "WTimeMinusP": "kg/kg",
+      "W1": "kg/kg",
+      "WMX": "kg/kg",
+      "WM2": "kg/kg",
+      "tempIndLoad": "W",
+      "tempDepLoad": "W/K",
+      "airRelHum": "percent",
+      "AirPowerCap": "W/K"
+    },
+    "guard_fields": [
+      "MyEnvrnFlag",
+      "BeginEnvrnFlag"
+    ],
+    "default_and_bulk_phases": "selected genuine constructor defaults and zone-only original reconstruction/current-W seed; not full surface or CTF initialization"
+  },
+  "source_write_order": {
+    "loop": {
+      "indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "per_index_assignments": [
+        "ZTM[i]=+0",
+        "WPrevZoneTS[i]=OutHumRat",
+        "DSWPrevZoneTS[i]=OutHumRat",
+        "WPrevZoneTSTemp[i]=+0"
+      ]
+    },
+    "after_loop": [
+      "WTimeMinusP=OutHumRat",
+      "W1=OutHumRat",
+      "WMX=OutHumRat",
+      "WM2=OutHumRat",
+      "airHumRatTemp=+0",
+      "tempIndLoad=+0",
+      "tempDepLoad=+0",
+      "airRelHum=+0",
+      "AirPowerCap=+0",
+      "T1=+0"
+    ],
+    "retention": "The member does not write any of the ten selected retained fields; it neither reconstructs the owner nor clamps external W."
+  },
+  "constructor": {
+    "temperature_constant": "DataHeatBalance::ZoneInitialTemp=23.0",
+    "selected_temperature_defaults": "MAT/ZT/ZTAV/XMPT/XMAT[4]/DSXMAT[4]/TMX/TM2 use ZoneInitialTemp; T1 and ZTM[4] use +0",
+    "selected_humidity_defaults": "airHumRat/airHumRatAvg/airHumRatTemp=.01; W history arrays and WTimeMinusP/W1/WMX/WM2 use +0",
+    "selected_load_defaults": "tempIndLoad/tempDepLoad/airRelHum/AirPowerCap use +0",
+    "module_guard_default": "MyEnvrnFlag=true; BeginEnvrnFlag belongs to external global control and defaults false"
+  },
+  "incoming_bulk": {
+    "fragment": {
+      "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "symbol": "InitThermalAndFluxHistories",
+      "start": 2231,
+      "end": 2239,
+      "role": "byte-exact-zone-only-bulk-fragment",
+      "helpers": [],
+      "range_sha256": "0841ec2b11d0dcf592b0bc1d3e16f1d0a64e095d29df1d7d2377f4822486b770"
+    },
+    "genuine_action": "placement-new concrete ZoneHeatBalanceData then airHumRatAvg/current airHumRat=actual external OutHumRat; source TempTstatAir also initialized and remains unpaired",
+    "guard": "source BeginEnvrnFlag; direct helper invokes the selected original fragment explicitly as an input-only operation",
+    "not_a_claim": "SUR-01 complete surface/CTF history initialization, Space reconstruction or MRT enclosure state"
+  },
+  "genuine_guard": {
+    "entrypoint": "whole original InitZoneAirSetPoints",
+    "eligibility": "actual MyEnvrnFlag && actual BeginEnvrnFlag",
+    "exit_write": "MyEnvrnFlag=false after eligible source begin/sibling reset block",
+    "rearm": "!BeginEnvrnFlag -> MyEnvrnFlag=true",
+    "preparation": {
+      "InitZoneAirSetPointsOneTimeFlag": false,
+      "NumOfZones": 1,
+      "numSpaces": 0,
+      "NumTempControlledZones": 0,
+      "NumComfortControlledZones": 0,
+      "doSpaceHeatBalance": false,
+      "BeginDayFlag": false,
+      "ZoneEquipInputsFilled": false,
+      "allocation_policy": "genuine one-zone owner and source-required thermostat/load-correction/control/deadband/hybrid-history/energy-demand/moisture-demand arrays; no fake state layout",
+      "source_constructor_MyEnvrnFlag": "observe actual default; no wrapper expected-state seeding"
+    },
+    "observation": "Source-derived guard eligibility is labelled separately; wrapper invocation counts do not claim observed individual member-call counts. Whole-source sibling resets execute but are unpaired and not exhaustively observed."
+  },
+  "Rust_reuse": {
+    "current_initialization": "heat_balance/initialization.rs57-65 creates caller-T/constant-W shell; air_manager.rs134-138 then seeds current/average and first three W history slots from own weather input",
+    "temperature_projection": {
+      "previous_mean_air_temperatures_c": "XMAT[0:3]",
+      "previous_system_mean_air_temperatures_c": "DSXMAT[0:3]"
+    },
+    "humidity_projection": {
+      "previous_air_humidity_ratios": "WPrevZoneTS[0:3]",
+      "previous_system_air_humidity_ratios": "DSWPrevZoneTS[0:3]"
+    },
+    "missing_owner": "separate four-slot working/temporary arrays and scalar begin-write state plus actual guarded reconstruction lifecycle",
+    "handoff_requirement": "actual constructor/bulk/begin return fields must be used by initialization to write actual legacy MAT/ZTAV/current W/average W and first-three history slots; no unused mirror or report recomputation",
+    "prepared_caller_temperature": "Normal CON uses source default23; a public custom initial temperature is explicit prepared caller state, retained by the bare member, not a changed constructor default or a new physical CON case.",
+    "not_a_claim": "later four-slot shifting, retry/downstep interpolation, ZT/MAT separation after corrections or working-buffer selection: ZON-04/05/06 remain pending",
+    "capacity_distinction": "source AirPowerCap reset has W/K units; Rust air_heat_capacity_j_per_k is J/K and is not paired as the same state field"
+  },
+  "native_stage_witnesses": [
+    {
+      "callback": "callbackBeginZoneTimeStepAfterInitHeatBalance",
+      "phase": "after_init_heat_balance",
+      "meaning": "real callback before ManageSurfaceHeatBalance and zone reconstruction; not post-bulk or post-member"
+    },
+    {
+      "callback": "callbackBeginTimeStepBeforePredictor",
+      "phase": "before_predictor",
+      "meaning": "after bulk reconstruction and HVAC ZT=MAT, ZTAV=0, averageW=0; before InitZoneAirSetPoints; external OutHumRat and owner flags are actual pre-owner observations"
+    },
+    {
+      "callback": "callbackAfterPredictorBeforeHVACManagers",
+      "phase": "after_predictor_before_hvac_managers",
+      "meaning": "working histories/capacity/loads already evolved by PredictStep; not pristine fourteen-field member return"
+    }
+  ],
+  "external_input_policy": {
+    "helper": "OutHumRat is an explicit finite binary64 request input; copy exact bits, including zero sign, with no floor or numerical tolerance",
+    "production_Rust": "own actual initialization external-W input must bind exact returned writes and actual solver projections; no original output is supplied to Rust",
+    "ordinary_native": "actual original external OutHumRat, stage, flags and selected source fields are retained as source-context witnesses; native/Rust weather producer or warmup-stage numeric equivalence is unpaired until separately certified",
+    "no_discrepancy_mask": "Do not add physical tolerances or silently choose a different source callback to hide unverified CLK/SYS/weather alignment."
+  },
+  "references": {
+    "helper": "genuine same-GCC EnergyPlusData and concrete ZoneHeatBalanceData per sequence; original bare member, source-exact zone-only bulk fragment and whole original guard function",
+    "normal_native": "seven unchanged CON inputs via ordinary original API; readonly callbacks only, no actuators/setters or member calls as observational probes",
+    "native_core_build": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+    },
+    "ABI": "same verified GNU original core/options; no private EnergyPlusData crosses installed MSVC DLL",
+    "incoming_GEO03_contract": {
+      "path": "energyplus_porting_plan/contracts/GEO-03-source.json",
+      "sha256": "a17138b811096a9295ea4e87830100fc31be446771db198cce5e43d700330bd1"
+    },
+    "frozen_CON_scope": {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    }
+  },
+  "unpaired_source_only": [
+    "whole-guard sibling thermostat/setpoint/control/energy-demand/moisture-demand/deadband/hybrid/day resets",
+    "Space/MRT/comfort/mixing and unselected ZoneSpaceHeatBalanceData fields",
+    "ordinary native callback evolved fields and native external weather/initial calendar/warmup producer alignment",
+    "source warning/error IO, output registration, equipment/controller branches outside frozen CON",
+    "fourth history slot and working/scalar fields after later solver mutation; these remain paired in direct initialization units only"
+  ],
+  "consumer_scope": "actual initialization operator return and actual first-three T/W projections handed to the existing Rust A/B solver; ordinary Full/Summary equality is observer independence only",
+  "excluded": [
+    "ZON-02 AirPowerCap/rhoCp/multiplier/systemdt result parity",
+    "ZON-04/05/06 history/correction/retry algorithms",
+    "SUR-01 CTF/surface initialization",
+    "SYS/warmup/annual/B72 Rust physics renewal",
+    "native callback poststate invented by recomputation",
+    "whole EnergyPlus equivalence"
+  ],
+  "comparison_run": false,
+  "gates_updated": false
+}

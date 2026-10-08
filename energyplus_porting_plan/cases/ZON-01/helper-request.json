@@ -1,0 +1,1265 @@
+{
+  "schema": "zon01-helper-cases.v1",
+  "card": "ZON-01",
+  "state_policy": {
+    "fresh_EnergyPlusData_per_sequence": true,
+    "zone_count": 1,
+    "space_heat_balance": false,
+    "factory_snapshot": "allocated_zone_constructor before explicit guard prerequisites",
+    "selected_written_fields": [
+      "ZTM",
+      "WPrevZoneTS",
+      "DSWPrevZoneTS",
+      "WPrevZoneTSTemp",
+      "WTimeMinusP",
+      "W1",
+      "WMX",
+      "WM2",
+      "airHumRatTemp",
+      "tempIndLoad",
+      "tempDepLoad",
+      "airRelHum",
+      "AirPowerCap",
+      "T1"
+    ],
+    "selected_retained_fields": [
+      "MAT",
+      "ZT",
+      "ZTAV",
+      "XMPT",
+      "XMAT",
+      "DSXMAT",
+      "TMX",
+      "TM2",
+      "airHumRat",
+      "airHumRatAvg"
+    ],
+    "four_slot_arrays": [
+      "XMAT",
+      "DSXMAT",
+      "ZTM",
+      "WPrevZoneTS",
+      "DSWPrevZoneTS",
+      "WPrevZoneTSTemp"
+    ],
+    "all_numeric_inputs_finite": true,
+    "guard_preparation": {
+      "InitZoneAirSetPointsOneTimeFlag": false,
+      "NumOfZones": 1,
+      "numSpaces": 0,
+      "NumTempControlledZones": 0,
+      "NumComfortControlledZones": 0,
+      "doSpaceHeatBalance": false,
+      "BeginDayFlag": false,
+      "ZoneEquipInputsFilled": false,
+      "allocation_policy": "genuine one-zone owner and source-required thermostat/load-correction/control/deadband/hybrid-history/energy-demand/moisture-demand arrays; no fake state layout",
+      "source_constructor_MyEnvrnFlag": "observe actual default; no wrapper expected-state seeding"
+    },
+    "operation_numeric_policy": "parsed binary64 numbers must match companion hex16 bits before assignment; actual request inputs only",
+    "guard_call_policy": "whole genuine InitZoneAirSetPoints executes sibling/day/thermostat/demand resets; these are unpaired and not exhaustively observed"
+  },
+  "sequences": [
+    {
+      "sequence_id": "DEFAULT-BARE-ZERO",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Constructor defaults versus an unguarded zero external-W initialization; current T/W are not reset by the member method.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "bare_zero",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": 0.0,
+          "out_hum_rat_bits": "0000000000000000"
+        }
+      ]
+    },
+    {
+      "sequence_id": "BULK-SEED-NORMAL",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Incoming original zone reconstruction and current/average-W seed are distinct from later history/scalar initialization.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "bulk_normal",
+          "operation": "bulk_reconstruct_and_current_w_seed",
+          "out_hum_rat": 0.008,
+          "out_hum_rat_bits": "3f80624dd2f1a9fc"
+        },
+        {
+          "operation_id": "bare_normal",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": 0.008,
+          "out_hum_rat_bits": "3f80624dd2f1a9fc"
+        }
+      ]
+    },
+    {
+      "sequence_id": "POSITIVE-SUBFLOOR-COPY",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Positive external W below the psychrometric floor is copied unchanged; this member performs no W floor.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "bare_subfloor",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": 1e-06,
+          "out_hum_rat_bits": "3eb0c6f7a0b5ed8d"
+        }
+      ]
+    },
+    {
+      "sequence_id": "NEGATIVE-ZERO-COPY",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Copied -0 retains its sign; source literal zero assignments retain +0. This is a helper diagnostic, not physical input admission.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "bulk_negative_zero",
+          "operation": "bulk_reconstruct_and_current_w_seed",
+          "out_hum_rat": -0.0,
+          "out_hum_rat_bits": "8000000000000000"
+        },
+        {
+          "operation_id": "bare_negative_zero",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": -0.0,
+          "out_hum_rat_bits": "8000000000000000"
+        }
+      ]
+    },
+    {
+      "sequence_id": "SEEDED-UNWRITTEN-RETENTION",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Distinct per-field and four-slot canaries expose every selected write and every selected untouched field.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "bare_wet",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": 0.02,
+          "out_hum_rat_bits": "3f947ae147ae147b"
+        }
+      ]
+    },
+    {
+      "sequence_id": "REPEATED-BARE-W-RESEED",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Two direct member calls on the same actual owner replace W histories each time without a guard or reconstruction.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "bare_first",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": 0.008,
+          "out_hum_rat_bits": "3f80624dd2f1a9fc"
+        },
+        {
+          "operation_id": "bare_second",
+          "operation": "bare_begin_environment",
+          "out_hum_rat": 0.02,
+          "out_hum_rat_bits": "3f947ae147ae147b"
+        }
+      ]
+    },
+    {
+      "sequence_id": "GUARDED-SKIP-REARM",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Whole original InitZoneAirSetPoints executes an eligible begin, skips repeated true, rearms on false, then executes the next eligible begin.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "guard_first_true",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.008,
+          "out_hum_rat_bits": "3f80624dd2f1a9fc",
+          "begin_environment": true
+        },
+        {
+          "operation_id": "seed_before_skip",
+          "operation": "seed_zone_state",
+          "fields": {
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "guard_repeated_true",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.02,
+          "out_hum_rat_bits": "3f947ae147ae147b",
+          "begin_environment": true
+        },
+        {
+          "operation_id": "guard_false_rearm",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.03,
+          "out_hum_rat_bits": "3f9eb851eb851eb8",
+          "begin_environment": false
+        },
+        {
+          "operation_id": "guard_next_true",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.012,
+          "out_hum_rat_bits": "3f889374bc6a7efa",
+          "begin_environment": true
+        }
+      ]
+    },
+    {
+      "sequence_id": "NEW-ENVIRONMENT-BULK-RECONSTRUCTION",
+      "kind": "bounded_initial_state_sequence",
+      "branch_intent": "Dirty old owner, explicit guard rearm, zone reconstruction/current-W seed, then begin on the same state; bulk reset does not itself reset the module guard.",
+      "operations": [
+        {
+          "operation_id": "prepared_owner_snapshot",
+          "operation": "snapshot"
+        },
+        {
+          "operation_id": "seed_all_selected",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "guard_old_environment",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.008,
+          "out_hum_rat_bits": "3f80624dd2f1a9fc",
+          "begin_environment": true
+        },
+        {
+          "operation_id": "dirty_previous_environment",
+          "operation": "seed_zone_state",
+          "fields": {
+            "MAT": 17.25,
+            "ZT": 19.5,
+            "ZTAV": 21.75,
+            "XMPT": 16.125,
+            "XMAT": [
+              30.25,
+              31.5,
+              32.75,
+              33.125
+            ],
+            "DSXMAT": [
+              40.25,
+              41.5,
+              42.75,
+              43.125
+            ],
+            "TMX": 12.5,
+            "TM2": -4.25,
+            "airHumRat": 0.014,
+            "airHumRatAvg": 0.015,
+            "ZTM": [
+              1.25,
+              2.5,
+              3.75,
+              4.125
+            ],
+            "WPrevZoneTS": [
+              0.002,
+              0.003,
+              0.004,
+              0.005
+            ],
+            "DSWPrevZoneTS": [
+              0.006,
+              0.007,
+              0.009,
+              0.011
+            ],
+            "WPrevZoneTSTemp": [
+              0.012,
+              0.013,
+              0.014,
+              0.015
+            ],
+            "WTimeMinusP": 0.016,
+            "W1": 0.017,
+            "WMX": 0.018,
+            "WM2": 0.019,
+            "airHumRatTemp": 0.02,
+            "tempIndLoad": 100.125,
+            "tempDepLoad": -200.25,
+            "airRelHum": 67.5,
+            "AirPowerCap": 321.75,
+            "T1": -8.5
+          },
+          "input_field_bits": {
+            "MAT": "4031400000000000",
+            "ZT": "4033800000000000",
+            "ZTAV": "4035c00000000000",
+            "XMPT": "4030200000000000",
+            "XMAT": [
+              "403e400000000000",
+              "403f800000000000",
+              "4040600000000000",
+              "4040900000000000"
+            ],
+            "DSXMAT": [
+              "4044200000000000",
+              "4044c00000000000",
+              "4045600000000000",
+              "4045900000000000"
+            ],
+            "TMX": "4029000000000000",
+            "TM2": "c011000000000000",
+            "airHumRat": "3f8cac083126e979",
+            "airHumRatAvg": "3f8eb851eb851eb8",
+            "ZTM": [
+              "3ff4000000000000",
+              "4004000000000000",
+              "400e000000000000",
+              "4010800000000000"
+            ],
+            "WPrevZoneTS": [
+              "3f60624dd2f1a9fc",
+              "3f689374bc6a7efa",
+              "3f70624dd2f1a9fc",
+              "3f747ae147ae147b"
+            ],
+            "DSWPrevZoneTS": [
+              "3f789374bc6a7efa",
+              "3f7cac083126e979",
+              "3f826e978d4fdf3b",
+              "3f86872b020c49ba"
+            ],
+            "WPrevZoneTSTemp": [
+              "3f889374bc6a7efa",
+              "3f8a9fbe76c8b439",
+              "3f8cac083126e979",
+              "3f8eb851eb851eb8"
+            ],
+            "WTimeMinusP": "3f90624dd2f1a9fc",
+            "W1": "3f916872b020c49c",
+            "WMX": "3f926e978d4fdf3b",
+            "WM2": "3f9374bc6a7ef9db",
+            "airHumRatTemp": "3f947ae147ae147b",
+            "tempIndLoad": "4059080000000000",
+            "tempDepLoad": "c069080000000000",
+            "airRelHum": "4050e00000000000",
+            "AirPowerCap": "40741c0000000000",
+            "T1": "c021000000000000"
+          }
+        },
+        {
+          "operation_id": "guard_rearm",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.02,
+          "out_hum_rat_bits": "3f947ae147ae147b",
+          "begin_environment": false
+        },
+        {
+          "operation_id": "bulk_new_environment",
+          "operation": "bulk_reconstruct_and_current_w_seed",
+          "out_hum_rat": 0.012,
+          "out_hum_rat_bits": "3f889374bc6a7efa"
+        },
+        {
+          "operation_id": "guard_new_environment",
+          "operation": "guarded_init_zone_air_setpoints",
+          "out_hum_rat": 0.012,
+          "out_hum_rat_bits": "3f889374bc6a7efa",
+          "begin_environment": true
+        }
+      ]
+    }
+  ],
+  "expected_values_supplied": false
+}

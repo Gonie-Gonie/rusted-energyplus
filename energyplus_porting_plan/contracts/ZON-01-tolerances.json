@@ -1,0 +1,45 @@
+{
+  "schema": "zon01-tolerances.v1",
+  "card": "ZON-01",
+  "status": "frozen-before-scientific-execution",
+  "frozen_before_numerical_comparison": true,
+  "profiles": {
+    "direct_assignment_state": {
+      "unit": "field-specific source units",
+      "absolute_tolerance": 0.0,
+      "relative_tolerance": 0.0,
+      "rule": "exact binary64 value_bits for every scalar/slot, including signed zero; exact value_class and typed field/array identity"
+    },
+    "actual_Rust_handoff": {
+      "unit": "degC or kg/kg by field",
+      "absolute_tolerance": 0.0,
+      "relative_tolerance": 0.0,
+      "rule": "exact actual operator result bits -> actual stored/projection bits; external W request/input must also match exact companion bits"
+    }
+  },
+  "exact_metadata": [
+    "selected 24 source field identities and six array lengths4",
+    "ordered sequence/operation/input bits",
+    "four-slot canary retention",
+    "typed flags and actual before/after guard state",
+    "actual route and separately labelled wrapper invocations/source-derived eligibility",
+    "real Rust init callsite/context and projection slot mappings",
+    "original-before-Rust chronology/build/source/input archives",
+    "Full/Summary ordinary output bytes except existing trace/timing fields"
+  ],
+  "source_only_unpaired": [
+    "native external-weather producer alignment and calendar/warmup phase equivalence",
+    "ordinary callback fields after unrelated HVAC/Predictor mutations",
+    "whole-guard sibling state, Space/global/IO/unselected fields",
+    "later history/correction/retry/CTF/AirPowerCap numerical outputs"
+  ],
+  "exclusions": [
+    "any tolerance on plain assignment or zero reset",
+    "postfailure tolerance widening",
+    "cross-engine external-W mismatch hidden by a numerical profile",
+    "invented pristine fourteen-field native callback poststate",
+    "whole EnergyPlus or warmup/annual parity"
+  ],
+  "comparison_run": false,
+  "gates_updated": false
+}

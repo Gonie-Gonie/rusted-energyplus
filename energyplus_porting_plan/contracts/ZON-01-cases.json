@@ -1,0 +1,235 @@
+{
+  "schema": "zon01-input-contract.v1",
+  "card": "ZON-01",
+  "status": "frozen-before-scientific-execution",
+  "helper_request": {
+    "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+    "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+  },
+  "helper_sequence_count": 8,
+  "helper_sequence_ids": [
+    "DEFAULT-BARE-ZERO",
+    "BULK-SEED-NORMAL",
+    "POSITIVE-SUBFLOOR-COPY",
+    "NEGATIVE-ZERO-COPY",
+    "SEEDED-UNWRITTEN-RETENTION",
+    "REPEATED-BARE-W-RESEED",
+    "GUARDED-SKIP-REARM",
+    "NEW-ENVIRONMENT-BULK-RECONSTRUCTION"
+  ],
+  "helper_operation_count": 34,
+  "helper_domain": "finite selected field inputs, one concrete zone per fresh sequence, six source four-slot arrays; input canaries and helper-only subfloor/-0 diagnostics do not expand ordinary CON admission",
+  "request_policy": {
+    "input_only": true,
+    "source_defaults_are_observed_not_supplied_expected_values": true,
+    "expected_values_supplied": false,
+    "strict_decimal_and_companion_bits": true,
+    "sequence_id_resets_actual_state": true,
+    "operation_order_is_preserved": true
+  },
+  "helper_phases": [
+    "constructor",
+    "allocated_zone_constructor",
+    "prepared_manager_state",
+    "before_inputs",
+    "before",
+    "after"
+  ],
+  "helper_phase_keys": {
+    "factory": [
+      "constructor",
+      "allocated_zone_constructor",
+      "prepared_manager_state"
+    ],
+    "per_operation": [
+      "before_inputs",
+      "before",
+      "after"
+    ]
+  },
+  "helper_phase_meanings": {
+    "constructor": "genuine EnergyPlusData construction before zone allocation; no fabricated zone row",
+    "allocated_zone_constructor": "genuine concrete zone constructor before explicit manager prerequisites",
+    "prepared_manager_state": "declared manager prerequisites, with no initializer called",
+    "before_inputs": "actual owned state before this operation external-W and BeginEnvrnFlag input writes",
+    "before": "actual owned state after declared external inputs and before the selected wrapper operation",
+    "after": "actual owned state after the selected wrapper operation; seed operations are explicit input preparation, not source initializer output"
+  },
+  "helper_result_schema": "zon01-helper-results.v1",
+  "helper_snapshot_schema": {
+    "zone_fields": "24 named selected fields: 18 scalar objects and six four-slot scalar-object arrays",
+    "scalar_keys": [
+      "value",
+      "value_bits",
+      "value_class"
+    ],
+    "observed_flags": [
+      "MyEnvrnFlag",
+      "BeginEnvrnFlag",
+      "InitZoneAirSetPointsOneTimeFlag",
+      "doSpaceHeatBalance",
+      "MyDayFlag",
+      "BeginDayFlag",
+      "ErrorsFound",
+      "ControlledZonesChecked"
+    ],
+    "paired_environment_flags": [
+      "MyEnvrnFlag",
+      "BeginEnvrnFlag"
+    ],
+    "other_flags": "genuine observed prerequisite/context state; sibling/day/control algorithm parity is unpaired",
+    "wrapper_invocations": "actual direct wrapper counts only; member_call_count_observed=false"
+  },
+  "helper_routes": {
+    "snapshot": "copy actual selected fields and source flags only",
+    "seed_zone_state": "explicit input preparation of selected owner fields",
+    "bulk_reconstruct_and_current_w_seed": "byte-exact original zone-only bulk fragment",
+    "bare_begin_environment": "original ZoneSpaceHeatBalanceData::beginEnvironmentInit",
+    "guarded_init_zone_air_setpoints": "whole original InitZoneAirSetPoints"
+  },
+  "native_case_count": 7,
+  "native_cases": [
+    {
+      "id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      }
+    },
+    {
+      "id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      }
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "NOLIMIT",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+      }
+    },
+    {
+      "id": "B-FLOW-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "FLOW",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+      }
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "CAPACITY",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+      }
+    },
+    {
+      "id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "BOTH",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      }
+    },
+    {
+      "id": "B-BOTH-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "BOTH",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+      }
+    }
+  ],
+  "native_callback_policy": "actual readonly named-stage witnesses; retain warmup/physical distinction and available ownIDs/fields/flags, do not label callbacks as pristine constructor/bulk/member poststate",
+  "native_external_input_pairing": "source-only actual OutHumRat and source-stage context, no cross-engine producer-equivalence predicate",
+  "Rust_physical_case_ids": [
+    "A-24H",
+    "A-72H",
+    "B-BOTH-24H"
+  ],
+  "Rust_physical_trace_levels": [
+    "full",
+    "summary"
+  ],
+  "Rust_physical_command_count": 6,
+  "production_pairing": "exact actual Rust external-W operand -> genuine-source-compatible initialization writes -> actual stored current/average fields and three-slot solver projections; original helper establishes operator semantics, native stages establish real source owner context",
+  "physical_scope_statement": "three representative Rust Full/Summary pairs only; no fresh annual/B72/per-limit Rust physics, warmup or source weather-algorithm certification",
+  "comparison_run": false,
+  "gates_updated": false
+}
