@@ -78,6 +78,8 @@ pub struct WeatherDayOperationObservation {
 pub struct WeatherDayConsumerObservation {
     /// One-based hook order; repeated identities remain separate.
     pub sequence: u64,
+    /// Actual completed-operation count when these operands reached the hook.
+    pub completed_operation_count: u64,
     /// Actual hook caller.
     pub caller: &'static Location<'static>,
     /// Thermal caller's civil hourly index, not a native EPW record index.
@@ -189,6 +191,7 @@ pub(super) fn record_consumer(
         };
         trace.consumers.push(WeatherDayConsumerObservation {
             sequence: trace.total_consumer_count,
+            completed_operation_count: trace.total_operation_count,
             caller,
             record_index,
             timestep,

@@ -162,7 +162,8 @@ pub(crate) fn write_trace(
             "outcome":{"returned":row.error.is_none(),"source_fatal":row.error.as_ref().is_some_and(|error|error.is_source_fatal()),
                 "error":row.error.as_ref().map(ToString::to_string)}})).collect::<Vec<_>>(),
         "consumers":trace.consumers.iter().map(|row|json!({
-            "sequence":row.sequence,"caller":{"file":row.caller.file(),"line":row.caller.line(),"column":row.caller.column()},
+            "sequence":row.sequence,"completed_operation_count":row.completed_operation_count,
+            "caller":{"file":row.caller.file(),"line":row.caller.line(),"column":row.caller.column()},
             "record_index":row.record_index,"timestep":row.timestep,"phase":format!("{:?}",row.phase),
             "caller_state":global(&row.caller_state),"received_raw":raw(&row.raw),
             "actual_input_byte_range":{"start_byte":row.provenance.start_byte,"end_byte":row.provenance.end_byte,

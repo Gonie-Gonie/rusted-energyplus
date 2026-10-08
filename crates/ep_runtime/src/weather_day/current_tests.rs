@@ -37,44 +37,66 @@ fn setup_rejects_zero_steps_without_allocating_owners() {
 #[test]
 fn repeated_initial_consumers_share_current_without_deduplicating_hooks()
 -> Result<(), Box<dyn std::error::Error>> {
-    let series = ProductionWeatherTimestepSeries::from_bytes(
-        DECOY_BYTES.to_vec(),
-        configuration(6, 30, 7, 2, FirstHourInterpolationStartingValues::Hour24)?,
-    )?;
-    let (result, trace) = super::production_trace::capture(true, || {
-        series.prepare_initial_phase(WeatherDayPhase::Warmup { day: 1 })?;
-        let seed = series.current_for(0, 1)?;
-        series.begin_day(WeatherDayPhase::Warmup { day: 1 })?;
-        let first = series.current_for(0, 1)?;
-        assert_eq!(seed.current_weather, first.current_weather);
-        assert_eq!(seed.sample, first.sample);
-        assert!(!first.current_weather.is_rain);
+    crate::psychrometrics::with_fresh_psychrometric_state(|| {
+        let series = ProductionWeatherTimestepSeries::from_bytes(
+            DECOY_BYTES.to_vec(),
+            configuration(6, 30, 7, 2, FirstHourInterpolationStartingValues::Hour24)?,
+        )?;
+        let (result, trace) = super::production_trace::capture(true, || {
+            series.prepare_initial_phase(WeatherDayPhase::Warmup { day: 1 })?;
+            let seed = series.current_for(0, 1)?;
+            series.begin_day(WeatherDayPhase::Warmup { day: 1 })?;
+            let first = series.current_for(0, 1)?;
+            assert_eq!(seed.current_weather, first.current_weather);
+            assert_eq!(seed.sample, first.sample);
+            assert!(!first.current_weather.is_rain);
+            assert_eq!(
+                first.current_weather.out_dry_bulb_temp.to_bits(),
+                first.sample.dry_bulb_c.to_bits()
+            );
+            assert_eq!(
+                first.current_weather.out_hum_rat.to_bits(),
+                first.sample.outdoor_humidity_ratio.to_bits()
+            );
+            series.begin_day(WeatherDayPhase::Warmup { day: 2 })?;
+            series.current_for(0, 1)?;
+            Ok::<_, super::WeatherDayError>(())
+        });
+        result?;
+        let trace = trace.unwrap();
+        assert_eq!(trace.total_consumer_count, 3);
+        assert_eq!(trace.consumers.len(), 3);
         assert_eq!(
-            first.current_weather.out_dry_bulb_temp.to_bits(),
-            first.sample.dry_bulb_c.to_bits()
+            trace
+                .operations
+                .iter()
+                .filter(|row| row.kind == "SetCurrentWeather")
+                .count(),
+            2
         );
+        assert_eq!(trace.consumers[0].phase, WeatherDayPhase::Warmup { day: 1 });
+        assert_eq!(trace.consumers[1].phase, WeatherDayPhase::Warmup { day: 1 });
+        assert_eq!(trace.consumers[2].phase, WeatherDayPhase::Warmup { day: 2 });
         assert_eq!(
-            first.current_weather.out_hum_rat.to_bits(),
-            first.sample.outdoor_humidity_ratio.to_bits()
+            trace.consumers[0].completed_operation_count,
+            trace.consumers[1].completed_operation_count
         );
-        series.begin_day(WeatherDayPhase::Warmup { day: 2 })?;
-        series.current_for(0, 1)?;
-        Ok::<_, super::WeatherDayError>(())
-    });
-    result?;
-    let trace = trace.unwrap();
-    assert_eq!(trace.total_consumer_count, 3);
-    assert_eq!(trace.consumers.len(), 3);
-    assert_eq!(
-        trace
-            .operations
-            .iter()
-            .filter(|row| row.kind == "SetCurrentWeather")
-            .count(),
-        2
-    );
-    assert_eq!(trace.consumers[0].phase, WeatherDayPhase::Warmup { day: 1 });
-    assert_eq!(trace.consumers[1].phase, WeatherDayPhase::Warmup { day: 1 });
-    assert_eq!(trace.consumers[2].phase, WeatherDayPhase::Warmup { day: 2 });
-    Ok(())
+        assert!(
+            trace.consumers[2].completed_operation_count
+                > trace.consumers[1].completed_operation_count
+        );
+        for consumer in &trace.consumers {
+            let completed = trace
+                .operations
+                .iter()
+                .find(|row| row.sequence == consumer.completed_operation_count)
+                .unwrap();
+            assert_eq!(completed.kind, "SetCurrentWeather");
+            assert_eq!(
+                completed.after.state.environment.current_weather,
+                consumer.context.current_weather
+            );
+        }
+        Ok(())
+    })
 }
