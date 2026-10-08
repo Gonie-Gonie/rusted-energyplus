@@ -121,4 +121,8 @@ SetupInterpolationValues를 ReadUserWeatherInput보다 먼저 호출하고, 기�
 
 workspace 회귀시험 4,580개가 통과했다. 그 뒤 독립 소스 검토에서 찾은 완료 시간의 PreviousHour 인계와 warmup의 DayOfSimChr="0" 처리를 고쳤고, 실제 반복 warmup·다일 경계를 포함한 기상 시험 56개가 통과했다. 최종 `cargo clippy --workspace --all-targets -- -D warnings`도 종료 코드 0이다. 초기 하늘복사 시험의 비활성 지붕 형상과 정적 검사 실패 기록은 보존했다.
 
-[구현 후보 및 회귀시험 증거](../evidence/CLK-03-candidate-implementation.json)에 실행별 소스·명령과 검사 시점을 기록했다. 원본과의 새 후보 대조는 아직 실행 전이며, 네 종료 gate는 계속 미확인이다. 생성된 기상 물리값의 동등성, 전체 native registry와 내부 locals는 이 후보의 복사·커서 검증으로 인증하지 않는다.
+[구현 후보 및 회귀시험 증거](../evidence/CLK-03-candidate-implementation.json)에 실행별 소스·명령과 검사 시점을 기록했다. 최초 구현 증거 작성 시점에는 원본 대조를 실행하지 않았고, 네 종료 gate는 계속 미확인이다. 생성된 기상 물리값의 동등성, 전체 native registry와 내부 locals는 이 후보의 복사·커서 검증으로 인증하지 않는다.
+
+첫 커밋 후보의 실제 관측 실행은 종료 코드 0이다. 첫 대조는 Windows canonical 경로의 `\\?\C:\...` 표기를 일반 저장소 경로와 같은 입력으로 해석하지 못해 종료 코드 1이며 과학 비교 보고서는 생성되지 않았다. 기존 EXE·관측 결과·실패 기록을 보존하고 새 관측 serializer의 rooted VerbatimDisk 표기만 일반 disk 경로로 바꾼다. 실제 읽기 경로·입력·caller·scalar·엄격한 비교 기준은 그대로 유지하며 새 커밋과 빌드로 재실행한다.
+
+[경로 표기 수정 증거](../evidence/CLK-03-candidate-path-amendment.json)에 종료 코드·빈 비교 stdout·미생성 과학 보고서, 기존 결과 보존과 수정 소스의 독립 검토를 기록했다. 수정한 관측 프로그램의 Clippy도 실제 종료 코드 0이다.

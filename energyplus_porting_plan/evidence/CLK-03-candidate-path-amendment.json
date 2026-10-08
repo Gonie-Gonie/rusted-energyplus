@@ -1,0 +1,46 @@
+{
+  "schema": "clk03-candidate-path-observer-amendment.v1",
+  "card": "CLK-03",
+  "recorded_utc": "2026-10-08T07:59:26.218277+00:00",
+  "status": "actual-first-probe-returned-comparer-path-metadata-failed-before-scientific-report",
+  "actual_receipts": {
+    "probe": {
+      "path": ".runtime/porting/CLK-03/candidate-probe-command-01/receipt.json",
+      "sha256": "7c7d7ff610b1964d06ce4c28457ce1ef86feb1a2a09d1e99509c03b710663f02"
+    },
+    "comparison": {
+      "path": ".runtime/porting/CLK-03/candidate-unit-comparison-command-01/receipt.json",
+      "sha256": "34cf8cc6b6ea8cd15e0c7a804bc70f22aaca4ce1738098df5965daa8e1e22652"
+    },
+    "Clippy": {
+      "path": ".runtime/porting/CLK-03/candidate-probe-clippy-command-04/receipt.json",
+      "sha256": "471ee0f422875501ccbd71cf6e7d0c155b28e15e0957dc6677083240d8447422"
+    },
+    "source_review": {
+      "path": ".runtime/porting/CLK-03/candidate-path-observer-static-review-command-01/receipt.json",
+      "sha256": "0b2e647d77e298764b81897225e7d83188cf7fb03459426506d62eebae0b6a37"
+    }
+  },
+  "preserved_build": {
+    "path": ".runtime/porting/CLK-03/candidate-probe-build-01/build-receipt.json",
+    "sha256": "12e194bf8de0ae744e61abba28c662fc6e8652fad8b8f90cba84e1688c0d55e5"
+  },
+  "preserved_Rust_results": {
+    "path": ".runtime/porting/CLK-03/candidate-probe-command-01/stdout.log",
+    "sha256": "20e2bae67970f9dfc3144b4c5d891671d676880ff0f2fbfddd88f4c0d178f98b"
+  },
+  "independent_review": {
+    "path": ".runtime/porting/CLK-03/candidate-path-observer-static-review-01/review.json",
+    "sha256": "4b2b73bce561bf47196eacb1edf8ce6ba0fb1a3f830155c681a2ca088115b489"
+  },
+  "unchanged_pre_execution_DTO_projection": {
+    "path": ".runtime/porting/CLK-03/unit-dto-freeze-01/projection.json",
+    "sha256": "4417bed908752814a1a5ea1bd79c1b2af13c0979fb6f2ca11dd3691a31285b6b"
+  },
+  "amendment": "Rooted Windows VerbatimDisk is displayed with its same ordinary drive and unchanged component tail; actual reads and all other DTO operands are unchanged.",
+  "comparison_policy_changed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

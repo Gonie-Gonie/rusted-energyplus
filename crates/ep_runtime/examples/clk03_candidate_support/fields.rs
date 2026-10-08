@@ -168,8 +168,27 @@ fn slots(value: &WeatherDayValues) -> Value {
     let rows=value.slots().iter().enumerate().map(|(index,v)|json!({"hour":index/value.time_steps()+1,"time_step":index%value.time_steps()+1,"value":weather(v)})).collect::<Vec<_>>();
     json!({"allocated":value.is_allocated(),"time_steps":value.time_steps(),"hours":value.hours(),"ordering":"hour-major,timestep-minor","slots":rows})
 }
+fn input_path_display(path: &Path) -> String {
+    #[cfg(windows)]
+    {
+        use std::path::{Component, PathBuf, Prefix};
+        if let Some(Component::Prefix(prefix)) = path.components().next()
+            && let Prefix::VerbatimDisk(letter) = prefix.kind()
+            && let Ok(remainder) = path.strip_prefix(prefix.as_os_str())
+            && matches!(remainder.components().next(), Some(Component::RootDir))
+        {
+            // canonicalize supplies a Windows namespace prefix. Preserve the
+            // actual disk and every remaining component in ordinary path form.
+            let mut ordinary = PathBuf::from(format!("{}:", char::from(letter)));
+            ordinary.push(remainder);
+            return ordinary.to_string_lossy().into_owned();
+        }
+    }
+    path.to_string_lossy().into_owned()
+}
+
 fn stream(v: RawEpwStreamState, path: Option<&Path>) -> Value {
-    json!({"file_path":path.map(|p|p.to_string_lossy().into_owned()).unwrap_or_default(),"is_open":v.is_open,"good":v.good,"eof":v.eof,"fail":v.fail,"bad":v.bad,"position_byte":v.position_byte,"position_available":v.position_byte.is_some()})
+    json!({"file_path":path.map(input_path_display).unwrap_or_default(),"is_open":v.is_open,"good":v.good,"eof":v.eof,"fail":v.fail,"bad":v.bad,"position_byte":v.position_byte,"position_available":v.position_byte.is_some()})
 }
 pub(super) fn snapshot(
     state: &WeatherDayState,
