@@ -146,7 +146,7 @@ B에서는 그 의존성을 적용한다.
 ### 08 존 공기
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [ZON-01](cards/ZON-01.md) | 존 공기 상태 초기화 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::beginEnvironmentInit` | CON-01, GEO-03 |
+| [x] | [ZON-01](cards/ZON-01.md) | 존 공기 상태 초기화 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::beginEnvironmentInit` | CON-01, GEO-03 |
 | [ ] | [ZON-02](cards/ZON-02.md) | 존 열수지 계수와 공기 열용량 | `ZoneTempPredictorCorrector.cc` · `ZoneHeatBalanceData::calcSumHAT; ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums; predictSystemLoad` | ZON-01, SUR-05, SRC-01, PSY-01 |
 | [ ] | [ZON-03](cards/ZON-03.md) | ThirdOrder·이중 설정온도 부하예측 | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::predictSystemLoad; calcPredictedSystemLoad; CalcZoneAirTempSetPoints` | ZON-02, SCH-03 |
 | [ ] | [ZON-04](cards/ZON-04.md) | 공기온도 corrector | `ZoneTempPredictorCorrector.cc` · `ZoneSpaceHeatBalanceData::correctAirTemp; correctZoneAirTemps` | ZON-02 |

@@ -1,140 +1,160 @@
-# ZON-01 bounded source and reuse review
+# ZON-01 bounded source, ownership and final handoff review
 
-This is a preparation packet. Its source/input/assignment policy must pass
-independent review, then genuine original execution must precede Rust numerical
-execution. All four ZON-01 gates remain pending. The original is EnergyPlus
+ZON-01 is closed for the frozen A/B scope at implementation
+`af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e`, crates tree
+`e94b3224a4f6aeb5e7b2b993cfe4587b6585322c`. Original EnergyPlus is
 26.1.0, `6f2e40d10250a105b49966baa24d843711e61048`.
 
-The draft [source](../../contracts/ZON-01-source.json),
+The [source](../../contracts/ZON-01-source.json),
 [cases](../../contracts/ZON-01-cases.json),
-[exact policy](../../contracts/ZON-01-tolerances.json) and
-[input-only request](../../cases/ZON-01/helper-request.json) separate constructor,
-incoming bulk reconstruction, bare member initialization and genuine guarded
-initialization. They contain no reference outputs to inject into Rust.
+[exact assignment policy](../../contracts/ZON-01-tolerances.json) and
+[input-only request](../../cases/ZON-01/helper-request.json) were frozen and
+independently reviewed before scientific execution. They pin eleven original
+files and 36 byte ranges. Reference outputs were never Rust inputs.
 
-## Actual selected owners
+## Selected source owners and distinct phases
 
-`ZoneSpaceHeatBalanceData` in `ZoneTempPredictorCorrector.hh:102-145` gives MAT,
-ZT, ZTAV, XMPT, XMAT[4], DSXMAT[4], TMX and TM2 the source ZoneInitialTemp of
-23 degrees C. Current/average/temporary humidity defaults are .01; humidity
-histories and the selected working fields start at +0. The separate module
-MyEnvrnFlag defaults true. Global BeginEnvrnFlag belongs to external control.
+`ZoneSpaceHeatBalanceData`, `ZoneTempPredictorCorrector.hh:102-145`, initializes
+MAT/ZT/ZTAV/XMPT/XMAT[4]/DSXMAT[4]/TMX/TM2 to ZoneInitialTemp 23 degrees C.
+Current, average and temporary humidity default to .01; humidity histories and
+selected working fields start at +0. Module MyEnvrnFlag defaults true, while
+BeginEnvrnFlag belongs to external control.
 
-`HeatBalanceSurfaceManager.cc:2231-2239` placement-news the concrete zone owner,
-then sets only current airHumRat and airHumRatAvg from actual OutHumRat. Its
-normal caller executes under BeginEnvrnFlag at 379-384. The helper selects this
-byte-exact zone block; it does not certify all surface/flux/CTF histories,
-Space reconstruction or enclosure MRT.
+The byte-exact zone block in `HeatBalanceSurfaceManager.cc:2231-2239`
+placement-news the concrete owner, then seeds current airHumRat and airHumRatAvg
+from OutHumRat. Its ordinary guard is at 379-384. Only this incoming zone block
+is paired: TempTstatAir, Space, surface/flux/CTF and enclosure MRT remain unpaired.
 
-`ZoneSpaceHeatBalanceData::beginEnvironmentInit`,
-`ZoneTempPredictorCorrector.cc:2818-2836`, owns four array fields and ten scalar
-fields. In each index 0 through 3 it writes ZTM to +0, WPrevZoneTS and
-DSWPrevZoneTS to external OutHumRat, and WPrevZoneTSTemp to +0. It then writes
-WTimeMinusP/W1/WMX/WM2 from OutHumRat and resets airHumRatTemp,
-tempIndLoad/tempDepLoad/airRelHum/AirPowerCap/T1 to +0 in source order.
+`ZoneSpaceHeatBalanceData::beginEnvironmentInit:2818-2836` writes fourteen fields
+through 26 scalar stores. For all four indices, ZTM and WPrevZoneTSTemp become
++0; WPrevZoneTS and DSWPrevZoneTS receive OutHumRat. WTimeMinusP/W1/WMX/WM2
+also receive OutHumRat; airHumRatTemp, tempIndLoad/tempDepLoad/airRelHum/
+AirPowerCap/T1 become +0. It retains the ten selected constructor/current
+fields, including MAT/ZT/ZTAV and current/average W. It does not reconstruct
+the owner or impose a W floor. Source AirPowerCap W/K is distinct from Rust
+air_heat_capacity_j_per_k J/K.
 
-The method leaves the ten selected constructor/current fields unchanged. In
-particular it does not reset MAT/ZT/ZTAV, reconstruct the owner, update current
-W, or impose a psychrometric W floor. Source AirPowerCap is W/K; it cannot be
-identified with Rust air_heat_capacity_j_per_k in J/K.
+The genuine whole `InitZoneAirSetPoints:2621-2670` calls this member for
+MyEnvrnFlag && BeginEnvrnFlag, clears MyEnvrnFlag and rearms it when BeginEnvrnFlag
+is false. The helper prepared genuine one-zone, zero-controller arrays and
+disabled its one-time allocation branch. Sibling control/demand/day resets
+executed but remain unpaired and not exhaustively observed. Wrapper invocation
+counts and guard eligibility are not direct member-call observations.
 
-`InitZoneAirSetPoints:2621-2670` calls the member only while actual MyEnvrnFlag
-and BeginEnvrnFlag are both true, clears MyEnvrnFlag after the block, and
-rearms it when BeginEnvrnFlag is false. The helper will call this whole genuine
-function on an explicitly prepared one-zone, zero-controller state, with the
-one-time allocation branch disabled and genuine required arrays allocated.
-Sibling thermostat/control/demand/deadband/hybrid/day resets execute in the
-genuine whole function, remain unpaired, and are not exhaustively observed.
-Wrapper invocations and source-derived guard eligibility are not invented
-direct observations of the member's individual invocation count.
+## Original-first evidence and exact unit policy
 
-## Reuse and actual handoff
+[Original-first evidence](original-first.json) binds actual native configure,
+build, commands, binaries, source archives, four contracts and independent
+reviews. Eight fresh genuine-state sequences executed 34 ordered operations:
+seven bare calls, seven guarded calls and three bulk reconstructions, plus
+input preparation and snapshots. The helper observes constructor-before-zone,
+allocated-zone defaults, prepared-manager state and each operation's
+before_inputs/before/after separately.
 
-Rust `heat_balance/initialization.rs:57-65` currently initializes temperature
-and both three-slot T histories from a caller temperature, and current/average
-W plus both three-slot W histories from the legacy .008 fallback. The normal
-A and B paths then seed current/average W and both history projections from
-their own first interpolated weather sample in `air_manager.rs:110-139`.
+The selected payload has eighteen scalar fields and six four-element arrays.
+Finite input bits, negative zero, positive subfloor W, all four slots, retained
+canaries, repeated calls and guard skip/rearm are compared exactly: atol=0 and
+rtol=0. No physical tolerance hides a different weather provider or source
+stage. No source RHS is reconstructed by the reader.
 
-The temperature history mappings are XMAT[0:3] and DSXMAT[0:3], not the separate
-ZTM[4] working buffer. Source selection at 3893-3900 and 6825-6832 makes that
-distinction explicit. Humidity mappings are WPrevZoneTS[0:3] and
-DSWPrevZoneTS[0:3]. Later source history pushes and working-buffer selection
-are pinned for semantic mapping, not certified by ZON-01.
+The [final committed unit comparison](final-unit-comparison.json) passes
+5,528 checks with zero mismatches: 126 snapshot pairs, 5,082 scalar-bit pairs,
+252 flag pairs, 34 guard-eligibility pairs and 34 wrapper-count pairs.
 
-The missing boundary is a genuine mutable initialization owner for selected
-constructor defaults, all four slots, working/scalar fields, reconstruction
-and the environment guard. Its actual returned values must initialize the
-existing solver's current/average state and first-three projections. An unused
-shadow bundle or observer recomputation would not establish production use.
-This card does not promise distinct MAT/ZT storage or full four-slot
-synchronization after later corrections; those remain ZON-04/05/06 obligations.
-The ordinary CON caller starts at the source default of 23 degrees C. A public
-custom initial temperature is explicit prepared caller state retained by the
-bare member, not a replacement constructor default or expanded CON input.
+Seven unchanged ordinary CON original lifetimes emitted 28,081 callback rows
+with zero omissions. Physical after-init-HB/beforePredictor/afterPredictor
+counts are 1,056/1,056/2,226. AfterInitHeatBalance at HeatBalanceManager:199-200
+precedes surface bulk reconstruction. BeforePredictor at HVACManager:217 is
+after bulk and ZT=MAT/ZTAV=0/averageW=0 writes, but before the member.
+AfterPredictor at 844 observes evolved working histories/capacity/load state.
+These are genuine named stage witnesses, not pristine fourteen-field returns.
+Native weather/calendar/warmup alignment with Rust remains unpaired.
 
-Normal A creates state once in `runtime.rs:304-336`; normal B does so in
-`ideal_loads/coupled_runtime.rs:5943-5981`. Their default normal CLI options
-start at 23 degrees C and do not execute Rust warmup. Existing fresh-state
-independence tests do not cover a persistent guarded reset/rearm lifecycle,
-the fourth slot, differing OutHumRat values or retained canaries.
+## Actual Rust ownership and solver handoff
 
-## Pre-run packet and exact assignment policy
+The earlier public initializer exposed four scalars and four three-slot history
+projections, with separate diagnostic coefficients. Its preserved
+[baseline review](independent-baseline-review.json) records eight shell
+snapshots, nine partial seeds and seventeen unsupported source operations.
+It intentionally makes zero source-vs-legacy numerical pairs and cannot pass
+scientific certification; missing initializer ownership is not fabricated as
+a same-phase numerical error.
 
-The three contracts pin eleven original files and 36 selected byte ranges.
-Their input-only request is `zon01-helper-cases.v1`; the genuine helper output
-is `zon01-helper-results.v1`. The packet awaits independent pre-run review and
-original-first execution. All four card gates remain pending.
+The canonical `ZoneAirInitializationState` now owns all selected 24 fields.
+`ZoneAirEnvironmentGuard` persists on real HeatBalanceState. The common weather
+entry executes constructor, bulk current-W seed, actual caller-temperature
+preparation, genuine Rust guard and member API, then projects actual returned
+values into the existing solver. Ordinary input W comes from Rust's own
+provider; Begin=true is explicit Rust caller policy, not a native callback
+flag. Custom T is prepared caller state retained by the member, not a changed
+source constructor default or wider CON admission.
 
-Eight fresh genuine-state sequences contain 34 ordered input-only operations:
-constructor plus zero-W bare initialization; bulk current-W seed; positive
-subfloor copying; negative-zero copying; selected retained-field/four-slot
-canaries; repeated bare calls; guarded skip/rearm; and dirty old state followed
-by explicit rearm and new bulk reconstruction. The request supplies only
-finite binary64 inputs and companion hexadecimal bits. Helper-only subfloor
-and negative-zero stimuli do not expand ordinary CON admission.
+XMAT/DSXMAT first-three temperature histories remain distinct from ZTM[4]
+working zeros. WPrevZoneTS/DSWPrevZoneTS first-three histories, current/average
+T/W and three diagnostic coefficients are actually stored. The separate
+four-slot transient owner is not claimed to remain synchronized after later
+solver corrections. MAT/ZT projection is an initialization mapping only.
 
-The helper separately copies `constructor` (before zone allocation),
-`allocated_zone_constructor`, and `prepared_manager_state`. Each operation
-copies `before_inputs`, `before`, and `after`, separating external input writes
-from the wrapper action. Its first snapshot operation is named
-`prepared_owner_snapshot`; it does not relabel the prepared state as a
-constructor. Each zone row has the 24 selected fields: eighteen scalar objects
-and six four-element scalar-object arrays. Actual source flags are retained;
-only MyEnvrnFlag/BeginEnvrnFlag define the paired environment guard. Other
-control/day flags remain prerequisite/context observations.
+The scoped owner/facade/observer/export/shared-entry review archives twelve
+Rust files. Full-only observation copies actual input, constructor/bulk/
+before-member/after-member returns and stored projection. The shared A/B
+source-order timestep hook copies actual index=0 entry before history reads.
+Default-off behavior, nested/unwind restoration, own IDs/callers/context and
+retained-prefix/omission semantics are reviewed; observation recalculates no
+initialization values.
 
-Every selected direct scalar assignment, four-slot array, retained canary,
-zero sign, input bit and flag is compared exactly. There is no physical
-tolerance on copied W or literal zero, and no tolerance may be introduced to
-mask a different weather producer or observation stage.
+[Final production evidence](production-comparison.json) binds six actual normal
+A24/A72/BBoth24 Full/Summary CLI commands. It passes 690 checks with zero
+mismatches, including 504 constructor/bulk/caller-preparation/member snapshot
+anchor bit pairs and 114 actual
+stored/first-entry handoff bit pairs. Three actual initializer records and
+three zero-index entry records are retained. Separately, all 480 physical clock intervals
+(96/288/96) retain exact order and zero omissions. Entry context may be null or
+warmup and is copied honestly, without cross-engine phase alignment. Later
+history/correction is unpaired. Summary proves ordinary-output equality and
+observer absence, not direct 24-field Summary observation.
 
-## Ordinary native stages and bounded Rust connection
+## Final revision, required checks and preserved failures
 
-Seven unchanged CON inputs are planned for fresh ordinary original lifetimes:
-A24/A72, four B limit variants at 24 hours, and BBoth72. The passive API
-observer will retain genuinely named callback rows, actual context/OutHumRat,
-flags and selected fields. It will call no source member as a probe.
+Candidate `534144cb92fac8e6bf206d41067671734e436bd0` unit/source evidence remains
+immutable, including its prior unit 5,528/0 and bounded production 690/0.
+[Checks before lint cleanup](checks-before-lint-cleanup.json) retain its real
+Clippy exit 101. [Source amendment](source-amendment.json) binds the independent
+two-expression Copy-closure lint change in air_manager.rs, all other unchanged
+available Rust source bytes, and fresh final02 proofs for af3f3cb2.
 
-`callbackBeginZoneTimeStepAfterInitHeatBalance` occurs at
-`HeatBalanceManager.cc:199-200`, before ManageSurfaceHeatBalance and the bulk
-zone reconstruction. `callbackBeginTimeStepBeforePredictor` is at
-`HVACManager.cc:217`, after bulk reconstruction and the 165-170 writes
-ZT=MAT, ZTAV=+0 and averageW=+0, but before GetZoneSetPoints and the member.
-`callbackAfterPredictorBeforeHVACManagers` occurs at 844 after PredictStep;
-selected working arrays/capacity/load fields have already evolved.
+All five [required final checks](actual-commands.json) succeeded with unchanged
+source: workspace tests (21 suite groups, 4,552 passed/0 failed/0 ignored),
+Clippy --workspace --all-targets -D warnings, source-quality,
+heat-balance-structure and scoped rustfmt --check. Format scope is only
+air_manager.rs; no whole-workspace format assertion is made.
 
-None of these callbacks exposes the pure fourteen-field member return. They
-are source-stage witnesses. ZTAV or average-W stage differences cannot be
-mistaken for a constructor/member mismatch. Native weather/calendar/warmup
-producer equivalence is explicitly unpaired until its CLK/SYS obligations are
-closed; a reference OutHumRat is never supplied to Rust's production provider.
+The archived available-source inventory has 3,656 Rust files: 3,655 exact Git
+byte matches and one pre-existing CRLF-only difference in
+ideal_loads/binding/scheduled_output.rs. This inventories available source,
+including files not selected by a particular build. Actual Cargo emitted
+binary identity is bound separately; not every available .rs file is claimed
+compiled into each executable.
 
-The proposed Rust physical subset is A24/A72/BBoth24 Full/Summary: six ordinary
-commands. Full must copy the actual initialization input, fourteen returned
-write fields and actual current/average/three-slot handoff. Original-first
-exact member/guard units establish the operator semantics; native callbacks
-establish its real source context. Full/Summary ordinary-output equality only
-tests observer independence. No annual/B72 Rust physics, warmup convergence,
-SUR-01, ZON-02 AirPowerCap result, later history/retry, or whole EnergyPlus
-equivalence is claimed.
+[Reader invocation failure](reader-invocation-failure.json) preserves the real
+production command02 child exit 2: --rust-matrix was an invalid argument, stdout
+was empty and scientific comparison did not start. Correct command03 changed
+only that flag to --rust and used the same completed matrix/proofs. No engine
+or CLI rerun, source/tolerance change or invented wrapper exit is claimed.
+The [independent final review](independent-final-review.json) binds authoritative
+review03, separate unit review02, static lineage and all successful proofs.
+Its independent reader's earlier metadata-selector failure (assuming an absent
+workspace --all-targets flag), exact selector amendment and successful review02
+remain separate history in plan provenance. The subsequent output-path-only
+amendment is not labeled as a separate execution receipt; authoritative
+review03 itself records its actual argv and time.
+
+## Limits retained at closure
+
+Source Space, manager/sibling states, MRT/comfort/mixing, global counters and IO
+remain unpaired. Later history pushes, correction/retry/downsteps, SUR-01,
+CTF and full SYS remain pending. AirPowerCap reset ownership is not numerical
+capacity/load parity. No B72/annual/per-limit Rust physics renewal, warmup
+convergence, external weather/calendar alignment or whole-engine equivalence
+is certified. Frozen helper subfloor/negative-zero inputs do not widen normal
+CON admission. These limits remain explicit in the card and plan evidence.

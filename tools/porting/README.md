@@ -402,3 +402,63 @@ commands, comparisons and independent reviews are under
 `energyplus_porting_plan/evidence/GEO-03/`. They certify no general polyhedron,
 Space/global lifetime, AirPowerCap/rhoCp/multiplier/dt, ZON-02/SYS, B72/annual
 renewal or whole EnergyPlus physics.
+
+## ZON-01: selected environment initialization and real solver handoff
+
+ZON-01 closes the frozen A/B boundary at
+`af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e` (crates tree
+`e94b3224a4f6aeb5e7b2b993cfe4587b6585322c`). The unchanged contracts pin
+11 original files/36 ranges, 8 input-only sequences/34 operations and exact
+IEEE assignments: 18 scalars plus 6 four-slot arrays, zero tolerance, signed
+zero/flags/order exact. Original constructor, incoming bulk W seed, bare
+member writes and genuine guarded calls are distinct phases.
+
+The final committed unit run passes **5,528 checks/0 mismatches**. Six normal
+A24/A72/BBoth24 Full/Summary CLI runs pass **690 checks/0 mismatches**: 504
+constructor/bulk/caller-preparation/member snapshot anchor bit pairs and 114
+actual stored/first-entry handoff bit pairs. Separately, 480 ordered physical
+clock intervals were verified with no omissions. The transient selected 24-field owner hands
+four scalar values, four three-slot arrays and three diagnostic scalars to
+the real solver. Only the environment guard persists as that new guard owner;
+later four-slot history synchronization is not certified by this card.
+
+The recorded metadata readers can replay completed evidence without launching
+EnergyPlus, Rust CLI, Cargo or changing gates. Use fresh output paths:
+
+```powershell
+python -X utf8 -B .runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py --original-helper .runtime/porting/ZON-01/original-helper-first-01/helper-reference.json --native-matrix .runtime/porting/ZON-01/original-native-first-01/matrix.json --original-review .runtime/porting/ZON-01/independent-original-data-review-01/review.json --rust .runtime/porting/ZON-01/rust-final-unit-first-02/execution.json --output .runtime/porting/ZON-01/replay-unit-NEW.json
+python -X utf8 -B tools/porting/check_zon01_production.py --rust .runtime/porting/ZON-01/rust-final-production-02/matrix.json --unit-report .runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json --unit-command .runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json --unit-review .runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json --output .runtime/porting/ZON-01/replay-production-NEW.json
+```
+
+Readers bind actual commands, original-first chronology, source archives,
+binary/build identity and typed input bits; they reconstruct no source RHS
+and supply no original output to Rust. `--baseline` remains an intentionally
+incomplete legacy observation with zero source-vs-legacy numerical pairs;
+it cannot pass scientific certification.
+
+[Final unit evidence](../../energyplus_porting_plan/evidence/ZON-01/final-unit-comparison.json),
+[production evidence](../../energyplus_porting_plan/evidence/ZON-01/production-comparison.json),
+[actual commands](../../energyplus_porting_plan/evidence/ZON-01/actual-commands.json),
+[independent final review](../../energyplus_porting_plan/evidence/ZON-01/independent-final-review.json)
+and [source amendment](../../energyplus_porting_plan/evidence/ZON-01/source-amendment.json)
+preserve the candidate534 unit/source proofs and Clippy exit 101. The later
+two observer closure changes have independent exact-delta review and fresh
+final02 build/unit/production proof. The
+[invocation failure](../../energyplus_porting_plan/evidence/ZON-01/reader-invocation-failure.json)
+records actual command02 child exit 2 for `--rust-matrix`; corrected command03
+used `--rust` with the same completed data. No scientific reader execution
+occurred on the failed invocation and no engines were rerun.
+
+All five required checks passed on final02 unchanged source: workspace tests
+(21 suite groups, 4,552 passed/0 failed/0 ignored), Clippy `-D warnings`,
+source-quality, heat-balance-structure and scoped rustfmt of `air_manager.rs`
+only. Available-source inventories are labeled as available files, not a
+claim that each file was compiled into each executable.
+
+The seven original CON lifetimes provide 28,081 genuine callback rows and
+source-stage context. Native callbacks are not pristine member returns or
+cross-engine weather/calendar/warmup samples. Summary checks ordinary-output
+equality and observer absence only. Space/manager siblings, later
+history/correction/retry, AirPowerCap numerical results, SUR/CTF/SYS, warmup
+convergence and annual/B72/per-limit Rust physics renewal remain outside
+this closure.

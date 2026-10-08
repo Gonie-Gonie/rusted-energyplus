@@ -1,0 +1,218 @@
+{
+  "card": "ZON-01",
+  "written_utc": "2026-10-08T01:39:31.946606+00:00",
+  "implementation_commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+  "crates_tree": "e94b3224a4f6aeb5e7b2b993cfe4587b6585322c",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+    }
+  },
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/ZON-01/final-evidence-writer-02/write_final_evidence.ccd26f106e79.py",
+    "sha256": "ccd26f106e795f51e7ea2b14590a47e1de358b9137ff87360a895f6719ddcceb"
+  },
+  "actual_metadata_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/ZON-01/final-evidence-writer-02/write_final_evidence.ccd26f106e79.py",
+    "--unit-report",
+    ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+    "--unit-command",
+    ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+    "--unit-review",
+    ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+    "--production-report",
+    ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+    "--production-command",
+    ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+    "--production-matrix",
+    ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+    "--final-review",
+    ".runtime/porting/ZON-01/independent-final-data-review-03/review.json",
+    "--implementation-commit",
+    "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+    "--crates-tree",
+    "e94b3224a4f6aeb5e7b2b993cfe4587b6585322c",
+    "--check",
+    "workspace=.runtime/porting/ZON-01/checks-workspace-test-02/receipt.json",
+    "--check",
+    "clippy=.runtime/porting/ZON-01/checks-clippy-02/receipt.json",
+    "--check",
+    "source-quality=.runtime/porting/ZON-01/checks-source-quality-02/receipt.json",
+    "--check",
+    "structure=.runtime/porting/ZON-01/checks-heat-balance-structure-02/receipt.json",
+    "--check",
+    "fmt=.runtime/porting/ZON-01/checks-scoped-format-02/receipt.json",
+    "--output-dir",
+    ".runtime/porting/ZON-01/final-evidence-02",
+    "--write-tracked"
+  ],
+  "writer_executes_engines_Cargo_Git_or_comparers": false,
+  "initializer_RHS_reconstructed": false,
+  "reference_answers_supplied": false,
+  "scientific_gates_updated": false,
+  "metadata_author_limit": "Observer/facade and early reader author transcribes actual independent proof. This writer is not an independent numerical review.",
+  "preserved_candidate534_history": {
+    "unit-final.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/unit-final.json",
+      "sha256": "3c8a1694f17bdef2f000fb246051b4a9e0ae647f2b870fa46e23b2c358a1663c"
+    },
+    "independent-canonical-source-review.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/independent-canonical-source-review.json",
+      "sha256": "f91e2d3e4d2d23eb16d6644ee1180796b18857bde86a26c238fc746f83bf9695"
+    },
+    "checks-before-lint-cleanup.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/checks-before-lint-cleanup.json",
+      "sha256": "242b252230133d34cd56e8278bc3bc583b9a8d3a4da47ed4f67bb056a1368b5f"
+    },
+    "independent-baseline-review.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/independent-baseline-review.json",
+      "sha256": "e523e605d89b2ded8b8508744ca5636a43c0e5a71965b9b12bc45f2d2aecb34f"
+    },
+    "original-first.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/original-first.json",
+      "sha256": "e583bfe36c47729485b104e15ddcbe8aebb590555db5cbf1ca9ea24ab18e979c"
+    }
+  },
+  "available_source_inventory_limit": "Available .rs archive inventories are not compiler file-selection proof. Actual Cargo executable emissions are bound separately.",
+  "native_stage_limit": "Seven native callbacks are contextual witnesses, not pristine14 post-state or matched Rust weather/calendar/warmup observations.",
+  "schema": "zon01-independent-final-review-evidence.v1",
+  "status": "pass-committed-selected-unit-and-bounded-production",
+  "actual_independent_final_data_review": {
+    "path": ".runtime/porting/ZON-01/independent-final-data-review-03/review.json",
+    "sha256": "7bbdb0d0611cfa04a0422c14586524ce33c4e8067bbbb529be1f97f3b3fc3e22"
+  },
+  "actual_independent_unit_data_review": {
+    "path": ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+    "sha256": "53c6aea78424c8e84961672111869242e33d1519fb5fb28ac0715c769f969ad5"
+  },
+  "review_completed_utc": "2026-10-08T01:38:30.787748+00:00",
+  "static_lineage": {
+    "owner": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+      "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+    },
+    "facade": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/review.json",
+      "sha256": "139dea312a343324048a20241afac564cc859d14ffc57dd7c8152e43d9b8a3f7"
+    },
+    "unit_reader": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/review.json",
+      "sha256": "6d276fea62f05cb16a0669f67675a4b91a29b0e1b9ca2acb4794923f1e2737bf"
+    },
+    "production_reader": {
+      "path": ".runtime/porting/ZON-01/independent-production-reader-review-01/review.json",
+      "sha256": "d6261cf8aa5b6762f4beabc3f8de14b83a25abc97031349f3802a6d1c11e1485"
+    },
+    "lint_delta": {
+      "path": ".runtime/porting/ZON-01/independent-lint-delta-review-01/review.json",
+      "sha256": "64fe1844fc2b15c6ee9ac618261fbb4f1240316e4e522de8aa450e3e4c4fa250"
+    }
+  },
+  "actual_proof_bindings": {
+    "reviewed_unit_comparison_report": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+      "sha256": "3acb9910e9e73047eb5a62c4ef68fecae43f0f5ec5387d4ef2f1fe61906f9ac9"
+    },
+    "reviewed_unit_comparison_command": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+      "sha256": "b9cb4cfa1e103067e693820897fa45b52d7e1bc8e4efa40782204ff561356651"
+    },
+    "reviewed_Rust_unit_execution": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-02/execution.json",
+      "sha256": "b1cbd4b2693292decee05cab9e658d4369d9236abb896cdc6b60c5a8a588b643"
+    },
+    "reviewed_Rust_unit_build": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-build-02/build-receipt.json",
+      "sha256": "88048cf7202f7be799a3b403c85cef3b89e056f859262274ee6cfdf49f397dc9"
+    },
+    "reviewed_Rust_unit_binary": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-build-02/zon01_tuples.exe",
+      "sha256": "8fd3823a986e8622e8d60530fb0479516a4d350e54d7082637949b486ec5ddbb"
+    },
+    "reviewed_reader_static_review": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/review.json",
+      "sha256": "6d276fea62f05cb16a0669f67675a4b91a29b0e1b9ca2acb4794923f1e2737bf"
+    },
+    "reviewed_owner_static_review": {
+      "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+      "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+    },
+    "reviewed_exact_observer_lint_delta": {
+      "path": ".runtime/porting/ZON-01/independent-lint-delta-review-01/review.json",
+      "sha256": "64fe1844fc2b15c6ee9ac618261fbb4f1240316e4e522de8aa450e3e4c4fa250"
+    },
+    "reviewed_unit_data_review": {
+      "path": ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+      "sha256": "53c6aea78424c8e84961672111869242e33d1519fb5fb28ac0715c769f969ad5"
+    },
+    "reviewed_production_comparison_report": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+      "sha256": "a92fa8073e2e8398c38437ed9ec09d9931cece6af6a70b9ab30b4df54f071e34"
+    },
+    "reviewed_production_comparison_command": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+      "sha256": "013596cf273d3e0d951d679da40dea5c0db98129d759f864765be3f96c6ab74f"
+    },
+    "reviewed_production_matrix": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+      "sha256": "2bf02cf98a8d6681e52b9802faa13195b4250839e1449ca89d7bdfdfd5185f0c"
+    },
+    "reviewed_Rust_CLI_build": {
+      "path": ".runtime/porting/ZON-01/rust-final-cli-build-02/build-receipt.json",
+      "sha256": "649c7b2e293003b52b485b2b8ee7fe54a7210a5928bea6ac864219ed3b7df563"
+    },
+    "reviewed_Rust_CLI_binary": {
+      "path": ".runtime/porting/ZON-01/rust-final-cli-build-02/eplus-rs.exe",
+      "sha256": "e6c1f6d8f81642f455834359c99828978aca694ee09b43d3647a1f72a0720c36"
+    },
+    "reviewed_production_reader_static_review": {
+      "path": ".runtime/porting/ZON-01/independent-production-reader-review-01/review.json",
+      "sha256": "d6261cf8aa5b6762f4beabc3f8de14b83a25abc97031349f3802a6d1c11e1485"
+    }
+  },
+  "source_archive_precision": {
+    "source_count": 3656,
+    "exact_byte_matches": 3655,
+    "line_ending_only_differences": [
+      {
+        "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+        "archive": {
+          "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+          "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+        },
+        "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+        "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+        "difference": "Working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+      }
+    ],
+    "all_other_content_exact": true,
+    "scope": "Archived available Rust-source inventory versus committed blobs; not compiler file-selection evidence"
+  },
+  "scope": "Actual final02 unit selected state and bounded three Full/three Summary commands, separately independently reviewed.",
+  "limits": [
+    "Exact selected unit source anchors support constructor/reset and actual dynamic OutHumRat copy/retention checks; no new formula is rebuilt.",
+    "Only actual initializer projection and the first stored solver entry are paired. Later history/correction/retry/Space/sibling/CTF/SYS remain unpaired.",
+    "Native ordinary callbacks are independently reviewed source-stage witnesses, not pristine member returns or cross-engine Rust weather/calendar/warmup samples.",
+    "Rust own IDs/phases/caller/entry counts are observed. No native numeric-ID identity or member-call counts are invented.",
+    "Actual enclosing context is copied by the reviewed observer and reported without cross-engine context/phase alignment; solver entry may be warmup or context-null.",
+    "Summary checks observer absence and ordinary output equality only; it does not directly observe initialization fields.",
+    "AirPowerCap W/K reset ownership is observed, not J/K capacity parity, later load-output parity or annual/B72 physics."
+  ]
+}

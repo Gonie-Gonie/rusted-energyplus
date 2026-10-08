@@ -1,0 +1,79 @@
+{
+  "schema": "native-reference-efficiency-audit-compact.v1",
+  "status": "read-only-audit-complete-no-derivative-created",
+  "written_utc": "2026-10-08T01:21:41.828031+00:00",
+  "raw_audit": {
+    "path": ".runtime/porting/native-efficiency-audit-01/audit.json",
+    "sha256": "5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f"
+  },
+  "recommendation": {
+    "path": ".runtime/porting/native-efficiency-audit-01/recommendation.md",
+    "sha256": "a2edcdf41393f03bc2ef25ec605435c36589638ec6a879e5ebadba6ecc5d3e3a"
+  },
+  "genuine_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "audited_existing_ZON_driver_build": {
+    "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+    "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+  },
+  "actual_binary_evidence": {
+    "API": {
+      "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+      "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33",
+      "bytes": 1305150896
+    },
+    "passive_observer": {
+      "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference.exe",
+      "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+    },
+    "direct_helper": {
+      "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+      "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+    }
+  },
+  "observed_sizes_bytes": {
+    "API": 1305150896,
+    "passive_observer": 9941020,
+    "direct_helper": 1296118832,
+    "helper_debug_sections": 1129179136,
+    "helper_nondebug_sections": 70770176
+  },
+  "actual_API_named_export_count": 168,
+  "selected_private_symbol_exports": {
+    "beginEnvironmentInit": [],
+    "InitZoneAirSetPoints": [],
+    "EnergyPlusData_ctor": [],
+    "EnergyPlusData_dtor": [],
+    "CalculateZoneVolume": []
+  },
+  "DLL_limit": "Observed API exports do not supply currently required private C++ entry points; public-API passive observers remain small. No relink or general private-ABI availability is assumed.",
+  "authenticated_unexecuted_strip_tool": {
+    "installed_binary": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+      "sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+    },
+    "size_bytes": 1318414,
+    "publisher_archive": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64ucrt-11.0.1-r3.zip",
+      "sha256": "4889a18dd97d601c1d6c2f141865469979472846751e444840532257dfac44b6"
+    },
+    "archive_member": "mingw64/bin/strip.exe",
+    "byte_equal_to_verified_publisher_archive_member": true,
+    "tool_executed": false
+  },
+  "future_candidate_only": "Keep genuine source/compiler/ABI/FP compile-link settings; record a distinct debug-only execution derivative, before/after nondebug section hashes/layout and actual strip command receipt before execution.",
+  "retention_limit": "Avoiding a second full per-card execution archive can save debug bulk while keeping existing Products hash guards. Keeping both full archive and derivative saves no disk. No current Products/core/API/archive deletion or mutation is proposed.",
+  "observed_stripped_size": null,
+  "derivative_created": false,
+  "strip_or_relink_or_engine_executed": false,
+  "existing_frozen_native_proofs_changed": false,
+  "new_card_science_started": false,
+  "metadata_writer": {
+    "path": ".runtime/porting/native-efficiency-audit-compact-01/write_compact.py",
+    "sha256": "a760101134354edf08de6d73787910eee8e5f903b25e3cab8a6662d7ebe8683b"
+  },
+  "engines_Cargo_Git_or_comparers_executed_by_writer": false,
+  "gates_updated": false
+}

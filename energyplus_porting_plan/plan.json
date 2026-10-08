@@ -6374,7 +6374,7 @@
       "title": "존 공기 상태 초기화",
       "source": "ZoneTempPredictorCorrector.cc",
       "symbols": "ZoneSpaceHeatBalanceData::beginEnvironmentInit",
-      "block": "현재 범위에서 사용하는 MAT/ZT/ZTAV·습공기비·zone/system 이력 초기화.",
+      "block": "선택한 생성자 기본값·bulk 현재 W seed·member 14개 쓰기·guard와 기존 solver 초기화 투영을 구분한다. MAT/ZT/ZTAV와 현재 W를 member reset으로 취급하지 않는다.",
       "dependencies": [
         "CON-01",
         "GEO-03"
@@ -6382,21 +6382,852 @@
       "inputs": "환경 시작, 초기 상태정책",
       "outputs": "존 공기온도·습공기비와 history의 초기값",
       "timing": "BeginEnvrn",
-      "unit_tests": "첫환경/새환경 reset; 초기값 일관성",
-      "integration_test": "SUR-01 및 warmup driver와 독립 초기화 시점 비교",
-      "rust_candidate": "heat_balance/initialization.rs; state.rs",
+      "unit_tests": "8 sequence/34 operation: 생성자·bulk·bare·guard skip/rearm·4-slot canary·subfloor/−0 exact assignment; 5528/0",
+      "integration_test": "A24/A72/BBoth24 실제 초기화 24-field 관측→legacy 19값 저장→공통 solver 첫 진입 exact handoff; native 단계·weather/warmup 정렬은 별도 미대응",
+      "rust_candidate": "heat_balance/zone_air_initialization.rs; air_manager.rs; state.rs; timestep.rs",
       "assessment": "기존 구현 보완",
       "companion": "ZoneTempPredictorCorrector.hh::ZoneSpaceHeatBalanceData의 해당 필드만",
       "excludes": "CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생략 분기가 실행되지 않는다는 근거를 남긴다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
-      "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "source_boundary_note": "실행 전 동결한 원본 11파일/36구간과 생성자·bulk·bare member·genuine whole guard를 분리한다. 원본 7개 CON callback은 실제 단계 문맥이며 순수 member 반환값이 아니다.",
+      "numeric_policy": "선택한 scalar/6×4 array·유지 canary·signed zero·입력 bits·flag·순서·실제 solver 초기화 인계를 atol=0/rtol=0 exact IEEE로 판정한다. 외부 weather/calendar/warmup 생산자·단계 동등성은 미대응이며 이를 감추는 허용치를 쓰지 않는다.",
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+            "symbol": "ZoneSpaceHeatBalanceData",
+            "role": "selected-constructor-defaults-and-four-slot-history-declarations",
+            "helpers": [],
+            "range_sha256": "113869602c09c5ae778393c5d40f95622ecccaf8d589b802250cab1e0fcd34ae",
+            "start_line": 102,
+            "end_line": 145
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+            "symbol": "ZoneSpaceHeatBalanceData",
+            "role": "selected-load-humidity-powercap-defaults-and-member-declaration",
+            "helpers": [],
+            "range_sha256": "d716d4710c810e9445c87227a6baba563a12aff1e9394335f247b24b9369118c",
+            "start_line": 204,
+            "end_line": 213
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+            "symbol": "ZoneHeatBalanceData",
+            "role": "genuine-concrete-owner-derived-from-selected-base",
+            "helpers": [],
+            "range_sha256": "ccb8fe305740a95fcb4a3ffa3c3e346ba86f17508ddf72ce10be7bae0393f2e3",
+            "start_line": 252,
+            "end_line": 260
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+            "symbol": "ManageZoneAirUpdates",
+            "role": "public-caller-and-guard-declarations",
+            "helpers": [],
+            "range_sha256": "4e6ad0a1b60d073f0c553a0b601345baec68fa4a815a5856a613d3ccc51d2da9",
+            "start_line": 264,
+            "end_line": 276
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+            "symbol": "MyEnvrnFlag",
+            "role": "module-one-time-environment-guard-default-and-owner-container",
+            "helpers": [],
+            "range_sha256": "bc61949a4ee1ff0c4b901141d7aa2595f1cb46c3d2f7185a210ebf09b9fd9f4a",
+            "start_line": 408,
+            "end_line": 431
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "ManageZoneAirUpdates",
+            "role": "normal-call-of-InitZoneAirSetPoints-before-dispatch",
+            "helpers": [
+              "InitZoneAirSetPoints"
+            ],
+            "range_sha256": "2e5b4c866ad96f44ee0c62a9a2868f4d6da209304a05d78249b1448db17aa3d9",
+            "start_line": 195,
+            "end_line": 230
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "InitZoneAirSetPoints",
+            "role": "genuine-whole-guard-caller-context",
+            "helpers": [],
+            "range_sha256": "d545f485230949bbc3185152ef7cac3e039c54f0ec349969eb6b2c7082625194",
+            "start_line": 2350,
+            "end_line": 2376
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "InitZoneAirSetPoints",
+            "role": "source-required-array-preparation-context-one-time-branch-inactive-in-helper",
+            "helpers": [],
+            "range_sha256": "a83ad33494d9dd128a7258035d1b7f518f126d1d18e9e6c2cbea315388d24414",
+            "start_line": 2378,
+            "end_line": 2420
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "InitZoneAirSetPoints",
+            "role": "whole-genuine-environment-guard-owner-calls-sibling-resets-and-rearm",
+            "helpers": [
+              "ZoneSpaceHeatBalanceData::beginEnvironmentInit"
+            ],
+            "range_sha256": "ee307a6f88f4f37e35b5bdeee15ce69bd0da4329c84f19aa018699abd3a4b73b",
+            "start_line": 2618,
+            "end_line": 2670
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "MyDayFlag",
+            "role": "day-and-zero-controller-branches-source-only",
+            "helpers": [],
+            "range_sha256": "0685586aae6796ba147a94e97d75c583b08a67cdcd105ae494a28d68b239ee0f",
+            "start_line": 2672,
+            "end_line": 2684,
+            "contract_symbol": "InitZoneAirSetPoints"
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "ErrorsFound",
+            "role": "helper-errors-and-equipment-tail-prerequisites-inactive",
+            "helpers": [],
+            "range_sha256": "a7680fe17dd3ce1f4e5c7c9dee2daa662ca031661d9d098c5ecb69f150dd0647",
+            "start_line": 2809,
+            "end_line": 2816,
+            "contract_symbol": "InitZoneAirSetPoints"
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "ZoneSpaceHeatBalanceData::beginEnvironmentInit",
+            "role": "primary-four-array-and-ten-scalar-write-owner",
+            "helpers": [],
+            "range_sha256": "2b633ddef807e1c64225c5744caa89a4117b853e654c44f66975dd2d4357ea10",
+            "start_line": 2818,
+            "end_line": 2836
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "ZTM",
+            "role": "later-consumer-semantic-map-only-not-ZON04-closure",
+            "helpers": [],
+            "range_sha256": "2cff9f5cf717c98a494c86e20adb261be6cb1bf8469c5db2113b985dbebcfecf",
+            "start_line": 3893,
+            "end_line": 3900,
+            "contract_symbol": "correctAirTemp"
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "XMAT",
+            "role": "later-XMAT-WPrev-history-semantic-map-only-not-ZON05-closure",
+            "helpers": [],
+            "range_sha256": "df378c8567a748dd26f81c4c4fc33b2b6a00c0988d6d0bd972c4c13ce03abea6",
+            "start_line": 4194,
+            "end_line": 4205,
+            "contract_symbol": "pushZoneTimestepHistories"
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "pushSystemTimestepHistory",
+            "role": "later-DSXMAT-DSW-history-semantic-map-only-not-ZON05-closure",
+            "helpers": [],
+            "range_sha256": "d0e30b8799b5ec5e27ad3fbfb77d04163d477ab3e1b3f6165b1414c0611f5d26",
+            "start_line": 4297,
+            "end_line": 4305,
+            "contract_symbol": "pushSystemTimestepHistories"
+          },
+          {
+            "path": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+            "symbol": "ZTM",
+            "role": "later-working-buffer-selection-map-only",
+            "helpers": [],
+            "range_sha256": "8775639c79718ccac36238cd04afd0efa2fcb55957b2399c070991c75deaba70",
+            "start_line": 6825,
+            "end_line": 6832,
+            "contract_symbol": "predictSystemLoad"
+          },
+          {
+            "path": "src/EnergyPlus/DataHeatBalance.hh",
+            "symbol": "ZoneInitialTemp",
+            "role": "source-temperature-default-constant",
+            "helpers": [],
+            "range_sha256": "fa35d318f54a03fa4180cc67a85dd8ed01ae4fcde79ce8b7323c57a6e5e7bc01",
+            "start_line": 426,
+            "end_line": 431
+          },
+          {
+            "path": "src/EnergyPlus/DataHeatBalance.hh",
+            "symbol": "doSpaceHeatBalance",
+            "role": "space-heat-balance-disabled-source-branch-declaration",
+            "helpers": [],
+            "range_sha256": "ccc35b3fe14c7419f84836278ecf0c9f76a03af2a960d5cd5c41eb4d0cef331a",
+            "start_line": 1833,
+            "end_line": 1838
+          },
+          {
+            "path": "src/EnergyPlus/DataEnvironment.hh",
+            "symbol": "OutHumRat",
+            "role": "external-humidity-input-owner-default",
+            "helpers": [],
+            "range_sha256": "90cc0b583c2f7aca52b5e27b0c9a1bd3b157ec6762ea8b21826025296b8e65fb",
+            "start_line": 126,
+            "end_line": 134
+          },
+          {
+            "path": "src/EnergyPlus/DataGlobals.hh",
+            "symbol": "BeginEnvrnFlag",
+            "role": "actual-environment-and-day-control-declarations",
+            "helpers": [],
+            "range_sha256": "114bee48de661002c32da1d765f8cf757523697bfba78d887b49399e9943b3fc",
+            "start_line": 74,
+            "end_line": 82
+          },
+          {
+            "path": "src/EnergyPlus/DataGlobals.hh",
+            "symbol": "NumOfZones",
+            "role": "genuine-one-zone-and-source-warmup-observation-declarations",
+            "helpers": [],
+            "range_sha256": "c85efa6dcb4644fe6b058a01fbde6fdcb02d0687dc0f93f6a2b30db63e8dc97f",
+            "start_line": 107,
+            "end_line": 115
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            "symbol": "InitSurfaceHeatBalance",
+            "role": "incoming-bulk-reconstruction-guard",
+            "helpers": [
+              "InitThermalAndFluxHistories"
+            ],
+            "range_sha256": "376b2aa8db625d85c4ab44dfbc686885907b32ca44a2051bd78d341562e9e150",
+            "start_line": 378,
+            "end_line": 384
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            "symbol": "InitThermalAndFluxHistories",
+            "role": "incoming-zone-only-constructor-reconstruction-and-current-W-seed-context",
+            "helpers": [],
+            "range_sha256": "e8a9ed80fe167436f91d92bec10b7363b0666e9d62eea02191b41557cd111f29",
+            "start_line": 2208,
+            "end_line": 2239
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            "symbol": "ZoneHeatBalanceData",
+            "role": "byte-exact-zone-only-bulk-fragment",
+            "helpers": [],
+            "range_sha256": "0841ec2b11d0dcf592b0bc1d3e16f1d0a64e095d29df1d7d2377f4822486b770",
+            "start_line": 2231,
+            "end_line": 2239,
+            "contract_symbol": "InitThermalAndFluxHistories"
+          },
+          {
+            "path": "src/EnergyPlus/HeatBalanceManager.cc",
+            "symbol": "InitHeatBalance",
+            "role": "after-init-HB-callback-precedes-surface-bulk-initialization",
+            "helpers": [],
+            "range_sha256": "95d019deb4fbc877bc4b112e8f319c71047153903879d8024f3f400d54d007f8",
+            "start_line": 191,
+            "end_line": 210,
+            "contract_symbol": "ManageHeatBalance"
+          },
+          {
+            "path": "src/EnergyPlus/HVACManager.cc",
+            "symbol": "ZTAV",
+            "role": "pre-predictor-current-temperature-and-average-clears-stage-context",
+            "helpers": [],
+            "range_sha256": "e0f87be59a40ba50ec24f043b1eca35f26c22161d089ad296b8fd43f4f922566",
+            "start_line": 165,
+            "end_line": 176,
+            "contract_symbol": "ManageHVAC"
+          },
+          {
+            "path": "src/EnergyPlus/HVACManager.cc",
+            "symbol": "ManageZoneAirUpdates",
+            "role": "actual-system-context-and-before-predictor-callback-before-owner-call",
+            "helpers": [
+              "ManageZoneAirUpdates"
+            ],
+            "range_sha256": "0bb3dc43fd5bb6371fcb20118a4937a31f2b63c05aaea7fb3bf6b0c6aee356f3",
+            "start_line": 194,
+            "end_line": 229,
+            "contract_symbol": "ManageHVAC"
+          },
+          {
+            "path": "src/EnergyPlus/HVACManager.cc",
+            "symbol": "ManageZoneAirUpdates",
+            "role": "PredictStep-before-after-predictor-observer",
+            "helpers": [
+              "ManageZoneAirUpdates"
+            ],
+            "range_sha256": "e5d7e7bd9977f7cf010838e31bee948a5057ba1d1f19de3f39ef20e5e8ca90b9",
+            "start_line": 262,
+            "end_line": 267,
+            "contract_symbol": "ManageHVAC"
+          },
+          {
+            "path": "src/EnergyPlus/HVACManager.cc",
+            "symbol": "BeforeHVACManagers",
+            "role": "real-after-predictor-before-HVAC-callback-context",
+            "helpers": [],
+            "range_sha256": "5acbc65b4b736de71cea1d6149dff489547ff9653b6677af6d423453a063adf8",
+            "start_line": 840,
+            "end_line": 846,
+            "contract_symbol": "SimHVAC"
+          },
+          {
+            "path": "src/EnergyPlus/DataZoneEnergyDemands.cc",
+            "symbol": "ZoneSystemSensibleDemand::beginEnvironmentInit",
+            "role": "genuine-whole-guard-sibling-reset-source-only",
+            "helpers": [],
+            "range_sha256": "45ed8cda46a41c02447dd6b9492b0f0a6a4c7155e02a818d2ca249b3dbcf7e05",
+            "start_line": 57,
+            "end_line": 75
+          },
+          {
+            "path": "src/EnergyPlus/DataZoneEnergyDemands.cc",
+            "symbol": "ZoneSystemMoistureDemand::beginEnvironmentInit",
+            "role": "genuine-whole-guard-sibling-reset-source-only",
+            "helpers": [],
+            "range_sha256": "7a788d434b1adf98f2d2dd8488877873ccbd21f4ae9837b04f8150a42067bcaa",
+            "start_line": 77,
+            "end_line": 95
+          },
+          {
+            "path": "src/EnergyPlus/api/runtime.cc",
+            "symbol": "callbackBeginZoneTimeStepAfterInitHeatBalance",
+            "role": "actual-readonly-after-init-HB-callback-registration",
+            "helpers": [],
+            "range_sha256": "430b593c1785d010866edf91be64f06a85df6bd438e4b14b05afd9aec3c7116f",
+            "start_line": 199,
+            "end_line": 209
+          },
+          {
+            "path": "src/EnergyPlus/api/runtime.cc",
+            "symbol": "callbackBeginTimeStepBeforePredictor",
+            "role": "actual-readonly-pre-owner-callback-registration",
+            "helpers": [],
+            "range_sha256": "35621989c5d76ff162b477e700c42753e23a449bccb652304b0677bf13691f4f",
+            "start_line": 211,
+            "end_line": 221
+          },
+          {
+            "path": "src/EnergyPlus/api/runtime.cc",
+            "symbol": "callbackAfterPredictorBeforeHVACManagers",
+            "role": "actual-readonly-evolved-after-predictor-callback-registration",
+            "helpers": [],
+            "range_sha256": "78dfd55f09c4e5b92324e48567565685ba23cf19c4232d41ccfe06e74d50d098",
+            "start_line": 223,
+            "end_line": 233
+          },
+          {
+            "path": "src/EnergyPlus/api/runtime.h",
+            "symbol": "callbackBeginZoneTimeStepAfterInitHeatBalance",
+            "role": "public-pre-HVAC-stage-callback-declarations",
+            "helpers": [],
+            "range_sha256": "9bedd3f66ef3dbc195e9872eee3ad282cb216320a7ba0a0ea6a63c332ed1799a",
+            "start_line": 249,
+            "end_line": 269
+          },
+          {
+            "path": "src/EnergyPlus/api/runtime.h",
+            "symbol": "callbackAfterPredictorBeforeHVACManagers",
+            "role": "public-evolved-after-predictor-callback-declaration",
+            "helpers": [],
+            "range_sha256": "950659219fce9e95cfe4f0ac357e67eacc3d8028b708f04188db44912fc5c992",
+            "start_line": 280,
+            "end_line": 289
+          }
+        ],
+        "complete_source_packet": {
+          "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+          "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+        },
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+            "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+            "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+            "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+            "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+            "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+            "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+            "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+            "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": "energyplus_porting_plan/evidence/ZON-01/original-first.json",
+              "sha256": "e583bfe36c47729485b104e15ddcbe8aebb590555db5cbf1ca9ea24ab18e979c"
+            },
+            {
+              "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-reference.json",
+              "sha256": "e677a24b59ddb47bbde2eecd76cdce4e99a3ffebd8ca63576c4e60a938c20d59"
+            },
+            {
+              "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-results.json",
+              "sha256": "4bb8e86d734868bc7ac80e1bb931bcfe9c1c79821262d32fcef846027e848112"
+            },
+            {
+              "path": ".runtime/porting/ZON-01/original-native-first-01/matrix.json",
+              "sha256": "8672ce9c0a674efe1c8d46b715b2d0024f9d7004cec3d51cb8edabbfc76c0b42"
+            },
+            {
+              "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+              "sha256": "a396421d1358f5150482c2823f773b147eddf6f7ce488d3f698fe7aeb03f3361"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python -X utf8 -B .runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py --original-helper .runtime/porting/ZON-01/original-helper-first-01/helper-reference.json --native-matrix .runtime/porting/ZON-01/original-native-first-01/matrix.json --original-review .runtime/porting/ZON-01/independent-original-data-review-01/review.json --rust .runtime/porting/ZON-01/rust-final-unit-first-02/execution.json --output .runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+            "commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+                "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+                "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+                "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+              },
+              {
+                "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+                "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/original-first.json",
+                "sha256": "e583bfe36c47729485b104e15ddcbe8aebb590555db5cbf1ca9ea24ab18e979c"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+                "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/review.json",
+                "sha256": "139dea312a343324048a20241afac564cc859d14ffc57dd7c8152e43d9b8a3f7"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/independent-lint-delta-review-01/review.json",
+                "sha256": "64fe1844fc2b15c6ee9ac618261fbb4f1240316e4e522de8aa450e3e4c4fa250"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/source-amendment.json",
+                "sha256": "a2972239068c6456dedb61d58c6e714ebc6ea451db54ef6631a2ba66af3a1303"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+                "sha256": "b9cb4cfa1e103067e693820897fa45b52d7e1bc8e4efa40782204ff561356651"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/independent-final-review.json",
+                "sha256": "f6aebd4ba8c82fd4cabe150dcbc29aa5f7c66b8d708dad9896df1ec4fc845623"
+              }
+            ],
+            "scope": "Frozen 11 files/36 ranges and input-only exact assignment packet; original-first/state ownership, 12 scoped Rust files, actual facade/handoff and exact lint delta independently reviewed."
+          },
+          "unit_gate": {
+            "command": "python -X utf8 -B .runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py --original-helper .runtime/porting/ZON-01/original-helper-first-01/helper-reference.json --native-matrix .runtime/porting/ZON-01/original-native-first-01/matrix.json --original-review .runtime/porting/ZON-01/independent-original-data-review-01/review.json --rust .runtime/porting/ZON-01/rust-final-unit-first-02/execution.json --output .runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+            "commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/final-unit-comparison.json",
+                "sha256": "e069e2d9f47d8fa62c25a303b6db4c82df3640b890583bd64f4732527ef3d3f2"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+                "sha256": "b9cb4cfa1e103067e693820897fa45b52d7e1bc8e4efa40782204ff561356651"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+                "sha256": "53c6aea78424c8e84961672111869242e33d1519fb5fb28ac0715c769f969ad5"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/independent-final-review.json",
+                "sha256": "f6aebd4ba8c82fd4cabe150dcbc29aa5f7c66b8d708dad9896df1ec4fc845623"
+              }
+            ],
+            "scope": "8 sequences/34 ordered operations; 24 selected fields (18 scalars, 6 four-slot arrays), constructor/bulk/bare/guard phases; 5528 checks/0 mismatches, exact IEEE/flags/order."
+          },
+          "integration_gate": {
+            "command": "python -X utf8 -B tools/porting/check_zon01_production.py --rust .runtime/porting/ZON-01/rust-final-production-02/matrix.json --unit-report .runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json --unit-command .runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json --unit-review .runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json --output .runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+            "commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/production-comparison.json",
+                "sha256": "f197aa23cf515c5fa7f08ca375e94634034f3f738fd03e4e185ac5fce6d73108"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+                "sha256": "013596cf273d3e0d951d679da40dea5c0db98129d759f864765be3f96c6ab74f"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+                "sha256": "2bf02cf98a8d6681e52b9802faa13195b4250839e1449ca89d7bdfdfd5185f0c"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/independent-final-review.json",
+                "sha256": "f6aebd4ba8c82fd4cabe150dcbc29aa5f7c66b8d708dad9896df1ec4fc845623"
+              }
+            ],
+            "scope": "3 actual Full initializer/first-index-zero-entry observations; 504 constructor/bulk/caller-preparation/member anchor bit pairs, 114 real stored/entry pairs; 480 ordered physical clock intervals, no omissions."
+          },
+          "production_gate": {
+            "command": "python -X utf8 -B tools/porting/check_zon01_production.py --rust .runtime/porting/ZON-01/rust-final-production-02/matrix.json --unit-report .runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json --unit-command .runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json --unit-review .runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json --output .runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+            "commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/production-comparison.json",
+                "sha256": "f197aa23cf515c5fa7f08ca375e94634034f3f738fd03e4e185ac5fce6d73108"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/actual-commands.json",
+                "sha256": "9abaa42fee08869fbe9501565e4c263f31cc6487828e2d263fbd4ed99e8e9176"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/source-amendment.json",
+                "sha256": "a2972239068c6456dedb61d58c6e714ebc6ea451db54ef6631a2ba66af3a1303"
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/ZON-01/independent-final-review.json",
+                "sha256": "f6aebd4ba8c82fd4cabe150dcbc29aa5f7c66b8d708dad9896df1ec4fc845623"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+                "sha256": "013596cf273d3e0d951d679da40dea5c0db98129d759f864765be3f96c6ab74f"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+                "sha256": "2bf02cf98a8d6681e52b9802faa13195b4250839e1449ca89d7bdfdfd5185f0c"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/checks-workspace-test-02/receipt.json",
+                "sha256": "fbce59743d3ce7872447a1c46025400bac1de92e87f2f797536d7ba6a61389e4"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/checks-clippy-02/receipt.json",
+                "sha256": "23403214f98854f6b496930d9c784cd6b81acfb273571e16db926b05165dbe77"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/checks-source-quality-02/receipt.json",
+                "sha256": "15dea0488d2934bba1b37501a1302c69c5392c62e2330b2d8f30d0a85e6b3994"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-02/receipt.json",
+                "sha256": "7c2040a21aa3036c7a4c73d69a1dbbea0b9595c409f3d55b6272e4967ca7a798"
+              },
+              {
+                "path": ".runtime/porting/ZON-01/checks-scoped-format-02/receipt.json",
+                "sha256": "1b605cfd5bdc9216e13e8b3baff1ed1579220cb345afa098df0413ffe1a61d90"
+              }
+            ],
+            "scope": "6 successful normal A24/A72/BBoth24 Full/Summary CLI commands; own weather inputs, no oracle/fixture answers; ordinary-output invariance/Full-only observer; all5 required same-source checks succeeded."
+          }
+        },
+        "production": {
+          "rust_entrypoint": ".runtime/porting/ZON-01/rust-final-cli-build-02/eplus-rs.exe run <frozen-IDF> --weather <pinned-EPW> --output-dir <fresh-directory> --mode compatibility --partial deny --trace-level full|summary --porting-scope A|B",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "completed_actual_cases": [
+            "A-24H",
+            "A-72H",
+            "B-BOTH-24H"
+          ],
+          "actual_successful_normal_CLI_commands": 6,
+          "actual_Full_initializer_observations": 3,
+          "actual_zero_index_entry_observations": 3,
+          "actual_physical_clock_intervals": 480,
+          "selected_transient_owner_fields": 24,
+          "stored_projection": {
+            "scalars": 4,
+            "three_slot_arrays": 4,
+            "diagnostic_scalars": 3,
+            "scalar_values": 19
+          },
+          "persistent_environment_guard": true,
+          "selected_24_fields_retained_across_later_steps_claimed": false,
+          "Summary_direct_initialization_state_claim": false,
+          "B_72H_annual_or_per_limit_Rust_physics_renewed": false
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+            "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+          },
+          "report": {
+            "path": "energyplus_porting_plan/evidence/ZON-01/production-comparison.json",
+            "sha256": "f197aa23cf515c5fa7f08ca375e94634034f3f738fd03e4e185ac5fce6d73108"
+          },
+          "unit_report": {
+            "path": "energyplus_porting_plan/evidence/ZON-01/final-unit-comparison.json",
+            "sha256": "e069e2d9f47d8fa62c25a303b6db4c82df3640b890583bd64f4732527ef3d3f2"
+          }
+        },
+        "scope_metrics": {
+          "unit": {
+            "sequences": 8,
+            "operations": 34,
+            "selected_fields": 24,
+            "arrays": 6,
+            "slots_per_array": 4,
+            "comparison_count": 5528,
+            "mismatch_count": 0,
+            "snapshot_pairs": 126,
+            "scalar_bit_pairs": 5082,
+            "guard_flag_pairs": 252,
+            "guard_eligibility_pairs": 34,
+            "wrapper_count_pairs": 34
+          },
+          "production": {
+            "checks": 690,
+            "mismatches": 0,
+            "constructor_bulk_preparation_member_anchor_bit_pairs": 504,
+            "actual_stored_first_entry_bit_pairs": 114,
+            "physical_clock_intervals": 480,
+            "omissions": 0
+          },
+          "numeric_error_metrics": "Not recomputed: exact assignment/bit-state policy with zero mismatches."
+        },
+        "provenance": {
+          "scientific_review": {
+            "path": "energyplus_porting_plan/evidence/ZON-01/independent-final-review.json",
+            "sha256": "f6aebd4ba8c82fd4cabe150dcbc29aa5f7c66b8d708dad9896df1ec4fc845623"
+          },
+          "implementation_commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+          "crates_tree": "e94b3224a4f6aeb5e7b2b993cfe4587b6585322c",
+          "canonical_scoped_Rust_source_file_count": 12,
+          "source_amendment": {
+            "path": "energyplus_porting_plan/evidence/ZON-01/source-amendment.json",
+            "sha256": "a2972239068c6456dedb61d58c6e714ebc6ea451db54ef6631a2ba66af3a1303"
+          },
+          "static_lineage": {
+            "owner": {
+              "path": ".runtime/porting/ZON-01/independent-canonical-owner-source-review-01/review.json",
+              "sha256": "524c67c9d9622e716698c2c2f4c984f5a3e2b280ad8fa0945c21f77ff768ad42"
+            },
+            "facade": {
+              "path": ".runtime/porting/ZON-01/independent-canonical-facade-trace-review-01/review.json",
+              "sha256": "139dea312a343324048a20241afac564cc859d14ffc57dd7c8152e43d9b8a3f7"
+            },
+            "unit_reader": {
+              "path": ".runtime/porting/ZON-01/independent-canonical-unit-reader-review-01/review.json",
+              "sha256": "6d276fea62f05cb16a0669f67675a4b91a29b0e1b9ca2acb4794923f1e2737bf"
+            },
+            "production_reader": {
+              "path": ".runtime/porting/ZON-01/independent-production-reader-review-01/review.json",
+              "sha256": "d6261cf8aa5b6762f4beabc3f8de14b83a25abc97031349f3802a6d1c11e1485"
+            },
+            "lint_delta": {
+              "path": ".runtime/porting/ZON-01/independent-lint-delta-review-01/review.json",
+              "sha256": "64fe1844fc2b15c6ee9ac618261fbb4f1240316e4e522de8aa450e3e4c4fa250"
+            }
+          },
+          "source_archive_precision": {
+            "source_count": 3656,
+            "exact_byte_matches": 3655,
+            "line_ending_only_differences": [
+              {
+                "historical_path": "crates/ep_runtime/src/ideal_loads/binding/scheduled_output.rs",
+                "archive": {
+                  "path": ".runtime/porting/source-objects/8c/8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148",
+                  "sha256": "8c554ec09415548122ea6feae459364c22710b8740ab61b0e75f62e44a4af148"
+                },
+                "git_blob": "3c131c25f457c4a33f78128991933b528580f99a",
+                "git_blob_sha256": "7a48a7758b121a053c2048cb7cdaa3b01c8eb533189159017641215677ad2f85",
+                "difference": "Working-tree CRLF bytes; exact LF-normalized equality with committed blob"
+              }
+            ],
+            "all_other_content_exact": true,
+            "scope": "Archived available Rust-source inventory versus committed blobs; not compiler file-selection evidence"
+          },
+          "available_source_inventory_scope": "Archived available Rust files versus Git blobs; not compiler file-selection evidence.",
+          "preserved_history": [
+            {
+              "path": "energyplus_porting_plan/evidence/ZON-01/independent-baseline-review.json",
+              "sha256": "e523e605d89b2ded8b8508744ca5636a43c0e5a71965b9b12bc45f2d2aecb34f"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/ZON-01/unit-final.json",
+              "sha256": "3c8a1694f17bdef2f000fb246051b4a9e0ae647f2b870fa46e23b2c358a1663c"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/ZON-01/independent-canonical-source-review.json",
+              "sha256": "f91e2d3e4d2d23eb16d6644ee1180796b18857bde86a26c238fc746f83bf9695"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/ZON-01/checks-before-lint-cleanup.json",
+              "sha256": "242b252230133d34cd56e8278bc3bc583b9a8d3a4da47ed4f67bb056a1368b5f"
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/ZON-01/reader-invocation-failure.json",
+              "sha256": "1669e401095dbe7fa15dcc9a3e4d79438a9ff83065c3a53f604c2712dc205a0d"
+            }
+          ],
+          "independent_review_metadata_selector_history": {
+            "selector_amendment": {
+              "path": ".runtime/porting/ZON-01/independent-final-reader-metadata-fix-01/amendment.json",
+              "sha256": "f68365421e19269bfbf562f46d8bc0b6ddd1dc17300914d2aa6dec04270106d4"
+            },
+            "first_reader_failure_output": {
+              "path": ".runtime/porting/ZON-01/independent-final-reader-metadata-fix-01/first-reader-tool-output.log",
+              "sha256": "fa8a415aa8e7bb2f0465bedebe92eb0caa1caba13f9aaa4893fb8a9a25d17cd5"
+            },
+            "preserved_successful_review02": {
+              "path": ".runtime/porting/ZON-01/independent-final-data-review-02/review.json",
+              "sha256": "8ca5a2fbacb1a1689d9909be9051b813e4c6430f1189b7745a7fa4334bb8bab1"
+            },
+            "output_path_only_amendment03": {
+              "path": ".runtime/porting/ZON-01/independent-final-review-output-amendment-03/amendment.json",
+              "sha256": "c64d506861d35e1a55a5556544c56852f3d8627bc02db9aa6cb8d680038a3d3b"
+            },
+            "authoritative_review03": {
+              "path": ".runtime/porting/ZON-01/independent-final-data-review-03/review.json",
+              "sha256": "7bbdb0d0611cfa04a0422c14586524ce33c4e8067bbbb529be1f97f3b3fc3e22"
+            },
+            "scope": "Independent metadata reader initially assumed an absent workspace --all-targets flag. Exact selector correction only; first traceback and successful02 retained. c64d is output-path-only amendment, not a separate execution receipt; actual03 argv/time come from raw review03."
+          },
+          "closure_plan_range_label_projection": {
+            "actual_first_metadata_check_failure": {
+              "path": ".runtime/porting/ZON-01/closure-plan-check-01/receipt.json",
+              "sha256": "ac03e24997a66f348e5cb1998a5d209676edcd4b5a5019904570b62eb93d29df"
+            },
+            "label_projection_amendment": {
+              "path": ".runtime/porting/ZON-01/closure-plan-symbol-amendment-01/amendment.json",
+              "sha256": "2480c7b8010341b1c918243bd7e351ad6df805643bdd23ec6c975e1b70fa2813"
+            },
+            "actual_identifier_refinement": {
+              "path": ".runtime/porting/ZON-01/closure-plan-symbol-amendment-02/amendment.json",
+              "sha256": "8cbf61747cc149b9a16b6281f1c15516daf2d4843ada243f094089c648f7762b"
+            },
+            "scope": "Only plan projection symbols use actual in-slice C++ functions/state/member fields. Original enclosing contract_symbol, all36 exact bounds/hash values and immutable contracts are preserved."
+          }
+        },
+        "implementation_validation": {
+          "actual_commands": {
+            "path": "energyplus_porting_plan/evidence/ZON-01/actual-commands.json",
+            "sha256": "9abaa42fee08869fbe9501565e4c263f31cc6487828e2d263fbd4ed99e8e9176"
+          },
+          "required_checks": {
+            "workspace": {
+              "path": ".runtime/porting/ZON-01/checks-workspace-test-02/receipt.json",
+              "sha256": "fbce59743d3ce7872447a1c46025400bac1de92e87f2f797536d7ba6a61389e4"
+            },
+            "clippy": {
+              "path": ".runtime/porting/ZON-01/checks-clippy-02/receipt.json",
+              "sha256": "23403214f98854f6b496930d9c784cd6b81acfb273571e16db926b05165dbe77"
+            },
+            "source-quality": {
+              "path": ".runtime/porting/ZON-01/checks-source-quality-02/receipt.json",
+              "sha256": "15dea0488d2934bba1b37501a1302c69c5392c62e2330b2d8f30d0a85e6b3994"
+            },
+            "structure": {
+              "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-02/receipt.json",
+              "sha256": "7c2040a21aa3036c7a4c73d69a1dbbea0b9595c409f3d55b6272e4967ca7a798"
+            },
+            "fmt": {
+              "path": ".runtime/porting/ZON-01/checks-scoped-format-02/receipt.json",
+              "sha256": "1b605cfd5bdc9216e13e8b3baff1ed1579220cb345afa098df0413ffe1a61d90"
+            }
+          },
+          "all_five_exit_zero_source_unchanged": true,
+          "workspace_suite_groups": 21,
+          "workspace_passed": 4552,
+          "workspace_failed": 0,
+          "workspace_ignored": 0,
+          "format_scope": "Only air_manager.rs exact lint delta; no whole-workspace format claim."
+        },
+        "limitations": [
+          "Exact selected unit source anchors support constructor/reset and actual dynamic OutHumRat copy/retention checks; no new formula is rebuilt.",
+          "Only actual initializer projection and the first stored solver entry are paired. Later history/correction/retry/Space/sibling/CTF/SYS remain unpaired.",
+          "Native ordinary callbacks are independently reviewed source-stage witnesses, not pristine member returns or cross-engine Rust weather/calendar/warmup samples.",
+          "Rust own IDs/phases/caller/entry counts are observed. No native numeric-ID identity or member-call counts are invented.",
+          "Actual enclosing context is copied by the reviewed observer and reported without cross-engine context/phase alignment; solver entry may be warmup or context-null.",
+          "Summary checks observer absence and ordinary output equality only; it does not directly observe initialization fields.",
+          "AirPowerCap W/K reset ownership is observed, not J/K capacity parity, later load-output parity or annual/B72 physics.",
+          "Selected owner24 fields are transient initialization observations; actual persistent handoff stores19 legacy values and environment guard. Later fourth-slot synchronization is unpaired.",
+          "Original7 CON stage witnesses do not expose pristine member returns or certify Rust external weather/calendar/warmup provider equality.",
+          "Source Space/manager siblings/MRT/comfort/mixing/global counters/IO are unpaired and not exhaustively observed.",
+          "No source AirPowerCap numerical result, ZON02/SUR/CTF/SYS, later correction/retry or whole-engine closure is claimed.",
+          "Frozen baseline/candidate534 science and Clippy101, reader argument failure2 and historical reviews remain immutable; fresh final02 evidence alone binds af3.",
+          "Helper subfloor/negativezero/canary inputs do not widen ordinary CON admission."
+        ]
+      }
     },
     {
       "id": "ZON-02",

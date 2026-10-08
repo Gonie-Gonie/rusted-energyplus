@@ -1,0 +1,863 @@
+{
+  "card": "ZON-01",
+  "written_utc": "2026-10-08T01:39:31.946606+00:00",
+  "implementation_commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+  "crates_tree": "e94b3224a4f6aeb5e7b2b993cfe4587b6585322c",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+    }
+  },
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/ZON-01/final-evidence-writer-02/write_final_evidence.ccd26f106e79.py",
+    "sha256": "ccd26f106e795f51e7ea2b14590a47e1de358b9137ff87360a895f6719ddcceb"
+  },
+  "actual_metadata_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/ZON-01/final-evidence-writer-02/write_final_evidence.ccd26f106e79.py",
+    "--unit-report",
+    ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+    "--unit-command",
+    ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+    "--unit-review",
+    ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+    "--production-report",
+    ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+    "--production-command",
+    ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+    "--production-matrix",
+    ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+    "--final-review",
+    ".runtime/porting/ZON-01/independent-final-data-review-03/review.json",
+    "--implementation-commit",
+    "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+    "--crates-tree",
+    "e94b3224a4f6aeb5e7b2b993cfe4587b6585322c",
+    "--check",
+    "workspace=.runtime/porting/ZON-01/checks-workspace-test-02/receipt.json",
+    "--check",
+    "clippy=.runtime/porting/ZON-01/checks-clippy-02/receipt.json",
+    "--check",
+    "source-quality=.runtime/porting/ZON-01/checks-source-quality-02/receipt.json",
+    "--check",
+    "structure=.runtime/porting/ZON-01/checks-heat-balance-structure-02/receipt.json",
+    "--check",
+    "fmt=.runtime/porting/ZON-01/checks-scoped-format-02/receipt.json",
+    "--output-dir",
+    ".runtime/porting/ZON-01/final-evidence-02",
+    "--write-tracked"
+  ],
+  "writer_executes_engines_Cargo_Git_or_comparers": false,
+  "initializer_RHS_reconstructed": false,
+  "reference_answers_supplied": false,
+  "scientific_gates_updated": false,
+  "metadata_author_limit": "Observer/facade and early reader author transcribes actual independent proof. This writer is not an independent numerical review.",
+  "preserved_candidate534_history": {
+    "unit-final.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/unit-final.json",
+      "sha256": "3c8a1694f17bdef2f000fb246051b4a9e0ae647f2b870fa46e23b2c358a1663c"
+    },
+    "independent-canonical-source-review.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/independent-canonical-source-review.json",
+      "sha256": "f91e2d3e4d2d23eb16d6644ee1180796b18857bde86a26c238fc746f83bf9695"
+    },
+    "checks-before-lint-cleanup.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/checks-before-lint-cleanup.json",
+      "sha256": "242b252230133d34cd56e8278bc3bc583b9a8d3a4da47ed4f67bb056a1368b5f"
+    },
+    "independent-baseline-review.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/independent-baseline-review.json",
+      "sha256": "e523e605d89b2ded8b8508744ca5636a43c0e5a71965b9b12bc45f2d2aecb34f"
+    },
+    "original-first.json": {
+      "path": "energyplus_porting_plan/evidence/ZON-01/original-first.json",
+      "sha256": "e583bfe36c47729485b104e15ddcbe8aebb590555db5cbf1ca9ea24ab18e979c"
+    }
+  },
+  "available_source_inventory_limit": "Available .rs archive inventories are not compiler file-selection proof. Actual Cargo executable emissions are bound separately.",
+  "native_stage_limit": "Seven native callbacks are contextual witnesses, not pristine14 post-state or matched Rust weather/calendar/warmup observations.",
+  "schema": "zon01-actual-commands-evidence.v1",
+  "status": "recorded-final02-proofs-and-required-checks",
+  "comparers": {
+    "unit": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+        "sha256": "b9cb4cfa1e103067e693820897fa45b52d7e1bc8e4efa40782204ff561356651"
+      },
+      "actual_argv": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        ".runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py",
+        "--original-helper",
+        ".runtime/porting/ZON-01/original-helper-first-01/helper-reference.json",
+        "--native-matrix",
+        ".runtime/porting/ZON-01/original-native-first-01/matrix.json",
+        "--original-review",
+        ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+        "--rust",
+        ".runtime/porting/ZON-01/rust-final-unit-first-02/execution.json",
+        "--output",
+        ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:23:56.350997+00:00",
+      "finished_utc": "2026-10-08T01:24:26.413607+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/stdout.log",
+        "sha256": "482b7249a859bd732bb94326133b3917598b0c5910362526e1d3edbea600d873"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    "production": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+        "sha256": "013596cf273d3e0d951d679da40dea5c0db98129d759f864765be3f96c6ab74f"
+      },
+      "actual_argv": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/porting/check_zon01_production.py",
+        "--rust",
+        ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+        "--unit-report",
+        ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+        "--unit-command",
+        ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+        "--unit-review",
+        ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+        "--output",
+        ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:34:56.738786+00:00",
+      "finished_utc": "2026-10-08T01:36:00.355897+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/stdout.log",
+        "sha256": "b98b597f08fa25cc83e6355f8db7e0e6626f5788e4689c05f7a5b55b02e59d98"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    }
+  },
+  "builds": {
+    "unit": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-build-command-02/receipt.json",
+        "sha256": "d1a30a705dffb5277b71445f03f0f8a4730e0e1ce0033a355b86bcee9f244eb4"
+      },
+      "actual_argv": [
+        "cargo",
+        "build",
+        "-p",
+        "ep_runtime",
+        "--example",
+        "zon01_tuples",
+        "-j",
+        "2",
+        "--message-format=json-render-diagnostics"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:21:05.214540+00:00",
+      "finished_utc": "2026-10-08T01:21:50.594920+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-build-command-02/stdout.log",
+        "sha256": "5b001bd6c2a3df39ee03d0b03af38caed6e18deeb397a502a785a69e746c9695"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-unit-build-command-02/stderr.log",
+        "sha256": "3135c665b36987b6677e21b5faa819858bde1bc58fe91779df1fdaeb2d9978e8"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    "CLI": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-cli-build-command-02/receipt.json",
+        "sha256": "42199dbb6b46a105fe028870ffe4eb2ce9667c68c80a913682a6f0711e4bd499"
+      },
+      "actual_argv": [
+        "cargo",
+        "build",
+        "-p",
+        "ep_cli",
+        "--bin",
+        "eplus-rs",
+        "-j",
+        "2",
+        "--message-format=json-render-diagnostics"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:23:29.475184+00:00",
+      "finished_utc": "2026-10-08T01:23:48.446209+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-cli-build-command-02/stdout.log",
+        "sha256": "22418843823dd08c42d791fc3b78fe628f35c020d19cfcd5de1d944124f49ede"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-cli-build-command-02/stderr.log",
+        "sha256": "5182f4abc72c3d89f827dd1909f96ffd22818e95ef199ad2d7eb381b374df45c"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    }
+  },
+  "unit_engine": {
+    "receipt": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-02/command/receipt.json",
+      "sha256": "c74d07a83d348a366dd83c45c08622cc8c4ff6a3fc9a831295e53b30138a449a"
+    },
+    "actual_argv": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-unit-build-02\\zon01_tuples.exe",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\ZON-01\\helper-request.json"
+    ],
+    "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+    "exit_code": 0,
+    "started_utc": "2026-10-08T01:23:30.512821+00:00",
+    "finished_utc": "2026-10-08T01:23:31.744545+00:00",
+    "source_bytes_match_before_and_after": true,
+    "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+      "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+    },
+    "stdout": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-02/command/stdout.log",
+      "sha256": "4d34aa4ac4327eb63b2e335a54a6cccae732e352ea8bda14796709d1dab724c4"
+    },
+    "stderr": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-first-02/command/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actual_recorder": {
+      "historical_path": "tools/porting/record_command.py",
+      "archive": {
+        "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+      }
+    }
+  },
+  "normal_CLI_commands": [
+    {
+      "case_id": "A-24H",
+      "trace_level": "Full",
+      "execution": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/full-execution.json",
+        "sha256": "c1e0d70a36644323b5bd55232624873b64d34010b1c7bfc577e80f9a94aeafa8"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/full/run-summary.json",
+        "sha256": "9321297f3d06ecba70f8db2c9945cd0051d67ee6075419a316111d3da6b761f1"
+      },
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/full-command/receipt.json",
+        "sha256": "4445f0211ef89d954118b8c187c70fc8e639f2eff5dfa2c168a2601b156841c1"
+      },
+      "actual_argv": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-cli-build-02\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-production-02\\A-24H\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:26:16.647095+00:00",
+      "finished_utc": "2026-10-08T01:26:17.574956+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/full-command/stdout.log",
+        "sha256": "9c482fe99a0f868d73c6b02289fa36dd0f1e09ea0cb04bcb3b883fd5f0010d91"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    {
+      "case_id": "A-24H",
+      "trace_level": "Summary",
+      "execution": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/summary-execution.json",
+        "sha256": "4ea3c7a7f91e610fcd29b076fcfcbf9869e36d9292864d2d932001aa00b5d83e"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/summary/run-summary.json",
+        "sha256": "026e115f43f8478e0dffbbf70477be8bc5210bbfc8e95cec7840924dff0f8296"
+      },
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/summary-command/receipt.json",
+        "sha256": "e89e2cb1e46d95894cc68820c2e4235d35ca650b2e88e352d0e4864f14461454"
+      },
+      "actual_argv": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-cli-build-02\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-production-02\\A-24H\\summary",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:26:33.465527+00:00",
+      "finished_utc": "2026-10-08T01:26:34.012149+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/summary-command/stdout.log",
+        "sha256": "c992158cb7d4286576411a872701f0a6a9670391d4800a0b4875336258d8cf74"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-24H/summary-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "trace_level": "Full",
+      "execution": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/full-execution.json",
+        "sha256": "db02c2ab050bc654806139b55bc0689a76f7bf33581effc511bb951b86fe84a4"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/full/run-summary.json",
+        "sha256": "d73911b7b12061153b308bc61d72eb268db61481f4a115e8f0211c1e835af5dc"
+      },
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/full-command/receipt.json",
+        "sha256": "61e3eba0cec3951b2a46ab979242ac52f292cb2e29de600de64b76c116ddd9be"
+      },
+      "actual_argv": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-cli-build-02\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-production-02\\A-72H\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:26:47.410947+00:00",
+      "finished_utc": "2026-10-08T01:26:48.829014+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/full-command/stdout.log",
+        "sha256": "79e8adffc254eb602865aa4280f1354aac4e5fdcdfb25fcd194f24c21cf9c904"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "trace_level": "Summary",
+      "execution": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/summary-execution.json",
+        "sha256": "e6330a7d8a9553f71a9f92cb718b253c1c8915d58712938e587af0d6d5fd4877"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/summary/run-summary.json",
+        "sha256": "6f327c7e17a68a657ea03bbbc2ae471900b64a9ea6ea9b1530077820b276e6dc"
+      },
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/summary-command/receipt.json",
+        "sha256": "618a24477568103c3eabacf7cc793ae1ceacae84138f7fce6a8d378e029e82ea"
+      },
+      "actual_argv": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-cli-build-02\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-production-02\\A-72H\\summary",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary",
+        "--porting-scope",
+        "A"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:27:03.296533+00:00",
+      "finished_utc": "2026-10-08T01:27:03.881248+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/summary-command/stdout.log",
+        "sha256": "58c87745de5030627cd40f244dfd2589fbd19f1b79b644d1bad39e6342badf8a"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/A-72H/summary-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Full",
+      "execution": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/full-execution.json",
+        "sha256": "cbc07a285ed60f649a74a245eb18279381f6f0c3416528bc363dc0091d86acef"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/full/run-summary.json",
+        "sha256": "7b4ef65601f8bb220cb3cef4293973ecd425763f2c947cd270d706da7d49b066"
+      },
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/full-command/receipt.json",
+        "sha256": "d5aaa8afc9811181e5e929d45ff49833c28b43ce5bd2c6d8c1d5fc9fb0f6271d"
+      },
+      "actual_argv": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-cli-build-02\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-production-02\\B-BOTH-24H\\full",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "full",
+        "--porting-scope",
+        "B"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:27:18.500094+00:00",
+      "finished_utc": "2026-10-08T01:30:44.066215+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/full-command/stdout.log",
+        "sha256": "dddc41263d8f5a8e5176284bef33ac298f81c8c2a3c37b52a1f67a521f05ae66"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/full-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Summary",
+      "execution": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/summary-execution.json",
+        "sha256": "3a91e04e6a278023d78b62644755b6417d84af0437c0461cc9b02ed168304994"
+      },
+      "run_summary": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/summary/run-summary.json",
+        "sha256": "ed0ab068131d972a7766985cf061f8699c634c3acc46e056060ecde006c339d0"
+      },
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/summary-command/receipt.json",
+        "sha256": "ae11d66bafbb63fbdf7e1190593e89cdd20e2a4b3e296af3f55b7c850e8fa101"
+      },
+      "actual_argv": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-cli-build-02\\eplus-rs.exe",
+        "run",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+        "--weather",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+        "--output-dir",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\rust-final-production-02\\B-BOTH-24H\\summary",
+        "--mode",
+        "compatibility",
+        "--partial",
+        "deny",
+        "--trace-level",
+        "summary",
+        "--porting-scope",
+        "B"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:30:58.555645+00:00",
+      "finished_utc": "2026-10-08T01:32:50.173097+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/summary-command/stdout.log",
+        "sha256": "7fc2b3854815d2edd1c027bc200d05d3c61bba24b4f7e9fc656f7c91f61d827c"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/rust-final-production-02/B-BOTH-24H/summary-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    }
+  ],
+  "required_checks": {
+    "workspace": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-workspace-test-02/receipt.json",
+        "sha256": "fbce59743d3ce7872447a1c46025400bac1de92e87f2f797536d7ba6a61389e4"
+      },
+      "actual_argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "-j",
+        "2"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:25:20.403286+00:00",
+      "finished_utc": "2026-10-08T01:29:09.905276+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-workspace-test-02/stdout.log",
+        "sha256": "b8f78b14f686fe0c9312b486d539cd67f4ee13beb227dd529cf30f4bb92367ed"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-workspace-test-02/stderr.log",
+        "sha256": "af5f34bc0814e2afedf256294a8f9084c3e45c1b5a8b242178e7bf75fc4c38ba"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-clippy-02/receipt.json",
+        "sha256": "23403214f98854f6b496930d9c784cd6b81acfb273571e16db926b05165dbe77"
+      },
+      "actual_argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:29:42.149733+00:00",
+      "finished_utc": "2026-10-08T01:31:33.129351+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-clippy-02/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-clippy-02/stderr.log",
+        "sha256": "0113845c5155a6c3c5c3382d2ba65ca682dc92505e7c891cc83019e3b78d4c3e"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    "source-quality": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-source-quality-02/receipt.json",
+        "sha256": "15dea0488d2934bba1b37501a1302c69c5392c62e2330b2d8f30d0a85e6b3994"
+      },
+      "actual_argv": [
+        ".\\scripts\\dev.cmd",
+        "source-quality-gate"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:21:28.635074+00:00",
+      "finished_utc": "2026-10-08T01:21:55.806776+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-source-quality-02/stdout.log",
+        "sha256": "476c1a791141c4b630e473435d4d73b74929f4e656c4dc1ecde5cd2fd5ab1a90"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-source-quality-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    "structure": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-02/receipt.json",
+        "sha256": "7c2040a21aa3036c7a4c73d69a1dbbea0b9595c409f3d55b6272e4967ca7a798"
+      },
+      "actual_argv": [
+        ".\\scripts\\dev.cmd",
+        "heat-balance-structure-audit"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:21:28.635074+00:00",
+      "finished_utc": "2026-10-08T01:21:52.240458+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-02/stdout.log",
+        "sha256": "ce2cfab7a00d0146e97b9f4d91e5b317d43b989ee4edaad74211f8932cdfd9fa"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      }
+    },
+    "fmt": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-scoped-format-02/receipt.json",
+        "sha256": "1b605cfd5bdc9216e13e8b3baff1ed1579220cb345afa098df0413ffe1a61d90"
+      },
+      "actual_argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "--check",
+        "crates/ep_runtime/src/heat_balance/air_manager.rs"
+      ],
+      "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:23:04.340674+00:00",
+      "finished_utc": "2026-10-08T01:23:04.709747+00:00",
+      "source_bytes_match_before_and_after": true,
+      "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+        "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-scoped-format-02/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-scoped-format-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "actual_recorder": {
+        "historical_path": "tools/porting/record_command.py",
+        "archive": {
+          "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+          "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+        }
+      },
+      "scope": "Only air_manager.rs lint delta; not a whole-workspace format assertion."
+    }
+  },
+  "preserved_failed_and_prior_checks": {
+    "path": "energyplus_porting_plan/evidence/ZON-01/checks-before-lint-cleanup.json",
+    "sha256": "242b252230133d34cd56e8278bc3bc583b9a8d3a4da47ed4f67bb056a1368b5f"
+  }
+}

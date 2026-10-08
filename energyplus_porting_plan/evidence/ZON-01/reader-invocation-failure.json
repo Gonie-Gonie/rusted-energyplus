@@ -1,0 +1,162 @@
+{
+  "schema": "zon01-reader-invocation-failure-evidence.v1",
+  "status": "preserved-parser-failure-and-same-reader-successful-retry",
+  "written_utc": "2026-10-08T01:40:09.099512+00:00",
+  "implementation_commit": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+  "crates_tree": "e94b3224a4f6aeb5e7b2b993cfe4587b6585322c",
+  "failed_invocation": {
+    "receipt": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-02/receipt.json",
+      "sha256": "4a9dfcff44af42b98fce0e88b1559bd288be2b7615cf05aae0196775e10b0979"
+    },
+    "actual_argv": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "tools/porting/check_zon01_production.py",
+      "--rust-matrix",
+      ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+      "--unit-report",
+      ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+      "--unit-command",
+      ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+      "--unit-review",
+      ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+      "--output",
+      ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json"
+    ],
+    "exit_code": 2,
+    "started_utc": "2026-10-08T01:34:14.616593+00:00",
+    "finished_utc": "2026-10-08T01:34:14.742382+00:00",
+    "stdout": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-02/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-02/stderr.log",
+      "sha256": "3cd6bbdbfa2269972d9fb72cea37c1ddad91b82e10f8ab5b35d04449c1f86719"
+    },
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+      "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+    },
+    "source_bytes_match_before_and_after": true,
+    "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+    "actual_recorder": {
+      "historical_path": "tools/porting/record_command.py",
+      "archive": {
+        "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+      }
+    }
+  },
+  "successful_retry": {
+    "receipt": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+      "sha256": "013596cf273d3e0d951d679da40dea5c0db98129d759f864765be3f96c6ab74f"
+    },
+    "actual_argv": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "tools/porting/check_zon01_production.py",
+      "--rust",
+      ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+      "--unit-report",
+      ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+      "--unit-command",
+      ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+      "--unit-review",
+      ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+      "--output",
+      ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json"
+    ],
+    "exit_code": 0,
+    "started_utc": "2026-10-08T01:34:56.738786+00:00",
+    "finished_utc": "2026-10-08T01:36:00.355897+00:00",
+    "stdout": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/stdout.log",
+      "sha256": "b98b597f08fa25cc83e6355f8db7e0e6626f5788e4689c05f7a5b55b02e59d98"
+    },
+    "stderr": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "source_snapshot": {
+      "path": ".runtime/porting/source-objects/8c/8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939",
+      "sha256": "8caf40c92d3777e3e51f38080dc010b2865366f2e97896d1a1c834225bb14939"
+    },
+    "source_bytes_match_before_and_after": true,
+    "historical_repository_head": "af3f3cb2c1ed79ac2a7887e5ca2cc6334196cf9e",
+    "actual_recorder": {
+      "historical_path": "tools/porting/record_command.py",
+      "archive": {
+        "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+      }
+    }
+  },
+  "successful_comparison_report": {
+    "path": ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+    "sha256": "a92fa8073e2e8398c38437ed9ec09d9931cece6af6a70b9ab30b4df54f071e34"
+  },
+  "unchanged_actual_input_bindings": {
+    "Rust_matrix": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-02/matrix.json",
+      "sha256": "2bf02cf98a8d6681e52b9802faa13195b4250839e1449ca89d7bdfdfd5185f0c"
+    },
+    "unit_comparison": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-02/comparison.json",
+      "sha256": "3acb9910e9e73047eb5a62c4ef68fecae43f0f5ec5387d4ef2f1fe61906f9ac9"
+    },
+    "actual_unit_comparison_command": {
+      "path": ".runtime/porting/ZON-01/rust-final-unit-comparison-command-02/receipt.json",
+      "sha256": "b9cb4cfa1e103067e693820897fa45b52d7e1bc8e4efa40782204ff561356651"
+    },
+    "independent_unit_data_review": {
+      "path": ".runtime/porting/ZON-01/independent-final-unit-data-review-02/review.json",
+      "sha256": "53c6aea78424c8e84961672111869242e33d1519fb5fb28ac0715c769f969ad5"
+    }
+  },
+  "exact_argv_correction": {
+    "before": "--rust-matrix",
+    "after": "--rust"
+  },
+  "accepted_reader_archive": {
+    "historical_path": "tools/porting/check_zon01_production.py",
+    "sha256": "cb4fec95f215c9a7afd599888d16109fb078d384ac9eeac3571f981d64f287e5",
+    "matching_archive": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.reader-source/check_zon01_production.py",
+      "sha256": "cb4fec95f215c9a7afd599888d16109fb078d384ac9eeac3571f981d64f287e5"
+    }
+  },
+  "failure_classification": "Argument parser exit2 before comparison state creation; empty stdout and no comparison result from this failed invocation.",
+  "outer_wrapper_status_limit": "Raw command receipt is authoritative for child exit2. A separately reported outer shell/tool status is not fabricated as a recorder receipt.",
+  "scientific_engines_rerun_for_argument_fix": false,
+  "reader_source_changed_for_argument_fix": false,
+  "actual_successful_comparison_count": 690,
+  "actual_successful_mismatch_count": 0,
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/ZON-01/reader-invocation-failure-writer-01/write_failure_compact.ccde2b29f148.py",
+    "sha256": "ccde2b29f14865856cae18e37da6724d59873f3deb06d35f644270ae609394aa"
+  },
+  "actual_metadata_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/ZON-01/reader-invocation-failure-writer-01/write_failure_compact.ccde2b29f148.py",
+    "--success-command",
+    ".runtime/porting/ZON-01/rust-final-production-comparison-command-03/receipt.json",
+    "--success-report",
+    ".runtime/porting/ZON-01/rust-final-production-comparison-02/comparison.json",
+    "--output-dir",
+    ".runtime/porting/ZON-01/reader-invocation-failure-compact-01",
+    "--write-tracked"
+  ],
+  "metadata_author_limit": "Observer/facade author transcribes preserved invocation metadata; no independent numerical certification is claimed.",
+  "engines_Cargo_Git_or_comparers_executed_by_writer": false,
+  "gates_updated": false
+}

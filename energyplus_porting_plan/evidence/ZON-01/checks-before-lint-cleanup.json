@@ -1,0 +1,184 @@
+{
+  "schema": "zon01-checks-before-lint-cleanup.v1",
+  "status": "preserved-candidate-checks-with-clippy-failure",
+  "written_utc": "2026-10-08T01:21:41.833097+00:00",
+  "candidate_implementation_commit": "534144cb92fac8e6bf206d41067671734e436bd0",
+  "candidate_crates_tree": "5c1c37fd487b1a5f259ed9ccda01d49d238e9b8b",
+  "preserved_source_review": {
+    "path": "energyplus_porting_plan/evidence/ZON-01/independent-canonical-source-review.json",
+    "sha256": "f91e2d3e4d2d23eb16d6644ee1180796b18857bde86a26c238fc746f83bf9695"
+  },
+  "preserved_unit_compact": {
+    "path": "energyplus_porting_plan/evidence/ZON-01/unit-final.json",
+    "sha256": "3c8a1694f17bdef2f000fb246051b4a9e0ae647f2b870fa46e23b2c358a1663c"
+  },
+  "actual_checks": {
+    "workspace_tests": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-workspace-test-01/receipt.json",
+        "sha256": "a213ecc10d4f31b43a274929e1ac22de36628cc40f0007ec7b2d56fe591e8d40"
+      },
+      "actual_command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:04:52.167819+00:00",
+      "finished_utc": "2026-10-08T01:10:36.703939+00:00",
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+        "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-workspace-test-01/stdout.log",
+        "sha256": "19c346d62833c9d9f2a1cd375f135cd01eb6d4f9d6d7870694ba7cebb40505e2"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-workspace-test-01/stderr.log",
+        "sha256": "aab1f00ecf5656d41cb4e0b773c42864e99901834174fbd7cee7da012fce297b"
+      },
+      "actual_test_summary_totals": {
+        "result_lines": 21,
+        "passed": 4552,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    "source_quality": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-source-quality-01/receipt.json",
+        "sha256": "fecfcd627768f405727b4d124f37675ab7478f6b8d22856c4da5a9328fd5f366"
+      },
+      "actual_command": [
+        ".\\scripts\\dev.cmd",
+        "source-quality-gate"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:05:38.033867+00:00",
+      "finished_utc": "2026-10-08T01:06:07.756293+00:00",
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+        "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-source-quality-01/stdout.log",
+        "sha256": "476c1a791141c4b630e473435d4d73b74929f4e656c4dc1ecde5cd2fd5ab1a90"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-source-quality-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "reported_counts": {
+        "checked_rust_files": 2491,
+        "skipped_test_files": 1165
+      }
+    },
+    "heat_balance_structure": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-01/receipt.json",
+        "sha256": "c449291ee9ead431f93081fdc9884c0a8bb888ba03bbae22e6032e70fa6f1255"
+      },
+      "actual_command": [
+        ".\\scripts\\dev.cmd",
+        "heat-balance-structure-audit"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-08T01:05:38.034418+00:00",
+      "finished_utc": "2026-10-08T01:06:04.840214+00:00",
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+        "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-01/stdout.log",
+        "sha256": "ce2cfab7a00d0146e97b9f4d91e5b317d43b989ee4edaad74211f8932cdfd9fa"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-heat-balance-structure-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/checks-clippy-01/receipt.json",
+        "sha256": "86ea60f9788a7265df3ba7249c8765bc2d11cc3003a779cc4a01e5fd9d3157e2"
+      },
+      "actual_command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "started_utc": "2026-10-08T01:11:25.286923+00:00",
+      "finished_utc": "2026-10-08T01:12:44.403079+00:00",
+      "source_bytes_match_before_and_after": true,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/e7/e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3",
+        "sha256": "e7ef358b60b77d432a49effb455a2e5f6d75fb466d4a15d3bc688a88b6f234d3"
+      },
+      "stdout": {
+        "path": ".runtime/porting/ZON-01/checks-clippy-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": ".runtime/porting/ZON-01/checks-clippy-01/stderr.log",
+        "sha256": "16a225ef001d96c864a986442dbe63407be271a88a4fd03157554ec552146560"
+      },
+      "actual_fail_reason": {
+        "lint": "clippy::unnecessary_lazy_evaluations",
+        "diagnostic_count": 2,
+        "source_locations": [
+          "crates/ep_runtime/src/heat_balance/air_manager.rs:149:27",
+          "crates/ep_runtime/src/heat_balance/air_manager.rs:151:26"
+        ],
+        "candidate_expressions": [
+          "capturing.then(|| owner)",
+          "capturing.then(|| owner)"
+        ],
+        "scope": "Two unnecessary lazy Copy closures only; this preserved command does not validate the later explicit-if cleanup."
+      }
+    }
+  },
+  "separate_independent_lint_cleanup_delta_review": {
+    "path": ".runtime/porting/ZON-01/independent-lint-delta-review-01/review.json",
+    "sha256": "64fe1844fc2b15c6ee9ac618261fbb4f1240316e4e522de8aa450e3e4c4fa250"
+  },
+  "candidate_production_comparison": {
+    "report": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-01/comparison.json",
+      "sha256": "ddff19480dbac460dff37f3b75fefb3402c83fdc6076d5de5d858446f5f66d87"
+    },
+    "command_receipt": {
+      "path": ".runtime/porting/ZON-01/rust-final-production-comparison-command-01/receipt.json",
+      "sha256": "e66cdfd629367c5f68bd8a6c9aa4bd2fd0dbbdfe3d4bf17532cb6a3286335f5f"
+    },
+    "comparison_count": 690,
+    "mismatch_count": 0,
+    "actual_CLI_command_count": 6,
+    "status": "pass",
+    "source_bytes_match_before_and_after": true,
+    "scope": "Preserved candidate534144cb result, not a fresh run of later lint-cleanup source or final gate closure."
+  },
+  "remaining_validation": "Root will commit the explicit-if default-off copy cleanup and use fresh02 builds/checks/proofs. No candidate receipt or source archive is rewritten by this record.",
+  "native_stage_limit": "Seven native ordinary callbacks remain source-context witnesses; no weather/warmup or pristine initializer phase pairing.",
+  "metadata_author_limit": "CP is a kernel/native author. This is transcription of actual recorded checks and independent source/unit records, not independent numerical review.",
+  "metadata_writer": {
+    "path": ".runtime/porting/ZON-01/checks-before-lint-cleanup-compact-01/write_checks.py",
+    "sha256": "6bc5a52608c5e3e4dc55f2f666046511aa0edddd167505116aac5cc9cfaf7403"
+  },
+  "engines_Cargo_Git_or_comparers_executed_by_writer": false,
+  "final_scientific_gate_promotion": false,
+  "gates_updated": false
+}
