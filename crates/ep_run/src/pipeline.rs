@@ -917,7 +917,7 @@ fn run_with_optional_porting_scope_observed(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    let ((((outcome, volume_trace), geometry_trace), trace), clock_trace) =
+    let (((((outcome, initialization_trace), volume_trace), geometry_trace), trace), clock_trace) =
         ep_runtime::time_axis::clock_trace::capture(config.trace_level == TraceLevel::Full, || {
             ep_runtime::psychrometrics::production_trace::capture(
                 config.trace_level == TraceLevel::Full,
@@ -927,7 +927,12 @@ fn run_with_optional_porting_scope_observed(
                         || {
                             ep_runtime::geometry::zone_volume_trace::capture(
                                 config.trace_level == TraceLevel::Full,
-                                || run_with_optional_porting_scope_impl(config, scope),
+                                || {
+                                    ep_runtime::heat_balance::zone_air_initialization_trace::capture(
+                                        config.trace_level == TraceLevel::Full,
+                                        || run_with_optional_porting_scope_impl(config, scope),
+                                    )
+                                },
                             )
                         },
                     )
@@ -960,6 +965,13 @@ fn run_with_optional_porting_scope_observed(
         && trace.total_call_count > 0
     {
         crate::geo03_trace::write_trace(config, &trace)?;
+    }
+    if let Some(trace) = initialization_trace
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+        && (trace.total_initializer_count > 0 || trace.zero_index_timestep_entry_count > 0)
+    {
+        crate::zon01_trace::write_trace(config, &trace)?;
     }
     outcome
 }

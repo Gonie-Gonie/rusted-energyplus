@@ -14,6 +14,7 @@ pub(super) fn finish_heat_balance_state(
     HeatBalanceState {
         timestep_index: 0,
         zones,
+        zone_air_environment_guard: Default::default(),
         surfaces,
         surface_indexes,
         construction_cache_hash: construction_thermal_data.coefficient_cache_hash,

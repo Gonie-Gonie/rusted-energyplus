@@ -1,0 +1,101 @@
+{
+  "schema": "zon01-independent-unit-reader-static-review-summary.v1",
+  "status": "pass-static-baseline-reader-before-comparer-execution",
+  "raw_review": {
+    "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/review.json",
+    "sha256": "60faca80b665c7bbefcb11e880c722f6ab197a087be7b6d7cf3d855daf0de1fe"
+  },
+  "review_completed_utc": "2026-10-08T00:42:08.242863+00:00",
+  "reviewed_metadata_amendment": {
+    "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/history/amendment.json",
+    "sha256": "bb613e26ca08f64692021b2c118d617caefdc511ce7537958f719896bea98b75"
+  },
+  "reviewed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/check_zon01_units.py",
+      "sha256": "c4e5a29081c6a85387f033898f659c08c85a2b9d97121ac82f9817b4d693ac92",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/source/check_zon01_units.py",
+        "sha256": "c4e5a29081c6a85387f033898f659c08c85a2b9d97121ac82f9817b4d693ac92"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/zon01_provenance.py",
+      "sha256": "7a07162d3809682b50eca51a98a784d825aeea1fb20cad525015f9433bdec4f4",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/source/zon01_provenance.py",
+        "sha256": "7a07162d3809682b50eca51a98a784d825aeea1fb20cad525015f9433bdec4f4"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-01/unit-reader-draft-02/zon01_values.py",
+      "sha256": "79eb77526eb3056efcbcae051ccd80de458d58ee2454a059172da7635d0f63f9",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/source/zon01_values.py",
+        "sha256": "79eb77526eb3056efcbcae051ccd80de458d58ee2454a059172da7635d0f63f9"
+      }
+    }
+  ],
+  "reviewed_original_data_review": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+    "sha256": "a396421d1358f5150482c2823f773b147eddf6f7ce488d3f698fe7aeb03f3361"
+  },
+  "actual_baseline_execution_schema_checked": {
+    "path": ".runtime/porting/ZON-01/rust-baseline-first-01/execution.json",
+    "sha256": "d6359b6537e474639285b8a56a8bf1935c1fe09fc77d4a1bbed403974f3bccf2"
+  },
+  "frozen_contracts": {
+    "source": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/packet/ZON-01-source.json",
+        "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+      }
+    },
+    "cases": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/packet/ZON-01-cases.json",
+        "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+      }
+    },
+    "tolerances": {
+      "historical_path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/packet/ZON-01-tolerances.json",
+        "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+      }
+    },
+    "helper_request": {
+      "historical_path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/independent-unit-reader-review-01/packet/helper-request.json",
+        "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+      }
+    }
+  },
+  "baseline_comparison_policy": {
+    "source_vs_legacy_numeric_pairs": 0,
+    "mismatch_count": null,
+    "report_status": "fail-incomplete-source-initializer-ownership",
+    "intentional_comparer_exit": 1,
+    "missing_owner_fields_per_sequence": 16,
+    "missing_fourth_slots_per_sequence": 4,
+    "environment_guard_implemented": false
+  },
+  "canonical_review_pending": true,
+  "scientific_gate_completion": false,
+  "scope_limits": [
+    "This is static source and bounded schema/provenance inspection. The comparer is not imported or executed; no scientific result is compared by this review.",
+    "The proposed canonical DTO and actual canonical state owner do not yet exist. Canonical/default mode, new owner source requirements and real lifecycle correspondence require a new independent review before numerical execution.",
+    "Ordinary original callbacks are stage witnesses, not pristine member returns. Weather/calendar/warmup producer alignment, later history/synchronization, Space/siblings/global/IO and whole physical pipeline remain unpaired.",
+    "Existing AirPowerCap diagnostic W/K is not heat-capacity J/K parity. This review does not update numerical gates or prove production handoff."
+  ],
+  "comparer_executed_by_review": false,
+  "engines_Cargo_Git_executed": false,
+  "gates_updated": false
+}

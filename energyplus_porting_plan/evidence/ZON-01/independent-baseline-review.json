@@ -1,0 +1,52 @@
+{
+  "schema": "zon01-independent-baseline-review-summary.v1",
+  "status": "pass-factual-intentionally-incomplete-baseline-data",
+  "raw_review": {
+    "path": ".runtime/porting/ZON-01/independent-baseline-data-review-01/review.json",
+    "sha256": "84b5a74ba9f320466617dc56fe99d9c80f12f8ebefc22ce13873020aeb2ab9fb"
+  },
+  "review_completed_utc": "2026-10-08T00:46:33.993291+00:00",
+  "reviewed_baseline_comparison_report": {
+    "path": ".runtime/porting/ZON-01/rust-baseline-comparison-01/comparison.json",
+    "sha256": "f7ee60e0da462740e46f2bd7dd8134e421f23fab93de24cb7c3e7fba80b0386c"
+  },
+  "reviewed_comparison_command": {
+    "path": ".runtime/porting/ZON-01/rust-baseline-comparison-command-01/receipt.json",
+    "sha256": "f7686afbe9e43a1dd07f50b8207e5d99c53e49844af7a6983a60cab8c222a5b0"
+  },
+  "reviewed_Rust_baseline_execution": {
+    "path": ".runtime/porting/ZON-01/rust-baseline-first-01/execution.json",
+    "sha256": "d6359b6537e474639285b8a56a8bf1935c1fe09fc77d4a1bbed403974f3bccf2"
+  },
+  "observed": {
+    "actual_engine_exit": 0,
+    "actual_comparer_exit": 1,
+    "source_numeric_pairs": 0,
+    "mismatch_count": null,
+    "sequences": 8,
+    "operations": 34,
+    "snapshots": 8,
+    "partial_seeds": 9,
+    "unsupported_source_operations": 17,
+    "missing_owner_fields_per_sequence": 16,
+    "missing_fourth_slots_per_sequence": 4,
+    "missing_guard_sequences": 8,
+    "comparer_metadata_check_count": 6252072
+  },
+  "source_precision": {
+    "immutable_baseline_implementation_commit": "80caffe77d5e1461540b7b49a120bb0a2cdbfe67",
+    "immutable_baseline_crates_tree": "5e66e8132242a017093c8b569dd52d559b795468",
+    "baseline_engine_source_bytes_match_before_and_after": true,
+    "comparison_command_current_source_bytes_match_before_and_after": false,
+    "comparison_command_repository_revision_unchanged": true,
+    "comparison_current_source_certified": false,
+    "explanation": "The comparer reads archived clean80caffe7 baseline source/binary/results/reader bytes. Authorized canonical working-source edits occur during metadata comparison; the actual false flag is retained and does not certify a quiescent current source tree."
+  },
+  "scope_limits": [
+    "No original initializer numeric outputs are paired to the legacy shell. Incompleteness is ownership/phase/guard/slot absence, not invented same-phase numerical error.",
+    "Three legacy coefficient diagnostics remain unpaired as source initializer members. Actual own copies/seeds/unsupported no-mutation are the only baseline observations.",
+    "This review reads preserved data without importing/rerunning comparers, engines, Cargo or Git, reconstructing original RHS, or updating gates. Canonical source, production handoff and later histories remain pending."
+  ],
+  "scientific_gate_completion": false,
+  "gates_updated": false
+}

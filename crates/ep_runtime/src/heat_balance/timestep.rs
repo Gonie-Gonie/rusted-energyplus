@@ -229,6 +229,8 @@ fn advance_heat_balance_state_one_timestep_source_order_path<PredictorHook, Outp
 where
     PredictorHook: FnOnce(&mut HeatBalanceState) -> Result<Output, Error>,
 {
+    // Observe the actual state consumed by either solver before any history push.
+    super::zone_air_initialization_trace::record_timestep_entry(state);
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
         .zones

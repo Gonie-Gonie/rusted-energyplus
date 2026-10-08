@@ -1,5 +1,6 @@
 //! Heat-balance trace and diagnostic state value types.
 
+use super::zone_air_initialization::ZoneAirEnvironmentGuard;
 use crate::diagnostic_probes::HeatBalanceZoneAirAlgorithm;
 use ep_model::{
     ConstructionId, MaterialId, MaterialSurfaceRoughness, OutsideBoundaryCondition,
@@ -47,6 +48,8 @@ pub struct HeatBalanceState {
     pub timestep_index: usize,
     /// Per-zone heat-balance state.
     pub zones: Vec<ZoneHeatBalanceState>,
+    /// Persistent selected global BeginEnvrn guard shared by all zone owners.
+    pub zone_air_environment_guard: ZoneAirEnvironmentGuard,
     /// Per-surface heat-balance state.
     pub surfaces: Vec<SurfaceHeatBalanceState>,
     pub(crate) surface_indexes: HeatBalanceSurfaceIndexes,

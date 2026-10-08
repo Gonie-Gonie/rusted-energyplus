@@ -1,13 +1,9 @@
-//! Input-only observation of the existing public heat-balance shell initializer.
-//! This baseline has no original constructor/bulk/begin/guard implementation.
-//! Existing three-slot histories are explicit partial source-key projections.
+//! Input-only selected constructor/reconstruction/member/guard ownership.
+//!
+//! Calls the same actual public kernel as production. External Begin/OutW are
+//! explicit local input context; no native weather/manager sibling state is made.
 
-use ep_model::{
-    AutoOrNumber, InsideSurfaceConvectionAlgorithm, NormalizedName,
-    OutsideSurfaceConvectionAlgorithm, Point3, SimulationModel, TypedModel, Zone,
-    ZoneConvectionAlgorithm, ZoneId,
-};
-use ep_runtime::heat_balance::{ZoneHeatBalanceState, initialize_heat_balance_state};
+use ep_runtime::heat_balance::{ZoneAirEnvironmentGuard, ZoneAirInitializationState};
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, error::Error, io::Read};
 
@@ -39,24 +35,6 @@ const ARRAYS: [&str; 6] = [
     "DSWPrevZoneTS",
     "WPrevZoneTSTemp",
 ];
-const UNIMPLEMENTED: [&str; 16] = [
-    "ZT",
-    "XMPT",
-    "TMX",
-    "TM2",
-    "ZTM",
-    "WPrevZoneTSTemp",
-    "WTimeMinusP",
-    "W1",
-    "WMX",
-    "WM2",
-    "airHumRatTemp",
-    "tempIndLoad",
-    "tempDepLoad",
-    "airRelHum",
-    "AirPowerCap",
-    "T1",
-];
 
 fn bits(value: f64) -> String {
     format!("{:016x}", value.to_bits())
@@ -77,8 +55,7 @@ fn scalar(value: f64) -> Value {
     } else {
         "finite"
     };
-    json!({"value": if value.is_finite() { Some(value) } else { None },
-        "value_bits":bits(value), "value_class":class})
+    json!({"value":if value.is_finite(){Some(value)}else{None},"value_bits":bits(value),"value_class":class})
 }
 fn text<'a>(value: &'a Value, key: &str) -> Result<&'a str, String> {
     value[key]
@@ -114,7 +91,7 @@ fn validate_operation(operation: &Value) -> Result<(), String> {
     }
     if operation
         .get("begin_environment")
-        .is_some_and(|v| !v.is_boolean())
+        .is_some_and(|value| !value.is_boolean())
     {
         return Err("expected boolean environment input".into());
     }
@@ -125,19 +102,19 @@ fn validate_operation(operation: &Value) -> Result<(), String> {
         let tokens = operation["input_field_bits"]
             .as_object()
             .ok_or("expected seed bit fields")?;
-        if fields.len() != tokens.len() || fields.keys().any(|k| !tokens.contains_key(k)) {
+        if fields.len() != tokens.len() || fields.keys().any(|key| !tokens.contains_key(key)) {
             return Err("seed field/bit keys differ".into());
         }
         for (key, value) in fields {
             if SCALARS.contains(&key.as_str()) {
                 own_number(value, &tokens[key])?;
             } else if ARRAYS.contains(&key.as_str()) {
-                let values = value.as_array().ok_or("expected source four-slot input")?;
-                let bits = tokens[key].as_array().ok_or("expected four bit tokens")?;
-                if values.len() != 4 || bits.len() != 4 {
+                let values = value.as_array().ok_or("expected four-slot input")?;
+                let tokens = tokens[key].as_array().ok_or("expected four bit tokens")?;
+                if values.len() != 4 || tokens.len() != 4 {
                     return Err("source input slot count differs".into());
                 }
-                for (number, token) in values.iter().zip(bits) {
+                for (number, token) in values.iter().zip(tokens) {
                     own_number(number, token)?;
                 }
             } else {
@@ -147,108 +124,79 @@ fn validate_operation(operation: &Value) -> Result<(), String> {
     }
     Ok(())
 }
-fn model() -> SimulationModel {
-    let mut typed = TypedModel::default();
-    typed.zones.push(Zone {
-        id: ZoneId(0),
-        name: NormalizedName::new("PREPARED-ONE-ZONE"),
-        direction_of_relative_north_deg: 0.0,
-        origin: Point3 {
-            x_m: 0.0,
-            y_m: 0.0,
-            z_m: 0.0,
-        },
-        zone_type: 1,
-        multiplier: 1,
-        list_multiplier: 1,
-        list_group: None,
-        ceiling_height: AutoOrNumber::AutoCalculate,
-        volume: AutoOrNumber::Value(1.0),
-        floor_area: AutoOrNumber::AutoCalculate,
-        inside_convection_algorithm: ZoneConvectionAlgorithm::Inherited(
-            InsideSurfaceConvectionAlgorithm::Tarp,
-        ),
-        outside_convection_algorithm: ZoneConvectionAlgorithm::Inherited(
-            OutsideSurfaceConvectionAlgorithm::Doe2,
-        ),
-        is_part_of_total_floor_area: true,
-        is_nominal_controlled: false,
-        linked_outdoor_air_node: None,
-        spaces: Vec::new(),
-    });
-    SimulationModel::from_typed(typed)
+fn fields(owner: &ZoneAirInitializationState) -> Value {
+    json!({
+        "MAT":scalar(owner.mat),"ZT":scalar(owner.zt),"ZTAV":scalar(owner.ztav),
+        "XMPT":scalar(owner.xmpt),"XMAT":owner.xmat.map(scalar),"DSXMAT":owner.dsxmat.map(scalar),
+        "TMX":scalar(owner.tmx),"TM2":scalar(owner.tm2),
+        "airHumRat":scalar(owner.air_hum_rat),"airHumRatAvg":scalar(owner.air_hum_rat_avg),
+        "ZTM":owner.ztm.map(scalar),"WPrevZoneTS":owner.w_prev_zone_ts.map(scalar),
+        "DSWPrevZoneTS":owner.dsw_prev_zone_ts.map(scalar),"WPrevZoneTSTemp":owner.w_prev_zone_ts_temp.map(scalar),
+        "WTimeMinusP":scalar(owner.w_time_minus_p),"W1":scalar(owner.w1),"WMX":scalar(owner.wmx),"WM2":scalar(owner.wm2),
+        "airHumRatTemp":scalar(owner.air_hum_rat_temp),"tempIndLoad":scalar(owner.temp_ind_load),
+        "tempDepLoad":scalar(owner.temp_dep_load),"airRelHum":scalar(owner.air_rel_hum),
+        "AirPowerCap":scalar(owner.air_power_cap),"T1":scalar(owner.t1),
+    })
 }
-fn observe(zone: &ZoneHeatBalanceState) -> Value {
-    json!({"phase":"legacy_shell_return","zone":{"id":zone.zone_id.0,"name":zone.zone_name},
-        "legacy_fields":{
-            "mean_air_temperature_c":scalar(zone.mean_air_temperature_c),
-            "zone_timestep_average_air_temperature_c":scalar(zone.zone_timestep_average_air_temperature_c),
-            "air_humidity_ratio":scalar(zone.air_humidity_ratio),
-            "zone_timestep_average_air_humidity_ratio":scalar(zone.zone_timestep_average_air_humidity_ratio),
-            "previous_mean_air_temperatures_c":zone.previous_mean_air_temperatures_c.map(scalar),
-            "previous_system_mean_air_temperatures_c":zone.previous_system_mean_air_temperatures_c.map(scalar),
-            "previous_air_humidity_ratios":zone.previous_air_humidity_ratios.map(scalar),
-            "previous_system_air_humidity_ratios":zone.previous_system_air_humidity_ratios.map(scalar)},
-        "source_correspondence":{
-            "MAT":"mean_air_temperature_c","ZTAV":"zone_timestep_average_air_temperature_c",
-            "airHumRat":"air_humidity_ratio","airHumRatAvg":"zone_timestep_average_air_humidity_ratio",
-            "XMAT_first_three":"previous_mean_air_temperatures_c",
-            "DSXMAT_first_three":"previous_system_mean_air_temperatures_c",
-            "WPrevZoneTS_first_three":"previous_air_humidity_ratios",
-            "DSWPrevZoneTS_first_three":"previous_system_air_humidity_ratios"},
-        "legacy_diagnostic_snapshots":{
-            "third_order_temp_independent_load_w":scalar(zone.zone_air_temperature_coefficients.third_order_temp_independent_load_w),
-            "third_order_temp_dependent_load_w_per_k":scalar(zone.zone_air_temperature_coefficients.third_order_temp_dependent_load_w_per_k),
-            "air_power_cap_w_per_k":scalar(zone.zone_air_temperature_coefficients.air_power_cap_w_per_k)},
-        "existing_diagnostic_snapshots_not_validated_as_source_initializer_owner":{
-            "tempIndLoad":"third_order_temp_independent_load_w",
-            "tempDepLoad":"third_order_temp_dependent_load_w_per_k",
-            "AirPowerCap":"air_power_cap_w_per_k"},
-        "unimplemented_source_fields":UNIMPLEMENTED,
-        "unimplemented_means_source_initializer_ownership":true,
-        "unimplemented_source_slots":["XMAT[3]","DSXMAT[3]","WPrevZoneTS[3]","DSWPrevZoneTS[3]"],
-        "source_flags":null,"source_state":null,
-        "original_constructor_bulk_or_begin_phase_claimed":false})
+fn snapshot(
+    phase: &str,
+    owner: Option<&ZoneAirInitializationState>,
+    named: bool,
+    guard: ZoneAirEnvironmentGuard,
+    begin: bool,
+    out_w: f64,
+) -> Value {
+    let zones = owner.map(|owner|json!({"id":0,"name":if named {Some("PREPARED-ONE-ZONE")}else{None},"fields":fields(owner)}));
+    json!({"phase":phase,"zones":zones.into_iter().collect::<Vec<_>>(),
+        "zone_owner_allocated":owner.is_some(),"zone_owner_count":usize::from(owner.is_some()),
+        "flags":{"MyEnvrnFlag":guard.my_environment_flag,"BeginEnvrnFlag":begin},
+        "OutHumRat":scalar(out_w),"context":null,
+        "unpaired_native_context_and_manager_sibling_flags":true})
 }
-fn seed(zone: &mut ZoneHeatBalanceState, operation: &Value) -> Result<Value, String> {
-    let fields = operation["fields"].as_object().ok_or("expected fields")?;
-    let mut applied = Vec::new();
-    let mut unsupported = Vec::new();
-    let mut fourth_slots = Vec::new();
+fn seed(owner: &mut ZoneAirInitializationState, operation: &Value) -> Result<(), String> {
+    let fields = operation["fields"]
+        .as_object()
+        .ok_or("expected seed fields")?;
     for (key, value) in fields {
-        let scalar_target = match key.as_str() {
-            "MAT" => Some(&mut zone.mean_air_temperature_c),
-            "ZTAV" => Some(&mut zone.zone_timestep_average_air_temperature_c),
-            "airHumRat" => Some(&mut zone.air_humidity_ratio),
-            "airHumRatAvg" => Some(&mut zone.zone_timestep_average_air_humidity_ratio),
+        let target = match key.as_str() {
+            "MAT" => Some(&mut owner.mat),
+            "ZT" => Some(&mut owner.zt),
+            "ZTAV" => Some(&mut owner.ztav),
+            "XMPT" => Some(&mut owner.xmpt),
+            "TMX" => Some(&mut owner.tmx),
+            "TM2" => Some(&mut owner.tm2),
+            "airHumRat" => Some(&mut owner.air_hum_rat),
+            "airHumRatAvg" => Some(&mut owner.air_hum_rat_avg),
+            "WTimeMinusP" => Some(&mut owner.w_time_minus_p),
+            "W1" => Some(&mut owner.w1),
+            "WMX" => Some(&mut owner.wmx),
+            "WM2" => Some(&mut owner.wm2),
+            "airHumRatTemp" => Some(&mut owner.air_hum_rat_temp),
+            "tempIndLoad" => Some(&mut owner.temp_ind_load),
+            "tempDepLoad" => Some(&mut owner.temp_dep_load),
+            "airRelHum" => Some(&mut owner.air_rel_hum),
+            "AirPowerCap" => Some(&mut owner.air_power_cap),
+            "T1" => Some(&mut owner.t1),
             _ => None,
         };
-        if let Some(target) = scalar_target {
+        if let Some(target) = target {
             *target = own_number(value, &operation["input_field_bits"][key])?;
-            applied.push(key.clone());
             continue;
         }
-        let array_target = match key.as_str() {
-            "XMAT" => Some(&mut zone.previous_mean_air_temperatures_c),
-            "DSXMAT" => Some(&mut zone.previous_system_mean_air_temperatures_c),
-            "WPrevZoneTS" => Some(&mut zone.previous_air_humidity_ratios),
-            "DSWPrevZoneTS" => Some(&mut zone.previous_system_air_humidity_ratios),
-            _ => None,
+        let target = match key.as_str() {
+            "XMAT" => &mut owner.xmat,
+            "DSXMAT" => &mut owner.dsxmat,
+            "ZTM" => &mut owner.ztm,
+            "WPrevZoneTS" => &mut owner.w_prev_zone_ts,
+            "DSWPrevZoneTS" => &mut owner.dsw_prev_zone_ts,
+            "WPrevZoneTSTemp" => &mut owner.w_prev_zone_ts_temp,
+            _ => return Err("unknown validated input field".into()),
         };
-        if let Some(target) = array_target {
-            for (index, element) in target.iter_mut().enumerate() {
-                *element = own_number(&value[index], &operation["input_field_bits"][key][index])?;
-            }
-            applied.push(format!("{key}[0..3)"));
-            fourth_slots.push(format!("{key}[3]"));
-        } else {
-            unsupported.push(key.clone());
+        for (index, element) in target.iter_mut().enumerate() {
+            *element = own_number(&value[index], &operation["input_field_bits"][key][index])?;
         }
     }
-    Ok(
-        json!({"applied_existing_field_inputs":applied,"unconsumed_source_fields":unsupported,
-        "unconsumed_source_slots":fourth_slots}),
-    )
+    Ok(())
 }
 fn execute(request: &Value) -> Result<Value, String> {
     if request["schema"].as_str() != Some("zon01-helper-cases.v1")
@@ -266,14 +214,41 @@ fn execute(request: &Value) -> Result<Value, String> {
         if !ids.insert(id) {
             return Err("duplicate sequence_id".into());
         }
-        let mut state = initialize_heat_balance_state(&model(), 23.0).map_err(|e| e.to_string())?;
-        let zone = state
-            .zones
-            .get_mut(0)
-            .ok_or("existing initializer returned no zone")?;
-        let initial = observe(zone);
+        let mut guard = ZoneAirEnvironmentGuard::default();
+        // Explicit external input context starts at the source declaration defaults.
+        // No EnergyPlus manager/context object or unrelated flags are fabricated.
+        let mut begin = false;
+        let mut out_w = 0.0;
+        let constructor = snapshot(
+            "selected-Rust-container-before-zone-allocation",
+            None,
+            false,
+            guard,
+            begin,
+            out_w,
+        );
+        let mut owner = ZoneAirInitializationState::default();
+        let allocated = snapshot(
+            "selected-Rust-zone-constructor",
+            Some(&owner),
+            false,
+            guard,
+            begin,
+            out_w,
+        );
+        let prepared = snapshot(
+            "explicit-one-zone-selected-Rust-guard-context",
+            Some(&owner),
+            true,
+            guard,
+            begin,
+            out_w,
+        );
         let mut operations = Vec::new();
         let mut operation_ids = BTreeSet::new();
+        let mut bare_calls = 0_usize;
+        let mut guard_calls = 0_usize;
+        let mut bulk_calls = 0_usize;
         for operation in sequence["operations"]
             .as_array()
             .ok_or("expected operations")?
@@ -284,35 +259,73 @@ fn execute(request: &Value) -> Result<Value, String> {
                 return Err("duplicate operation_id".into());
             }
             let name = text(operation, "operation")?;
-            let before = observe(zone);
-            let (status, seed_projection) = match name {
-                "snapshot" => ("legacy_shell_snapshot", Value::Null),
-                "seed_zone_state" => ("baseline_partial_seed", seed(zone, operation)?),
-                _ => ("unsupported_source_operation", Value::Null),
-            };
-            operations.push(
-                json!({"operation_id":operation_id,"operation":name,"input":operation,
-                "status":status,"legacy_before":before,"legacy_after":observe(zone),
-                "seed_projection":seed_projection,"numeric_input_identity_checked":true,
-                "out_hum_rat_consumed":false,"begin_environment_consumed":false,
-                "source_state":null,"source_flags":null,"source_operation_executed":false}),
+            let before_inputs = snapshot(
+                "before-operation-input-writes",
+                Some(&owner),
+                true,
+                guard,
+                begin,
+                out_w,
             );
+            if let Some(value) = operation.get("out_hum_rat") {
+                out_w = own_number(value, &operation["out_hum_rat_bits"])?;
+            }
+            if let Some(value) = operation.get("begin_environment") {
+                begin = value.as_bool().ok_or("expected boolean")?;
+            }
+            let before = snapshot(
+                "after-declared-operation-inputs-before-selected-Rust-call",
+                Some(&owner),
+                true,
+                guard,
+                begin,
+                out_w,
+            );
+            let eligible = guard.my_environment_flag && begin;
+            let mut invocation = None;
+            match name {
+                "snapshot" => {}
+                "seed_zone_state" => seed(&mut owner, operation)?,
+                "bulk_reconstruct_and_current_w_seed" => {
+                    owner.bulk_reconstruct_and_current_w_seed(out_w);
+                    bulk_calls += 1;
+                }
+                "bare_begin_environment" => {
+                    owner.begin_environment_init(out_w);
+                    bare_calls += 1;
+                }
+                "guarded_init_zone_air_setpoints" => {
+                    invocation = Some(guard.apply(begin, out_w, std::slice::from_mut(&mut owner)));
+                    guard_calls += 1;
+                }
+                _ => return Err("unknown validated operation".into()),
+            }
+            operations.push(json!({"operation_id":operation_id,"operation":name,"input":operation,
+                "before_inputs":before_inputs,"before":before,
+                "after":snapshot("after-selected-Rust-wrapper-operation",Some(&owner),true,guard,begin,out_w),
+                "source_guard_eligibility_before_call":eligible,"member_call_count_observed":false,
+                "numeric_input_identity_checked":true,
+                "Rust_guard_invocation":invocation.map(|value|json!({
+                    "begin_environment":value.begin_environment,"my_environment_before":value.my_environment_before,
+                    "eligible_before":value.eligible_before,"my_environment_after":value.my_environment_after,
+                    "initializer_invocations":value.initializer_invocations,"initializer_invocations_are_Rust_only":true,
+                })),
+                "wrapper_invocations":{"bare_begin_environment":bare_calls,"guarded_init_zone_air_setpoints":guard_calls,
+                    "bulk_reconstruct_and_current_w_seed":bulk_calls}}));
         }
         results.push(json!({"sequence_id":id,"kind":text(sequence,"kind")?,"input":sequence,
-            "status":"baseline_partial","route":"ep_runtime::heat_balance::initialize_heat_balance_state",
-            "legacy_shell_return":initial,"operations":operations,
-            "source_state":null,"source_flags":null,"unimplemented_source_fields":UNIMPLEMENTED,
-            "unavailable_source_phases":["constructor","allocated_zone_constructor","prepared_manager_state","before_inputs","before","after"],
-            "environment_guard_implemented":false,"four_slot_source_arrays_implemented":false,
-            "physics_executed":false,"original_parser_admission_claimed":false}));
+            "status":"source_complete","route":"selected-public-Rust-zone-air-initialization-owner",
+            "constructor":constructor,"allocated_zone_constructor":allocated,"prepared_manager_state":prepared,
+            "operations":operations,"wrapper_invocations":{"bare_begin_environment":bare_calls,
+                "guarded_init_zone_air_setpoints":guard_calls,"bulk_reconstruct_and_current_w_seed":bulk_calls},
+            "original_parser_admission_claimed":false,"physics_executed":false,
+            "whole_original_manager_siblings_implemented":false}));
     }
     Ok(
-        json!({"schema":"zon01-helper-results.v1","implementation_stage":"baseline_partial",
-        "sequences":results,"factory":{"zone_count":1,"zone_volume_m3":scalar(1.0),
-            "initial_zone_air_temperature_c":scalar(23.0),"surfaces":0,
-            "weather_seed_called":false,"prepared_input_not_CON_model":true},
-        "reference_outputs_supplied_to_Rust":false,"expected_values_supplied":false,
-        "physics_executed":false,"gates_updated":false}),
+        json!({"schema":"zon01-helper-results.v1","implementation_stage":"canonical_owned_state",
+        "sequences":results,"reference_outputs_supplied_to_Rust":false,"expected_values_supplied":false,
+        "physics_executed":false,"gates_updated":false,
+        "unpaired_source_context":["native calendar/weather/warmup","manager sibling flags/thermostat/day/demand/hybrid/Space resets","native member invocation counts"]}),
     )
 }
 fn main() -> Result<(), Box<dyn Error>> {

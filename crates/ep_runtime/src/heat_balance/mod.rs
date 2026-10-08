@@ -30,6 +30,8 @@ pub mod timestep;
 pub(crate) mod trace;
 pub(crate) mod warmup;
 pub mod zone_air_correction;
+pub mod zone_air_initialization;
+pub mod zone_air_initialization_trace;
 pub mod zone_predictor_corrector;
 
 pub use air_manager::*;
@@ -51,4 +53,5 @@ pub use surface_manager::*;
 pub use surface_weather::*;
 pub use timestep::*;
 pub use zone_air_correction::*;
+pub use zone_air_initialization::*;
 pub use zone_predictor_corrector::*;

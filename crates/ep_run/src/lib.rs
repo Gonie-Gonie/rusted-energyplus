@@ -23,6 +23,7 @@ mod psy02_trace;
 mod psychrometrics_trace;
 mod support;
 mod support_registry;
+mod zon01_trace;
 
 pub use config::*;
 pub use diagnostics::*;

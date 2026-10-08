@@ -3,6 +3,10 @@
 use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
 use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::state::{HeatBalanceState, ZoneHeatBalanceState};
+use crate::heat_balance::zone_air_initialization::{
+    ZoneAirCallerTemperatureInputs, ZoneAirInitializationState,
+};
+use crate::heat_balance::zone_air_initialization_trace::{self, ZoneAirInitializationObservation};
 use crate::psychrometrics::energyplus_zone_air_heat_capacity_j_per_k;
 use crate::weather::{
     HeatBalanceWeatherContext, WeatherTimestepSeries,
@@ -131,11 +135,52 @@ pub(crate) fn seed_zone_air_humidity_ratios_from_weather_series(
         return;
     };
 
-    for zone in &mut state.zones {
-        zone.air_humidity_ratio = humidity_ratio;
-        zone.zone_timestep_average_air_humidity_ratio = humidity_ratio;
-        zone.previous_air_humidity_ratios = [humidity_ratio; 3];
-        zone.previous_system_air_humidity_ratios = [humidity_ratio; 3];
+    // This existing weather-entry path starts one environment for either A or B.
+    // Weather interpolation remains its own producer. The selected global guard
+    // prevents a repeated entry from reconstructing active solver histories.
+    if !state.zone_air_environment_guard.my_environment_flag {
+        return;
+    }
+    let capturing = zone_air_initialization_trace::is_active();
+    let mut owners = Vec::with_capacity(state.zones.len());
+    let mut preparations = capturing.then(|| Vec::with_capacity(state.zones.len()));
+    for zone in &state.zones {
+        let mut owner = ZoneAirInitializationState::default();
+        let constructor = capturing.then(|| owner);
+        owner.bulk_reconstruct_and_current_w_seed(humidity_ratio);
+        let after_bulk = capturing.then(|| owner);
+        let caller_temperature_inputs = ZoneAirCallerTemperatureInputs::from_legacy_zone(zone);
+        owner.prepare_caller_temperature_inputs(&caller_temperature_inputs);
+        if let (Some(preparations), Some(constructor), Some(after_bulk)) =
+            (&mut preparations, constructor, after_bulk)
+        {
+            preparations.push((constructor, after_bulk, caller_temperature_inputs, owner));
+        }
+        owners.push(owner);
+    }
+    let invocation = state
+        .zone_air_environment_guard
+        .apply(true, humidity_ratio, &mut owners);
+    for (zone, owner) in state.zones.iter_mut().zip(&owners) {
+        owner.project_to_legacy_zone(zone);
+    }
+    if let Some(preparations) = preparations {
+        for ((zone, owner), (constructor, after_bulk, caller_temperature_inputs, before_begin)) in
+            state.zones.iter().zip(owners).zip(preparations)
+        {
+            zone_air_initialization_trace::record(ZoneAirInitializationObservation {
+                zone_id: zone.zone_id,
+                zone_name: zone.zone_name.clone(),
+                out_hum_rat: humidity_ratio,
+                caller_temperature_inputs,
+                constructor,
+                after_bulk,
+                before_begin,
+                after_begin: owner,
+                guard: invocation,
+                handoff: zone_air_initialization_trace::capture_projection(zone),
+            });
+        }
     }
 }
 
