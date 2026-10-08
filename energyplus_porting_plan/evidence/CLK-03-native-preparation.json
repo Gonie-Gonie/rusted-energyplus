@@ -1,7 +1,7 @@
 {
   "schema": "clk03-native-preparation-evidence.v1",
   "card": "CLK-03",
-  "status": "native-build-complete-independent-PE-review-pending",
+  "status": "native-build-and-independent-PE-review-complete-before-numerical-execution",
   "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
   "frozen_contracts": {
     "source": {
@@ -128,5 +128,9 @@
     "Build and compile-only preparation; no CLK-03 unit, integration or production PASS.",
     "Failed original adapter sources and actual failure logs remain preserved; the frozen input packet and EnergyPlus original sources are unchanged.",
     "Independent actual build/PE review and original data review precede Rust numerical execution."
-  ]
+  ],
+  "independent_actual_build_review": {
+    "path": ".runtime/porting/CLK-03/independent-native-build-review-02/review.json",
+    "sha256": "6bfd6787c997e58a0f3a0203befa59840b0a64336ca2e6dd60fa20dca34b8342"
+  }
 }

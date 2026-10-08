@@ -66,6 +66,14 @@ Warmup 첫날 재사용, 24→1시, 다음 날 lookahead, 마지막 날 no-prefe
 
 현재 eager full-file parser와 mutable source-order cursor의 차이를 실제 legacy baseline으로 기록한 뒤 수정한다. 모든 종료 gate는 실제 시험과 생산 연결 검증 전까지 미확인이다.
 
+## 준비 검증
+
+[준비 증거](../evidence/CLK-03-native-preparation.json)에 고정 입력 14개 sequence·51개 요청 operation, 원본 helper 빌드와 기존 Rust probe의 실제 컴파일 영수증을 기록했다.
+
+첫 원본 helper 컴파일은 관찰 코드의 타입 오류와 존재하지 않는 상태 필드 참조로 종료 코드 1을 반환했다. 실패 소스·로그를 보존하고 관찰 코드 두 파일만 수정했다. 두 번째 configure·compile/link·derivation은 모두 실제 종료 코드 0이다. EnergyPlus 원본 13,537개 파일, 기존 655개 compile row와 643개 core row, 보호 바이너리 14개는 보존됐다.
+
+기존 Rust probe는 `b3e1a4ad2c63c80dfef9baa21cbb6e16599d6bcd`에서 실제 컴파일 종료 코드 0으로 생성한 EXE와 소스를 보존했다. 모든 종료 gate는 실제 수치 비교와 생산 연결 시험 전까지 미확인이다.
+
 ## 종료 체크
 
 - [ ] 원본 범위와 입출력·변경상태 계약 확정
