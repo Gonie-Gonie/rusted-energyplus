@@ -43,7 +43,11 @@ fn warning_counts_preserve_diffuse_assignment_and_negative_range_order() {
 
 #[test]
 fn beam_diffuse_and_all_ignore_controls_are_independent() {
-    for (all, beam, diffuse) in [(false, true, false), (false, false, true), (true, false, false)] {
+    for (all, beam, diffuse) in [
+        (false, true, false),
+        (false, false, true),
+        (true, false, false),
+    ] {
         let mut state = WeatherDayState::default();
         state.environment.ignore_solar_radiation = all;
         state.environment.ignore_beam_radiation = beam;

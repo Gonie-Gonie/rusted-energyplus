@@ -65,6 +65,7 @@ pub(super) fn sequence(input: &Value, idf: &[u8], weather: &Path, bytes: Vec<u8>
     let prepared = fields::session_snapshot(&session, weather, true);
     let before_context = prepared.clone();
     seeds::context(&mut session.state, input)?;
+    session.cursor.set_weather_code_missed_count(session.state.missed_counts.weath_codes);
     let after_context = fields::session_snapshot(&session, weather, true);
     let mut operations = Vec::new();
     let mut stop: Option<String> = None;

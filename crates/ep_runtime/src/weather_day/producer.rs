@@ -6,9 +6,9 @@
 //! policies. No native outputs are inputs to this owner.
 
 use super::hourly::interpolate_wind_direction;
+use super::solar::interpolation_weights;
 use super::{WeatherDayError, WeatherDayState, WeatherVars};
 use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
-use super::solar::interpolation_weights;
 use crate::psychrometrics::with_fresh_psychrometric_state;
 use crate::weather::raw::{RawEpwOutputs, RawWeatherDay, project_record};
 use crate::weather::{EpwRecord, WeatherTimestepSample, weather_timestep_sample_with_neighbors};
@@ -88,10 +88,17 @@ pub fn produce_day(
         .ok_or_else(|| WeatherDayError::admission("prepared interpolation owner unavailable"))?
         .clone();
     let solar_weights = if steps > 1 {
-        Some(state.weather.solar_interpolation.as_ref()
-            .filter(|values| values.len() == steps as usize)
-            .ok_or_else(|| WeatherDayError::admission("prepared solar interpolation owner unavailable"))?
-            .clone())
+        Some(
+            state
+                .weather
+                .solar_interpolation
+                .as_ref()
+                .filter(|values| values.len() == steps as usize)
+                .ok_or_else(|| {
+                    WeatherDayError::admission("prepared solar interpolation owner unavailable")
+                })?
+                .clone(),
+        )
     } else {
         None
     };
@@ -194,11 +201,16 @@ pub fn produce_day(
                     // the selected processed dry-bulb interpolation.
                     sample.dry_bulb_c,
                 );
-                let current_weight = *solar_weights.as_ref()
+                let current_weight = *solar_weights
+                    .as_ref()
                     .and_then(|values| values.get(timestep as usize - 1))
-                    .ok_or_else(|| WeatherDayError::admission("solar timestep storage unavailable"))?;
+                    .ok_or_else(|| {
+                        WeatherDayError::admission("solar timestep storage unavailable")
+                    })?;
                 let (prior_weight, next_weight) = interpolation_weights(
-                    current_weight, timestep, state.weather.time_step_fraction,
+                    current_weight,
+                    timestep,
+                    state.weather.time_step_fraction,
                 );
                 value.dif_solar_rad = previous_values.dif_solar_rad * prior_weight
                     + hourly[index].dif_solar_rad * current_weight

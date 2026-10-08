@@ -12,8 +12,8 @@ mod hourly;
 mod lifecycle;
 mod producer;
 mod production;
-mod solar;
 pub mod production_trace;
+mod solar;
 pub mod state;
 
 pub use configuration::WeatherSolarControls;

@@ -20,9 +20,9 @@ pub(crate) fn capture_environment_inputs() -> Result<WeatherSolarEnvironmentInpu
         match std::env::var(name) {
             Ok(value) => Ok(Some(value)),
             Err(std::env::VarError::NotPresent) => Ok(None),
-            Err(std::env::VarError::NotUnicode(_)) => {
-                Err(format!("weather control {name} is outside the UTF-8 input domain"))
-            }
+            Err(std::env::VarError::NotUnicode(_)) => Err(format!(
+                "weather control {name} is outside the UTF-8 input domain"
+            )),
         }
     }
     Ok(WeatherSolarEnvironmentInputs {
@@ -87,7 +87,10 @@ pub(crate) fn resolve_controls(
 
 fn environment_on(value: Option<&str>) -> bool {
     // UtilityRoutines.cc:691-702 examines only the first character, untrimmed.
-    matches!(value.and_then(|value| value.as_bytes().first()), Some(b'Y' | b'y' | b'T' | b't'))
+    matches!(
+        value.and_then(|value| value.as_bytes().first()),
+        Some(b'Y' | b'y' | b'T' | b't')
+    )
 }
 
 #[cfg(test)]
@@ -97,11 +100,15 @@ mod tests {
     use std::collections::BTreeMap;
 
     fn diagnostics(keys: &[&str]) -> RawObject {
-        let values = keys.iter().map(|key| {
-            RawValue::Object(BTreeMap::from([
-                (FieldName("key".into()), RawValue::String((*key).into())),
-            ]))
-        }).collect();
+        let values = keys
+            .iter()
+            .map(|key| {
+                RawValue::Object(BTreeMap::from([(
+                    FieldName("key".into()),
+                    RawValue::String((*key).into()),
+                )]))
+            })
+            .collect();
         RawObject {
             fields: BTreeMap::from([(FieldName("diagnostics".into()), RawValue::Array(values))]),
             source_span: None,
@@ -109,12 +116,16 @@ mod tests {
     }
 
     fn model(instances: &[(&str, RawObject)]) -> RawModel {
-        RawModel::new(None, BTreeMap::from([(
-            ObjectType("Output:Diagnostics".into()),
-            instances.iter().map(|(name, object)| {
-                (ObjectName((*name).into()), object.clone())
-            }).collect(),
-        )]))
+        RawModel::new(
+            None,
+            BTreeMap::from([(
+                ObjectType("Output:Diagnostics".into()),
+                instances
+                    .iter()
+                    .map(|(name, object)| (ObjectName((*name).into()), object.clone()))
+                    .collect(),
+            )]),
+        )
     }
 
     #[test]
@@ -135,31 +146,42 @@ mod tests {
             ignore_beam_radiation: Some("false".into()),
             ignore_diffuse_radiation: Some("true".into()),
         };
-        assert_eq!(resolve_controls(&RawModel::default(), &environment), Ok(WeatherSolarControls {
-            display_weather_missing_data_warnings: false,
-            ignore_solar_radiation: true,
-            ignore_beam_radiation: false,
-            ignore_diffuse_radiation: true,
-        }));
+        assert_eq!(
+            resolve_controls(&RawModel::default(), &environment),
+            Ok(WeatherSolarControls {
+                display_weather_missing_data_warnings: false,
+                ignore_solar_radiation: true,
+                ignore_beam_radiation: false,
+                ignore_diffuse_radiation: true,
+            })
+        );
     }
 
     #[test]
     fn diagnostics_assign_true_after_environment_values() {
-        let raw = model(&[("A", diagnostics(&[
-            "displayweathermissingdatawarnings", "IgnoreSolarRadiation",
-            "IgnoreBeamRadiation", "IgnoreDiffuseRadiation",
-        ]))]);
+        let raw = model(&[(
+            "A",
+            diagnostics(&[
+                "displayweathermissingdatawarnings",
+                "IgnoreSolarRadiation",
+                "IgnoreBeamRadiation",
+                "IgnoreDiffuseRadiation",
+            ]),
+        )]);
         let environment = WeatherSolarEnvironmentInputs {
             ignore_solar_radiation: Some("No".into()),
             ignore_beam_radiation: Some("No".into()),
             ignore_diffuse_radiation: Some("No".into()),
         };
-        assert_eq!(resolve_controls(&raw, &environment), Ok(WeatherSolarControls {
-            display_weather_missing_data_warnings: true,
-            ignore_solar_radiation: true,
-            ignore_beam_radiation: true,
-            ignore_diffuse_radiation: true,
-        }));
+        assert_eq!(
+            resolve_controls(&raw, &environment),
+            Ok(WeatherSolarControls {
+                display_weather_missing_data_warnings: true,
+                ignore_solar_radiation: true,
+                ignore_beam_radiation: true,
+                ignore_diffuse_radiation: true,
+            })
+        );
     }
 
     #[test]
@@ -168,30 +190,48 @@ mod tests {
             ("Z", diagnostics(&["IgnoreSolarRadiation"])),
             ("A", diagnostics(&["IgnoreBeamRadiation"])),
         ]);
-        assert_eq!(resolve_controls(&raw, &WeatherSolarEnvironmentInputs::default()),
+        assert_eq!(
+            resolve_controls(&raw, &WeatherSolarEnvironmentInputs::default()),
             Ok(WeatherSolarControls {
                 ignore_beam_radiation: true,
                 ..WeatherSolarControls::default()
-            }));
+            })
+        );
     }
 
     #[test]
     fn unrelated_con_diagnostic_does_not_assign_weather_controls() {
         let raw = model(&[("A", diagnostics(&["DisplayAdvancedReportVariables"]))]);
-        assert_eq!(resolve_controls(&raw, &WeatherSolarEnvironmentInputs::default()),
-            Ok(WeatherSolarControls::default()));
+        assert_eq!(
+            resolve_controls(&raw, &WeatherSolarEnvironmentInputs::default()),
+            Ok(WeatherSolarControls::default())
+        );
     }
 
     #[test]
     fn missing_extensible_key_is_skipped_but_malformed_types_are_rejected() {
         let mut object = diagnostics(&[]);
-        object.fields.insert(FieldName("diagnostics".into()), RawValue::Array(vec![
-            RawValue::Object(BTreeMap::new()),
-        ]));
-        assert_eq!(resolve_controls(&model(&[("A", object)]), &WeatherSolarEnvironmentInputs::default()),
-            Ok(WeatherSolarControls::default()));
+        object.fields.insert(
+            FieldName("diagnostics".into()),
+            RawValue::Array(vec![RawValue::Object(BTreeMap::new())]),
+        );
+        assert_eq!(
+            resolve_controls(
+                &model(&[("A", object)]),
+                &WeatherSolarEnvironmentInputs::default()
+            ),
+            Ok(WeatherSolarControls::default())
+        );
         let mut object = diagnostics(&[]);
-        object.fields.insert(FieldName("diagnostics".into()), RawValue::Bool(true));
-        assert!(resolve_controls(&model(&[("A", object)]), &WeatherSolarEnvironmentInputs::default()).is_err());
+        object
+            .fields
+            .insert(FieldName("diagnostics".into()), RawValue::Bool(true));
+        assert!(
+            resolve_controls(
+                &model(&[("A", object)]),
+                &WeatherSolarEnvironmentInputs::default()
+            )
+            .is_err()
+        );
     }
 }

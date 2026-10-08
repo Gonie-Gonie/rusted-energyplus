@@ -286,13 +286,30 @@ fn producer_consumes_stored_solar_weights_and_actual_hour_caches() {
     prepare_hourly(&raw, &mut owner);
     owner.weather.solar_interpolation = Some(vec![0.0, 1.0, 0.0, 0.0]);
     let produced = produce_day(
-        &raw, None, 4, FirstHourInterpolationStartingValues::Hour24, &mut owner,
-    ).unwrap();
+        &raw,
+        None,
+        4,
+        FirstHourInterpolationStartingValues::Hour24,
+        &mut owner,
+    )
+    .unwrap();
     let first = owner.tomorrow_values.hour(1).unwrap();
-    assert_eq!(first[0].beam_solar_rad.to_bits(), produced.hourly_values[23].beam_solar_rad.to_bits());
-    assert_eq!(first[1].beam_solar_rad.to_bits(), produced.hourly_values[0].beam_solar_rad.to_bits());
-    assert_eq!(first[2].beam_solar_rad.to_bits(), produced.hourly_values[1].beam_solar_rad.to_bits());
-    assert_eq!(first[3].dif_solar_rad.to_bits(), produced.hourly_values[1].dif_solar_rad.to_bits());
+    assert_eq!(
+        first[0].beam_solar_rad.to_bits(),
+        produced.hourly_values[23].beam_solar_rad.to_bits()
+    );
+    assert_eq!(
+        first[1].beam_solar_rad.to_bits(),
+        produced.hourly_values[0].beam_solar_rad.to_bits()
+    );
+    assert_eq!(
+        first[2].beam_solar_rad.to_bits(),
+        produced.hourly_values[1].beam_solar_rad.to_bits()
+    );
+    assert_eq!(
+        first[3].dif_solar_rad.to_bits(),
+        produced.hourly_values[1].dif_solar_rad.to_bits()
+    );
 }
 
 #[test]
@@ -303,9 +320,16 @@ fn solar_array_shape_is_admitted_before_writes_and_one_step_bypasses_use() {
         prepare_hourly(&raw, &mut owner);
         owner.weather.solar_interpolation = array;
         let before = owner.clone();
-        assert!(produce_day(
-            &raw, None, 4, FirstHourInterpolationStartingValues::Hour24, &mut owner,
-        ).is_err());
+        assert!(
+            produce_day(
+                &raw,
+                None,
+                4,
+                FirstHourInterpolationStartingValues::Hour24,
+                &mut owner,
+            )
+            .is_err()
+        );
         assert_eq!(owner, before);
     }
     let mut owner = state(1);
@@ -313,9 +337,17 @@ fn solar_array_shape_is_admitted_before_writes_and_one_step_bypasses_use() {
     owner.weather.solar_interpolation = None;
     let before = owner.clone();
     let produced = produce_day(
-        &raw, None, 1, FirstHourInterpolationStartingValues::Hour24, &mut owner,
-    ).unwrap();
-    assert_eq!(owner.tomorrow_values.hour(1).unwrap()[0], produced.hourly_values[0]);
+        &raw,
+        None,
+        1,
+        FirstHourInterpolationStartingValues::Hour24,
+        &mut owner,
+    )
+    .unwrap();
+    assert_eq!(
+        owner.tomorrow_values.hour(1).unwrap()[0],
+        produced.hourly_values[0]
+    );
     assert_eq!(owner.last_hour, before.last_hour);
     assert_eq!(owner.next_hour, before.next_hour);
     assert_eq!(owner.weather.last_hour_set, before.weather.last_hour_set);
@@ -332,7 +364,11 @@ fn raw_solar_locals_reach_the_producer_despite_a_different_record_projection() {
     raw.hours[0].raw.mandatory_reals[9] = -3.0;
     raw.hours[1].raw.mandatory_reals[8] = 9999.0;
     raw.hours[1].raw.mandatory_reals[9] = 9999.0;
-    let before_raw = raw.hours.iter().map(|slot| slot.raw.clone()).collect::<Vec<_>>();
+    let before_raw = raw
+        .hours
+        .iter()
+        .map(|slot| slot.raw.clone())
+        .collect::<Vec<_>>();
     for warnings in [false, true] {
         let mut owner = state(4);
         owner.environment.display_weather_missing_data_warnings = warnings;
@@ -347,20 +383,55 @@ fn raw_solar_locals_reach_the_producer_despite_a_different_record_projection() {
         }
         let first_hour = owner.tomorrow_values.hour(1).unwrap()[0];
         let second_hour = owner.tomorrow_values.hour(2).unwrap()[0];
-        assert_eq!(first_hour.beam_solar_rad.to_bits(), (if warnings { 0.0_f64 } else { -8.0_f64 }).to_bits());
-        assert_eq!(first_hour.dif_solar_rad.to_bits(), (if warnings { 0.0_f64 } else { -3.0_f64 }).to_bits());
+        assert_eq!(
+            first_hour.beam_solar_rad.to_bits(),
+            (if warnings { 0.0_f64 } else { -8.0_f64 }).to_bits()
+        );
+        assert_eq!(
+            first_hour.dif_solar_rad.to_bits(),
+            (if warnings { 0.0_f64 } else { -3.0_f64 }).to_bits()
+        );
         assert_eq!(second_hour.beam_solar_rad, 0.0);
         assert_eq!(second_hour.dif_solar_rad, 0.0);
-        assert_eq!(owner.out_of_range_counts.beam_solar_rad, i32::from(warnings));
+        assert_eq!(
+            owner.out_of_range_counts.beam_solar_rad,
+            i32::from(warnings)
+        );
         assert_eq!(owner.out_of_range_counts.dif_solar_rad, i32::from(warnings));
         assert_eq!(owner.missed_counts.beam_solar_rad, i32::from(warnings));
-        assert_eq!(owner.missed_counts.dif_solar_rad, if warnings { 2 } else { 0 });
+        assert_eq!(
+            owner.missed_counts.dif_solar_rad,
+            if warnings { 2 } else { 0 }
+        );
         let counts = (owner.missed_counts, owner.out_of_range_counts);
-        let produced = produce_day(&raw, None, 4, FirstHourInterpolationStartingValues::Hour1, &mut owner).unwrap();
+        let produced = produce_day(
+            &raw,
+            None,
+            4,
+            FirstHourInterpolationStartingValues::Hour1,
+            &mut owner,
+        )
+        .unwrap();
         assert_eq!(produced.hourly_values[0], first_hour);
-        assert_eq!(owner.tomorrow_values.hour(1).unwrap()[1].beam_solar_rad.to_bits(), first_hour.beam_solar_rad.to_bits());
-        assert_eq!(owner.tomorrow_values.hour(1).unwrap()[1].dif_solar_rad.to_bits(), first_hour.dif_solar_rad.to_bits());
+        assert_eq!(
+            owner.tomorrow_values.hour(1).unwrap()[1]
+                .beam_solar_rad
+                .to_bits(),
+            first_hour.beam_solar_rad.to_bits()
+        );
+        assert_eq!(
+            owner.tomorrow_values.hour(1).unwrap()[1]
+                .dif_solar_rad
+                .to_bits(),
+            first_hour.dif_solar_rad.to_bits()
+        );
         assert_eq!((owner.missed_counts, owner.out_of_range_counts), counts);
     }
-    assert_eq!(raw.hours.iter().map(|slot| slot.raw.clone()).collect::<Vec<_>>(), before_raw);
+    assert_eq!(
+        raw.hours
+            .iter()
+            .map(|slot| slot.raw.clone())
+            .collect::<Vec<_>>(),
+        before_raw
+    );
 }

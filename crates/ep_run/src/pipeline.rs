@@ -3455,8 +3455,7 @@ fn prepare_runtime_inputs(
                 i32::try_from(design_day_count).map_err(|error| error.to_string())?,
             )
             .map_err(|error| error.to_string())?;
-            let environment_inputs =
-                crate::weather_solar_controls::capture_environment_inputs()?;
+            let environment_inputs = crate::weather_solar_controls::capture_environment_inputs()?;
             configuration.solar_controls =
                 crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
             let weather_series = ProductionWeatherTimestepSeries::from_bytes(
