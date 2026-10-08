@@ -1,0 +1,108 @@
+{
+  "schema": "clk03-legacy-baseline-evidence.v1",
+  "card": "CLK-03",
+  "created_utc": "2026-10-08T06:41:23.153253+00:00",
+  "status": "actual-original-and-unchanged-legacy-baseline-preserved-before-candidate-port",
+  "packet_revision": 3,
+  "prior_original_evidence": {
+    "path": "energyplus_porting_plan/evidence/CLK-03-original-execution.json",
+    "sha256": "9a16824993dbc0b043e2472b352fd1661c761a63cfb669850595c827db5c78f8"
+  },
+  "actual_legacy_receipt": {
+    "path": ".runtime/porting/CLK-03/legacy-observations-03/receipt.json",
+    "sha256": "a54810bc4ae8cc03d888e2da807e509ad60954b3153163601809f177196870a4"
+  },
+  "actual_legacy_command": {
+    "path": ".runtime/porting/CLK-03/legacy-command-03/receipt.json",
+    "sha256": "36b9fcde42e8f71ebbd3523603d111611295e154eafb22c9b13459fc6fa58da4"
+  },
+  "actual_legacy_child": {
+    "path": ".runtime/porting/CLK-03/legacy-observations-03/command.json",
+    "sha256": "d9b0679cedfcf85a38a7b52548853b5995a09bb3fbd5135a580f9c40b9a4071d"
+  },
+  "actual_legacy_results": {
+    "path": ".runtime/porting/CLK-03/legacy-observations-03/stdout.log",
+    "sha256": "3b57ec0f1972990bbc060f19eedd9214e9abc2db6ef795d199ce794a00a64a0b"
+  },
+  "actual_legacy_Rust_build": {
+    "path": ".runtime/porting/CLK-03/legacy-probe-build-01/build-receipt.json",
+    "sha256": "386b32c6f665a122548656011ab363d50c79008ebeb73f72872a2a15c362d679"
+  },
+  "actual_legacy_build_commit": "b3e1a4ad2c63c80dfef9baa21cbb6e16599d6bcd",
+  "actual_legacy_source_snapshot": {
+    "path": ".runtime/porting/source-objects/f6/f661b9f9f95874049a3ef11b878d45f0a51fe53614e3035f8fffb8ea763b8137",
+    "sha256": "f661b9f9f95874049a3ef11b878d45f0a51fe53614e3035f8fffb8ea763b8137"
+  },
+  "all3690_Rust_Cargo_and_configuration_bytes_preserved": true,
+  "actual_legacy_child_and_launcher_exit_codes": 0,
+  "actual_gap_metadata": {
+    "path": ".runtime/porting/CLK-03/legacy-gap-05/gap.json",
+    "sha256": "340365c467b4dd606fa9721261e0ffd52f762662943875d1f2aab928bf858097"
+  },
+  "actual_gap_metadata_command": {
+    "path": ".runtime/porting/CLK-03/legacy-gap-command-05/receipt.json",
+    "sha256": "97e3afebd97c101b1ded4101913cf55ce01099bfe8a80061602b1126d79d557a"
+  },
+  "independent_final_gap_reader_source_review": {
+    "path": ".runtime/porting/CLK-03/independent-legacy-gap-reader-static-review-05/review.json",
+    "sha256": "dfe56452f2a0d67b3636e1005034732ff96f2671b5f91bee45ef0069eeab1216"
+  },
+  "preserved_failed_metadata_reader_attempts": [
+    {
+      "actual_command": {
+        "path": ".runtime/porting/CLK-03/legacy-gap-command-03/receipt.json",
+        "sha256": "51941f902158377bc6b67de4818ae76c583eb6eef9134004b2dbc0ad41cabc02"
+      },
+      "actual_exit_code": 1,
+      "stderr": {
+        "path": ".runtime/porting/CLK-03/legacy-gap-command-03/stderr.log",
+        "sha256": "35eefc218bba0ba9c69210756f1031f2af29f2d9f2805d27f815803218ee8e9d"
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/f6/f661b9f9f95874049a3ef11b878d45f0a51fe53614e3035f8fffb8ea763b8137",
+        "sha256": "f661b9f9f95874049a3ef11b878d45f0a51fe53614e3035f8fffb8ea763b8137"
+      },
+      "repair_scope": "Reader conflated3677 Rust files with3690 complete Rust/Cargo/config snapshot."
+    },
+    {
+      "actual_command": {
+        "path": ".runtime/porting/CLK-03/legacy-gap-command-04/receipt.json",
+        "sha256": "d81c2d89433675469e6737449627d367cc868429b536a4f823bdf36dec76095a"
+      },
+      "actual_exit_code": 1,
+      "stderr": {
+        "path": ".runtime/porting/CLK-03/legacy-gap-command-04/stderr.log",
+        "sha256": "d8bdb1621ad104825815beda46dcd3d504e36d565f3695622c61c255d8ba7718"
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/f6/f661b9f9f95874049a3ef11b878d45f0a51fe53614e3035f8fffb8ea763b8137",
+        "sha256": "f661b9f9f95874049a3ef11b878d45f0a51fe53614e3035f8fffb8ea763b8137"
+      },
+      "repair_scope": "Later reviewed-source lookup still omitted Cargo.toml from the Rust-only map."
+    }
+  ],
+  "native_operation_counts": {
+    "UpdateWeatherData": 8,
+    "GetNextEnvironment": 10,
+    "InitializeWeather": 27,
+    "ReadWeatherForDay": 3
+  },
+  "native_source_status_counts": {
+    "source_returned": 46,
+    "source_fatal": 2,
+    "not-invoked-after-prior-source-outcome": 3
+  },
+  "legacy_unavailable_native_operation_count": 51,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "processed_weather_physics_certified": false,
+  "candidate_implementation_executed_at_this_stage": false,
+  "gates_changed": false,
+  "gap": "The existing eager full-file parser and immutable weather series expose no same-owner source-order reader or full Today/Tomorrow call snapshots. Availability remains explicit instead of inventing native operations.",
+  "next_implementation": [
+    "Actual supplied-byte cursor with source-order header/read/rewind/backspace and authoritative parser counter.",
+    "Full daily/slot carrier assignment with unchanged auxiliary owners.",
+    "Shared fallible A/B consumer hooks using actual current Today operands."
+  ]
+}

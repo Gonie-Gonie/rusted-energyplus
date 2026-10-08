@@ -1,0 +1,736 @@
+{
+  "schema": "clk03-original-first-execution-evidence.v1",
+  "card": "CLK-03",
+  "created_utc": "2026-10-08T06:26:53.411133+00:00",
+  "packet_revision": 3,
+  "status": "genuine-original-and-intended-call-coverage-reviewed-before-legacy-baseline",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "actual_original_reference": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+    "sha256": "0513bc94d02703d299cb0a63bc66fa11a0b405e0d0873d3e61a0916a4e123cdc"
+  },
+  "actual_original_command": {
+    "path": ".runtime/porting/CLK-03/original-command-03/receipt.json",
+    "sha256": "cb2f1e545802fcdcdf8015ce5ee2f405fefb02dcd35dd5b196550647dd45fcde"
+  },
+  "actual_native_child": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-command.json",
+    "sha256": "adc89192036147befe8970fa1974a79f7df13b337a1669f31daa1909d8763544"
+  },
+  "actual_native_results": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/native-output/results.json",
+    "sha256": "d9b7c675e2a4ac77968b03a1e7c17a366f61a22e9ea4c1bed00b88a4a2ac0a34"
+  },
+  "independent_original_data_review": {
+    "path": ".runtime/porting/CLK-03/independent-original-data-review-02/review.json",
+    "sha256": "b8874a962db7c71f6395a5b3ccd811e780fffacc048a76d67bc215634f756166"
+  },
+  "actual_data_review_command": {
+    "path": ".runtime/porting/CLK-03/original-data-review-command-02/receipt.json",
+    "sha256": "eec4b78a8d48f4e6d711f05ef6603374010c70300e2ac0cb8a0ba4beb1e87505"
+  },
+  "actual_native_and_launcher_exit_codes": 0,
+  "source_and_input_preservation_passed": true,
+  "runtime_input_admission": {
+    "path": ".runtime/porting/CLK-03/runtime-input-admission-01/admission.json",
+    "sha256": "b9291bb7ede3a0aefd9cfa72842c724b931d0c830447424695d7c0b59e005f19"
+  },
+  "actual_runtime_input_admission_command": {
+    "path": ".runtime/porting/CLK-03/runtime-input-admission-command-01/receipt.json",
+    "sha256": "5e5744f5b621c9925872f804c81775fe3b57a0603540f2d5766475e10f172ad3"
+  },
+  "independent_reviews": {
+    "actual_build_review": {
+      "path": ".runtime/porting/CLK-03/independent-native-build-review-03/review.json",
+      "sha256": "771f09567e5d1b3c91fcbd54f9519f0cb415a63db8560818576f62277162b01a"
+    },
+    "original_launcher_static_review": {
+      "path": ".runtime/porting/CLK-03/independent-original-launcher-static-review-04/review.json",
+      "sha256": "d6872579de8b95c8218f7bb2a70628e8c11b2abef3afb93c9f155dcd09a28c38"
+    },
+    "historical_contract_review": {
+      "path": ".runtime/porting/CLK-03/independent-contract-review-02/review.json",
+      "sha256": "8c03a8de71177b9bf24a6f7d6c5d9d5bbce174f9975572cbf8df5bc1524944fc"
+    },
+    "historical_helper_static_review": {
+      "path": ".runtime/porting/CLK-03/independent-helper-static-review-03/review.json",
+      "sha256": "46c2ba9983922b7eadb975bd5d4927d3ee1a6ee6a4337c858d13bfe2255c794f"
+    },
+    "runtime_contract_review": {
+      "path": ".runtime/porting/CLK-03/independent-contract-review-03/review.json",
+      "sha256": "7cea358f34f2e95bcd010616203b13b1737c0c1a8f953b3d2bd84a865d3cf379"
+    },
+    "runtime_admission_source_review": {
+      "path": ".runtime/porting/CLK-03/independent-runtime-admission-source-review-01/review.json",
+      "sha256": "edb13426e907b312cb5b0edda10c9a01bafff8918676eecb8901d425aa6d1ce5"
+    },
+    "runtime_input_admission_review": {
+      "path": ".runtime/porting/CLK-03/independent-runtime-input-admission-review-01/review.json",
+      "sha256": "91dacc4d1aaa9d83e33c1de068d8701a9b3170cac4fbe830f53a893e44b143f6"
+    }
+  },
+  "historical_genuine_native_build": {
+    "path": ".runtime/porting/CLK-03/native-build-03/native-driver-build.json",
+    "sha256": "cdc90a5e5806c03e98355e7cd1593a0638ea1a5c7f801aa52ac7aad73c1a2700"
+  },
+  "historical_compiled_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "34a97933c787e208a1e948dc7c2f2a42640c2192c859236e138be5dcc5d276f2"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "069b727bf532b74c1378d082700aea690771360c88b7c31146f14f081a700b0f"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "d203fd996fa7df1e52a9f6b0192f1aef89892bce458b74e713d1dad72ee10b02"
+    }
+  },
+  "historical_compiled_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "8995143c6d12ac46c695a401b7b3084c7c5f10c807675b2846c4691befd7b55b"
+  },
+  "current_runtime_packet": {
+    "contracts": {
+      "source": {
+        "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+        "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+      },
+      "cases": {
+        "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+        "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+      },
+      "tolerances": {
+        "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+        "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+      }
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+      "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+    },
+    "counts": {
+      "handoff_sequences": 4,
+      "weather_sequences": 10,
+      "handoff_operations": 7,
+      "weather_operations": 44,
+      "total_sequences": 14,
+      "total_operations": 51
+    },
+    "fixed_CON_scope": {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    },
+    "input_byte_maps": {
+      "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+      "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+    }
+  },
+  "new_native_build_claimed": false,
+  "historical_build_receipt_rewritten": false,
+  "actual_requested_counts": {
+    "handoff_operations": 7,
+    "handoff_sequences": 4,
+    "total_operations": 51,
+    "total_sequences": 14,
+    "weather_operations": 44,
+    "weather_sequences": 10
+  },
+  "actual_invoked_operation_counts": {
+    "UpdateWeatherData": 8,
+    "GetNextEnvironment": 10,
+    "InitializeWeather": 27,
+    "ReadWeatherForDay": 3
+  },
+  "actual_source_status_counts": {
+    "source_returned": 46,
+    "source_fatal": 2,
+    "not-invoked-after-prior-source-outcome": 3
+  },
+  "intended_native_branch_coverage_complete": true,
+  "intended_native_branch_coverage": [
+    {
+      "sequence_id": "CTOR-COPY-DEFAULTS",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "copy-defaults",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "COPY-BEGIN-ENV-POSITIVE-HOLIDAY",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "first",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "repeat-with-new-tomorrow",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "COPY-NORMAL-ZERO-HOLIDAY",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "first",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "repeat-with-new-tomorrow",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "COPY-NORMAL-NEGATIVE-HOLIDAY",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "first",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "repeat-with-new-tomorrow",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "A-24H",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "A-72H",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-3",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-3",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "MISSING-MATCH-DEFINED-FAILURE",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_fatal",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": false,
+          "source_status": "not-invoked-after-prior-source-outcome",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "OUTSIDE-DATA-PERIOD",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_fatal",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": false,
+          "source_status": "not-invoked-after-prior-source-outcome",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": false,
+          "source_status": "not-invoked-after-prior-source-outcome",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "read-first",
+          "kind": "ReadWeatherForDay",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "handoff-with-live-input-stream",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "replay-search-from-current-position",
+          "kind": "ReadWeatherForDay",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "read-first",
+          "kind": "ReadWeatherForDay",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    }
+  ],
+  "prior_preparation_fatal_accepted_as_intended_weather_failure": false,
+  "Rust_legacy_execution_performed_at_this_stage": false,
+  "Rust_candidate_execution_performed_at_this_stage": false,
+  "Rust_values_numerically_compared": false,
+  "processed_weather_physics_certified": false,
+  "gates_changed": false,
+  "prior_input_preparation": {
+    "path": "energyplus_porting_plan/evidence/CLK-03-input-preparation.json",
+    "sha256": "ab247b7f4486837aeaadaedf9cc2e11cc35e7a2d67c41ace4e398c24ad983826"
+  },
+  "remaining": [
+    "Execute the unchanged frozen Rust baseline and record actual owner availability and gap.",
+    "Implement live source-order cursor, whole daily/slot handoff and actual shared A/B consumer hooks.",
+    "Run paired unit/connection comparison and actual production traces before closing gates."
+  ]
+}

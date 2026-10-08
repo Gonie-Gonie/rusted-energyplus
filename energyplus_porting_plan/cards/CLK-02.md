@@ -89,3 +89,7 @@ workspace 실제 시험: 4,552 passed/0 failed/0 ignored; 21 reported suite grou
 추가 검토할 helper: CLK-03~06 record selection·Today/Tomorrow·결측 대체·보간·sky/IR·calendar/warmup 및 이후 물리 계산.
 
 기존 public legacy API는 유지한다. 새로운 생산 로더는 동일 raw 파싱 결과와 별도 physical projection을 반환하며, 실제 소비 인계만 이 카드에서 인증한다.
+
+## 계획 데이터의 형식 보완
+
+계획 검사에 맞춰 EP 범위 54개에 선정 helper 목록을 추가하고 외부 라이브러리 범위 10개를 별도 항목에 보존했다. EnergyPlus.hh의 실제 마지막 행은 196이므로 계획 범위의 끝을 196으로 고쳤으며, 동결 계약에 기재된 197도 별도 기록했다. 두 범위의 실제 바이트와 기존 해시는 같다. 동결 계약·원본·시험 기록·완료 gate는 변경하지 않았다.
