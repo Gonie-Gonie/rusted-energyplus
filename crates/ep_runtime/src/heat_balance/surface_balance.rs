@@ -12,10 +12,13 @@ use crate::heat_balance::ctf::{
     CtfOutsideQuickConductionBalanceInput, energyplus_ctf_outside_face_temperature_c,
     energyplus_ctf_outside_face_temperature_quick_conduction_calculation,
 };
-use crate::heat_balance::longwave::{ExteriorLongwaveTerms, energyplus_exterior_longwave_terms};
+use crate::heat_balance::longwave::{
+    ExteriorLongwaveTerms, energyplus_exterior_longwave_terms_with_sky_temperature_c,
+    horizontal_infrared_sky_temperature_c,
+};
 use crate::heat_balance::solar::{
-    stored_surface_incident_solar_radiation_for_weather_context_w_per_m2,
-    surface_incident_solar_radiation_for_weather_context_w_per_m2,
+    stored_surface_incident_solar_radiation_for_current_weather_context_w_per_m2,
+    surface_incident_solar_radiation_for_current_weather_context_w_per_m2,
 };
 use crate::heat_balance::state::{
     SurfaceBoundaryBalanceResult, SurfaceExteriorReportTerms, SurfaceHeatBalanceState,
@@ -119,7 +122,7 @@ pub(crate) fn exterior_surface_boundary_balance(
             outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
         };
     };
-    let Some(record) = context.records.get(context.record_index) else {
+    let Some(record) = context.current_record() else {
         return SurfaceBoundaryBalanceResult {
             temperature_c: outdoor_dry_bulb_c,
             exterior_report_terms: SurfaceExteriorReportTerms::default(),
@@ -168,7 +171,7 @@ pub(crate) fn exterior_surface_boundary_balance(
             return exterior_surface_energy_balance(
                 surface_state,
                 typed_surface,
-                record,
+                &record,
                 surface_outdoor_dry_bulb_c,
                 owning_zone_temperature_c,
                 0.0,
@@ -182,17 +185,14 @@ pub(crate) fn exterior_surface_boundary_balance(
                 wet_timestep_fraction,
                 quick_outside_conduction
                     .and_then(|context| context.exterior_coefficient_surface_temperature_c),
+                context.owned.map(|current| current.weather.sky_temp),
             );
         };
-        stored_surface_incident_solar_radiation_for_weather_context_w_per_m2(
+        stored_surface_incident_solar_radiation_for_current_weather_context_w_per_m2(
             typed_surface,
             surface_state,
             site,
-            context.records,
-            context.record_index,
-            context.zone_steps_per_hour,
-            context.zone_timestep,
-            context.first_hour_interpolation_starting_values,
+            context,
         )
     } else {
         0.0
@@ -200,7 +200,7 @@ pub(crate) fn exterior_surface_boundary_balance(
     exterior_surface_energy_balance(
         surface_state,
         typed_surface,
-        record,
+        &record,
         surface_outdoor_dry_bulb_c,
         owning_zone_temperature_c,
         incident_solar_w_per_m2,
@@ -214,6 +214,7 @@ pub(crate) fn exterior_surface_boundary_balance(
         wet_timestep_fraction,
         quick_outside_conduction
             .and_then(|context| context.exterior_coefficient_surface_temperature_c),
+        context.owned.map(|current| current.weather.sky_temp),
     )
 }
 
@@ -265,7 +266,7 @@ pub(crate) fn surface_exterior_report_terms(
     let Some(context) = weather_context else {
         return SurfaceExteriorReportTerms::default();
     };
-    let Some(record) = context.records.get(context.record_index) else {
+    let Some(record) = context.current_record() else {
         return SurfaceExteriorReportTerms::default();
     };
     let Some(typed_surface) = model
@@ -281,14 +282,10 @@ pub(crate) fn surface_exterior_report_terms(
             .site
             .as_ref()
             .map(|site| {
-                surface_incident_solar_radiation_for_weather_context_w_per_m2(
+                surface_incident_solar_radiation_for_current_weather_context_w_per_m2(
                     typed_surface,
                     site,
-                    context.records,
-                    context.record_index,
-                    context.zone_steps_per_hour,
-                    context.zone_timestep,
-                    context.first_hour_interpolation_starting_values,
+                    context,
                 )
             })
             .unwrap_or(0.0)
@@ -330,10 +327,19 @@ pub(crate) fn surface_exterior_report_terms(
         wet_reference_temperature_c,
         wet_timestep_fraction,
     );
-    let longwave_terms = energyplus_exterior_longwave_terms(
+    let sky_temperature_c = context
+        .owned
+        .map(|current| current.weather.sky_temp)
+        .unwrap_or_else(|| {
+            horizontal_infrared_sky_temperature_c(
+                horizontal_infrared_radiation_w_per_m2,
+                surface_outdoor_dry_bulb_c,
+            )
+        });
+    let longwave_terms = energyplus_exterior_longwave_terms_with_sky_temperature_c(
         surface_state,
         typed_surface,
-        horizontal_infrared_radiation_w_per_m2,
+        sky_temperature_c,
         reported_outside_face_temperature_c,
         convection_terms.reference_temperature_c,
         surface_outdoor_dry_bulb_c,
@@ -465,6 +471,7 @@ pub(crate) fn exterior_surface_energy_balance(
     wet_reference_temperature_c: f64,
     wet_timestep_fraction: f64,
     exterior_coefficient_surface_temperature_c: Option<f64>,
+    sky_temperature_c: Option<f64>,
 ) -> SurfaceBoundaryBalanceResult {
     if quick_outside_conduction.is_none() {
         if wet_timestep_fraction <= f64::EPSILON
@@ -500,10 +507,16 @@ pub(crate) fn exterior_surface_energy_balance(
         wet_reference_temperature_c,
         wet_timestep_fraction,
     );
-    let longwave_terms = energyplus_exterior_longwave_terms(
+    let sky_temperature_c = sky_temperature_c.unwrap_or_else(|| {
+        horizontal_infrared_sky_temperature_c(
+            horizontal_infrared_radiation_w_per_m2,
+            outdoor_dry_bulb_c,
+        )
+    });
+    let longwave_terms = energyplus_exterior_longwave_terms_with_sky_temperature_c(
         surface_state,
         typed_surface,
-        horizontal_infrared_radiation_w_per_m2,
+        sky_temperature_c,
         coefficient_surface_temperature_c,
         convection_terms.reference_temperature_c,
         outdoor_dry_bulb_c,

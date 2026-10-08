@@ -108,7 +108,7 @@ pub fn load_parsed_epw_weather_file(
     })
 }
 
-fn project_record(raw: &RawEpwOutputs, line: usize) -> Result<EpwRecord, EpwError> {
+pub(crate) fn project_record(raw: &RawEpwOutputs, line: usize) -> Result<EpwRecord, EpwError> {
     let mut dates = [0_u32; 5];
     for (target, value) in dates.iter_mut().zip(raw.dates) {
         *target = u32::try_from(value).map_err(|reason| error(line, reason))?;

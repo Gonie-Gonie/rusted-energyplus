@@ -1,0 +1,155 @@
+{
+  "schema": "clk03-candidate-implementation-regressions.v1",
+  "card": "CLK-03",
+  "recorded_utc": "2026-10-08T07:46:48.389789+00:00",
+  "status": "candidate-source-and-regressions-ready-original-comparison-pending",
+  "implementation": [
+    "actual mutable EPW cursor/header/parser owner",
+    "full11 daily/full17 weather carrier and whole Today/Tomorrow copy",
+    "source-order selected GetNextEnvironment/InitializeWeather/ReadWeatherForDay",
+    "one-use initial phase token before humidity and raw-hour CTF seeds",
+    "owned live weather operands shared by actual A/B consumers",
+    "completed-hour clock and warmup reporting string from pinned caller order"
+  ],
+  "commands": {
+    "candidate-runtime-unit-command-02": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-runtime-unit-command-02/receipt.json",
+        "sha256": "b9a32eca10ba4e83a4748d97bf14e5f8e0ef0360a5b31b02ea0b5fe6419bd14c"
+      },
+      "actual_exit_code": 101,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/dc/dc0e0620d1ac57526079992c40e9056dce9757576a0d2ca236121eebc3f029a9",
+        "sha256": "dc0e0620d1ac57526079992c40e9056dce9757576a0d2ca236121eebc3f029a9"
+      },
+      "actual_passed_tests": 2971,
+      "actual_failed_tests": 1
+    },
+    "candidate-owned-forcing-unit-command-03": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-owned-forcing-unit-command-03/receipt.json",
+        "sha256": "3848405ae5db1183878b06ec9ca791d6d686eb81cd11e32072b9a9059e82a5b8"
+      },
+      "actual_exit_code": 0,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/6e/6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb",
+        "sha256": "6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb"
+      },
+      "actual_passed_tests": 1,
+      "actual_failed_tests": 0
+    },
+    "candidate-workspace-unit-command-01": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-workspace-unit-command-01/receipt.json",
+        "sha256": "3f703ee6b06a01d8388055b89bf7704b7714bf276bf38988ed7648e4983847ec"
+      },
+      "actual_exit_code": 0,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/6e/6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb",
+        "sha256": "6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb"
+      },
+      "actual_passed_tests": 4580,
+      "actual_failed_tests": 0
+    },
+    "candidate-weather-unit-command-04": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-weather-unit-command-04/receipt.json",
+        "sha256": "3a7a131121cba41f081d33d41e3ba7f14756cfd07c8f6f09f4d122bf87d0829c"
+      },
+      "actual_exit_code": 0,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/d8/d8eb681101071960125210ed8b97d4d694043ca300e6f0f4335c16051633a7a5",
+        "sha256": "d8eb681101071960125210ed8b97d4d694043ca300e6f0f4335c16051633a7a5"
+      },
+      "actual_passed_tests": 56,
+      "actual_failed_tests": 0
+    },
+    "candidate-clippy-command-01": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-clippy-command-01/receipt.json",
+        "sha256": "7908da1e60cec22a7cbf79e1799e984caafc294d9d3c181c9d6d12d57bc37c7c"
+      },
+      "actual_exit_code": 101,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/0a/0aded3050c80943afa053ce687eac9d6d367120ef1e37f11e3750baa92fd892f",
+        "sha256": "0aded3050c80943afa053ce687eac9d6d367120ef1e37f11e3750baa92fd892f"
+      }
+    },
+    "candidate-clippy-command-02": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-clippy-command-02/receipt.json",
+        "sha256": "226af8da5c2946170236801218a353e883d5a9debe1fc62388a8c1694a231a0d"
+      },
+      "actual_exit_code": 0,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/d8/d8eb681101071960125210ed8b97d4d694043ca300e6f0f4335c16051633a7a5",
+        "sha256": "d8eb681101071960125210ed8b97d4d694043ca300e6f0f4335c16051633a7a5"
+      }
+    },
+    "candidate-comparer-source-review-command-01": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-comparer-source-review-command-01/receipt.json",
+        "sha256": "288409818ff914c58a6af53f57bf78a640a866ee68e7b326545efdc40f6b9b91"
+      },
+      "actual_exit_code": 1,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/dc/dc0e0620d1ac57526079992c40e9056dce9757576a0d2ca236121eebc3f029a9",
+        "sha256": "dc0e0620d1ac57526079992c40e9056dce9757576a0d2ca236121eebc3f029a9"
+      }
+    },
+    "candidate-comparer-source-review-command-02": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/candidate-comparer-source-review-command-02/receipt.json",
+        "sha256": "19d21cc345c5e4eb80998e3b2d1e9baa1c3af9e9edf4d1b4bef9864d6404e3a4"
+      },
+      "actual_exit_code": 0,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/6e/6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb",
+        "sha256": "6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb"
+      }
+    },
+    "unit-dto-freeze-command-01": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/unit-dto-freeze-command-01/receipt.json",
+        "sha256": "0933af8afbb5efa8582736c1012ef4321f954aae6b116580e2ad148e16cdcead"
+      },
+      "actual_exit_code": 0,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/6e/6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb",
+        "sha256": "6efb465258eadae77ce9dc65ab939a8a53bac7090e784287ef16b1f546bc69cb"
+      }
+    }
+  },
+  "source_review": {
+    "path": ".runtime/porting/CLK-03/candidate-comparer-source-review-02/review.json",
+    "sha256": "c54f573174c73ee7ee03d1b772c0c8712b31fb3209662bfdb5901bd293581d52"
+  },
+  "supplemental_caller_source_review": {
+    "path": ".runtime/porting/CLK-03/production-source-readiness-review-01/review.json",
+    "sha256": "755f22129578c7762a05c56966029f2ca5a5c1754a732f5e520cc3b4f8af8286"
+  },
+  "pre_execution_DTO_projection": {
+    "path": ".runtime/porting/CLK-03/unit-dto-freeze-01/projection.json",
+    "sha256": "4417bed908752814a1a5ea1bd79c1b2af13c0979fb6f2ca11dd3691a31285b6b"
+  },
+  "failed_attempts_preserved": [
+    "Inactive downward-roof sky forcing fixture: 2971 pass / 1 failure; outward roof plus active sky assertion then passes.",
+    "Static prereq review rejected full-report assumption for genuine compact original command stdout.",
+    "Clippy rejected seven style diagnostics; bounded equivalent guards/initializers and explicit constructor-order allowance corrected."
+  ],
+  "regression_scope": [
+    "Workspace 4580 tests passed before the supplemental production caller clock correction.",
+    "Weather 56 tests passed after completed-hour and warmup report-string correction; includes actual repeated warmup/day transitions.",
+    "Final Clippy workspace/all-targets with -D warnings passed; production source remains held for canonical build."
+  ],
+  "native_comparison_executed": false,
+  "native_numerical_PASS_claimed": false,
+  "canonical_candidate_probe_executed": false,
+  "production_matrix_executed": false,
+  "gates_updated": false,
+  "limits": [
+    "Physical producer generation remains explicitly unpaired until its own weather cards.",
+    "Full native registry/interpolation/private locals and source record indices remain unavailable.",
+    "Public phase/axis caller assumptions are bounded to admitted ordered A/B inputs."
+  ]
+}

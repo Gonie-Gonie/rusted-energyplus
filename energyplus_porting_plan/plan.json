@@ -5057,6 +5057,11 @@
       "legacy_baseline_evidence": {
         "path": "energyplus_porting_plan/evidence/CLK-03-legacy-baseline.json",
         "sha256": "57c8d4cd6f0b76a1e591079ed999566565f9d100b832a0ddadd7de5e2bb4ebc2"
+      },
+      "rust_candidate_implementation_evidence": {
+        "path": "energyplus_porting_plan/evidence/CLK-03-candidate-implementation.json",
+        "sha256": "0f782533646ac63f49d8fbbfec9e10eae524a03aea968b9894ed2adee8aa2f44",
+        "status": "candidate-regressions-passed-original-and-production-comparison-pending"
       }
     },
     {

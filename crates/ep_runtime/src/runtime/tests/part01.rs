@@ -9,7 +9,7 @@
         HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
         HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupOptions,
-        HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirReportSampling,
+        HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceWeatherDriver, HeatBalanceZoneAirReportSampling,
         HeatBalanceZoneConductionReportSource, InteriorLongwaveExchangeProbe,
         InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, OutputSeries,
         QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,

@@ -67,6 +67,7 @@
             Some(HeatBalanceWeatherContext {
                 records: &records,
                 sample: None,
+                owned: None,
                 record_index: 0,
                 zone_steps_per_hour: 4,
                 zone_timestep: None,
@@ -257,7 +258,7 @@
                 zone.zone_timestep_average_air_temperature_c = temperature_c;
                 state.timestep_index += 1;
             },
-        );
+        )?;
 
         assert_eq!(summary.day_count, 3);
         assert!(summary.converged);
@@ -331,13 +332,13 @@ DATA PERIODS
             FirstHourInterpolationStartingValues::Hour24,
             &mut dry_only_warmup_day_end_states,
             advance_heat_balance_state_one_timestep_internal,
-        );
+        )?;
         let weather_context_summary = run_heat_balance_run_period_warmup(
             &typed,
             &mut weather_context_state,
             &weather_dry_bulb_c,
             Some(&records),
-            Some(&weather_series),
+            Some(HeatBalanceWeatherDriver::Legacy(&weather_series)),
             1,
             SECONDS_PER_HOUR,
             options,
@@ -348,7 +349,7 @@ DATA PERIODS
             FirstHourInterpolationStartingValues::Hour24,
             &mut weather_context_warmup_day_end_states,
             advance_heat_balance_state_one_timestep_internal,
-        );
+        )?;
 
         assert_eq!(dry_only_summary.day_count, 1);
         assert_eq!(weather_context_summary.day_count, 1);

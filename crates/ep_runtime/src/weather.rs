@@ -12,6 +12,9 @@ const EPW_HEADER_LINE_COUNT: usize = 8;
 #[path = "weather_raw/mod.rs"]
 pub mod raw;
 
+#[path = "weather_day/mod.rs"]
+pub mod day;
+
 #[path = "weather_calendar.rs"]
 mod weather_calendar;
 use weather_calendar::parse_epw_calendar_metadata;
@@ -196,10 +199,27 @@ pub struct EpwRecord {
 pub(crate) struct HeatBalanceWeatherContext<'a> {
     pub(crate) records: &'a [EpwRecord],
     pub(crate) sample: Option<&'a WeatherTimestepSample>,
+    pub(crate) owned: Option<day::ProductionWeatherContext>,
     pub(crate) record_index: usize,
     pub(crate) zone_steps_per_hour: u32,
     pub(crate) zone_timestep: Option<u32>,
     pub(crate) first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+}
+
+impl HeatBalanceWeatherContext<'_> {
+    pub(crate) fn current_record(self) -> Option<EpwRecord> {
+        match self.owned {
+            Some(current) => Some(current.record),
+            None => self.records.get(self.record_index).copied(),
+        }
+    }
+
+    pub(crate) fn sample_value(self) -> Option<WeatherTimestepSample> {
+        match self.owned {
+            Some(current) => Some(current.sample),
+            None => self.sample.copied(),
+        }
+    }
 }
 
 /// One weather sample precomputed for a zone timestep.
@@ -553,16 +573,17 @@ pub(crate) fn heat_balance_weather_context_for_timestep(
         let context = HeatBalanceWeatherContext {
             records: series.hourly_records(),
             sample: series.sample_for(record_index, zone_timestep),
+            owned: None,
             record_index,
             zone_steps_per_hour,
             zone_timestep: Some(zone_timestep),
             first_hour_interpolation_starting_values,
         };
-        if let Some(record) = context.records.get(record_index) {
+        if let Some(record) = context.current_record() {
             raw::production_trace::record_consumer(
                 record_index,
                 zone_timestep,
-                record,
+                &record,
                 context.sample,
             );
         }
@@ -637,7 +658,7 @@ pub(crate) fn energyplus_weather_relative_humidity_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_relative_humidity_percent: f64,
 ) -> f64 {
-    if let Some(sample) = context.sample {
+    if let Some(sample) = context.sample_value() {
         return sample.relative_humidity_percent;
     }
     let Some(timestep) = context.zone_timestep else {
@@ -695,7 +716,7 @@ pub(crate) fn energyplus_weather_atmospheric_pressure_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_atmospheric_pressure_pa: f64,
 ) -> f64 {
-    if let Some(sample) = context.sample {
+    if let Some(sample) = context.sample_value() {
         return sample.atmospheric_pressure_pa;
     }
     let Some(timestep) = context.zone_timestep else {
@@ -753,10 +774,10 @@ pub(crate) fn weather_context_outdoor_humidity_ratio(
     context: HeatBalanceWeatherContext<'_>,
     fallback_dry_bulb_c: f64,
 ) -> Option<f64> {
-    if let Some(sample) = context.sample {
+    if let Some(sample) = context.sample_value() {
         return Some(sample.outdoor_humidity_ratio);
     }
-    let record = context.records.get(context.record_index)?;
+    let record = context.current_record()?;
     let dry_bulb_c = context
         .zone_timestep
         .map(|timestep| {
@@ -788,7 +809,7 @@ pub(crate) fn energyplus_weather_horizontal_infrared_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_hourly_horizontal_infrared_w_per_m2: f64,
 ) -> f64 {
-    if let Some(sample) = context.sample {
+    if let Some(sample) = context.sample_value() {
         return sample.horizontal_infrared_radiation_w_per_m2;
     }
     let Some(timestep) = context.zone_timestep else {
@@ -922,7 +943,7 @@ pub(crate) fn energyplus_weather_wind_speed_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_hourly_wind_speed_m_per_s: f64,
 ) -> f64 {
-    if let Some(sample) = context.sample {
+    if let Some(sample) = context.sample_value() {
         return sample.wind_speed_m_per_s;
     }
     let Some(timestep) = context.zone_timestep else {
@@ -980,7 +1001,7 @@ pub(crate) fn energyplus_weather_wind_direction_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_hourly_wind_direction_deg: f64,
 ) -> f64 {
-    if let Some(sample) = context.sample {
+    if let Some(sample) = context.sample_value() {
         return sample.wind_direction_deg;
     }
     let Some(timestep) = context.zone_timestep else {
@@ -1041,7 +1062,7 @@ pub(crate) fn energyplus_weather_wind_direction_at_timestep_with_starting_values
     )
 }
 
-fn energyplus_interpolate_wind_direction_deg(
+pub(crate) fn energyplus_interpolate_wind_direction_deg(
     previous_wind_direction_deg: f64,
     current_wind_direction_deg: f64,
     current_hour_weight: f64,
@@ -1257,3 +1278,75 @@ fn epw_field<'a>(
 #[cfg(test)]
 #[path = "weather_tests.rs"]
 mod tests;
+
+/// Existing compatibility sample equations with an explicit preceding hourly record.
+///
+/// Daily callers retain the prior day's hour 24 without inserting it into their
+/// day array. Solar day-local indexing therefore remains independent of this
+/// scalar predecessor. These weather equations have their own source cards.
+pub(crate) fn weather_timestep_sample_with_neighbors(
+    previous: &EpwRecord,
+    current: &EpwRecord,
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> WeatherTimestepSample {
+    let weight = energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+    let scalar = |before: f64, now: f64| before * (1.0 - weight) + now * weight;
+    let dry_bulb_c = scalar(previous.dry_bulb_c, current.dry_bulb_c);
+    let relative_humidity_percent = scalar(
+        previous.relative_humidity_percent,
+        current.relative_humidity_percent,
+    );
+    let atmospheric_pressure_pa = scalar(
+        previous.atmospheric_pressure_pa,
+        current.atmospheric_pressure_pa,
+    );
+    let outdoor_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
+        dry_bulb_c,
+        (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
+        atmospheric_pressure_pa,
+    )
+    .unwrap_or(0.0);
+    let wet_bulb_c = energyplus_outdoor_wet_bulb_c(
+        dry_bulb_c,
+        relative_humidity_percent,
+        atmospheric_pressure_pa,
+    )
+    .unwrap_or(dry_bulb_c);
+    WeatherTimestepSample {
+        record_index,
+        timestep: zone_timestep,
+        dry_bulb_c,
+        wet_bulb_c,
+        relative_humidity_percent,
+        outdoor_humidity_ratio,
+        atmospheric_pressure_pa,
+        horizontal_infrared_radiation_w_per_m2: scalar(
+            previous.horizontal_infrared_radiation_wh_per_m2,
+            current.horizontal_infrared_radiation_wh_per_m2,
+        ),
+        global_horizontal_radiation_w_per_m2: scalar(
+            previous.global_horizontal_radiation_wh_per_m2,
+            current.global_horizontal_radiation_wh_per_m2,
+        ),
+        direct_normal_radiation_w_per_m2: scalar(
+            previous.direct_normal_radiation_wh_per_m2,
+            current.direct_normal_radiation_wh_per_m2,
+        ),
+        diffuse_horizontal_radiation_w_per_m2: scalar(
+            previous.diffuse_horizontal_radiation_wh_per_m2,
+            current.diffuse_horizontal_radiation_wh_per_m2,
+        ),
+        wind_speed_m_per_s: scalar(previous.wind_speed_m_per_s, current.wind_speed_m_per_s),
+        wind_direction_deg: energyplus_interpolate_wind_direction_deg(
+            previous.wind_direction_deg,
+            current.wind_direction_deg,
+            weight,
+        ),
+        liquid_precipitation_depth_mm: scalar(
+            previous.liquid_precipitation_depth_mm,
+            current.liquid_precipitation_depth_mm,
+        ),
+    }
+}

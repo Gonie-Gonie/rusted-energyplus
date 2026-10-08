@@ -1,5 +1,8 @@
 use super::*;
 
+#[path = "coupled_runtime_tests_weather_day.rs"]
+mod coupled_runtime_tests_weather_day;
+
 #[path = "coupled_runtime_tests_cp355.rs"]
 mod coupled_runtime_tests_cp355;
 #[path = "coupled_runtime_tests_cp356.rs"]

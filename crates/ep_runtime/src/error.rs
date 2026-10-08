@@ -15,6 +15,13 @@ pub enum RuntimeError {
     NoPlantStateProjectionLoops,
     /// No weather data was supplied.
     NoWeatherData,
+    /// The live weather-day owner could not complete an operation.
+    WeatherDay {
+        /// Actual owner failure; source diagnostic-string parity is not claimed.
+        reason: String,
+        /// Whether the selected original branch represents a source fatal.
+        source_fatal: bool,
+    },
     /// Requested more hourly samples than the weather series contains.
     SampleCountExceedsWeather {
         /// Requested sample count.
@@ -115,6 +122,15 @@ impl Display for RuntimeError {
                 "plant-state projection requires at least one resolved plant loop"
             ),
             Self::NoWeatherData => write!(formatter, "first-zone simulation requires weather data"),
+            Self::WeatherDay {
+                reason,
+                source_fatal,
+            } => {
+                write!(
+                    formatter,
+                    "weather-day operation failed (source fatal: {source_fatal}): {reason}"
+                )
+            }
             Self::SampleCountExceedsWeather {
                 requested,
                 available,
@@ -194,3 +210,12 @@ impl Display for RuntimeError {
 }
 
 impl std::error::Error for RuntimeError {}
+
+impl From<crate::weather::day::WeatherDayError> for RuntimeError {
+    fn from(error: crate::weather::day::WeatherDayError) -> Self {
+        Self::WeatherDay {
+            source_fatal: error.is_source_fatal(),
+            reason: error.to_string(),
+        }
+    }
+}

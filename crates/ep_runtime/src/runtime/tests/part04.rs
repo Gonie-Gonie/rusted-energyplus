@@ -793,6 +793,7 @@
         let context = HeatBalanceWeatherContext {
             records: &records,
             sample: None,
+            owned: None,
             record_index: 0,
             zone_steps_per_hour: 4,
             zone_timestep: Some(1),

@@ -114,3 +114,11 @@ SetupInterpolationValues를 ReadUserWeatherInput보다 먼저 호출하고, 기�
 보존한 기존 Rust EXE의 실제 실행은 종료 코드 0이며 빌드 당시 Rust·Cargo·설정 3,690개 파일의 바이트가 유지됐다. 기존 eager loader와 불변 weather series에는 원본과 같은 일별 작업 전후 상태가 없어 51개 요청 작업을 모두 관측 불가로 기록했다. 수치 비교 건수·불일치 건수는 미확인으로 유지한다.
 
 차이 기록 도구의 파일 목록 검사 오류 두 건은 실패 소스·명령·로그를 보존하고 수정했다. 최종 메타데이터 실행은 종료 코드 0이다. [기준선 증거](../evidence/CLK-03-legacy-baseline.json)에 실제 실행과 수정 범위를 기록했다. 이제 실제 파일 커서·전체 carrier 인계·공통 A/B 소비 연결을 구현하며 종료 gate는 단위·연결·생산 시험 전까지 미확인이다.
+
+## 라이브 커서와 A/B 연결 후보
+
+실제 EPW 커서와 header/parser 상태를 유지하는 일별 읽기, 전체 daily 11필드·weather 17필드 인계, 준비된 첫날의 일회성 소비, A/B의 owned Today 소비 경로를 구현했다. 입력을 미리 읽은 값은 달력·별도 관측 준비에 사용하며 생산 기상 값은 라이브 커서가 공급한다. 초기 CTF 이력은 실제 첫 시간의 원자료를 사용한다.
+
+workspace 회귀시험 4,580개가 통과했다. 그 뒤 독립 소스 검토에서 찾은 완료 시간의 PreviousHour 인계와 warmup의 DayOfSimChr="0" 처리를 고쳤고, 실제 반복 warmup·다일 경계를 포함한 기상 시험 56개가 통과했다. 최종 `cargo clippy --workspace --all-targets -- -D warnings`도 종료 코드 0이다. 초기 하늘복사 시험의 비활성 지붕 형상과 정적 검사 실패 기록은 보존했다.
+
+[구현 후보 및 회귀시험 증거](../evidence/CLK-03-candidate-implementation.json)에 실행별 소스·명령과 검사 시점을 기록했다. 원본과의 새 후보 대조는 아직 실행 전이며, 네 종료 gate는 계속 미확인이다. 생성된 기상 물리값의 동등성, 전체 native registry와 내부 locals는 이 후보의 복사·커서 검증으로 인증하지 않는다.

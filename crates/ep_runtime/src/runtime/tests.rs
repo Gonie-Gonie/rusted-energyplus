@@ -12,3 +12,4 @@ include!("tests/part11.rs");
 include!("tests/part12.rs");
 include!("tests/part13.rs");
 include!("tests/part14_geometry.rs");
+include!("tests/production_weather.rs");

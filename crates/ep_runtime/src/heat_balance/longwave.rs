@@ -47,6 +47,7 @@ impl ExteriorLongwaveTerms {
     }
 }
 
+#[cfg(test)]
 pub(crate) fn energyplus_exterior_longwave_terms(
     surface_state: &SurfaceHeatBalanceState,
     typed_surface: &Surface,
@@ -56,12 +57,32 @@ pub(crate) fn energyplus_exterior_longwave_terms(
     ground_temperature_c: f64,
     tilt_rad: f64,
 ) -> ExteriorLongwaveTerms {
-    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
-    let surface_temperature_k = surface_temperature_c + KELVIN_OFFSET;
     let sky_temperature_c = horizontal_infrared_sky_temperature_c(
         horizontal_infrared_radiation_w_per_m2,
         ground_temperature_c,
     );
+    energyplus_exterior_longwave_terms_with_sky_temperature_c(
+        surface_state,
+        typed_surface,
+        sky_temperature_c,
+        surface_temperature_c,
+        air_reference_temperature_c,
+        ground_temperature_c,
+        tilt_rad,
+    )
+}
+
+pub(crate) fn energyplus_exterior_longwave_terms_with_sky_temperature_c(
+    surface_state: &SurfaceHeatBalanceState,
+    typed_surface: &Surface,
+    sky_temperature_c: f64,
+    surface_temperature_c: f64,
+    air_reference_temperature_c: f64,
+    ground_temperature_c: f64,
+    tilt_rad: f64,
+) -> ExteriorLongwaveTerms {
+    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
+    let surface_temperature_k = surface_temperature_c + KELVIN_OFFSET;
     let sky_temperature_k = sky_temperature_c + KELVIN_OFFSET;
     let air_temperature_k = air_reference_temperature_c + KELVIN_OFFSET;
     let ground_temperature_k = ground_temperature_c + KELVIN_OFFSET;

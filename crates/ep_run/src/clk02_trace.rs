@@ -9,7 +9,7 @@ use ep_runtime::weather::{EpwRecord, WeatherTimestepSample};
 use serde_json::{Map, Value, json};
 use std::io::{BufWriter, Write};
 
-fn scalar(value: f64) -> Value {
+pub(crate) fn scalar(value: f64) -> Value {
     let class = if value.is_nan() {
         "nan"
     } else if value == f64::INFINITY {
@@ -38,7 +38,7 @@ fn named<const N: usize>(keys: [&str; N], values: [f64; N]) -> Value {
     )
 }
 
-fn raw(value: &RawEpwOutputs) -> Value {
+pub(crate) fn raw(value: &RawEpwOutputs) -> Value {
     json!({
         "ErrorFound":value.error_found,"WObs":value.observation_indicator,
         "date_fields":DATE_KEYS.into_iter().zip(value.dates).map(|(key, number)|(key.to_owned(),json!(number))).collect::<Map<_,_>>(),
@@ -48,7 +48,7 @@ fn raw(value: &RawEpwOutputs) -> Value {
     })
 }
 
-fn projected(value: &EpwRecord) -> Value {
+pub(crate) fn projected(value: &EpwRecord) -> Value {
     json!({
         "source_date_fields":{"year":value.year,"month":value.month,"day":value.day,"hour":value.hour,"minute":value.minute},
         "legacy_fields":{
@@ -65,7 +65,7 @@ fn projected(value: &EpwRecord) -> Value {
     })
 }
 
-fn sample(value: &WeatherTimestepSample) -> Value {
+pub(crate) fn sample(value: &WeatherTimestepSample) -> Value {
     json!({
         "record_index":value.record_index,"zone_timestep":value.timestep,
         "dry_bulb_c":scalar(value.dry_bulb_c),"wet_bulb_c":scalar(value.wet_bulb_c),
@@ -81,13 +81,13 @@ fn sample(value: &WeatherTimestepSample) -> Value {
     })
 }
 
-fn stream(value: RawEpwStreamState) -> Value {
+pub(crate) fn stream(value: RawEpwStreamState) -> Value {
     json!({"is_open":value.is_open,"good":value.good,"eof":value.eof,"fail":value.fail,"bad":value.bad,
         "position_byte":value.position_byte,"position_available":value.position_byte.is_some(),
         "native_rdstate_bits_claimed":false})
 }
 
-fn header(value: &RawEpwHeaderState) -> Value {
+pub(crate) fn header(value: &RawEpwHeaderState) -> Value {
     let dst = |value: &ep_runtime::weather::raw::DstPeriod| {
         json!({
             "StDateType":value.start_date_type as i32,"StWeekDay":value.start_weekday,"StMon":value.start_month,"StDay":value.start_day,
@@ -131,6 +131,8 @@ pub(crate) fn write_trace(
     let artifact = json!({
         "schema":"clk02-weather-production-trace.v1",
         "capture_source":"actual-Rust-runtime-raw-weather-preparation-and-existing-consumers",
+        "prepared_lane":"eager-input-preview-only; live CLK-03 owner supplies production weather",
+        "prepared_rows_supply_production_weather":false,
         "thread_coverage":"collecting-thread-only","observer_supplies_inputs":false,"observer_recomputes_weather":false,
         "observation_limit_per_series":OBSERVATION_LIMIT,"selected_record_pool_limit":OBSERVATION_LIMIT,
         "total_prepared_count":trace.total_prepared_count,"retained_prepared_count":trace.prepared.len(),"omitted_prepared_count":omitted_prepared,

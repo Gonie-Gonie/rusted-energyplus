@@ -77,7 +77,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased
                     )?;
                 let limit_context = weather_context
                     .and_then(|context| {
-                        context.records.get(context.record_index).map(|record| {
+                        context.current_record().map(|record| {
                             binding.limit_context.with_barometric_pressure_pa(
                                 energyplus_weather_atmospheric_pressure_for_context(
                                     context,

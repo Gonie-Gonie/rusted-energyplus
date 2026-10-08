@@ -5,7 +5,7 @@ use std::fmt::{Display, Formatter};
 use ep_model::{AutosizeOrNumber, IdealLoadsLimit, SimulationModel};
 
 use crate::error::RuntimeError;
-use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_series;
+use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_context;
 use crate::heat_balance::algorithm::{
     HeatBalanceRuntimeConfig, direct_zone_purchased_air_fixed_step_runtime_config,
 };
@@ -23,6 +23,7 @@ use crate::heat_balance::surface_boundary::{
 };
 use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air;
 use crate::heat_balance::trace::HeatBalanceRunPeriodSamples;
+use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
 use crate::psychrometrics::production_trace::output_step as trace_output_step;
 use crate::schedules::{
     HeatBalanceInternalGainScheduleOperationProfile, ScheduleSeriesCache,
@@ -30,6 +31,7 @@ use crate::schedules::{
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;
 use crate::weather::WeatherTimestepSeries;
+use crate::weather::day::{ProductionWeatherTimestepSeries, WeatherDayPhase};
 use crate::{ResultStore, ZoneSensibleDemandInputKind};
 
 use super::{
@@ -5877,6 +5879,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
 
 impl std::error::Error for DirectZonePurchasedAirCoupledRuntimeError {}
 
+impl From<RuntimeError> for DirectZonePurchasedAirCoupledRuntimeError {
+    fn from(error: RuntimeError) -> Self {
+        Self::HeatBalance(error)
+    }
+}
+
 /// Executes the exact one-Zone/no-OA sensible subset through a shared fixed
 /// ThirdOrder heat-balance and PurchasedAir loop.
 ///
@@ -5891,8 +5899,46 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     coupling_schedule_cache: &ScheduleSeriesCache,
     options: DirectZonePurchasedAirCoupledOptions,
 ) -> Result<DirectZonePurchasedAirCoupledSimulation, DirectZonePurchasedAirCoupledRuntimeError> {
-    let weather_dry_bulb_c = weather_series.hourly_dry_bulb_c();
-    if weather_dry_bulb_c.is_empty() {
+    simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
+        model,
+        HeatBalanceWeatherDriver::Legacy(weather_series),
+        coupling_schedule_cache,
+        options,
+    )
+}
+
+/// Runs the coupled B path with weather read and handed off by its live day owner.
+/// B retains its existing run-period-only behavior without a warmup loop.
+pub fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather(
+    model: &SimulationModel,
+    weather_series: &ProductionWeatherTimestepSeries,
+    coupling_schedule_cache: &ScheduleSeriesCache,
+    options: DirectZonePurchasedAirCoupledOptions,
+) -> Result<DirectZonePurchasedAirCoupledSimulation, DirectZonePurchasedAirCoupledRuntimeError> {
+    simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
+        model,
+        HeatBalanceWeatherDriver::Production(weather_series),
+        coupling_schedule_cache,
+        options,
+    )
+}
+
+fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
+    model: &SimulationModel,
+    weather_driver: HeatBalanceWeatherDriver<'_>,
+    coupling_schedule_cache: &ScheduleSeriesCache,
+    options: DirectZonePurchasedAirCoupledOptions,
+) -> Result<DirectZonePurchasedAirCoupledSimulation, DirectZonePurchasedAirCoupledRuntimeError> {
+    let weather_dry_bulb_c = match weather_driver {
+        HeatBalanceWeatherDriver::Legacy(series) => series.hourly_dry_bulb_c(),
+        HeatBalanceWeatherDriver::Production(_) => &[],
+    };
+    let weather_records = match weather_driver {
+        HeatBalanceWeatherDriver::Legacy(series) => Some(series.hourly_records()),
+        HeatBalanceWeatherDriver::Production(_) => None,
+    };
+    let hourly_count = weather_driver.hourly_count();
+    if hourly_count == 0 {
         return Err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance(
             RuntimeError::NoWeatherData,
         ));
@@ -5900,11 +5946,11 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     if options.sample_count == 0 {
         return Err(DirectZonePurchasedAirCoupledRuntimeError::NoTimestepsRequested);
     }
-    if options.sample_count > weather_dry_bulb_c.len() {
+    if options.sample_count > hourly_count {
         return Err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance(
             RuntimeError::SampleCountExceedsWeather {
                 requested: options.sample_count,
-                available: weather_dry_bulb_c.len(),
+                available: hourly_count,
             },
         ));
     }
@@ -5934,6 +5980,14 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         run_period_first_hour_interpolation_starting_values(&model.typed);
     let runtime_config = direct_zone_purchased_air_fixed_step_runtime_config();
     validate_fixed_runtime_config(runtime_config);
+    weather_driver.prepare_initial_phase(WeatherDayPhase::Run { day: 1 })?;
+    let initial_dry_bulb_c = weather_driver.initial_hourly_dry_bulb_c()?;
+    let initial_weather_context = Some(weather_driver.current_context(
+        0,
+        zone_steps_per_hour,
+        1,
+        first_hour_interpolation_starting_values,
+    )?);
 
     let heat_balance_options = HeatBalanceSimulationOptions {
         sample_count: options.sample_count,
@@ -5954,22 +6008,20 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                     &mut schedule_cache_profile,
                 )
                 .map_err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance)?;
-            seed_zone_air_humidity_ratios_from_weather_series(
+            seed_zone_air_humidity_ratios_from_weather_context(
                 &mut state,
-                Some(weather_series),
-                weather_dry_bulb_c[0],
-                zone_steps_per_hour,
-                first_hour_interpolation_starting_values,
+                initial_weather_context,
+                initial_dry_bulb_c,
             );
             match heat_balance_options.ctf_initial_history_policy {
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
-                    seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+                    seed_initial_surface_ctf_boundary_histories(&mut state, initial_dry_bulb_c);
                 }
                 HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
                     seed_energyplus_initial_surface_ctf_histories(
                         &mut state,
                         options.initial_zone_air_temperature_c,
-                        weather_dry_bulb_c[0],
+                        initial_dry_bulb_c,
                     );
                 }
             }
@@ -5985,8 +6037,8 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         model,
         &mut state,
         weather_dry_bulb_c,
-        Some(weather_series.hourly_records()),
-        Some(weather_series),
+        weather_records,
+        Some(weather_driver),
         heat_balance_options,
         runtime_config,
         zone_steps_per_hour,
@@ -9806,6 +9858,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     )
     .map_err(DirectZonePurchasedAirCoupledRuntimeError::HourlyOutput)?;
 
+    weather_driver.finish_environment()?;
     Ok(DirectZonePurchasedAirCoupledSimulation {
         summary: DirectZonePurchasedAirCoupledSummary {
             samples: options.sample_count,

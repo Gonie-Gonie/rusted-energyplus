@@ -7,7 +7,7 @@ pub use crate::first_zone::*;
 pub use crate::geometry::{surface_area_m2, surface_geometry_summaries, zone_geometry_summaries};
 #[cfg(test)]
 pub(crate) use crate::geometry::{surface_azimuth_deg, surface_tilt_deg};
-use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_series;
+use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_context;
 #[cfg(test)]
 use crate::heat_balance::air_manager::{
     update_zone_air_heat_capacities_from_weather_context, zone_air_heat_balance_air_storage_rate_w,
@@ -113,6 +113,7 @@ pub(crate) use crate::heat_balance::timestep::{
 };
 pub(crate) use crate::heat_balance::trace::*;
 pub(crate) use crate::heat_balance::warmup::run_heat_balance_run_period_warmup;
+use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
 #[cfg(test)]
 use crate::heat_balance::zone_air_correction::{
     ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
@@ -164,6 +165,7 @@ pub use crate::schedules::{
     simulate_zone_internal_radiant_gains,
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;
+use crate::weather::day::{ProductionWeatherTimestepSeries, WeatherDayPhase};
 pub use crate::weather::*;
 #[cfg(test)]
 use crate::weather::{
@@ -269,9 +271,26 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_c
         model,
         weather_series.hourly_dry_bulb_c(),
         Some(weather_series.hourly_records()),
-        Some(weather_series),
+        Some(HeatBalanceWeatherDriver::Legacy(weather_series)),
         options,
         ctf_coefficients,
+    )
+}
+
+/// Simulates through the live EPW cursor and the current Today weather owner.
+/// Weather interpolation and thermal algorithms retain their existing producers.
+pub fn simulate_heat_balance_zone_air_temperatures_with_production_weather(
+    model: &SimulationModel,
+    weather_series: &ProductionWeatherTimestepSeries,
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    simulate_heat_balance_zone_air_temperatures_internal(
+        model,
+        &[],
+        None,
+        Some(HeatBalanceWeatherDriver::Production(weather_series)),
+        options,
+        &[],
     )
 }
 
@@ -279,17 +298,19 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     model: &SimulationModel,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
-    weather_series: Option<&WeatherTimestepSeries>,
+    weather_driver: Option<HeatBalanceWeatherDriver<'_>>,
     options: HeatBalanceSimulationOptions,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
-    if weather_dry_bulb_c.is_empty() {
+    let hourly_count =
+        weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
+    if hourly_count == 0 {
         return Err(RuntimeError::NoWeatherData);
     }
-    if options.sample_count > weather_dry_bulb_c.len() {
+    if options.sample_count > hourly_count {
         return Err(RuntimeError::SampleCountExceedsWeather {
             requested: options.sample_count,
-            available: weather_dry_bulb_c.len(),
+            available: hourly_count,
         });
     }
     if model.typed.zones.is_empty() {
@@ -301,6 +322,28 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let first_hour_interpolation_starting_values =
         run_period_first_hour_interpolation_starting_values(&model.typed);
     let heat_balance_runtime_config = options.zone_air_algorithm.runtime_config();
+    if let Some(driver) = weather_driver {
+        let initial_phase = if options.warmup.enabled && options.warmup.maximum_days > 0 {
+            WeatherDayPhase::Warmup { day: 1 }
+        } else {
+            WeatherDayPhase::Run { day: 1 }
+        };
+        driver.prepare_initial_phase(initial_phase)?;
+    }
+    let initial_dry_bulb_c = match weather_driver {
+        Some(driver) => driver.initial_hourly_dry_bulb_c()?,
+        None => weather_dry_bulb_c[0],
+    };
+    let initial_weather_context = weather_driver
+        .map(|driver| {
+            driver.current_context(
+                0,
+                zone_steps_per_hour,
+                1,
+                first_hour_interpolation_starting_values,
+            )
+        })
+        .transpose()?;
     let (mut state, internal_gain_schedule_cache, mut internal_gain_schedule_cache_profile) =
         init_heat_balance_source_order_path(|| {
             let (schedule_cache, mut schedule_cache_profile) =
@@ -313,22 +356,20 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     &schedule_cache,
                     &mut schedule_cache_profile,
                 )?;
-            seed_zone_air_humidity_ratios_from_weather_series(
+            seed_zone_air_humidity_ratios_from_weather_context(
                 &mut state,
-                weather_series,
-                weather_dry_bulb_c[0],
-                zone_steps_per_hour,
-                first_hour_interpolation_starting_values,
+                initial_weather_context,
+                initial_dry_bulb_c,
             );
             match options.ctf_initial_history_policy {
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
-                    seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+                    seed_initial_surface_ctf_boundary_histories(&mut state, initial_dry_bulb_c);
                 }
                 HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
                     seed_energyplus_initial_surface_ctf_histories(
                         &mut state,
                         options.initial_zone_air_temperature_c,
-                        weather_dry_bulb_c[0],
+                        initial_dry_bulb_c,
                     );
                 }
             }
@@ -340,7 +381,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &mut state,
         weather_dry_bulb_c,
         weather_records,
-        weather_series,
+        weather_driver,
         zone_steps_per_hour,
         seconds_per_timestep,
         options.warmup,
@@ -371,7 +412,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 surface_loop_zone_air_correction,
             );
         },
-    );
+    )?;
     let run_period_initial_zone_air_states = state
         .zones
         .iter()
@@ -407,13 +448,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &mut state,
         weather_dry_bulb_c,
         weather_records,
-        weather_series,
+        weather_driver,
         options,
         heat_balance_runtime_config,
         zone_steps_per_hour,
         seconds_per_timestep,
         first_hour_interpolation_starting_values,
-    );
+    )?;
+    if let Some(driver) = weather_driver {
+        driver.finish_environment()?;
+    }
     let results = heat_balance_result_store_from_traces(HeatBalanceResultSeriesTraces {
         zone_temperatures,
         zone_humidity_ratios,

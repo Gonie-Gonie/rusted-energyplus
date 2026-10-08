@@ -495,6 +495,86 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
     }
 }
 
+/// Uses current owned Today solar operands, or the retained legacy adapter.
+pub(crate) fn surface_incident_solar_radiation_for_current_weather_context_w_per_m2(
+    surface: &Surface,
+    site: &SiteLocation,
+    context: crate::weather::HeatBalanceWeatherContext<'_>,
+) -> f64 {
+    if context.owned.is_none() {
+        return surface_incident_solar_radiation_for_weather_context_w_per_m2(
+            surface,
+            site,
+            context.records,
+            context.record_index,
+            context.zone_steps_per_hour,
+            context.zone_timestep,
+            context.first_hour_interpolation_starting_values,
+        );
+    }
+    current_weather_solar_components(surface, None, site, context).total_w_per_m2()
+}
+
+/// Stored geometry consumer receiving the actual current Today solar operands.
+pub(crate) fn stored_surface_incident_solar_radiation_for_current_weather_context_w_per_m2(
+    surface: &Surface,
+    state: &SurfaceHeatBalanceState,
+    site: &SiteLocation,
+    context: crate::weather::HeatBalanceWeatherContext<'_>,
+) -> f64 {
+    if context.owned.is_none() {
+        return stored_surface_incident_solar_radiation_for_weather_context_w_per_m2(
+            surface,
+            state,
+            site,
+            context.records,
+            context.record_index,
+            context.zone_steps_per_hour,
+            context.zone_timestep,
+            context.first_hour_interpolation_starting_values,
+        );
+    }
+    current_weather_solar_components(surface, Some(state), site, context).total_w_per_m2()
+}
+
+fn current_weather_solar_components(
+    surface: &Surface,
+    state: Option<&SurfaceHeatBalanceState>,
+    site: &SiteLocation,
+    context: crate::weather::HeatBalanceWeatherContext<'_>,
+) -> SurfaceIncidentSolarComponents {
+    let Some(current) = context.owned else {
+        return surface_incident_solar_components_for_weather_context_w_per_m2(
+            surface,
+            state,
+            site,
+            context.records,
+            context.record_index,
+            context.zone_steps_per_hour,
+            context.zone_timestep,
+            context.first_hour_interpolation_starting_values,
+        );
+    };
+    surface_incident_solar_components_at_local_hour_w_per_m2(
+        surface,
+        state,
+        site,
+        SurfaceSolarTimestepInput {
+            local_hour: current.local_hour,
+            actual_solar_position_rad: solar_position_rad_at_local_hour(
+                site,
+                &current.record,
+                current.local_hour,
+            ),
+            sin_declination: current.solar.sin_declination,
+            cos_declination: current.solar.cos_declination,
+            equation_of_time_hours: current.solar.equation_of_time_hours,
+            direct_normal_radiation_w_per_m2: current.weather.beam_solar_rad,
+            diffuse_horizontal_radiation_w_per_m2: current.weather.dif_solar_rad,
+        },
+    )
+}
+
 fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
     surface: &Surface,
     state: Option<&SurfaceHeatBalanceState>,

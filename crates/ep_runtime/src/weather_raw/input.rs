@@ -55,6 +55,20 @@ pub struct RawEpwLineRead {
     pub end_byte: usize,
 }
 
+impl RawEpwLineRead {
+    /// Source ReadResult::update retains the old data on failed extraction.
+    /// Offsets describe the actual latest attempted read, including failures.
+    pub fn update(&mut self, next: Self) {
+        self.eof = next.eof;
+        self.read_good = next.read_good;
+        self.start_byte = next.start_byte;
+        self.end_byte = next.end_byte;
+        if next.read_good {
+            self.data = next.data;
+        }
+    }
+}
+
 impl RawEpwInput {
     /// Construct the closed supplied-byte owner used before explicit opening.
     pub fn new_unopened(bytes: Vec<u8>) -> Self {
@@ -76,6 +90,53 @@ impl RawEpwInput {
         self.eof = false;
         self.failed = false;
         self.bad = false;
+    }
+
+    /// InputFile::close releases the stream; closed rdstate reports badbit.
+    /// Supplied bytes and Rust read-attempt bookkeeping remain available for a
+    /// later open, but no native closed-stream position is claimed.
+    pub fn close(&mut self) {
+        self.opened = false;
+        self.eof = false;
+        self.failed = false;
+        self.bad = true;
+    }
+
+    /// InputFile::rewind clears flags and seeks to zero on an open owner only.
+    /// It retains the actual line-attempt count and does not reopen the stream.
+    pub fn rewind(&mut self) {
+        if self.opened {
+            self.eof = false;
+            self.failed = false;
+            self.bad = false;
+            self.byte_cursor = 0;
+        }
+    }
+
+    /// Literal InputFile::backspace scan, including its cursor-one edge case.
+    /// This is a byte operation, rather than a saved previous-line position.
+    pub fn backspace(&mut self) -> Result<(), RawEpwHeaderError> {
+        if !self.opened {
+            return Ok(());
+        }
+        self.eof = false;
+        self.failed = false;
+        self.bad = false;
+        if self.byte_cursor > self.bytes.len() {
+            return Err(RawEpwHeaderError::OutsideBoundedDomain(
+                "backspace cursor outside supplied stream",
+            ));
+        }
+        let mut scan = self.byte_cursor.saturating_sub(1);
+        while scan > 0 {
+            scan -= 1;
+            self.byte_cursor = scan;
+            if self.bytes[scan] == b'\n' {
+                self.byte_cursor = scan + 1;
+                break;
+            }
+        }
+        Ok(())
     }
 
     /// Observe cursor availability without altering flags through a failed tellg.

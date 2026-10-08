@@ -146,6 +146,7 @@ fn geometry_report_recomputation_is_unobserved_while_physical_coefficient_calls_
                 Some(HeatBalanceWeatherContext {
                     records: &records,
                     sample: None,
+                    owned: None,
                     record_index: 0,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(1),

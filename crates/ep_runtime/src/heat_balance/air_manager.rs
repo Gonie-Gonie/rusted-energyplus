@@ -9,10 +9,9 @@ use crate::heat_balance::zone_air_initialization::{
 use crate::heat_balance::zone_air_initialization_trace::{self, ZoneAirInitializationObservation};
 use crate::psychrometrics::energyplus_zone_air_heat_capacity_j_per_k;
 use crate::weather::{
-    HeatBalanceWeatherContext, WeatherTimestepSeries,
-    energyplus_weather_atmospheric_pressure_for_context, weather_context_outdoor_humidity_ratio,
+    HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
+    weather_context_outdoor_humidity_ratio,
 };
-use ep_model::FirstHourInterpolationStartingValues;
 
 /// EnergyPlus `HeatBalanceAirManager::ManageAirHeatBalance`.
 #[must_use]
@@ -68,7 +67,7 @@ pub(crate) fn weather_context_zone_air_heat_capacity_j_per_k(
     context: Option<HeatBalanceWeatherContext<'_>>,
 ) -> Option<f64> {
     let context = context?;
-    let record = context.records.get(context.record_index)?;
+    let record = context.current_record()?;
     let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
         context,
         record.atmospheric_pressure_pa,
@@ -111,27 +110,14 @@ pub(crate) fn update_zone_air_heat_capacities_from_weather_context(
     }
 }
 
-pub(crate) fn seed_zone_air_humidity_ratios_from_weather_series(
+pub(crate) fn seed_zone_air_humidity_ratios_from_weather_context(
     state: &mut HeatBalanceState,
-    weather_series: Option<&WeatherTimestepSeries>,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
     fallback_dry_bulb_c: f64,
-    zone_steps_per_hour: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) {
-    let Some(series) = weather_series else {
-        return;
-    };
-    let Some(humidity_ratio) = weather_context_outdoor_humidity_ratio(
-        HeatBalanceWeatherContext {
-            records: series.hourly_records(),
-            sample: series.sample_for(0, 1),
-            record_index: 0,
-            zone_steps_per_hour,
-            zone_timestep: Some(1),
-            first_hour_interpolation_starting_values,
-        },
-        fallback_dry_bulb_c,
-    ) else {
+    let Some(humidity_ratio) = weather_context
+        .and_then(|context| weather_context_outdoor_humidity_ratio(context, fallback_dry_bulb_c))
+    else {
         return;
     };
 

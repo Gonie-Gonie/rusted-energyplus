@@ -9,6 +9,7 @@
 #![recursion_limit = "1024"]
 
 mod clk02_trace;
+mod clk03_trace;
 mod clock_trace;
 mod config;
 mod diagnostics;

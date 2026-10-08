@@ -29,6 +29,7 @@ pub mod surface_weather;
 pub mod timestep;
 pub(crate) mod trace;
 pub(crate) mod warmup;
+pub(crate) mod weather_driver;
 pub mod zone_air_correction;
 pub mod zone_air_initialization;
 pub mod zone_air_initialization_trace;

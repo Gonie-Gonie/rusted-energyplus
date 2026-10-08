@@ -14,6 +14,7 @@ use ep_compiler::{CompileReport, compile_raw_model};
 use ep_model::{AutosizeOrNumber, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
+use ep_runtime::weather::day::{ProductionWeatherTimestepSeries, WeatherEnvironmentConfiguration};
 use ep_runtime::{
     DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
     ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
@@ -159,13 +160,12 @@ use ep_runtime::{
     PurchasedAirRecirculationSource, PurchasedAirSupplyTemperatureDiagnosticKind,
     PurchasedAirSupplyTemperatureInitialMessageApi, ResultStore, RuntimePrecomputedData,
     ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis,
-    WeatherTimestepSeries, ZoneSensibleDemandInputKind,
-    build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
-    build_hourly_time_axis_with_weather_metadata, precompute_runtime_data,
+    ZoneSensibleDemandInputKind, build_environment_time_axes_with_weather_metadata,
+    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, precompute_runtime_data,
     precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
-    precompute_weather_timestep_series, select_epw_environment_weather,
-    simulate_direct_zone_purchased_air_coupled_heat_balance,
-    simulate_heat_balance_zone_air_temperatures_with_weather_series,
+    select_epw_environment_weather,
+    simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather,
+    simulate_heat_balance_zone_air_temperatures_with_production_weather,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
 use serde::Serialize;
@@ -837,7 +837,7 @@ struct PreparedRuntimeInputs {
     time_axis: TimeAxis,
     schedule_cache: ScheduleSeriesCache,
     zone_timestep_schedule_cache: Option<ScheduleSeriesCache>,
-    weather_series: Option<WeatherTimestepSeries>,
+    weather_series: Option<ProductionWeatherTimestepSeries>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -898,22 +898,27 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    let (outcome, weather_trace) = ep_runtime::weather::raw::production_trace::capture(
+    let ((outcome, weather_trace), day_trace) = ep_runtime::weather::day::production_trace::capture(
         config.trace_level == TraceLevel::Full,
         || {
-            ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
-                let (outcome, trace) = ep_runtime::psychrometrics::psy02_trace::capture(
-                    config.trace_level == TraceLevel::Full,
-                    || run_with_optional_porting_scope_observed(config, scope),
-                );
-                if let Some(trace) = trace
-                    && outcome.is_ok()
-                    && config.output_dir.is_dir()
-                {
-                    crate::psy02_trace::write_trace(config, &trace)?;
-                }
-                outcome
-            })
+            ep_runtime::weather::raw::production_trace::capture(
+                config.trace_level == TraceLevel::Full,
+                || {
+                    ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
+                        let (outcome, trace) = ep_runtime::psychrometrics::psy02_trace::capture(
+                            config.trace_level == TraceLevel::Full,
+                            || run_with_optional_porting_scope_observed(config, scope),
+                        );
+                        if let Some(trace) = trace
+                            && outcome.is_ok()
+                            && config.output_dir.is_dir()
+                        {
+                            crate::psy02_trace::write_trace(config, &trace)?;
+                        }
+                        outcome
+                    })
+                },
+            )
         },
     );
     if let Some(trace) = weather_trace
@@ -921,6 +926,12 @@ fn run_with_optional_porting_scope(
         && config.output_dir.is_dir()
     {
         crate::clk02_trace::write_trace(config, &trace)?;
+    }
+    if let Some(trace) = day_trace
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+    {
+        crate::clk03_trace::write_trace(config, &trace)?;
     }
     outcome
 }
@@ -1330,7 +1341,14 @@ fn run_with_optional_porting_scope_impl(
         let runtime_setup_start = Instant::now();
         let runtime_inputs = match ep_runtime::psychrometrics::production_trace::in_phase(
             "rust_runtime_setup",
-            || prepare_runtime_inputs(config, simulation_model.as_ref(), assessment.runtime_class),
+            || {
+                prepare_runtime_inputs(
+                    config,
+                    simulation_model.as_ref(),
+                    assessment.runtime_class,
+                    &raw_model,
+                )
+            },
         ) {
             Ok(inputs) => inputs,
             Err(error) => {
@@ -3370,6 +3388,7 @@ fn prepare_runtime_inputs(
     config: &RunConfig,
     simulation_model: Option<&SimulationModel>,
     runtime_class: RuntimeClass,
+    raw_model: &RawModel,
 ) -> Result<PreparedRuntimeInputs, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let (time_axis, weather_series, zone_timestep_schedule_cache) =
@@ -3387,9 +3406,10 @@ fn prepare_runtime_inputs(
                 &weather_file.calendar_metadata,
             )
             .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?;
-            let environment_weather = select_epw_environment_weather(weather_file, &time_axis)
-                .map_err(|error| format!("failed to select EPW environment records: {error}"))?;
             if ep_runtime::weather::raw::production_trace::is_active() {
+                // Preview evidence remains separate from the live owner below.
+                let environment_weather = select_epw_environment_weather(weather_file, &time_axis)
+                    .map_err(|error| format!("failed to prepare EPW preview evidence: {error}"))?;
                 let selected = environment_weather
                     .selected_source_record_indices
                     .iter()
@@ -3414,11 +3434,32 @@ fn prepare_runtime_inputs(
                     &selected,
                 );
             }
-            let weather_series = precompute_weather_timestep_series(
-                environment_weather.hourly_records(),
-                time_axis.zone_timestep.timesteps_per_hour,
-                time_axis.first_hour_interpolation_starting_values,
-            );
+            let header = &parsed_weather.raw_header;
+            let fallback_site = ep_model::SiteLocation {
+                name: ep_model::NormalizedName(header.weather_location_title.clone()),
+                latitude_deg: header.latitude,
+                longitude_deg: header.longitude,
+                time_zone_hours: header.time_zone,
+                elevation_m: header.elevation,
+            };
+            let design_day_count = raw_model
+                .objects
+                .iter()
+                .filter(|(kind, _)| kind.0.eq_ignore_ascii_case("SizingPeriod:DesignDay"))
+                .map(|(_, objects)| objects.len())
+                .sum::<usize>();
+            let configuration = WeatherEnvironmentConfiguration::for_model(
+                &time_axis,
+                &model.typed,
+                &fallback_site,
+                i32::try_from(design_day_count).map_err(|error| error.to_string())?,
+            )
+            .map_err(|error| error.to_string())?;
+            let weather_series = ProductionWeatherTimestepSeries::from_bytes(
+                std::fs::read(weather_path).map_err(|error| error.to_string())?,
+                configuration,
+            )
+            .map_err(|error| format!("failed to open live EPW owner: {error}"))?;
             let zone_timestep_schedule_cache =
                 if runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility {
                     let environment_axis = build_environment_time_axes_with_weather_metadata(
@@ -3490,7 +3531,7 @@ fn execute_rust_runtime(
             let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
             let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
             let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
-            let simulation = simulate_heat_balance_zone_air_temperatures_with_weather_series(
+            let simulation = simulate_heat_balance_zone_air_temperatures_with_production_weather(
                 model,
                 weather_series,
                 options,
@@ -3703,13 +3744,14 @@ fn execute_rust_runtime(
                 })?;
             let schedule_cache_sample_count = schedule_cache.sample_count();
             let schedule_cache_profile = schedule_cache.profile();
-            let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
-                model,
-                weather_series,
-                schedule_cache,
-                DirectZonePurchasedAirCoupledOptions::hourly_samples(sample_count),
-            )
-            .map_err(|error| error.to_string())?;
+            let simulation =
+                simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather(
+                    model,
+                    weather_series,
+                    schedule_cache,
+                    DirectZonePurchasedAirCoupledOptions::hourly_samples(sample_count),
+                )
+                .map_err(|error| error.to_string())?;
             let zone_demand_source = Some(simulation.summary.zone_demand_source.to_string());
             let fixture_demand_injection_used =
                 Some(simulation.summary.fixture_demand_injection_used);

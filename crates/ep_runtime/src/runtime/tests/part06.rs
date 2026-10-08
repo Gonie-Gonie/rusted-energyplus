@@ -504,6 +504,7 @@
             10.0,
             0.0,
             quick_context.exterior_coefficient_surface_temperature_c,
+            None,
         );
         let unfrozen = exterior_surface_energy_balance(
             surface_state,
@@ -523,6 +524,7 @@
             true,
             10.0,
             0.0,
+            None,
             None,
         );
         let expected_coefficient = energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
@@ -653,6 +655,7 @@
                 HeatBalanceWeatherContext {
                     records: &records,
                     sample: None,
+                    owned: None,
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(3),
@@ -668,6 +671,7 @@
                 HeatBalanceWeatherContext {
                     records: &records,
                     sample: None,
+                    owned: None,
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(4),
@@ -683,6 +687,7 @@
                 HeatBalanceWeatherContext {
                     records: &records,
                     sample: None,
+                    owned: None,
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: None,
@@ -764,6 +769,7 @@
         let context = HeatBalanceWeatherContext {
             records: &records,
             sample: None,
+            owned: None,
             record_index: 1,
             zone_steps_per_hour: 4,
             zone_timestep: Some(2),

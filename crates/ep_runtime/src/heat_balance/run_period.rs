@@ -1,6 +1,9 @@
 //! Heat-balance run-period timestep sampling loop.
 
+use crate::error::RuntimeError;
+use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
 use crate::psychrometrics::production_trace::zone_step as trace_zone_step;
+use crate::weather::day::WeatherDayPhase;
 
 use crate::heat_balance::air_manager::{
     weather_proxy_zone_air_heat_capacity_j_per_k, zone_air_heat_balance_air_storage_rate_w,
@@ -60,13 +63,11 @@ use crate::psychrometrics::{
 };
 use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache};
 use crate::weather::{
-    EpwRecord, HeatBalanceWeatherContext, WeatherTimestepSeries,
-    energyplus_weather_atmospheric_pressure_for_context,
+    EpwRecord, HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
 };
 use ep_model::{FirstHourInterpolationStartingValues, SimulationModel};
 use std::collections::BTreeMap;
-use std::convert::Infallible;
 
 mod weather_sampling;
 
@@ -79,19 +80,19 @@ pub(crate) fn sample_heat_balance_run_period(
     state: &mut HeatBalanceState,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
-    weather_series: Option<&WeatherTimestepSeries>,
+    weather_driver: Option<HeatBalanceWeatherDriver<'_>>,
     options: HeatBalanceSimulationOptions,
     runtime_config: HeatBalanceRuntimeConfig,
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> HeatBalanceRunPeriodSamples {
+) -> Result<HeatBalanceRunPeriodSamples, RuntimeError> {
     let sampled = sample_heat_balance_run_period_with_step_driver(
         model,
         state,
         weather_dry_bulb_c,
         weather_records,
-        weather_series,
+        weather_driver,
         options,
         runtime_config,
         zone_steps_per_hour,
@@ -110,13 +111,10 @@ pub(crate) fn sample_heat_balance_run_period(
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
             );
-            Ok::<(), Infallible>(())
+            Ok::<(), RuntimeError>(())
         },
     );
-    match sampled {
-        Ok((samples, _)) => samples,
-        Err(error) => match error {},
-    }
+    sampled.map(|(samples, _)| samples)
 }
 
 /// Samples the shared heat-balance run-period loop while delegating exactly
@@ -131,7 +129,7 @@ pub(crate) fn sample_heat_balance_run_period_with_step_driver<StepDriver, StepOu
     state: &mut HeatBalanceState,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
-    weather_series: Option<&WeatherTimestepSeries>,
+    weather_driver: Option<HeatBalanceWeatherDriver<'_>>,
     options: HeatBalanceSimulationOptions,
     runtime_config: HeatBalanceRuntimeConfig,
     zone_steps_per_hour: u32,
@@ -140,6 +138,7 @@ pub(crate) fn sample_heat_balance_run_period_with_step_driver<StepDriver, StepOu
     mut step_driver: StepDriver,
 ) -> Result<(HeatBalanceRunPeriodSamples, Vec<StepOutput>), StepError>
 where
+    StepError: From<RuntimeError>,
     StepDriver: for<'weather> FnMut(
         &mut HeatBalanceState,
         HeatBalanceStepInput,
@@ -184,12 +183,18 @@ where
         HeatBalanceZoneConductionReportSource::SurfaceReport
     );
 
-    for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
-        .iter()
-        .copied()
-        .take(options.sample_count)
-        .enumerate()
-    {
+    let hourly_count =
+        weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
+    for hour_index in 0..options.sample_count.min(hourly_count) {
+        if hour_index % 24 == 0 {
+            if let Some(driver) = weather_driver {
+                driver.begin_day(WeatherDayPhase::Run {
+                    day: hour_index / 24 + 1,
+                })?;
+            }
+        }
+        // Production forcing is resolved below from the live Today owner.
+        let outdoor_dry_bulb_c = weather_dry_bulb_c.get(hour_index).copied();
         let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
         let steps = zone_steps_per_hour.max(1);
         let mut zone_temperature_sums = vec![0.0; zone_temperatures.len()];
@@ -226,13 +231,13 @@ where
                 timestep_rain_status,
             } = sample_run_period_weather(
                 weather_records,
-                weather_series,
+                weather_driver,
                 hour_index,
                 outdoor_dry_bulb_c,
                 steps,
                 substep,
                 first_hour_interpolation_starting_values,
-            );
+            )?;
             let timestep_output = step_driver(
                 &mut *state,
                 HeatBalanceStepInput {
@@ -317,7 +322,7 @@ where
                     if hour_index == 0 {
                         let barometric_pressure_pa = weather_context
                             .and_then(|context| {
-                                context.records.get(context.record_index).map(|record| {
+                                context.current_record().map(|record| {
                                     energyplus_weather_atmospheric_pressure_for_context(
                                         context,
                                         record.atmospheric_pressure_pa,
@@ -629,7 +634,7 @@ where
                             surface_outdoor_air_wind_direction_deg,
                         ) = weather_context
                             .and_then(|context| {
-                                context.records.get(context.record_index).map(|record| {
+                                context.current_record().map(|record| {
                                     (
                                         energyplus_weather_wind_speed_for_context(
                                             context,

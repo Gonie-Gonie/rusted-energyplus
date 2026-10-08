@@ -926,7 +926,7 @@ struct ResolvedCalendarDay {
     special_day_type: Option<DayType>,
 }
 
-fn default_run_period() -> RunPeriod {
+pub(crate) fn default_run_period() -> RunPeriod {
     RunPeriod {
         id: RunPeriodId(0),
         name: NormalizedName::new("Default Run Period"),
