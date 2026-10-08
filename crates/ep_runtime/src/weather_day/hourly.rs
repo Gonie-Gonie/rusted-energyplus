@@ -31,6 +31,25 @@ pub(crate) fn process_hour(
     let mut speed = raw.mandatory_reals[15];
     let mut liquid = raw.optional_reals[5];
 
+    // Source preconditioning follows hour/date admission and precedes the
+    // missing/range/history pass. It changes local values, never the raw owner.
+    // WeatherManager.cc:2779-2793 and 2821-2822.
+    if pressure < 0.0 {
+        pressure = 999999.0;
+    }
+    if speed < 0.0 {
+        speed = 999.0;
+    }
+    if direction < -360.0 || direction > 360.0 {
+        direction = 999.0;
+    }
+    if humidity < 0.0 {
+        humidity = 999.0;
+    }
+    if liquid < 0.0 {
+        liquid = 999.0;
+    }
+
     if dry >= 99.9 {
         dry = missing.out_dry_bulb_temp;
         missed.out_dry_bulb_temp += 1;
@@ -195,7 +214,7 @@ mod tests {
         input.mandatory_reals[2] = 110.1;
         input.mandatory_reals[3] = 31000.0;
         input.mandatory_reals[14] = -1.0;
-        input.mandatory_reals[15] = -1.0;
+        input.mandatory_reals[15] = 40.1;
         input.optional_reals[5] = -2.0;
         let value = processed(&input, &mut owner);
         assert_eq!(value.out_dry_bulb_temp, -90.1);
@@ -203,8 +222,9 @@ mod tests {
         assert_eq!(value.out_rel_hum, 110.1);
         assert_eq!(value.out_baro_press, 101000.0);
         assert_eq!(value.wind_dir, -1.0);
-        assert_eq!(value.wind_speed, -1.0);
-        assert_eq!(value.liquid_precip, -2.0);
+        assert_eq!(value.wind_speed, 40.1);
+        assert_eq!(value.liquid_precip, 0.0);
+        assert_eq!(owner.missed_counts.liquid_precip, 1);
         let counts = owner.out_of_range_counts;
         assert_eq!(counts.out_dry_bulb_temp, 1);
         assert_eq!(counts.out_dew_point_temp, 1);
@@ -217,6 +237,56 @@ mod tests {
             owner.missing_values.base.total_sky_cover.to_bits(),
             (-0.0_f64).to_bits()
         );
+    }
+
+    #[test]
+    fn negative_selected_inputs_become_missing_before_range_and_history() {
+        let mut owner = WeatherDayState::default();
+        owner.missing_values.base.liquid_precip = 0.75;
+        let first = processed(&raw(), &mut owner);
+        let mut input = raw();
+        input.mandatory_reals[2] = -0.1;
+        input.mandatory_reals[3] = -1.0;
+        input.mandatory_reals[14] = 360.0001;
+        input.mandatory_reals[15] = -0.1;
+        input.optional_reals[5] = -0.1;
+        let value = processed(&input, &mut owner);
+        assert_eq!(value.out_rel_hum, 51.0);
+        assert_eq!(value.out_baro_press, first.out_baro_press);
+        assert_eq!(value.wind_dir, first.wind_dir);
+        assert_eq!(value.wind_speed, first.wind_speed);
+        assert_eq!(value.liquid_precip, 0.75);
+        let missed = owner.missed_counts;
+        assert_eq!(missed.out_rel_hum, 1);
+        assert_eq!(missed.out_baro_press, 1);
+        assert_eq!(missed.wind_dir, 1);
+        assert_eq!(missed.wind_speed, 1);
+        assert_eq!(missed.liquid_precip, 1);
+        assert_eq!(owner.out_of_range_counts, Default::default());
+        assert_eq!(owner.missing_values.base.out_rel_hum, 51.0);
+        assert_eq!(owner.missing_values.base.liquid_precip, 0.75);
+        // Actual parser values and source identity are not rewritten.
+        assert_eq!(input.mandatory_reals[2], -0.1);
+        assert_eq!(input.mandatory_reals[14], 360.0001);
+        assert_eq!(input.optional_reals[5], -0.1);
+    }
+
+    #[test]
+    fn minus_360_wind_remains_range_only_but_lower_values_are_missing() {
+        let mut owner = WeatherDayState::default();
+        owner.missing_values.base.wind_dir = 180.0;
+        let mut input = raw();
+        input.mandatory_reals[14] = -360.0001;
+        let missing = processed(&input, &mut owner);
+        assert_eq!(missing.wind_dir, 180.0);
+        assert_eq!(owner.missed_counts.wind_dir, 1);
+        assert_eq!(owner.out_of_range_counts.wind_dir, 0);
+        input.mandatory_reals[14] = -360.0;
+        let boundary = processed(&input, &mut owner);
+        assert_eq!(boundary.wind_dir, -360.0);
+        assert_eq!(owner.missed_counts.wind_dir, 1);
+        assert_eq!(owner.out_of_range_counts.wind_dir, 1);
+        assert_eq!(owner.missing_values.base.wind_dir, -360.0);
     }
 
     #[test]
