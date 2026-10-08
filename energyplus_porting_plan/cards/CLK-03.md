@@ -94,3 +94,9 @@ Warmup 첫날 재사용, 24→1시, 다음 날 lookahead, 마지막 날 no-prefe
 SetupInterpolationValues를 ReadUserWeatherInput보다 먼저 호출하고, 기존 TimeStepFraction 값은 Setup 다음·Open 전에 기록한다. 입력·14개 sequence/51개 operation·byte map·CON45·비교 정책은 변경하지 않는다. 수정 계약은 재실행 전에 다시 동결했다. 모든 gate는 미확인이다.
 
 [수정 및 실패 보존 증거](../evidence/CLK-03-preparation-amendment.json)에 원본 종료 코드 3221226505, 실제 디버거 호출 스택, 수정 계약의 독립 검토와 실패 원본 EXE의 보관 위치를 기록했다. 디버거 종료 코드 0은 수치 시험 통과를 의미하지 않는다.
+
+## 필수 입력 수정 3차
+
+두 번째 원본 실행의 종료 코드는 0이지만, 진단 IDF 7개에 필수 GlobalGeometryRules가 없어 27개 요청 작업이 실행되지 않았다. Decoy 검색·재호출·backspace·의도한 reader 오류 경로 검증과 Rust 기준 실행은 보류한다.
+
+원본 IDD에서 요구하는 객체 한 줄만 추가한 새 IDF 7개를 만들고 입력 계약을 다시 동결했다. 기존 빌드·소스·바이너리는 보존한다. 새 실행 입력은 기존 빌드 기록과 별도로 검토한 뒤 사용한다. [입력 수정 증거](../evidence/CLK-03-input-preparation.json)에 실제 24개 호출·27개 skip과 이전 입력 보존 위치를 기록했다. 모든 gate는 미확인이다.

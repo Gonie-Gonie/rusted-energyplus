@@ -1,0 +1,5 @@
+Version,26.1;
+Timestep,4;
+Building,CLK03 Unit,0,Suburbs,0.04,0.4,FullExterior,25,6;
+GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;
+RunPeriod,CLK03 Unit,7,3,2013,7,3,2013,Wednesday,No,No,No,Yes,Yes,No,Hour24;

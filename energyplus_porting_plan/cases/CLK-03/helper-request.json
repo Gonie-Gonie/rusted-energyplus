@@ -43619,8 +43619,8 @@
     {
       "id": "DECOY-OFFSET-HOUR24",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour24-02.idf",
-        "sha256": "500e4db6df588550514858908f3a5fa839926537d54cf520f3ef5bbda83c1f1d"
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour24-03.idf",
+        "sha256": "6bd6bb410a5c2d74e54f5b78e3202981aabe1e70b1143e4d3103f1980e7e1deb"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
@@ -43708,8 +43708,8 @@
     {
       "id": "DECOY-OFFSET-HOUR1",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour1-02.idf",
-        "sha256": "3ad8701c4b654e6d4bd7cce70dc1f3409cc8cfa8beea1b1659a6e7e0ee6bd330"
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour1-03.idf",
+        "sha256": "d6a77c04de81c6c52fdf57814d1587c8077d1131738090955387c411aa1460ce"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
@@ -43777,8 +43777,8 @@
     {
       "id": "FIRST-DAY-THREE-DAYS",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/first-day-three-days-02.idf",
-        "sha256": "da9d5f0235fee85a3a289792a5141053905a469f9c6adc605fedd07429b28a0a"
+        "path": "energyplus_porting_plan/cases/CLK-03/first-day-three-days-03.idf",
+        "sha256": "2e6eae5aa9b927349d751711ecffc1659b2482b02be22bf845a2ac9e3c5afb15"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
@@ -43856,8 +43856,8 @@
     {
       "id": "MISSING-MATCH-DEFINED-FAILURE",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/missing-match-defined-failure-02.idf",
-        "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-match-defined-failure-03.idf",
+        "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
@@ -43915,8 +43915,8 @@
     {
       "id": "OUTSIDE-DATA-PERIOD",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/outside-data-period-02.idf",
-        "sha256": "6bd09229d20e9772eaff7373069b6e197bfa0706f4d55c9a2e81aa5291fae3e7"
+        "path": "energyplus_porting_plan/cases/CLK-03/outside-data-period-03.idf",
+        "sha256": "ee541d85aa0b8e5091ca65de16175e6f9aaad9fc87c09f2aa3051ed73d4e7297"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
@@ -43974,8 +43974,8 @@
     {
       "id": "DIRECT-READDAY-REPLAY",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-replay-03.idf",
-        "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+        "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-replay-04.idf",
+        "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
@@ -44028,8 +44028,8 @@
     {
       "id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
       "input": {
-        "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-backspace-one-record-03.idf",
-        "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+        "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-backspace-one-record-04.idf",
+        "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
       },
       "weather": {
         "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",

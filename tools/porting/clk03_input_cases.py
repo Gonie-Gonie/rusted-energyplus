@@ -117,6 +117,7 @@ def idf_for(rp):
     weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][rp['start_weekday'] - 1]
     text = ('Version,26.1;\nTimestep,4;\n'
             'Building,CLK03 Unit,0,Suburbs,0.04,0.4,FullExterior,25,6;\n'
+            'GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;\n'
             f"RunPeriod,CLK03 Unit,{rp['begin_month']},{rp['begin_day_of_month']},2013,"
             f"{rp['end_month']},{rp['end_day_of_month']},2013,{weekday},No,No,No,Yes,Yes,No,{first};\n")
     return text.encode('utf-8')
@@ -161,7 +162,7 @@ def main():
         ('MISSING-MATCH-DEFINED-FAILURE', (7, 1), (7, 1), False, 0),
         ('OUTSIDE-DATA-PERIOD', (7, 3), (7, 3), False, 0)]:
         rp = run_period(*start, *end, first)
-        input_ref = put(identifier.lower() + '-02.idf', idf_for(rp))
+        input_ref = put(identifier.lower() + '-03.idf', idf_for(rp))
         weather_ref = missing if identifier == 'MISSING-MATCH-DEFINED-FAILURE' else epw
         diagnostics.append({'id': identifier, 'input': input_ref, 'weather': weather_ref, 'run_period': rp,
                             'time_steps_per_hour': 4, 'prepared_environment_lane': True,
@@ -170,7 +171,7 @@ def main():
     for identifier, source_epw, backspace in [('DIRECT-READDAY-REPLAY', duplicate, False),
                                                ('DIRECT-READDAY-BACKSPACE-ONE-RECORD', epw, True)]:
         rp = run_period(7, 1, 7, 1)
-        input_ref = put(identifier.lower() + '-03.idf', idf_for(rp))
+        input_ref = put(identifier.lower() + '-04.idf', idf_for(rp))
         calls = [{'id': 'get-next-environment', 'kind': 'GetNextEnvironment', 'caller': {}},
                  {'id': 'read-first', 'kind': 'ReadWeatherForDay', 'day_to_read': 1,
                   'backspace_after_read': backspace, 'caller': {}}]
@@ -204,7 +205,7 @@ def main():
                    'eio_sink': 'native-output-stringstream', 'error_sink': 'native-output-stringstream'},
                'production_case_ids': ['A-24H', 'A-72H', 'B-BOTH-24H'],
                'draft_not_frozen': True, 'scientific_execution_performed': False}
-    binding = put('helper-request-draft-06.json', (json.dumps(request, indent=2, ensure_ascii=False) + '\n').encode('utf-8'))
+    binding = put('helper-request-draft-07.json', (json.dumps(request, indent=2, ensure_ascii=False) + '\n').encode('utf-8'))
     print(json.dumps({'draft_request': binding, 'handoff_sequences': len(request['handoff_sequences']),
                       'weather_sequences': len(request['weather_sequences']),
                       'scope_cases_unchanged': len(scope['cases']), 'expected_values_supplied': False}))

@@ -1,0 +1,215 @@
+{
+  "schema": "clk03-required-input-preparation-evidence.v1",
+  "card": "CLK-03",
+  "status": "schema-required-diagnostic-inputs-refrozen-awaiting-independent-runtime-input-admission",
+  "packet_revision": 3,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "actual_revision2_reference": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-02/helper-reference.json",
+    "sha256": "4eb4b7bf48fdfd24c6853f9e9220c222b9924bffc7bf06976bc5d554e2a1ea2b"
+  },
+  "actual_revision2_outer_command": {
+    "path": ".runtime/porting/CLK-03/original-command-02/receipt.json",
+    "sha256": "103739082912cc0160b99fc2dee1cddea2319f9ca02a7d48e4cc2ec3eb4f347e"
+  },
+  "actual_revision2_results": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-02/native-output/results.json",
+    "sha256": "2b16ce6302df96d14140eb2c15bb31def58b4d4ecfe13ef34063d22b596011b5"
+  },
+  "actual_revision2_child_and_outer_exit_codes": 0,
+  "actual_revision2_invoked_operations": 24,
+  "actual_revision2_skipped_operations": 27,
+  "diagnostic_preparation_fatals": 7,
+  "input_schema_error": "Missing required property GlobalGeometryRules.",
+  "intended_diagnostic_reader_branches_certified_by_revision2": false,
+  "preserved_original_data_structure_review": {
+    "path": ".runtime/porting/CLK-03/independent-original-data-review-01/review.json",
+    "sha256": "801e62d4eafd147330847f73fb6fb3063b6fc09a9afbaa04ee3f295dc2ccfce5"
+  },
+  "explicit_coverage_gap_and_baseline_hold": {
+    "path": ".runtime/porting/CLK-03/runtime-input-admission-plan-01/coverage-gap.json",
+    "sha256": "5b6b5beb0ce4b7c2484853c98d2da87330d617cda01d90c780cc6ed03a58df60"
+  },
+  "required_input_amendment": {
+    "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/amendment.json",
+    "sha256": "7cda69fe4c6488a062c3dfee107e3c4c0ad5c40b985fc20ac3fc7900dd97c638"
+  },
+  "generator_filename_amendment": {
+    "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-02/amendment.json",
+    "sha256": "7b168f4f4b93e4d5931974d657ade2dadeb9311f384016d760c72d330b84def2"
+  },
+  "current_generator": {
+    "path": "tools/porting/clk03_input_cases.py",
+    "sha256": "4b81b94fbab10fbe281cefdf7171362d9740a7a65bbfd237355d0f0b6d49f33d"
+  },
+  "seven_input_replacements": [
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/decoy-offset-hour24-02.idf",
+        "sha256": "500e4db6df588550514858908f3a5fa839926537d54cf520f3ef5bbda83c1f1d"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour24-03.idf",
+        "sha256": "6bd6bb410a5c2d74e54f5b78e3202981aabe1e70b1143e4d3103f1980e7e1deb"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/decoy-offset-hour1-02.idf",
+        "sha256": "3ad8701c4b654e6d4bd7cce70dc1f3409cc8cfa8beea1b1659a6e7e0ee6bd330"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour1-03.idf",
+        "sha256": "d6a77c04de81c6c52fdf57814d1587c8077d1131738090955387c411aa1460ce"
+      }
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/first-day-three-days-02.idf",
+        "sha256": "da9d5f0235fee85a3a289792a5141053905a469f9c6adc605fedd07429b28a0a"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/first-day-three-days-03.idf",
+        "sha256": "2e6eae5aa9b927349d751711ecffc1659b2482b02be22bf845a2ac9e3c5afb15"
+      }
+    },
+    {
+      "sequence_id": "MISSING-MATCH-DEFINED-FAILURE",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/missing-match-defined-failure-02.idf",
+        "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-match-defined-failure-03.idf",
+        "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
+      }
+    },
+    {
+      "sequence_id": "OUTSIDE-DATA-PERIOD",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/outside-data-period-02.idf",
+        "sha256": "6bd09229d20e9772eaff7373069b6e197bfa0706f4d55c9a2e81aa5291fae3e7"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/outside-data-period-03.idf",
+        "sha256": "ee541d85aa0b8e5091ca65de16175e6f9aaad9fc87c09f2aa3051ed73d4e7297"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/direct-readday-replay-03.idf",
+        "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-replay-04.idf",
+        "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+      "old_input_archive": {
+        "path": ".runtime/porting/CLK-03/diagnostic-geometry-rules-amendment-01/before/direct-readday-backspace-one-record-03.idf",
+        "sha256": "4e1e0d33d9b3b901844208bd35f8e22d5f10f139be2b2e6cb6b1672be1b14aff"
+      },
+      "new_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-backspace-one-record-04.idf",
+        "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
+      }
+    }
+  ],
+  "only_IDF_content_delta": "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;",
+  "pinned_required_property_provenance": {
+    "pinned_IDD": {
+      "path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+      "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f"
+    },
+    "line_range": [
+      9392,
+      9432
+    ],
+    "range_sha256": "0fcde6484393990552794adc607e7593956de45298aafa3da8e97136fda5dba9",
+    "required_object": true,
+    "unique_object": true,
+    "required_fields": [
+      "Starting Vertex Position",
+      "Vertex Entry Direction",
+      "Coordinate System"
+    ],
+    "literal_values": [
+      "UpperLeftCorner",
+      "Counterclockwise",
+      "World"
+    ],
+    "added_literal_IDF_object": "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;\n"
+  },
+  "amended_packet": {
+    "path": ".runtime/porting/CLK-03/packet-amendment-prep-03/amendment-result.json",
+    "sha256": "811fb2050030fb6cc31e79f8446882217ae2ea2a8b6f73a1667a1230f8e9bc2e"
+  },
+  "actual_packet_freeze_command": {
+    "path": ".runtime/porting/CLK-03/packet-amendment-command-03/receipt.json",
+    "sha256": "2be6b65f522c7b2e75918add78168110fb442de4aa296546340230e57a2345de"
+  },
+  "runtime_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "runtime_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+  },
+  "requested_counts": {
+    "handoff_sequences": 4,
+    "weather_sequences": 10,
+    "handoff_operations": 7,
+    "weather_operations": 44,
+    "total_sequences": 14,
+    "total_operations": 51
+  },
+  "input_byte_maps": {
+    "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+    "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+  },
+  "accepted_unchanged_compiled_build": {
+    "path": ".runtime/porting/CLK-03/native-build-03/native-driver-build.json",
+    "sha256": "cdc90a5e5806c03e98355e7cd1593a0638ea1a5c7f801aa52ac7aad73c1a2700"
+  },
+  "independent_actual_build_and_PE_review": {
+    "path": ".runtime/porting/CLK-03/independent-native-build-review-03/review.json",
+    "sha256": "771f09567e5d1b3c91fcbd54f9519f0cb415a63db8560818576f62277162b01a"
+  },
+  "unchanged_compiled_helper": {
+    "path": "tools/porting/clk03_reference_helper.cpp",
+    "sha256": "2f4fb94a04f0638016b2f458ad9a567fa8e201b57323663b7fd18cf4e21b9877"
+  },
+  "compiled_build_receipt_rewritten": false,
+  "fresh_native_build_claimed": false,
+  "runtime_input_admission_pending": true,
+  "current_revision_native_execution_performed": false,
+  "Rust_numerical_execution_performed": false,
+  "tolerance_policy_or_operations_canaries_weather_CON_scope_changed": false,
+  "card_gates_updated": false,
+  "remaining": [
+    "Independent current contract and runtime input admission reviews.",
+    "Actual intended reader coverage and initial data review before Rust baseline.",
+    "Actual Rust implementation, unit, lifecycle/consumer and production verification."
+  ],
+  "independent_current_contract_review": {
+    "path": ".runtime/porting/CLK-03/independent-contract-review-03/review.json",
+    "sha256": "7cea358f34f2e95bcd010616203b13b1737c0c1a8f953b3d2bd84a865d3cf379"
+  }
+}
