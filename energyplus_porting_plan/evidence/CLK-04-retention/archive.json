@@ -1,0 +1,839 @@
+{
+  "schema": "clk04-selected-byte-evidence-archive.v1",
+  "purpose": "actual-single-target-retirement",
+  "rows": [
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-01/review.json",
+        "sha256": "b9e0dcfaaeddf3e7c4c41daf6aff5a82866573daff5edb063a9b19810228d5d0"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "b9e0dcfaaeddf3e7c4c41daf6aff5a82866573daff5edb063a9b19810228d5d0",
+        "original_size_bytes": 3777,
+        "stored_payload_sha256": "56d2763b5b8e5f9f6f201cb09580c23a9a057b4eb3871c22252f6020680f6693",
+        "stored_payload_size_bytes": 1469,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/56d2763b5b8e5f9f6f201cb09580c23a9a057b4eb3871c22252f6020680f6693.gz",
+            "sha256": "56d2763b5b8e5f9f6f201cb09580c23a9a057b4eb3871c22252f6020680f6693",
+            "size_bytes": 1469
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-01/source/common.py",
+        "sha256": "69cc6dc81125bb0f5beaf9e850616755db25b5d9599590f20fc25b2a4a704bd5"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "69cc6dc81125bb0f5beaf9e850616755db25b5d9599590f20fc25b2a4a704bd5",
+        "original_size_bytes": 5605,
+        "stored_payload_sha256": "e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba",
+        "stored_payload_size_bytes": 2285,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba.gz",
+            "sha256": "e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba",
+            "size_bytes": 2285
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-01/source/proofs.py",
+        "sha256": "5b72d8161bcfee3b0497adbfd4b062573cacae4a9f80e837491ad8382b8686b7"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "5b72d8161bcfee3b0497adbfd4b062573cacae4a9f80e837491ad8382b8686b7",
+        "original_size_bytes": 13446,
+        "stored_payload_sha256": "6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d",
+        "stored_payload_size_bytes": 3899,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d.gz",
+            "sha256": "6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d",
+            "size_bytes": 3899
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-01/source/retire.py",
+        "sha256": "d00061fc23615f812a03088f63147b2a261670ef28de7aea20ffb6b02d2aba58"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d00061fc23615f812a03088f63147b2a261670ef28de7aea20ffb6b02d2aba58",
+        "original_size_bytes": 11592,
+        "stored_payload_sha256": "9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d",
+        "stored_payload_size_bytes": 3680,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d.gz",
+            "sha256": "9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d",
+            "size_bytes": 3680
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-01/source/write_plan.py",
+        "sha256": "2221186f5b9d47bcbf1ac5df560d91d21568fb80ee527c617a7472e5c6f91221"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "2221186f5b9d47bcbf1ac5df560d91d21568fb80ee527c617a7472e5c6f91221",
+        "original_size_bytes": 8660,
+        "stored_payload_sha256": "b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db",
+        "stored_payload_size_bytes": 3075,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db.gz",
+            "sha256": "b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db",
+            "size_bytes": 3075
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-command-01/receipt.json",
+        "sha256": "9ede528de04d6b93786a5de75cb1cbb5d9fde940f9edb8dc2448163bbbc7b268"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "9ede528de04d6b93786a5de75cb1cbb5d9fde940f9edb8dc2448163bbbc7b268",
+        "original_size_bytes": 2852,
+        "stored_payload_sha256": "49f35f72f7cb64ae4de1bd28db28e0962a11faaa53f2a4373e6488b81b0a37ca",
+        "stored_payload_size_bytes": 1247,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/49f35f72f7cb64ae4de1bd28db28e0962a11faaa53f2a4373e6488b81b0a37ca.gz",
+            "sha256": "49f35f72f7cb64ae4de1bd28db28e0962a11faaa53f2a4373e6488b81b0a37ca",
+            "size_bytes": 1247
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_size_bytes": 0,
+        "stored_payload_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "stored_payload_size_bytes": 20,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64.gz",
+            "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+            "size_bytes": 20
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/independent-retirement-writer-source-review-command-01/stdout.log",
+        "sha256": "123ec28736fb3b2212cd4af7f6b45a25129fa0af3c33573b8d1b5dbd3d334299"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "123ec28736fb3b2212cd4af7f6b45a25129fa0af3c33573b8d1b5dbd3d334299",
+        "original_size_bytes": 3444,
+        "stored_payload_sha256": "dda16d677eed095b951687cfc38271fe02c500b5279c42b5a02ca76324e01113",
+        "stored_payload_size_bytes": 1428,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/dda16d677eed095b951687cfc38271fe02c500b5279c42b5a02ca76324e01113.gz",
+            "sha256": "dda16d677eed095b951687cfc38271fe02c500b5279c42b5a02ca76324e01113",
+            "size_bytes": 1428
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-01/plan.json",
+        "sha256": "a7275322d88e6ed4e89b238fa770a1ca3d1001096a461b2e21930456ea75ed2d"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "a7275322d88e6ed4e89b238fa770a1ca3d1001096a461b2e21930456ea75ed2d",
+        "original_size_bytes": 43912,
+        "stored_payload_sha256": "e6f9a98481112d558c5173136bce11e5e8e0dd87ca0e75dae20d983ecbe292b8",
+        "stored_payload_size_bytes": 7937,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e6f9a98481112d558c5173136bce11e5e8e0dd87ca0e75dae20d983ecbe292b8.gz",
+            "sha256": "e6f9a98481112d558c5173136bce11e5e8e0dd87ca0e75dae20d983ecbe292b8",
+            "size_bytes": 7937
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-01/source/bindings.json",
+        "sha256": "602c58ef90e110b6eee71c8838b85cdae8f9a7ef6f3d6e51c83996be3cfd7564"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "602c58ef90e110b6eee71c8838b85cdae8f9a7ef6f3d6e51c83996be3cfd7564",
+        "original_size_bytes": 13362,
+        "stored_payload_sha256": "1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb",
+        "stored_payload_size_bytes": 3709,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb.gz",
+            "sha256": "1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb",
+            "size_bytes": 3709
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-01/source/common.py",
+        "sha256": "69cc6dc81125bb0f5beaf9e850616755db25b5d9599590f20fc25b2a4a704bd5"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "69cc6dc81125bb0f5beaf9e850616755db25b5d9599590f20fc25b2a4a704bd5",
+        "original_size_bytes": 5605,
+        "stored_payload_sha256": "e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba",
+        "stored_payload_size_bytes": 2285,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba.gz",
+            "sha256": "e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba",
+            "size_bytes": 2285
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-01/source/proofs.py",
+        "sha256": "5b72d8161bcfee3b0497adbfd4b062573cacae4a9f80e837491ad8382b8686b7"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "5b72d8161bcfee3b0497adbfd4b062573cacae4a9f80e837491ad8382b8686b7",
+        "original_size_bytes": 13446,
+        "stored_payload_sha256": "6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d",
+        "stored_payload_size_bytes": 3899,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d.gz",
+            "sha256": "6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d",
+            "size_bytes": 3899
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-01/source/retire.py",
+        "sha256": "d00061fc23615f812a03088f63147b2a261670ef28de7aea20ffb6b02d2aba58"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d00061fc23615f812a03088f63147b2a261670ef28de7aea20ffb6b02d2aba58",
+        "original_size_bytes": 11592,
+        "stored_payload_sha256": "9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d",
+        "stored_payload_size_bytes": 3680,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d.gz",
+            "sha256": "9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d",
+            "size_bytes": 3680
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-01/source/write_plan.py",
+        "sha256": "2221186f5b9d47bcbf1ac5df560d91d21568fb80ee527c617a7472e5c6f91221"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "2221186f5b9d47bcbf1ac5df560d91d21568fb80ee527c617a7472e5c6f91221",
+        "original_size_bytes": 8660,
+        "stored_payload_sha256": "b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db",
+        "stored_payload_size_bytes": 3075,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db.gz",
+            "sha256": "b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db",
+            "size_bytes": 3075
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-command-01/receipt.json",
+        "sha256": "d9bc66343af8bd08d7bae491a8054b3870a2037991daabe6a7ecff9d85b475f9"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d9bc66343af8bd08d7bae491a8054b3870a2037991daabe6a7ecff9d85b475f9",
+        "original_size_bytes": 3394,
+        "stored_payload_sha256": "143e873633e12c94fea29795fab9f33cce3d5b3658afe8bfbcd7ffbcbcfb40e1",
+        "stored_payload_size_bytes": 1356,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/143e873633e12c94fea29795fab9f33cce3d5b3658afe8bfbcd7ffbcbcfb40e1.gz",
+            "sha256": "143e873633e12c94fea29795fab9f33cce3d5b3658afe8bfbcd7ffbcbcfb40e1",
+            "size_bytes": 1356
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_size_bytes": 0,
+        "stored_payload_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "stored_payload_size_bytes": 20,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64.gz",
+            "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+            "size_bytes": 20
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-plan-command-01/stdout.log",
+        "sha256": "004c829ccfa2db27ea8bfae9ff545f2ada702972daccc7cb807a41f30275b969"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "004c829ccfa2db27ea8bfae9ff545f2ada702972daccc7cb807a41f30275b969",
+        "original_size_bytes": 333,
+        "stored_payload_sha256": "0780b0493b70d761db89f1f3d5cfc3f009848d2475e72237a828c185ca874ad9",
+        "stored_payload_size_bytes": 256,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/0780b0493b70d761db89f1f3d5cfc3f009848d2475e72237a828c185ca874ad9.gz",
+            "sha256": "0780b0493b70d761db89f1f3d5cfc3f009848d2475e72237a828c185ca874ad9",
+            "size_bytes": 256
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-prep-01/bindings.json",
+        "sha256": "602c58ef90e110b6eee71c8838b85cdae8f9a7ef6f3d6e51c83996be3cfd7564"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "602c58ef90e110b6eee71c8838b85cdae8f9a7ef6f3d6e51c83996be3cfd7564",
+        "original_size_bytes": 13362,
+        "stored_payload_sha256": "1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb",
+        "stored_payload_size_bytes": 3709,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb.gz",
+            "sha256": "1c60769d1c33ef0a89c29ffc020fe4842326f323507d2f67b57759c6c7cd26fb",
+            "size_bytes": 3709
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-prep-01/common.py",
+        "sha256": "69cc6dc81125bb0f5beaf9e850616755db25b5d9599590f20fc25b2a4a704bd5"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "69cc6dc81125bb0f5beaf9e850616755db25b5d9599590f20fc25b2a4a704bd5",
+        "original_size_bytes": 5605,
+        "stored_payload_sha256": "e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba",
+        "stored_payload_size_bytes": 2285,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba.gz",
+            "sha256": "e5a80299efc16362bc169fab86de4a41e770fd2f29566454fa00d22da6fd4dba",
+            "size_bytes": 2285
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-prep-01/proofs.py",
+        "sha256": "5b72d8161bcfee3b0497adbfd4b062573cacae4a9f80e837491ad8382b8686b7"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "5b72d8161bcfee3b0497adbfd4b062573cacae4a9f80e837491ad8382b8686b7",
+        "original_size_bytes": 13446,
+        "stored_payload_sha256": "6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d",
+        "stored_payload_size_bytes": 3899,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d.gz",
+            "sha256": "6b1f6c225dd204c90480a32e1aed8e75fac06dc39d19413cbe1b54d4ad28a28d",
+            "size_bytes": 3899
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-prep-01/retire.py",
+        "sha256": "d00061fc23615f812a03088f63147b2a261670ef28de7aea20ffb6b02d2aba58"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d00061fc23615f812a03088f63147b2a261670ef28de7aea20ffb6b02d2aba58",
+        "original_size_bytes": 11592,
+        "stored_payload_sha256": "9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d",
+        "stored_payload_size_bytes": 3680,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d.gz",
+            "sha256": "9efb35eebc9085e9e6883baba32516281d0e95ad31cc10ba4fbce32b0a4c248d",
+            "size_bytes": 3680
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retention-prep-01/write_plan.py",
+        "sha256": "2221186f5b9d47bcbf1ac5df560d91d21568fb80ee527c617a7472e5c6f91221"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "2221186f5b9d47bcbf1ac5df560d91d21568fb80ee527c617a7472e5c6f91221",
+        "original_size_bytes": 8660,
+        "stored_payload_sha256": "b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db",
+        "stored_payload_size_bytes": 3075,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db.gz",
+            "sha256": "b9cb483ff65b62517c6f0f22ac44f9cdf5534e6cac9cf73e06921cadf79261db",
+            "size_bytes": 3075
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/clk04_reference_helper-registry-attempt.json",
+        "sha256": "d90a276b5549b0697d66313ae62d79b00bed65cf6c650badf8a40fc384bce06c"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "d90a276b5549b0697d66313ae62d79b00bed65cf6c650badf8a40fc384bce06c",
+        "original_size_bytes": 25489,
+        "stored_payload_sha256": "f7dc9aeaedc5e9f2f5e711e036ac606783acd293441597d9d9861cbe65b6f659",
+        "stored_payload_size_bytes": 5394,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f7dc9aeaedc5e9f2f5e711e036ac606783acd293441597d9d9861cbe65b6f659.gz",
+            "sha256": "f7dc9aeaedc5e9f2f5e711e036ac606783acd293441597d9d9861cbe65b6f659",
+            "size_bytes": 5394
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/clk04_reference_helper-removal-receipt.json",
+        "sha256": "75a2876684e9f18e5af85162d74e72f38a01116c250b305777d266392c6b08e5"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "75a2876684e9f18e5af85162d74e72f38a01116c250b305777d266392c6b08e5",
+        "original_size_bytes": 13398,
+        "stored_payload_sha256": "7ac739d579de2c47b77aea57d307a309f07c76e91831dc3b9a1de062d44f3aab",
+        "stored_payload_size_bytes": 2197,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7ac739d579de2c47b77aea57d307a309f07c76e91831dc3b9a1de062d44f3aab.gz",
+            "sha256": "7ac739d579de2c47b77aea57d307a309f07c76e91831dc3b9a1de062d44f3aab",
+            "size_bytes": 2197
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/clk04_reference_helper-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_size_bytes": 0,
+        "stored_payload_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "stored_payload_size_bytes": 20,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64.gz",
+            "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+            "size_bytes": 20
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/clk04_reference_helper-stdout.log",
+        "sha256": "e4f13ab70eb9225972901098341945957d231172b44c65f0b2dd390fa650344e"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e4f13ab70eb9225972901098341945957d231172b44c65f0b2dd390fa650344e",
+        "original_size_bytes": 93,
+        "stored_payload_sha256": "418c025defb6a48d68cd081ded15d03b969b97cc499a439400e320dcf82a61c3",
+        "stored_payload_size_bytes": 104,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/418c025defb6a48d68cd081ded15d03b969b97cc499a439400e320dcf82a61c3.gz",
+            "sha256": "418c025defb6a48d68cd081ded15d03b969b97cc499a439400e320dcf82a61c3",
+            "size_bytes": 104
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/registry-admitted.json",
+        "sha256": "6f94d02cb69db09c342debc350c04d9ed5ad701bef9b1bd02fa28eb85daa1db2"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "6f94d02cb69db09c342debc350c04d9ed5ad701bef9b1bd02fa28eb85daa1db2",
+        "original_size_bytes": 25218,
+        "stored_payload_sha256": "978243c8d839d2f95dcaad231a723e3fb35d9a69677700bf86a3b3cd2bfb7ce9",
+        "stored_payload_size_bytes": 5373,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/978243c8d839d2f95dcaad231a723e3fb35d9a69677700bf86a3b3cd2bfb7ce9.gz",
+            "sha256": "978243c8d839d2f95dcaad231a723e3fb35d9a69677700bf86a3b3cd2bfb7ce9",
+            "size_bytes": 5373
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/registry-retired.json",
+        "sha256": "27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378",
+        "original_size_bytes": 25490,
+        "stored_payload_sha256": "1a3a423053c33f17ea920210a7d0977b8be334e2d3757a888bfea1935d545871",
+        "stored_payload_size_bytes": 5395,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1a3a423053c33f17ea920210a7d0977b8be334e2d3757a888bfea1935d545871.gz",
+            "sha256": "1a3a423053c33f17ea920210a7d0977b8be334e2d3757a888bfea1935d545871",
+            "size_bytes": 5395
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/remove-clk04_reference_helper.ps1",
+        "sha256": "56a74ac47b56d38ae369020c423847d7e159cc8a298ed7c82be914f3ee468336"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "56a74ac47b56d38ae369020c423847d7e159cc8a298ed7c82be914f3ee468336",
+        "original_size_bytes": 1727,
+        "stored_payload_sha256": "fe5bcdf221f388b0fbdaf88a65ffbddabccf7f1c1ff417c3e4a9b63884df182c",
+        "stored_payload_size_bytes": 671,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/fe5bcdf221f388b0fbdaf88a65ffbddabccf7f1c1ff417c3e4a9b63884df182c.gz",
+            "sha256": "fe5bcdf221f388b0fbdaf88a65ffbddabccf7f1c1ff417c3e4a9b63884df182c",
+            "size_bytes": 671
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-01/retirement.json",
+        "sha256": "b9ca376626a2503ecf77ef21cc4394331563fc1d0628d32f1849abcb2f23038c"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "b9ca376626a2503ecf77ef21cc4394331563fc1d0628d32f1849abcb2f23038c",
+        "original_size_bytes": 9679,
+        "stored_payload_sha256": "5d72f41a02fb0fa15ddb868a32f93d06a1c37b341b2fc12115ca66adb30b544d",
+        "stored_payload_size_bytes": 2788,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5d72f41a02fb0fa15ddb868a32f93d06a1c37b341b2fc12115ca66adb30b544d.gz",
+            "sha256": "5d72f41a02fb0fa15ddb868a32f93d06a1c37b341b2fc12115ca66adb30b544d",
+            "size_bytes": 2788
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-command-01/receipt.json",
+        "sha256": "4937e664fd7c509f77a8302c70b30bdd4d7aaf5d60d4894c406f643839ee1a38"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "4937e664fd7c509f77a8302c70b30bdd4d7aaf5d60d4894c406f643839ee1a38",
+        "original_size_bytes": 3163,
+        "stored_payload_sha256": "c07609441da7c8624e02ca70570240b105ff7b4b04454fa8cb0b76c3381349b2",
+        "stored_payload_size_bytes": 1314,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/c07609441da7c8624e02ca70570240b105ff7b4b04454fa8cb0b76c3381349b2.gz",
+            "sha256": "c07609441da7c8624e02ca70570240b105ff7b4b04454fa8cb0b76c3381349b2",
+            "size_bytes": 1314
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_size_bytes": 0,
+        "stored_payload_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "stored_payload_size_bytes": 20,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64.gz",
+            "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+            "size_bytes": 20
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-command-01/stdout.log",
+        "sha256": "87295fc6bfa9d0caf731bffb82a95e4ddd32dd5f6444b5f0fea10dc4b7f701d2"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "87295fc6bfa9d0caf731bffb82a95e4ddd32dd5f6444b5f0fea10dc4b7f701d2",
+        "original_size_bytes": 8228,
+        "stored_payload_sha256": "fe32aa3f3ef19fec940e58c11915a7efef87fd5d7e5854e45d3621ee37593e4b",
+        "stored_payload_size_bytes": 2726,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/fe32aa3f3ef19fec940e58c11915a7efef87fd5d7e5854e45d3621ee37593e4b.gz",
+            "sha256": "fe32aa3f3ef19fec940e58c11915a7efef87fd5d7e5854e45d3621ee37593e4b",
+            "size_bytes": 2726
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-review-prep-01/review_sources.py",
+        "sha256": "4f2595724cfbbd7374f49ff09fe9ae230c1888304d0dd9a71dbbdae8f024f7e6"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "4f2595724cfbbd7374f49ff09fe9ae230c1888304d0dd9a71dbbdae8f024f7e6",
+        "original_size_bytes": 11726,
+        "stored_payload_sha256": "96e201978ae7ec5c39f86b537fd93706eef2efc265f0c495f712bbd8a25f8a27",
+        "stored_payload_size_bytes": 4549,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/96e201978ae7ec5c39f86b537fd93706eef2efc265f0c495f712bbd8a25f8a27.gz",
+            "sha256": "96e201978ae7ec5c39f86b537fd93706eef2efc265f0c495f712bbd8a25f8a27",
+            "size_bytes": 4549
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": "energyplus_porting_plan/evidence/native-helper-retention-policy.json",
+        "sha256": "782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379",
+        "original_size_bytes": 6659,
+        "stored_payload_sha256": "7a061e6610150521a83436e9a30bad37000c8a53faee599068cf917d10d82409",
+        "stored_payload_size_bytes": 2690,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7a061e6610150521a83436e9a30bad37000c8a53faee599068cf917d10d82409.gz",
+            "sha256": "7a061e6610150521a83436e9a30bad37000c8a53faee599068cf917d10d82409",
+            "size_bytes": 2690
+          }
+        ]
+      }
+    },
+    {
+      "role": "retirement-source-or-actual-receipt",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/retirement-archive-prep-01/archive.py",
+        "sha256": "cf089a381c676671554c9ef01f9873fd843df78379324baa97dd21db3afae6af"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "cf089a381c676671554c9ef01f9873fd843df78379324baa97dd21db3afae6af",
+        "original_size_bytes": 4190,
+        "stored_payload_sha256": "470e920ca57ab401dec1c44b23e7a49eeccdf816d08e8dc8c6a8b262db0c03f2",
+        "stored_payload_size_bytes": 1824,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/470e920ca57ab401dec1c44b23e7a49eeccdf816d08e8dc8c6a8b262db0c03f2.gz",
+            "sha256": "470e920ca57ab401dec1c44b23e7a49eeccdf816d08e8dc8c6a8b262db0c03f2",
+            "size_bytes": 1824
+          }
+        ]
+      }
+    }
+  ],
+  "exact_decompressed_bytes_verified": true,
+  "original_bytes_rewritten_or_JSON_reserialized": false,
+  "scientific_values_compared": false,
+  "canonical_files_or_gates_changed": false,
+  "native_or_binary_copy_created": false
+}
