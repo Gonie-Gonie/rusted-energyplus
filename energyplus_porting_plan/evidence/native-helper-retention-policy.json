@@ -1,0 +1,124 @@
+{
+  "schema": "native-helper-forward-retention-policy.v1",
+  "completed_utc": "2026-10-08T02:53:20.869896+00:00",
+  "scope": "Prospective genuine static reference helpers; existing legacy files/proofs remain live and unchanged",
+  "measured_validation": {
+    "linked_original": {
+      "historical_path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+      "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861",
+      "size_bytes": 1296118832,
+      "retention_class": "prospective-debug-original"
+    },
+    "derivative": {
+      "path": ".runtime/porting/native-debug-derivative-validation-02/derived-helper.exe",
+      "sha256": "445290676d6999328d0389f70397b7ce774a8c24c413fd007ba9f2469c0ef79e",
+      "size_bytes": 149394449
+    },
+    "retained_raw_section_count": 11,
+    "retained_raw_payload_bytes": 70770176,
+    "removed_debug_raw_bytes": 1129179136,
+    "whole_file_saved_bytes": 1146724383,
+    "strip_exit_code": 0,
+    "original_unchanged": true,
+    "utility_request_sequences": 8,
+    "utility_request_operations": 34,
+    "utility_child_exit_code": 0,
+    "utility_stdout_exactly_equal_to_preserved_original": true,
+    "opaque_language_specific_handler_data": "Whole containing-section payload retained exactly; pointer format not interpreted",
+    "complete_pointer_walk_or_error_unwind_execution_certified": false,
+    "successful_derivation_status": "pass-exact-retained-runtime-sections-and-directories"
+  },
+  "sources": {
+    "native_pe.py": {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56"
+    },
+    "derive_native_helper.py": {
+      "path": "tools/porting/derive_native_helper.py",
+      "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf"
+    },
+    "freeze_native_registry.py": {
+      "path": "tools/porting/freeze_native_registry.py",
+      "sha256": "762d747f40d2e20e5b30a49b9bfb32c63a1e026c5124d86931727f5d1163b1dc"
+    }
+  },
+  "raw_evidence": {
+    "proposal": {
+      "path": ".runtime/porting/native-debug-derivative-plan-01/plan.md",
+      "sha256": "2088da2620881475ee33c6056b68cb56b9eb26e6e07099440e9ca5d09bd5e5d6"
+    },
+    "forward_only_policy": {
+      "path": ".runtime/porting/native-debug-derivative-plan-01/retention-forward-only.md",
+      "sha256": "b9aaf18cc2415ace6a8fe6e7c25185f197044ab5ca85b060148d04190459c982"
+    },
+    "failed_read_only_map_preflight": {
+      "path": ".runtime/porting/native-debug-derivative-preflight-01/receipt.json",
+      "sha256": "0bf24d49975c99ea5a7d7a0a961d9de48c97aa5a4288ac12a29e43a8ce9c9c3b"
+    },
+    "pointer_diagnostic_with_display_exit_failure": {
+      "path": ".runtime/porting/native-debug-derivative-preflight-01/pointer-diagnostic-01/diagnostic.json",
+      "sha256": "91090447c8098c1fb8267c53bf0c937e15b0bc203eeb9e4bb854562fef53fcca"
+    },
+    "failed_first_transformation": {
+      "path": ".runtime/porting/native-debug-derivative-validation-01/receipt.json",
+      "sha256": "686ebd3a5d77ddeb283bd6e7fea60fa9413432c41b5a7ad4f966c78db1029ad9"
+    },
+    "independent_utility_amendment_review": {
+      "path": ".runtime/porting/native-debug-derivative-independent-amendment-review-02/review.json",
+      "sha256": "a3dd6cd9d171eee9582a1eaea75620d6b831786185d224a8990819b388dc774d"
+    },
+    "successful_transformation": {
+      "path": ".runtime/porting/native-debug-derivative-validation-02/receipt.json",
+      "sha256": "dcdd3e52af5c08827c4c92a6a8bf1cc4f043a805456110f753a96316c8aebe83"
+    },
+    "independent_actual_PE_review": {
+      "path": ".runtime/porting/native-debug-derivative-independent-actual-review-02/review.json",
+      "sha256": "305bfd2c31458a8cd8ccbb569f5f1e5d2db9279da3f65d69d1f6b50e912213e3"
+    },
+    "actual_bounded_same_input_execution": {
+      "path": ".runtime/porting/native-debug-derivative-validation-02/same-input-runtime-01/receipt.json",
+      "sha256": "0f1d04209d163912821d80c125e482cc0005b9dba0f1e620fa3bb2ed70254e2d"
+    },
+    "independent_bounded_runtime_review": {
+      "path": ".runtime/porting/native-debug-derivative-independent-runtime-review-01/review.json",
+      "sha256": "9e779dfb6dcddc97a3bcce3f61fd61b2430fc53c893ca12cdfc91abb0a449a2e"
+    },
+    "legacy_registry_transition": {
+      "path": ".runtime/porting/native-retention-transition-01/registry.json",
+      "sha256": "f2455dc3cc74f5840fab60b58aba79b01b250bb15dcf399932915ddd6a43abc6"
+    }
+  },
+  "forward_policy_accepted_by_root": true,
+  "new_helper_lifecycle": [
+    "Unchanged genuine pinned core/source/compiler/ABI/flags; targeted new helper link",
+    "Record historical linked path/SHA/size without a second full unstripped copy",
+    "Authenticated strip --strip-debug --preserve-dates -o fresh derivative original",
+    "Require exact retained raw bytes/RVA/sizes/flags/directories and narrow explained headers; independently review actual files",
+    "Run actual original-first card inputs through this exact derivative after independent build/contract review",
+    "Retain debug original until successful initial original data review and all preservation guards",
+    "Only a specifically registered NEW linked target may then be removed with contained-path/SHA/size/absence receipts",
+    "Future builders require the prior explicit registry and preserve all eleven legacy Products and protected libraries"
+  ],
+  "limits": [
+    "All existing historical readers and live-file references stay unchanged",
+    "Failed attempt01 remains permanently unaccepted and preserved",
+    "The existing legacy ZON original is not eligible for removal under this new-target policy",
+    "Peak storage still contains original plus derivative; retained future savings require separate successful removal",
+    "Discarded full debug bytes cannot be recovered from hashes/maps; deterministic recovery is not claimed",
+    "Utility success on eight ZON sequences is not scientific certification for any new card",
+    "Every new target requires its own genuine build, exact PE validation and actual original-first execution"
+  ],
+  "existing_originals_removed": 0,
+  "legacy_products_retained": 11,
+  "new_targets_admitted": 0,
+  "existing_proofs_rewritten": false,
+  "scientific_gates_changed": false,
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/native-efficiency-final-02/write_compact.py",
+    "sha256": "44a0c5c1fbafd9d5fdf5eb0d073c8701a984e56c7fcc4bf2ef8ff5aa272ed6db"
+  },
+  "metadata_transcription_amendment": {
+    "path": ".runtime/porting/native-efficiency-final-02/amendment.json",
+    "sha256": "e68f4424852f5b411f9faa4af7dbcfd8751adef8595d559d010ca73780aaa48b"
+  }
+}
