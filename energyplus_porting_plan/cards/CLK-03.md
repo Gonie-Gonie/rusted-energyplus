@@ -76,16 +76,16 @@ Warmup 첫날 재사용, 24→1시, 다음 날 lookahead, 마지막 날 no-prefe
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:
+구현 커밋: `df88eb4c7b03cd8a04ad09d5fce3300a4d5b7b22`; crates tree `47e544dafabcec8e30197597b8832ee1c290c8fc`
+시험 명령: 실제 unit·production·workspace·Clippy·구조·형식 명령 및 기록은 아래 종료 증거에 결합한다.
+증거 경로: [종료 증거](../evidence/CLK-03.json).
+최대오차/RMSE/상태 불일치: exact 단위 239,178건/0, 생산 1,742,058건/0. RMSE를 재계산하지 않는다.
+추가 검토할 helper: CLK-04/06 및 기존 물리 계산·native 내부 상태는 계속 별도 검증 대상이다.
 
 ## 준비 순서 수정 2차
 
@@ -136,3 +136,13 @@ workspace 회귀시험 4,580개가 통과했다. 그 뒤 독립 소스 검토에
 최종 실제 명령 `cargo test --workspace -j 2`는 4,580 passed·0 failed·0 ignored, `cargo clippy --workspace --all-targets -- -D warnings`는 종료 코드 0이다. source-quality는 production 파일 2,533개 검사·test 파일 1,172개 제외, structure 및 변경 파일의 scoped rustfmt 검사도 실제 종료 코드 0이다. 각 기록은 `.runtime/porting/CLK-03/final-workspace-unit-command-01`, `final-clippy-command-01`, `final-source-quality-command-03`, `final-structure-command-06`, `final-scoped-format-command-03`에 있다. 구조·형식 및 최초 PowerShell 실행 실패는 덮어쓰지 않았다.
 
 Full/Summary 생산 실행 6개는 모두 실제 종료 코드 0이다. 첫 판독은 CRLF를 포함한 입력 행 해시와 native readLine 문자열 해시를 동일하게 요구한 metadata 오류로 종료 코드 1이며 수치 보고서는 생성되지 않았다. `production-comparison-command-01`의 실패를 보존하고, 전체 원본 행과 실제 전달 문자열을 각각 해시·cursor 위치로 확인하는 수정 판독기를 `independent-production-reader-amendment-source-review-01`에서 독립 검토했다. 입력·원본 출력·6개 실행·기존 관측 선택과 수치 정책은 유지한다. 수정 판독과 최종 생산 결과 검토를 마치기 전에는 네 종료 gate를 체크하지 않는다.
+
+## 최종 생산 호출 이력 대조와 종료
+
+앞 절의 준비·실패·초기 결과는 당시 기록으로 보존한다. 이전 생산 대조는 1,647,956건 중 DatesShouldBeReset 한 건이 불일치했다. 생산은 각 timestep에 Initialize를 호출했지만 최초 원본 대조 입력은 일 경계만 호출했다. 실패 보고서의 값·정책·상태를 바꾸지 않았다.
+
+현재 Rust caller 소스의 부분 대입과 실제 호출 시점을 입력만으로 재구성한 3사례/483호출 계약과 관측 선택을 새 원본 실행 전에 동결했다. 새 genuine 원본의 3개 GetNextEnvironment·480개 Initialize 호출과 독립 결과 검토가 끝난 뒤, 같은 최종 커밋 EXE로 Full/Summary 6개를 실행했다. Rust trace나 원본 결과값은 실행 입력으로 공급하지 않았다.
+
+최종 커밋의 단위 대조는 239,178건/불일치0, 새 생산 대조는 1,742,058건/불일치0이다. 두 결과는 각각 별도의 독립 메타데이터 검토를 받았다. workspace 4,580개, Clippy·source-quality·structure·scoped rustfmt도 실제 종료 코드0이며 최종 source snapshot과 연결한다. 단위 원본14/51과 별도 생산 원본3/483의 시간 순서는 구분한다.
+
+완료 범위는 CON-01의 비실측 hourly EPW와 4 timestep 환경에서 라이브 커서·선택 상태·전체 carrier 복사·owned A/B 소비 인계이다. 결측·보간·sky·solar·처리된 기상 물리 RHS, native private index와 관측 불가 경계에는 PASS를 부여하지 않는다. 자세한 실제 명령·입력·원본·소스 해시·실패 보존·독립 검토는 [종료 증거](../evidence/CLK-03.json)에 기록한다.
