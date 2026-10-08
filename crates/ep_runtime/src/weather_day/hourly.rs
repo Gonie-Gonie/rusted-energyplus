@@ -1,7 +1,8 @@
 //! Selected hourly missing values and history from WeatherManager.cc:2880–3040.
 //!
-//! The raw parser and its date admission run before this callback. Optional sky,
-//! snow, solar and albedo fields keep their existing compatibility policy.
+//! The raw parser and its date admission run before this callback. Selected
+//! solar locals start from original raw references; sky, snow and albedo remain
+//! separate compatibility policies.
 
 use super::producer::weather_vars_from_raw;
 use super::{WeatherDayState, WeatherVars};
@@ -20,6 +21,12 @@ pub(crate) fn process_hour(
     state: &mut WeatherDayState,
 ) -> WeatherVars {
     let mut value = weather_vars_from_raw(raw, record);
+    // DirectRad/DiffuseRad are the source raw reference arguments. Their
+    // preprocessing must not depend on the caller's EpwRecord projection.
+    value.beam_solar_rad = raw.mandatory_reals[8];
+    value.dif_solar_rad = raw.mandatory_reals[9];
+    // Selected solar local preprocessing precedes the scalar missing/history pass.
+    super::solar::process_hourly_solar(&mut value, state);
     let missing = &mut state.missing_values.base;
     let missed = &mut state.missed_counts;
     let range = &mut state.out_of_range_counts;

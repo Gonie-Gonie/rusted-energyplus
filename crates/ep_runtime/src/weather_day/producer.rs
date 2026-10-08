@@ -1,13 +1,14 @@
 //! Selected source interpolation between processed hourly and daily transport.
 //!
 //! Hourly missing/range/history processing already ran in the reader callback.
-//! Sky, solar, snow and optional compatibility fields retain their separate
-//! unpaired policies. No native outputs are inputs to this owner.
+//! Solar interpolation uses stored source weights and processed hourly values.
+//! Sky, snow and optional compatibility fields retain separate unpaired
+//! policies. No native outputs are inputs to this owner.
 
 use super::hourly::interpolate_wind_direction;
 use super::{WeatherDayError, WeatherDayState, WeatherVars};
 use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
-use crate::heat_balance::solar::{solar_weather_interpolation_weights, weighted_solar_value};
+use super::solar::interpolation_weights;
 use crate::psychrometrics::with_fresh_psychrometric_state;
 use crate::weather::raw::{RawEpwOutputs, RawWeatherDay, project_record};
 use crate::weather::{EpwRecord, WeatherTimestepSample, weather_timestep_sample_with_neighbors};
@@ -86,6 +87,14 @@ pub fn produce_day(
         .filter(|values| values.len() == steps as usize)
         .ok_or_else(|| WeatherDayError::admission("prepared interpolation owner unavailable"))?
         .clone();
+    let solar_weights = if steps > 1 {
+        Some(state.weather.solar_interpolation.as_ref()
+            .filter(|values| values.len() == steps as usize)
+            .ok_or_else(|| WeatherDayError::admission("prepared solar interpolation owner unavailable"))?
+            .clone())
+    } else {
+        None
+    };
     let projected = raw_day
         .hours
         .iter()
@@ -185,24 +194,18 @@ pub fn produce_day(
                     // the selected processed dry-bulb interpolation.
                     sample.dry_bulb_c,
                 );
-                let (prior_weight, current_weight, next_weight) =
-                    solar_weather_interpolation_weights(steps, timestep);
-                value.beam_solar_rad = weighted_solar_value(
-                    previous_values.beam_solar_rad,
-                    hourly[index].beam_solar_rad,
-                    hourly[next_index].beam_solar_rad,
-                    prior_weight,
-                    current_weight,
-                    next_weight,
+                let current_weight = *solar_weights.as_ref()
+                    .and_then(|values| values.get(timestep as usize - 1))
+                    .ok_or_else(|| WeatherDayError::admission("solar timestep storage unavailable"))?;
+                let (prior_weight, next_weight) = interpolation_weights(
+                    current_weight, timestep, state.weather.time_step_fraction,
                 );
-                value.dif_solar_rad = weighted_solar_value(
-                    previous_values.dif_solar_rad,
-                    hourly[index].dif_solar_rad,
-                    hourly[next_index].dif_solar_rad,
-                    prior_weight,
-                    current_weight,
-                    next_weight,
-                );
+                value.dif_solar_rad = previous_values.dif_solar_rad * prior_weight
+                    + hourly[index].dif_solar_rad * current_weight
+                    + state.next_hour.dif_solar_rad * next_weight;
+                value.beam_solar_rad = previous_values.beam_solar_rad * prior_weight
+                    + hourly[index].beam_solar_rad * current_weight
+                    + state.next_hour.beam_solar_rad * next_weight;
                 value.liquid_precip =
                     scalar(previous_values.liquid_precip, hourly[index].liquid_precip);
                 value.liquid_precip /= f64::from(steps);

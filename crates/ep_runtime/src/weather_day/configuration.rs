@@ -1,8 +1,33 @@
 //! Calendar and input controls supplied to the live weather reader.
 
-use super::WeatherDayError;
+use super::{WeatherDayError, WeatherEnvironmentState};
 use crate::time_axis::{TimeAxis, TimePoint};
 use ep_model::{DayOfWeek, FirstHourInterpolationStartingValues, RunPeriod, SiteLocation};
+
+/// Literal selected weather controls registered by the actual caller.
+///
+/// The initializer matches DataEnvironment.hh:200-203. Effective production
+/// values must be resolved from captured environment inputs and raw diagnostics.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct WeatherSolarControls {
+    /// Source DisplayWeatherMissingDataWarnings.
+    pub display_weather_missing_data_warnings: bool,
+    /// Source IgnoreSolarRadiation.
+    pub ignore_solar_radiation: bool,
+    /// Source IgnoreBeamRadiation.
+    pub ignore_beam_radiation: bool,
+    /// Source IgnoreDiffuseRadiation.
+    pub ignore_diffuse_radiation: bool,
+}
+
+impl WeatherSolarControls {
+    pub(super) fn apply_to(self, owner: &mut WeatherEnvironmentState) {
+        owner.display_weather_missing_data_warnings = self.display_weather_missing_data_warnings;
+        owner.ignore_solar_radiation = self.ignore_solar_radiation;
+        owner.ignore_beam_radiation = self.ignore_beam_radiation;
+        owner.ignore_diffuse_radiation = self.ignore_diffuse_radiation;
+    }
+}
 
 /// Calendar metadata and input controls, containing no selected weather values.
 #[derive(Clone, Debug)]
@@ -17,6 +42,8 @@ pub struct WeatherEnvironmentConfiguration {
     pub design_day_count: i32,
     /// Caller-prepared count of input-file special-day objects.
     pub input_special_day_count: i32,
+    /// Explicitly resolved caller controls, copied before the first source read.
+    pub solar_controls: WeatherSolarControls,
 }
 
 impl WeatherEnvironmentConfiguration {
@@ -71,6 +98,7 @@ impl WeatherEnvironmentConfiguration {
             site: site.clone(),
             design_day_count,
             input_special_day_count,
+            solar_controls: WeatherSolarControls::default(),
         })
     }
 
@@ -129,5 +157,36 @@ pub(super) fn between(value: i32, start: i32, end: i32) -> bool {
         value >= start && value <= end
     } else {
         value >= start || value <= end
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn explicit_controls_copy_without_overwriting_calendar_or_current_weather() {
+        let controls = WeatherSolarControls {
+            display_weather_missing_data_warnings: true,
+            ignore_solar_radiation: false,
+            ignore_beam_radiation: true,
+            ignore_diffuse_radiation: false,
+        };
+        let mut owner = WeatherEnvironmentState {
+            ignore_solar_radiation: true,
+            ignore_diffuse_radiation: true,
+            day_of_year: 123,
+            std_baro_press: -0.0,
+            ..WeatherEnvironmentState::default()
+        };
+        let prior_current = owner.current_weather;
+        controls.apply_to(&mut owner);
+        assert!(owner.display_weather_missing_data_warnings);
+        assert!(!owner.ignore_solar_radiation);
+        assert!(owner.ignore_beam_radiation);
+        assert!(!owner.ignore_diffuse_radiation);
+        assert_eq!(owner.day_of_year, 123);
+        assert_eq!(owner.std_baro_press.to_bits(), (-0.0_f64).to_bits());
+        assert_eq!(owner.current_weather, prior_current);
     }
 }

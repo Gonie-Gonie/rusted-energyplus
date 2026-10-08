@@ -54,6 +54,7 @@ impl WeatherSession {
             },
         )?;
         let mut state = WeatherDayState::default();
+        configuration.solar_controls.apply_to(&mut state.environment);
         state.today_values = WeatherDayValues::allocated(configuration.steps() as usize)?;
         state.tomorrow_values = WeatherDayValues::allocated(configuration.steps() as usize)?;
         state.global.time_steps_in_hour = configuration.steps() as i32;

@@ -12,9 +12,11 @@ mod hourly;
 mod lifecycle;
 mod producer;
 mod production;
+mod solar;
 pub mod production_trace;
 pub mod state;
 
+pub use configuration::WeatherSolarControls;
 pub use current::CurrentWeatherState;
 pub use error::WeatherDayError;
 pub use handoff::update_weather_data;

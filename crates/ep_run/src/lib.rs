@@ -25,6 +25,7 @@ mod psy02_trace;
 mod psychrometrics_trace;
 mod support;
 mod support_registry;
+mod weather_solar_controls;
 mod zon01_trace;
 
 pub use config::*;

@@ -139,7 +139,14 @@ fn snapshot(value: &WeatherSessionSnapshot) -> Value {
         "SolarInterpolation_length":owner.solar_interpolation.as_ref().map(Vec::len),
         "SolarInterpolation":owner.solar_interpolation.as_ref().map(|values|values.iter().copied().map(scalar).collect::<Vec<_>>()).unwrap_or_default(),
         "solar_interpolation_numerical_parity_claimed":false,
-        "clk04_observation":current_observation(state)})
+        "clk04_observation":current_observation(state),
+        "clk05_observation":{
+            "solar_controls":{"DisplayWeatherMissingDataWarnings":env.display_weather_missing_data_warnings,
+                "IgnoreSolarRadiation":env.ignore_solar_radiation,
+                "IgnoreBeamRadiation":env.ignore_beam_radiation,
+                "IgnoreDiffuseRadiation":env.ignore_diffuse_radiation},
+            "values_copied_from_actual_stored_owner":true,
+            "current_solar_night_physics_paired":false}})
 }
 
 pub(crate) fn write_trace(

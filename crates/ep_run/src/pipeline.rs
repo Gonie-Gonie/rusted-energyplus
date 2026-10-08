@@ -3448,13 +3448,17 @@ fn prepare_runtime_inputs(
                 .filter(|(kind, _)| kind.0.eq_ignore_ascii_case("SizingPeriod:DesignDay"))
                 .map(|(_, objects)| objects.len())
                 .sum::<usize>();
-            let configuration = WeatherEnvironmentConfiguration::for_model(
+            let mut configuration = WeatherEnvironmentConfiguration::for_model(
                 &time_axis,
                 &model.typed,
                 &fallback_site,
                 i32::try_from(design_day_count).map_err(|error| error.to_string())?,
             )
             .map_err(|error| error.to_string())?;
+            let environment_inputs =
+                crate::weather_solar_controls::capture_environment_inputs()?;
+            configuration.solar_controls =
+                crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
             let weather_series = ProductionWeatherTimestepSeries::from_bytes(
                 std::fs::read(weather_path).map_err(|error| error.to_string())?,
                 configuration,

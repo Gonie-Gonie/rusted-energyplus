@@ -223,6 +223,8 @@ impl ProductionWeatherTimestepSeries {
         // The sample contract is mm, while the current owner is m. Preserve
         // the actual Today depth instead of a lossy m-to-mm round trip.
         sample.liquid_precipitation_depth_mm = weather.liquid_precip;
+        sample.direct_normal_radiation_w_per_m2 = weather.beam_solar_rad;
+        sample.diffuse_horizontal_radiation_w_per_m2 = weather.dif_solar_rad;
         let period_start = ((day - 1) / 20) * 20;
         let period_days = 20
             .min(session.configuration.total_days() - period_start)

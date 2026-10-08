@@ -112,6 +112,14 @@ impl Default for WeatherGlobalState {
 pub struct WeatherEnvironmentState {
     /// Selected mutable environment after SetCurrentWeather.
     pub current_weather: CurrentWeatherState,
+    /// Source warning switch controlling hourly solar counts and negative sentinels.
+    pub display_weather_missing_data_warnings: bool,
+    /// Source override to suppress all hourly solar.
+    pub ignore_solar_radiation: bool,
+    /// Source override to suppress hourly beam solar.
+    pub ignore_beam_radiation: bool,
+    /// Source override to suppress hourly diffuse solar.
+    pub ignore_diffuse_radiation: bool,
     /// Current weather ordinal.
     pub day_of_year: i32,
     /// Schedule ordinal; pure UpdateWeatherData does not write this member.
@@ -170,6 +178,10 @@ impl Default for WeatherEnvironmentState {
     fn default() -> Self {
         Self {
             current_weather: CurrentWeatherState::default(),
+            display_weather_missing_data_warnings: false,
+            ignore_solar_radiation: false,
+            ignore_beam_radiation: false,
+            ignore_diffuse_radiation: false,
             day_of_year: 0,
             day_of_year_schedule: 0,
             year: 0,
