@@ -1,0 +1,627 @@
+{
+  "schema": "zon01-original-first.v1",
+  "card": "ZON-01",
+  "status": "completed-original-first-only-before-Rust-baseline",
+  "written_utc": "2026-10-08T00:33:03.996999+00:00",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-source.json",
+      "sha256": "7e1e5582e9ec5348cd62f00c8e8c99cbfd6d03bea2ddb91e992fa10bb2900fee"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-cases.json",
+      "sha256": "f9c00245eedaaaa24600b6a15fa9864fbaa89255fe8a935221e8b1ab93bfd7b2"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/ZON-01-tolerances.json",
+      "sha256": "56479ebb3b821f1c90176d0792141c57252196ac6f9706f1a1313ff514c0b0f4"
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/ZON-01/helper-request.json",
+      "sha256": "a3a69aadef063f5710d3a7af739d306d6486e68d62d376f3a3c009f737fa2972"
+    }
+  },
+  "selected_source_files": 11,
+  "selected_source_ranges": 36,
+  "selected_written_fields": [
+    "ZTM",
+    "WPrevZoneTS",
+    "DSWPrevZoneTS",
+    "WPrevZoneTSTemp",
+    "WTimeMinusP",
+    "W1",
+    "WMX",
+    "WM2",
+    "airHumRatTemp",
+    "tempIndLoad",
+    "tempDepLoad",
+    "airRelHum",
+    "AirPowerCap",
+    "T1"
+  ],
+  "selected_retained_fields": [
+    "MAT",
+    "ZT",
+    "ZTAV",
+    "XMPT",
+    "XMAT",
+    "DSXMAT",
+    "TMX",
+    "TM2",
+    "airHumRat",
+    "airHumRatAvg"
+  ],
+  "selected_field_count": 24,
+  "selected_four_slot_arrays": [
+    "XMAT",
+    "DSXMAT",
+    "ZTM",
+    "WPrevZoneTS",
+    "DSWPrevZoneTS",
+    "WPrevZoneTSTemp"
+  ],
+  "slots_per_source_array": 4,
+  "native_build": {
+    "receipt": {
+      "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+      "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+    },
+    "independent_build_review": {
+      "path": ".runtime/porting/ZON-01/independent-native-build-review-01/review.json",
+      "sha256": "119811aea18571e2a939690e465c026bbf6e96f3a7e934ea48d631157227e8ee"
+    },
+    "independent_contract_review": {
+      "path": ".runtime/porting/ZON-01/independent-contract-review-02/review.json",
+      "sha256": "2c4ae57777cd8c959ee5316b078b2ce37fd51f44178f926910cb47d3b1d8afcf"
+    },
+    "core_build": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+    },
+    "configure": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/native-build-01/configure-command.json",
+        "sha256": "b1fc5acb8d9f569c70237756d696ceb610fd2015ab5e403bf4b842ec60988120"
+      },
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\cmake-4.4.4\\cmake-4.4.4-windows-x86_64\\bin\\cmake.exe",
+        "-S",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.reference\\energyplus-src\\26.1.0",
+        "-B",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\ninja-1.13.2\\ninja.exe",
+        "-DCMAKE_C_COMPILER=C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\gcc.exe",
+        "-DCMAKE_CXX_COMPILER=C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\g++.exe",
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+        "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O0 -g -DNDEBUG",
+        "-DCMAKE_CXX_FLAGS=-Wa,-mbig-obj -ffp-contract=off",
+        "-DFORCE_DEBUG_ARITHM_GCC_OR_CLANG=OFF",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_FORTRAN=OFF",
+        "-DBUILD_PACKAGE=OFF",
+        "-DDOCUMENTATION_BUILD=DoNotBuild",
+        "-DLINK_WITH_PYTHON=OFF",
+        "-DPython_EXECUTABLE=C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-DCMAKE_PROJECT_INCLUDE=C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\tools\\porting\\zon01_reference.cmake",
+        "-DGEO02_SETUP_FRAGMENT=C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/GEO-02/native-build-04/source/geo02_setup273-289.inc",
+        "-DGEO03_HEIGHT_FRAGMENT=C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/GEO-03/native-build-02/source/geo03_height455-546.inc",
+        "-DZON01_REPOSITORY_ROOT=C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+        "-DZON01_BULK_FRAGMENT=C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/native-build-01/source/zon01_bulk2231-2239.inc"
+      ],
+      "started_utc": "2026-10-08T00:08:54.558836+00:00",
+      "finished_utc": "2026-10-08T00:09:01.330571+00:00"
+    },
+    "compile_link": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/native-build-01/build-command.json",
+        "sha256": "3362620513df48c784b066f3aedb4b3cd19193e63f907009e38a7f76413ad380"
+      },
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\cmake-4.4.4\\cmake-4.4.4-windows-x86_64\\bin\\cmake.exe",
+        "--build",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0",
+        "--target",
+        "zon01_reference",
+        "zon01_reference_helper",
+        "--parallel",
+        "1",
+        "--verbose"
+      ],
+      "started_utc": "2026-10-08T00:09:01.513776+00:00",
+      "finished_utc": "2026-10-08T00:15:21.105618+00:00"
+    },
+    "helper_binary": {
+      "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+      "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+    },
+    "observer_binary": {
+      "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference.exe",
+      "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+    },
+    "reference_optimization_override": "-O0 -g -DNDEBUG",
+    "source_default_optimized_build_passes": false,
+    "assertions_enabled": true,
+    "fp_contract": "off",
+    "scientific_source_patches": false,
+    "original_core_and_API_bytes_unchanged": true,
+    "existing_target_compile_commands_unchanged": true
+  },
+  "helper": {
+    "receipt": {
+      "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-reference.json",
+      "sha256": "e677a24b59ddb47bbde2eecd76cdce4e99a3ffebd8ca63576c4e60a938c20d59"
+    },
+    "results": {
+      "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-results.json",
+      "sha256": "4bb8e86d734868bc7ac80e1bb931bcfe9c1c79821262d32fcef846027e848112"
+    },
+    "execution": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-command.json",
+        "sha256": "12edd3603f06c704467ff9930ce93be4f22ae749ba3608e798182509a6ade3e3"
+      },
+      "exit_code": 0,
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference_helper.exe",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\ZON-01\\helper-request.json"
+      ],
+      "started_utc": "2026-10-08T00:20:24.597964+00:00",
+      "finished_utc": "2026-10-08T00:20:34.128231+00:00"
+    },
+    "sequence_count": 8,
+    "ordered_operation_count": 34,
+    "root_wrapper_invocations": {
+      "bare_begin_environment": 7,
+      "guarded_init_zone_air_setpoints": 7,
+      "bulk_reconstruct_and_current_w_seed": 3
+    },
+    "member_invocations_inferred": false,
+    "physics_executed": false,
+    "original_parser_admission_claimed": false
+  },
+  "ordinary_native": {
+    "matrix": {
+      "path": ".runtime/porting/ZON-01/original-native-first-01/matrix.json",
+      "sha256": "8672ce9c0a674efe1c8d46b715b2d0024f9d7004cec3d51cb8edabbfc76c0b42"
+    },
+    "case_count": 7,
+    "cases": [
+      {
+        "case_id": "A-24H",
+        "scope": "A",
+        "duration": "24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+          "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/A-24H/receipt.json",
+          "sha256": "34c09e20d59f4769781e5f9746723f99bcfa3d6ed85808caa97640a20a4b5250"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/A-24H/native/zone-air-observation.json",
+          "sha256": "ee03a85d39f0403435f7ae82b58f9d7de6b3d44bb866e7bf3b5b199594f2cd12"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/A-24H/original-command.json",
+            "sha256": "6b30114506297efaed69cfb5fd046184bf7d25cfe1a7faf8e49b4d170ddc0999"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "A-24H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\A-24H\\native"
+          ],
+          "started_utc": "2026-10-08T00:21:33.578290+00:00",
+          "finished_utc": "2026-10-08T00:21:42.780357+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 6232,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 96,
+          "after_predictor_before_hvac_managers": 106,
+          "before_predictor": 96
+        },
+        "observed_physical_environment_ids": [
+          3
+        ]
+      },
+      {
+        "case_id": "A-72H",
+        "scope": "A",
+        "duration": "72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+          "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/A-72H/receipt.json",
+          "sha256": "026345f33da151047356fba6e6738bfcfe39a843619e2401ccf836b783acb588"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/A-72H/native/zone-air-observation.json",
+          "sha256": "a9e28e7b15c55a7e9c7cc72a620a6f33e35224a92c8fdf351d9c3640df7db22c"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/A-72H/original-command.json",
+            "sha256": "0b0ea2808a979f901cbd8e0da67087e3d799b879677498b80711b4deb6d423b8"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "A-72H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\A-72H\\native"
+          ],
+          "started_utc": "2026-10-08T00:21:42.880043+00:00",
+          "finished_utc": "2026-10-08T00:21:53.392111+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 5474,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 288,
+          "after_predictor_before_hvac_managers": 290,
+          "before_predictor": 288
+        },
+        "observed_physical_environment_ids": [
+          3
+        ]
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "scope": "B",
+        "duration": "24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+          "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-NOLIMIT-24H/receipt.json",
+          "sha256": "c686f5e54207956a1d29a7c8930ca3060311c220e26e637556e9210e1eb69182"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-NOLIMIT-24H/native/zone-air-observation.json",
+          "sha256": "d34330fd04303f43a1518822e7e86b4bd49c7decc043c9b6000f46230daa9292"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/B-NOLIMIT-24H/original-command.json",
+            "sha256": "d179d236597bbe3ef53de2f34056de8943ca743c0bedd75ec1986f633d842cae"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "B-NOLIMIT-24H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-NOLIMIT-24H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\B-NOLIMIT-24H\\native"
+          ],
+          "started_utc": "2026-10-08T00:21:53.481287+00:00",
+          "finished_utc": "2026-10-08T00:21:59.155523+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 2509,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 96,
+          "after_predictor_before_hvac_managers": 163,
+          "before_predictor": 96
+        },
+        "observed_physical_environment_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "scope": "B",
+        "duration": "24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+          "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-FLOW-24H/receipt.json",
+          "sha256": "f9cf7e969ef7db263063d0fe992344d0ecd4e0290d81937886f22b6f4b98ef99"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-FLOW-24H/native/zone-air-observation.json",
+          "sha256": "55b6b25bc7a35bde694176c7d79428f7583a47141f68fbb5fa832438824750f5"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/B-FLOW-24H/original-command.json",
+            "sha256": "1f56e682ba1e538b576a3cf07b85907d2cb63fc01b6d7e20e98ecddfe3773a4e"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "B-FLOW-24H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-FLOW-24H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\B-FLOW-24H\\native"
+          ],
+          "started_utc": "2026-10-08T00:21:59.229439+00:00",
+          "finished_utc": "2026-10-08T00:22:04.907505+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 2652,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 96,
+          "after_predictor_before_hvac_managers": 183,
+          "before_predictor": 96
+        },
+        "observed_physical_environment_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "scope": "B",
+        "duration": "24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+          "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-CAPACITY-24H/receipt.json",
+          "sha256": "4e51907054fba3adb68256abcbd3f534e3c6ba66b5fb30a114e2484e79e540a4"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-CAPACITY-24H/native/zone-air-observation.json",
+          "sha256": "31dceff1a68ca5e00849d91e55b97d5af8b019e92ce9ece4b2efb63af4642c55"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/B-CAPACITY-24H/original-command.json",
+            "sha256": "84030d014220b81aa849b0ea1660e50460b0b3506c2c7f6293ab99408e9357b8"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "B-CAPACITY-24H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-CAPACITY-24H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\B-CAPACITY-24H\\native"
+          ],
+          "started_utc": "2026-10-08T00:22:04.978590+00:00",
+          "finished_utc": "2026-10-08T00:22:11.793014+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 3401,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 96,
+          "after_predictor_before_hvac_managers": 291,
+          "before_predictor": 96
+        },
+        "observed_physical_environment_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "scope": "B",
+        "duration": "24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+          "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-24H/receipt.json",
+          "sha256": "589865976b6ce2d275e0e9a7c367a9a1c3507ee3cc0b77d68fea62af35979be8"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-24H/native/zone-air-observation.json",
+          "sha256": "a3bdca845256e3e21ca7ab62accb4c186888b9074196742ad1eed69289fb8bbb"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-24H/original-command.json",
+            "sha256": "ba339bdd2caa944d02dbdd25b099c44d402a56c10ff41a5270c5411d24f328a9"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "B-BOTH-24H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\B-BOTH-24H\\native"
+          ],
+          "started_utc": "2026-10-08T00:22:11.879777+00:00",
+          "finished_utc": "2026-10-08T00:22:19.476035+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 3377,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 96,
+          "after_predictor_before_hvac_managers": 287,
+          "before_predictor": 96
+        },
+        "observed_physical_environment_ids": [
+          1
+        ]
+      },
+      {
+        "case_id": "B-BOTH-72H",
+        "scope": "B",
+        "duration": "72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+          "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+        },
+        "receipt": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-72H/receipt.json",
+          "sha256": "9e20a7dce28331ad3fe6a7cd81cbddf1ac0d612315f8c179fca121020ebf80fa"
+        },
+        "results": {
+          "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-72H/native/zone-air-observation.json",
+          "sha256": "255f03c80d9c3c65e995258d36ed7333cfc2a7e2cb93a76da6b4474766609b1a"
+        },
+        "execution": {
+          "receipt": {
+            "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-72H/original-command.json",
+            "sha256": "89e295a70cc45c96992fa5359ae9c410f14f07eead744eb73a579762badde365"
+          },
+          "exit_code": 0,
+          "command": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\native-build-01\\zon01_reference.exe",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reference-energyplus-26.1.0\\native-core-build.json",
+            "B-BOTH-72H",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-72H\\input.idf",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\Energy+.idd",
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ZON-01\\original-native-first-01\\B-BOTH-72H\\native"
+          ],
+          "started_utc": "2026-10-08T00:22:19.560067+00:00",
+          "finished_utc": "2026-10-08T00:22:29.020261+00:00"
+        },
+        "energyplus_exit_code": 0,
+        "recorded_callback_count": 4436,
+        "omitted_callback_count": 0,
+        "physical_callbacks_by_phase": {
+          "after_init_heat_balance": 288,
+          "after_predictor_before_hvac_managers": 906,
+          "before_predictor": 288
+        },
+        "observed_physical_environment_ids": [
+          1
+        ]
+      }
+    ],
+    "recorded_callback_count": 28081,
+    "physical_callbacks_by_phase": {
+      "after_init_heat_balance": 1056,
+      "before_predictor": 1056,
+      "after_predictor_before_hvac_managers": 2226
+    },
+    "omitted_callback_count": 0,
+    "pristine_fourteen_field_poststate_pairing_claimed": false
+  },
+  "independent_original_data_review": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+    "sha256": "a396421d1358f5150482c2823f773b147eddf6f7ce488d3f698fe7aeb03f3361"
+  },
+  "author_observed_reader": {
+    "report": {
+      "path": ".runtime/porting/ZON-01/original-observation-reader-01/review.json",
+      "sha256": "11dff0df886469d96c4aedcef21fc5d6d1e33557c2c4ca3fa2fd5f8e2ddd025f"
+    },
+    "actual_command": {
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-observation-reader-command-01/receipt.json",
+        "sha256": "b83d58861b2d08ff1ad4a72f95efc1edfb9799f5b29c94944a7d742fdc56bc6e"
+      },
+      "exit_code": 0,
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        ".runtime/porting/ZON-01/original-review-draft-01/review_original.py",
+        "--helper-reference",
+        ".runtime/porting/ZON-01/original-helper-first-01/helper-reference.json",
+        "--native-matrix",
+        ".runtime/porting/ZON-01/original-native-first-01/matrix.json",
+        "--output-dir",
+        ".runtime/porting/ZON-01/original-observation-reader-01"
+      ],
+      "started_utc": "2026-10-08T00:25:14.439886+00:00",
+      "finished_utc": "2026-10-08T00:25:33.185043+00:00"
+    },
+    "role": "author-prepared observed-data checks, separate from independent review",
+    "independent_review_claimed": false
+  },
+  "original_completed_utc": "2026-10-08T00:22:29.020261+00:00",
+  "independent_review_completed_utc": "2026-10-08T00:27:39.711415+00:00",
+  "preserved_initial_independent_reader_failure": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/reader-failure-01.json",
+    "sha256": "71024f53018861f8215af9440fb3a4c6ff69230c56790e9a168df23cdbc40625"
+  },
+  "limits": [
+    "Native callbacks are source-stage witnesses only; after-init-HB precedes bulk, beforePredictor follows average clears and precedes member, afterPredictor is evolved state.",
+    "No native callback is claimed as pristine14field return. Cross-engine external weather/calendar/warmup input or evolving solver/history equivalence is unpaired.",
+    "Sibling/controller/day/Space/MRT/global/IO and later history/correction/retry are unpaired. AirPowerCap W/K output is not heat-capacity J/K parity.",
+    "No Rust scientific output is read or compared, no source RHS is rebuilt, no numerical gate is completed by this factual original-first review.",
+    "The byte-exact incoming2231-2239 fragment is zone-only bulk reconstruction/current-W seed, not the whole surface initializer.",
+    "The genuine whole InitZoneAirSetPoints sibling resets execute, but are unpaired and not exhaustively observed.",
+    "Native callback count2226 afterPredictor is an actual evolved-stage count, not1056 pure begin-environment returns or Rust system-step equivalence.",
+    "Direct copied OutHumRat, scalar resets and source four-slot assignments use exact IEEE policies; no source RHS is rebuilt by this compact metadata writer.",
+    "Rust baseline must run first using its preserved public legacy shell before any authorized canonical implementation or comparison."
+  ],
+  "next_step": "Commit preserved evidence/facade, then Root records input-only existing-Rust baseline build/execution and honest incomplete comparison.",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/ZON-01/original-first-writer-01/write_original_first.5c39b89574e6f72393bcf7666e4ab4316a5b11f748f810234628826073013d7f.py",
+    "sha256": "5c39b89574e6f72393bcf7666e4ab4316a5b11f748f810234628826073013d7f"
+  },
+  "Rust_compared": false,
+  "Rust_numerical_execution_performed_by_writer": false,
+  "unit_gate_completed": false,
+  "other_gates_completed": false,
+  "source_RHS_reconstructed": false,
+  "weather_calendar_warmup_parity_claimed": false,
+  "whole_physics_or_annual_parity_claimed": false,
+  "engines_executed_by_writer": false,
+  "gates_updated": false
+}

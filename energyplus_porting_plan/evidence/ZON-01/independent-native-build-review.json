@@ -1,0 +1,206 @@
+{
+  "schema": "zon01-independent-native-build-final-review.v1",
+  "status": "pass-build-identity-before-original-numerical-execution",
+  "card": "ZON-01",
+  "review_completed_utc": "2026-10-08T00:20:01.253427+00:00",
+  "raw_independent_review": {
+    "path": ".runtime/porting/ZON-01/independent-native-build-review-01/review.json",
+    "sha256": "119811aea18571e2a939690e465c026bbf6e96f3a7e934ea48d631157227e8ee"
+  },
+  "executed_independent_reader": {
+    "path": ".runtime/porting/ZON-01/independent-native-build-review-01/review_build.py",
+    "sha256": "9278bb90d4664067599d52b15404280dbfd2e5fca72c8187a2c72ede4bbc8bad"
+  },
+  "compact_metadata_writer": {
+    "path": ".runtime/porting/ZON-01/independent-native-build-review-01/write_compact.py",
+    "sha256": "3ba92e99f61c45230add93364260ab421ea80c6186ddfe68fb7516c1508cda4c"
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+    "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+  },
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/ZON-01/independent-contract-review-02/review.json",
+    "sha256": "2c4ae57777cd8c959ee5316b078b2ce37fd51f44178f926910cb47d3b1d8afcf"
+  },
+  "native_core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "observer_binary": {
+    "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference.exe",
+    "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+    "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+  },
+  "actual_commands": {
+    "configure": {
+      "path": ".runtime/porting/ZON-01/native-build-01/configure-command.json",
+      "sha256": "b1fc5acb8d9f569c70237756d696ceb610fd2015ab5e403bf4b842ec60988120"
+    },
+    "compile_link": {
+      "path": ".runtime/porting/ZON-01/native-build-01/build-command.json",
+      "sha256": "3362620513df48c784b066f3aedb4b3cd19193e63f907009e38a7f76413ad380"
+    }
+  },
+  "actual_source_archives": [
+    {
+      "historical_path": "tools/porting/zon01_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/zon01_reference.cpp",
+        "sha256": "27f2ace0fd6dc9e4ada4361aced7ea41d14d3b5f6541825f6817ea0108deb46b"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/zon01_reference_helper.cpp",
+        "sha256": "4345e4407d953eade45c30c3555894d5adb3eba3c16381fdc0391cf5f9b8c060"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/zon01_reference_fields.hh",
+        "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/zon01_reference.cmake",
+        "sha256": "64cbd5a57412e3ab135d71e03f1f24d42a37d6639ee8dbdfc2e2f9c54516aad1"
+      }
+    },
+    {
+      "historical_path": "tools/porting/zon01_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/zon01_reference_native.py",
+        "sha256": "7546ef8f0e44026174afed99000e87ee0c84185e135a74e743ae5cd8321a7add"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cpp",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo03_reference.cpp",
+        "sha256": "303c82647526f16b2f0e35bc979c335dfb67cedc75414ce58dd9e708d5a7a917"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo03_reference_helper.cpp",
+        "sha256": "67e2472f48749b6e40a981fee9ce04b5619567b6ae4e15932d6ee47eac818dc4"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo03_reference.cmake",
+        "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_reference_native.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo03_reference_native.py",
+        "sha256": "ddaeadbbdb7d6a1c93fbf1de681fa028c8470c200b8ee4b90afb5881592cd0a8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo02_reference_fields.hh",
+        "sha256": "5dc8ed739ae2580f67780b77231c7bcc9f3cd748ed9fdcf58fabd296e629410d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo02_reference.cmake",
+        "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/geo01_reference.cmake",
+        "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/psy02_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/psy02_reference.cmake",
+        "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490"
+      }
+    },
+    {
+      "historical_path": "tools/porting/psy02_reachability.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/psy02_reachability.cmake",
+        "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk01_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/ZON-01/native-build-01/source/clk01_reference.cmake",
+        "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f"
+      }
+    }
+  ],
+  "source_fragment": {
+    "artifact": {
+      "path": ".runtime/porting/ZON-01/native-build-01/source/zon01_bulk2231-2239.inc",
+      "sha256": "0841ec2b11d0dcf592b0bc1d3e16f1d0a64e095d29df1d7d2377f4822486b770"
+    },
+    "source_range": {
+      "path": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "symbol": "InitThermalAndFluxHistories",
+      "start": 2231,
+      "end": 2239,
+      "role": "byte-exact-zone-only-bulk-fragment",
+      "helpers": [],
+      "range_sha256": "0841ec2b11d0dcf592b0bc1d3e16f1d0a64e095d29df1d7d2377f4822486b770"
+    },
+    "whole_surface_initializer_claimed": false
+  },
+  "verified_total_compile_rows": 654,
+  "verified_prior_compile_rows": 652,
+  "verified_original_core_compile_rows": 643,
+  "verified_original_archive_rows": 13537,
+  "verified_prior_executables": 9,
+  "verified_new_compile_rows": 2,
+  "verified_core_API_and_Objexx_bytes": true,
+  "historical_git_metadata_absences_outside_archive_table": [
+    "third_party/penumbra/vendor/glfw/.gitattributes",
+    "third_party/penumbra/vendor/glfw/.gitignore"
+  ],
+  "reference_occurrences_verified": 106,
+  "distinct_files_hashed": 13603,
+  "findings": [
+    "Actual successful configure/compile/link match the reviewed5native source archives and exact9line bulk fragment.",
+    "GCC13.2/O0/assertions/Werror/errorsON/statsOFF/FP-contractOFF/nondebug modes are present in actual target commands.",
+    "Private state observation uses the pinned genuine same-GCC API DLL; direct helper links unchanged original core.",
+    "All652prior rows including643original rows, nine prior executables, core/API/Objexx and13537present original source rows remain hash-identical.",
+    "No mathematical/source bodies, inputs or scientific tolerances changed; this review does not execute original simulation or claim numerical validation."
+  ],
+  "scientific_gates_completed_by_this_review": false,
+  "all_four_ZON01_gates_remain_pending": true,
+  "engines_executed": false,
+  "builds_executed_by_reviewer": false,
+  "Cargo_or_Git_executed": false,
+  "scientific_comparer_executed": false,
+  "original_numerical_execution_performed": false,
+  "gates_updated": false
+}

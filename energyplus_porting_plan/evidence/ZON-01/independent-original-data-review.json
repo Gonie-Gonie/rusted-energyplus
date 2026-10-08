@@ -1,0 +1,401 @@
+{
+  "reviewed_helper_reference": {
+    "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-reference.json",
+    "sha256": "e677a24b59ddb47bbde2eecd76cdce4e99a3ffebd8ca63576c4e60a938c20d59"
+  },
+  "reviewed_native_matrix": {
+    "path": ".runtime/porting/ZON-01/original-native-first-01/matrix.json",
+    "sha256": "8672ce9c0a674efe1c8d46b715b2d0024f9d7004cec3d51cb8edabbfc76c0b42"
+  },
+  "helper_results": {
+    "path": ".runtime/porting/ZON-01/original-helper-first-01/helper-results.json",
+    "sha256": "4bb8e86d734868bc7ac80e1bb931bcfe9c1c79821262d32fcef846027e848112"
+  },
+  "reviewed_build_identity": {
+    "path": ".runtime/porting/ZON-01/independent-native-build-review-01/review.json",
+    "sha256": "119811aea18571e2a939690e465c026bbf6e96f3a7e934ea48d631157227e8ee"
+  },
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/ZON-01/independent-contract-review-02/review.json",
+    "sha256": "2c4ae57777cd8c959ee5316b078b2ce37fd51f44178f926910cb47d3b1d8afcf"
+  },
+  "reviewed_native_driver_build": {
+    "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+    "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+  },
+  "executed_independent_reader": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review_original.py",
+    "sha256": "ec535425a2a871382f8cc38e09b82ca792fcbf2993be3340e48e578ba7ed2573"
+  },
+  "preserved_initial_reader_failure": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/reader-failure-01.json",
+    "sha256": "71024f53018861f8215af9440fb3a4c6ff69230c56790e9a168df23cdbc40625"
+  },
+  "factual_counts": {
+    "helper_sequences": 8,
+    "helper_ordered_operations": 34,
+    "root_wrapper_invocations": {
+      "bare_begin_environment": 7,
+      "guarded_init_zone_air_setpoints": 7,
+      "bulk_reconstruct_and_current_w_seed": 3
+    },
+    "native_cases": 7,
+    "retained_source_callbacks": 28081,
+    "physical_after_init_HB_callbacks": 1056,
+    "physical_callbacks_by_phase": {
+      "after_init_heat_balance": 1056,
+      "before_predictor": 1056,
+      "after_predictor_before_hvac_managers": 2226
+    },
+    "omitted_callbacks": 0
+  },
+  "native_stage_observations": [
+    {
+      "case_id": "A-24H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/A-24H/receipt.json",
+        "sha256": "34c09e20d59f4769781e5f9746723f99bcfa3d6ed85808caa97640a20a4b5250"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/A-24H/native/zone-air-observation.json",
+        "sha256": "ee03a85d39f0403435f7ae82b58f9d7de6b3d44bb866e7bf3b5b199594f2cd12"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/A-24H/native/zone-air-stage-observations.jsonl",
+        "sha256": "b4becdad89631749930458a3ffa067ead97af6e4621b6983d974814d4a082204"
+      },
+      "retained_callbacks": 6232,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 2016,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 1920,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 2016,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 1920,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 2200,
+          "physical_weather": 106,
+          "kickoff": 0,
+          "warmup": 2094,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 96,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    },
+    {
+      "case_id": "A-72H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/A-72H/receipt.json",
+        "sha256": "026345f33da151047356fba6e6738bfcfe39a843619e2401ccf836b783acb588"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/A-72H/native/zone-air-observation.json",
+        "sha256": "a9e28e7b15c55a7e9c7cc72a620a6f33e35224a92c8fdf351d9c3640df7db22c"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/A-72H/native/zone-air-stage-observations.jsonl",
+        "sha256": "571caf84c15de5402cb013fbe692e3952057dadbeab084fd9ba53515d7264331"
+      },
+      "retained_callbacks": 5474,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 1824,
+          "physical_weather": 288,
+          "kickoff": 0,
+          "warmup": 1536,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 1824,
+          "physical_weather": 288,
+          "kickoff": 0,
+          "warmup": 1536,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 1826,
+          "physical_weather": 290,
+          "kickoff": 0,
+          "warmup": 1536,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 288,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-NOLIMIT-24H/receipt.json",
+        "sha256": "c686f5e54207956a1d29a7c8930ca3060311c220e26e637556e9210e1eb69182"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-NOLIMIT-24H/native/zone-air-observation.json",
+        "sha256": "d34330fd04303f43a1518822e7e86b4bd49c7decc043c9b6000f46230daa9292"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/B-NOLIMIT-24H/native/zone-air-stage-observations.jsonl",
+        "sha256": "f4c31ff0c104866c1caa041ac3de56848e73b81f677e5c33607be76f8a4d4769"
+      },
+      "retained_callbacks": 2509,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 1165,
+          "physical_weather": 163,
+          "kickoff": 0,
+          "warmup": 1002,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 96,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-FLOW-24H/receipt.json",
+        "sha256": "f9cf7e969ef7db263063d0fe992344d0ecd4e0290d81937886f22b6f4b98ef99"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-FLOW-24H/native/zone-air-observation.json",
+        "sha256": "55b6b25bc7a35bde694176c7d79428f7583a47141f68fbb5fa832438824750f5"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/B-FLOW-24H/native/zone-air-stage-observations.jsonl",
+        "sha256": "12f683f07c814e630a35a6de1037430fd7f34a1f7647e64cd47f245a27592e35"
+      },
+      "retained_callbacks": 2652,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 1308,
+          "physical_weather": 183,
+          "kickoff": 0,
+          "warmup": 1125,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 96,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-CAPACITY-24H/receipt.json",
+        "sha256": "4e51907054fba3adb68256abcbd3f534e3c6ba66b5fb30a114e2484e79e540a4"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-CAPACITY-24H/native/zone-air-observation.json",
+        "sha256": "31dceff1a68ca5e00849d91e55b97d5af8b019e92ce9ece4b2efb63af4642c55"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/B-CAPACITY-24H/native/zone-air-stage-observations.jsonl",
+        "sha256": "d766f9f61a448e999dbbaa8eb8896c6d263df3ec39ff106d6581febe6210d00d"
+      },
+      "retained_callbacks": 3401,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 2057,
+          "physical_weather": 291,
+          "kickoff": 0,
+          "warmup": 1766,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 96,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-24H/receipt.json",
+        "sha256": "589865976b6ce2d275e0e9a7c367a9a1c3507ee3cc0b77d68fea62af35979be8"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-24H/native/zone-air-observation.json",
+        "sha256": "a3bdca845256e3e21ca7ab62accb4c186888b9074196742ad1eed69289fb8bbb"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/B-BOTH-24H/native/zone-air-stage-observations.jsonl",
+        "sha256": "9268bb51289e03d95eae91acb62541784bd93cc2d97ac3b1aca26096eca86ee5"
+      },
+      "retained_callbacks": 3377,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 672,
+          "physical_weather": 96,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 2033,
+          "physical_weather": 287,
+          "kickoff": 0,
+          "warmup": 1746,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 96,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "receipt": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-72H/receipt.json",
+        "sha256": "9e20a7dce28331ad3fe6a7cd81cbddf1ac0d612315f8c179fca121020ebf80fa"
+      },
+      "results": {
+        "path": ".runtime/porting/ZON-01/original-native-first-01/B-BOTH-72H/native/zone-air-observation.json",
+        "sha256": "255f03c80d9c3c65e995258d36ed7333cfc2a7e2cb93a76da6b4474766609b1a"
+      },
+      "ordered_trace": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/ZON-01/original-native-first-01/B-BOTH-72H/native/zone-air-stage-observations.jsonl",
+        "sha256": "d4d77493ee50aa7cd9980c7af8ae9564e0c14948155eac81a655f7f5a534dd53"
+      },
+      "retained_callbacks": 4436,
+      "source_phase_counts": {
+        "after_init_heat_balance": {
+          "total": 864,
+          "physical_weather": 288,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "before_predictor": {
+          "total": 864,
+          "physical_weather": 288,
+          "kickoff": 0,
+          "warmup": 576,
+          "other": 0
+        },
+        "after_predictor_before_hvac_managers": {
+          "total": 2708,
+          "physical_weather": 906,
+          "kickoff": 0,
+          "warmup": 1802,
+          "other": 0
+        }
+      },
+      "after_init_physical_cursors": 288,
+      "member_calls_observed": false,
+      "omitted_callbacks": 0
+    }
+  ],
+  "latest_original_execution_finished_utc": "2026-10-08T00:22:29.020261+00:00",
+  "metadata_counts": {
+    "metadata_checks": 6127809,
+    "reference_occurrences": 699,
+    "typed_scalar_objects": 1325757,
+    "snapshots_checked": 28221
+  },
+  "distinct_files_hashed": 125,
+  "method": "Direct preserved-source snapshot/input/canary/guard/root-call/order review and every native JSONL row; IEEE representations validated, source initializer RHS and numerical outputs never reconstructed.",
+  "findings": [
+    "Eight independent genuine concrete owners have identical observed selected constructor fields; prepared manager inputs are distinct from constructor and actual member/guard/bulk operations.",
+    "Thirty-four root operations preserve exact own request echoes, before-input continuity and explicit canary/W/flag bits. Actual changed-field and MyEnvrn transitions are recorded without a modeled initializer.",
+    "Root wrapper invocations are actual wrapper counts; source-derived guard eligibility is not an observation of internal member-call counts.",
+    "All seven unchanged ordinary original API runs return0 with actual after-init physical96/288 cursors in order and no observer probes, input changes, resets or omissions.",
+    "Every retained callback has typed selected24fields/sixfour-slot arrays, actual flags/context/OutHumRat and matching raw stream/first/last/category summaries.",
+    "AfterPredictor physical callback counts remain their actual adaptive source values rather than being forced to zone-step counts."
+  ],
+  "scope_limits": [
+    "Native callbacks are source-stage witnesses only; after-init-HB precedes bulk, beforePredictor follows average clears and precedes member, afterPredictor is evolved state.",
+    "No native callback is claimed as pristine14field return. Cross-engine external weather/calendar/warmup input or evolving solver/history equivalence is unpaired.",
+    "Sibling/controller/day/Space/MRT/global/IO and later history/correction/retry are unpaired. AirPowerCap W/K output is not heat-capacity J/K parity.",
+    "No Rust scientific output is read or compared, no source RHS is rebuilt, no numerical gate is completed by this factual original-first review."
+  ],
+  "schema": "zon01-independent-original-data-review.v1",
+  "status": "pass-source-provenance-before-Rust-numerical-execution",
+  "card": "ZON-01",
+  "review_completed_utc": "2026-10-08T00:27:39.711415+00:00",
+  "raw_independent_review": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/review.json",
+    "sha256": "a396421d1358f5150482c2823f773b147eddf6f7ce488d3f698fe7aeb03f3361"
+  },
+  "compact_metadata_writer": {
+    "path": ".runtime/porting/ZON-01/independent-original-data-review-01/write_compact.py",
+    "sha256": "f545e3abe4de846d5d56095b4f135831d84b733e94cfcf1a66906428bc51b5b6"
+  },
+  "direct_source_coverage": [
+    "genuine empty EnergyPlusData constructor and allocated concrete owner defaults",
+    "explicit selected24field/four-slot canaries and retained before-input continuity",
+    "original selected zone-only bulk reconstruction/current-W seed",
+    "original bare member with zero/subfloor/negative-zero/repeated external-W inputs",
+    "genuine whole manager guard eligibility, repeated true skip, false rearm and new-environment reconstruction"
+  ],
+  "source_operator_RHS_reconstruction": false,
+  "native_callback_pristine14field_return_pairing": false,
+  "native_Rust_weather_calendar_or_warmup_parity": false,
+  "scientific_gates_completed_by_this_review": false,
+  "all_four_ZON01_gates_remain_pending": true,
+  "Rust_compared": false,
+  "gates_updated": false,
+  "scientific_reference_math_recomputed": false,
+  "engines_executed_by_review": false,
+  "Cargo_or_Git_executed": false,
+  "scientific_comparer_imported_or_executed": false
+}
