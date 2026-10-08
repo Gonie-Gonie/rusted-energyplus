@@ -1,0 +1,46 @@
+{
+  "schema": "clk03-selected-git-evidence-archive-supplement.v1",
+  "predecessor_manifest": {
+    "path": "energyplus_porting_plan/evidence/CLK-03/archive.json",
+    "sha256": "c4cc284f53fcd6cb3b99eaf0628104b39acc88427f5b478976514100ff587085"
+  },
+  "rows": [
+    {
+      "historical": {
+        "path": ".runtime/porting/CLK-03/legacy-gap-05/gap.json",
+        "sha256": "340365c467b4dd606fa9721261e0ffd52f762662943875d1f2aab928bf858097"
+      },
+      "archive": {
+        "path": "energyplus_porting_plan/evidence/CLK-03/reports/legacy_gap.json",
+        "sha256": "340365c467b4dd606fa9721261e0ffd52f762662943875d1f2aab928bf858097"
+      },
+      "bytes": 3687541
+    },
+    {
+      "historical": {
+        "path": ".runtime/porting/CLK-03/production-matched-comparison-01/production-comparison.json",
+        "sha256": "4ea395d2ec02d2011fdc5e7c405fc5f1e7f41bfac031b1c6699b6f5cf27ecedb"
+      },
+      "archive": {
+        "path": "energyplus_porting_plan/evidence/CLK-03/reports/production_comparison.json",
+        "sha256": "4ea395d2ec02d2011fdc5e7c405fc5f1e7f41bfac031b1c6699b6f5cf27ecedb"
+      },
+      "bytes": 2650832
+    },
+    {
+      "historical": {
+        "path": ".runtime/porting/CLK-03/production-comparison-02/production-comparison.json",
+        "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+      },
+      "archive": {
+        "path": "energyplus_porting_plan/evidence/CLK-03/reports/prior-failure-report.json",
+        "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+      },
+      "bytes": 2652360
+    }
+  ],
+  "archived_bytes": 8990733,
+  "historical_proofs_and_first_manifest_unchanged": true,
+  "numerical_comparison_or_engine_executed": false,
+  "reason": "Reports under 4 MB are retained for direct review in Git; only archival size admission changed."
+}

@@ -1,0 +1,489 @@
+{
+  "schema": "clk03-independent-production-failure-review.v1",
+  "status": "authenticated-failed-production-result-with-unmatched-incoming-history",
+  "review_completed_utc": "2026-10-08T08:40:57.272907+00:00",
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-03/production-comparison-02/production-comparison.json",
+    "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CLK-03/production-comparison-command-02/receipt.json",
+    "sha256": "0fb86b4517921fb0bf9c9b236c26044d5c32ed13250c54823123d32d13ab5e5a"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CLK-03/candidate-cli-build-01/build-receipt.json",
+    "sha256": "a029c664635c5682c2f05c6a09fe54681814db58c387ee1301aa8d777aad60ec"
+  },
+  "matrix": {
+    "path": ".runtime/porting/CLK-03/production-matrix-01/matrix.json",
+    "sha256": "2299a4ecb25d3669c2f7ae7f5939dade0a1f974c5c845cb6f4bb2bb69ec5203c"
+  },
+  "plan": {
+    "path": ".runtime/porting/CLK-03/production-plan-01/plan.json",
+    "sha256": "3148fbbdcb5215a437eb03f0778039adf73deaa75b67a9f22c84161e84585a7b"
+  },
+  "amendment": {
+    "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/amendment.json",
+    "sha256": "f54ef46ae6f5971cd2877ab132d6421fc104161b8db4db7641c62995431ef281"
+  },
+  "guarded_old_refs": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    },
+    "Rust_matrix": {
+      "path": ".runtime/porting/CLK-03/production-matrix-01/matrix.json",
+      "sha256": "2299a4ecb25d3669c2f7ae7f5939dade0a1f974c5c845cb6f4bb2bb69ec5203c"
+    },
+    "declared_plan": {
+      "path": ".runtime/porting/CLK-03/production-plan-01/plan.json",
+      "sha256": "3148fbbdcb5215a437eb03f0778039adf73deaa75b67a9f22c84161e84585a7b"
+    },
+    "independent_sources_review": {
+      "path": ".runtime/porting/CLK-03/independent-production-sources-review-01/review.json",
+      "sha256": "8cb335447542ca92a747e11219e8fcb1d4af393e656be70672beaa9fcabf6dda"
+    },
+    "reader_transport_amendment": {
+      "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/amendment.json",
+      "sha256": "f54ef46ae6f5971cd2877ab132d6421fc104161b8db4db7641c62995431ef281"
+    },
+    "amended_reader_independent_source_review": {
+      "path": ".runtime/porting/CLK-03/independent-production-reader-amendment-source-review-01/review.json",
+      "sha256": "c73f15715d3b8cac3af8ddfd2b2a59d0bf199c0a8ea081ee11557a6cc22247b1"
+    },
+    "reader_transport_amendment_execution": {
+      "path": ".runtime/porting/CLK-03/reader-transport-amendment-command-01/receipt.json",
+      "sha256": "52251d49446170359c31d8f715966b7fef5c3b516f518380fd24fe4f6d98be43"
+    },
+    "unit_comparison": {
+      "path": ".runtime/porting/CLK-03/candidate-unit-comparison-02/unit-comparison.json",
+      "sha256": "41ca089e3b56bbc031718dac3421b5f5879c4d655eabdfc6bc2dfc518c706b09"
+    },
+    "unit_comparison_execution": {
+      "path": ".runtime/porting/CLK-03/candidate-unit-comparison-command-02/receipt.json",
+      "sha256": "f6a3a62cc5519123b6c434dbe451d066fcfecdf2b098f04c16a22b940fb954e4"
+    },
+    "executed_production_launcher": {
+      "path": ".runtime/porting/CLK-03/production-matrix-01/launcher.py",
+      "sha256": "53aa6935b10d512768f4f2b1ad7b8674cf688bd165c6aa0756df3f438bdf40a7"
+    },
+    "Rust_build": {
+      "path": ".runtime/porting/CLK-03/candidate-cli-build-01/build-receipt.json",
+      "sha256": "a029c664635c5682c2f05c6a09fe54681814db58c387ee1301aa8d777aad60ec"
+    },
+    "preserved_failed_reader_execution": {
+      "path": ".runtime/porting/CLK-03/production-comparison-command-01/receipt.json",
+      "sha256": "5fdcca184e8c8a29c96f07705abddfa4e7c8dee3d3bda1a8b5b168a0ed56b701"
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+      "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+    }
+  },
+  "guarded_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-prep-02/check_clk03_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/check_clk03_production.py",
+        "sha256": "e75518ac8332868a551a8d781923762af5b6bde97c88f3b124a9daef177fd3d9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-prep-02/clk03_production_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/clk03_production_state.py",
+        "sha256": "c3f681f9bc76686a2b65bf2ad28572090db46a481290c88a7e0e3c009fbc91b5"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-prep-02/clk03_production_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/clk03_production_provenance.py",
+        "sha256": "909830b90fd9dc42b64d73de47de6c81d37de19ec95e6390861bede01fa5999e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-prep-02/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/run_production.py",
+        "sha256": "53aa6935b10d512768f4f2b1ad7b8674cf688bd165c6aa0756df3f438bdf40a7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-prep-02/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/prepare_plan.py",
+        "sha256": "a5552ead093256251d5490b86d3163608cc9ae2c714b0a7ff562ac28c91807b4"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-prep-02/reader_amendment.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/reader_amendment.py",
+        "sha256": "53eeab2534da8345c4c2dd5c5c219fe1a4f9328a527c66a904853efdc4a0d414"
+      }
+    },
+    {
+      "historical_path": "tools/porting/check_clk03_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/check_clk03_unit.py",
+        "sha256": "8b77430dd686b4291f756be26d2962d38cc611e6dae31d39b321cb9b244ecfe6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_unit_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/clk03_unit_state.py",
+        "sha256": "7aff322a5c1278cbd22bd37d00145f8de02023075e51dd0d26aeff99687013e1"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-reader-amendment-prep-01/amend.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/reader-transport-amendment-01/source/amend.py",
+        "sha256": "0b275c2de35e14019a96951ad72fdfd971c927de81e37b44fba49b969fc739ee"
+      }
+    }
+  ],
+  "actual_six_CLI_receipts": [
+    {
+      "case_id": "A-24H",
+      "trace_level": "Full",
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/production-matrix-01/A-24H/full-command/receipt.json",
+        "sha256": "baa7ce33ee9659a867dc64b2988c932b0966a60b99e22ef99380df29f88071f1"
+      },
+      "actual_exit_code": 0
+    },
+    {
+      "case_id": "A-24H",
+      "trace_level": "Summary",
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/production-matrix-01/A-24H/summary-command/receipt.json",
+        "sha256": "604f9cd9752cf2cbd3dbb3b5901fa37c6ccb7628012e2c2cc07122256a35d6a2"
+      },
+      "actual_exit_code": 0
+    },
+    {
+      "case_id": "A-72H",
+      "trace_level": "Full",
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/production-matrix-01/A-72H/full-command/receipt.json",
+        "sha256": "2c13b1540ac64ff5bae3eefbe23cb1d4836068311f4424c220937f40c011d5f3"
+      },
+      "actual_exit_code": 0
+    },
+    {
+      "case_id": "A-72H",
+      "trace_level": "Summary",
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/production-matrix-01/A-72H/summary-command/receipt.json",
+        "sha256": "732718561408848216643ecb222bc6b2894c8c5091fcffa9c680f9cb129fa3d5"
+      },
+      "actual_exit_code": 0
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Full",
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/production-matrix-01/B-BOTH-24H/full-command/receipt.json",
+        "sha256": "34a13360f0dc273adea5181cd2e50d5c05021851053a0596d7a9cd13b790a090"
+      },
+      "actual_exit_code": 0
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Summary",
+      "receipt": {
+        "path": ".runtime/porting/CLK-03/production-matrix-01/B-BOTH-24H/summary-command/receipt.json",
+        "sha256": "e8c33404b8fe3dd8ae74a3f95a98cb5c417a9ac53e0bf4a2e6a1fcc8d1f1ccae"
+      },
+      "actual_exit_code": 0
+    }
+  ],
+  "authenticated_actual_comparison_count": 1647956,
+  "authenticated_actual_mismatch_count": 1,
+  "actual_scientific_exit_code": 1,
+  "strict_failed_mismatch": [
+    {
+      "location": "A-72H/operations/196/weather/DatesShouldBeReset",
+      "actual": true,
+      "original": false
+    }
+  ],
+  "actual_A72_trace": {
+    "path": ".runtime/porting/CLK-03/production-matrix-01/A-72H/full/clk03-weather-day-production-trace.json",
+    "sha256": "7abdb41f754ace010e2e1800ba69a64682fda6fd1386523c85621e5fdca8aa79"
+  },
+  "selected_actual_observations": [
+    {
+      "operation_index_zero_based": 100,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": false,
+        "DayOfSim": 2,
+        "HourOfDay": 1,
+        "TimeStep": 1
+      },
+      "before_date": {
+        "Month": 6,
+        "DayOfMonth": 30
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "operation_index_zero_based": 101,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": false,
+        "WarmupFlag": false,
+        "DayOfSim": 2,
+        "HourOfDay": 1,
+        "TimeStep": 2
+      },
+      "before_date": {
+        "Month": 7,
+        "DayOfMonth": 1
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": true
+    },
+    {
+      "operation_index_zero_based": 195,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": false,
+        "WarmupFlag": false,
+        "DayOfSim": 2,
+        "HourOfDay": 24,
+        "TimeStep": 4
+      },
+      "before_date": {
+        "Month": 7,
+        "DayOfMonth": 1
+      },
+      "DatesShouldBeReset_before": true,
+      "DatesShouldBeReset_after": true
+    },
+    {
+      "operation_index_zero_based": 196,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": false,
+        "DayOfSim": 3,
+        "HourOfDay": 1,
+        "TimeStep": 1
+      },
+      "before_date": {
+        "Month": 7,
+        "DayOfMonth": 1
+      },
+      "DatesShouldBeReset_before": true,
+      "DatesShouldBeReset_after": true
+    }
+  ],
+  "native_sparse_observations": [
+    {
+      "id": "get-next-environment",
+      "operation_index_zero_based": 0,
+      "kind": "GetNextEnvironment",
+      "before": {
+        "BeginDayFlag": false,
+        "WarmupFlag": false,
+        "DayOfSim": 0,
+        "HourOfDay": 0,
+        "TimeStep": 0
+      },
+      "before_date": {
+        "Month": 0,
+        "DayOfMonth": 0
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "id": "warmup-1",
+      "operation_index_zero_based": 1,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": true,
+        "DayOfSim": 1,
+        "HourOfDay": 0,
+        "TimeStep": 0
+      },
+      "before_date": {
+        "Month": 6,
+        "DayOfMonth": 30
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "id": "warmup-2",
+      "operation_index_zero_based": 2,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": true,
+        "DayOfSim": 1,
+        "HourOfDay": 0,
+        "TimeStep": 0
+      },
+      "before_date": {
+        "Month": 6,
+        "DayOfMonth": 30
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "id": "run-day-1",
+      "operation_index_zero_based": 3,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": false,
+        "DayOfSim": 1,
+        "HourOfDay": 0,
+        "TimeStep": 0
+      },
+      "before_date": {
+        "Month": 6,
+        "DayOfMonth": 30
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "id": "run-day-2",
+      "operation_index_zero_based": 4,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": false,
+        "DayOfSim": 2,
+        "HourOfDay": 0,
+        "TimeStep": 0
+      },
+      "before_date": {
+        "Month": 6,
+        "DayOfMonth": 30
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "id": "run-day-3",
+      "operation_index_zero_based": 5,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": true,
+        "WarmupFlag": false,
+        "DayOfSim": 3,
+        "HourOfDay": 0,
+        "TimeStep": 0
+      },
+      "before_date": {
+        "Month": 7,
+        "DayOfMonth": 1
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": false
+    },
+    {
+      "id": "end-environment-rewind",
+      "operation_index_zero_based": 6,
+      "kind": "InitializeWeather",
+      "before": {
+        "BeginDayFlag": false,
+        "WarmupFlag": false,
+        "DayOfSim": 3,
+        "HourOfDay": 24,
+        "TimeStep": 4
+      },
+      "before_date": {
+        "Month": 7,
+        "DayOfMonth": 2
+      },
+      "DatesShouldBeReset_before": false,
+      "DatesShouldBeReset_after": true
+    }
+  ],
+  "native_run_period_start": {
+    "StartMonth": 6,
+    "StartDay": 30
+  },
+  "original_results": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/native-output/results.json",
+    "sha256": "d9b7c675e2a4ac77968b03a1e7c17a366f61a22e9ea4c1bed00b88a4a2ac0a34"
+  },
+  "source_predicate": {
+    "source": {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    },
+    "start_line": 1954,
+    "end_line": 1957,
+    "raw_range_sha256": "08bc8793833ea03b6e9b75264f5404f4561fd4b410f60b1fe0f2c638e63d531b",
+    "archive": {
+      "path": ".runtime/porting/CLK-03/independent-production-failure-review-01/original-1954-1957.txt",
+      "sha256": "08bc8793833ea03b6e9b75264f5404f4561fd4b410f60b1fe0f2c638e63d531b"
+    }
+  },
+  "actual_compiled_Rust_predicate": {
+    "source": {
+      "path": ".runtime/porting/source-objects/e6/e614140a18aff88131551c80a4cd376bd790610a592e0cd807b34c87254cb873",
+      "sha256": "e614140a18aff88131551c80a4cd376bd790610a592e0cd807b34c87254cb873"
+    },
+    "historical_path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+    "start_line": 269,
+    "end_line": 277,
+    "raw_range_sha256": "66fca61ae965179c42f4cae9109a271c298d67432ed243065bc5d39f693094bd",
+    "archive": {
+      "path": ".runtime/porting/CLK-03/independent-production-failure-review-01/compiled-Rust-269-277.txt",
+      "sha256": "66fca61ae965179c42f4cae9109a271c298d67432ed243065bc5d39f693094bd"
+    }
+  },
+  "cause_interpretation": "Actual production invokes non-BeginDay InitializeWeather on day2; old native sparse request does not. The actual native branch and compiled Rust predicate agree on their selected literal controls, while operation196 begins with different already-observed retained DatesShouldBeReset. This is unmatched incoming-history evidence, not a paired proof that the Rust whole lifecycle or physics is correct.",
+  "authoring_disclosure": "Reviewer authored Rust carrier/compatibility producer/probe earlier. Independence is limited to factual authentication of other-authored comparer/failed report and raw-byte source/caller-history observations; no self-certification of Rust science.",
+  "scientific_certification_passed": false,
+  "failed_result_repurposed_as_PASS": false,
+  "unavailable_counted_as_PASS": false,
+  "native_record_index_fabricated": false,
+  "scientific_comparison_reexecuted": false,
+  "native_or_Rust_engine_executed": false,
+  "science_modules_imported": false,
+  "Cargo_executed": false,
+  "Git_executed_by_reader": false,
+  "numeric_tolerance_or_old_policy_changed": false,
+  "gates_updated": false,
+  "executed_reader": {
+    "path": ".runtime/porting/CLK-03/independent-production-failure-review-01/review_failure.py",
+    "sha256": "8ce25f5e2b83a58a19c084082f1361cd4df150e33c35378665d8194a239c79f8"
+  },
+  "actual_reader_command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    ".runtime/porting/CLK-03/production-failure-review-prep-01/review_failure.py"
+  ],
+  "review_scope": "preserved failure honesty/source-literal history only; full numeric/physical build certification outside this bounded review",
+  "guarded_metadata_and_trace_bytes_unchanged_after": true
+}

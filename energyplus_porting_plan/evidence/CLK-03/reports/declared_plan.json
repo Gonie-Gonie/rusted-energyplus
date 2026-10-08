@@ -1,0 +1,310 @@
+{
+  "schema": "clk03-matched-production-plan.v1",
+  "created_utc": "2026-10-08T09:08:14.235664+00:00",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "matched_native_contract": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/native-contract.json",
+    "sha256": "fa534ac3525b8d1e63e793ef37e46ba082501c1d0e149e111588d2096392d984"
+  },
+  "matched_input_projection": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/projection.json",
+    "sha256": "b768e6d30c5ac6b9a63602f6aef531acd87703b3ace2a105b7773fcee206cb7a"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "input_byte_maps": {
+    "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+    "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+  },
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ]
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ]
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ]
+    }
+  ],
+  "actual_command_count": 6,
+  "expected_outputs_supplied": false,
+  "physical_execution_performed": false,
+  "gates_updated": false,
+  "selected_policy": {
+    "production_cases": [
+      "A-24H",
+      "A-72H",
+      "B-BOTH-24H"
+    ],
+    "trace_levels": [
+      "Full",
+      "Summary"
+    ],
+    "whole_copy": "actual Rust Today full11/full17 against actual incoming Tomorrow at observed boundary",
+    "consumer_receipt": "every raw field against preserved CLK02 native raw row by external exact input-byte map; literal10 record projections; full17 slot against actual Today",
+    "lifecycle_native_selection": {
+      "environment": [
+        "DayOfYear",
+        "DayOfYear_Schedule",
+        "Year",
+        "Month",
+        "DayOfMonth",
+        "DayOfWeek",
+        "HolidayIndex",
+        "DSTIndicator",
+        "YearTomorrow",
+        "MonthTomorrow",
+        "DayOfMonthTomorrow",
+        "DayOfWeekTomorrow",
+        "HolidayIndexTomorrow",
+        "TotDesDays",
+        "CurEnvirNum",
+        "EnvironmentName",
+        "EndMonthFlag",
+        "EndYearFlag"
+      ],
+      "weather": [
+        "Envrn",
+        "NumOfEnvrn",
+        "TotRunPers",
+        "TotRunDesPers",
+        "NumDataPeriods",
+        "NumIntervalsPerHour",
+        "NumSpecialDays",
+        "LeapYearAdd",
+        "RptDayType",
+        "CurDayOfWeek",
+        "curSimDayForEndOfRunPeriod",
+        "GetBranchInputOneTimeFlag",
+        "GetEnvironmentFirstCall",
+        "FirstCall",
+        "WaterMainsParameterReport",
+        "LastHourSet",
+        "WeatherFileExists",
+        "DatesShouldBeReset",
+        "StartDatesCycleShouldBeReset",
+        "Jan1DatesShouldBeReset",
+        "RPReadAllWeatherData",
+        "UseDaylightSaving",
+        "UseSpecialDays",
+        "DaylightSavingIsActive",
+        "ReadEPlusWeatherCurTime",
+        "TimeStepFraction",
+        "IsRainThreshold"
+      ],
+      "daily": [
+        "DayOfYear",
+        "DayOfYear_Schedule",
+        "Year",
+        "Month",
+        "DayOfMonth",
+        "DayOfWeek",
+        "DaylightSavingIndex",
+        "HolidayIndex"
+      ],
+      "header": [
+        "EPWHeaderTitle",
+        "WeatherFileLocationTitle",
+        "WeatherFileLatitude",
+        "WeatherFileLongitude",
+        "WeatherFileTimeZone",
+        "WeatherFileElevation",
+        "WFAllowsLeapYears",
+        "EPWDaylightSaving",
+        "EPWDST",
+        "DST",
+        "NumSpecialDays",
+        "SpecialDays",
+        "NumDataPeriods",
+        "NumIntervalsPerHour",
+        "DataPeriods",
+        "SpecialDays_allocated",
+        "DataPeriods_allocated",
+        "LeapYearAdd",
+        "EndDayOfMonth",
+        "wvarsMissedCounts.WeathCodes"
+      ],
+      "stream": [
+        "is_open",
+        "good",
+        "eof",
+        "fail",
+        "bad",
+        "position_available",
+        "position_byte"
+      ],
+      "context": [
+        "current_cycle",
+        "set_week_days"
+      ]
+    },
+    "caller_sensitive_pairing": "Every actual GetNext/Initialize is paired in order to the freshly declared matched native caller schedule; all existing selected owner fields remain strict, with no incoming-history exclusion or retroactive relabelling.",
+    "matched_history": "Initial GetNext plus one Initialize per zone timestep; literal set_phase/current_for/PreviousHour controls, no duplicate initial1/1 Initialize, no production warmup inserted.",
+    "source_literal_initialization": "actual before/after FirstCall branch; EndMonth reset observed only where later BeginDay month-end write does not hide its final value, no invented intermediate write events",
+    "clock_selection": "actual caller hour/timestep/phase/civil index and end flags; no inferred native thermal callbacks",
+    "source_order": "one GetNext; one first-day search; actual day reads; no last-day prefetch; actual terminal rewind",
+    "first_phase_token": "one initial BeginEnvrn/BeginDay transport, no repeated first-loop transport/prefetch",
+    "preview_policy": "available preview is independent metadata/evidence; live cursor and Today are thermal payload owners",
+    "unpaired": [
+      "processed numeric/boolean physics generation",
+      "daily solar and shadow coefficients generation",
+      "missing/range cache/counters except raw WeathCodes",
+      "liquid sentinel normalization",
+      "native thermal/warmup callbacks",
+      "full native design-day/Interpolation/DST registry"
+    ],
+    "warmup_policy": "observed only, no production warmup inserted; no warmup observation is unavailable, never PASS",
+    "native_internal_record_index_claimed": false,
+    "unavailable_counted_as_PASS": false
+  },
+  "independent_sources_review": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/review.json",
+    "sha256": "250cd20c506ce9c7c5b66614a748f889d486e71f09f21565aae93d676d659c68"
+  },
+  "reader_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/check_clk03_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/check_clk03_production.py",
+        "sha256": "7c6c407f6d12bb86c4b55f3477a087d971942c3ce8a13baf3483609b8e03dc2d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/clk03_production_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/clk03_production_state.py",
+        "sha256": "8e6f7d909e351a79d9c586d1b746d7f9a014977c6600a28c3087d86cd2c703b8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/clk03_production_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/clk03_production_provenance.py",
+        "sha256": "31d98cb32fd6014ab37d49ccf72e9d24943f5fee97a86e4714d75c3c584b728a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/run_production.py",
+        "sha256": "590a4d140740bd9045866f59b698aba0e53eb5d569aa86ce282d2563ef6d9e01"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/prepare_plan.py",
+        "sha256": "6e68cf88a590e6abf57a959d77a8a95459b2e8e16cdda6d077c785d4feb6538f"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/matched_metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/matched_metadata.py",
+        "sha256": "3a4b5d40a8bbcfc2253e0b8d2d1514f00f8e80602fb1cfe69037432fbdda4ba8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/prepare_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/prepare_inputs.py",
+        "sha256": "6b31149b9fb0c81c879159e4154f504533cf53e0458768c91c7fd405b0eadbe7"
+      }
+    },
+    {
+      "historical_path": "tools/porting/check_clk03_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/check_clk03_unit.py",
+        "sha256": "8b77430dd686b4291f756be26d2962d38cc611e6dae31d39b321cb9b244ecfe6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_unit_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/clk03_unit_state.py",
+        "sha256": "7aff322a5c1278cbd22bd37d00145f8de02023075e51dd0d26aeff99687013e1"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-plan-01/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "native_reference_reads_by_plan_writer": false,
+  "hour1_production_matrix_added": false,
+  "warmup_options_changed": false,
+  "scope": "fresh source-declared matched native caller history; actual selected live cursor/wholeToday/owned A+B operands; generated processed weather physics unpaired"
+}

@@ -1,0 +1,949 @@
+{
+  "schema": "clk03-independent-unit-result-review.v1",
+  "status": "pass-authenticated-selected-unit-result-and-honest-unavailable-scope",
+  "review_started_utc": "2026-10-08T08:54:09.615278+00:00",
+  "review_completed_utc": "2026-10-08T08:54:27.008516+00:00",
+  "preserved_prior_metadata_attempts": [
+    {
+      "path": ".runtime/porting/CLK-03/independent-unit-result-review-command-01/receipt.json",
+      "sha256": "e66fb8362e253865d8a27be062db9d42cbea962fd5e15af5ed40e6f256a1416f"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/independent-unit-result-review-command-02/receipt.json",
+      "sha256": "e41523274a22bf8f1fea8f378a025f7e214db183c7611eae58757af40f52c848"
+    }
+  ],
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-01/unit-comparison.json",
+    "sha256": "80fec36962d0583e7c69bd85e40afddb1cbb645ea0bc1ad53789c7b53a4d95c4"
+  },
+  "reviewed_comparison_execution": {
+    "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-command-01/receipt.json",
+    "sha256": "d4f77a8d43a86f76f813345de679bfefb5384c135ef4dfff2ac9e71ae3e0900d"
+  },
+  "reviewed_Rust_build": {
+    "path": ".runtime/porting/CLK-03/final-candidate-probe-build-01/build-receipt.json",
+    "sha256": "acbf047718079347630a20e01990597984e1b6e213153a470f1bf7f1db367435"
+  },
+  "reviewed_Rust_execution": {
+    "path": ".runtime/porting/CLK-03/final-candidate-probe-command-01/receipt.json",
+    "sha256": "f7a23b1ca12ecf67bc2276ce8caf6753034d7c15c7792182425dadd51488cd35"
+  },
+  "reviewed_original_reference": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+    "sha256": "0513bc94d02703d299cb0a63bc66fa11a0b405e0d0873d3e61a0916a4e123cdc"
+  },
+  "reviewed_original_execution": {
+    "path": ".runtime/porting/CLK-03/original-command-03/receipt.json",
+    "sha256": "cb2f1e545802fcdcdf8015ce5ee2f405fefb02dcd35dd5b196550647dd45fcde"
+  },
+  "reviewed_independent_original_data": {
+    "path": ".runtime/porting/CLK-03/independent-original-data-review-02/review.json",
+    "sha256": "b8874a962db7c71f6395a5b3ccd811e780fffacc048a76d67bc215634f756166"
+  },
+  "reviewed_legacy_gap": {
+    "path": ".runtime/porting/CLK-03/legacy-gap-05/gap.json",
+    "sha256": "340365c467b4dd606fa9721261e0ffd52f762662943875d1f2aab928bf858097"
+  },
+  "reviewed_legacy_gap_execution": {
+    "path": ".runtime/porting/CLK-03/legacy-gap-command-05/receipt.json",
+    "sha256": "97e3afebd97c101b1ded4101913cf55ce01099bfe8a80061602b1126d79d557a"
+  },
+  "reviewed_pre_execution_projection": {
+    "path": ".runtime/porting/CLK-03/unit-dto-freeze-01/projection.json",
+    "sha256": "4417bed908752814a1a5ea1bd79c1b2af13c0979fb6f2ca11dd3691a31285b6b"
+  },
+  "reviewed_frozen_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "reviewed_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+  },
+  "reviewed_fixed_CON_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "actual_reported_comparisons": 239178,
+  "actual_reported_mismatches": 0,
+  "actual_reported_scoped_unit_PASS_authenticated": true,
+  "selected_policy_unchanged_from_pre_execution_projection": true,
+  "actual_unavailable_values": 114,
+  "unavailable_value_suffixes": {
+    "position_byte": 72,
+    "returned_bool": 39,
+    "source_fatal": 3
+  },
+  "actual_unavailable_interior_boundaries": 12,
+  "unavailable_counted_as_PASS": false,
+  "actual_lane_observations": [
+    {
+      "lane": "Rust",
+      "results": {
+        "path": ".runtime/porting/CLK-03/final-candidate-probe-command-01/stdout.log",
+        "sha256": "7ea693890bfb7c711cbf51610f2fe03481b67adc5ac6504b9efbc1c2064562fa"
+      },
+      "actual_status_counts": {
+        "source_returned": 46,
+        "source_fatal": 2,
+        "not-invoked-after-prior-source-outcome": 3
+      },
+      "actual_function_counts": {
+        "UpdateWeatherData": 8,
+        "GetNextEnvironment": 10,
+        "InitializeWeather": 27,
+        "ReadWeatherForDay": 3
+      },
+      "sequence_observations": [
+        {
+          "id": "CTOR-COPY-DEFAULTS",
+          "operations": [
+            {
+              "id": "copy-defaults",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "COPY-BEGIN-ENV-POSITIVE-HOLIDAY",
+          "operations": [
+            {
+              "id": "first",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "repeat-with-new-tomorrow",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "COPY-NORMAL-ZERO-HOLIDAY",
+          "operations": [
+            {
+              "id": "first",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "repeat-with-new-tomorrow",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "COPY-NORMAL-NEGATIVE-HOLIDAY",
+          "operations": [
+            {
+              "id": "first",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "repeat-with-new-tomorrow",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "A-24H",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "A-72H",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-3",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "B-BOTH-24H",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "DECOY-OFFSET-HOUR24",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "DECOY-OFFSET-HOUR1",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "FIRST-DAY-THREE-DAYS",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-3",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "MISSING-MATCH-DEFINED-FAILURE",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_fatal",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "not-invoked-after-prior-source-outcome",
+              "invoked": false
+            }
+          ]
+        },
+        {
+          "id": "OUTSIDE-DATA-PERIOD",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_fatal",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "not-invoked-after-prior-source-outcome",
+              "invoked": false
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "not-invoked-after-prior-source-outcome",
+              "invoked": false
+            }
+          ]
+        },
+        {
+          "id": "DIRECT-READDAY-REPLAY",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "read-first",
+              "kind": "ReadWeatherForDay",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "handoff-with-live-input-stream",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "replay-search-from-current-position",
+              "kind": "ReadWeatherForDay",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "read-first",
+              "kind": "ReadWeatherForDay",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lane": "original",
+      "results": {
+        "path": ".runtime/porting/CLK-03/original-helper-first-03/native-output/results.json",
+        "sha256": "d9b7c675e2a4ac77968b03a1e7c17a366f61a22e9ea4c1bed00b88a4a2ac0a34"
+      },
+      "actual_status_counts": {
+        "source_returned": 46,
+        "source_fatal": 2,
+        "not-invoked-after-prior-source-outcome": 3
+      },
+      "actual_function_counts": {
+        "UpdateWeatherData": 8,
+        "GetNextEnvironment": 10,
+        "InitializeWeather": 27,
+        "ReadWeatherForDay": 3
+      },
+      "sequence_observations": [
+        {
+          "id": "CTOR-COPY-DEFAULTS",
+          "operations": [
+            {
+              "id": "copy-defaults",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "COPY-BEGIN-ENV-POSITIVE-HOLIDAY",
+          "operations": [
+            {
+              "id": "first",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "repeat-with-new-tomorrow",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "COPY-NORMAL-ZERO-HOLIDAY",
+          "operations": [
+            {
+              "id": "first",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "repeat-with-new-tomorrow",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "COPY-NORMAL-NEGATIVE-HOLIDAY",
+          "operations": [
+            {
+              "id": "first",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "repeat-with-new-tomorrow",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "A-24H",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "A-72H",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-3",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "B-BOTH-24H",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "DECOY-OFFSET-HOUR24",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "warmup-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "DECOY-OFFSET-HOUR1",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "FIRST-DAY-THREE-DAYS",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-2",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-3",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "MISSING-MATCH-DEFINED-FAILURE",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "source_fatal",
+              "invoked": true
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "not-invoked-after-prior-source-outcome",
+              "invoked": false
+            }
+          ]
+        },
+        {
+          "id": "OUTSIDE-DATA-PERIOD",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_fatal",
+              "invoked": true
+            },
+            {
+              "id": "run-day-1",
+              "kind": "InitializeWeather",
+              "status": "not-invoked-after-prior-source-outcome",
+              "invoked": false
+            },
+            {
+              "id": "end-environment-rewind",
+              "kind": "InitializeWeather",
+              "status": "not-invoked-after-prior-source-outcome",
+              "invoked": false
+            }
+          ]
+        },
+        {
+          "id": "DIRECT-READDAY-REPLAY",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "read-first",
+              "kind": "ReadWeatherForDay",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "handoff-with-live-input-stream",
+              "kind": "UpdateWeatherData",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "replay-search-from-current-position",
+              "kind": "ReadWeatherForDay",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        },
+        {
+          "id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+          "operations": [
+            {
+              "id": "get-next-environment",
+              "kind": "GetNextEnvironment",
+              "status": "source_returned",
+              "invoked": true
+            },
+            {
+              "id": "read-first",
+              "kind": "ReadWeatherForDay",
+              "status": "source_returned",
+              "invoked": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actual_binary64_DTO_representation_counts": {
+    "positive_zero": 793641,
+    "finite": 529907,
+    "negative_zero": 8412
+  },
+  "available_source_inventory_count": 3718,
+  "available_source_inventory_is_compiler_selection": false,
+  "actual_build_commit": "df88eb4c7b03cd8a04ad09d5fce3300a4d5b7b22",
+  "actual_crates_tree": "47e544dafabcec8e30197597b8832ee1c290c8fc",
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+    "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+  },
+  "numerical_comparisons_recomputed_by_reviewer": false,
+  "scientific_comparer_imported_or_executed_by_reviewer": false,
+  "native_or_Rust_engine_executed_by_reviewer": false,
+  "Cargo_or_Git_executed_by_reviewer": false,
+  "tracked_files_or_gates_changed": false,
+  "whole_weather_physics_certified_by_reviewer": false,
+  "production_invocation_certified_by_this_review": false,
+  "unit_original_is_preserved_14_sequence_51_operation_reference": true,
+  "unit_claimed_to_follow_future_supplemental_matched_production_original": false,
+  "authorship_disclosure": "Reviewer authored raw header and thermal consumer bridges/tests, and native build guards. This independent review authenticates other-authored comparison/observer outputs and actual evidence; it does not independently certify those self-authored implementations.",
+  "executed_reader_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/review_results.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/source/0-review_results.py",
+        "sha256": "7e9ee52a0698c4b8bdc9c0488bae6dcd451635a4046e1fa6761d93d3b9f73e92"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/source/1-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    },
+    {
+      "historical_path": "tools/porting/check_clk03_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/source/2-check_clk03_unit.py",
+        "sha256": "8b77430dd686b4291f756be26d2962d38cc611e6dae31d39b321cb9b244ecfe6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_unit_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/source/3-clk03_unit_state.py",
+        "sha256": "7aff322a5c1278cbd22bd37d00145f8de02023075e51dd0d26aeff99687013e1"
+      }
+    }
+  ],
+  "limits": [
+    "Full supplied-carrier copies pair literal typed values, including signed zero; no generated processed physics parity is claimed.",
+    "Lifecycle selected dates, caller flags, source clock controls, actual counters and available byte positions compare exactly.",
+    "Full original constructor/preparation/registry arrays are not claimed by a selected Rust session.",
+    "Generated full-carrier transport is checked within each actual lane when its before/after boundary is observed.",
+    "The BeginEnvrn interior native handoff boundary remains unavailable; it is never counted as a passing comparison.",
+    "Source-error text/private-local parity and production invocation require separate evidence.",
+    "No scientific value comparison was rerun. Numerical 239178/0 is the authenticated actual Root execution report.",
+    "Native-generated processed physics is unpaired across lanes; full literal supplied carriers and observed within-lane transport are the selected unit scope.",
+    "No production invocation or physical-stage closure is inferred from this unit report.",
+    "This final unit execution follows the preserved 14/51 original. It does not follow or certify the distinct future three-case matched-production original request."
+  ]
+}

@@ -1,0 +1,798 @@
+{
+  "schema": "clk03-matched-production-matrix.v1",
+  "matched_native_contract": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/native-contract.json",
+    "sha256": "fa534ac3525b8d1e63e793ef37e46ba082501c1d0e149e111588d2096392d984"
+  },
+  "matched_native_reference": {
+    "path": ".runtime/porting/CLK-03/matched-original-first-01/helper-reference.json",
+    "sha256": "172d704acb24b84bc120b9f6ecb173426b7b247a1f24cbe2a543c893c1a35974"
+  },
+  "matched_original_execution": {
+    "path": ".runtime/porting/CLK-03/matched-original-command-01/receipt.json",
+    "sha256": "457279ec0ffe730521d88a1c2761d74bd27b29a3c5d6dd083341f7eb80f730e7"
+  },
+  "matched_original_data_review": {
+    "path": ".runtime/porting/CLK-03/independent-matched-original-data-review-02/review.json",
+    "sha256": "997980c8f10ece57ce67b6ae3023726737953620802cea7179ee31e824928ce6"
+  },
+  "matched_original_data_review_execution": {
+    "path": ".runtime/porting/CLK-03/independent-matched-original-data-review-command-02/receipt.json",
+    "sha256": "8d5646d007f1db979ec0f6dfa53d0b896490bae9b9add08c8a31a2561ed06be6"
+  },
+  "build": {
+    "path": ".runtime/porting/CLK-03/final-candidate-cli-build-01/build-receipt.json",
+    "sha256": "ae5fba2373695df7bd68aec45aad18e328a3270fa17769b2436ba8174771eaea"
+  },
+  "unit_comparison": {
+    "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-01/unit-comparison.json",
+    "sha256": "80fec36962d0583e7c69bd85e40afddb1cbb645ea0bc1ad53789c7b53a4d95c4"
+  },
+  "unit_comparison_execution": {
+    "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-command-01/receipt.json",
+    "sha256": "d4f77a8d43a86f76f813345de679bfefb5384c135ef4dfff2ac9e71ae3e0900d"
+  },
+  "declared_plan": {
+    "path": ".runtime/porting/CLK-03/production-matched-plan-01/plan.json",
+    "sha256": "e549cad6a6926f4631b6e9f109931f793dbdf668259f6209625279270ebb3bc9"
+  },
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "independent_sources_review": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/review.json",
+    "sha256": "250cd20c506ce9c7c5b66614a748f889d486e71f09f21565aae93d676d659c68"
+  },
+  "executed_launcher": {
+    "path": ".runtime/porting/CLK-03/production-matched-matrix-01/launcher.py",
+    "sha256": "590a4d140740bd9045866f59b698aba0e53eb5d569aa86ce282d2563ef6d9e01"
+  },
+  "implementation_commit": "df88eb4c7b03cd8a04ad09d5fce3300a4d5b7b22",
+  "crates_tree": "47e544dafabcec8e30197597b8832ee1c290c8fc",
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "Full": {
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full-command/receipt.json",
+          "sha256": "cc558d1dd3b0cd9bd083262647e32946596a16f618fce3a04c14201dbb0bda66"
+        },
+        "output_directory": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/clk02-weather-production-trace.json",
+            "sha256": "7e11312b7f584f8081ab369e6098944295c8c79e79ff9bf252adaa1f29e7139e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/clk03-weather-day-production-trace.json",
+            "sha256": "082a0de62823d5bee3011387e0e5c858ded1f83d7431d481b5b5769944f68593"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/clock-calls.json",
+            "sha256": "e3822268d3cfe821d02e9b7d283e24b5a2a04c20cb9ed47fbebaaab6494d0ace"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/compiled-geometry.json",
+            "sha256": "55252ef3826e6a4c2719893946265ebb4ab7515af022145882cfeb1957bda44a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/diagnostics.json",
+            "sha256": "58a9250978c6c91abd792f79ff60a3e8743946ab1c294ea0a090131018322704"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/eplusrs.err",
+            "sha256": "474fcd0dfda73a93a4678c5c6e8dadf965c941ab0f2e64b3ec36204ac1961ab3"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/geo02-geometry-operands.json",
+            "sha256": "3c8bfec120f35682506af49c157413e8393a342f21c12a8d87ff99437fd1453a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/geo02-geometry.json",
+            "sha256": "9303cd74009e3b0a3f584e2b37520fd8c7e5827e8bbf94c55c32eb2b9ecd5776"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/geo03-zone-volume.json",
+            "sha256": "6bb0545bb66c895eebcf080a9a0f278cf08d709abbd15436ad113e28d3c3ed4b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/geometry-consumers.json",
+            "sha256": "4c4177b9a1ce19390259394919c69875997b65850d574b240da6b252d793982d"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/input/converted.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/input/input-hashes.json",
+            "sha256": "25f31bc398aa7f6018193f956153b7eed0aa4f5c1d7a1030a4c15282a9681f9e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/input/original.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/input/original.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/logs/source-order-stage-state-snapshots.json",
+            "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/model/execution-plan.json",
+            "sha256": "7ca632ab84962388293d7c1f2f7935bb7e5d5f2d3c344146d2ee63714d38c519"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/porting_scope.json",
+            "sha256": "c22e24c537892979abbf036d27a4169ed618a6d7edbe8126f98e5cde7afea0a8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/psy02-calls.json",
+            "sha256": "c2d19628719da6955630ba0ef874c0191e1b2f61fad142ec3d8e348c6033dc3e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/psychrometrics-calls.json",
+            "sha256": "38991f22b23f3a928a59d466b1fa7b44c0799b9657c4c3702fadb0197c2765a6"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/results/result-store.json",
+            "sha256": "a7e20a57ae6399ba3947919e51d4dfbe404214db6f28f912f7e47692f84fc3be"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/results/selected-outputs.csv",
+            "sha256": "92497d92c6b0eaabaa50f82b18f433a02ff9e67cc8893c9a5d3f19a23110f95e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/run-summary.json",
+            "sha256": "f0d12689fdf7565867df9b19b15a47ce0a948dd9cb6fc40ccb19d887298690d7"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/support-assessment.json",
+            "sha256": "f596567ce69683dd9daae372cc7355f92ceef3621fa8ede89d1851a689377ae9"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full/zon01-initialization.json",
+            "sha256": "b53a0eb555dcbe34c1f238dcb641e5910b9caf9c1380603d1baa910891304a69"
+          }
+        ]
+      },
+      "Summary": {
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary-command/receipt.json",
+          "sha256": "135120209ca2a7d362e8e420bcb74087c3d3f16f0a7858822b82ce6ca1649f4d"
+        },
+        "output_directory": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/diagnostics.json",
+            "sha256": "e17165767644add32f08dbbdbfe1d1e7e401e8b69b7c33654fd83a45ce4f5ff3"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/eplusrs.err",
+            "sha256": "36ad18439cd440cb99fdb443bcb032e50900c9dd4f10115f0e36a9f9ccb68850"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/input/converted.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/input/input-hashes.json",
+            "sha256": "4c58dceaf6843e5f8866590648009414f4a77338f54a960bcfb8fca56ce9b0fb"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/input/original.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/input/original.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/model/execution-plan.json",
+            "sha256": "1c79d234cb867ebe9067405d1745df24e99227313502018efe10bf0fda195caa"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/porting_scope.json",
+            "sha256": "c22e24c537892979abbf036d27a4169ed618a6d7edbe8126f98e5cde7afea0a8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/results/result-store.json",
+            "sha256": "a7e20a57ae6399ba3947919e51d4dfbe404214db6f28f912f7e47692f84fc3be"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/results/selected-outputs.csv",
+            "sha256": "92497d92c6b0eaabaa50f82b18f433a02ff9e67cc8893c9a5d3f19a23110f95e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/run-summary.json",
+            "sha256": "d4c7e861e6e8bdc7ce8bb3017469b92768436eeda33982deec6ee214ea3befe1"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/support-assessment.json",
+            "sha256": "0851f26b7143f29c4dab759b91fb6f4fee924295ca0f8968dd8f91ea267d7b9c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "Full": {
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full-command/receipt.json",
+          "sha256": "bfeb2cf2d1cfb6d6d53490d3da4dca5b6f5f078310845e3b5aca53df2cc17525"
+        },
+        "output_directory": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/clk02-weather-production-trace.json",
+            "sha256": "83daadbb42bbddc8bf47f216daf731b7df09af2e7916d0df645e426143052355"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/clk03-weather-day-production-trace.json",
+            "sha256": "7abdb41f754ace010e2e1800ba69a64682fda6fd1386523c85621e5fdca8aa79"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/clock-calls.json",
+            "sha256": "51e6b1467af9cdd666ce6cb1c44aaff3c2bb256250922b08e7c81a059d08d0fb"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/compiled-geometry.json",
+            "sha256": "cf7d7bffb37a0f4495abaa5b23a1fccf3dc47c5c40aeda53342df921a112918f"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/diagnostics.json",
+            "sha256": "4ade72c2132d653d7ade821ed57ddcf5d2b54a0772571bfa60ba7090dcddd6f7"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/eplusrs.err",
+            "sha256": "b26e081330ba6ef2c97cb3b91e67a3fd915c813fb9d01928161097118a461fb7"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/geo02-geometry-operands.json",
+            "sha256": "453f9eca554f4fe7eaaf1b0d5e06a028c2fc397bf6484da762417917dbaa4855"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/geo02-geometry.json",
+            "sha256": "8b9fc2ed14c5f562c62c15b30518fb0e954f87ed2f19ad3334e448957eac096c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/geo03-zone-volume.json",
+            "sha256": "6bb0545bb66c895eebcf080a9a0f278cf08d709abbd15436ad113e28d3c3ed4b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/geometry-consumers.json",
+            "sha256": "98662e8d9971b87640c66a9c1efd658beb677fcfab9e1873dd99947ab2ca3b5d"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/input/converted.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/input/input-hashes.json",
+            "sha256": "83b5c3e1d28f88774fce1c65d3ef8e2f90e266d2de000fd20fe39e604ba56ddc"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/input/original.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/input/original.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/logs/source-order-stage-state-snapshots.json",
+            "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/model/execution-plan.json",
+            "sha256": "7ca632ab84962388293d7c1f2f7935bb7e5d5f2d3c344146d2ee63714d38c519"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/porting_scope.json",
+            "sha256": "bbfed308053d866a61b2e67bd3d40205934506e9a3d4eaa73c029c70dc94599b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/psy02-calls.json",
+            "sha256": "7ba2f317b2bb7555175a7e9db1152b045b5c712762d1d0673482140354bbaba4"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/psychrometrics-calls.json",
+            "sha256": "237816341aba371bdd26fadaaa30cec0060d402ed6af086ee72674cc968548f5"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/results/result-store.json",
+            "sha256": "509d427ce49f40487428ef217c65b6ec4141e32b63c0c868fc09e15f14cd13f5"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/results/selected-outputs.csv",
+            "sha256": "7ca27c02a578619a24d15dd2f0147deb5b5e7040705249ecff83c6c394292324"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/run-summary.json",
+            "sha256": "123adb75e2c8691c26b0e6a8f4f5f44696703a1afd4338a50d4c5e8b0b29502a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/support-assessment.json",
+            "sha256": "f596567ce69683dd9daae372cc7355f92ceef3621fa8ede89d1851a689377ae9"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full/zon01-initialization.json",
+            "sha256": "15deacdf2473dfd637c6e4d8e3bd6469f770f0b730f96d25ec4caba3b24cc952"
+          }
+        ]
+      },
+      "Summary": {
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary-command/receipt.json",
+          "sha256": "69944df965db8c4bdc8173381e3d92f15844e55eabb632287aad1488590ae52f"
+        },
+        "output_directory": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/diagnostics.json",
+            "sha256": "a86f5a9e84b6cbf7da5af9f582cd15fc752a1c157989ae6aef40f5615bd2c182"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/eplusrs.err",
+            "sha256": "4efcbe266bcc47f7f818ddca15785347efa1473b155c52d171049b5c3095019f"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/input/converted.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/input/input-hashes.json",
+            "sha256": "d2faa5e162d63bbcbd4ed7d30023b5a1b88daec1f21ecb689a58fda57fe807a3"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/input/original.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/input/original.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/model/execution-plan.json",
+            "sha256": "1c79d234cb867ebe9067405d1745df24e99227313502018efe10bf0fda195caa"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/porting_scope.json",
+            "sha256": "bbfed308053d866a61b2e67bd3d40205934506e9a3d4eaa73c029c70dc94599b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/results/result-store.json",
+            "sha256": "509d427ce49f40487428ef217c65b6ec4141e32b63c0c868fc09e15f14cd13f5"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/results/selected-outputs.csv",
+            "sha256": "7ca27c02a578619a24d15dd2f0147deb5b5e7040705249ecff83c6c394292324"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/run-summary.json",
+            "sha256": "91bfd6d6f825fe4f6acc9c5f1cf24366aaa1cbc9f6f4349ef69c5a172bddc864"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/support-assessment.json",
+            "sha256": "0851f26b7143f29c4dab759b91fb6f4fee924295ca0f8968dd8f91ea267d7b9c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "Full": {
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full-command/receipt.json",
+          "sha256": "232eb22421778c8bcbfdb20e799d3186d3249188d86fc5be1ad79590a7cf1541"
+        },
+        "output_directory": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/clk02-weather-production-trace.json",
+            "sha256": "7e11312b7f584f8081ab369e6098944295c8c79e79ff9bf252adaa1f29e7139e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/clk03-weather-day-production-trace.json",
+            "sha256": "ef98634bbb10004e4290154b42142aa6449f2aa22e5c9a3149ee1fc518a87922"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/clock-calls.json",
+            "sha256": "1324209cdceca3ec6c1762869ab2c17b229ba11ecf55e78b93a37f85a696650a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/compiled-geometry.json",
+            "sha256": "5aff96b73f1f34458c6473fefba1ddcd2c1b331b82e69d6b1ce610d4c6a79071"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/diagnostics.json",
+            "sha256": "6d7a40d174d8d7db7022212a81172acbddaee1ff795c8092fa21ac76b38587ed"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/eplusrs.err",
+            "sha256": "7cab15b143ed82baa86e422875b71754842d752eba6e50c926d4ce74b7169b71"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/geo02-geometry-operands.json",
+            "sha256": "24d9bbcebcf4aeb81da006a4a05358a6841ffe0e6a07c30015982158402da3c5"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/geo02-geometry.json",
+            "sha256": "30f4b54678a2f972bcab9140628fbc00a2cfc60fb99a8dcccbb58446ebbc53d7"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/geo03-zone-volume.json",
+            "sha256": "5dc2c30d6072766bb97b9c3e69421d2cd37a4cc4097854d91443b2b6d17878af"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/geometry-consumers.json",
+            "sha256": "609fbce8359b00eb0cb30d53609e6b3dc8744a5c9536e387d78a84fe45343524"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/input/converted.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/input/input-hashes.json",
+            "sha256": "cc9331a2cb2c428ee518f03621ea2f979a91e3b43c98e0d643e2ffc9ed1e370f"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/input/original.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/input/original.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/logs/source-order-stage-state-snapshots.json",
+            "sha256": "daebe9bde2d889f52e0ed722483ad968b1d9b62c62554bce4fc6ea957c610beb"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/model/execution-plan.json",
+            "sha256": "70ca026a2af871e72dea0fccb6ba9054efb60e3cdc6b7ba60387a528be38d358"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/model/graph-summary.json",
+            "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/model/raw-model-summary.json",
+            "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/model/typed-model-summary.json",
+            "sha256": "adc67bb7fb889a7ac644864309af9beef2e5a6209af454a14576bbf2c04e385a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/porting_scope.json",
+            "sha256": "6c70446d6fb5ecfce4d468dd67d3aba59e5d1835c759cceebdc6f8c362284c86"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/psy02-calls.json",
+            "sha256": "f95585bdf8ec8e5ec0785b5e2859924c9a6647891d98f4d47cc84c641257fc95"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/psychrometrics-calls.json",
+            "sha256": "646b40f3b5bf2770a7d636ed240bc6400ef32d8d965dbeecfc772fc77668a08c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/reports/compatibility-boundary.md",
+            "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/reports/run-report.md",
+            "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/results/result-store.json",
+            "sha256": "fe1ac8d865b0c21cf385ea2747c7ffd905bed24e0cc9447bc921d758c540ea6e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/results/selected-outputs.csv",
+            "sha256": "8e818151cc8eb10aff92a7da0615ae7c958328df0acfe8eec09130d7c15fcad4"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/run-summary.json",
+            "sha256": "4f8912b77bdc9829400948dec0b399e0cb1b6166246f89d9e5f28e198b375d5c"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/support-assessment.json",
+            "sha256": "ba0685d062b0b41dd4c21bdd7ed6ee1e15417551913806a694b80b243317895b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/support-report.md",
+            "sha256": "1f6f0c0be130066f73fba39d7682cfb7d7d3b08b6abf5d7ea248387b4eac21f8"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full/zon01-initialization.json",
+            "sha256": "f23542259fb2fb65076c4c8bcb0d8711e93659d26d5995db58abe5d515dfc244"
+          }
+        ]
+      },
+      "Summary": {
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary-command/receipt.json",
+          "sha256": "74c1022660df398588a0fda3cf67e0360e2757a1807ebb61098fe32f9131c388"
+        },
+        "output_directory": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/diagnostics.json",
+            "sha256": "94a660f2a451c2265a95b1216ed165347da972c6d9a9d7c499e17a9bb471d720"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/eplusrs.err",
+            "sha256": "6378e1785504c5ddd01432b700f8855364f414b4cdff8ef44824beb9e82712f3"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/input/converted.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/input/input-hashes.json",
+            "sha256": "f082c244f7673df1f2d3e9900e68fed4b9d5ba13a4a687bd71be511b23f0ab35"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/input/original.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/input/original.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/model/execution-plan.json",
+            "sha256": "7d93e096cfb8e3f21369a54da4888e5d4ee73059225131fbe0b3b11722ad6e81"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/model/graph-summary.json",
+            "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/model/raw-model-summary.json",
+            "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/model/typed-model-summary.json",
+            "sha256": "adc67bb7fb889a7ac644864309af9beef2e5a6209af454a14576bbf2c04e385a"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/porting_scope.json",
+            "sha256": "6c70446d6fb5ecfce4d468dd67d3aba59e5d1835c759cceebdc6f8c362284c86"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/reports/compatibility-boundary.md",
+            "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/reports/run-report.md",
+            "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/results/result-store.json",
+            "sha256": "fe1ac8d865b0c21cf385ea2747c7ffd905bed24e0cc9447bc921d758c540ea6e"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/results/selected-outputs.csv",
+            "sha256": "8e818151cc8eb10aff92a7da0615ae7c958328df0acfe8eec09130d7c15fcad4"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/run-summary.json",
+            "sha256": "d60959b5c2cc91287feb7d14ebcd2766d6113eb0e42a6eb8cb2e8b3dbf39f83b"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/support-assessment.json",
+            "sha256": "4d5c90d5ff4e188fb8d32c1058969c31882abf78455446aaeb9058b28231cc32"
+          },
+          {
+            "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary/support-report.md",
+            "sha256": "1f6f0c0be130066f73fba39d7682cfb7d7d3b08b6abf5d7ea248387b4eac21f8"
+          }
+        ]
+      }
+    }
+  ],
+  "actual_command_count": 6,
+  "complete": true,
+  "original_outputs_supplied_to_Rust": false,
+  "gates_updated": false
+}

@@ -1,0 +1,4 @@
+# Keep historical copies out of default ripgrep development searches.
+# Inspect them explicitly with rg --no-ignore when reviewing evidence.
+reports/
+sources/

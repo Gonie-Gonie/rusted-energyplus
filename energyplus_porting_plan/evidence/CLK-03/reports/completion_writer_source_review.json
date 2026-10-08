@@ -1,0 +1,187 @@
+{
+  "schema": "clk03-independent-completion-writer-source-review.v1",
+  "status": "pass-source-before-proposed-closure-metadata",
+  "review_started_utc": "2026-10-08T09:38:32.936931+00:00",
+  "review_completed_utc": "2026-10-08T09:38:33.140296+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/completion-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-completion-writer-source-review-01/source/common.py",
+        "sha256": "f966ec1a2f28e28a3fdbb193d67bf39ce498cc1987ac2af833e47aa34bb2cc46"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/completion-prep-02/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-completion-writer-source-review-01/source/proofs.py",
+        "sha256": "c3758c935ebb3450449273e9bc3debf0b3b39368343dcf87de2931d8375ae17b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/completion-prep-02/quality.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-completion-writer-source-review-01/source/quality.py",
+        "sha256": "1b7c74702f24926d00211942ba53df95890c32e75c46da651895a2a6e547be4a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/completion-prep-02/document.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-completion-writer-source-review-01/source/document.py",
+        "sha256": "8e007bcc72f484b13c7458e3793f296b3507a9affd7df8d90d23dc3ee8fdc07c"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/completion-prep-02/propose_closure.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-completion-writer-source-review-01/source/propose_closure.py",
+        "sha256": "28b8cd33ce99435c8181b41cb9a53cc803f15c5ff6239709c548da60cadd9d88"
+      }
+    }
+  ],
+  "reviewed_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "reviewed_fixed_prerequisites": {
+    "PINNED.unit": {
+      "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-01/unit-comparison.json",
+      "sha256": "80fec36962d0583e7c69bd85e40afddb1cbb645ea0bc1ad53789c7b53a4d95c4"
+    },
+    "PINNED.unit_execution": {
+      "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-command-01/receipt.json",
+      "sha256": "d4f77a8d43a86f76f813345de679bfefb5384c135ef4dfff2ac9e71ae3e0900d"
+    },
+    "PINNED.unit_review": {
+      "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/review.json",
+      "sha256": "d2b1475f7f71760856a6f8de84138b8d7bbfdd591643d961140fc4f5a8b7342a"
+    },
+    "PINNED.unit_review_execution": {
+      "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-command-01/receipt.json",
+      "sha256": "a7dc77769546d6164a90a536b21ab703550f4a3984dc6471ab7e393cc95db38e"
+    },
+    "PINNED.plan": {
+      "path": ".runtime/porting/CLK-03/production-matched-plan-01/plan.json",
+      "sha256": "e549cad6a6926f4631b6e9f109931f793dbdf668259f6209625279270ebb3bc9"
+    },
+    "PINNED.source_review": {
+      "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/review.json",
+      "sha256": "250cd20c506ce9c7c5b66614a748f889d486e71f09f21565aae93d676d659c68"
+    },
+    "PINNED.matched_contract": {
+      "path": ".runtime/porting/CLK-03/production-matched-inputs-01/native-contract.json",
+      "sha256": "fa534ac3525b8d1e63e793ef37e46ba082501c1d0e149e111588d2096392d984"
+    },
+    "PINNED.matched_request": {
+      "path": ".runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json",
+      "sha256": "e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1"
+    },
+    "PINNED.matched_projection": {
+      "path": ".runtime/porting/CLK-03/production-matched-inputs-01/projection.json",
+      "sha256": "b768e6d30c5ac6b9a63602f6aef531acd87703b3ace2a105b7773fcee206cb7a"
+    },
+    "PINNED.original": {
+      "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+      "sha256": "0513bc94d02703d299cb0a63bc66fa11a0b405e0d0873d3e61a0916a4e123cdc"
+    },
+    "PINNED.original_review": {
+      "path": ".runtime/porting/CLK-03/independent-original-data-review-02/review.json",
+      "sha256": "b8874a962db7c71f6395a5b3ccd811e780fffacc048a76d67bc215634f756166"
+    },
+    "PINNED.gap": {
+      "path": ".runtime/porting/CLK-03/legacy-gap-05/gap.json",
+      "sha256": "340365c467b4dd606fa9721261e0ffd52f762662943875d1f2aab928bf858097"
+    },
+    "PINNED.failed_production": {
+      "path": ".runtime/porting/CLK-03/production-comparison-02/production-comparison.json",
+      "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+    },
+    "PINNED.failed_production_execution": {
+      "path": ".runtime/porting/CLK-03/production-comparison-command-02/receipt.json",
+      "sha256": "0fb86b4517921fb0bf9c9b236c26044d5c32ed13250c54823123d32d13ab5e5a"
+    },
+    "PINNED.failed_production_review": {
+      "path": ".runtime/porting/CLK-03/independent-production-failure-review-01/review.json",
+      "sha256": "77645ff38c2aab3a7b3c9a4b673b7abdfaa9e63ea70148f749c587fce6a7d4d6"
+    },
+    "PINNED.failed_production_review_execution": {
+      "path": ".runtime/porting/CLK-03/independent-production-failure-review-command-01/receipt.json",
+      "sha256": "06906d3ed754ebee7b6d1598f4b13fc281cf57574cc315d6ecfb777becd7da5d"
+    },
+    "PINNED.failed_reader": {
+      "path": ".runtime/porting/CLK-03/production-comparison-command-01/receipt.json",
+      "sha256": "5fdcca184e8c8a29c96f07705abddfa4e7c8dee3d3bda1a8b5b168a0ed56b701"
+    },
+    "QUALITY.workspace": {
+      "path": ".runtime/porting/CLK-03/final-workspace-unit-command-01/receipt.json",
+      "sha256": "f41f8d482379f979fc346091882600d03dd56bc89d01cf2a5ed84421b8905dc7"
+    },
+    "QUALITY.clippy": {
+      "path": ".runtime/porting/CLK-03/final-clippy-command-01/receipt.json",
+      "sha256": "ffc047375fc3b0950c3057db600a72b2b8c825c80f06377f35101eb18bced932"
+    },
+    "QUALITY.source_quality": {
+      "path": ".runtime/porting/CLK-03/final-source-quality-command-03/receipt.json",
+      "sha256": "9a591af959f70dbaab5356b0f8139760daec38aacf893e0d4d41e97a509abb03"
+    },
+    "QUALITY.structure": {
+      "path": ".runtime/porting/CLK-03/final-structure-command-06/receipt.json",
+      "sha256": "a97eb3d5910528e664c392b31ba628e04494ef2dc8ceba887719e07ff4f30e10"
+    },
+    "QUALITY.format": {
+      "path": ".runtime/porting/CLK-03/final-scoped-format-command-03/receipt.json",
+      "sha256": "d9f3ca3ae163c6d078105ea45fe1b2262b702124beb7c936c250818dcaf2693c"
+    },
+    "QUALITY.final_git_metadata": {
+      "path": ".runtime/porting/CLK-03/final-quality-git-metadata-command-01/receipt.json",
+      "sha256": "88bb66767cf6437822810f68fb2a82935d0873d0402f54a19eba1bbc12e5a9f3"
+    }
+  },
+  "reviewed_unclosed_canonical_files": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "1e432c806a5932256f52aa984722ba684a7699ee0a17cde0474d91f212688fb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-03.md",
+      "sha256": "dec57cbe35936cfe4280498c566a67c1a9df7f20298c61a9b221ca8b83673716"
+    }
+  ],
+  "executed_reader_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/completion-writer-source-review-prep-01/review_writer.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-completion-writer-source-review-01/source/executed_review_writer.py",
+        "sha256": "279b62e932a77c7e145d57e2618f8ff407737a2536f4ee3fc73f4ff40548f56c"
+      }
+    }
+  ],
+  "source_review_scope": [
+    "Only fresh ignored three-file proposals; canonical apply and native retirement are separately required.",
+    "Required actual unit239178/0, matched production positive/0, full independent reviews, six CLI0, matched483 data and final-source QA0.",
+    "Original14/51 chronology remains distinct from supplemental3/483; old1647956/1 remains failed.",
+    "Strict actual stdout protocols: full report/production QA; compact unit, Original, failure and lineage; ordered six child log tails/receipts/progress/final matrix.",
+    "Final scientific df88/47e/ca7b sources and separate actual precommit quality heads; no compiler-selected inventory claim.",
+    "Typed exact comparisons remain the existing scientific readers; this writer transcribes reports without recomputing operands.",
+    "Other63 plan tasks/root fields and prior card history preserved; four proposed gates do not constitute actual closure."
+  ],
+  "authorship_disclosure": "Reviewer did not author the five proposal sources or scientific comparers. Reviewer authored header/consumer and native glue and separately reviewed actual provenance; this static review does not independently certify those implementations.",
+  "scientific_execution_performed": false,
+  "target_sources_imported_or_executed": false,
+  "future_production_PASS_or_actual_card_closure_claimed": false,
+  "canonical_files_written": false,
+  "gates_updated": false,
+  "native_retirement_admitted": false,
+  "engines_Cargo_Git_or_comparers_executed_by_reviewer": false
+}

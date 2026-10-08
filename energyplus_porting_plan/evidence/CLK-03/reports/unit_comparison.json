@@ -1,0 +1,1075 @@
+{
+  "schema": "clk03-unit-comparison.v1",
+  "status": "pass-exact-selected-carrier-and-lifecycle-state",
+  "scientific_certification_passed": true,
+  "started_utc": "2026-10-08T08:42:59.049041+00:00",
+  "completed_utc": "2026-10-08T08:43:14.448736+00:00",
+  "actual_reader_command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    "tools/porting/check_clk03_unit.py",
+    "--original-reference",
+    ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+    "--original-command",
+    ".runtime/porting/CLK-03/original-command-03/receipt.json",
+    "--original-data-review",
+    ".runtime/porting/CLK-03/independent-original-data-review-02/review.json",
+    "--baseline-review",
+    ".runtime/porting/CLK-03/legacy-gap-05/gap.json",
+    "--baseline-command",
+    ".runtime/porting/CLK-03/legacy-gap-command-05/receipt.json",
+    "--rust-build",
+    ".runtime/porting/CLK-03/final-candidate-probe-build-01/build-receipt.json",
+    "--rust-execution",
+    ".runtime/porting/CLK-03/final-candidate-probe-command-01/receipt.json",
+    "--dto-projection",
+    ".runtime/porting/CLK-03/unit-dto-freeze-01/projection.json",
+    "--output-dir",
+    ".runtime/porting/CLK-03/final-candidate-unit-comparison-01"
+  ],
+  "actual_reader_cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+  },
+  "original_helper": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+    "sha256": "0513bc94d02703d299cb0a63bc66fa11a0b405e0d0873d3e61a0916a4e123cdc"
+  },
+  "original_command": {
+    "path": ".runtime/porting/CLK-03/original-command-03/receipt.json",
+    "sha256": "cb2f1e545802fcdcdf8015ce5ee2f405fefb02dcd35dd5b196550647dd45fcde"
+  },
+  "original_results": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/native-output/results.json",
+    "sha256": "d9b7c675e2a4ac77968b03a1e7c17a366f61a22e9ea4c1bed00b88a4a2ac0a34"
+  },
+  "independent_original_data_review": {
+    "path": ".runtime/porting/CLK-03/independent-original-data-review-02/review.json",
+    "sha256": "b8874a962db7c71f6395a5b3ccd811e780fffacc048a76d67bc215634f756166"
+  },
+  "legacy_gap": {
+    "path": ".runtime/porting/CLK-03/legacy-gap-05/gap.json",
+    "sha256": "340365c467b4dd606fa9721261e0ffd52f762662943875d1f2aab928bf858097"
+  },
+  "legacy_gap_command": {
+    "path": ".runtime/porting/CLK-03/legacy-gap-command-05/receipt.json",
+    "sha256": "97e3afebd97c101b1ded4101913cf55ce01099bfe8a80061602b1126d79d557a"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CLK-03/final-candidate-probe-build-01/build-receipt.json",
+    "sha256": "acbf047718079347630a20e01990597984e1b6e213153a470f1bf7f1db367435"
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/CLK-03/final-candidate-probe-command-01/receipt.json",
+    "sha256": "f7a23b1ca12ecf67bc2276ce8caf6753034d7c15c7792182425dadd51488cd35"
+  },
+  "Rust_results": {
+    "path": ".runtime/porting/CLK-03/final-candidate-probe-command-01/stdout.log",
+    "sha256": "7ea693890bfb7c711cbf51610f2fe03481b67adc5ac6504b9efbc1c2064562fa"
+  },
+  "implementation_commit": "df88eb4c7b03cd8a04ad09d5fce3300a4d5b7b22",
+  "crates_tree": "47e544dafabcec8e30197597b8832ee1c290c8fc",
+  "committed_source_certification": true,
+  "available_source_inventory_count": 3718,
+  "actual_Rust_finished_utc": "2026-10-08T08:42:21.757622+00:00",
+  "declared_pre_execution_DTO_projection": {
+    "path": ".runtime/porting/CLK-03/unit-dto-freeze-01/projection.json",
+    "sha256": "4417bed908752814a1a5ea1bd79c1b2af13c0979fb6f2ca11dd3691a31285b6b"
+  },
+  "selected_policy": {
+    "pure_handoff_full_owners": [
+      "global",
+      "environment",
+      "weather",
+      "today_variables",
+      "tomorrow_variables",
+      "today_values",
+      "tomorrow_values",
+      "last_hour",
+      "next_hour",
+      "missing_values",
+      "missed_counts",
+      "out_of_range_counts"
+    ],
+    "raw_header_owner_keys": [
+      "EPWHeaderTitle",
+      "WeatherFileLocationTitle",
+      "WeatherFileLatitude",
+      "WeatherFileLongitude",
+      "WeatherFileTimeZone",
+      "WeatherFileElevation",
+      "WFAllowsLeapYears",
+      "EPWDaylightSaving",
+      "EPWDST",
+      "DST",
+      "NumSpecialDays",
+      "SpecialDays",
+      "NumDataPeriods",
+      "NumIntervalsPerHour",
+      "DataPeriods",
+      "SpecialDays_allocated",
+      "DataPeriods_allocated",
+      "LeapYearAdd",
+      "EndDayOfMonth",
+      "wvarsMissedCounts.WeathCodes"
+    ],
+    "semantic_stream_keys": [
+      "is_open",
+      "good",
+      "eof",
+      "fail",
+      "bad",
+      "position_available",
+      "position_byte",
+      "file_path"
+    ],
+    "lifecycle_global": "all emitted typed caller/global clock fields",
+    "lifecycle_environment_discrete": [
+      "DayOfYear",
+      "DayOfYear_Schedule",
+      "Year",
+      "Month",
+      "DayOfMonth",
+      "DayOfWeek",
+      "HolidayIndex",
+      "DSTIndicator",
+      "YearTomorrow",
+      "MonthTomorrow",
+      "DayOfMonthTomorrow",
+      "DayOfWeekTomorrow",
+      "HolidayIndexTomorrow",
+      "TotDesDays",
+      "CurEnvirNum",
+      "RunPeriodStartDayOfWeek",
+      "EnvironmentName",
+      "EndMonthFlag",
+      "EndYearFlag"
+    ],
+    "lifecycle_environment_literal_reals": [
+      "Latitude",
+      "Longitude",
+      "Elevation"
+    ],
+    "lifecycle_weather_control": "all emitted typed owner controls",
+    "lifecycle_weather_control_reals": [
+      "ReadEPlusWeatherCurTime",
+      "TimeStepFraction",
+      "IsRainThreshold"
+    ],
+    "lifecycle_daily_discrete": [
+      "DayOfYear",
+      "DayOfYear_Schedule",
+      "Year",
+      "Month",
+      "DayOfMonth",
+      "DayOfWeek",
+      "DaylightSavingIndex",
+      "HolidayIndex"
+    ],
+    "lifecycle_grid_structure": [
+      "allocated",
+      "time_steps",
+      "hours",
+      "ordering"
+    ],
+    "selected_environment_context": [
+      "CurrentCycle",
+      "SetWeekDays"
+    ],
+    "shared_raw_counter": "header.wvarsMissedCounts.WeathCodes and missed_counts.WeathCodes",
+    "within_lane_handoff": "full11 daily plus full17 every slot, environment projection and RptDayType/PreviousHour",
+    "unpaired_scope": [
+      "Native-generated processed weather numeric/boolean values and daily solar coefficients",
+      "Physical missing/range count generation and missing-value cache generation",
+      "Standard barometric pressure preparation formula and other physical producer formulas",
+      "Full native EnvironmentData design-day registry, Interpolation and SolarInterpolation arrays",
+      "Native DSTIndex, SpecialDayTypes and WeekDayTypes source-only arrays",
+      "Native rdstate integer bits, diagnostic/error text and private source-local variables",
+      "Native stored record indices (unobserved); Rust raw provenance is not a native index",
+      "Raw-header source_only_context from unowned Typical/Extreme and Ground calculations",
+      "BeginEnvrn interior handoff input is not separately snapshotted by the native helper"
+    ],
+    "unavailable_counted_as_PASS": false
+  },
+  "comparison": {
+    "comparison_count": 239178,
+    "mismatch_count": 0,
+    "categories": {
+      "full_literal_owner": 30339,
+      "full_literal_owner/binary64": 97482,
+      "full_literal_owner/cardinality": 74,
+      "raw_header_owner": 11323,
+      "raw_header_owner/binary64": 756,
+      "raw_header_owner/cardinality": 719,
+      "source_stream": 1251,
+      "input_identity": 189,
+      "outcome_availability": 150,
+      "selected_call_result": 201,
+      "within_lane_transport/binary64": 63624,
+      "within_lane_transport": 17820,
+      "within_lane_transport/cardinality": 44,
+      "caller_clock": 3496,
+      "caller_clock/binary64": 152,
+      "day_environment": 2888,
+      "day_environment/binary64": 456,
+      "weather_control": 3648,
+      "weather_control/binary64": 456,
+      "daily_discrete": 2432,
+      "daily_grid_structure": 1216,
+      "raw_parser_counter": 152,
+      "selected_environment_control": 304,
+      "cardinality": 6
+    },
+    "mismatches": [],
+    "mismatch_payload_limit": 1000,
+    "unavailable_operand_count": 114,
+    "unavailable_operands_counted_as_PASS": false,
+    "mismatch_payloads_truncated": false
+  },
+  "coverage": {
+    "requested_counts": {
+      "handoff_sequences": 4,
+      "handoff_operations": 7,
+      "weather_sequences": 10,
+      "weather_operations": 44,
+      "total_sequences": 14,
+      "total_operations": 51
+    },
+    "actual_native_status_counts": {
+      "source_returned": 46,
+      "source_fatal": 2,
+      "not-invoked-after-prior-source-outcome": 3
+    },
+    "within_lane_literal_transport_boundaries": {
+      "Rust": 22,
+      "original": 22
+    },
+    "unavailable_interior_handoff_boundaries": [
+      {
+        "lane": "Rust",
+        "operation": "weather/A-24H/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "original",
+        "operation": "weather/A-24H/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "Rust",
+        "operation": "weather/A-72H/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "original",
+        "operation": "weather/A-72H/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "Rust",
+        "operation": "weather/B-BOTH-24H/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "original",
+        "operation": "weather/B-BOTH-24H/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "Rust",
+        "operation": "weather/DECOY-OFFSET-HOUR24/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "original",
+        "operation": "weather/DECOY-OFFSET-HOUR24/warmup-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "Rust",
+        "operation": "weather/DECOY-OFFSET-HOUR1/run-day-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "original",
+        "operation": "weather/DECOY-OFFSET-HOUR1/run-day-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "Rust",
+        "operation": "weather/FIRST-DAY-THREE-DAYS/run-day-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      },
+      {
+        "lane": "original",
+        "operation": "weather/FIRST-DAY-THREE-DAYS/run-day-1",
+        "boundary": "native helper does not snapshot between first read and interior handoff",
+        "counted_as_PASS": false
+      }
+    ],
+    "unavailable_value_paths": [
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/constructor/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/allocated_defaults/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/final_state/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/copy-defaults/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/copy-defaults/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/copy-defaults/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/CTOR-COPY-DEFAULTS/copy-defaults/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/constructor/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/allocated_defaults/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/final_state/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/first/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/first/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/first/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/first/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/repeat-with-new-tomorrow/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/repeat-with-new-tomorrow/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/repeat-with-new-tomorrow/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-BEGIN-ENV-POSITIVE-HOLIDAY/repeat-with-new-tomorrow/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/constructor/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/allocated_defaults/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/final_state/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/first/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/first/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/first/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/first/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/repeat-with-new-tomorrow/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/repeat-with-new-tomorrow/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/repeat-with-new-tomorrow/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-ZERO-HOLIDAY/repeat-with-new-tomorrow/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/constructor/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/allocated_defaults/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/final_state/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/first/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/first/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/first/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/first/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/repeat-with-new-tomorrow/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/repeat-with-new-tomorrow/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/repeat-with-new-tomorrow/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "handoff/COPY-NORMAL-NEGATIVE-HOLIDAY/repeat-with-new-tomorrow/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/warmup-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/warmup-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-24H/end-environment-rewind/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/warmup-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/warmup-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/run-day-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/run-day-3/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/A-72H/end-environment-rewind/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/warmup-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/warmup-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/B-BOTH-24H/end-environment-rewind/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/warmup-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/warmup-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/run-day-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR24/end-environment-rewind/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR1/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR1/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR1/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR1/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR1/run-day-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DECOY-OFFSET-HOUR1/end-environment-rewind/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/run-day-2/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/run-day-3/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/FIRST-DAY-THREE-DAYS/end-environment-rewind/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/final_state/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/run-day-1/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/run-day-1/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/end-environment-rewind/call_outcome/source_fatal",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/end-environment-rewind/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/end-environment-rewind/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/MISSING-MATCH-DEFINED-FAILURE/end-environment-rewind/after/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/OUTSIDE-DATA-PERIOD/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/OUTSIDE-DATA-PERIOD/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/OUTSIDE-DATA-PERIOD/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/OUTSIDE-DATA-PERIOD/get-next-environment/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/OUTSIDE-DATA-PERIOD/run-day-1/call_outcome/source_fatal",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/OUTSIDE-DATA-PERIOD/end-environment-rewind/call_outcome/source_fatal",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-REPLAY/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-REPLAY/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-REPLAY/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-REPLAY/read-first/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-REPLAY/handoff-with-live-input-stream/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-REPLAY/replay-search-from-current-position/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-BACKSPACE-ONE-RECORD/prepared/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-BACKSPACE-ONE-RECORD/get-next-environment/before_caller/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-BACKSPACE-ONE-RECORD/get-next-environment/before/stream/position_byte",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      },
+      {
+        "location": "weather/DIRECT-READDAY-BACKSPACE-ONE-RECORD/read-first/returned_bool",
+        "actual_available": false,
+        "original_available": false,
+        "counted_as_PASS": false
+      }
+    ],
+    "unpaired_fields_counted_as_PASS": false
+  },
+  "executed_reader_source_archives": [
+    {
+      "historical_path": "tools/porting/check_clk03_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-01/source/check_clk03_unit.py",
+        "sha256": "8b77430dd686b4291f756be26d2962d38cc611e6dae31d39b321cb9b244ecfe6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-01/source/geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_unit_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/final-candidate-unit-comparison-01/source/clk03_unit_state.py",
+        "sha256": "7aff322a5c1278cbd22bd37d00145f8de02023075e51dd0d26aeff99687013e1"
+      }
+    }
+  ],
+  "engines_executed_by_reader": false,
+  "Cargo_executed_by_reader": false,
+  "Git_executed_by_reader": false,
+  "reference_outputs_supplied_to_Rust": false,
+  "original_RHS_recomputed": false,
+  "gates_updated": false,
+  "unpaired_scope": [
+    "Native-generated processed weather numeric/boolean values and daily solar coefficients",
+    "Physical missing/range count generation and missing-value cache generation",
+    "Standard barometric pressure preparation formula and other physical producer formulas",
+    "Full native EnvironmentData design-day registry, Interpolation and SolarInterpolation arrays",
+    "Native DSTIndex, SpecialDayTypes and WeekDayTypes source-only arrays",
+    "Native rdstate integer bits, diagnostic/error text and private source-local variables",
+    "Native stored record indices (unobserved); Rust raw provenance is not a native index",
+    "Raw-header source_only_context from unowned Typical/Extreme and Ground calculations",
+    "BeginEnvrn interior handoff input is not separately snapshotted by the native helper"
+  ],
+  "unavailable_counted_as_PASS": false,
+  "limits": [
+    "Full supplied-carrier copies pair literal typed values, including signed zero; no generated processed physics parity is claimed.",
+    "Lifecycle selected dates, caller flags, source clock controls, actual counters and available byte positions compare exactly.",
+    "Full original constructor/preparation/registry arrays are not claimed by a selected Rust session.",
+    "Generated full-carrier transport is checked within each actual lane when its before/after boundary is observed.",
+    "The BeginEnvrn interior native handoff boundary remains unavailable; it is never counted as a passing comparison.",
+    "Source-error text/private-local parity and production invocation require separate evidence."
+  ]
+}

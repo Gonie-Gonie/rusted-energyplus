@@ -1,0 +1,333 @@
+{
+  "schema": "clk03-matched-production-input-projection.v1",
+  "status": "declared-input-only-caller-history-before-supplemental-original-execution",
+  "created_utc": "2026-10-08T08:48:38.972669+00:00",
+  "actual_metadata_writer_command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-03/production-matched-prep-01/prepare_inputs.py",
+    "--source-review",
+    ".runtime/porting/CLK-03/independent-production-matched-input-source-review-01/review.json",
+    "--output-dir",
+    ".runtime/porting/CLK-03/production-matched-inputs-01"
+  ],
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "old_unit_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+  },
+  "matched_request": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json",
+    "sha256": "e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "input_byte_maps": {
+    "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+    "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+  },
+  "input_artifacts": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour24-03.idf",
+      "sha256": "6bd6bb410a5c2d74e54f5b78e3202981aabe1e70b1143e4d3103f1980e7e1deb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+      "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/decoy-offset-hour1-03.idf",
+      "sha256": "d6a77c04de81c6c52fdf57814d1587c8077d1131738090955387c411aa1460ce"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/first-day-three-days-03.idf",
+      "sha256": "2e6eae5aa9b927349d751711ecffc1659b2482b02be22bf845a2ac9e3c5afb15"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/missing-match-defined-failure-03.idf",
+      "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+      "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/outside-data-period-03.idf",
+      "sha256": "ee541d85aa0b8e5091ca65de16175e6f9aaad9fc87c09f2aa3051ed73d4e7297"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-replay-04.idf",
+      "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+      "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/direct-readday-backspace-one-record-04.idf",
+      "sha256": "6ee18363617179702de63547d948bf013bb10beb57dd3db4bb8e3b84aed66a04"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+      "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+    }
+  ],
+  "requested_counts": {
+    "weather_sequences": 3,
+    "GetNextEnvironment": 3,
+    "InitializeWeather": 480,
+    "total_operations": 483
+  },
+  "independent_input_source_review": {
+    "path": ".runtime/porting/CLK-03/independent-production-matched-input-source-review-01/review.json",
+    "sha256": "7b29128aa70c6f8f00e3387b030bc31b72119886ec3231f85a82dd676d8222ec"
+  },
+  "caller_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/prepare_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/00-prepare_inputs.py",
+        "sha256": "6b31149b9fb0c81c879159e4154f504533cf53e0458768c91c7fd405b0eadbe7"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/production.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/01-production.rs",
+        "sha256": "7ad079ee868bfecd86be556524724fb27b2f7096b5bc8161ce1aba82585560bd"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 80,
+          "end_line": 90,
+          "sha256": "aaafdfedda3595cd4ef036721d5e6bb80a03657ea384d1695348e7fced24523d"
+        },
+        {
+          "start_line": 98,
+          "end_line": 132,
+          "sha256": "941cf784c9177f93a4cffd287d65bfa3613332d4289a440a933cb2aaf8215213"
+        },
+        {
+          "start_line": 208,
+          "end_line": 235,
+          "sha256": "6cebdf373d794fa03c79a8308cd0ab6334081a44f8136fbecbff65c2ff7ec7b4"
+        },
+        {
+          "start_line": 250,
+          "end_line": 268,
+          "sha256": "e057d3e63f1afc6b3bacfa33a1678daa1c55649a9749df94244ac18bc3a19877"
+        }
+      ]
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/02-lifecycle.rs",
+        "sha256": "e614140a18aff88131551c80a4cd376bd790610a592e0cd807b34c87254cb873"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 380,
+          "end_line": 395,
+          "sha256": "9e12261d3be4b356a422197e2c75e445957e5830f1c21c054b8e414c083419bf"
+        }
+      ]
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/03-SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 475,
+          "end_line": 554,
+          "sha256": "85e83fdaa644d6fbb76787d97112fe3ab07480fe96b355e59e3b437c4272cc3a"
+        }
+      ]
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/04-WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 1737,
+          "end_line": 1743,
+          "sha256": "4b1f928bd950038db316d9fe7d78ecf6d3525f43ce60da791d2170c1f9f8156c"
+        },
+        {
+          "start_line": 1796,
+          "end_line": 1830,
+          "sha256": "a880212c2ccf55b0dc20060573672c97b7f4029b404c1d0a26b5fa2f5688d043"
+        },
+        {
+          "start_line": 1954,
+          "end_line": 1976,
+          "sha256": "ca64c7d490848f92da6704a0bf2a9eeaab86ee42983d0bae62454cb8d41e34e3"
+        },
+        {
+          "start_line": 1994,
+          "end_line": 2034,
+          "sha256": "f1c9f39c75dbdcc07e5e71d11883d833dd0dc1cbb4d69ebf64d42cda361dd973"
+        }
+      ]
+    }
+  ],
+  "retained_prior_policy": {
+    "path": ".runtime/porting/CLK-03/production-plan-01/plan.json",
+    "sha256": "3148fbbdcb5215a437eb03f0778039adf73deaa75b67a9f22c84161e84585a7b"
+  },
+  "prior_selected_field_arrays": {
+    "environment": [
+      "DayOfYear",
+      "DayOfYear_Schedule",
+      "Year",
+      "Month",
+      "DayOfMonth",
+      "DayOfWeek",
+      "HolidayIndex",
+      "DSTIndicator",
+      "YearTomorrow",
+      "MonthTomorrow",
+      "DayOfMonthTomorrow",
+      "DayOfWeekTomorrow",
+      "HolidayIndexTomorrow",
+      "TotDesDays",
+      "CurEnvirNum",
+      "EnvironmentName",
+      "EndMonthFlag",
+      "EndYearFlag"
+    ],
+    "weather": [
+      "Envrn",
+      "NumOfEnvrn",
+      "TotRunPers",
+      "TotRunDesPers",
+      "NumDataPeriods",
+      "NumIntervalsPerHour",
+      "NumSpecialDays",
+      "LeapYearAdd",
+      "RptDayType",
+      "CurDayOfWeek",
+      "curSimDayForEndOfRunPeriod",
+      "GetBranchInputOneTimeFlag",
+      "GetEnvironmentFirstCall",
+      "FirstCall",
+      "WaterMainsParameterReport",
+      "LastHourSet",
+      "WeatherFileExists",
+      "DatesShouldBeReset",
+      "StartDatesCycleShouldBeReset",
+      "Jan1DatesShouldBeReset",
+      "RPReadAllWeatherData",
+      "UseDaylightSaving",
+      "UseSpecialDays",
+      "DaylightSavingIsActive",
+      "ReadEPlusWeatherCurTime",
+      "TimeStepFraction",
+      "IsRainThreshold"
+    ],
+    "daily": [
+      "DayOfYear",
+      "DayOfYear_Schedule",
+      "Year",
+      "Month",
+      "DayOfMonth",
+      "DayOfWeek",
+      "DaylightSavingIndex",
+      "HolidayIndex"
+    ],
+    "header": [
+      "EPWHeaderTitle",
+      "WeatherFileLocationTitle",
+      "WeatherFileLatitude",
+      "WeatherFileLongitude",
+      "WeatherFileTimeZone",
+      "WeatherFileElevation",
+      "WFAllowsLeapYears",
+      "EPWDaylightSaving",
+      "EPWDST",
+      "DST",
+      "NumSpecialDays",
+      "SpecialDays",
+      "NumDataPeriods",
+      "NumIntervalsPerHour",
+      "DataPeriods",
+      "SpecialDays_allocated",
+      "DataPeriods_allocated",
+      "LeapYearAdd",
+      "EndDayOfMonth",
+      "wvarsMissedCounts.WeathCodes"
+    ],
+    "stream": [
+      "is_open",
+      "good",
+      "eof",
+      "fail",
+      "bad",
+      "position_available",
+      "position_byte"
+    ],
+    "context": [
+      "current_cycle",
+      "set_week_days"
+    ]
+  },
+  "preserved_failed_comparison": {
+    "path": ".runtime/porting/CLK-03/production-comparison-02/production-comparison.json",
+    "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+  },
+  "preserved_failed_execution": {
+    "path": ".runtime/porting/CLK-03/production-comparison-command-02/receipt.json",
+    "sha256": "0fb86b4517921fb0bf9c9b236c26044d5c32ed13250c54823123d32d13ab5e5a"
+  },
+  "prior_actual_mismatch_relabelled_unavailable_or_PASS": false,
+  "old_contract_plan_report_or_policy_rewritten": false,
+  "clock_model": "literal selected production set_phase/current_for assignments; PreviousHour only on actual external hour/day transition; whole native InitializeWeather owns retained writes",
+  "initial_token": "GetNext after initial phase, one initial Initialize; duplicate seed/first-loop consumer identity invokes no additional Initialize",
+  "terminal": "final zone timestep EndEnvrn before consumer; no duplicate finish initialization or day prefetch",
+  "warmup_inserted": false,
+  "native_thermal_callback_parity_claimed": false,
+  "Rust_trace_or_native_result_deserialized_as_input": false,
+  "scientific_execution_performed": false,
+  "expected_values_supplied": false,
+  "prospective_PASS_claimed": false,
+  "gates_updated": false
+}

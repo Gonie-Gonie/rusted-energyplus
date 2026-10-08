@@ -1,0 +1,95 @@
+{
+  "schema": "clk03-independent-matched-production-original-data-review.v1",
+  "status": "pass-original-matched-history-before-production",
+  "review_started_utc": "2026-10-08T09:21:20.835916+00:00",
+  "review_completed_utc": "2026-10-08T09:21:45.271614+00:00",
+  "reviewed_reference": {
+    "path": ".runtime/porting/CLK-03/matched-original-first-01/helper-reference.json",
+    "sha256": "172d704acb24b84bc120b9f6ecb173426b7b247a1f24cbe2a543c893c1a35974"
+  },
+  "reviewed_results": {
+    "path": ".runtime/porting/CLK-03/matched-original-first-01/native-output/results.json",
+    "sha256": "2021ce329ef2b646c6ea2540a41c4dc5ba5378efbb928eea3018ea69810d8d55"
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json",
+    "sha256": "e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1"
+  },
+  "reviewed_contract": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/native-contract.json",
+    "sha256": "fa534ac3525b8d1e63e793ef37e46ba082501c1d0e149e111588d2096392d984"
+  },
+  "reviewed_execution": {
+    "path": ".runtime/porting/CLK-03/matched-original-first-01/helper-command.json",
+    "sha256": "f202426ce235ba013be8b34f9caa46c9fd86d81de555c9687a86496364556a2a"
+  },
+  "reviewed_outer_execution": {
+    "path": ".runtime/porting/CLK-03/matched-original-command-01/receipt.json",
+    "sha256": "457279ec0ffe730521d88a1c2761d74bd27b29a3c5d6dd083341f7eb80f730e7"
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CLK-03/matched-native-build-01/native-driver-build.json",
+    "sha256": "a0fbe3ff2a6c807c33a0db14a39f518dce0514d6f1b8086ffbc3e974763d64ea"
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-native-build-review-01/review.json",
+    "sha256": "33792e1dc9c3a5fa1b7374a405d1904f97d235d6f6ce463dd96af34aef278b92"
+  },
+  "reviewed_plan": {
+    "path": ".runtime/porting/CLK-03/production-matched-plan-01/plan.json",
+    "sha256": "e549cad6a6926f4631b6e9f109931f793dbdf668259f6209625279270ebb3bc9"
+  },
+  "reviewed_production_sources": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/review.json",
+    "sha256": "250cd20c506ce9c7c5b66614a748f889d486e71f09f21565aae93d676d659c68"
+  },
+  "actual_operation_invocations": 483,
+  "actual_operations_skipped": 0,
+  "actual_operation_counts": {
+    "GetNextEnvironment": 3,
+    "InitializeWeather": 480
+  },
+  "actual_source_status_counts": {
+    "source_returned": 483
+  },
+  "actual_case_observations": [
+    {
+      "id": "A-24H",
+      "actual_operation_count": 97,
+      "all_intended_whole_operations_invoked_and_returned": true
+    },
+    {
+      "id": "A-72H",
+      "actual_operation_count": 289,
+      "all_intended_whole_operations_invoked_and_returned": true
+    },
+    {
+      "id": "B-BOTH-24H",
+      "actual_operation_count": 97,
+      "all_intended_whole_operations_invoked_and_returned": true
+    }
+  ],
+  "actual_DTO_binary64_representation_counts": {
+    "positive_zero": 1238457,
+    "finite": 3139743
+  },
+  "actual_carrier_storage_observations": {
+    "weather17": 285840,
+    "semantic_stream_snapshots": 1512,
+    "unallocated_grids": 78,
+    "daily11": 3024,
+    "allocated_grids": 2946
+  },
+  "scientific_values_compared": false,
+  "native_Rust_Cargo_or_Git_executed_by_review_target": false,
+  "gates_updated": false,
+  "unavailable_counted_as_PASS": false,
+  "native_internal_record_index_claimed": false,
+  "processed_physics_cross_lane_certified": false,
+  "independent_source_call_glue_certified_by_this_reviewer": false,
+  "executed_metadata_reader": {
+    "path": ".runtime/porting/CLK-03/independent-matched-original-data-review-02/executed-reviewer.py",
+    "sha256": "19e316ba173e29a6c14c181c6fb3250ac60fa383c10bdf30686ccdf64425a49a"
+  },
+  "authorship_disclosure": "Reviewer authored supplemental native dispatcher/build and launcher glue. This data review independently authenticates Root actual execution, preserved byte bindings, observed outcome/storage/DTO integrity and pre-execution peer reviews. It does not independently certify self-authored call glue or any generated scientific values."
+}

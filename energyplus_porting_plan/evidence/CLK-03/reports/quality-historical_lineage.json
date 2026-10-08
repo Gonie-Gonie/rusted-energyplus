@@ -1,0 +1,152 @@
+{
+  "schema": "clk03-independent-quality-source-lineage-review.v1",
+  "status": "pass-exact-function-move-and-test-format-only-lineage",
+  "review_started_utc": "2026-10-08T08:28:34.807898+00:00",
+  "review_completed_utc": "2026-10-08T08:28:43.672632+00:00",
+  "reviewed_actual_scientific_unit_result": {
+    "path": ".runtime/porting/CLK-03/independent-unit-result-review-03/review.json",
+    "sha256": "7ea5784401433cd0fda4b552528673dee840b2c6dca0ba8c8bb82479855a6014"
+  },
+  "historical_scientific_commit": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+  "historical_scientific_crates_tree": "6da001a8e6a06a33df97a1bced3518a2ce7abf19",
+  "historical_scientific_available_source_snapshot": {
+    "path": ".runtime/porting/source-objects/83/8314c7b133f78270cb974580c683daaa5f8ebbd94be918d70fc5d64f652ecb70",
+    "sha256": "8314c7b133f78270cb974580c683daaa5f8ebbd94be918d70fc5d64f652ecb70"
+  },
+  "historical_available_source_inventory_count": 3716,
+  "final_available_Rust_sources_delta": 2,
+  "source_path_differences": [
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "before": {
+        "path": ".runtime/porting/source-objects/eb/eb6d2c9c3f0133bfb1c39419af49b98215f83a7552fac99f9efa310b83801e42",
+        "sha256": "eb6d2c9c3f0133bfb1c39419af49b98215f83a7552fac99f9efa310b83801e42"
+      },
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+        "sha256": "e625a6e3c0e7b84c7a3a17a728517369fa1017c260c055bd2229c2ca5e575f60"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/solar.rs",
+      "before": {
+        "path": ".runtime/porting/source-objects/79/79fd7dcfd721367b863f0b5ee24ac4632ecd6db9f12896c9c8ecf2e01e506132",
+        "sha256": "79fd7dcfd721367b863f0b5ee24ac4632ecd6db9f12896c9c8ecf2e01e506132"
+      },
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/solar.rs",
+        "sha256": "312ed2dc03795a6616ad183d745ba6a3ed2c48bc558f566ea0eac2639b301a5b"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/runtime/tests/production_weather.rs",
+      "before": {
+        "path": ".runtime/porting/source-objects/a6/a63aa6fe138652cebced2920cbc35de46f1c1506a61abb8ea97c9d71799204bd",
+        "sha256": "a63aa6fe138652cebced2920cbc35de46f1c1506a61abb8ea97c9d71799204bd"
+      },
+      "after": {
+        "path": "crates/ep_runtime/src/runtime/tests/production_weather.rs",
+        "sha256": "9759bc2b8d22f1f971ac83632c7bd16e785932f5377e7dc1b568f289a4bc4312"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/solar/interpolation.rs",
+      "before": null,
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/solar/interpolation.rs",
+        "sha256": "3ac6e8b575b9373e0ec9d13affd009bc36dcb25200292203a9f0d1e5ecc9444c"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "before": null,
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+        "sha256": "61c697094d99adbb56f9a49ee74ee3af0481e67d312200a7934d705d2986151f"
+      }
+    }
+  ],
+  "moved_function_names": [
+    "weighted_solar_value",
+    "solar_weather_interpolation_weights",
+    "solar_interpolation_weight",
+    "sample_heat_balance_run_period"
+  ],
+  "literal_function_signatures_and_bodies_unchanged": true,
+  "parent_module_reverse_move_reconstructs_entire_old_source": true,
+  "existing_pub_crate_reexports_preserve_same_caller_paths": true,
+  "test_change_only_exact_line_wrap": true,
+  "standalone_wrapper_literal_signature_and_body_unchanged": true,
+  "shared_run_period_driver_whole_source_reconstructed": true,
+  "preserved_prior_metadata_attempt": {
+    "path": ".runtime/porting/CLK-03/quality-source-lineage-review-command-01/receipt.json",
+    "sha256": "c3d9a85f35820e61b2dfc10c04542c961a23f2a133a5b0d385aa0689b8dad5f3"
+  },
+  "reviewed_original_quality_script_command": {
+    "path": ".runtime/porting/CLK-03/final-quality-original-script-command-01/receipt.json",
+    "sha256": "fb8024cc2de148126663e749c45acdc8ee8f62f10b232f09c2e8e995650a0b12"
+  },
+  "reviewed_quality_script_before": {
+    "path": ".runtime/porting/CLK-03/final-quality-original-script-command-01/stdout.log",
+    "sha256": "b36e5f7f3c3484bf7113442d0e1f937d1954829ebf517105a14b9979291b7179"
+  },
+  "reviewed_quality_script_after": {
+    "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/final-heat-balance-structure-audit.ps1",
+    "sha256": "39584f7b4c49d2ce6792418866efb89973aa27c9fd78e575ce13417816114a6b"
+  },
+  "quality_script_reverse_declared_changes_reconstructs_entire_old_source": true,
+  "existing_quality_line_limits_and_calculation_isolation_not_relaxed": true,
+  "all_other_previously_available_source_bytes_unchanged": true,
+  "full_final_source_snapshot_equal_to_scientific_snapshot": false,
+  "final_source_is_already_scientifically_executed_claimed": false,
+  "physics_values_recomputed_or_compared": false,
+  "engines_Cargo_Git_executed_by_reviewer": false,
+  "tracked_files_or_gates_changed": false,
+  "authorship_disclosure": "Reviewer authored the thermal owned-weather test and consumer bridges. This review independently verifies Root solar move and exact source lineage; it does not independently certify self-authored thermal semantics.",
+  "reviewed_source_archives": [
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/solar.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/crates__ep_runtime__src__heat_balance__solar.rs",
+        "sha256": "312ed2dc03795a6616ad183d745ba6a3ed2c48bc558f566ea0eac2639b301a5b"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/solar/interpolation.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/crates__ep_runtime__src__heat_balance__solar__interpolation.rs",
+        "sha256": "3ac6e8b575b9373e0ec9d13affd009bc36dcb25200292203a9f0d1e5ecc9444c"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/crates__ep_runtime__src__heat_balance__run_period.rs",
+        "sha256": "e625a6e3c0e7b84c7a3a17a728517369fa1017c260c055bd2229c2ca5e575f60"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/run_period/standalone.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/crates__ep_runtime__src__heat_balance__run_period__standalone.rs",
+        "sha256": "61c697094d99adbb56f9a49ee74ee3af0481e67d312200a7934d705d2986151f"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/runtime/tests/production_weather.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/crates__ep_runtime__src__runtime__tests__production_weather.rs",
+        "sha256": "9759bc2b8d22f1f971ac83632c7bd16e785932f5377e7dc1b568f289a4bc4312"
+      }
+    }
+  ],
+  "executed_reader": {
+    "path": ".runtime/porting/CLK-03/quality-source-lineage-review-02/source/executed_review_lineage.py",
+    "sha256": "2c997e7ce15f4cbdd65dc7f2a4d8bad4156bd67863dfcf6ea1a000d32177d92b"
+  },
+  "limits": [
+    "Literal whole-function/source text identity after reading preserved CRLF as LF is stronger than token-only equality for this scoped move; no Rust parser or compiler is invoked.",
+    "Final QA has a distinct source tree. Existing actual343647 science receipts remain historical and are not relabelled as executions of the final whole source tree.",
+    "Final quality and workspace test success require their own actual execution receipts."
+  ]
+}

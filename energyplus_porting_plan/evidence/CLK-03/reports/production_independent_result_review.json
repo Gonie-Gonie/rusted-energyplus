@@ -1,0 +1,167 @@
+{
+  "schema": "clk03-independent-production-result-review.v1",
+  "status": "pass-authenticated-selected-production-result-and-honest-unavailable-scope",
+  "review_started_utc": "2026-10-08T09:38:32.955641+00:00",
+  "review_completed_utc": "2026-10-08T09:38:42.699336+00:00",
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-03/production-matched-comparison-01/production-comparison.json",
+    "sha256": "4ea395d2ec02d2011fdc5e7c405fc5f1e7f41bfac031b1c6699b6f5cf27ecedb"
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CLK-03/production-matched-comparison-command-01/receipt.json",
+    "sha256": "ccf035d5bfdad146e366fbe63b92c37951bf5e5440301195fa91de9d28d57aa0"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CLK-03/final-candidate-cli-build-01/build-receipt.json",
+    "sha256": "ae5fba2373695df7bd68aec45aad18e328a3270fa17769b2436ba8174771eaea"
+  },
+  "matrix": {
+    "path": ".runtime/porting/CLK-03/production-matched-matrix-01/matrix.json",
+    "sha256": "e0cf1c085fba23309c0a5f36eeb3b962db5fc0bd2b64609e6b283023e4234fba"
+  },
+  "plan": {
+    "path": ".runtime/porting/CLK-03/production-matched-plan-01/plan.json",
+    "sha256": "e549cad6a6926f4631b6e9f109931f793dbdf668259f6209625279270ebb3bc9"
+  },
+  "matched_native_contract": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/native-contract.json",
+    "sha256": "fa534ac3525b8d1e63e793ef37e46ba082501c1d0e149e111588d2096392d984"
+  },
+  "matched_native_reference": {
+    "path": ".runtime/porting/CLK-03/matched-original-first-01/helper-reference.json",
+    "sha256": "172d704acb24b84bc120b9f6ecb173426b7b247a1f24cbe2a543c893c1a35974"
+  },
+  "matched_original_data_review": {
+    "path": ".runtime/porting/CLK-03/independent-matched-original-data-review-02/review.json",
+    "sha256": "997980c8f10ece57ce67b6ae3023726737953620802cea7179ee31e824928ce6"
+  },
+  "matched_original_execution": {
+    "path": ".runtime/porting/CLK-03/matched-original-command-01/receipt.json",
+    "sha256": "457279ec0ffe730521d88a1c2761d74bd27b29a3c5d6dd083341f7eb80f730e7"
+  },
+  "matched_original_data_review_execution": {
+    "path": ".runtime/porting/CLK-03/independent-matched-original-data-review-command-02/receipt.json",
+    "sha256": "8d5646d007f1db979ec0f6dfa53d0b896490bae9b9add08c8a31a2561ed06be6"
+  },
+  "actual_reported_comparisons": 1742058,
+  "actual_reported_mismatches": 0,
+  "actual_command_count": 6,
+  "actual_CLI_commands": [
+    {
+      "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/full-command/receipt.json",
+      "sha256": "cc558d1dd3b0cd9bd083262647e32946596a16f618fce3a04c14201dbb0bda66"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-24H/summary-command/receipt.json",
+      "sha256": "135120209ca2a7d362e8e420bcb74087c3d3f16f0a7858822b82ce6ca1649f4d"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/full-command/receipt.json",
+      "sha256": "bfeb2cf2d1cfb6d6d53490d3da4dca5b6f5f078310845e3b5aca53df2cc17525"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-matched-matrix-01/A-72H/summary-command/receipt.json",
+      "sha256": "69944df965db8c4bdc8173381e3d92f15844e55eabb632287aad1488590ae52f"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/full-command/receipt.json",
+      "sha256": "232eb22421778c8bcbfdb20e799d3186d3249188d86fc5be1ad79590a7cf1541"
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-matched-matrix-01/B-BOTH-24H/summary-command/receipt.json",
+      "sha256": "74c1022660df398588a0fda3cf67e0360e2757a1807ebb61098fe32f9131c388"
+    }
+  ],
+  "actual_build_commit": "df88eb4c7b03cd8a04ad09d5fce3300a4d5b7b22",
+  "actual_crates_tree": "47e544dafabcec8e30197597b8832ee1c290c8fc",
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+    "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+  },
+  "available_source_inventory_count": 3718,
+  "quality_source_snapshot_matches_final_science_source": true,
+  "quality_recorded_heads_and_worktree_states": [
+    {
+      "execution": {
+        "path": ".runtime/porting/CLK-03/final-workspace-unit-command-01/receipt.json",
+        "sha256": "f41f8d482379f979fc346091882600d03dd56bc89d01cf2a5ed84421b8905dc7"
+      },
+      "recorded_head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+      "recorded_worktree_clean": false,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+        "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+      }
+    },
+    {
+      "execution": {
+        "path": ".runtime/porting/CLK-03/final-clippy-command-01/receipt.json",
+        "sha256": "ffc047375fc3b0950c3057db600a72b2b8c825c80f06377f35101eb18bced932"
+      },
+      "recorded_head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+      "recorded_worktree_clean": false,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+        "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+      }
+    },
+    {
+      "execution": {
+        "path": ".runtime/porting/CLK-03/final-source-quality-command-03/receipt.json",
+        "sha256": "9a591af959f70dbaab5356b0f8139760daec38aacf893e0d4d41e97a509abb03"
+      },
+      "recorded_head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+      "recorded_worktree_clean": false,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+        "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+      }
+    },
+    {
+      "execution": {
+        "path": ".runtime/porting/CLK-03/final-structure-command-06/receipt.json",
+        "sha256": "a97eb3d5910528e664c392b31ba628e04494ef2dc8ceba887719e07ff4f30e10"
+      },
+      "recorded_head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+      "recorded_worktree_clean": false,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+        "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+      }
+    },
+    {
+      "execution": {
+        "path": ".runtime/porting/CLK-03/final-scoped-format-command-03/receipt.json",
+        "sha256": "d9f3ca3ae163c6d078105ea45fe1b2262b702124beb7c936c250818dcaf2693c"
+      },
+      "recorded_head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+      "recorded_worktree_clean": false,
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+        "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+      }
+    }
+  ],
+  "actual_workspace_tests_passed": 4580,
+  "quality_checks_claimed_to_have_run_at_final_commit": false,
+  "unavailable_counted_as_PASS": false,
+  "preserved_failed_comparison": {
+    "path": ".runtime/porting/CLK-03/production-comparison-02/production-comparison.json",
+    "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+  },
+  "preserved_failed_execution": {
+    "path": ".runtime/porting/CLK-03/production-comparison-command-02/receipt.json",
+    "sha256": "0fb86b4517921fb0bf9c9b236c26044d5c32ed13250c54823123d32d13ab5e5a"
+  },
+  "prior_actual_failure_relabelled_PASS": false,
+  "scientific_comparisons_recomputed": false,
+  "scientific_comparer_imported_or_executed": false,
+  "engines_Cargo_Git_executed_by_review_target": false,
+  "gates_updated": false,
+  "physical_producer_or_native_thermal_callback_parity_claimed": false,
+  "executed_metadata_reader": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-result-review-01/executed-reviewer.py",
+    "sha256": "3813d7c3a623d08084950721c5239b86aabf0f173b6274a28351d4b4216ae788"
+  },
+  "authorship_disclosure": "Reviewer authored raw headers, A/B thermal consumer integration and supplemental native build/launcher glue. This review independently authenticates raw-peer authored matched comparison outputs and Root actual execution/source evidence. It does not independently certify those self-authored implementations or extend the selected carrier/lifecycle scope to weather physics."
+}

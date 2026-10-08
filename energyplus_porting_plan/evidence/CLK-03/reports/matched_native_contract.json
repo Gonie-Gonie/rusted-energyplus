@@ -1,0 +1,426 @@
+{
+  "schema": "clk03-matched-production-native-contract.v1",
+  "status": "frozen-input-only-matched-caller-before-supplemental-original-execution",
+  "created_utc": "2026-10-08T08:48:38.972669+00:00",
+  "source_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "request": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json",
+    "sha256": "e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1"
+  },
+  "input_projection": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/projection.json",
+    "sha256": "b768e6d30c5ac6b9a63602f6aef531acd87703b3ace2a105b7773fcee206cb7a"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "input_byte_maps": {
+    "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+    "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+  },
+  "literal_CON_input_references": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+    },
+    {
+      "path": "src/EnergyPlus/General.cc",
+      "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658"
+    },
+    {
+      "path": "src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+    },
+    {
+      "path": "src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25"
+    },
+    {
+      "path": "src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4"
+    },
+    {
+      "path": "src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68"
+    },
+    {
+      "path": "src/EnergyPlus/IOFiles.cc",
+      "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a"
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.cc",
+      "sha256": "74e45dca0d71e9cd1ac37f4cdc85da6fe7780d78a5ec6cf3d304da4e770b9ea2"
+    },
+    {
+      "path": "src/EnergyPlus/api/runtime.h",
+      "sha256": "0ca948f159186052b8d417150676302eb4e4d272df8186b8d40ccbc0b3c005a4"
+    },
+    {
+      "path": "src/EnergyPlus/PluginManager.cc",
+      "sha256": "4df126820bd132fa4c75ebc8479106632916aa886a3229c06f0c8f53beb1fc48"
+    },
+    {
+      "path": "src/EnergyPlus/EMSManager.cc",
+      "sha256": "b5626bf87617a9cf4d9aa523dc4975fc4a148b2d69fe2daad17d00c07f9649b4"
+    },
+    {
+      "path": "third_party/ObjexxFCL/src/ObjexxFCL/Array1.hh",
+      "sha256": "d1f4dade3becca09d780cb4c8da044876be5d67a9ae5ad8f8568faabf06fe066"
+    },
+    {
+      "path": "idd/Energy+.idd.in",
+      "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f"
+    }
+  ],
+  "production_case_ids": [
+    "A-24H",
+    "A-72H",
+    "B-BOTH-24H"
+  ],
+  "requested_counts": {
+    "weather_sequences": 3,
+    "GetNextEnvironment": 3,
+    "InitializeWeather": 480,
+    "total_operations": 483
+  },
+  "native_preparation": {
+    "lane": "selected-prepared-environment",
+    "genuine_calls": [
+      "InputProcessor::processInput",
+      "SetupInterpolationValues",
+      "OpenWeatherFile",
+      "CloseWeatherFile",
+      "ReadUserWeatherInput",
+      "AllocateWeatherData",
+      "ResolveLocationInformation",
+      "CheckLocationValidity"
+    ],
+    "GetEnvironmentFirstCall": false,
+    "GetBranchInputOneTimeFlag": false,
+    "WaterMainsParameterReport": false,
+    "BeginSimFlag": false,
+    "DoWeathSim": true,
+    "DoDesDaySim": false,
+    "Envrn_before_GetNextEnvironment": "actual-native-TotDesDays",
+    "TimeStepFraction": {
+      "bits": "3fd0000000000000"
+    },
+    "TimeStepZone": {
+      "bits": "3fd0000000000000"
+    },
+    "registered_whole_simulation_initialization_claimed": false,
+    "eio_sink": "native-output-stringstream",
+    "error_sink": "native-output-stringstream"
+  },
+  "independent_input_source_review": {
+    "path": ".runtime/porting/CLK-03/independent-production-matched-input-source-review-01/review.json",
+    "sha256": "7b29128aa70c6f8f00e3387b030bc31b72119886ec3231f85a82dd676d8222ec"
+  },
+  "caller_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/prepare_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/00-prepare_inputs.py",
+        "sha256": "6b31149b9fb0c81c879159e4154f504533cf53e0458768c91c7fd405b0eadbe7"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/production.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/01-production.rs",
+        "sha256": "7ad079ee868bfecd86be556524724fb27b2f7096b5bc8161ce1aba82585560bd"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 80,
+          "end_line": 90,
+          "sha256": "aaafdfedda3595cd4ef036721d5e6bb80a03657ea384d1695348e7fced24523d"
+        },
+        {
+          "start_line": 98,
+          "end_line": 132,
+          "sha256": "941cf784c9177f93a4cffd287d65bfa3613332d4289a440a933cb2aaf8215213"
+        },
+        {
+          "start_line": 208,
+          "end_line": 235,
+          "sha256": "6cebdf373d794fa03c79a8308cd0ab6334081a44f8136fbecbff65c2ff7ec7b4"
+        },
+        {
+          "start_line": 250,
+          "end_line": 268,
+          "sha256": "e057d3e63f1afc6b3bacfa33a1678daa1c55649a9749df94244ac18bc3a19877"
+        }
+      ]
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/02-lifecycle.rs",
+        "sha256": "e614140a18aff88131551c80a4cd376bd790610a592e0cd807b34c87254cb873"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 380,
+          "end_line": 395,
+          "sha256": "9e12261d3be4b356a422197e2c75e445957e5830f1c21c054b8e414c083419bf"
+        }
+      ]
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/03-SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 475,
+          "end_line": 554,
+          "sha256": "85e83fdaa644d6fbb76787d97112fe3ab07480fe96b355e59e3b437c4272cc3a"
+        }
+      ]
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/production-matched-inputs-01/source/04-WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "caller_ranges": [
+        {
+          "start_line": 1737,
+          "end_line": 1743,
+          "sha256": "4b1f928bd950038db316d9fe7d78ecf6d3525f43ce60da791d2170c1f9f8156c"
+        },
+        {
+          "start_line": 1796,
+          "end_line": 1830,
+          "sha256": "a880212c2ccf55b0dc20060573672c97b7f4029b404c1d0a26b5fa2f5688d043"
+        },
+        {
+          "start_line": 1954,
+          "end_line": 1976,
+          "sha256": "ca64c7d490848f92da6704a0bf2a9eeaab86ee42983d0bae62454cb8d41e34e3"
+        },
+        {
+          "start_line": 1994,
+          "end_line": 2034,
+          "sha256": "f1c9f39c75dbdcc07e5e71d11883d833dd0dc1cbb4d69ebf64d42cda361dd973"
+        }
+      ]
+    }
+  ],
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "old_R3_contracts_rewritten": false,
+  "source_RHS_copied_or_native_results_as_inputs": false,
+  "production_matrix_expanded": false
+}

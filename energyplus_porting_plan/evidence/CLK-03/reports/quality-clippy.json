@@ -1,0 +1,74 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-08T08:26:40.444599+00:00",
+  "finished_utc": "2026-10-08T08:27:41.647508+00:00",
+  "elapsed_seconds": 61.202870399923995,
+  "repository_before": {
+    "head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/run_period.rs\u0000 M crates/ep_runtime/src/heat_balance/solar.rs\u0000 M crates/ep_runtime/src/runtime/tests/production_weather.rs\u0000 M scripts/quality/heat-balance-structure-audit.ps1\u0000?? crates/ep_runtime/src/heat_balance/run_period/standalone.rs\u0000?? crates/ep_runtime/src/heat_balance/solar/\u0000"
+  },
+  "repository_after": {
+    "head": "34364787737a0f5799b11a2b7ba80594cf6c70f9",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/run_period.rs\u0000 M crates/ep_runtime/src/heat_balance/solar.rs\u0000 M crates/ep_runtime/src/runtime/tests/production_weather.rs\u0000 M scripts/quality/heat-balance-structure-audit.ps1\u0000?? crates/ep_runtime/src/heat_balance/run_period/standalone.rs\u0000?? crates/ep_runtime/src/heat_balance/solar/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4",
+    "sha256": "ca7b7f6bbbc8954f07f5efad2b5a26af93303b9a1ee1a43bf605567386ad3ca4"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CLK-03/final-clippy-command-01/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-03/final-clippy-command-01/stderr.log",
+    "sha256": "c8b83c4b7f2a7b79ee53bb84b554276cc97a17a36fb4b903122356a407682c2b"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-08T08:27:41.647508+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

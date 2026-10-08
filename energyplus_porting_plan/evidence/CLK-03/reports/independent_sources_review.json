@@ -1,0 +1,157 @@
+{
+  "schema": "clk03-independent-matched-production-sources-review.v1",
+  "status": "pass-source-and-matched-observation-selection-before-original-and-production",
+  "scientific_execution_performed": false,
+  "review_started_utc": "2026-10-08T09:07:14.051269+00:00",
+  "review_completed_utc": "2026-10-08T09:07:14.345083+00:00",
+  "reviewed_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    }
+  },
+  "reviewed_matched_contract": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/native-contract.json",
+    "sha256": "fa534ac3525b8d1e63e793ef37e46ba082501c1d0e149e111588d2096392d984"
+  },
+  "reviewed_matched_request": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json",
+    "sha256": "e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1"
+  },
+  "reviewed_matched_projection": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-01/projection.json",
+    "sha256": "b768e6d30c5ac6b9a63602f6aef531acd87703b3ace2a105b7773fcee206cb7a"
+  },
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/check_clk03_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/00-check_clk03_production.py",
+        "sha256": "7c6c407f6d12bb86c4b55f3477a087d971942c3ce8a13baf3483609b8e03dc2d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/clk03_production_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/01-clk03_production_state.py",
+        "sha256": "8e6f7d909e351a79d9c586d1b746d7f9a014977c6600a28c3087d86cd2c703b8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/clk03_production_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/02-clk03_production_provenance.py",
+        "sha256": "31d98cb32fd6014ab37d49ccf72e9d24943f5fee97a86e4714d75c3c584b728a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/matched_metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/03-matched_metadata.py",
+        "sha256": "3a4b5d40a8bbcfc2253e0b8d2d1514f00f8e80602fb1cfe69037432fbdda4ba8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/prepare_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/04-prepare_inputs.py",
+        "sha256": "6b31149b9fb0c81c879159e4154f504533cf53e0458768c91c7fd405b0eadbe7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/05-prepare_plan.py",
+        "sha256": "6e68cf88a590e6abf57a959d77a8a95459b2e8e16cdda6d077c785d4feb6538f"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-03/production-matched-prep-01/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/06-run_production.py",
+        "sha256": "590a4d140740bd9045866f59b698aba0e53eb5d569aa86ce282d2563ef6d9e01"
+      }
+    },
+    {
+      "historical_path": "tools/porting/check_clk03_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/07-check_clk03_unit.py",
+        "sha256": "8b77430dd686b4291f756be26d2962d38cc611e6dae31d39b321cb9b244ecfe6"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_unit_state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/08-clk03_unit_state.py",
+        "sha256": "7aff322a5c1278cbd22bd37d00145f8de02023075e51dd0d26aeff99687013e1"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/source/09-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_actual_input_freezer": {
+    "path": ".runtime/porting/CLK-03/production-matched-inputs-command-01/receipt.json",
+    "sha256": "f0033cf207ce03d2ab7d52556588e90438d99ec7d8a268fab04986b244b57964"
+  },
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-contract-review-01/review.json",
+    "sha256": "feb1ba4d09f4f5be66973ed88027c8967d1d850a73517321a02684235d923ef6"
+  },
+  "reviewed_final_unit_result": {
+    "path": ".runtime/porting/CLK-03/independent-final-unit-result-review-01/review.json",
+    "sha256": "d2b1475f7f71760856a6f8de84138b8d7bbfdd591643d961140fc4f5a8b7342a"
+  },
+  "preserved_failed_report": {
+    "path": ".runtime/porting/CLK-03/production-comparison-02/production-comparison.json",
+    "sha256": "085076f535c285794e893e064b210f7536dcbbf7b02d5de06ae60ede5ab253a2"
+  },
+  "preserved_failed_execution": {
+    "path": ".runtime/porting/CLK-03/production-comparison-command-02/receipt.json",
+    "sha256": "0fb86b4517921fb0bf9c9b236c26044d5c32ed13250c54823123d32d13ab5e5a"
+  },
+  "prior_failed_comparison_relabelled_unavailable_or_PASS": false,
+  "old14_51_unit_packet_or_report_rewritten": false,
+  "requested_supplemental_counts": {
+    "weather_sequences": 3,
+    "GetNextEnvironment": 3,
+    "InitializeWeather": 480,
+    "total_operations": 483
+  },
+  "actual_supplemental_original_executed_or_certified_by_this_review": false,
+  "actual_runtime_CLI_executed_or_certified_by_this_review": false,
+  "gates_updated": false,
+  "readers_imported_or_executed": false,
+  "numerical_comparisons_recomputed": false,
+  "native_Rust_Cargo_or_Git_executed_by_review_target": false,
+  "unchanged_functions_AST_verified": [
+    "weather_shape",
+    "grid_shape",
+    "owner_shape",
+    "copy_boundary",
+    "byte_map"
+  ],
+  "existing_selected_owner_arrays_unchanged": true,
+  "matched_incoming_caller_and_weather_controls_strict": true,
+  "same_literal_binary64_signed_zero_policy": true,
+  "unavailable_counted_as_PASS": false,
+  "source_inputs_from_archived_caller_and_CON_only": true,
+  "processed_weather_physics_generated_cross_lane_parity_claimed": false,
+  "authorship_disclosure": "Reviewer authored raw headers, thermal consumer bridges/tests and native build/launcher guards. This review independently examines raw-peer authored matched reader/plan/CLI dispatcher selection and metadata, without independently certifying self-authored implementations.",
+  "executed_metadata_reader": {
+    "path": ".runtime/porting/CLK-03/independent-matched-production-sources-review-01/review_sources.py",
+    "sha256": "4deb30248ef0299e72e7d16d0b90e74c74b0502c86e655e39a4b9100d5d3a8c8"
+  }
+}

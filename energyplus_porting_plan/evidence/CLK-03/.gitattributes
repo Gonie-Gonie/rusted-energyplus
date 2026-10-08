@@ -1,0 +1,4 @@
+# Historical proof/source hashes include original line endings.
+reports/** -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+sources/** -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+archive*.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

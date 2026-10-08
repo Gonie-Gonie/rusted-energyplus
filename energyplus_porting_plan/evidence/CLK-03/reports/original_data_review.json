@@ -1,0 +1,3382 @@
+{
+  "schema": "clk03-independent-original-data-review.v1",
+  "status": "pass-preserved-original-data-before-Rust-baseline",
+  "review_started_utc": "2026-10-08T06:23:18.802557+00:00",
+  "review_completed_utc": "2026-10-08T06:23:32.627719+00:00",
+  "actual_reader_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-03/initial-data-review-prep-02/review_data.py",
+    "--reference",
+    ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+    "--reference-command",
+    ".runtime/porting/CLK-03/original-command-03/receipt.json",
+    "--output-dir",
+    ".runtime/porting/CLK-03/independent-original-data-review-02"
+  ],
+  "reviewed_reference": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+    "sha256": "0513bc94d02703d299cb0a63bc66fa11a0b405e0d0873d3e61a0916a4e123cdc"
+  },
+  "reviewed_results": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/native-output/results.json",
+    "sha256": "d9b7c675e2a4ac77968b03a1e7c17a366f61a22e9ea4c1bed00b88a4a2ac0a34"
+  },
+  "reviewed_execution": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-command.json",
+    "sha256": "adc89192036147befe8970fa1974a79f7df13b337a1669f31daa1909d8763544"
+  },
+  "reviewed_reference_command": {
+    "path": ".runtime/porting/CLK-03/original-command-03/receipt.json",
+    "sha256": "cb2f1e545802fcdcdf8015ce5ee2f405fefb02dcd35dd5b196550647dd45fcde"
+  },
+  "reviewed_frozen_input_packet": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "da6eabfb07236e6303df15ede7e35a4254a2499369ade283a4ebaecfc3cd561d"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "44d2f61ce68ed13c704e292dc9b25d3e8c6c8f871185027ac88cb3afaa9482c5"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "fc2b509c35e415f50621cc8f144922ba5b7888ba697e74862298a1a0efb5b98e"
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+      "sha256": "f12d3d22b5d7d20304cf2934c113555a0c1f7b4023d02cbf497b859d1933b2fb"
+    },
+    "fixed_CON_scope": {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    }
+  },
+  "reviewed_runtime_input_admission": {
+    "path": ".runtime/porting/CLK-03/runtime-input-admission-01/admission.json",
+    "sha256": "b9291bb7ede3a0aefd9cfa72842c724b931d0c830447424695d7c0b59e005f19"
+  },
+  "reviewed_historical_native_build": {
+    "path": ".runtime/porting/CLK-03/native-build-03/native-driver-build.json",
+    "sha256": "cdc90a5e5806c03e98355e7cd1593a0638ea1a5c7f801aa52ac7aad73c1a2700"
+  },
+  "historical_compiled_packet": {
+    "contracts": {
+      "source": {
+        "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+        "sha256": "34a97933c787e208a1e948dc7c2f2a42640c2192c859236e138be5dcc5d276f2"
+      },
+      "cases": {
+        "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+        "sha256": "069b727bf532b74c1378d082700aea690771360c88b7c31146f14f081a700b0f"
+      },
+      "tolerances": {
+        "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+        "sha256": "d203fd996fa7df1e52a9f6b0192f1aef89892bce458b74e713d1dad72ee10b02"
+      }
+    },
+    "helper_request": {
+      "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+      "sha256": "8995143c6d12ac46c695a401b7b3084c7c5f10c807675b2846c4691befd7b55b"
+    }
+  },
+  "intended_native_branch_coverage_complete": true,
+  "intended_native_branch_coverage": [
+    {
+      "sequence_id": "CTOR-COPY-DEFAULTS",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "copy-defaults",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "COPY-BEGIN-ENV-POSITIVE-HOLIDAY",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "first",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "repeat-with-new-tomorrow",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "COPY-NORMAL-ZERO-HOLIDAY",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "first",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "repeat-with-new-tomorrow",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "COPY-NORMAL-NEGATIVE-HOLIDAY",
+      "preparation_calls_actually_returned": [
+        "AllocateWeatherData"
+      ],
+      "selected_operations": [
+        {
+          "id": "first",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "repeat-with-new-tomorrow",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "A-24H",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "A-72H",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-3",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "warmup-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "warmup-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-2",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-3",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "MISSING-MATCH-DEFINED-FAILURE",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": true,
+          "source_status": "source_fatal",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": false,
+          "source_status": "not-invoked-after-prior-source-outcome",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "OUTSIDE-DATA-PERIOD",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_fatal",
+          "returned_bool": null
+        },
+        {
+          "id": "run-day-1",
+          "kind": "InitializeWeather",
+          "invoked": false,
+          "source_status": "not-invoked-after-prior-source-outcome",
+          "returned_bool": null
+        },
+        {
+          "id": "end-environment-rewind",
+          "kind": "InitializeWeather",
+          "invoked": false,
+          "source_status": "not-invoked-after-prior-source-outcome",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "read-first",
+          "kind": "ReadWeatherForDay",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "handoff-with-live-input-stream",
+          "kind": "UpdateWeatherData",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        },
+        {
+          "id": "replay-search-from-current-position",
+          "kind": "ReadWeatherForDay",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+      "preparation_calls_actually_returned": [
+        "InputProcessor::processInput",
+        "SetupInterpolationValues",
+        "OpenWeatherFile",
+        "CloseWeatherFile",
+        "ReadUserWeatherInput",
+        "AllocateWeatherData",
+        "ResolveLocationInformation",
+        "CheckLocationValidity"
+      ],
+      "selected_operations": [
+        {
+          "id": "get-next-environment",
+          "kind": "GetNextEnvironment",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": true
+        },
+        {
+          "id": "read-first",
+          "kind": "ReadWeatherForDay",
+          "invoked": true,
+          "source_status": "source_returned",
+          "returned_bool": null
+        }
+      ],
+      "intended_native_call_coverage_observed": true,
+      "source_error_text_parity_claimed": false
+    }
+  ],
+  "prior_preparation_SourceFatal_accepted_as_intended_reader_coverage": false,
+  "requested_counts": {
+    "handoff_sequences": 4,
+    "weather_sequences": 10,
+    "handoff_operations": 7,
+    "weather_operations": 44,
+    "total_sequences": 14,
+    "total_operations": 51
+  },
+  "actual_operation_counts": {
+    "UpdateWeatherData": 8,
+    "GetNextEnvironment": 10,
+    "InitializeWeather": 27,
+    "ReadWeatherForDay": 3
+  },
+  "actual_source_status_counts": {
+    "source_returned": 46,
+    "source_fatal": 2,
+    "not-invoked-after-prior-source-outcome": 3
+  },
+  "actual_operations": [
+    {
+      "sequence_id": "CTOR-COPY-DEFAULTS",
+      "operation_id": "copy-defaults",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "COPY-BEGIN-ENV-POSITIVE-HOLIDAY",
+      "operation_id": "first",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "COPY-BEGIN-ENV-POSITIVE-HOLIDAY",
+      "operation_id": "repeat-with-new-tomorrow",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "COPY-NORMAL-ZERO-HOLIDAY",
+      "operation_id": "first",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "COPY-NORMAL-ZERO-HOLIDAY",
+      "operation_id": "repeat-with-new-tomorrow",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "COPY-NORMAL-NEGATIVE-HOLIDAY",
+      "operation_id": "first",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "COPY-NORMAL-NEGATIVE-HOLIDAY",
+      "operation_id": "repeat-with-new-tomorrow",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-24H",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-24H",
+      "operation_id": "warmup-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-24H",
+      "operation_id": "warmup-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-24H",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-24H",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "warmup-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "warmup-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "run-day-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "run-day-3",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "A-72H",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "operation_id": "warmup-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "operation_id": "warmup-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "operation_id": "warmup-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "operation_id": "warmup-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "operation_id": "run-day-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR24",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "operation_id": "run-day-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DECOY-OFFSET-HOUR1",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "operation_id": "run-day-2",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "operation_id": "run-day-3",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "FIRST-DAY-THREE-DAYS",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "MISSING-MATCH-DEFINED-FAILURE",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "MISSING-MATCH-DEFINED-FAILURE",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": "Error occurred on EPW while searching for first day, stopped at 2007/7/2 1:60 IO Error='no error'",
+        "source_fatal": true,
+        "status": "source_fatal"
+      }
+    },
+    {
+      "sequence_id": "MISSING-MATCH-DEFINED-FAILURE",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": false,
+      "call_outcome": {
+        "exception_message": null,
+        "skip_reason": "actual-source-fatal",
+        "source_fatal": null,
+        "status": "not-invoked-after-prior-source-outcome"
+      }
+    },
+    {
+      "sequence_id": "OUTSIDE-DATA-PERIOD",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": "GetNextEnvironment: Program terminates due to preceding condition.",
+        "source_fatal": true,
+        "status": "source_fatal"
+      }
+    },
+    {
+      "sequence_id": "OUTSIDE-DATA-PERIOD",
+      "operation_id": "run-day-1",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": false,
+      "call_outcome": {
+        "exception_message": null,
+        "skip_reason": "actual-source-fatal",
+        "source_fatal": null,
+        "status": "not-invoked-after-prior-source-outcome"
+      }
+    },
+    {
+      "sequence_id": "OUTSIDE-DATA-PERIOD",
+      "operation_id": "end-environment-rewind",
+      "kind": "InitializeWeather",
+      "actual_source_invoked": false,
+      "call_outcome": {
+        "exception_message": null,
+        "skip_reason": "actual-source-fatal",
+        "source_fatal": null,
+        "status": "not-invoked-after-prior-source-outcome"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "operation_id": "read-first",
+      "kind": "ReadWeatherForDay",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "operation_id": "handoff-with-live-input-stream",
+      "kind": "UpdateWeatherData",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-REPLAY",
+      "operation_id": "replay-search-from-current-position",
+      "kind": "ReadWeatherForDay",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+      "operation_id": "get-next-environment",
+      "kind": "GetNextEnvironment",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    },
+    {
+      "sequence_id": "DIRECT-READDAY-BACKSPACE-ONE-RECORD",
+      "operation_id": "read-first",
+      "kind": "ReadWeatherForDay",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "source_fatal": false,
+        "status": "source_returned"
+      }
+    }
+  ],
+  "typed_storage_and_input_transport_observations": {
+    "typed_integers": 452915,
+    "finite_scalars": 751518,
+    "positive_zero": 495836,
+    "daily_carriers": 782,
+    "unallocated_buffers": 284,
+    "weather_carriers": 48981,
+    "unavailable_native_positions": 254,
+    "finite": 251476,
+    "actual_snapshots": 391,
+    "allocated_buffers": 498,
+    "negative_zero": 4206,
+    "literal_input_discrete_transports": 2157,
+    "literal_input_real_transports": 13146
+  },
+  "actual_stream_external_input_identity_observations": [
+    {
+      "context": "weather/A-24H/final_state",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/get-next-environment/after",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/warmup-1/before_caller",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/warmup-1/before",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/warmup-1/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/warmup-2/before_caller",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/warmup-2/before",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/warmup-2/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/run-day-1/before_caller",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/run-day-1/before",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/run-day-1/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/end-environment-rewind/before_caller",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/end-environment-rewind/before",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-24H/end-environment-rewind/after",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/A-72H/final_state",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/get-next-environment/after",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/warmup-1/before_caller",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/warmup-1/before",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/warmup-1/after",
+      "actual_position_byte": 805797,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4344,
+        "start_byte": 805797,
+        "end_byte": 805969,
+        "input_row_sha256": "51e1fe49652b0d9ab8911b0644d7463559d0846e253960b08b45162c790bc77c"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/warmup-2/before_caller",
+      "actual_position_byte": 805797,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4344,
+        "start_byte": 805797,
+        "end_byte": 805969,
+        "input_row_sha256": "51e1fe49652b0d9ab8911b0644d7463559d0846e253960b08b45162c790bc77c"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/warmup-2/before",
+      "actual_position_byte": 805797,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4344,
+        "start_byte": 805797,
+        "end_byte": 805969,
+        "input_row_sha256": "51e1fe49652b0d9ab8911b0644d7463559d0846e253960b08b45162c790bc77c"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/warmup-2/after",
+      "actual_position_byte": 805797,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4344,
+        "start_byte": 805797,
+        "end_byte": 805969,
+        "input_row_sha256": "51e1fe49652b0d9ab8911b0644d7463559d0846e253960b08b45162c790bc77c"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-1/before_caller",
+      "actual_position_byte": 805797,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4344,
+        "start_byte": 805797,
+        "end_byte": 805969,
+        "input_row_sha256": "51e1fe49652b0d9ab8911b0644d7463559d0846e253960b08b45162c790bc77c"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-1/before",
+      "actual_position_byte": 805797,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4344,
+        "start_byte": 805797,
+        "end_byte": 805969,
+        "input_row_sha256": "51e1fe49652b0d9ab8911b0644d7463559d0846e253960b08b45162c790bc77c"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-1/after",
+      "actual_position_byte": 810320,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4368,
+        "start_byte": 810320,
+        "end_byte": 810493,
+        "input_row_sha256": "e0803541289d38b15992ae7c7894ff87b906c3005a6322c531b9d899def84e0b"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-2/before_caller",
+      "actual_position_byte": 810320,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4368,
+        "start_byte": 810320,
+        "end_byte": 810493,
+        "input_row_sha256": "e0803541289d38b15992ae7c7894ff87b906c3005a6322c531b9d899def84e0b"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-2/before",
+      "actual_position_byte": 810320,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4368,
+        "start_byte": 810320,
+        "end_byte": 810493,
+        "input_row_sha256": "e0803541289d38b15992ae7c7894ff87b906c3005a6322c531b9d899def84e0b"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-2/after",
+      "actual_position_byte": 814820,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4392,
+        "start_byte": 814820,
+        "end_byte": 814993,
+        "input_row_sha256": "865fe9d1e0eabad72d4f92d7589ecda1617ba0807a06f2387e427a6368701664"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-3/before_caller",
+      "actual_position_byte": 814820,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4392,
+        "start_byte": 814820,
+        "end_byte": 814993,
+        "input_row_sha256": "865fe9d1e0eabad72d4f92d7589ecda1617ba0807a06f2387e427a6368701664"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-3/before",
+      "actual_position_byte": 814820,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4392,
+        "start_byte": 814820,
+        "end_byte": 814993,
+        "input_row_sha256": "865fe9d1e0eabad72d4f92d7589ecda1617ba0807a06f2387e427a6368701664"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/run-day-3/after",
+      "actual_position_byte": 814820,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4392,
+        "start_byte": 814820,
+        "end_byte": 814993,
+        "input_row_sha256": "865fe9d1e0eabad72d4f92d7589ecda1617ba0807a06f2387e427a6368701664"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/end-environment-rewind/before_caller",
+      "actual_position_byte": 814820,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4392,
+        "start_byte": 814820,
+        "end_byte": 814993,
+        "input_row_sha256": "865fe9d1e0eabad72d4f92d7589ecda1617ba0807a06f2387e427a6368701664"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/end-environment-rewind/before",
+      "actual_position_byte": 814820,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 4392,
+        "start_byte": 814820,
+        "end_byte": 814993,
+        "input_row_sha256": "865fe9d1e0eabad72d4f92d7589ecda1617ba0807a06f2387e427a6368701664"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "A-72H/end-environment-rewind/after",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/B-BOTH-24H/final_state",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/get-next-environment/after",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/warmup-1/before_caller",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/warmup-1/before",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/warmup-1/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/warmup-2/before_caller",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/warmup-2/before",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/warmup-2/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/run-day-1/before_caller",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/run-day-1/before",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/run-day-1/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/end-environment-rewind/before_caller",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/end-environment-rewind/before",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 24,
+        "start_byte": 5759,
+        "end_byte": 5927,
+        "input_row_sha256": "624c1528190786413afcddc21256620cd314a595b56409fff8210e06c44baab4"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "B-BOTH-24H/end-environment-rewind/after",
+      "actual_position_byte": 1445,
+      "actual_input": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 1445,
+        "end_byte": 1615,
+        "input_row_sha256": "9e426e838ad5b6ba1577e506384e5333559e52086419ed75aacb43aa8e13ad16"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/DECOY-OFFSET-HOUR24/final_state",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/warmup-1/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/warmup-1/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/warmup-1/after",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/warmup-2/before_caller",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/warmup-2/before",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/warmup-2/after",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/run-day-1/before_caller",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/run-day-1/before",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/run-day-1/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/run-day-2/before_caller",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/run-day-2/before",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/run-day-2/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/end-environment-rewind/before_caller",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/end-environment-rewind/before",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR24/end-environment-rewind/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/DECOY-OFFSET-HOUR1/final_state",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/run-day-1/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/run-day-1/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/run-day-1/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/run-day-2/before_caller",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/run-day-2/before",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/run-day-2/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/end-environment-rewind/before_caller",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/end-environment-rewind/before",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DECOY-OFFSET-HOUR1/end-environment-rewind/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/FIRST-DAY-THREE-DAYS/final_state",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-1/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-1/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-1/after",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-2/before_caller",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-2/before",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4b77b09b8bbb8d4d66171a572d693bba658cc9975c44806f0afc6f3082f42c7e"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-2/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-3/before_caller",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-3/before",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/run-day-3/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/end-environment-rewind/before_caller",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/end-environment-rewind/before",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": null,
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "FIRST-DAY-THREE-DAYS/end-environment-rewind/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "MISSING-MATCH-DEFINED-FAILURE/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+        "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "MISSING-MATCH-DEFINED-FAILURE/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+        "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "MISSING-MATCH-DEFINED-FAILURE/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+        "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "MISSING-MATCH-DEFINED-FAILURE/run-day-1/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+        "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "MISSING-MATCH-DEFINED-FAILURE/run-day-1/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/missing-target-complete-days.epw",
+        "sha256": "12e9e79210b36c9d647decf3e9a47527c9825a5040ef6f4ebb7e6635c76e5f70"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/OUTSIDE-DATA-PERIOD/final_state",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/run-day-1/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/run-day-1/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/run-day-1/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/end-environment-rewind/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/end-environment-rewind/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "OUTSIDE-DATA-PERIOD/end-environment-rewind/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/DIRECT-READDAY-REPLAY/final_state",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 72,
+        "start_byte": 8668,
+        "end_byte": 8786,
+        "input_row_sha256": "c67dbd5c036ec771da80cc271a7d3456c1f16052e60306e5e9a2e138761d062b"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/read-first/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/read-first/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/read-first/after",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4e5c09b48706929cdc2fd6b7428d84fb1d2b4cb969accf82f092b84371b7a849"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/handoff-with-live-input-stream/before_caller",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4e5c09b48706929cdc2fd6b7428d84fb1d2b4cb969accf82f092b84371b7a849"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/handoff-with-live-input-stream/before",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4e5c09b48706929cdc2fd6b7428d84fb1d2b4cb969accf82f092b84371b7a849"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/handoff-with-live-input-stream/after",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4e5c09b48706929cdc2fd6b7428d84fb1d2b4cb969accf82f092b84371b7a849"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/replay-search-from-current-position/before_caller",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4e5c09b48706929cdc2fd6b7428d84fb1d2b4cb969accf82f092b84371b7a849"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/replay-search-from-current-position/before",
+      "actual_position_byte": 5872,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 48,
+        "start_byte": 5872,
+        "end_byte": 5990,
+        "input_row_sha256": "4e5c09b48706929cdc2fd6b7428d84fb1d2b4cb969accf82f092b84371b7a849"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-REPLAY/replay-search-from-current-position/after",
+      "actual_position_byte": 8668,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/duplicate-target-complete-days.epw",
+        "sha256": "263ee5b9d4ba18baf9a5a54e39f68d435224c48643cc1cb593b2ac781fef53ca"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 72,
+        "start_byte": 8668,
+        "end_byte": 8786,
+        "input_row_sha256": "c67dbd5c036ec771da80cc271a7d3456c1f16052e60306e5e9a2e138761d062b"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "weather/DIRECT-READDAY-BACKSPACE-ONE-RECORD/final_state",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 47,
+        "start_byte": 5759,
+        "end_byte": 5872,
+        "input_row_sha256": "2fd423fce7d0c304aeb5de4cd9c360be9cf688921d1d4cc92dacf111b41e2442"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-BACKSPACE-ONE-RECORD/prepare-after/OpenWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-BACKSPACE-ONE-RECORD/prepare-before/CloseWeatherFile",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-BACKSPACE-ONE-RECORD/get-next-environment/after",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-BACKSPACE-ONE-RECORD/read-first/before_caller",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-BACKSPACE-ONE-RECORD/read-first/before",
+      "actual_position_byte": 256,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 0,
+        "start_byte": 256,
+        "end_byte": 375,
+        "input_row_sha256": "28ba41b57bf8ce247564c7100efdccc8d8bfa44228306fa640b9ce586524a4f1"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    },
+    {
+      "context": "DIRECT-READDAY-BACKSPACE-ONE-RECORD/read-first/after",
+      "actual_position_byte": 5759,
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/CLK-03/decoy-three-days.epw",
+        "sha256": "13225567a5e06f851ebacb6deaff4c8129d850a4d5ae587314eb45a22654e6d6"
+      },
+      "external_input_row_identity": {
+        "source_record_index": 47,
+        "start_byte": 5759,
+        "end_byte": 5872,
+        "input_row_sha256": "2fd423fce7d0c304aeb5de4cd9c360be9cf688921d1d4cc92dacf111b41e2442"
+      },
+      "external_mapping_only": true,
+      "native_record_index_claimed": false
+    }
+  ],
+  "preserved_source_and_input_archive_count": 177,
+  "whole_source_invocations_observed_in_actual_native_data": true,
+  "source_expected_answers_supplied": false,
+  "scientific_weather_formulas_reconstructed": false,
+  "whole_scientific_engine_certified": false,
+  "processed_weather_numerical_fields_paired": false,
+  "Rust_or_native_engine_executed_by_reader": false,
+  "Cargo_or_Git_executed_by_reader": false,
+  "tracked_files_or_gates_changed": false,
+  "executed_reader": {
+    "historical_path": ".runtime/porting/CLK-03/initial-data-review-prep-02/review_data.py",
+    "archive": {
+      "path": ".runtime/porting/CLK-03/independent-original-data-review-02/source/review_data.py",
+      "sha256": "7f4501494ddc5142bf6c9e21922037e8933e71ff1e597e83e29f49553ccb33ea"
+    }
+  },
+  "limits": [
+    "Metadata/native invocation and input provenance review only; no Rust numerical comparison or whole weather science certification.",
+    "Stream row indices are exclusively external identities of hashed input bytes, never invented native record-index owners.",
+    "Canary transport checks compare supplied literal typed inputs with actual native caller storage; no original scientific RHS is copied.",
+    "Reviewer authored the builder and four earlier raw-header owner files; other agents independently reviewed those sources. This review does not self-certify their algorithms."
+  ]
+}
