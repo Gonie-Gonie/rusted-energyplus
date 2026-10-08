@@ -60,7 +60,8 @@ fn owned_today_drives_solar_rain_and_sky_with_no_legacy_record_array()
         .iter()
         .find(|surface| surface.surface_type == SurfaceType::Roof)
         .ok_or("missing roof")?;
-    let tilt_rad = crate::geometry::surface_tilt_deg(roof.surface_type, &roof.vertices).to_radians();
+    let tilt_rad =
+        crate::geometry::surface_tilt_deg(roof.surface_type, &roof.vertices).to_radians();
     assert!(surface_sky_view_factor(roof, tilt_rad) > 0.0);
     assert_eq!(energyplus_exterior_wet_context_fraction(context, roof), 1.0);
     let incident = crate::heat_balance::solar::surface_incident_solar_radiation_for_current_weather_context_w_per_m2(

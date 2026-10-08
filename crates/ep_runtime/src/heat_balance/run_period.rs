@@ -48,7 +48,6 @@ use crate::heat_balance::surface_balance::{
     surface_inside_face_balance_equation_terms_w_per_m2,
 };
 use crate::heat_balance::surface_manager;
-use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled;
 use crate::heat_balance::trace::{
     HeatBalanceCtfHistorySlotFirstSampleAccumulator, HeatBalanceRunPeriodSamples,
     SurfaceHeatBalanceTraceSums, ZoneAirDebugTraceSums, push_surface_heat_balance_trace_averages,
@@ -61,7 +60,6 @@ use crate::heat_balance::trace::{
 use crate::psychrometrics::{
     energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
 };
-use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache};
 use crate::weather::{
     EpwRecord, HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
@@ -69,53 +67,12 @@ use crate::weather::{
 use ep_model::{FirstHourInterpolationStartingValues, SimulationModel};
 use std::collections::BTreeMap;
 
+mod standalone;
 mod weather_sampling;
 
-use weather_sampling::{RunPeriodWeatherSample, sample_run_period_weather};
+pub(crate) use standalone::sample_heat_balance_run_period;
 
-pub(crate) fn sample_heat_balance_run_period(
-    model: &SimulationModel,
-    schedule_cache: &ScheduleSeriesCache,
-    schedule_operations: &mut InternalGainSchedulePhaseOperations,
-    state: &mut HeatBalanceState,
-    weather_dry_bulb_c: &[f64],
-    weather_records: Option<&[EpwRecord]>,
-    weather_driver: Option<HeatBalanceWeatherDriver<'_>>,
-    options: HeatBalanceSimulationOptions,
-    runtime_config: HeatBalanceRuntimeConfig,
-    zone_steps_per_hour: u32,
-    seconds_per_timestep: f64,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> Result<HeatBalanceRunPeriodSamples, RuntimeError> {
-    let sampled = sample_heat_balance_run_period_with_step_driver(
-        model,
-        state,
-        weather_dry_bulb_c,
-        weather_records,
-        weather_driver,
-        options,
-        runtime_config,
-        zone_steps_per_hour,
-        seconds_per_timestep,
-        first_hour_interpolation_starting_values,
-        |state, input, weather_context, _hour_index, _substep| {
-            advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
-                &model.typed,
-                schedule_cache,
-                schedule_operations,
-                state,
-                input,
-                weather_context,
-                runtime_config,
-                options.surface_iteration_count,
-                options.inside_hconv_reevaluation_interval,
-                options.surface_loop_zone_air_correction,
-            );
-            Ok::<(), RuntimeError>(())
-        },
-    );
-    sampled.map(|(samples, _)| samples)
-}
+use weather_sampling::{RunPeriodWeatherSample, sample_run_period_weather};
 
 /// Samples the shared heat-balance run-period loop while delegating exactly
 /// one source-order timestep advance to the caller.

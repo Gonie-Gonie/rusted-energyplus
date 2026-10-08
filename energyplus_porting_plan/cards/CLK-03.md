@@ -126,3 +126,13 @@ workspace 회귀시험 4,580개가 통과했다. 그 뒤 독립 소스 검토에
 첫 커밋 후보의 실제 관측 실행은 종료 코드 0이다. 첫 대조는 Windows canonical 경로의 `\\?\C:\...` 표기를 일반 저장소 경로와 같은 입력으로 해석하지 못해 종료 코드 1이며 과학 비교 보고서는 생성되지 않았다. 기존 EXE·관측 결과·실패 기록을 보존하고 새 관측 serializer의 rooted VerbatimDisk 표기만 일반 disk 경로로 바꾼다. 실제 읽기 경로·입력·caller·scalar·엄격한 비교 기준은 그대로 유지하며 새 커밋과 빌드로 재실행한다.
 
 [경로 표기 수정 증거](../evidence/CLK-03-candidate-path-amendment.json)에 종료 코드·빈 비교 stdout·미생성 과학 보고서, 기존 결과 보존과 수정 소스의 독립 검토를 기록했다. 수정한 관측 프로그램의 Clippy도 실제 종료 코드 0이다.
+
+## 실제 단위 대조와 최종 품질 검사
+
+`34364787737a0f5799b11a2b7ba80594cf6c70f9`에서 빌드·실행한 후보의 실제 단위 대조는 239,178건·불일치 0이다. 14개 sequence·51개 요청에서 실제 호출 48개, 정상 반환 46개, 의도한 source fatal 2개와 후속 skip 3개를 확인했다. 사용 불가능한 값 114개와 내부 인계 경계 12개는 PASS에서 제외했다. 보고서는 `.runtime/porting/CLK-03/candidate-unit-comparison-02/unit-comparison.json`, 독립 결과 검토는 `independent-unit-result-review-03/review.json`에 보존한다. 처리된 기상 물리값 생성의 동등성을 이 인계 검증으로 인증하지 않는다.
+
+저장소 구조 검사에서 기존 solar 760행·run-period 920행 제한을 초과해, 기존 보간 함수 3개와 standalone timestep wrapper를 각각 하위 모듈로 분리했다. 함수 서명·본문과 shared day driver는 그대로 유지하며, 새 wrapper에는 100행 제한을 추가했다. 구조 검사의 이전 weather-series/precompute 단언도 실제 current-context/live-owner 경로를 확인하도록 갱신했다. 독립 검토 `quality-source-lineage-review-02/review.json`은 변경한 부모 2개·추가한 자식 2개와 테스트 줄바꿈 1개만 기존 수치 실행의 Rust 소스와 다름을 확인한다. 기존 수치 실행과 최종 QA 소스의 identity를 같다고 기록하지 않는다.
+
+최종 실제 명령 `cargo test --workspace -j 2`는 4,580 passed·0 failed·0 ignored, `cargo clippy --workspace --all-targets -- -D warnings`는 종료 코드 0이다. source-quality는 production 파일 2,533개 검사·test 파일 1,172개 제외, structure 및 변경 파일의 scoped rustfmt 검사도 실제 종료 코드 0이다. 각 기록은 `.runtime/porting/CLK-03/final-workspace-unit-command-01`, `final-clippy-command-01`, `final-source-quality-command-03`, `final-structure-command-06`, `final-scoped-format-command-03`에 있다. 구조·형식 및 최초 PowerShell 실행 실패는 덮어쓰지 않았다.
+
+Full/Summary 생산 실행 6개는 모두 실제 종료 코드 0이다. 첫 판독은 CRLF를 포함한 입력 행 해시와 native readLine 문자열 해시를 동일하게 요구한 metadata 오류로 종료 코드 1이며 수치 보고서는 생성되지 않았다. `production-comparison-command-01`의 실패를 보존하고, 전체 원본 행과 실제 전달 문자열을 각각 해시·cursor 위치로 확인하는 수정 판독기를 `independent-production-reader-amendment-source-review-01`에서 독립 검토했다. 입력·원본 출력·6개 실행·기존 관측 선택과 수치 정책은 유지한다. 수정 판독과 최종 생산 결과 검토를 마치기 전에는 네 종료 gate를 체크하지 않는다.
