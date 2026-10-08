@@ -970,7 +970,10 @@ Assert-Contains -Path $pipeline -Pattern 'PreparedRuntimeInputs' -Description "p
 Assert-Contains -Path $pipeline -Pattern 'weather runtimes load rich EPW metadata, build the metadata-aware time axis, select source-order records, and precompute weather timesteps' -Description "weather runtime setup timing scope"
 $prepareRuntimeInputsScope = '(?s)fn prepare_runtime_inputs\s*\((?:(?!\r?\nfn execute_rust_runtime\s*\().)*'
 $executeRustRuntimeScope = '(?s)fn execute_rust_runtime\s*\((?:(?!\r?\nfn runtime_class_requires_weather\s*\().)*'
-Assert-Contains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + '\bload_epw_weather_file\s*\(') -Description "rich EPW loading inside runtime input preparation"
+Assert-Contains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + '\bload_parsed_epw_weather_file\s*\(') -Description "canonical raw EPW loading inside runtime input preparation"
+Assert-Contains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + 'parsed_weather\.physical_projection') -Description "literal raw EPW projection supplies existing runtime metadata and records"
+Assert-NotContains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + '\bload_epw_weather_file\s*\(') -Description "independent legacy EPW record parsing inside runtime input preparation"
+Assert-Contains -Path 'crates\ep_runtime\src\weather_raw\loader.rs' -Pattern 'interpret_weather_data_line\s*\([\s\S]*records\.push\(project_record\(&output[\s\S]*raw_records\.push\(output\)' -Description "canonical raw outputs retained beside their literal physical projection"
 Assert-Contains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + '\bbuild_hourly_time_axis_with_weather_metadata\s*\(') -Description "metadata-aware time-axis construction inside runtime input preparation"
 Assert-Contains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + '\bselect_epw_environment_weather\s*\(') -Description "source-order EPW selection inside runtime input preparation"
 Assert-Contains -Path $pipeline -Pattern ($prepareRuntimeInputsScope + '\bprecompute_weather_timestep_series\s*\(') -Description "weather timestep precompute inside runtime input preparation"
