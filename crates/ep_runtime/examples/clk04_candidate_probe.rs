@@ -9,11 +9,14 @@ mod existing_inputs;
 mod fields;
 #[path = "clk04_candidate_support/inputs.rs"]
 mod inputs;
+// Frozen prior-card DTO reuse retains its original module declaration.
+#[allow(clippy::duplicate_mod)]
 #[path = "clk03_candidate_support/fields.rs"]
 mod legacy_fields;
 #[path = "clk04_candidate_support/observe.rs"]
 mod observe;
-#[allow(dead_code)]
+// Retain the frozen DTO bytes shared by the observation bridge.
+#[allow(dead_code, clippy::duplicate_mod)]
 #[path = "clk02_probe_support/dto.rs"]
 mod raw_dto;
 #[path = "clk04_candidate_support/wind.rs"]

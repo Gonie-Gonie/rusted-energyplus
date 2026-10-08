@@ -229,7 +229,7 @@ pub(super) fn configuration(
     one("Building")?;
     require(
         one("GlobalGeometryRules")?
-            == &vec![
+            == &[
                 "GlobalGeometryRules",
                 "UpperLeftCorner",
                 "Counterclockwise",
