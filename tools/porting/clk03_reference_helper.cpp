@@ -121,7 +121,7 @@ struct Factory {
         if (stopped) return;
         auto before = Clk03::snapshot(*state); auto outcome = invoke(std::forward<Function>(function));
         preparation.push_back({{"kind", name}, {"before", before}, {"after", Clk03::snapshot(*state)}, {"call_outcome", outcome}});
-        if (outcome.at("source_fatal").get<bool>()) { stopped = true; stop_reason = "actual-source-fatal-during-preparation"; }
+        if (outcome.at("source_fatal").template get<bool>()) { stopped = true; stop_reason = "actual-source-fatal-during-preparation"; }
         else if (errors) { stopped = true; stop_reason = "actual-errors-during-genuine-preparation"; }
     }
     json diagnostics(fs::path const &output, std::string const &id)
@@ -249,7 +249,7 @@ json weather_sequence(json const &input, json const &declared, fs::path const &r
     }
     auto const prepared = Clk03::snapshot(state); json operations = json::array();
     for (auto const &item : input.at("operations")) operations.push_back(operation(factory, item, true));
-    require(file_sha(idf) == input.at("input").at("sha256") && file_sha(epw) == input.at("weather").at("sha256"),
+    require(file_sha(idf) == input.at("input").at("sha256").get<std::string>() && file_sha(epw) == input.at("weather").at("sha256").get<std::string>(),
             "Original input bytes changed during genuine calls");
     return {{"id", input.at("id")}, {"lane", "selected-prepared-whole-original-environment-reader-lifecycle"},
             {"input", file_ref(idf)}, {"weather_input", file_ref(epw)}, {"declared_run_period_input", input.at("run_period")},
@@ -281,13 +281,13 @@ int main(int argc, char **argv)
             require(contract.at("status") == "frozen-before-numerical-execution" && contract.at("frozen_before_numerical_execution") == true,
                     "Unfrozen original contract");
             if (std::string(name) == "cases") {
-                require(file_sha(request_path) == contract.at("helper_request").at("sha256"), "Request differs from frozen cases");
+                require(file_sha(request_path) == contract.at("helper_request").at("sha256").get<std::string>(), "Request differs from frozen cases");
                 frozen_counts = contract.at("counts");
             }
             if (std::string(name) == "source") {
                 require(contract.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048", "Wrong original source pin");
                 for (auto const &source : contract.at("source_files")) require(file_sha(root / ".reference/energyplus-src/26.1.0" /
-                    source.at("path").get<std::string>()) == source.at("sha256"), "Pinned original source changed");
+                    source.at("path").get<std::string>()) == source.at("sha256").get<std::string>(), "Pinned original source changed");
             }
             contracts[name] = file_ref(path);
         }

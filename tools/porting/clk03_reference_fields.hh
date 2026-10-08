@@ -93,10 +93,16 @@ template<class Array> json reals(Array const &value)
 inline json slots(ObjexxFCL::Array2D<EnergyPlus::Weather::WeatherVars> const &value)
 {
     json result = json::array();
-    if (value.allocated()) for (int hour = 1; hour <= value.size2(); ++hour) for (int step = 1; step <= value.size1(); ++step)
+    int steps = 0, hours = 0;
+    if (value.allocated()) {
+        require(value.size1() <= static_cast<std::size_t>(std::numeric_limits<int>::max()) &&
+                value.size2() <= static_cast<std::size_t>(std::numeric_limits<int>::max()), "Native array bounds exceed int indexing");
+        steps = static_cast<int>(value.size1()); hours = static_cast<int>(value.size2());
+    }
+    if (value.allocated()) for (int hour = 1; hour <= hours; ++hour) for (int step = 1; step <= steps; ++step)
         result.push_back({{"hour", hour}, {"time_step", step}, {"value", weather(value(step, hour))}});
-    return {{"allocated", value.allocated()}, {"time_steps", value.allocated() ? value.size1() : 0},
-            {"hours", value.allocated() ? value.size2() : 0}, {"ordering", "hour-major,timestep-minor"}, {"slots", result}};
+    return {{"allocated", value.allocated()}, {"time_steps", steps},
+            {"hours", hours}, {"ordering", "hour-major,timestep-minor"}, {"slots", result}};
 }
 inline json source_environment(EnergyPlus::Weather::EnvironmentData const &value)
 {
@@ -136,7 +142,7 @@ inline json snapshot(EnergyPlus::EnergyPlusData const &state)
     globals["CalendarYearChr"] = global.CalendarYearChr;
 #define OBS_EINT(name) env[#name] = environment.name;
     CLK03_ENV_INTS(OBS_EINT)
-    OBS_EINT(TotDesDays) OBS_EINT(CurEnvirNum) OBS_EINT(DayOfYearStart) OBS_EINT(RunPeriodStartDayOfWeek)
+    OBS_EINT(TotDesDays) OBS_EINT(CurEnvirNum) OBS_EINT(RunPeriodStartDayOfWeek)
 #undef OBS_EINT
 #define OBS_EREAL(name) env[#name] = scalar(environment.name);
     CLK03_DAY_REALS(OBS_EREAL)
