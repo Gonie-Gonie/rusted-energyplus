@@ -1,0 +1,42 @@
+{
+  "schema": "clk02-native-helper-retirement-evidence.v1",
+  "card": "CLK-02",
+  "retention_plan": {
+    "path": ".runtime/porting/CLK-02/new-target-retention-plan-03/plan.json",
+    "sha256": "f1d89988fc954b79fc9b5e7f3d16b8ab664e510b2a7237b065248a1826c7c51b"
+  },
+  "admitted_registry": {
+    "path": ".runtime/porting/CLK-02/retirement-command-01/registry-admitted.json",
+    "sha256": "7229632378458fa5ce8ba97c985554e7f6e898835f89f8267f8bebb6ada2f30c"
+  },
+  "retired_registry": {
+    "path": ".runtime/porting/CLK-02/retirement-command-01/registry-retired.json",
+    "sha256": "9fbc167c88860561601caa8ac6eec53caad6505fdf1b24e15ae9269def279564"
+  },
+  "actual_removal_receipt": {
+    "path": ".runtime/porting/CLK-02/retirement-command-01/removal-receipt.json",
+    "sha256": "e8aa4b71e5b6679905bc52a798422a4779564ea527db4bbc09a04201aa57cc53"
+  },
+  "removed_original": {
+    "historical_path": ".runtime/ep261-gcc13-o0/Products/clk02_reference_helper.exe",
+    "sha256": "c862da2948be4630f859bed0569e099ebe8e9738365ca146d9add7c790f85339",
+    "size_bytes": 1295668993
+  },
+  "retained_derivative": {
+    "path": ".runtime/porting/CLK-02/native-build-01/derivation/derived-helper.exe",
+    "sha256": "e41e8daf807dafed76ba61fc94637cedfb6f2d6cf9bb6cfbb7b3ab24a1fd9447",
+    "size_bytes": 149804630,
+    "currently_present_and_hash_size_verified": true
+  },
+  "actual_native_command_exit_code": 0,
+  "actual_original_absence": true,
+  "realized_removed_bytes": 1295668993,
+  "all_eleven_legacy_Products_and_three_libraries_preserved": true,
+  "prior_card_evidence_unchanged": true,
+  "scientific_execution_repeated": false,
+  "limits": [
+    "Historical original-first launcher requires the retired live original for a fresh run and remains unchanged.",
+    "Discarded debug bytes are not recoverable from hashes or PE maps; deterministic relink recovery is not claimed.",
+    "Only this registered new CLK02 Product was removed; the executable derivative and historical proofs remain."
+  ]
+}
