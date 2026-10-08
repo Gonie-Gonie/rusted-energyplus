@@ -44072,11 +44072,11 @@
     "lane": "selected-prepared-environment",
     "genuine_calls": [
       "InputProcessor::processInput",
+      "SetupInterpolationValues",
       "OpenWeatherFile",
       "CloseWeatherFile",
       "ReadUserWeatherInput",
       "AllocateWeatherData",
-      "SetupInterpolationValues",
       "ResolveLocationInformation",
       "CheckLocationValidity"
     ],

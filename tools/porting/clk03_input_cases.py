@@ -192,9 +192,9 @@ def main():
                'weather_sequences': fixed + diagnostics,
                'native_preparation': {
                    'lane': 'selected-prepared-environment',
-                   'genuine_calls': ['InputProcessor::processInput', 'OpenWeatherFile',
-                       'CloseWeatherFile', 'ReadUserWeatherInput', 'AllocateWeatherData',
-                       'SetupInterpolationValues', 'ResolveLocationInformation', 'CheckLocationValidity'],
+                   'genuine_calls': ['InputProcessor::processInput', 'SetupInterpolationValues',
+                       'OpenWeatherFile', 'CloseWeatherFile', 'ReadUserWeatherInput',
+                       'AllocateWeatherData', 'ResolveLocationInformation', 'CheckLocationValidity'],
                    'GetEnvironmentFirstCall': False, 'GetBranchInputOneTimeFlag': False,
                    'WaterMainsParameterReport': False, 'BeginSimFlag': False,
                    'DoWeathSim': True, 'DoDesDaySim': False,

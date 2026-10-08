@@ -206,8 +206,8 @@ void check_preparation(json const &value)
             value.at("registered_whole_simulation_initialization_claimed") == false &&
             value.at("eio_sink") == "native-output-stringstream" && value.at("error_sink") == "native-output-stringstream",
             "Declared selected prepared lane differs");
-    json const calls = {"InputProcessor::processInput", "OpenWeatherFile", "CloseWeatherFile", "ReadUserWeatherInput",
-                        "AllocateWeatherData", "SetupInterpolationValues", "ResolveLocationInformation", "CheckLocationValidity"};
+    json const calls = {"InputProcessor::processInput", "SetupInterpolationValues", "OpenWeatherFile", "CloseWeatherFile",
+                        "ReadUserWeatherInput", "AllocateWeatherData", "ResolveLocationInformation", "CheckLocationValidity"};
     require(value.at("genuine_calls") == calls && value.at("TimeStepFraction").at("bits") == "3fd0000000000000" &&
             value.at("TimeStepZone").at("bits") == "3fd0000000000000", "Declared input-only setup/call order differs");
 }
@@ -223,12 +223,13 @@ json weather_sequence(json const &input, json const &declared, fs::path const &r
     state.dataGlobal->DoWeathSim = Clk03::boolean(declared.at("DoWeathSim"));
     state.dataGlobal->DoDesDaySim = Clk03::boolean(declared.at("DoDesDaySim"));
     factory.prepare("InputProcessor::processInput", [&] { state.dataInputProcessing->inputProcessor->processInput(state); });
+    factory.prepare("SetupInterpolationValues", [&] { Weather::SetupInterpolationValues(state); });
+    if (!factory.stopped) owner.TimeStepFraction = Clk03::input_real(declared.at("TimeStepFraction"));
     factory.prepare("OpenWeatherFile", [&] { Weather::OpenWeatherFile(state, factory.errors); });
     factory.prepare("CloseWeatherFile", [&] { Weather::CloseWeatherFile(state); });
     factory.prepare("ReadUserWeatherInput", [&] { Weather::ReadUserWeatherInput(state); });
     factory.prepare("AllocateWeatherData", [&] { Weather::AllocateWeatherData(state); });
     auto const allocated_defaults = Clk03::snapshot(state);
-    factory.prepare("SetupInterpolationValues", [&] { Weather::SetupInterpolationValues(state); });
     factory.prepare("ResolveLocationInformation", [&] { Weather::ResolveLocationInformation(state, factory.errors); });
     factory.prepare("CheckLocationValidity", [&] { Weather::CheckLocationValidity(state); });
     if (!factory.stopped) {
@@ -241,7 +242,6 @@ json weather_sequence(json const &input, json const &declared, fs::path const &r
         owner.GetEnvironmentFirstCall = Clk03::boolean(declared.at("GetEnvironmentFirstCall"));
         owner.GetBranchInputOneTimeFlag = Clk03::boolean(declared.at("GetBranchInputOneTimeFlag"));
         owner.WaterMainsParameterReport = Clk03::boolean(declared.at("WaterMainsParameterReport"));
-        owner.TimeStepFraction = Clk03::input_real(declared.at("TimeStepFraction"));
         owner.Envrn = state.dataEnvrn->TotDesDays;
         // No Today/Tomorrow or calendar outcomes are fabricated here. These are
         // explicit caller controls for a selected, separately prepared source lane.
@@ -255,6 +255,7 @@ json weather_sequence(json const &input, json const &declared, fs::path const &r
             {"input", file_ref(idf)}, {"weather_input", file_ref(epw)}, {"declared_run_period_input", input.at("run_period")},
             {"constructor", factory.constructor}, {"after_constant_initialization", factory.after_constant_initialization},
             {"preparation_calls", factory.preparation}, {"allocated_defaults", allocated_defaults}, {"prepared", prepared},
+            {"allocated_defaults_observation_context", "after actual AllocateWeatherData; new Today/Tomorrow buffer defaults with prior genuine preparation context retained"},
             {"declared_native_preparation", declared}, {"operations", operations}, {"final_state", Clk03::snapshot(state)},
             {"source_only_diagnostics", factory.diagnostics(output, input.at("id").get<std::string>())},
             {"registered_whole_simulation_initialization_claimed", false}, {"native_processed_weather_storage_retained", true},

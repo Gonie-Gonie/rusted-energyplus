@@ -1,0 +1,165 @@
+{
+  "schema": "clk03-preparation-amendment-evidence.v1",
+  "card": "CLK-03",
+  "status": "revised-source-and-input-contract-independently-reviewed-before-fresh-native-build",
+  "packet_revision": 2,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "historical_preparation_evidence": {
+    "path": "energyplus_porting_plan/evidence/CLK-03-native-preparation.json",
+    "sha256": "eb179169a5f28794975376f3efe136fcb5edc251267d3bf0b2fd718e7eb33743"
+  },
+  "previous_packet_archives": [
+    {
+      "historical_path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/packet-amendment-prep-02/before/energyplus_porting_plan/cases/CLK-03/helper-request.json",
+        "sha256": "a0325f45d17ddf20b4655766bcf1dc8aaa48851f1f0ddc4c552f6ba09f1504c6"
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/packet-amendment-prep-02/before/energyplus_porting_plan/contracts/CLK-03-source.json",
+        "sha256": "4cb1e76005a90389b8798db6cc23c40a49ec96d1188ba15fb6db37fa286cf881"
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/packet-amendment-prep-02/before/energyplus_porting_plan/contracts/CLK-03-cases.json",
+        "sha256": "c7e83ab42395c65c35bf8e644a31230aeb17262bb760b7034f8f51ec95ab6dd1"
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-03/packet-amendment-prep-02/before/energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+        "sha256": "9d5fc542d230f0d0df38be5b073f0d57251ebde7662ff2c6f66208d4f6e39d5d"
+      }
+    }
+  ],
+  "actual_failed_original": {
+    "path": ".runtime/porting/CLK-03/original-helper-first-01/helper-reference.json",
+    "sha256": "7ca1dbd2df5be68c0aa89b69e61dd6ec8d8fe8663a12af09dc53e4ac6fcdcdce"
+  },
+  "actual_failed_outer_command": {
+    "path": ".runtime/porting/CLK-03/original-command-01/receipt.json",
+    "sha256": "29b676a56b6fb51f0f46534d1c37a389316468abaa374b0dba82381c862a3e32"
+  },
+  "actual_native_exit_code": 3221226505,
+  "actual_outer_exit_code": 4294967295,
+  "failed_native_results_available": false,
+  "actual_debugger_command": {
+    "path": ".runtime/porting/CLK-03/original-assertion-gdb-command-01/receipt.json",
+    "sha256": "7f35d731dc7adf600bd279a2980b70f95572ce8e9b104a57214eb59e369faacb"
+  },
+  "debugger_exit_code": 0,
+  "debugger_zero_certifies_scientific_success": false,
+  "assertion_chain": [
+    "ObjexxFCL Array1.hh:861",
+    "GetDesignDayData WeatherManager.cc:6167",
+    "ReadUserWeatherInput WeatherManager.cc:4786",
+    "old helper.cpp:228"
+  ],
+  "source_amendment": {
+    "path": ".runtime/porting/CLK-03/native-preparation-amendment-01/amendment.json",
+    "sha256": "56cbcc755f4e189219db9ff98e7ae5ca0c3af16c6293b0fcf92d2860bfe1bcc0"
+  },
+  "packet_amendment": {
+    "path": ".runtime/porting/CLK-03/packet-amendment-prep-02/amendment-result.json",
+    "sha256": "7ef047b9bc6c6d5513b5035c0a784a5fcddc03e874493763e59ee64ea4f61cfb"
+  },
+  "actual_packet_writer_command": {
+    "path": ".runtime/porting/CLK-03/packet-amendment-command-02/receipt.json",
+    "sha256": "9cf6dc8a9ed58417ff888c64220f99389d149afd8c54c05a4f0406214bdda6f8"
+  },
+  "amended_contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
+      "sha256": "34a97933c787e208a1e948dc7c2f2a42640c2192c859236e138be5dcc5d276f2"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
+      "sha256": "069b727bf532b74c1378d082700aea690771360c88b7c31146f14f081a700b0f"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
+      "sha256": "d203fd996fa7df1e52a9f6b0192f1aef89892bce458b74e713d1dad72ee10b02"
+    }
+  },
+  "amended_helper_request": {
+    "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
+    "sha256": "8995143c6d12ac46c695a401b7b3084c7c5f10c807675b2846c4691befd7b55b"
+  },
+  "counts": {
+    "handoff_sequences": 4,
+    "weather_sequences": 10,
+    "handoff_operations": 7,
+    "weather_operations": 44,
+    "total_sequences": 14,
+    "total_operations": 51
+  },
+  "input_byte_maps": {
+    "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
+    "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
+  },
+  "independent_reviews": {
+    "contracts": {
+      "path": ".runtime/porting/CLK-03/independent-contract-review-02/review.json",
+      "sha256": "8c03a8de71177b9bf24a6f7d6c5d9d5bbce174f9975572cbf8df5bc1524944fc"
+    },
+    "native_helper": {
+      "path": ".runtime/porting/CLK-03/independent-helper-static-review-03/review.json",
+      "sha256": "46c2ba9983922b7eadb975bd5d4927d3ee1a6ee6a4337c858d13bfe2255c794f"
+    },
+    "original_launcher": {
+      "path": ".runtime/porting/CLK-03/independent-original-launcher-static-review-03/review.json",
+      "sha256": "15ddd3314b2496dfab27fb22ae0e00c698e88bc3161756613697068658ef1b39"
+    },
+    "legacy_probe": {
+      "path": ".runtime/porting/CLK-03/independent-legacy-probe-static-review-02/review.json",
+      "sha256": "bf53b69fb490c70789f172fa4e8b8f021f34db2c0ba7b4ebf56bdcfb5db6dc4b"
+    },
+    "legacy_launcher": {
+      "path": ".runtime/porting/CLK-03/independent-legacy-launcher-static-review-02/review.json",
+      "sha256": "b84a139a748ad4a30f555583d47934e36490ed04228ce2ed14bdd08200dc2f0a"
+    }
+  },
+  "failed_original_preservation": {
+    "path": ".runtime/porting/CLK-03/failed-original-relocation-02/receipt.json",
+    "sha256": "6a0ea06b82ee4adee7fc1c8083d14786af577752aed504e6c3a1bc987bb1a18c"
+  },
+  "retained_failed_original": {
+    "path": ".runtime/porting/CLK-03/native-build-02/retained-failed-original/clk03_reference_helper.exe",
+    "sha256": "1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3",
+    "size_bytes": 1296271028
+  },
+  "initial_file_script_invocation": {
+    "receipt": {
+      "path": ".runtime/porting/CLK-03/failed-original-relocation-command-01/receipt.json",
+      "sha256": "a2f83a15078b5cc23acc02dee0c2927a4979fd9c08e204501af4504f97515d4d"
+    },
+    "actual_exit_code": 1,
+    "script_executed": false,
+    "reason": "File-script execution is disabled by the local PowerShell execution policy; no move occurred in that invocation."
+  },
+  "actual_relocation_method": "The same native PowerShell commands were executed inline in the existing PowerShell tool; no execution-policy change, copy, recursive move or deletion. The actual move receipt binds source/destination/hash/size and all fourteen protected artifacts before and after.",
+  "legacy_compiled_build_reused_with_unchanged_3690_source_bytes": {
+    "path": ".runtime/porting/CLK-03/legacy-probe-build-01/build-receipt.json",
+    "sha256": "386b32c6f665a122548656011ab363d50c79008ebeb73f72872a2a15c362d679"
+  },
+  "whole_simulation_first_registration_certified": false,
+  "tolerance_policy_changed": false,
+  "case_values_or_counts_changed": false,
+  "other63_tasks_changed": false,
+  "old_failure_and_review_receipts_rewritten": false,
+  "revised_numerical_execution_performed": false,
+  "Rust_numerical_execution_performed": false,
+  "numerical_comparison_performed": false,
+  "card_gates_updated": false,
+  "remaining": [
+    "Fresh original build and independent actual build/PE review.",
+    "Actual complete original execution and independent initial data review before actual legacy Rust baseline.",
+    "Actual Rust implementation, unit, lifecycle/consumer integration and fixed CON production gates."
+  ]
+}

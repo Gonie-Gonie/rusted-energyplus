@@ -3,7 +3,7 @@
   "status": "frozen-before-numerical-execution",
   "frozen_before_numerical_execution": true,
   "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
-  "created_utc": "2026-10-08T04:44:18.209685+00:00",
+  "created_utc": "2026-10-08T05:36:21.791366+00:00",
   "scientific_execution_performed": false,
   "gates_changed": false,
   "schema": "clk03-tolerances-contract.v1",
@@ -21,5 +21,102 @@
     "Hour1, duplicate-day replay, negative holiday and one-record backspace are input-only helper diagnostics, not expanded CON production.",
     "Native processed buffers remain distinct from raw EPW records. Later numerical physics remains unpaired here.",
     "Upstream daily solar/processed carrier numbers can certify literal handoff, not their calculation formulas."
-  ]
+  ],
+  "packet_revision": 2,
+  "scientific_execution_scope": "This amended revision only; prior failed native and debugger attempts are explicitly preserved.",
+  "freeze_scope": "frozen-before-numerical-execution applies to this revision, not the entire historical card.",
+  "amendment": {
+    "revision": 2,
+    "reason": "Actual native assertion identified a missing genuine preparation prerequisite; no numerical result available.",
+    "revised_preparation": "InputProcessor then SetupInterpolationValues then Open/Close/ReadUser/Allocate/Resolve/Check.",
+    "existing_TimeStepFraction_assignment_timing": "Existing declared0.25 bits are assigned after genuine Setup and before Open, matching native WeatherManager.cc707.",
+    "values_inputs_counts_maps_CON_scope_tolerance_policy_changed": false,
+    "prior_revision_actual_attempt": {
+      "failed_original_reference": {
+        "path": ".runtime/porting/CLK-03/original-helper-first-01/helper-reference.json",
+        "sha256": "7ca1dbd2df5be68c0aa89b69e61dd6ec8d8fe8663a12af09dc53e4ac6fcdcdce"
+      },
+      "failed_original_outer_command": {
+        "path": ".runtime/porting/CLK-03/original-command-01/receipt.json",
+        "sha256": "29b676a56b6fb51f0f46534d1c37a389316468abaa374b0dba82381c862a3e32"
+      },
+      "actual_native_child_exit_code": 3221226505,
+      "actual_wrapper_exit_code": 3221226505,
+      "actual_outer_exit_code": 4294967295,
+      "results_available": false,
+      "source_fatal_available": false,
+      "source_fatal": null,
+      "scientific_PASS": false,
+      "debugger_command": {
+        "path": ".runtime/porting/CLK-03/original-assertion-gdb-command-01/receipt.json",
+        "sha256": "7f35d731dc7adf600bd279a2980b70f95572ce8e9b104a57214eb59e369faacb"
+      },
+      "debugger_stdout": {
+        "path": ".runtime/porting/CLK-03/original-assertion-gdb-command-01/stdout.log",
+        "sha256": "7e8f98e72774c86e3b6da60e372a7e759f85e7548bad6b4c9d94b40cd339c70c"
+      },
+      "debugger_stderr": {
+        "path": ".runtime/porting/CLK-03/original-assertion-gdb-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "debugger_exit_code": 0,
+      "debugger_exit_zero_is_scientific_success": false,
+      "dynamic_assertion_call_chain": [
+        "_assert",
+        "ObjexxFCL::Array1<double>::operator()",
+        "WeatherManager.cc:6167 GetDesignDayData",
+        "WeatherManager.cc:4786 ReadUserWeatherInput",
+        "clk03_reference_helper.cpp:228"
+      ],
+      "old_receipts_unchanged": true
+    },
+    "revised_helper_source": {
+      "path": "tools/porting/clk03_reference_helper.cpp",
+      "sha256": "2f4fb94a04f0638016b2f458ad9a567fa8e201b57323663b7fd18cf4e21b9877"
+    },
+    "preparation_source_ranges": [
+      {
+        "file": "src/EnergyPlus/WeatherManager.cc",
+        "symbol": "GetNextEnvironment.one-time-preparation",
+        "start_line": 704,
+        "end_line": 713,
+        "role": "whole genuine interpolation setup and existing timestep-fraction write before weather/input reads",
+        "range_sha256": "9dca584e0d41d17bd53f278fdb423ff7ccf8e6a1ec2e5a878cad1d63ed7473f3"
+      },
+      {
+        "file": "src/EnergyPlus/WeatherManager.cc",
+        "symbol": "ReadUserWeatherInput.design-day-call",
+        "start_line": 4750,
+        "end_line": 4786,
+        "role": "declared design-day count and whole design-day input call",
+        "range_sha256": "73e1af4ee6af24c2e2cb75e9fed5d21cc5459db172a4b1172cf55363029f7e38"
+      },
+      {
+        "file": "src/EnergyPlus/WeatherManager.cc",
+        "symbol": "GetDesignDayData.default-range-modifier",
+        "start_line": 6123,
+        "end_line": 6167,
+        "role": "actual assertion stack reaches interpolation precondition; formula remains unpaired",
+        "range_sha256": "938a183ec464eaff565321afdcb9aec6a1d322e0502391b42273744949b48a12"
+      },
+      {
+        "file": "src/EnergyPlus/WeatherManager.cc",
+        "symbol": "SetupInterpolationValues.allocation",
+        "start_line": 8334,
+        "end_line": 8346,
+        "role": "whole interpolation arrays preparation; numerical weights remain unpaired",
+        "range_sha256": "d41e7fd4c84169ab089123bff15c16e8027d7d3ae02d44a04d8b0d3179d6d235"
+      },
+      {
+        "file": "third_party/ObjexxFCL/src/ObjexxFCL/Array1.hh",
+        "symbol": "Array1.mutable-operator",
+        "start_line": 859,
+        "end_line": 863,
+        "role": "real asserted containment precondition observed by GDB",
+        "range_sha256": "3438be7424ee4ac7daa8a712e7fcd63ca269a582ef02ce9925abcc02825ba012"
+      }
+    ],
+    "revision_frozen_before_its_own_numerical_execution": true,
+    "whole_card_never_executed_claimed": false
+  }
 }

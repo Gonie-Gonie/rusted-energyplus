@@ -85,4 +85,12 @@ Warmup 첫날 재사용, 24→1시, 다음 날 lookahead, 마지막 날 no-prefe
 시험 명령:  
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+추가 검토할 helper:
+
+## 준비 순서 수정 2차
+
+원본 첫 실행은 native assertion으로 종료했고 결과 JSON은 생성되지 않았다. 실제 GDB stack은 GetDesignDayData의 interpolation 접근을 확인했다. 실패 reference·command·debugger 증거와 기존 packet bytes를 보존한다.
+
+SetupInterpolationValues를 ReadUserWeatherInput보다 먼저 호출하고, 기존 TimeStepFraction 값은 Setup 다음·Open 전에 기록한다. 입력·14개 sequence/51개 operation·byte map·CON45·비교 정책은 변경하지 않는다. 수정 계약은 재실행 전에 다시 동결했다. 모든 gate는 미확인이다.
+
+[수정 및 실패 보존 증거](../evidence/CLK-03-preparation-amendment.json)에 원본 종료 코드 3221226505, 실제 디버거 호출 스택, 수정 계약의 독립 검토와 실패 원본 EXE의 보관 위치를 기록했다. 디버거 종료 코드 0은 수치 시험 통과를 의미하지 않는다.

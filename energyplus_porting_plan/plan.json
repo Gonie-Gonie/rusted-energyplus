@@ -4903,25 +4903,27 @@
       "prepared_packet": {
         "source": {
           "path": "energyplus_porting_plan/contracts/CLK-03-source.json",
-          "sha256": "4cb1e76005a90389b8798db6cc23c40a49ec96d1188ba15fb6db37fa286cf881"
+          "sha256": "34a97933c787e208a1e948dc7c2f2a42640c2192c859236e138be5dcc5d276f2"
         },
         "cases": {
           "path": "energyplus_porting_plan/contracts/CLK-03-cases.json",
-          "sha256": "c7e83ab42395c65c35bf8e644a31230aeb17262bb760b7034f8f51ec95ab6dd1"
+          "sha256": "069b727bf532b74c1378d082700aea690771360c88b7c31146f14f081a700b0f"
         },
         "tolerances": {
           "path": "energyplus_porting_plan/contracts/CLK-03-tolerances.json",
-          "sha256": "9d5fc542d230f0d0df38be5b073f0d57251ebde7662ff2c6f66208d4f6e39d5d"
+          "sha256": "d203fd996fa7df1e52a9f6b0192f1aef89892bce458b74e713d1dad72ee10b02"
         },
         "request": {
           "path": "energyplus_porting_plan/cases/CLK-03/helper-request.json",
-          "sha256": "a0325f45d17ddf20b4655766bcf1dc8aaa48851f1f0ddc4c552f6ba09f1504c6"
+          "sha256": "8995143c6d12ac46c695a401b7b3084c7c5f10c807675b2846c4691befd7b55b"
         },
         "input_byte_maps": {
           "path": "energyplus_porting_plan/cases/CLK-03/input-byte-maps.json",
           "sha256": "372a77a0b1d4834aa1f0a5d83242ba8c339826be1215504339f1745bf40bf835"
         }
-      }
+      },
+      "packet_amendment_revision": 2,
+      "preparation_amendment_note": "Actual original assertion and GDB stack preserved; genuine Setup precedes ReadUserWeatherInput. This revision is refrozen before its own execution; gates remain 미확인."
     },
     {
       "id": "CLK-04",
