@@ -161,7 +161,7 @@ use ep_runtime::{
     ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis,
     WeatherTimestepSeries, ZoneSensibleDemandInputKind,
     build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
-    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
+    build_hourly_time_axis_with_weather_metadata, precompute_runtime_data,
     precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
     precompute_weather_timestep_series, select_epw_environment_weather,
     simulate_direct_zone_purchased_air_coupled_heat_balance,
@@ -898,19 +898,31 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
-        let (outcome, trace) = ep_runtime::psychrometrics::psy02_trace::capture(
-            config.trace_level == TraceLevel::Full,
-            || run_with_optional_porting_scope_observed(config, scope),
-        );
-        if let Some(trace) = trace
-            && outcome.is_ok()
-            && config.output_dir.is_dir()
-        {
-            crate::psy02_trace::write_trace(config, &trace)?;
-        }
-        outcome
-    })
+    let (outcome, weather_trace) = ep_runtime::weather::raw::production_trace::capture(
+        config.trace_level == TraceLevel::Full,
+        || {
+            ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
+                let (outcome, trace) = ep_runtime::psychrometrics::psy02_trace::capture(
+                    config.trace_level == TraceLevel::Full,
+                    || run_with_optional_porting_scope_observed(config, scope),
+                );
+                if let Some(trace) = trace
+                    && outcome.is_ok()
+                    && config.output_dir.is_dir()
+                {
+                    crate::psy02_trace::write_trace(config, &trace)?;
+                }
+                outcome
+            })
+        },
+    );
+    if let Some(trace) = weather_trace
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+    {
+        crate::clk02_trace::write_trace(config, &trace)?;
+    }
+    outcome
 }
 
 fn run_with_optional_porting_scope_observed(
@@ -3366,15 +3378,42 @@ fn prepare_runtime_inputs(
                 .weather_path
                 .as_ref()
                 .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
-            let weather_file = load_epw_weather_file(weather_path)
-                .map_err(|error| format!("failed to load EPW weather: {error}"))?;
+            let parsed_weather =
+                ep_runtime::weather::raw::load_parsed_epw_weather_file(weather_path)
+                    .map_err(|error| format!("failed to load EPW weather: {error}"))?;
+            let weather_file = &parsed_weather.physical_projection;
             let time_axis = build_hourly_time_axis_with_weather_metadata(
                 &model.typed,
                 &weather_file.calendar_metadata,
             )
             .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?;
-            let environment_weather = select_epw_environment_weather(&weather_file, &time_axis)
+            let environment_weather = select_epw_environment_weather(weather_file, &time_axis)
                 .map_err(|error| format!("failed to select EPW environment records: {error}"))?;
+            if ep_runtime::weather::raw::production_trace::is_active() {
+                let selected = environment_weather
+                    .selected_source_record_indices
+                    .iter()
+                    .zip(environment_weather.hourly_records())
+                    .take(runtime_sample_count(config, &time_axis, true)?)
+                    .map(|(&index, &record)| {
+                        parsed_weather
+                            .raw_records
+                            .get(index)
+                            .copied()
+                            .map(|raw| (index, raw, record))
+                            .ok_or_else(|| "selected EPW source index has no raw owner".to_owned())
+                    })
+                    .collect::<Result<Vec<_>, _>>()?;
+                ep_runtime::weather::raw::production_trace::record_prepared(
+                    weather_path,
+                    parsed_weather.input_byte_length,
+                    &parsed_weather.raw_header,
+                    parsed_weather.stream_after_header,
+                    parsed_weather.final_stream,
+                    parsed_weather.raw_records.len(),
+                    &selected,
+                );
+            }
             let weather_series = precompute_weather_timestep_series(
                 environment_weather.hourly_records(),
                 time_axis.zone_timestep.timesteps_per_hour,

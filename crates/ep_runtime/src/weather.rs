@@ -9,6 +9,9 @@ use std::path::Path;
 
 const EPW_HEADER_LINE_COUNT: usize = 8;
 
+#[path = "weather_raw/mod.rs"]
+pub mod raw;
+
 #[path = "weather_calendar.rs"]
 mod weather_calendar;
 use weather_calendar::parse_epw_calendar_metadata;
@@ -546,13 +549,24 @@ pub(crate) fn heat_balance_weather_context_for_timestep(
     zone_timestep: u32,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> Option<HeatBalanceWeatherContext<'_>> {
-    weather_series.map(|series| HeatBalanceWeatherContext {
-        records: series.hourly_records(),
-        sample: series.sample_for(record_index, zone_timestep),
-        record_index,
-        zone_steps_per_hour,
-        zone_timestep: Some(zone_timestep),
-        first_hour_interpolation_starting_values,
+    weather_series.map(|series| {
+        let context = HeatBalanceWeatherContext {
+            records: series.hourly_records(),
+            sample: series.sample_for(record_index, zone_timestep),
+            record_index,
+            zone_steps_per_hour,
+            zone_timestep: Some(zone_timestep),
+            first_hour_interpolation_starting_values,
+        };
+        if let Some(record) = context.records.get(record_index) {
+            raw::production_trace::record_consumer(
+                record_index,
+                zone_timestep,
+                record,
+                context.sample,
+            );
+        }
+        context
     })
 }
 
