@@ -21,7 +21,7 @@
 
 crates/ep_runtime/src/weather.rs; weather_calendar.rs; weather_data_periods.rs
 
-현재 Rust 기준 커밋: `d7b516627f421259012f3e61bc28cca831452468`. 위 경로는 재사용·확인할 위치이며
+착수 전 Rust 기준 커밋: `d7b516627f421259012f3e61bc28cca831452468`. 위 경로는 재사용·확인할 위치이며
 이 카드의 새 검증이 통과했다는 의미가 아니다.
 
 ## 입력 계약
@@ -71,13 +71,21 @@ A-24H·A-72H·B-BOTH-24H Full/Summary의 실제 raw parser owner와 물리 adapt
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+구현 커밋: `930633cbda9c839cb0bad2c97361dc8885087de3`; crates tree `2bf661c9123d66f5af2bca51394f66d6c496a8ea`
+
+시험 명령: unit/production actual record_command receipt 및 workspace·Clippy·source-quality·structure의 actual exit 0을 [종료 증거](../evidence/CLK-02.json)에 결합했다.
+
+증거 경로: `energyplus_porting_plan/evidence/CLK-02.json`; 원본 21파일/64구간 및 header-container 보충 계약.
+
+최대오차/RMSE/상태 불일치: exact 정책; 단위 1,009,979건/불일치 0, 생산 15,078건/불일치 0. RMSE를 재구성하지 않는다.
+
+workspace 실제 시험: 4,552 passed/0 failed/0 ignored; 21 reported suite groups.
+
+추가 검토할 helper: CLK-03~06 record selection·Today/Tomorrow·결측 대체·보간·sky/IR·calendar/warmup 및 이후 물리 계산.
+
+기존 public legacy API는 유지한다. 새로운 생산 로더는 동일 raw 파싱 결과와 별도 physical projection을 반환하며, 실제 소비 인계만 이 카드에서 인증한다.

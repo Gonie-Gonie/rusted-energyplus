@@ -2055,3 +2055,47 @@ cross-year semantics, February 29
 coupling, subhourly solar interpolation,
 and complete `SetCurrentWeather`/solar/`WeatherManager` conformance remain
 explicitly deferred.
+
+## CLK-02: bounded raw EPW parsing and actual production handoff
+
+The CLK-02 evidence packet at
+[`energyplus_porting_plan/evidence/CLK-02.json`](../../../energyplus_porting_plan/evidence/CLK-02.json)
+binds the EnergyPlus 26.1.0 source contract, actual original helper output,
+canonical Rust probe, production CLI runs, and their recorded comparisons.
+Its scope is raw record interpretation and the selected header state; it does
+not promote this document's other weather or calendar boundaries.
+
+`ep_runtime::weather::raw` owns the raw date/time integers, twenty mandatory
+and six optional floating-point outputs, weather observation/code fields,
+the persistent missing-code counter, and selected EPW header state. Separate
+EPWDST and DST objects, allocation flags, constructor/prepared state, partial
+writes on actual source-fatal outcomes, ordered continuations, and available
+stream positions are retained. Finite scalar bits, signed zero, typed state,
+array cardinality, and input identity are compared exactly. Native error text,
+rdstate integers, private locals, and unused Typical/Extreme/Ground computed
+state remain outside the paired fields.
+
+Production runtime preparation calls `load_parsed_epw_weather_file` once. The returned
+`ParsedEpwWeatherFile` retains the raw owner outputs and a distinct
+`physical_projection` for the existing environment selector and weather
+precomputation. Ten shared weather values copy their literal raw public slots.
+The existing liquid-precipitation adapter maps its missing sentinel and
+negative values to zero; that adapter value is checked at the actual consumer
+handoff without certifying EnergyPlus' later precipitation policy. Raw record
+year remains distinct from the civil simulation year.
+
+Full observations connect the actual selected source record indices to these
+same raw outputs, selected hourly records, and the already-constructed weather
+consumer context. The observer copies received values; it neither reparses
+records nor recomputes weather. Summary uses the same canonical loading path
+with collection disabled and is checked for unchanged ordinary results. Trace
+omissions and the collecting-thread boundary are explicit. Observed selection
+indices are Rust provenance, rather than native record-selection parity.
+
+The existing public `load_epw_weather_file` and parsing APIs remain supported
+for their previous callers and the preserved legacy baseline. Their existence
+does not certify broader admission or later physical calculations. CLK-03
+through CLK-06 retain Today/Tomorrow lifecycle, native record selection,
+sentinel replacement, rain/snow policy, interpolation, sky/IR calculation,
+calendar/warmup correspondence, and later weather physics. Parsing all 8,760
+fixed-file rows does not certify annual thermal or HVAC performance.

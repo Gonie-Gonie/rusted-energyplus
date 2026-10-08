@@ -3913,29 +3913,963 @@
       "group": "02 시간·기상",
       "title": "EPW 헤더·시간별 레코드 해석",
       "source": "WeatherManager.cc",
-      "symbols": "ProcessEPWHeader; InterpretWeatherDataLine",
-      "block": "사용하는 헤더 및 기상 열의 해석·결측 정책만. 사용하지 않는 열은 원본 보존 또는 명시적 제외.",
+      "symbols": "ProcessEPWHeader; InterpretWeatherDataLine; OpenEPlusWeatherFile",
+      "block": "선정 raw 레코드와 헤더 상태·실제 스트림 해석. 기존 물리 adapter와 실제 소비 인계는 분리하며 결측 대체·보간·IR는 후속 카드에 남긴다.",
       "dependencies": [
         "CON-01"
       ],
       "inputs": "선정 EPW 텍스트",
       "outputs": "일자·건구/노점·RH·기압·풍속/풍향·일사·IR·강우 레코드",
       "timing": "기상 입력 읽기",
-      "unit_tests": "정상 레코드; 사용 열의 missing sentinel; 데이터 기간 해석",
-      "integration_test": "CLK-03~06에서 단위·결측 대체값 소비 확인",
-      "rust_candidate": "crates/ep_runtime/src/weather",
+      "unit_tests": "40 fresh owners/46 diagnostic calls + fixed 8760 = 8806 raw calls; 23 header roots; exact 1009979 comparisons/0 mismatches",
+      "integration_test": "A24/A72/BBoth24 실제 Full/Summary 6회; 같은 raw owner→selected source index→physical projection→actual consumer의 exact 인계",
+      "rust_candidate": "crates/ep_runtime/src/weather_raw; weather.rs; ep_run pipeline/clk02_trace.rs",
       "assessment": "기존 구현 재검증",
       "companion": "WeatherManager.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/WeatherManager.cc",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
-      "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "source_boundary_note": "동결 원본 21파일/64구간과 EPVector 생성자·allocate 의미 보충 증거. 실제 original-first 출력과 unchanged legacy baseline을 보존한다.",
+      "numeric_policy": "유한 raw Real64·signed zero·typed state·순서·배열 길이·실제 인계는 bit exact/atol=0/rtol=0. native 오류 문장·물리 계산·calendar/warmup 정렬에는 PASS를 부여하지 않는다.",
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+        "source_ranges": [
+          {
+            "symbol": "epwHeaders",
+            "description": "eight ordered header tokens",
+            "start_line": 105,
+            "end_line": 112,
+            "role": "header-token-table",
+            "range_sha256": "577582229864c09b607ac7af2cb4f4064ab7c896b08f42b50ee91e1142177f51",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "ManageWeather",
+            "description": "initialize, current weather and reporting",
+            "start_line": 131,
+            "end_line": 157,
+            "role": "caller-context",
+            "range_sha256": "b270fcc3a18e60da68634da5454a05b95578ace5b7b1a1f088db404fb8258940",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "GetBranchInputOneTimeFlag",
+            "description": "header open and later intervals admission",
+            "start_line": 705,
+            "end_line": 735,
+            "role": "caller-context",
+            "range_sha256": "8691651633f5df85576e3470b982ca53c902578c4dfb9be5f85a9ec12b8ca45e",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "SetupWeekDaysByMonth",
+            "description": "header weekday setup, immutable CLK-01 reuse",
+            "start_line": 1246,
+            "end_line": 1327,
+            "role": "direct-helper",
+            "range_sha256": "064e426422838349aaa68060a6977ed70592244a6c78daae7605e15bb8c93daa",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "InitializeWeather",
+            "description": "environment missing defaults and first daily read",
+            "start_line": 1725,
+            "end_line": 1791,
+            "role": "excluded-context",
+            "range_sha256": "9bf1d330b676d0bec76dec5d9afa70143456d1e4f379e4ca3db5a8a4bc311216",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "ReadWeatherForDay",
+            "description": "daily-reader delegation",
+            "start_line": 2275,
+            "end_line": 2292,
+            "role": "excluded-context",
+            "range_sha256": "ef8acd396825acaa367bac70c05634552b60c5e6c78215a06ce88e6c48ef4361",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "RecordDateMatch",
+            "description": "MatchYear versus source record year",
+            "start_line": 2469,
+            "end_line": 2477,
+            "role": "excluded-context",
+            "range_sha256": "3ec693816c3c4e2b603ff60372f175969f1f9d0de10e01830ce4746d42f2cd62",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "hour != WHour",
+            "description": "daily reader hourly order check",
+            "start_line": 2727,
+            "end_line": 2735,
+            "role": "excluded-context",
+            "range_sha256": "80900e75061a8ffabe712fa2d5497bbca7223d436d7c34c3984e1137f3bf281e",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "ETHoriz",
+            "description": "negative/missing preclassification",
+            "start_line": 2738,
+            "end_line": 2823,
+            "role": "excluded-context",
+            "range_sha256": "9958292d410321a0982a256358f47ca6809ffd0a74101ed4e2f307a118e577a0",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "TomorrowVariables.Year",
+            "description": "Feb29 and raw source year retained",
+            "start_line": 2825,
+            "end_line": 2853,
+            "role": "excluded-context",
+            "range_sha256": "e5b829b7f2e59eb696380b3b39efdd2ae2d6ee8d5b8c92aadc258dbbd131dd4a",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "wvarsMissing",
+            "description": "previous/default substitution, rain and sky owner",
+            "start_line": 2879,
+            "end_line": 3040,
+            "role": "excluded-context",
+            "range_sha256": "9fd9b1d8320fa329cf53878027c6cfd158cc43cd5efe43337b8f222e4f032fc7",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "ErrorInterpretWeatherDataLine",
+            "description": "genuine fatal error route",
+            "start_line": 3251,
+            "end_line": 3264,
+            "role": "direct-error-helper",
+            "range_sha256": "b97d5cd941816103e9611e3e8f1dd511763a549f83dd99d79d4ec1369ff88af6",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "InterpretWeatherDataLine",
+            "description": "whole unchanged raw record parser",
+            "start_line": 3266,
+            "end_line": 3492,
+            "role": "primary-owner",
+            "range_sha256": "d7cfd29bde7247bcda8df92c4950c6a9af30b087285d3e9f372175633bcd3066",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "OpenWeatherFile",
+            "description": "existing file to full header route",
+            "start_line": 4336,
+            "end_line": 4352,
+            "role": "caller-context",
+            "range_sha256": "d28135ac50f620ce5b2546857e590b4919949b541abb49d76f4280f49e962841",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "OpenEPlusWeatherFile",
+            "description": "actual file open and header dispatch gate",
+            "start_line": 4354,
+            "end_line": 4413,
+            "role": "primary-caller",
+            "range_sha256": "6259904acbbc7bd679836f8942f5488d0849e6b466668399fc418499cdad9ae3",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "WeatherFileLatitude",
+            "description": "later selected Site location override",
+            "start_line": 4434,
+            "end_line": 4474,
+            "role": "excluded-context",
+            "range_sha256": "64c9eb10ac03c20b98fc39d33030732986eb14f8d1c81ef1fda9c10481478274",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "ProcessEPWHeader",
+            "description": "whole unchanged header parser",
+            "start_line": 7486,
+            "end_line": 8170,
+            "role": "primary-owner",
+            "range_sha256": "8fcb8f3c449d35b77900e7def5154e32d0440b7971e3fef6be73a088fdfc34cd",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType::Location",
+            "description": "LOCATION numeric and title state",
+            "start_line": 7515,
+            "end_line": 7583,
+            "role": "selected-branch",
+            "range_sha256": "a95438d1b9b56cb49650b87bd97f98ad47953b472662d974b23ee677bead4fdd",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType::TypicalExtremePeriods",
+            "description": "genuine unused CON Typical/Extreme state",
+            "start_line": 7584,
+            "end_line": 7824,
+            "role": "unpaired-context",
+            "range_sha256": "7a8c3726f2293b3c861b40108bf743c7932b8809e94b042cde9a6e965aea7d7c",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType::GroundTemperatures",
+            "description": "genuine unused CON ground header state",
+            "start_line": 7825,
+            "end_line": 7865,
+            "role": "unpaired-context",
+            "range_sha256": "9c3f17512ce1bc91534be31c08eda1f008262d2dd6038034e4c2619c193ffc59",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType::HolidaysDST",
+            "description": "leap/DST/holiday header state",
+            "start_line": 7866,
+            "end_line": 8012,
+            "role": "selected-branch",
+            "range_sha256": "3393d52366cbcb40ae8ad4d211c46bf49586a324189c7173241da59094daa2b8",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType::Comments1",
+            "description": "comments/design have no action",
+            "start_line": 8013,
+            "end_line": 8017,
+            "role": "no-action-branch",
+            "range_sha256": "7af637fca8f26c6d71af888966b1acaea418ce0da08c723e3f831b40be01a394",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType::DataPeriods",
+            "description": "period count, dates and weekday state",
+            "start_line": 8018,
+            "end_line": 8164,
+            "role": "selected-branch",
+            "range_sha256": "6a36403dc8d2802c24d604a2bbb764337d89982afd389856ce8c1d7b9ee73245",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "SkipEPlusWFHeader",
+            "description": "already-parsed reopen route",
+            "start_line": 8172,
+            "end_line": 8248,
+            "role": "excluded-context",
+            "range_sha256": "c45a3fe70dc50f5eb0bce9e87470cc66621599a2fb55efde8b0f8e49f32982bc",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "computeJulianDate",
+            "description": "year-bearing header dates, CLK-01 reuse",
+            "start_line": 8533,
+            "end_line": 8558,
+            "role": "direct-helper",
+            "range_sha256": "f394a9b0f2bc38379a940a374ea3db1c2c31f64fc7fc86fd12067c49c31d1dd3",
+            "path": "src/EnergyPlus/WeatherManager.cc"
+          },
+          {
+            "symbol": "EpwHeaderType",
+            "description": "header and date enums",
+            "start_line": 73,
+            "end_line": 95,
+            "role": "declarations",
+            "range_sha256": "03b7c95750c0add16b7c41af255052e5df8a2f7c97b1e1895fb0e20793e846cf",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "DayWeatherVariables",
+            "description": "date provenance, periods and DST defaults",
+            "start_line": 305,
+            "end_line": 369,
+            "role": "state-declarations",
+            "range_sha256": "4257b96c42e201eaad8c01a99462cce02e1f9a3227d1def98c1888f07dffdcbb",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "WeatherVarCounts",
+            "description": "actual weather-code miss counter default",
+            "start_line": 373,
+            "end_line": 396,
+            "role": "state-declarations",
+            "range_sha256": "12aff056d5ff34a04401d150d83f55174fc599963a71f44b152e6783c4d715f6",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "InterpretWeatherDataLine",
+            "description": "public raw output references",
+            "start_line": 503,
+            "end_line": 544,
+            "role": "declarations",
+            "range_sha256": "119a33c8a9597132423d735c87a1b16c900146f360ce95ef8a0180244136ee2f",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "WeatherVars",
+            "description": "raw versus downstream weather owner types",
+            "start_line": 713,
+            "end_line": 744,
+            "role": "excluded-state-declarations",
+            "range_sha256": "881571ccc8d0c3d9f12a1800cae2ddcf036bfc1761e8d0a842de6c8dd156c870",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "WeatherFileLatitude",
+            "description": "location, period count and calendar defaults",
+            "start_line": 792,
+            "end_line": 833,
+            "role": "state-declarations",
+            "range_sha256": "57bb2b6f9364b496f7bf6995eed5525ca3ed1405a817f678025d2f6d2716c7f4",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "EndDayOfMonth",
+            "description": "date admission, arrays, counters and title defaults",
+            "start_line": 861,
+            "end_line": 930,
+            "role": "state-declarations",
+            "range_sha256": "7f94d8b0d0a6ca19afbc689fd45724db656d10728486bb4a5d69924d6ab761d9",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "clear_state",
+            "description": "actual WeatherManagerData reconstruction",
+            "start_line": 940,
+            "end_line": 943,
+            "role": "lifecycle",
+            "range_sha256": "166a690766eb1ba9e0396a1973fdcfef798b153233dc84594dbeacbb2e10c121",
+            "path": "src/EnergyPlus/WeatherManager.hh"
+          },
+          {
+            "symbol": "ProcessDateString",
+            "description": "header date lexical owner",
+            "start_line": 395,
+            "end_line": 454,
+            "role": "direct-helper",
+            "range_sha256": "2c4e37eb626cc83aaaaec886ce76ef19b090d97f9debf4b8a285553cad3f0e49",
+            "path": "src/EnergyPlus/General.cc"
+          },
+          {
+            "symbol": "DetermineDateTokens",
+            "description": "header date tokens and year extraction",
+            "start_line": 456,
+            "end_line": 668,
+            "role": "direct-helper",
+            "range_sha256": "53959fc0f5c27d16262143ad85a976d4a66b91ea4f77bdee9a760719e2226e60",
+            "path": "src/EnergyPlus/General.cc"
+          },
+          {
+            "symbol": "ValidateMonthDay",
+            "description": "date local validation flag",
+            "start_line": 670,
+            "end_line": 703,
+            "role": "direct-helper",
+            "range_sha256": "db9d229e9ae4a1330328e9010dcf9da6eadc56a5e298836161862a642ece8b49",
+            "path": "src/EnergyPlus/General.cc"
+          },
+          {
+            "symbol": "OrdinalDay",
+            "description": "no-year period dates, CLK-01 reuse",
+            "start_line": 705,
+            "end_line": 737,
+            "role": "direct-helper",
+            "range_sha256": "a75944ba1e753120c50af5c3741a157e2f33c456df3f2c00c6247309b3b4e665",
+            "path": "src/EnergyPlus/General.cc"
+          },
+          {
+            "symbol": "InvOrdinalDay",
+            "description": "single-number date path",
+            "start_line": 739,
+            "end_line": 784,
+            "role": "direct-helper",
+            "range_sha256": "cf0a8d9486040bd689f136f66c011bf95a32d0e5207b02bb295534c851987b3e",
+            "path": "src/EnergyPlus/General.cc"
+          },
+          {
+            "symbol": "stringReader",
+            "description": "actual stream for weather codes",
+            "start_line": 58,
+            "end_line": 63,
+            "role": "direct-helper",
+            "range_sha256": "c2e3f25ed3bef5135056d719d3d4c93e17c7ceb287ecfdebc10f157d9a232424",
+            "path": "src/EnergyPlus/StringUtilities.hh"
+          },
+          {
+            "symbol": "readListItem",
+            "description": "homogeneous lexical item parser",
+            "start_line": 65,
+            "end_line": 97,
+            "role": "direct-helper",
+            "range_sha256": "ca484af52bd4b258c99d79538bff0f1822c743eb008baf3726b91fe75ff5781c",
+            "path": "src/EnergyPlus/StringUtilities.hh"
+          },
+          {
+            "symbol": "nth_occurrence",
+            "description": "position after nth delimiter",
+            "start_line": 146,
+            "end_line": 164,
+            "role": "direct-helper",
+            "range_sha256": "21751cf061297fd8d205966cb4f9ac4109c463c5245bb12106f2da7f7ca73c64",
+            "path": "src/EnergyPlus/StringUtilities.hh"
+          },
+          {
+            "symbol": "readList",
+            "description": "last-status comma fold",
+            "start_line": 166,
+            "end_line": 175,
+            "role": "direct-helper",
+            "range_sha256": "9ea70786f553b69ba915692601debc169557062469f021f2d83568d6e0effef5",
+            "path": "src/EnergyPlus/StringUtilities.hh"
+          },
+          {
+            "symbol": "from_chars",
+            "description": "compiler-selected integer parse shim",
+            "start_line": 66,
+            "end_line": 123,
+            "role": "direct-helper",
+            "range_sha256": "c0bc387fcc1a8a9d3df4421731e39c3c5f890ab667ed791f5dea3647ddaa2969",
+            "path": "src/EnergyPlus/FromChars.hh"
+          },
+          {
+            "symbol": "ProcessNumber",
+            "description": "optional/header finite numeric parse",
+            "start_line": 94,
+            "end_line": 173,
+            "role": "direct-helper",
+            "range_sha256": "69d0e36ab14ac0b24cf2ef42a00a7b32bb6b5c2d7e31e6e5665d8a29edee947a",
+            "path": "src/EnergyPlus/UtilityRoutines.cc"
+          },
+          {
+            "symbol": "FindNonSpace",
+            "description": "full-file header leading-space gate",
+            "start_line": 674,
+            "end_line": 690,
+            "role": "direct-helper",
+            "range_sha256": "ec9c7abad477e3ed5fd1bc5c3aad5af0ec8fb2a02dc2e672756cedd28e7389eb",
+            "path": "src/EnergyPlus/UtilityRoutines.cc"
+          },
+          {
+            "symbol": "getEnumValue",
+            "description": "exact uppercase weekday lookup",
+            "start_line": 665,
+            "end_line": 673,
+            "role": "direct-helper",
+            "range_sha256": "eefd8872f3979e72fb935ab16bdd0077d2490267c4b71361fa7b4ee72d35aa2a",
+            "path": "src/EnergyPlus/UtilityRoutines.hh"
+          },
+          {
+            "symbol": "FindItemInList",
+            "description": "actual date-token iterator lookup",
+            "start_line": 410,
+            "end_line": 417,
+            "role": "direct-helper",
+            "range_sha256": "8729851b37f35dc89487dc569cf8e10ea6d724e6de8d445238cfaba2ebcd3a3d",
+            "path": "src/EnergyPlus/UtilityRoutines.hh"
+          },
+          {
+            "symbol": "dayTypeNamesUC",
+            "description": "weekday enum names",
+            "start_line": 137,
+            "end_line": 149,
+            "role": "constant-table",
+            "range_sha256": "765ad81dea61932f62946a3eff61bc8fefcf1822108f6daf3b46dbbc1ec83ace",
+            "path": "src/EnergyPlus/ScheduleManager.cc"
+          },
+          {
+            "symbol": "getNumObjectsFound",
+            "description": "real zero-control input lookup",
+            "start_line": 505,
+            "end_line": 541,
+            "role": "factory-helper",
+            "range_sha256": "fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301",
+            "path": "src/EnergyPlus/InputProcessing/InputProcessor.cc"
+          },
+          {
+            "symbol": "InputFile::readLine",
+            "description": "actual line read and CR removal",
+            "start_line": 89,
+            "end_line": 103,
+            "role": "direct-IO-helper",
+            "range_sha256": "02d331bf63e9d868fece98e9e6fb9f6e69aecdd09824082b9d09799d8055a2c2",
+            "path": "src/EnergyPlus/IOFiles.cc"
+          },
+          {
+            "symbol": "InputFile::open",
+            "description": "binary fstream owner",
+            "start_line": 143,
+            "end_line": 149,
+            "role": "direct-IO-helper",
+            "range_sha256": "054013a7e8fc2b054263c5b96007378237a25b454d43ed07309a8f7edd7ea96f",
+            "path": "src/EnergyPlus/IOFiles.cc"
+          },
+          {
+            "symbol": "ReadResult",
+            "description": "actual EOF/good semantics",
+            "start_line": 390,
+            "end_line": 417,
+            "role": "IO-declarations",
+            "range_sha256": "0af0e6e87a5f6eba8d975211a8fdef19af3df51e54247098b38abc124538b37b",
+            "path": "src/EnergyPlus/IOFiles.hh"
+          },
+          {
+            "symbol": "WeatherFileLocationTitle",
+            "description": "actual copied location title",
+            "start_line": 169,
+            "end_line": 175,
+            "role": "state-declarations",
+            "range_sha256": "716bd751b33fb60194ea8a9c7ec0445b1db0e575f2ee07bfdba3094f9a06b184",
+            "path": "src/EnergyPlus/DataEnvironment.hh"
+          },
+          {
+            "symbol": "sign",
+            "description": "nint bounded observation indicator",
+            "start_line": 566,
+            "end_line": 591,
+            "role": "direct-helper",
+            "range_sha256": "fc320e3a68d9ad63bb57831b545ab8502dfa72bdd14274b7bbe30c6434ccdbfb",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh"
+          },
+          {
+            "symbol": "ModSelector",
+            "description": "integer modulo for header field selection",
+            "start_line": 680,
+            "end_line": 715,
+            "role": "direct-helper",
+            "range_sha256": "7fc1f6b69ef19694852801faadd38117d9e276b9f445b839670bfecfea76f41c",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh"
+          },
+          {
+            "symbol": "not_blank",
+            "description": "date-token trailing-buffer check",
+            "start_line": 50,
+            "end_line": 56,
+            "role": "direct-helper",
+            "range_sha256": "2182cc4a80fd06d9c5f88624a75dba054bc83c90d69d4a8889ca5105360f11da",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh"
+          },
+          {
+            "symbol": "has",
+            "description": "weather-code digit membership",
+            "start_line": 140,
+            "end_line": 146,
+            "role": "direct-helper",
+            "range_sha256": "3029607b6611794dabdfefde723719b7887894b8a39bd3c621a84b1eff8d3d6f",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh"
+          },
+          {
+            "symbol": "len",
+            "description": "length and source index semantics",
+            "start_line": 691,
+            "end_line": 718,
+            "role": "direct-helper",
+            "range_sha256": "f318bfdcf042a4589028d5624cba99e4a11db7648388cdd6d021c564ae355291",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.hh"
+          },
+          {
+            "symbol": "uppercase",
+            "description": "header uppercase operation",
+            "start_line": 23,
+            "end_line": 32,
+            "role": "direct-helper",
+            "range_sha256": "2c057429f4c1404f72f258493e357e5526a34c57fcc02d3aa5057ec0a71bedc8",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc"
+          },
+          {
+            "symbol": "strip",
+            "description": "literal-space stripping",
+            "start_line": 81,
+            "end_line": 95,
+            "role": "direct-helper",
+            "range_sha256": "b36202f0fef7a877b36186e1daf7a03b9d201f40feabe6e24a6acae5b9cfa827",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc"
+          },
+          {
+            "symbol": "stripped",
+            "description": "LOCATION stripped title fragments",
+            "start_line": 263,
+            "end_line": 276,
+            "role": "direct-helper",
+            "range_sha256": "b02a2d986f68366cbd2e6f3ce3f995bfab0cfa24e10b3e7755e81c43d7ab6489",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/string.functions.cc"
+          },
+          {
+            "symbol": "uppercase",
+            "description": "ASCII character uppercase",
+            "start_line": 217,
+            "end_line": 225,
+            "role": "direct-helper",
+            "range_sha256": "3580eebdb35bf5c218b305625f4f2f380e332906ed21c61afe08e9d86be5679f",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/char.functions.hh"
+          },
+          {
+            "symbol": "to_upper",
+            "description": "actual character case arithmetic",
+            "start_line": 254,
+            "end_line": 261,
+            "role": "direct-helper",
+            "range_sha256": "444da309d1238f4590d140cab9590ba8b3912987828dc89ff35baf41d7845db8",
+            "path": "third_party/ObjexxFCL/src/ObjexxFCL/char.functions.hh"
+          },
+          {
+            "symbol": "ObjexxFCL::nint",
+            "description": "actual imported string and integer helpers",
+            "start_line": 145,
+            "end_line": 197,
+            "role": "import-bindings",
+            "range_sha256": "9b2868d3cbc27dc5716db6a22bc4d95ffe5a8b413b1141978e5b6aa7494f27b2",
+            "path": "src/EnergyPlus/EnergyPlus.hh"
+          }
+        ],
+        "complete_source_packet": {
+          "path": "energyplus_porting_plan/contracts/CLK-02-source.json",
+          "sha256": "4fc97c6a0a775f956c79855795f5a23c6e190ba2ad25dc2cba4b04477a9cf1d0"
+        },
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/cases/CLK-02/helper-request.json",
+            "sha256": "06059e9be2b8e2a20dc9a5d603d061dc427bb3dfa8ba83ec2b9fca75c27a709a"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+            "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+            "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+            "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": ".runtime/porting/CLK-02/original-helper-first-01/helper-reference.json",
+              "sha256": "afa446961b4df0651c916a84a24a816814da8becb48b952e511049e7cc4bc3d0"
+            },
+            {
+              "path": ".runtime/porting/CLK-02/original-helper-first-01/helper-command.json",
+              "sha256": "d3a0de48b47f2e89f12ace6cf91ebc351fb9dc5f0f8023ff4df1d2f89e7f60b8"
+            },
+            {
+              "path": ".runtime/porting/CLK-02/original-helper-first-01/native-output/results.json",
+              "sha256": "8342208b5946b89db1cc5670352734d88ec8bfb3f2e8cc3e62e25d93a6c61346"
+            },
+            {
+              "path": ".runtime/porting/CLK-02/independent-original-data-review-01/review.json",
+              "sha256": "a1acff78956de2f20ac101caef5e90e7a4970b2d4f62ec925fef158d39492b28"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python -X utf8 -B tools/porting/check_clk02_unit.py --original-reference .runtime/porting/CLK-02/original-helper-first-01/helper-reference.json --original-data-review .runtime/porting/CLK-02/independent-original-data-review-01/review.json --baseline-review .runtime/porting/CLK-02/independent-legacy-gap-review-01/review.json --rust-build .runtime/porting/CLK-02/canonical-rust-build-02/build-receipt.json --rust-execution .runtime/porting/CLK-02/canonical-unit-first-01/receipt.json --dto-projection .runtime/porting/CLK-02/unit-dto-freeze-03/projection.json --output-dir .runtime/porting/CLK-02/canonical-unit-comparison-01",
+            "commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/contracts/CLK-02-source.json",
+                "sha256": "4fc97c6a0a775f956c79855795f5a23c6e190ba2ad25dc2cba4b04477a9cf1d0"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/CLK-02-cases.json",
+                "sha256": "4752d6704b6ad8f6e4f1ea4907ce4d082bec041d0e2f22e28d11bd1c04ab062c"
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/CLK-02-tolerances.json",
+                "sha256": "3fb137a3096a331ea1ab3f751d2667530d9a6d8ca40d785bdd5c07bfd304350e"
+              },
+              {
+                "path": "energyplus_porting_plan/cases/CLK-02/helper-request.json",
+                "sha256": "06059e9be2b8e2a20dc9a5d603d061dc427bb3dfa8ba83ec2b9fca75c27a709a"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/original-helper-first-01/helper-reference.json",
+                "sha256": "afa446961b4df0651c916a84a24a816814da8becb48b952e511049e7cc4bc3d0"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/independent-original-data-review-01/review.json",
+                "sha256": "a1acff78956de2f20ac101caef5e90e7a4970b2d4f62ec925fef158d39492b28"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/header-container-source-audit-01/audit.json",
+                "sha256": "93e6d0b3a2ea2388270be7bffdeda434a4eec3dd55a9e10cc7da8a0788b075e9"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/independent-unit-comparer-static-review-02/review.json",
+                "sha256": "a51b718200bea42cabfde35da0d544f1fc496cc8d1620449238c77c945243378"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/independent-root-bridge-probe-static-review-01/review.json",
+                "sha256": "349f482705f650a0b336114eea66e039702814405a35060a3ef648522bb37563"
+              }
+            ],
+            "scope": "Frozen original source/header/container/input-only contract and independently reviewed bounded bridge/comparer."
+          },
+          "unit_gate": {
+            "command": "python -X utf8 -B tools/porting/check_clk02_unit.py --original-reference .runtime/porting/CLK-02/original-helper-first-01/helper-reference.json --original-data-review .runtime/porting/CLK-02/independent-original-data-review-01/review.json --baseline-review .runtime/porting/CLK-02/independent-legacy-gap-review-01/review.json --rust-build .runtime/porting/CLK-02/canonical-rust-build-02/build-receipt.json --rust-execution .runtime/porting/CLK-02/canonical-unit-first-01/receipt.json --dto-projection .runtime/porting/CLK-02/unit-dto-freeze-03/projection.json --output-dir .runtime/porting/CLK-02/canonical-unit-comparison-01",
+            "commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-02/canonical-unit-comparison-01/unit-comparison.json",
+                "sha256": "502dd9e0e74ffddf675c288a0dd4d474b576cbfa67f7c33f22aeef7737403e09"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/canonical-unit-comparison-command-01/receipt.json",
+                "sha256": "6446d4b0237ab19962545a99dce8968467bbcb5d728cfa281d3e2a4f7ffd95d6"
+              }
+            ],
+            "scope": "8806 raw calls/23 header roots, actual partial writes/typed state/stream/order; 1009979 exact comparisons, 0 mismatches."
+          },
+          "integration_gate": {
+            "command": "python -X utf8 -B tools/porting/check_clk02_production.py --matrix .runtime/porting/CLK-02/canonical-production-first-01/matrix.json --output-dir .runtime/porting/CLK-02/canonical-production-comparison-01",
+            "commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-02/canonical-production-comparison-01/production-comparison.json",
+                "sha256": "fc3a10e90c1b5bcf82b51d332d4218986776f2a21caf97b747ca8caad30c1966"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/canonical-production-comparison-command-01/receipt.json",
+                "sha256": "a6629f236ce8af166b9f2ea19821bf030fd4210e485c0506f0fa87d3879c2423"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/canonical-production-first-01/matrix.json",
+                "sha256": "73005dfa5ea736988097e670e933316d2daf0c0fe4bce7192efe8118dbb305dc"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/independent-production-reader-static-review-01/review.json",
+                "sha256": "53b541ff1e20be5a68f76366a9193edc645989143d26594a0344172a2af16491"
+              }
+            ],
+            "scope": "Actual raw owner to selected source record and existing physical consumer handoff, no native downstream-physics claim."
+          },
+          "production_gate": {
+            "command": "python -X utf8 -B tools/porting/check_clk02_production.py --matrix .runtime/porting/CLK-02/canonical-production-first-01/matrix.json --output-dir .runtime/porting/CLK-02/canonical-production-comparison-01",
+            "commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-02/canonical-production-comparison-01/production-comparison.json",
+                "sha256": "fc3a10e90c1b5bcf82b51d332d4218986776f2a21caf97b747ca8caad30c1966"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/canonical-production-comparison-command-01/receipt.json",
+                "sha256": "a6629f236ce8af166b9f2ea19821bf030fd4210e485c0506f0fa87d3879c2423"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/canonical-production-first-01/matrix.json",
+                "sha256": "73005dfa5ea736988097e670e933316d2daf0c0fe4bce7192efe8118dbb305dc"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/clippy-quality-01/receipt.json",
+                "sha256": "40c54852d3ecd69e680a5bf6432cdbc2032d8426504b299d692f46c42b0d7b1e"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/source-quality-01/receipt.json",
+                "sha256": "4942f3c5340c1786f16ba52502ddb412826ecb446fec43e1de0850b811aabddb"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/structure-quality-02/receipt.json",
+                "sha256": "d1d36a5d6aa15c8b5c4fb9d834e975d6a38349633a7a5cf85e7186fc2b42723e"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/scoped-format-check-01/receipt.json",
+                "sha256": "e3ce1b2d851147eb7473d38155bc6ad993edaa2643d86dc65e6be792ccfcf092"
+              },
+              {
+                "path": ".runtime/porting/CLK-02/workspace-tests-02/receipt.json",
+                "sha256": "7cb2530a5e7b7879f823e75e0cbf304c727679a6506e3535b7c3ebb0bef4db3d"
+              }
+            ],
+            "scope": "6 actual ordinary Full/Summary commands, observer absence and ordinary equality; unchanged production sources and separately recorded fixture-only final QA provenance, with all required actual quality checks passed."
+          }
+        },
+        "production": {
+          "rust_entrypoint": ".runtime/porting/CLK-02/canonical-cli-build-01/eplus-rs.exe run <fixed-IDF> --weather <pinned-EPW> --trace-level full|summary",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "completed_actual_cases": [
+            "A-24H",
+            "A-72H",
+            "B-BOTH-24H"
+          ],
+          "actual_successful_normal_CLI_commands": 6
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/CLK-02-tolerances.json",
+            "sha256": "3fb137a3096a331ea1ab3f751d2667530d9a6d8ca40d785bdd5c07bfd304350e"
+          },
+          "report": {
+            "path": ".runtime/porting/CLK-02/canonical-production-comparison-01/production-comparison.json",
+            "sha256": "fc3a10e90c1b5bcf82b51d332d4218986776f2a21caf97b747ca8caad30c1966"
+          },
+          "unit_report": {
+            "path": ".runtime/porting/CLK-02/canonical-unit-comparison-01/unit-comparison.json",
+            "sha256": "502dd9e0e74ffddf675c288a0dd4d474b576cbfa67f7c33f22aeef7737403e09"
+          }
+        },
+        "scope_metrics": {
+          "unit": {
+            "comparison_count": 1009979,
+            "mismatch_count": 0,
+            "categories": {
+              "array_cardinality": 18023,
+              "typed_state": 516107,
+              "finite_binary64_slots": 458280,
+              "input_identity": 17569
+            },
+            "mismatches": [],
+            "mismatch_payload_limit": 1000,
+            "mismatch_payloads_truncated": false
+          },
+          "production": {
+            "comparison_count": 15078,
+            "mismatch_count": 0,
+            "actual_command_count": 6,
+            "categories": {
+              "native_header_state": 219,
+              "native_semantic_stream": 42,
+              "native_raw_storage": 5280,
+              "literal_date_copy": 600,
+              "literal_scalar_copy": 1200,
+              "actual_consumer_record_handoff": 7680,
+              "Full_Summary_ordinary_equality": 45,
+              "Full_Summary_export_bytes": 6,
+              "Full_Summary_export_values": 6
+            }
+          }
+        },
+        "provenance": {
+          "implementation_commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+          "crates_tree": "2bf661c9123d66f5af2bca51394f66d6c496a8ea",
+          "compact_evidence": {
+            "path": "energyplus_porting_plan/evidence/CLK-02.json",
+            "sha256": "febdc55ef0feb2bf51f670f916b766fa37da26e76bf4750aebbebd683f02f0e3"
+          },
+          "source_snapshot": {
+            "path": ".runtime/porting/source-objects/17/17e9ece2685ab292204ff39d6c2bdb7d1fa10f0753fc2d57414f4de0650bcc1d",
+            "sha256": "17e9ece2685ab292204ff39d6c2bdb7d1fa10f0753fc2d57414f4de0650bcc1d"
+          },
+          "final_test_fixture_adjustment": {
+            "scientific_implementation_commit": "930633cbda9c839cb0bad2c97361dc8885087de3",
+            "scientific_crates_tree": "2bf661c9123d66f5af2bca51394f66d6c496a8ea",
+            "final_quality_commit": "42e587d979dcff8403fb8876657602176936cf6a",
+            "final_quality_crates_tree": "0bbb1d5f09536b4924c1564689d66bd3b07b1d21",
+            "scientific_source_snapshot": {
+              "path": ".runtime/porting/source-objects/17/17e9ece2685ab292204ff39d6c2bdb7d1fa10f0753fc2d57414f4de0650bcc1d",
+              "sha256": "17e9ece2685ab292204ff39d6c2bdb7d1fa10f0753fc2d57414f4de0650bcc1d"
+            },
+            "final_quality_source_snapshot": {
+              "path": ".runtime/porting/source-objects/a6/a657cce71094c1a1e57e973b095900b81760fa06f0c20db349080cb6053dfe89",
+              "sha256": "a657cce71094c1a1e57e973b095900b81760fa06f0c20db349080cb6053dfe89"
+            },
+            "actual_git_metadata_execution": {
+              "path": ".runtime/porting/CLK-02/final-qa-git-metadata-01/receipt.json",
+              "sha256": "d791a9ece54702b130146defee741d1740542b0a7f5fcdb4c6abb377aa71cbae"
+            },
+            "available_source_inventory_count": 3689,
+            "only_changed_available_source": [
+              {
+                "historical_path": "crates/ep_run/tests/arbitrary_run/fixtures.rs",
+                "scientific_archive": {
+                  "path": ".runtime/porting/source-objects/36/369c0f725b75bab578ad580144456236b855d409cc9de64ee64fda55457f8668",
+                  "sha256": "369c0f725b75bab578ad580144456236b855d409cc9de64ee64fda55457f8668"
+                },
+                "final_quality_archive": {
+                  "path": ".runtime/porting/source-objects/76/76008bcd4479c667e469895b6e636bd1ef7dea7f4e339f93a4c951fa91db7b03",
+                  "sha256": "76008bcd4479c667e469895b6e636bd1ef7dea7f4e339f93a4c951fa91db7b03"
+                }
+              }
+            ],
+            "all_other_available_Rust_and_Cargo_inputs_byte_identical": true,
+            "final_quality_tree_scientific_reexecution_claimed": false,
+            "scope": "Legacy arbitrary-run test EPW fixtures admitted to the safe raw input domain; archived successful 930633 unit/production science retained for unchanged production sources."
+          }
+        },
+        "implementation_validation": {
+          "required_checks": {
+            "clippy": {
+              "path": ".runtime/porting/CLK-02/clippy-quality-01/receipt.json",
+              "sha256": "40c54852d3ecd69e680a5bf6432cdbc2032d8426504b299d692f46c42b0d7b1e"
+            },
+            "source_quality": {
+              "path": ".runtime/porting/CLK-02/source-quality-01/receipt.json",
+              "sha256": "4942f3c5340c1786f16ba52502ddb412826ecb446fec43e1de0850b811aabddb"
+            },
+            "structure": {
+              "path": ".runtime/porting/CLK-02/structure-quality-02/receipt.json",
+              "sha256": "d1d36a5d6aa15c8b5c4fb9d834e975d6a38349633a7a5cf85e7186fc2b42723e"
+            },
+            "format": {
+              "path": ".runtime/porting/CLK-02/scoped-format-check-01/receipt.json",
+              "sha256": "e3ce1b2d851147eb7473d38155bc6ad993edaa2643d86dc65e6be792ccfcf092"
+            },
+            "workspace": {
+              "path": ".runtime/porting/CLK-02/workspace-tests-02/receipt.json",
+              "sha256": "7cb2530a5e7b7879f823e75e0cbf304c727679a6506e3535b7c3ebb0bef4db3d"
+            }
+          },
+          "all_actual_exit_zero_source_unchanged": true,
+          "workspace_actual_counts": {
+            "passed": 4552,
+            "failed": 0,
+            "ignored": 0,
+            "measured": 0,
+            "filtered_out": 0,
+            "reported_suite_groups": 21,
+            "nonempty_suite_groups": 13
+          }
+        },
+        "limitations": [
+          "This certifies only frozen raw parser/header fields and their observed contexts.",
+          "Finite scalars, signed zero, typed integers/text/booleans, array cardinality/order and actual source-fatal availability use exact comparisons.",
+          "Original public caller storage remains defined after source-fatal outcomes; no private source-local writes or global error-text parity is inferred.",
+          "Raw constructor phases pair only the actual raw owner context, rather than claiming Rust owns all original EnergyPlus state.",
+          "Production adapter handoff, physical invocation and all excluded downstream science require separate evidence.",
+          "Only actual selected raw outputs/header/stream observations, literal copied record fields and actual consumer record receipt are paired.",
+          "The liquid compatibility field is checked from actual projected record to actual consumer; source normalization/replacement policy remains unpaired.",
+          "Computed sample values are preserved and their own typed IEEE storage validated, without native interpolation or weather-physics equality claims.",
+          "Actual Rust caller/context/phase/order is observed; native callback, civil calendar and warmup correspondence is not inferred.",
+          "Summary establishes observer absence and unchanged ordinary results; it supplies no raw/consumer snapshots.",
+          "Card closure, later weather selection/lifecycle, annual performance and downstream thermal/HVAC science need separate evidence.",
+          "Raw 999 and the liquid physical adapter compatibility value are distinct owner fields; only the actual adapter-to-consumer handoff is certified here.",
+          "The legacy public parser APIs remain supported; unrestricted legacy admission or later weather physics are not promoted.",
+          "Header/date/input/state authorship is disclosed in the bridge static review and excluded from that independent review certification.",
+          "Available-source inventory certifies retained source bytes rather than compiler file selection, and before/after guards cannot rule out transient edits.",
+          "Final workspace/QA source differs only in one test-fixture file. Scientific unit/production results bind archived 930633 production sources, rather than certifying the whole final QA crates tree by reexecution.",
+          "CLK-03 is not started or promoted by this closure writer."
+        ]
+      }
     },
     {
       "id": "CLK-03",

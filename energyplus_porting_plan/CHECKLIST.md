@@ -83,7 +83,7 @@ B에서는 그 의존성을 적용한다.
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
 | [x] | [CLK-01](cards/CLK-01.md) | 달력·RunPeriod·day type | `WeatherManager.cc` · `GetRunPeriodData; SetupWeekDaysByMonth; calculateDayOfYear; isLeapYear` | CON-01 |
-| [ ] | [CLK-02](cards/CLK-02.md) | EPW 헤더·시간별 레코드 해석 | `WeatherManager.cc` · `ProcessEPWHeader; InterpretWeatherDataLine` | CON-01 |
+| [x] | [CLK-02](cards/CLK-02.md) | EPW 헤더·시간별 레코드 해석 | `WeatherManager.cc` · `ProcessEPWHeader; InterpretWeatherDataLine` | CON-01 |
 | [ ] | [CLK-03](cards/CLK-03.md) | 기상 레코드 선택·Today/Tomorrow 인계 | `WeatherManager.cc` · `GetNextEnvironment; ReadEPlusWeatherForDay; UpdateWeatherData` | CLK-01, CLK-02 |
 | [ ] | [CLK-04](cards/CLK-04.md) | 비일사 기상값 timestep 보간 | `WeatherManager.cc` · `SetupInterpolationValues; ReadEPlusWeatherForDay; SetCurrentWeather; interpolateWindDirection` | CLK-03 |
 | [ ] | [CLK-05](cards/CLK-05.md) | 일사 전용 timestep 보간 | `WeatherManager.cc` · `SetupInterpolationValues; ReadEPlusWeatherForDay` | CLK-03 |
