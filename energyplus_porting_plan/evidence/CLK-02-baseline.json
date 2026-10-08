@@ -1,0 +1,160 @@
+{
+  "schema": "clk02-original-and-legacy-baseline.v1",
+  "card": "CLK-02",
+  "created_utc": "2026-10-08T03:32:58.628973+00:00",
+  "status": "preserved-original-and-legacy-before-canonical-raw-owner",
+  "executed_metadata_writer": {
+    "path": ".runtime/porting/CLK-02/baseline-compact-01/write_compact.py",
+    "sha256": "b59e3beb82e4daf99f4f460880febb72a019341c28dbdc53c429f57e2989bb38"
+  },
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "contracts": {
+    "source": {
+      "path": "energyplus_porting_plan/contracts/CLK-02-source.json",
+      "sha256": "4fc97c6a0a775f956c79855795f5a23c6e190ba2ad25dc2cba4b04477a9cf1d0"
+    },
+    "cases": {
+      "path": "energyplus_porting_plan/contracts/CLK-02-cases.json",
+      "sha256": "4752d6704b6ad8f6e4f1ea4907ce4d082bec041d0e2f22e28d11bd1c04ab062c"
+    },
+    "tolerances": {
+      "path": "energyplus_porting_plan/contracts/CLK-02-tolerances.json",
+      "sha256": "3fb137a3096a331ea1ab3f751d2667530d9a6d8ca40d785bdd5c07bfd304350e"
+    }
+  },
+  "request": {
+    "path": "energyplus_porting_plan/cases/CLK-02/helper-request.json",
+    "sha256": "06059e9be2b8e2a20dc9a5d603d061dc427bb3dfa8ba83ec2b9fca75c27a709a"
+  },
+  "actual_original": {
+    "path": ".runtime/porting/CLK-02/original-helper-first-01/helper-reference.json",
+    "sha256": "afa446961b4df0651c916a84a24a816814da8becb48b952e511049e7cc4bc3d0"
+  },
+  "actual_original_results": {
+    "path": ".runtime/porting/CLK-02/original-helper-first-01/native-output/results.json",
+    "sha256": "8342208b5946b89db1cc5670352734d88ec8bfb3f2e8cc3e62e25d93a6c61346"
+  },
+  "actual_original_execution": {
+    "path": ".runtime/porting/CLK-02/original-helper-first-01/helper-command.json",
+    "sha256": "d3a0de48b47f2e89f12ace6cf91ebc351fb9dc5f0f8023ff4df1d2f89e7f60b8"
+  },
+  "independent_original_data_review": {
+    "path": ".runtime/porting/CLK-02/independent-original-data-review-01/review.json",
+    "sha256": "a1acff78956de2f20ac101caef5e90e7a4970b2d4f62ec925fef158d39492b28"
+  },
+  "actual_legacy": {
+    "path": ".runtime/porting/CLK-02/legacy-baseline-first-01/receipt.json",
+    "sha256": "99e0337da5423d04904059f0be937279bd55f3663de7f3172ccf53ff17de353f"
+  },
+  "actual_legacy_results": {
+    "path": ".runtime/porting/CLK-02/legacy-baseline-first-01/execution/stdout.log",
+    "sha256": "e3ca5741e4bcb26ec49f37c11539ba63b280c5555262ce916a9594e80557623a"
+  },
+  "actual_legacy_execution": {
+    "path": ".runtime/porting/CLK-02/legacy-baseline-first-01/execution/receipt.json",
+    "sha256": "bb65371deb102a170ac28af4b782a73403b99ab7e271458d07511468f5eacf5d"
+  },
+  "actual_legacy_build": {
+    "path": ".runtime/porting/CLK-02/legacy-rust-build-01/build-receipt.json",
+    "sha256": "8b189a7f86310d96f911d982d668bccc3522215685ed605b4828f71dd854c9d2"
+  },
+  "actual_legacy_binary": {
+    "path": ".runtime/porting/CLK-02/legacy-rust-build-01/clk02_legacy_probe.exe",
+    "sha256": "7724b0c068d30276f89b4e1ea58bbca7bb36297bd5c49d7179584f2760ad2b8f"
+  },
+  "actual_legacy_gap": {
+    "path": ".runtime/porting/CLK-02/legacy-gap-review-01/gap.json",
+    "sha256": "00bc81d2c82c81040e7fbed044976a62e86ec5194946b92e1ecad24c8a454255"
+  },
+  "independent_legacy_gap_review": {
+    "path": ".runtime/porting/CLK-02/independent-legacy-gap-review-01/review.json",
+    "sha256": "21d81253d737b517f1b12224d81488759b84362b47d168975df0d59b89bd82c8"
+  },
+  "actual_original_counts": {
+    "diagnostic_header_roots": 22,
+    "diagnostic_raw_calls": 46,
+    "fixed_epw_open_roots": 1,
+    "fixed_epw_raw_calls": 8760
+  },
+  "actual_diagnostic_source_status_counts": {
+    "source_returned": 37,
+    "source_fatal": 9
+  },
+  "actual_fixed_source_status_counts": {
+    "source_returned": 8760
+  },
+  "actual_overlap_counts": {
+    "date_equal": 43800,
+    "date_different": 0,
+    "mandatory_real_bits_equal": 87600,
+    "mandatory_real_bits_different": 0,
+    "liquid_real_bits_equal": 1527,
+    "liquid_real_bits_different": 7233
+  },
+  "unavailable_raw_mandatory_reals": [
+    "ETHoriz",
+    "ETDirect",
+    "GLBHorizIllum",
+    "DirectNrmIllum",
+    "DiffuseHorizIllum",
+    "ZenLum",
+    "TotalSkyCover",
+    "OpaqueSkyCover",
+    "Visibility",
+    "CeilHeight"
+  ],
+  "unavailable_raw_optional_reals": [
+    "PrecipWater",
+    "AerosolOptDepth",
+    "SnowDepth",
+    "DaysSinceLastSnow",
+    "Albedo"
+  ],
+  "unavailable_raw_integer_outputs": [
+    "WObs"
+  ],
+  "unavailable_raw_codes": 9,
+  "unavailable_header_ownership": [
+    "LOCATION and weather-file location numeric owner",
+    "original header Line/stream cursor and caller token admission",
+    "remaining ProcessEPWHeader state and error availability"
+  ],
+  "unavailable_record_state": [
+    "ErrorFound/fatal output availability",
+    "declared original output canary retention",
+    "source weather-code missed counter and original mutable state"
+  ],
+  "source_year_is_not_civil_calendar_year": true,
+  "preserved_actual_legacy_head": "e5bbe9aeb306afedb4a42204f0663092af7ee4a0",
+  "source_unchanged_during_legacy_execution": true,
+  "four_card_gates_updated": false,
+  "canonical_raw_Rust_unit_comparison_completed": false,
+  "production_connection_completed": false,
+  "limits": [
+    "Existing ten mandatory real columns and five date integers were compared as actual overlap.",
+    "All7233 liquid differences are actual raw999 versus existing compatibility positive zero; later rainfall/missing replacement physics remains unpaired.",
+    "Native whole parser functions were executed; caught SourceFatal outcomes remain preserved and are not wrapper failures.",
+    "Baseline lacks raw/header/counter/canary ownership and executes no diagnostic cases.",
+    "No original/reference output is supplied as a Rust computation operand."
+  ],
+  "header_container_source_supplement": {
+    "path": ".runtime/porting/CLK-02/header-container-source-audit-01/audit.json",
+    "sha256": "93e6d0b3a2ea2388270be7bffdeda434a4eec3dd55a9e10cc7da8a0788b075e9"
+  },
+  "independent_header_container_source_review": {
+    "path": ".runtime/porting/CLK-02/independent-header-container-source-review-01/review.json",
+    "sha256": "384859c4abe40c7ced4bbc75f1e0baa6d8555b21e2934b31d036f5fcfa4a8cd7"
+  },
+  "native_source_static_review": {
+    "path": ".runtime/porting/CLK-02/independent-native-source-static-review-01/review.json",
+    "sha256": "e582d9bb055c253b559c194e7713e42c75804945bc22730203e1147835df3f54"
+  },
+  "original_launcher_static_review": {
+    "path": ".runtime/porting/CLK-02/independent-original-launcher-static-review-01/review.json",
+    "sha256": "e308d0f1bdcacad35c0aafcdf7892f5f3a65f6059065ee2614390ecb1c57bd3e"
+  },
+  "independent_native_build_review": {
+    "path": ".runtime/porting/CLK-02/independent-native-build-review-02/review.json",
+    "sha256": "933d4d674901653fe18a931bf5127b93d40351aee83fc94b5c22022ca6adbce8"
+  }
+}
