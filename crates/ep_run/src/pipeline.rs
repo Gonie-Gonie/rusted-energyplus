@@ -898,29 +898,40 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
-    let ((outcome, weather_trace), day_trace) = ep_runtime::weather::day::production_trace::capture(
-        config.trace_level == TraceLevel::Full,
-        || {
-            ep_runtime::weather::raw::production_trace::capture(
-                config.trace_level == TraceLevel::Full,
-                || {
-                    ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
-                        let (outcome, trace) = ep_runtime::psychrometrics::psy02_trace::capture(
+    let (((outcome, weather_trace), day_trace), sky_trace) =
+        ep_runtime::weather::day::sky_transport_trace::capture(
+            matches!(config.trace_level, TraceLevel::Full | TraceLevel::Summary),
+            || {
+                ep_runtime::weather::day::production_trace::capture(
+                    config.trace_level == TraceLevel::Full,
+                    || {
+                        ep_runtime::weather::raw::production_trace::capture(
                             config.trace_level == TraceLevel::Full,
-                            || run_with_optional_porting_scope_observed(config, scope),
-                        );
-                        if let Some(trace) = trace
-                            && outcome.is_ok()
-                            && config.output_dir.is_dir()
-                        {
-                            crate::psy02_trace::write_trace(config, &trace)?;
-                        }
-                        outcome
-                    })
-                },
-            )
-        },
-    );
+                            || {
+                                ep_runtime::psychrometrics::with_fresh_psychrometric_state(|| {
+                                    let (outcome, trace) =
+                                        ep_runtime::psychrometrics::psy02_trace::capture(
+                                            config.trace_level == TraceLevel::Full,
+                                            || {
+                                                run_with_optional_porting_scope_observed(
+                                                    config, scope,
+                                                )
+                                            },
+                                        );
+                                    if let Some(trace) = trace
+                                        && outcome.is_ok()
+                                        && config.output_dir.is_dir()
+                                    {
+                                        crate::psy02_trace::write_trace(config, &trace)?;
+                                    }
+                                    outcome
+                                })
+                            },
+                        )
+                    },
+                )
+            },
+        );
     if let Some(trace) = weather_trace
         && outcome.is_ok()
         && config.output_dir.is_dir()
@@ -932,6 +943,12 @@ fn run_with_optional_porting_scope(
         && config.output_dir.is_dir()
     {
         crate::clk03_trace::write_trace(config, &trace)?;
+    }
+    if let Some(trace) = sky_trace
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+    {
+        crate::clk06_sky_trace::write_trace(config, &trace)?;
     }
     outcome
 }

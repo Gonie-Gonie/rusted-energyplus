@@ -50,6 +50,7 @@ fn owned_today_drives_solar_rain_and_sky_with_no_legacy_record_array()
             equation_of_time_hours,
         },
         local_hour: 12.0,
+        sky_transport_stamp: None,
     };
     let context = HeatBalanceWeatherContext {
         records: &[],

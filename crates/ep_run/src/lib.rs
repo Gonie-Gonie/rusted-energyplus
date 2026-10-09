@@ -10,6 +10,7 @@
 
 mod clk02_trace;
 mod clk03_trace;
+mod clk06_sky_trace;
 mod clock_trace;
 mod config;
 mod diagnostics;

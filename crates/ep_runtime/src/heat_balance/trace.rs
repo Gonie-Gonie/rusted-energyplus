@@ -22,6 +22,8 @@ pub(crate) struct HeatBalanceRunPeriodSamples {
     pub(crate) outdoor_temperatures: Vec<f64>,
     pub(crate) outdoor_wet_bulb_temperatures: Vec<f64>,
     pub(crate) sky_temperatures: Vec<f64>,
+    pub(crate) sky_transport_stamps:
+        Vec<Option<crate::weather::day::sky_transport_trace::SkyTransportStamp>>,
     pub(crate) horizontal_infrared_radiation_rates: Vec<f64>,
     pub(crate) rain_statuses: Vec<f64>,
     pub(crate) first_sample_ctf_history_slot_accumulators:

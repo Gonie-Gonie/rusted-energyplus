@@ -432,6 +432,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         outdoor_temperatures,
         outdoor_wet_bulb_temperatures,
         sky_temperatures,
+        sky_transport_stamps,
         horizontal_infrared_radiation_rates,
         rain_statuses,
         first_sample_ctf_history_slot_accumulators,
@@ -469,6 +470,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         outdoor_temperatures,
         outdoor_wet_bulb_temperatures,
         sky_temperatures,
+        sky_transport_stamps,
         horizontal_infrared_radiation_rates,
         rain_statuses,
     });

@@ -145,6 +145,7 @@ pub(super) fn record_operation(
     session: &WeatherSession,
     error: Option<&WeatherDayError>,
 ) {
+    super::sky_transport_trace::operation_completed();
     let Some(before) = before else {
         return;
     };

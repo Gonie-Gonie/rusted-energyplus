@@ -117,6 +117,8 @@ where
         surface_heat_balance_traces_from_state(state, options.sample_count);
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
     let mut outdoor_wet_bulb_temperatures = Vec::with_capacity(options.sample_count);
+    let capture_sky_transport = crate::weather::day::sky_transport_trace::is_active();
+    let mut sky_transport_stamps = Vec::new();
     let mut sky_temperatures = Vec::with_capacity(options.sample_count);
     let mut horizontal_infrared_radiation_rates = Vec::with_capacity(options.sample_count);
     let mut rain_statuses = Vec::with_capacity(options.sample_count);
@@ -169,6 +171,7 @@ where
             vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
         let mut outdoor_temperature_sum = 0.0;
         let mut outdoor_wet_bulb_temperature_sum = 0.0;
+        let mut hour_sky_transport_stamp = None;
         let mut sky_temperature_sum = 0.0;
         let mut horizontal_infrared_radiation_sum = 0.0;
         let mut rain_status_sum = 0.0;
@@ -195,6 +198,11 @@ where
                 substep,
                 first_hour_interpolation_starting_values,
             )?;
+            let sky_transport_stamp = weather_context
+                .and_then(|context| context.owned.and_then(|owned| owned.sky_transport_stamp));
+            if capture_sky_transport {
+                hour_sky_transport_stamp = sky_transport_stamp;
+            }
             let timestep_output = step_driver(
                 &mut *state,
                 HeatBalanceStepInput {
@@ -238,8 +246,25 @@ where
 
             outdoor_temperature_sum += timestep_outdoor_dry_bulb_c;
             outdoor_wet_bulb_temperature_sum += timestep_outdoor_wet_bulb_c;
+            let sky_transport_sums_before =
+                [sky_temperature_sum, horizontal_infrared_radiation_sum];
             sky_temperature_sum += timestep_sky_temperature_c;
             horizontal_infrared_radiation_sum += timestep_horizontal_infrared_radiation_w_per_m2;
+            crate::weather::day::sky_transport_trace::record(
+                crate::weather::day::sky_transport_trace::SkyTransportKind::ReportAccumulator,
+                sky_transport_stamp,
+                crate::weather::day::sky_transport_trace::SkyTransportValues::Accumulator {
+                    hour_index,
+                    substep,
+                    received: [
+                        timestep_sky_temperature_c,
+                        timestep_horizontal_infrared_radiation_w_per_m2,
+                    ],
+                    before: sky_transport_sums_before,
+                    after: [sky_temperature_sum, horizontal_infrared_radiation_sum],
+                },
+                None,
+            );
             rain_status_sum += timestep_rain_status;
             for (index, (zone_id, _zone_name, _values)) in zone_temperatures.iter().enumerate() {
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
@@ -866,6 +891,28 @@ where
         outdoor_wet_bulb_temperatures.push(outdoor_wet_bulb_temperature_sum / divisor);
         sky_temperatures.push(sky_temperature_sum / divisor);
         horizontal_infrared_radiation_rates.push(horizontal_infrared_radiation_sum / divisor);
+        if capture_sky_transport {
+            if sky_transport_stamps.len()
+                < crate::weather::day::sky_transport_trace::EVENT_LIMIT_PER_KIND
+            {
+                sky_transport_stamps.push(hour_sky_transport_stamp);
+            }
+            if let (Some(&sky), Some(&ir)) = (
+                sky_temperatures.last(),
+                horizontal_infrared_radiation_rates.last(),
+            ) {
+                crate::weather::day::sky_transport_trace::record(
+                    crate::weather::day::sky_transport_trace::SkyTransportKind::HourlyOutput,
+                    hour_sky_transport_stamp,
+                    crate::weather::day::sky_transport_trace::SkyTransportValues::Hourly {
+                        hour_index,
+                        divisor,
+                        pushed: [sky, ir],
+                    },
+                    None,
+                );
+            }
+        }
         rain_statuses.push(rain_status_sum / divisor);
     }
 
@@ -881,6 +928,7 @@ where
             outdoor_temperatures,
             outdoor_wet_bulb_temperatures,
             sky_temperatures,
+            sky_transport_stamps,
             horizontal_infrared_radiation_rates,
             rain_statuses,
             first_sample_ctf_history_slot_accumulators,

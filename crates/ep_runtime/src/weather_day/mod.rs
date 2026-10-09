@@ -14,6 +14,7 @@ mod producer;
 mod production;
 pub mod production_trace;
 mod sky;
+pub mod sky_transport_trace;
 mod solar;
 pub mod state;
 

@@ -28,6 +28,9 @@ use crate::heat_balance::surface_boundary::surface_boundary_temperature_c;
 use crate::heat_balance::surface_weather::{
     energyplus_exterior_wet_context_fraction, energyplus_exterior_wet_reference_temperature_c,
 };
+use crate::weather::day::sky_transport_trace::{
+    self as sky_trace, SkyTransportKind, SkyTransportOrigin, SkyTransportStamp, SkyTransportValues,
+};
 use crate::weather::{
     EpwRecord, HeatBalanceWeatherContext, energyplus_weather_horizontal_infrared_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
@@ -85,27 +88,6 @@ pub(crate) fn heat_balance_surface_boundary_balance(
     }
 }
 
-pub(crate) fn exterior_surface_boundary_temperature_c(
-    model: &TypedModel,
-    surface_state: &SurfaceHeatBalanceState,
-    outdoor_dry_bulb_c: f64,
-    owning_zone_temperature_c: f64,
-    weather_context: Option<HeatBalanceWeatherContext<'_>>,
-    quick_outside_conduction: Option<QuickOutsideConductionContext>,
-    use_doe2_outside_convection: bool,
-) -> f64 {
-    exterior_surface_boundary_balance(
-        model,
-        surface_state,
-        outdoor_dry_bulb_c,
-        owning_zone_temperature_c,
-        weather_context,
-        quick_outside_conduction,
-        use_doe2_outside_convection,
-    )
-    .temperature_c
-}
-
 pub(crate) fn exterior_surface_boundary_balance(
     model: &TypedModel,
     surface_state: &SurfaceHeatBalanceState,
@@ -114,6 +96,29 @@ pub(crate) fn exterior_surface_boundary_balance(
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
     use_doe2_outside_convection: bool,
+) -> SurfaceBoundaryBalanceResult {
+    exterior_surface_boundary_balance_with_origin(
+        model,
+        surface_state,
+        outdoor_dry_bulb_c,
+        owning_zone_temperature_c,
+        weather_context,
+        quick_outside_conduction,
+        use_doe2_outside_convection,
+        SkyTransportOrigin::SurfaceSolve,
+    )
+}
+
+#[allow(clippy::too_many_arguments)] // Preserve the existing boundary contract plus passive caller origin.
+fn exterior_surface_boundary_balance_with_origin(
+    model: &TypedModel,
+    surface_state: &SurfaceHeatBalanceState,
+    outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    quick_outside_conduction: Option<QuickOutsideConductionContext>,
+    use_doe2_outside_convection: bool,
+    sky_transport_origin: SkyTransportOrigin,
 ) -> SurfaceBoundaryBalanceResult {
     let Some(context) = weather_context else {
         return SurfaceBoundaryBalanceResult {
@@ -186,6 +191,10 @@ pub(crate) fn exterior_surface_boundary_balance(
                 quick_outside_conduction
                     .and_then(|context| context.exterior_coefficient_surface_temperature_c),
                 context.owned.map(|current| current.weather.sky_temp),
+                context
+                    .owned
+                    .and_then(|current| current.sky_transport_stamp),
+                sky_transport_origin,
             );
         };
         stored_surface_incident_solar_radiation_for_current_weather_context_w_per_m2(
@@ -215,6 +224,10 @@ pub(crate) fn exterior_surface_boundary_balance(
         quick_outside_conduction
             .and_then(|context| context.exterior_coefficient_surface_temperature_c),
         context.owned.map(|current| current.weather.sky_temp),
+        context
+            .owned
+            .and_then(|current| current.sky_transport_stamp),
+        sky_transport_origin,
     )
 }
 
@@ -233,7 +246,7 @@ pub(crate) fn reported_surface_outside_face_temperature_c(
         return surface_state.outside_face_temperature_c;
     }
 
-    exterior_surface_boundary_temperature_c(
+    exterior_surface_boundary_balance_with_origin(
         model,
         surface_state,
         outdoor_dry_bulb_c,
@@ -241,7 +254,9 @@ pub(crate) fn reported_surface_outside_face_temperature_c(
         weather_context,
         None,
         heat_balance_uses_doe2_outside_convection(model, runtime_config),
+        SkyTransportOrigin::ReportOutsideFace,
     )
+    .temperature_c
 }
 
 pub(crate) fn surface_exterior_report_terms(
@@ -336,6 +351,19 @@ pub(crate) fn surface_exterior_report_terms(
                 surface_outdoor_dry_bulb_c,
             )
         });
+    sky_trace::record(
+        SkyTransportKind::ReportResolved,
+        context
+            .owned
+            .and_then(|current| current.sky_transport_stamp),
+        SkyTransportValues::Resolved {
+            origin: SkyTransportOrigin::ReportTerms,
+            sky: sky_temperature_c,
+            ir: horizontal_infrared_radiation_w_per_m2,
+            owned: context.owned.is_some(),
+        },
+        Some((surface_state.surface_id, &surface_state.surface_name)),
+    );
     let longwave_terms = energyplus_exterior_longwave_terms_with_sky_temperature_c(
         surface_state,
         typed_surface,
@@ -472,7 +500,19 @@ pub(crate) fn exterior_surface_energy_balance(
     wet_timestep_fraction: f64,
     exterior_coefficient_surface_temperature_c: Option<f64>,
     sky_temperature_c: Option<f64>,
+    sky_transport_stamp: Option<SkyTransportStamp>,
+    sky_transport_origin: SkyTransportOrigin,
 ) -> SurfaceBoundaryBalanceResult {
+    sky_trace::record(
+        SkyTransportKind::PhysicalIngress,
+        sky_transport_stamp,
+        SkyTransportValues::Ingress {
+            origin: sky_transport_origin,
+            sky: sky_temperature_c,
+            ir: horizontal_infrared_radiation_w_per_m2,
+        },
+        Some((surface_state.surface_id, &surface_state.surface_name)),
+    );
     if quick_outside_conduction.is_none() {
         if wet_timestep_fraction <= f64::EPSILON
             && incident_solar_w_per_m2 < EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2
@@ -507,12 +547,24 @@ pub(crate) fn exterior_surface_energy_balance(
         wet_reference_temperature_c,
         wet_timestep_fraction,
     );
+    let sky_from_owned_context = sky_temperature_c.is_some();
     let sky_temperature_c = sky_temperature_c.unwrap_or_else(|| {
         horizontal_infrared_sky_temperature_c(
             horizontal_infrared_radiation_w_per_m2,
             outdoor_dry_bulb_c,
         )
     });
+    sky_trace::record(
+        SkyTransportKind::PhysicalResolved,
+        sky_transport_stamp,
+        SkyTransportValues::Resolved {
+            origin: sky_transport_origin,
+            sky: sky_temperature_c,
+            ir: horizontal_infrared_radiation_w_per_m2,
+            owned: sky_from_owned_context,
+        },
+        Some((surface_state.surface_id, &surface_state.surface_name)),
+    );
     let longwave_terms = energyplus_exterior_longwave_terms_with_sky_temperature_c(
         surface_state,
         typed_surface,

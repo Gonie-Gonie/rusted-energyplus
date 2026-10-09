@@ -1,5 +1,8 @@
 //! Fallible production weather access without borrowed cursor guards.
 
+use super::sky_transport_trace::{
+    self as sky_trace, SkyTransportKind, SkyTransportStamp, SkyTransportValues,
+};
 use super::{
     CurrentWeatherState, WeatherDayError, WeatherEnvironmentConfiguration, WeatherSession,
     WeatherVars,
@@ -49,6 +52,8 @@ pub struct ProductionWeatherContext {
     pub solar: ProductionSolarMetadata,
     /// Actual raw-hour ending clock at the current zone timestep.
     pub local_hour: f64,
+    /// Passive actual Current completion identity; absent outside C6 capture.
+    pub sky_transport_stamp: Option<SkyTransportStamp>,
 }
 
 /// Production weather lifecycle shared by A and B consumers.
@@ -62,6 +67,7 @@ pub struct ProductionWeatherTimestepSeries {
     current_phase: RefCell<Option<WeatherDayPhase>>,
     last_consumed: RefCell<Option<(usize, u32)>>,
     current_step: RefCell<Option<(WeatherDayPhase, usize, u32)>>,
+    current_step_stamp: RefCell<Option<SkyTransportStamp>>,
 }
 
 impl ProductionWeatherTimestepSeries {
@@ -76,6 +82,7 @@ impl ProductionWeatherTimestepSeries {
             current_phase: RefCell::new(None),
             last_consumed: RefCell::new(None),
             current_step: RefCell::new(None),
+            current_step_stamp: RefCell::new(None),
         })
     }
 
@@ -199,6 +206,12 @@ impl ProductionWeatherTimestepSeries {
                 session.initialize_weather()?;
             }
             session.set_current_weather()?;
+            *self.current_step_stamp.borrow_mut() = sky_trace::completed_stamp(
+                phase,
+                record_index,
+                session.state.global.hour_of_day,
+                session.state.global.time_step,
+            );
             // The initial humidity seed and first thermal consumer share one
             // zone step. Both consumer calls remain observable; the accepted
             // current owner is calculated once for this phase/hour/timestep.
@@ -225,6 +238,7 @@ impl ProductionWeatherTimestepSeries {
         sample.liquid_precipitation_depth_mm = weather.liquid_precip;
         sample.direct_normal_radiation_w_per_m2 = weather.beam_solar_rad;
         sample.diffuse_horizontal_radiation_w_per_m2 = weather.dif_solar_rad;
+        sample.horizontal_infrared_radiation_w_per_m2 = weather.horiz_ir_sky;
         let period_start = ((day - 1) / 20) * 20;
         let period_days = 20
             .min(session.configuration.total_days() - period_start)
@@ -249,6 +263,7 @@ impl ProductionWeatherTimestepSeries {
         let context = ProductionWeatherContext {
             record,
             sample,
+            sky_transport_stamp: *self.current_step_stamp.borrow(),
             weather,
             current_weather,
             solar: ProductionSolarMetadata {
@@ -259,6 +274,20 @@ impl ProductionWeatherTimestepSeries {
             local_hour: f64::from(record.hour.saturating_sub(1))
                 + f64::from(timestep) / f64::from(steps),
         };
+        sky_trace::record(
+            SkyTransportKind::OwnedContextReceipt,
+            context.sky_transport_stamp,
+            SkyTransportValues::OwnedContext {
+                today: [
+                    weather.sky_temp,
+                    weather.horiz_ir_sky,
+                    weather.total_sky_cover,
+                    weather.opaque_sky_cover,
+                ],
+                sample_ir: context.sample.horizontal_infrared_radiation_w_per_m2,
+            },
+            None,
+        );
         super::production_trace::record_consumer(record_index, timestep, phase, context, &session);
         *self.last_consumed.borrow_mut() = Some((record_index, timestep));
         Ok(context)

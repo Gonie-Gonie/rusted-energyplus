@@ -7,6 +7,9 @@ use crate::heat_balance::surface_weather::{
     energyplus_weather_record_is_rain_at_timestep_with_starting_values,
 };
 use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
+use crate::weather::day::sky_transport_trace::{
+    self as sky_trace, SkyTransportKind, SkyTransportValues,
+};
 use crate::weather::{
     EpwRecord, HeatBalanceWeatherContext,
     energyplus_weather_dry_bulb_at_timestep_with_starting_values,
@@ -104,6 +107,19 @@ pub(super) fn sample_run_period_weather<'weather>(
         })
         .unwrap_or(0.0);
 
+    sky_trace::record(
+        SkyTransportKind::SamplerReturn,
+        weather_context
+            .and_then(|context| context.owned.and_then(|owned| owned.sky_transport_stamp)),
+        SkyTransportValues::Sampler {
+            values: [
+                timestep_sky_temperature_c,
+                timestep_horizontal_infrared_radiation_w_per_m2,
+            ],
+            owned: weather_context.is_some_and(|context| context.owned.is_some()),
+        },
+        None,
+    );
     Ok(RunPeriodWeatherSample {
         weather_context,
         timestep_outdoor_dry_bulb_c,

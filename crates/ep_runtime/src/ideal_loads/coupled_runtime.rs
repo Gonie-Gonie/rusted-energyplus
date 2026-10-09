@@ -9824,6 +9824,7 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
         outdoor_temperatures,
         outdoor_wet_bulb_temperatures,
         sky_temperatures,
+        sky_transport_stamps,
         horizontal_infrared_radiation_rates,
         rain_statuses,
         ..
@@ -9839,6 +9840,7 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
         outdoor_temperatures,
         outdoor_wet_bulb_temperatures,
         sky_temperatures,
+        sky_transport_stamps,
         horizontal_infrared_radiation_rates,
         rain_statuses,
     });
