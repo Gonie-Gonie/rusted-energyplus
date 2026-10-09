@@ -21,14 +21,12 @@ fn selected(state: &WeatherDayState) -> Value {
     if let (Ok(hour), Ok(step)) = (
         usize::try_from(state.global.hour_of_day),
         usize::try_from(state.global.time_step),
-    ) {
-        if let Ok(values) = state.today_values.hour(hour) {
-            if let Some(value) = step.checked_sub(1).and_then(|i| values.get(i)) {
-                return json!({"hour":hour,"time_step":step,"value":{
-                    "BeamSolarRad":raw_dto::scalar(value.beam_solar_rad),
-                    "DifSolarRad":raw_dto::scalar(value.dif_solar_rad)}});
-            }
-        }
+    ) && let Ok(values) = state.today_values.hour(hour)
+        && let Some(value) = step.checked_sub(1).and_then(|i| values.get(i))
+    {
+        return json!({"hour":hour,"time_step":step,"value":{
+            "BeamSolarRad":raw_dto::scalar(value.beam_solar_rad),
+            "DifSolarRad":raw_dto::scalar(value.dif_solar_rad)}});
     }
     Value::Null
 }
