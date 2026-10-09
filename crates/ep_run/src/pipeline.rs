@@ -900,7 +900,7 @@ fn run_with_optional_porting_scope(
 ) -> Result<RunOutcome, RunError> {
     let (((outcome, weather_trace), day_trace), sky_trace) =
         ep_runtime::weather::day::sky_transport_trace::capture(
-            matches!(config.trace_level, TraceLevel::Full | TraceLevel::Summary),
+            scope.is_some() && matches!(config.trace_level, TraceLevel::Full | TraceLevel::Summary),
             || {
                 ep_runtime::weather::day::production_trace::capture(
                     config.trace_level == TraceLevel::Full,
@@ -945,6 +945,7 @@ fn run_with_optional_porting_scope(
         crate::clk03_trace::write_trace(config, &trace)?;
     }
     if let Some(trace) = sky_trace
+        && trace.total_event_count > 0
         && outcome.is_ok()
         && config.output_dir.is_dir()
     {
