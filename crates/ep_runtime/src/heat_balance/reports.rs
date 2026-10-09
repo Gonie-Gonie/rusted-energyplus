@@ -866,22 +866,11 @@ pub(crate) fn heat_balance_result_store_from_traces(
         units: "C".to_string(),
         values: sky_temperatures,
     };
-    if crate::weather::day::sky_transport_trace::is_active() {
-        for (hour_index, &value) in series.values.iter().enumerate() {
-            crate::weather::day::sky_transport_trace::record(
-                crate::weather::day::sky_transport_trace::SkyTransportKind::SeriesHandoff,
-                sky_transport_stamps.get(hour_index).copied().flatten(),
-                crate::weather::day::sky_transport_trace::SkyTransportValues::Series {
-                    hour_index,
-                    handle: series.handle.0,
-                    series:
-                        crate::weather::day::sky_transport_trace::SkyTransportSeries::SkyTemperature,
-                    value,
-                },
-                None,
-            );
-        }
-    }
+    crate::weather::day::sky_transport_trace::record_series_handoff(
+        &series,
+        &sky_transport_stamps,
+        crate::weather::day::sky_transport_trace::SkyTransportSeries::SkyTemperature,
+    );
     results.add_series(series);
     handle_index += 1;
     let series = OutputSeries {
@@ -891,18 +880,11 @@ pub(crate) fn heat_balance_result_store_from_traces(
         units: "W/m2".to_string(),
         values: horizontal_infrared_radiation_rates,
     };
-    if crate::weather::day::sky_transport_trace::is_active() {
-        for (hour_index, &value) in series.values.iter().enumerate() {
-            crate::weather::day::sky_transport_trace::record(
-                crate::weather::day::sky_transport_trace::SkyTransportKind::SeriesHandoff,
-                sky_transport_stamps.get(hour_index).copied().flatten(),
-                crate::weather::day::sky_transport_trace::SkyTransportValues::Series {
-                    hour_index, handle: series.handle.0,
-                    series: crate::weather::day::sky_transport_trace::SkyTransportSeries::HorizontalInfrared, value,
-                }, None,
-            );
-        }
-    }
+    crate::weather::day::sky_transport_trace::record_series_handoff(
+        &series,
+        &sky_transport_stamps,
+        crate::weather::day::sky_transport_trace::SkyTransportSeries::HorizontalInfrared,
+    );
     results.add_series(series);
     handle_index += 1;
     results.add_series(OutputSeries {

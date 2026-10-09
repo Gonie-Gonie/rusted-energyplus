@@ -892,26 +892,14 @@ where
         sky_temperatures.push(sky_temperature_sum / divisor);
         horizontal_infrared_radiation_rates.push(horizontal_infrared_radiation_sum / divisor);
         if capture_sky_transport {
-            if sky_transport_stamps.len()
-                < crate::weather::day::sky_transport_trace::EVENT_LIMIT_PER_KIND
-            {
-                sky_transport_stamps.push(hour_sky_transport_stamp);
-            }
-            if let (Some(&sky), Some(&ir)) = (
-                sky_temperatures.last(),
-                horizontal_infrared_radiation_rates.last(),
-            ) {
-                crate::weather::day::sky_transport_trace::record(
-                    crate::weather::day::sky_transport_trace::SkyTransportKind::HourlyOutput,
-                    hour_sky_transport_stamp,
-                    crate::weather::day::sky_transport_trace::SkyTransportValues::Hourly {
-                        hour_index,
-                        divisor,
-                        pushed: [sky, ir],
-                    },
-                    None,
-                );
-            }
+            crate::weather::day::sky_transport_trace::record_hourly_output(
+                &sky_temperatures,
+                &horizontal_infrared_radiation_rates,
+                &mut sky_transport_stamps,
+                hour_sky_transport_stamp,
+                hour_index,
+                divisor,
+            );
         }
         rain_statuses.push(rain_status_sum / divisor);
     }

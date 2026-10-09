@@ -297,3 +297,57 @@ pub(crate) fn record(
         });
     });
 }
+
+/// Borrows each actual constructed series value immediately before its existing move.
+/// Track-caller propagation retains the reports.rs handoff site in every receipt.
+#[track_caller]
+pub(crate) fn record_series_handoff(
+    output: &crate::OutputSeries,
+    stamps: &[Option<SkyTransportStamp>],
+    series: SkyTransportSeries,
+) {
+    if !is_active() {
+        return;
+    }
+    for (hour_index, &value) in output.values.iter().enumerate() {
+        record(
+            SkyTransportKind::SeriesHandoff,
+            stamps.get(hour_index).copied().flatten(),
+            SkyTransportValues::Series {
+                hour_index,
+                handle: output.handle.0,
+                series,
+                value,
+            },
+            None,
+        );
+    }
+}
+
+/// Borrows actual pushed hourly values and preserves the trace-only stamp cap.
+/// The caller retains its capture guard; no hourly scalar or mean is recalculated.
+#[track_caller]
+pub(crate) fn record_hourly_output(
+    sky_values: &[f64],
+    infrared_values: &[f64],
+    stamps: &mut Vec<Option<SkyTransportStamp>>,
+    stamp: Option<SkyTransportStamp>,
+    hour_index: usize,
+    divisor: f64,
+) {
+    if stamps.len() < EVENT_LIMIT_PER_KIND {
+        stamps.push(stamp);
+    }
+    if let (Some(&sky), Some(&ir)) = (sky_values.last(), infrared_values.last()) {
+        record(
+            SkyTransportKind::HourlyOutput,
+            stamp,
+            SkyTransportValues::Hourly {
+                hour_index,
+                divisor,
+                pushed: [sky, ir],
+            },
+            None,
+        );
+    }
+}
