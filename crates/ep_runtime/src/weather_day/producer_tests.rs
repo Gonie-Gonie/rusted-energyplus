@@ -49,6 +49,7 @@ fn state(steps: usize) -> WeatherDayState {
     };
     owner.global.time_steps_in_hour = steps as i32;
     owner.setup_interpolation_values().unwrap();
+    owner.weather.time_step_fraction = 1.0 / steps as f64;
     owner.weather.is_rain_threshold = 0.8 / steps as f64;
     owner
 }
