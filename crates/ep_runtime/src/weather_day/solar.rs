@@ -1,12 +1,13 @@
 //! Selected hourly solar preprocessing and stored-weight branch from the pin.
 //!
-//! This held proposal is unexecuted. Raw records remain separate, and current
-//! solar position, nighttime masking, sky and surface equations remain unpaired.
+//! Raw records remain separate. Hourly warning/negative handling and the later
+//! sentinel/Ignore writes surround the default sky call in source order.
+//! Current solar position, nighttime masking and surface equations are separate.
 
-use super::{WeatherDayState, WeatherVars};
+use super::{WeatherDayState, WeatherEnvironmentState, WeatherVars};
 
-/// Source local preprocessing, WeatherManager.cc:2751-2766,2978-3009.
-pub(super) fn process_hourly_solar(value: &mut WeatherVars, state: &mut WeatherDayState) {
+/// Early source warning/count/negative phase, WeatherManager.cc:2751-2766.
+pub(super) fn preprocess_hourly_solar(value: &mut WeatherVars, state: &mut WeatherDayState) {
     let mut beam = value.beam_solar_rad;
     let mut diffuse = value.dif_solar_rad;
     if state.environment.display_weather_missing_data_warnings {
@@ -25,24 +26,43 @@ pub(super) fn process_hourly_solar(value: &mut WeatherVars, state: &mut WeatherD
             state.out_of_range_counts.dif_solar_rad += 1;
         }
     }
+    value.beam_solar_rad = beam;
+    value.dif_solar_rad = diffuse;
+}
+
+/// Later source sentinel/Ignore phase, after sky, WeatherManager.cc:2978-3009.
+pub(super) fn finalize_hourly_solar(
+    value: &mut WeatherVars,
+    environment: &WeatherEnvironmentState,
+) {
+    let mut beam = value.beam_solar_rad;
+    let mut diffuse = value.dif_solar_rad;
     if beam >= 9999.0 {
         beam = 0.0;
     }
     if diffuse >= 9999.0 {
         diffuse = 0.0;
     }
-    if state.environment.ignore_solar_radiation {
+    if environment.ignore_solar_radiation {
         beam = 0.0;
         diffuse = 0.0;
     }
-    if state.environment.ignore_beam_radiation {
+    if environment.ignore_beam_radiation {
         beam = 0.0;
     }
-    if state.environment.ignore_diffuse_radiation {
+    if environment.ignore_diffuse_radiation {
         diffuse = 0.0;
     }
     value.beam_solar_rad = beam;
     value.dif_solar_rad = diffuse;
+}
+
+// Existing solar unit cases exercise the same two phases without an intervening
+// sky computation. Production calls the phases at their separate source loci.
+#[cfg(test)]
+fn process_hourly_solar(value: &mut WeatherVars, state: &mut WeatherDayState) {
+    preprocess_hourly_solar(value, state);
+    finalize_hourly_solar(value, &state.environment);
 }
 
 /// Active multi-step branch, WeatherManager.cc:3083-3100.

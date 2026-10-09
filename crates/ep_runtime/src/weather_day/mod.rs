@@ -1,8 +1,8 @@
 //! Live weather-file cursor, daily transport and production weather operands.
 //!
-//! The raw cursor and complete daily copy have separate owners. Existing weather
-//! Selected non-solar hourly processing and current weather use source-owned
-//! state. Sky and solar generation retain separate compatibility boundaries.
+//! The raw cursor and complete daily copy have separate owners. Selected hourly
+//! processing, default ClarkAllen sky, solar interpolation and current weather
+//! use source-owned state. Alternative sky and current-solar models are separate.
 
 mod configuration;
 mod current;
@@ -13,6 +13,7 @@ mod lifecycle;
 mod producer;
 mod production;
 pub mod production_trace;
+mod sky;
 mod solar;
 pub mod state;
 
@@ -25,6 +26,7 @@ pub use production::{
     ProductionSolarMetadata, ProductionWeatherContext, ProductionWeatherTimestepSeries,
     WeatherDayPhase,
 };
+pub use sky::{WeatherSky, default_clark_allen_sky_emissivity, default_weather_file_sky};
 pub use state::{
     DailyWeatherVariables, ExtendedWeatherVars, WeatherDayState, WeatherDayValues,
     WeatherDayValuesError, WeatherEnvironmentState, WeatherGlobalState, WeatherOwnerState,

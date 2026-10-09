@@ -1,8 +1,8 @@
-//! Selected hourly missing values and history from WeatherManager.cc:2880–3040.
+//! Selected hourly weather processing from WeatherManager.cc:2738-3040.
 //!
 //! The raw parser and its date admission run before this callback. Selected
-//! solar locals start from original raw references; sky, snow and albedo remain
-//! separate compatibility policies.
+//! solar, IR and cloud locals start from original raw references. Default sky
+//! uses processed hourly inputs; snow and albedo retain compatibility policies.
 
 use super::producer::weather_vars_from_raw;
 use super::{WeatherDayState, WeatherVars};
@@ -11,7 +11,7 @@ use crate::weather::raw::RawEpwOutputs;
 
 /// Processes one admitted raw hour exactly once, before the next record read.
 ///
-/// The six hourly history fields and seven selected count fields belong to this
+/// The eight hourly history fields and nine scalar missing counts belong to this
 /// owner. The incoming liquid missing cache is retained, including after rain's
 /// 2 mm default. The returned carrier is the actual hourly interval-one value.
 #[allow(clippy::manual_range_contains)] // Retain the source's explicit lower/upper predicates.
@@ -21,12 +21,16 @@ pub(crate) fn process_hour(
     state: &mut WeatherDayState,
 ) -> WeatherVars {
     let mut value = weather_vars_from_raw(raw, record);
+    let mut infrared = raw.mandatory_reals[6];
+    if infrared <= 0.0 {
+        infrared = 9999.0;
+    }
     // DirectRad/DiffuseRad are the source raw reference arguments. Their
     // preprocessing must not depend on the caller's EpwRecord projection.
     value.beam_solar_rad = raw.mandatory_reals[8];
     value.dif_solar_rad = raw.mandatory_reals[9];
     // Selected solar local preprocessing precedes the scalar missing/history pass.
-    super::solar::process_hourly_solar(&mut value, state);
+    super::solar::preprocess_hourly_solar(&mut value, state);
     let missing = &mut state.missing_values.base;
     let missed = &mut state.missed_counts;
     let range = &mut state.out_of_range_counts;
@@ -36,11 +40,13 @@ pub(crate) fn process_hour(
     let mut pressure = raw.mandatory_reals[3];
     let mut direction = raw.mandatory_reals[14];
     let mut speed = raw.mandatory_reals[15];
+    let mut total_sky_cover = raw.mandatory_reals[16];
+    let mut opaque_sky_cover = raw.mandatory_reals[17];
     let mut liquid = raw.optional_reals[5];
 
     // Source preconditioning follows hour/date admission and precedes the
     // missing/range/history pass. It changes local values, never the raw owner.
-    // WeatherManager.cc:2779-2793 and 2821-2822.
+    // WeatherManager.cc:2779-2796 and 2821-2822.
     if pressure < 0.0 {
         pressure = 999999.0;
     }
@@ -50,8 +56,14 @@ pub(crate) fn process_hour(
     if direction < -360.0 || direction > 360.0 {
         direction = 999.0;
     }
+    if total_sky_cover < 0.0 {
+        total_sky_cover = 99.0;
+    }
     if humidity < 0.0 {
         humidity = 999.0;
+    }
+    if opaque_sky_cover < 0.0 {
+        opaque_sky_cover = 99.0;
     }
     if liquid < 0.0 {
         liquid = 999.0;
@@ -100,6 +112,14 @@ pub(crate) fn process_hour(
     if speed < 0.0 || speed > 40.0 {
         range.wind_speed += 1;
     }
+    if total_sky_cover >= 99.0 {
+        total_sky_cover = missing.total_sky_cover;
+        missed.total_sky_cover += 1;
+    }
+    if opaque_sky_cover >= 99.0 {
+        opaque_sky_cover = missing.opaque_sky_cover;
+        missed.opaque_sky_cover += 1;
+    }
     if liquid >= 999.0 {
         liquid = missing.liquid_precip;
         missed.liquid_precip += 1;
@@ -109,9 +129,17 @@ pub(crate) fn process_hour(
     value.out_dew_point_temp = dew;
     value.out_baro_press = pressure;
     value.out_rel_hum = humidity;
-    value.wind_dir = direction;
+    let humidity_fraction = humidity * 0.01;
     value.wind_speed = speed;
+    value.wind_dir = direction;
     value.liquid_precip = liquid;
+    value.total_sky_cover = total_sky_cover;
+    value.opaque_sky_cover = opaque_sky_cover;
+    let sky =
+        super::default_weather_file_sky(opaque_sky_cover, dry, dew, humidity_fraction, infrared);
+    value.horiz_ir_sky = sky.horiz_ir_sky;
+    value.sky_temp = sky.sky_temp;
+    super::solar::finalize_hourly_solar(&mut value, &state.environment);
     value.is_rain =
         raw.observation_indicator == 0 && raw.weather_codes[..3].iter().any(|code| *code < 9);
     if value.is_rain && value.liquid_precip == 0.0 {
@@ -121,14 +149,16 @@ pub(crate) fn process_hour(
     missing.out_dew_point_temp = dew;
     // Preserve the source's percent -> fraction -> percent arithmetic and
     // integer rounding, rather than storing the unrounded hourly percentage.
-    missing.out_rel_hum = f64::from((humidity * 0.01 * 100.0).round() as i32);
+    missing.out_rel_hum = f64::from((humidity_fraction * 100.0).round() as i32);
     missing.out_baro_press = pressure;
     missing.wind_dir = direction;
     missing.wind_speed = speed;
+    missing.total_sky_cover = total_sky_cover;
+    missing.opaque_sky_cover = opaque_sky_cover;
     value
 }
 
-/// Whole source wind interpolation, WeatherManager.cc:3183–3198.
+/// Whole source wind interpolation, WeatherManager.cc:3183-3198.
 ///
 /// Signed remainder matches `std::fmod`; out-of-range negative directions are
 /// counted by the hourly owner and are not silently normalized here.
@@ -210,7 +240,7 @@ mod tests {
     }
 
     #[test]
-    fn range_counts_keep_values_except_pressure_and_do_not_write_other_histories() {
+    fn range_counts_keep_values_except_pressure_and_preserve_cloud_signed_zero() {
         let mut owner = WeatherDayState::default();
         owner.missing_values.base.out_baro_press = 101000.0;
         owner.missing_values.base.total_sky_cover = -0.0;
@@ -222,6 +252,7 @@ mod tests {
         input.mandatory_reals[3] = 31000.0;
         input.mandatory_reals[14] = -1.0;
         input.mandatory_reals[15] = 40.1;
+        input.mandatory_reals[16] = -0.0;
         input.optional_reals[5] = -2.0;
         let value = processed(&input, &mut owner);
         assert_eq!(value.out_dry_bulb_temp, -90.1);
@@ -317,6 +348,69 @@ mod tests {
         assert!(!missing.is_rain);
         assert_eq!(missing.liquid_precip.to_bits(), (-0.0_f64).to_bits());
         assert_eq!(owner.missed_counts.liquid_precip, 1);
+    }
+
+    #[test]
+    fn cloud_sentinels_reuse_then_update_actual_histories_once() {
+        let mut owner = WeatherDayState::default();
+        owner.missing_values.base.total_sky_cover = 7.0;
+        owner.missing_values.base.opaque_sky_cover = 4.0;
+        owner.missed_counts.total_sky_cover = 11;
+        owner.missed_counts.opaque_sky_cover = 23;
+        let mut input = raw();
+        input.mandatory_reals[16] = -1.0;
+        input.mandatory_reals[17] = 99.0;
+        let first = processed(&input, &mut owner);
+        assert_eq!([first.total_sky_cover, first.opaque_sky_cover], [7.0, 4.0]);
+        assert_eq!(owner.missed_counts.total_sky_cover, 12);
+        assert_eq!(owner.missed_counts.opaque_sky_cover, 24);
+        assert_eq!(input.mandatory_reals[16], -1.0);
+        assert_eq!(input.mandatory_reals[17], 99.0);
+        input.mandatory_reals[16] = -0.0;
+        input.mandatory_reals[17] = 3.5;
+        processed(&input, &mut owner);
+        input.mandatory_reals[16] = 99.0;
+        input.mandatory_reals[17] = -1.0;
+        let retained = processed(&input, &mut owner);
+        assert_eq!(retained.total_sky_cover.to_bits(), (-0.0_f64).to_bits());
+        assert_eq!(retained.opaque_sky_cover, 3.5);
+        assert_eq!(owner.missed_counts.total_sky_cover, 13);
+        assert_eq!(owner.missed_counts.opaque_sky_cover, 25);
+        assert_eq!(owner.out_of_range_counts, Default::default());
+    }
+
+    #[test]
+    fn sky_uses_raw_and_processed_owner_inputs_not_projected_record_canaries() {
+        let mut input = raw();
+        input.mandatory_reals[0] = 99.9;
+        input.mandatory_reals[1] = 99.9;
+        for infrared in [400.0, 0.0] {
+            input.mandatory_reals[6] = infrared;
+            let mut first = WeatherDayState::default();
+            first.missing_values.base.out_dry_bulb_temp = 12.0;
+            first.missing_values.base.out_dew_point_temp = 4.0;
+            let mut second = first.clone();
+            let ordinary = processed(&input, &mut first);
+            let mut projected = project_record(&input, 1).unwrap();
+            projected.dry_bulb_c = -40.0;
+            projected.dew_point_c = -50.0;
+            projected.horizontal_infrared_radiation_wh_per_m2 = 800.0;
+            let different_projection = process_hour(&input, projected, &mut second);
+            if infrared > 0.0 {
+                assert_eq!(ordinary.horiz_ir_sky.to_bits(), infrared.to_bits());
+            }
+            assert_eq!(
+                different_projection.horiz_ir_sky.to_bits(),
+                ordinary.horiz_ir_sky.to_bits()
+            );
+            assert_eq!(
+                different_projection.sky_temp.to_bits(),
+                ordinary.sky_temp.to_bits()
+            );
+            assert_eq!(different_projection.out_dry_bulb_temp, 12.0);
+            assert_eq!(different_projection.out_dew_point_temp, 4.0);
+            assert_eq!(first.missed_counts, second.missed_counts);
+        }
     }
 
     #[test]

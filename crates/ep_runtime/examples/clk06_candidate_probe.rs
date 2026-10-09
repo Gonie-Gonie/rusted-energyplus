@@ -1,4 +1,4 @@
-//! Passive observations of the unmodified existing core. No native answers as inputs.
+//! Passive observations of candidate public APIs and actual storage. No native answers as inputs.
 #[path = "clk02_probe_support/digest.rs"]
 mod digest;
 #[allow(dead_code, clippy::duplicate_mod)]
@@ -7,19 +7,19 @@ mod existing_current_fields;
 #[allow(dead_code)]
 #[path = "clk03_candidate_support/inputs.rs"]
 mod existing_inputs;
-#[path = "clk06_existing_support/fields.rs"]
+#[path = "clk06_candidate_support/fields.rs"]
 mod fields;
-#[path = "clk06_existing_support/inputs.rs"]
+#[path = "clk06_candidate_support/inputs.rs"]
 mod inputs;
 #[allow(clippy::duplicate_mod)]
 #[path = "clk03_candidate_support/fields.rs"]
 mod legacy_fields;
-#[path = "clk06_existing_support/observe.rs"]
+#[path = "clk06_candidate_support/observe.rs"]
 mod observe;
 #[allow(dead_code, clippy::duplicate_mod)]
 #[path = "clk02_probe_support/dto.rs"]
 mod raw_dto;
-#[path = "clk06_existing_support/seeds.rs"]
+#[path = "clk06_candidate_support/seeds.rs"]
 mod seeds;
 use inputs::{array, bound_file, require, text};
 use serde_json::{Value, json};
@@ -36,7 +36,7 @@ fn run() -> Result<()> {
     let mut args = std::env::args_os().skip(1);
     let supplied = args
         .next()
-        .ok_or("usage: clk06_existing_observer <input-only-observer-request.json>")?;
+        .ok_or("usage: clk06_candidate_probe <input-only-observer-request.json>")?;
     require(
         args.next().is_none(),
         "exactly one input-only observer request required",
@@ -54,12 +54,12 @@ fn run() -> Result<()> {
     let request_bytes = std::fs::read(&request_path)?;
     let observer: Value = serde_json::from_slice(&request_bytes)?;
     require(
-        text(&observer["schema"])? == "clk06-existing-observer-request.v1"
-            && observer["frozen_before_existing_Rust_observer_numerical_execution"] == true
+        text(&observer["schema"])? == "clk06-candidate-observer-request.v1"
+            && observer["frozen_before_Rust_candidate_numerical_execution"] == true
             && observer["expected_values_supplied"] == false
             && observer["native_results_supplied"] == false
             && observer["Rust_outputs_supplied_as_inputs"] == false,
-        "final input-only existing observer request required",
+        "final input-only candidate observer request required",
     )?;
     let (_, native_bytes) = bound_file(&root, &observer["native_request"])?;
     let native: Value = serde_json::from_slice(&native_bytes)?;
@@ -110,7 +110,11 @@ fn run() -> Result<()> {
     ] {
         bindings.push(binding.clone());
     }
-    for name in ["observer_sources", "actual_public_API_sources"] {
+    for name in [
+        "observer_sources",
+        "actual_public_API_sources",
+        "actual_promoted_observer_sources",
+    ] {
         for binding in array(&observer[name])? {
             bindings.push(binding.clone());
         }
@@ -133,7 +137,7 @@ fn run() -> Result<()> {
     }
     let mut emissivity = Vec::new();
     for input in array(&native["emissivity_cases"])? {
-        emissivity.push(observe::emissivity(input));
+        emissivity.push(observe::emissivity(input)?);
     }
     let mut weather = Vec::new();
     for input in array(&native["weather_sequences"])? {
@@ -170,7 +174,7 @@ fn run() -> Result<()> {
     }
     println!(
         "{}",
-        serde_json::to_string_pretty(&json!({"schema":"clk06-existing-probe-results.v1",
+        serde_json::to_string_pretty(&json!({"schema":"clk06-candidate-probe-results.v1",
         "actual_request":{"path":inputs::relative(&root,&request_path)?,"sha256":digest::sha256(&request_bytes)},
         "actual_native_request":observer["native_request"],"actual_native_admission_contract":observer["native_admission_contract"],
         "native_observation_projection":admission["projection"],"contracts":observer["contracts"],

@@ -2,12 +2,13 @@
 //!
 //! Hourly missing/range/history processing already ran in the reader callback.
 //! Solar interpolation uses stored source weights and processed hourly values.
-//! Sky, snow and optional compatibility fields retain separate unpaired
-//! policies. No native outputs are inputs to this owner.
+//! Default sky is recalculated from processed hourly IR and interpolated source
+//! inputs. Snow and optional compatibility fields retain separate policies.
+//! No native outputs are inputs to this owner.
 
 use super::hourly::interpolate_wind_direction;
 use super::solar::interpolation_weights;
-use super::{WeatherDayError, WeatherDayState, WeatherVars};
+use super::{WeatherDayError, WeatherDayState, WeatherVars, default_weather_file_sky};
 use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
 use crate::psychrometrics::with_fresh_psychrometric_state;
 use crate::weather::raw::{RawEpwOutputs, RawWeatherDay, project_record};
@@ -28,9 +29,10 @@ pub struct ProducedWeatherDay {
 
 /// Base carrier for the selected hourly processing callback.
 ///
-/// The callback replaces the seven selected raw scalar fields and rain flag.
-/// Sky and raw optional fields here remain compatibility policy, without native
-/// parity. The raw EpwRecord projection itself is retained separately.
+/// The callback replaces selected raw scalars, default sky and the rain flag.
+/// This initial sky and optional-field projection is compatibility storage;
+/// selected sky is written by the actual hourly callback before interpolation.
+/// The raw EpwRecord projection itself is retained separately.
 pub fn weather_vars_from_raw(raw: &RawEpwOutputs, record: EpwRecord) -> WeatherVars {
     WeatherVars {
         is_rain: record.liquid_precipitation_depth_mm >= 0.8,
@@ -164,7 +166,6 @@ pub fn produce_day(
             state.next_hour.liquid_precip = hourly[next_index].liquid_precip;
         }
         for timestep in 1..=steps {
-            let sample = &samples[index * steps as usize + timestep as usize - 1];
             let mut value = hourly[index];
             if steps > 1 {
                 let weight = weights[timestep as usize - 1];
@@ -194,13 +195,15 @@ pub fn produce_day(
                     previous_values.opaque_sky_cover,
                     hourly[index].opaque_sky_cover,
                 );
-                value.horiz_ir_sky = sample.horizontal_infrared_radiation_w_per_m2;
-                value.sky_temp = horizontal_infrared_sky_temperature_c(
-                    value.horiz_ir_sky,
-                    // Keep the existing raw-preview sky policy separate from
-                    // the selected processed dry-bulb interpolation.
-                    sample.dry_bulb_c,
+                let sky = default_weather_file_sky(
+                    value.opaque_sky_cover,
+                    value.out_dry_bulb_temp,
+                    value.out_dew_point_temp,
+                    value.out_rel_hum * 0.01,
+                    scalar(previous_values.horiz_ir_sky, hourly[index].horiz_ir_sky),
                 );
+                value.horiz_ir_sky = sky.horiz_ir_sky;
+                value.sky_temp = sky.sky_temp;
                 let current_weight = *solar_weights
                     .as_ref()
                     .and_then(|values| values.get(timestep as usize - 1))
@@ -240,3 +243,82 @@ pub fn produce_day(
 #[cfg(test)]
 #[path = "producer_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+mod sky_tests {
+    use super::*;
+    use crate::weather::day::WeatherDayValues;
+    use crate::weather::raw::{RawEpwInput, RawReadProvenance, RawWeatherSlot};
+
+    #[test]
+    fn second_sky_call_uses_processed_hourly_ir_and_not_preview_or_next_cache() {
+        let raw = RawWeatherDay {
+            hours: (1..=24)
+                .map(|hour| {
+                    let mut input = RawEpwOutputs {
+                        dates: [2013, 1, 1, hour, 60],
+                        ..RawEpwOutputs::default()
+                    };
+                    input.mandatory_reals[0] = 20.0;
+                    input.mandatory_reals[1] = 10.0;
+                    input.mandatory_reals[2] = 50.0;
+                    input.mandatory_reals[3] = 101325.0;
+                    input.mandatory_reals[6] = 300.0;
+                    RawWeatherSlot {
+                        raw: input,
+                        provenance: RawReadProvenance {
+                            start_byte: (hour as usize - 1) * 100,
+                            end_byte: hour as usize * 100,
+                            line_read_attempt: hour as usize + 8,
+                        },
+                    }
+                })
+                .collect(),
+            final_stream: RawEpwInput::new_unopened(Vec::new()).snapshot(),
+        };
+        let mut owner = WeatherDayState {
+            tomorrow_values: WeatherDayValues::allocated(4).unwrap(),
+            ..WeatherDayState::default()
+        };
+        owner.global.time_steps_in_hour = 4;
+        owner.setup_interpolation_values().unwrap();
+        owner.weather.time_step_fraction = 0.25;
+        owner.weather.interpolation = Some(vec![0.5, 1.0, 1.0, 1.0]);
+        owner.next_hour.horiz_ir_sky = 98.0;
+        for hour in 1..=24 {
+            owner.tomorrow_values.hour_mut(hour).unwrap()[0] = WeatherVars {
+                out_dry_bulb_temp: 20.0,
+                out_dew_point_temp: 10.0,
+                out_rel_hum: 50.0,
+                out_baro_press: 101325.0,
+                sky_temp: -1234.0,
+                horiz_ir_sky: if hour == 1 { 700.0 } else { 100.0 },
+                total_sky_cover: 7.0,
+                opaque_sky_cover: 5.0,
+                ..WeatherVars::default()
+            };
+        }
+        let counts = owner.missed_counts;
+        let history = owner.missing_values;
+        let produced = produce_day(
+            &raw,
+            None,
+            4,
+            FirstHourInterpolationStartingValues::Hour24,
+            &mut owner,
+        )
+        .unwrap();
+        let first_hour = owner.tomorrow_values.hour(1).unwrap();
+        assert_eq!(
+            produced.samples[0].horizontal_infrared_radiation_w_per_m2,
+            300.0
+        );
+        assert_eq!(first_hour[0].horiz_ir_sky, 400.0);
+        assert_eq!(first_hour[1].horiz_ir_sky, 700.0);
+        assert_ne!(first_hour[0].sky_temp, -1234.0);
+        assert_eq!(owner.next_hour.horiz_ir_sky, 98.0);
+        assert_eq!(owner.last_hour.horiz_ir_sky, 100.0);
+        assert_eq!(owner.missed_counts, counts);
+        assert_eq!(owner.missing_values, history);
+    }
+}

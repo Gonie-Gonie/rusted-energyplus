@@ -1,10 +1,12 @@
-//! Execute existing public calls only; no native outputs or scientific formulas.
+//! Execute actual candidate public calls only; no native outputs or scientific formulas.
 use super::{
     Result, fields,
     inputs::{array, configuration, flag, integer, real, require, seed_caller, text},
-    seeds,
+    raw_dto, seeds,
 };
-use ep_runtime::weather::day::{WeatherDayState, WeatherSession};
+use ep_runtime::weather::day::{
+    WeatherDayState, WeatherSession, default_clark_allen_sky_emissivity, default_weather_file_sky,
+};
 use serde_json::{Value, json};
 use std::path::Path;
 
@@ -65,16 +67,25 @@ pub(super) fn setup(input: &Value) -> Result<Value> {
     )
 }
 
-pub(super) fn emissivity(input: &Value) -> Value {
+pub(super) fn emissivity(input: &Value) -> Result<Value> {
     let state = WeatherDayState::default();
-    let snapshot = fields::state_snapshot(&state, None, None, true);
-    json!({"id":input["id"],"kind":"CalcSkyEmissivity","requested_operation":input,
-        "before":snapshot,"after":snapshot,"actual_rust_invoked":false,
-        "actual_return":null,"actual_return_available":false,
-        "call_outcome":{"status":"unavailable-public-Rust-API","source_fatal":null,
-            "reason":"existing Rust exposes no direct CalcSkyEmissivity API","counted_as_PASS":false},
-        "actual_public_Rust_API":null,"private_hourly_ESky_observed":false,
-        "whole_native_Factory_or_preparation_observed":false,"numerical_PASS_claimed":false})
+    let before = fields::state_snapshot(&state, None, None, true);
+    let args = &input["arguments"];
+    let returned = default_clark_allen_sky_emissivity(
+        real(&args["OpaqueSkyCover"])?,
+        real(&args["DryBulb"])?,
+        real(&args["DewPoint"])?,
+        real(&args["RelHum"])?,
+    );
+    Ok(
+        json!({"id":input["id"],"kind":"CalcSkyEmissivity","requested_operation":input,
+        "before":before,"after":fields::state_snapshot(&state,None,None,true),"actual_rust_invoked":true,
+        "actual_return":raw_dto::scalar(returned),"actual_return_available":true,
+        "call_outcome":outcome("source_returned",Some(false),None),
+        "actual_public_Rust_API":"ep_runtime::weather::day::default_clark_allen_sky_emissivity",
+        "private_hourly_ESky_observed":false,"whole_native_Factory_or_preparation_observed":false,
+        "numerical_PASS_claimed":false}),
+    )
 }
 
 pub(super) fn sequence(input: &Value, idf: &[u8], weather: &Path, bytes: Vec<u8>) -> Result<Value> {
@@ -131,16 +142,26 @@ pub(super) fn sequence(input: &Value, idf: &[u8], weather: &Path, bytes: Vec<u8>
         let before = fields::session_snapshot(&session, weather, full);
         let stamp = session.print_environment_stamp;
         if kind == "calcSky" {
-            let unavailable = fields::unavailable(
-                "existing Rust exposes no direct calcSky API or corresponding formal-output owner",
+            // Observe the literal formal-output inputs before the genuine API call.
+            let initial = &op["output_initial_values"];
+            let horizontal_ir_before = real(&initial["HorizIRSky"])?;
+            let sky_temperature_before = real(&initial["SkyTemp"])?;
+            let args = &op["arguments"];
+            let returned = default_weather_file_sky(
+                real(&args["OpaqueSkyCover"])?,
+                real(&args["DryBulb"])?,
+                real(&args["DewPoint"])?,
+                real(&args["RelHum"])?,
+                real(&args["IRHoriz"])?,
             );
             operations.push(json!({"id":op["id"],"kind":kind,"requested_operation":op,
                 "full_sky_grid_observation_declared":full,"before_caller":before_caller,"before":before,
-                "after":fields::session_snapshot(&session,weather,full),"actual_rust_invoked":false,
-                "call_outcome":{"status":"unavailable-public-Rust-API","source_fatal":null,
-                    "reason":"existing Rust direct calcSky API unavailable","counted_as_PASS":false},
-                "formal_outputs_before":unavailable,"formal_outputs_after":unavailable,
-                "declared_initial_formal_outputs_are_inputs_only":op["output_initial_values"],
+                "after":fields::session_snapshot(&session,weather,full),"actual_rust_invoked":true,
+                "call_outcome":outcome("source_returned",Some(false),None),
+                "formal_outputs_before":{"HorizIRSky":raw_dto::scalar(horizontal_ir_before),"SkyTemp":raw_dto::scalar(sky_temperature_before)},
+                "formal_outputs_after":{"HorizIRSky":raw_dto::scalar(returned.horiz_ir_sky),"SkyTemp":raw_dto::scalar(returned.sky_temp)},
+                "actual_public_Rust_API":"ep_runtime::weather::day::default_weather_file_sky",
+                "formal_output_before_is_literal_input_not_Rust_owner":true,
                 "returned_bool":null,"Available":session.available,"ErrorsFound":session.errors_found,
                 "print_environment_stamp_before":stamp,"print_environment_stamp_after":session.print_environment_stamp}));
             continue;
