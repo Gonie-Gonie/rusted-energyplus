@@ -1,11 +1,17 @@
 //! Typed literal public owner writes; no expected weather/interpolation answers.
-use super::{Result, inputs::{array, flag, real, require}};
+use super::{
+    Result,
+    inputs::{array, flag, real, require},
+};
 use ep_runtime::weather::day::{WeatherDayState, WeatherVarCounts, WeatherVars};
 use serde_json::Value;
 
 fn count(value: &Value) -> Result<i32> {
     let value = value.as_i64().ok_or("typed bounded count input required")?;
-    require((0..=1_000_000).contains(&value), "count outside nonoverflow domain")?;
+    require(
+        (0..=1_000_000).contains(&value),
+        "count outside nonoverflow domain",
+    )?;
     Ok(i32::try_from(value)?)
 }
 fn counts(owner: &mut WeatherVarCounts, input: &Value) -> Result<()> {
@@ -64,12 +70,21 @@ fn weather(owner: &mut WeatherVars, input: &Value) -> Result<()> {
 pub(super) fn context(state: &mut WeatherDayState, input: &Value) -> Result<()> {
     // Native seed_context applies declared controls after preparation and before
     // the genuine GetNext/read history. No input resolver or solar RHS is here.
-    let controls = input["solar_controls"].as_object().ok_or("typed solar controls required")?;
-    require(controls.len() == 4, "exactly four declared controls required")?;
-    state.environment.display_weather_missing_data_warnings = flag(&input["solar_controls"]["DisplayWeatherMissingDataWarnings"])?;
-    state.environment.ignore_solar_radiation = flag(&input["solar_controls"]["IgnoreSolarRadiation"])?;
-    state.environment.ignore_beam_radiation = flag(&input["solar_controls"]["IgnoreBeamRadiation"])?;
-    state.environment.ignore_diffuse_radiation = flag(&input["solar_controls"]["IgnoreDiffuseRadiation"])?;
+    let controls = input["solar_controls"]
+        .as_object()
+        .ok_or("typed solar controls required")?;
+    require(
+        controls.len() == 4,
+        "exactly four declared controls required",
+    )?;
+    state.environment.display_weather_missing_data_warnings =
+        flag(&input["solar_controls"]["DisplayWeatherMissingDataWarnings"])?;
+    state.environment.ignore_solar_radiation =
+        flag(&input["solar_controls"]["IgnoreSolarRadiation"])?;
+    state.environment.ignore_beam_radiation =
+        flag(&input["solar_controls"]["IgnoreBeamRadiation"])?;
+    state.environment.ignore_diffuse_radiation =
+        flag(&input["solar_controls"]["IgnoreDiffuseRadiation"])?;
     if let Some(seed) = input.get("caller_owned_seed") {
         for (key, value) in seed.as_object().ok_or("literal caller seed required")? {
             match key.as_str() {
@@ -78,10 +93,14 @@ pub(super) fn context(state: &mut WeatherDayState, input: &Value) -> Result<()> 
                 "next_hour" => weather(&mut state.next_hour, value)?,
                 "last_hour" => weather(&mut state.last_hour, value)?,
                 "weather" => {
-                    require(value.as_object().is_some_and(|v| v.len() == 1 && v.contains_key("LastHourSet")),
-                        "only LastHourSet weather seed admitted")?;
+                    require(
+                        value
+                            .as_object()
+                            .is_some_and(|v| v.len() == 1 && v.contains_key("LastHourSet")),
+                        "only LastHourSet weather seed admitted",
+                    )?;
                     state.weather.last_hour_set = flag(&value["LastHourSet"])?;
-                },
+                }
                 _ => return Err(format!("unknown closed seed group {key}").into()),
             }
         }
@@ -89,9 +108,18 @@ pub(super) fn context(state: &mut WeatherDayState, input: &Value) -> Result<()> 
     if let Some(override_input) = input.get("stored_solar_interpolation_override") {
         let values = array(override_input)?;
         let steps = usize::try_from(state.global.time_steps_in_hour)?;
-        let owner = state.weather.solar_interpolation.as_mut().ok_or("actual Setup solar allocation required")?;
-        require(owner.len() == steps && values.len() == steps, "literal stored override length differs")?;
-        for (target, value) in owner.iter_mut().zip(values) {*target = real(value)?;}
+        let owner = state
+            .weather
+            .solar_interpolation
+            .as_mut()
+            .ok_or("actual Setup solar allocation required")?;
+        require(
+            owner.len() == steps && values.len() == steps,
+            "literal stored override length differs",
+        )?;
+        for (target, value) in owner.iter_mut().zip(values) {
+            *target = real(value)?;
+        }
     }
     Ok(())
 }
