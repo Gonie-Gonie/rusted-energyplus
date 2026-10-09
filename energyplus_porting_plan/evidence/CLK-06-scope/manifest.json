@@ -1,0 +1,290 @@
+{
+  "schema": "clk06-scope-metadata-byte-archive.v1",
+  "created_utc": "2026-10-09T05:34:40.719384+00:00",
+  "scope_amendment": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+    "sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184"
+  },
+  "artifacts": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+      "original_sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184",
+      "original_bytes": 4173,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184.part",
+        "sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184",
+        "bytes": 4173,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/card.after",
+      "original_sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1",
+      "original_bytes": 7986,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1.part",
+        "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1",
+        "bytes": 7986,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/card.before",
+      "original_sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045",
+      "original_bytes": 2661,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045.part",
+        "sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045",
+        "bytes": 2661,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/card.diff",
+      "original_sha256": "bec1efdfaa4afb956fd3cc066f01df40e67f151a53766901b395223aa932a3db",
+      "original_bytes": 9367,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/bec1efdfaa4afb956fd3cc066f01df40e67f151a53766901b395223aa932a3db.part",
+        "sha256": "bec1efdfaa4afb956fd3cc066f01df40e67f151a53766901b395223aa932a3db",
+        "bytes": 9367,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/plan.after",
+      "original_sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042",
+      "original_bytes": 580159,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042.part",
+        "sha256": "b7269368141b083222569f61065e4d895e3fd1fe2a68e669f60eb29a10ef6992",
+        "bytes": 112295,
+        "codec": "gzip"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/plan.before",
+      "original_sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6",
+      "original_bytes": 577115,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6.part",
+        "sha256": "7ad8875b33b8a841c0c08f351c920e597514c60bcadc123bfa78b9383709044c",
+        "bytes": 110730,
+        "codec": "gzip"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-01/plan.diff",
+      "original_sha256": "da585112daeb916c67f32474f38b95c4bee58b52e02e074b77d6247b0542a3fd",
+      "original_bytes": 7034,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/da585112daeb916c67f32474f38b95c4bee58b52e02e074b77d6247b0542a3fd.part",
+        "sha256": "da585112daeb916c67f32474f38b95c4bee58b52e02e074b77d6247b0542a3fd",
+        "bytes": 7034,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-command-01/receipt.json",
+      "original_sha256": "e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b",
+      "original_bytes": 3505,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b.part",
+        "sha256": "e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b",
+        "bytes": 3505,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-command-01/stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.part",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-command-01/stdout.log",
+      "original_sha256": "033e69dff4709d35ac359785714197ab0c9f2363f6e890342c14910a61ea83ee",
+      "original_bytes": 4275,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/033e69dff4709d35ac359785714197ab0c9f2363f6e890342c14910a61ea83ee.part",
+        "sha256": "033e69dff4709d35ac359785714197ab0c9f2363f6e890342c14910a61ea83ee",
+        "bytes": 4275,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/executed-source-reviewer.py",
+      "original_sha256": "52232e527a465747e9f2c4f651624bb65e80b3a343a9f5d40d49962fd7ae0071",
+      "original_bytes": 11500,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/52232e527a465747e9f2c4f651624bb65e80b3a343a9f5d40d49962fd7ae0071.part",
+        "sha256": "52232e527a465747e9f2c4f651624bb65e80b3a343a9f5d40d49962fd7ae0071",
+        "bytes": 11500,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/review.json",
+      "original_sha256": "e0f255ff52ef0f30a3747fae2a24c26ab8c195edd9ced1ffe3491e249478f0f2",
+      "original_bytes": 4571,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/e0f255ff52ef0f30a3747fae2a24c26ab8c195edd9ced1ffe3491e249478f0f2.part",
+        "sha256": "e0f255ff52ef0f30a3747fae2a24c26ab8c195edd9ced1ffe3491e249478f0f2",
+        "bytes": 4571,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/source/CLK-06.proposed.md",
+      "original_sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1",
+      "original_bytes": 7986,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1.part",
+        "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1",
+        "bytes": 7986,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/source/task-updates.json",
+      "original_sha256": "c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d",
+      "original_bytes": 5323,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d.part",
+        "sha256": "c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d",
+        "bytes": 5323,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/source/write_amendment.py",
+      "original_sha256": "f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e",
+      "original_bytes": 13254,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e.part",
+        "sha256": "f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e",
+        "bytes": 13254,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-command-01/receipt.json",
+      "original_sha256": "b8533a06612a93f48ae30482ce928f97ca31fcb6709a3006b8c2403eca5574e8",
+      "original_bytes": 2854,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/b8533a06612a93f48ae30482ce928f97ca31fcb6709a3006b8c2403eca5574e8.part",
+        "sha256": "b8533a06612a93f48ae30482ce928f97ca31fcb6709a3006b8c2403eca5574e8",
+        "bytes": 2854,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-command-01/stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.part",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-command-01/stdout.log",
+      "original_sha256": "26ceae403465cc69bbd46c02d3b01ab9a11fdf563319ed7e312855fe43ce7f87",
+      "original_bytes": 4040,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/26ceae403465cc69bbd46c02d3b01ab9a11fdf563319ed7e312855fe43ce7f87.part",
+        "sha256": "26ceae403465cc69bbd46c02d3b01ab9a11fdf563319ed7e312855fe43ce7f87",
+        "bytes": 4040,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.json",
+      "original_sha256": "4ce884811c9c9a140dbe32963b46bbdc19646ca1b2019d87cfd20f5b8c5b6e84",
+      "original_bytes": 50666,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/4ce884811c9c9a140dbe32963b46bbdc19646ca1b2019d87cfd20f5b8c5b6e84.part",
+        "sha256": "4ce884811c9c9a140dbe32963b46bbdc19646ca1b2019d87cfd20f5b8c5b6e84",
+        "bytes": 50666,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.md",
+      "original_sha256": "3ac867d51535595685bb792f4478ac10327eb80957281498e93efe56f2a3106b",
+      "original_bytes": 8303,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/3ac867d51535595685bb792f4478ac10327eb80957281498e93efe56f2a3106b.part",
+        "sha256": "3ac867d51535595685bb792f4478ac10327eb80957281498e93efe56f2a3106b",
+        "bytes": 8303,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/readiness-audit-01/manifest.json",
+      "original_sha256": "1b30852a984c0bc45e00c2070fa54221b912f13ff73fdca6dbd480a4f1fdc53f",
+      "original_bytes": 38655,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/1b30852a984c0bc45e00c2070fa54221b912f13ff73fdca6dbd480a4f1fdc53f.part",
+        "sha256": "1b30852a984c0bc45e00c2070fa54221b912f13ff73fdca6dbd480a4f1fdc53f",
+        "bytes": 38655,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/readiness-audit-01/notes.md",
+      "original_sha256": "c55179ba25006d67226f832d163b9d713352ca47b8385d27727ff4c06a41ea1f",
+      "original_bytes": 11192,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/c55179ba25006d67226f832d163b9d713352ca47b8385d27727ff4c06a41ea1f.part",
+        "sha256": "c55179ba25006d67226f832d163b9d713352ca47b8385d27727ff4c06a41ea1f",
+        "bytes": 11192,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-prep-02/manifest.json",
+      "original_sha256": "ac6b7b37c49e5d0c66943c6ecc91ea8ff485e5059dea3c15e2e50786df818795",
+      "original_bytes": 3499,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/ac6b7b37c49e5d0c66943c6ecc91ea8ff485e5059dea3c15e2e50786df818795.part",
+        "sha256": "ac6b7b37c49e5d0c66943c6ecc91ea8ff485e5059dea3c15e2e50786df818795",
+        "bytes": 3499,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-prep-02/task-updates.json",
+      "original_sha256": "c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d",
+      "original_bytes": 5323,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d.part",
+        "sha256": "c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d",
+        "bytes": 5323,
+        "codec": "identity"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/scope-amendment-prep-02/write_amendment.py",
+      "original_sha256": "f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e",
+      "original_bytes": 13254,
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CLK-06-scope/f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e.part",
+        "sha256": "f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e",
+        "bytes": 13254,
+        "codec": "identity"
+      }
+    }
+  ],
+  "all_four_gates_pending": true,
+  "packet_projection_or_precision_frozen": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "retained_runtime_history_untouched": true
+}

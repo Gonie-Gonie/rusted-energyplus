@@ -1,0 +1,1042 @@
+{
+  "schema": "clk06-source-only-readiness-audit.v1",
+  "status": "bounded-source-findings-before-scope-amendment",
+  "created_utc": "2026-10-09T05:01:43.930480+00:00",
+  "completed_utc": "2026-10-09T05:01:43.995037+00:00",
+  "native_pin": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "notes": {
+    "path": ".runtime/porting/CLK-06/readiness-audit-01/notes.md",
+    "sha256": "c55179ba25006d67226f832d163b9d713352ca47b8385d27727ff4c06a41ea1f"
+  },
+  "sources_and_exact_byte_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "source_line_count": 8911,
+      "reviewed_ranges": [
+        {
+          "first_line": 1755,
+          "last_line": 1771,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-1755-1771.txt",
+            "sha256": "15e6884bdcb5dcdeb8cdc2b62153462358032187c3bf1cf78eb3a82ed0f0c5f4"
+          },
+          "size_bytes": 1872
+        },
+        {
+          "first_line": 2192,
+          "last_line": 2194,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2192-2194.txt",
+            "sha256": "3241fbb58f79fec9aba559647021e2d8c28d349cb3c0d187247f0c20543cc427"
+          },
+          "size_bytes": 194
+        },
+        {
+          "first_line": 2275,
+          "last_line": 2299,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2275-2299.txt",
+            "sha256": "4d2f201be12804529a5dd44446e83e113e4a4d8c46bf9d09c14cae6f4c86b5a1"
+          },
+          "size_bytes": 1235
+        },
+        {
+          "first_line": 2607,
+          "last_line": 2610,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2607-2610.txt",
+            "sha256": "28557c5441999b379ae153f1a73b6c1d9acf6f0a857ac2e5f46ee455ac0d108e"
+          },
+          "size_bytes": 344
+        },
+        {
+          "first_line": 2727,
+          "last_line": 2750,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2727-2750.txt",
+            "sha256": "7fb3c59dbaddf210b38b0a60d8d5630501adc873bfade8f9e7abad41d52f6052"
+          },
+          "size_bytes": 1147
+        },
+        {
+          "first_line": 2788,
+          "last_line": 2796,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2788-2796.txt",
+            "sha256": "072c3768ebaf2097ee6ee9d73517a73b53da68c548c37ad385949f4c437647c4"
+          },
+          "size_bytes": 334
+        },
+        {
+          "first_line": 2930,
+          "last_line": 2937,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2930-2937.txt",
+            "sha256": "22335ae63a9d0f01d317396b217b7ff339cfd879a49a1afde571e3025ce1f83b"
+          },
+          "size_bytes": 455
+        },
+        {
+          "first_line": 2955,
+          "last_line": 2967,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-2955-2967.txt",
+            "sha256": "9e9b9711639a3536f55250e4e8627dd44e5435bf67bf077cbf07ae8faa8cf141"
+          },
+          "size_bytes": 753
+        },
+        {
+          "first_line": 3026,
+          "last_line": 3033,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-3026-3033.txt",
+            "sha256": "9926085a1db74bd6f8b9397d47aa7330ef4efb0ea36457a67ee4169e8a522c7e"
+          },
+          "size_bytes": 659
+        },
+        {
+          "first_line": 3048,
+          "last_line": 3079,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-3048-3079.txt",
+            "sha256": "77b47c0a7231105e9e93b74380c7fb30ab4a6a078a2c0565b48274bf02ee17b8"
+          },
+          "size_bytes": 1678
+        },
+        {
+          "first_line": 3102,
+          "last_line": 3120,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-3102-3120.txt",
+            "sha256": "c37045eb554cc6cd5e7b7ba12ea5bd185d426125d190bb003d49afd02616bc7f"
+          },
+          "size_bytes": 1842
+        },
+        {
+          "first_line": 3133,
+          "last_line": 3180,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-3133-3180.txt",
+            "sha256": "2e9cd09d1b54a5b0d88a721b1888bfd7116e4f729e5a8b4a587c091d22d3d9ee"
+          },
+          "size_bytes": 2512
+        },
+        {
+          "first_line": 3200,
+          "last_line": 3226,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-3200-3226.txt",
+            "sha256": "2bf4d27838f76e70056afb020ce79238a7918587910222a7ba65b4d87860828e"
+          },
+          "size_bytes": 1552
+        },
+        {
+          "first_line": 6736,
+          "last_line": 6741,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-6736-6741.txt",
+            "sha256": "51a9e00eadbb573d087431a551bdff96f9bb7a4fb19d6b811611ce1da84d30c0"
+          },
+          "size_bytes": 418
+        },
+        {
+          "first_line": 6889,
+          "last_line": 6906,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-6889-6906.txt",
+            "sha256": "acfabdb09b83833938b6dacb7b911b983c2acd9f14d22b16337a595e76ffe2c9"
+          },
+          "size_bytes": 989
+        },
+        {
+          "first_line": 8873,
+          "last_line": 8907,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/01-WeatherManager-8873-8907.txt",
+            "sha256": "e1d81cb01906a51ae0cb6bbae33c81044a18177d069c320c53523e69ea5aa31a"
+          },
+          "size_bytes": 1771
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "source_line_count": 947,
+      "reviewed_ranges": [
+        {
+          "first_line": 163,
+          "last_line": 174,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/02-WeatherManager-163-174.txt",
+            "sha256": "215e4792c708f084f9161df0fb156098fd3f2dc4a1069bb2af67939cfcf19698"
+          },
+          "size_bytes": 649
+        },
+        {
+          "first_line": 203,
+          "last_line": 209,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/02-WeatherManager-203-209.txt",
+            "sha256": "4ffc9ab8ff883808c1df7eef167ddd72f5668f68d2436f38a735b3f20c282e84"
+          },
+          "size_bytes": 780
+        },
+        {
+          "first_line": 549,
+          "last_line": 549,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/02-WeatherManager-549-549.txt",
+            "sha256": "50e3605d7da1c3250e59faa7b0ef5dbc33b425ed1830bbc1be3a7ea122361006"
+          },
+          "size_bytes": 141
+        },
+        {
+          "first_line": 704,
+          "last_line": 732,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/02-WeatherManager-704-732.txt",
+            "sha256": "d4185416f98d6fb5fbc6bd78808f9ef9b14eb001244565dfcf03d3381c435bda"
+          },
+          "size_bytes": 956
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+      },
+      "source_line_count": 628,
+      "reviewed_ranges": [
+        {
+          "first_line": 611,
+          "last_line": 618,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/03-DataGlobalConstants-611-618.txt",
+            "sha256": "575aecd26bb0de9d629329247a33dbddb70febcf9ac0672ca7b6348c9070f08a"
+          },
+          "size_bytes": 889
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+        "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+      },
+      "source_line_count": 196,
+      "reviewed_ranges": [
+        {
+          "first_line": 160,
+          "last_line": 168,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/04-EnergyPlus-160-168.txt",
+            "sha256": "432df973777d73931a73a04f103890b1d4215add56b5e2ec34ca835859401ab5"
+          },
+          "size_bytes": 222
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+        "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45"
+      },
+      "source_line_count": 1739,
+      "reviewed_ranges": [
+        {
+          "first_line": 1016,
+          "last_line": 1062,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/05-Psychrometrics-1016-1062.txt",
+            "sha256": "b91a902f89f6d06b935d76dd69d8c702cb9592190ab137825e10fedfd39b6150"
+          },
+          "size_bytes": 1970
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+        "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+      },
+      "source_line_count": 1330,
+      "reviewed_ranges": [
+        {
+          "first_line": 90,
+          "last_line": 96,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/06-Fmath-90-96.txt",
+            "sha256": "e9df9b39ae0aefa1fa2738bf1a676ddde126bd15f70765f28ae6b6dc127be0f9"
+          },
+          "size_bytes": 108
+        },
+        {
+          "first_line": 1062,
+          "last_line": 1088,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/06-Fmath-1062-1088.txt",
+            "sha256": "77d6bfbfcb5c6431a75a4d5dda5c27c1c4ad07a41d9776b263ddb42301f80edf"
+          },
+          "size_bytes": 519
+        },
+        {
+          "first_line": 1141,
+          "last_line": 1148,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/06-Fmath-1141-1148.txt",
+            "sha256": "0b8b67fb2a36bf8a0bf3de43978bc1bcc02a9d9717c778621a5ab8a494c6c008"
+          },
+          "size_bytes": 197
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+        "sha256": "249e4001f941f55006cbfb0a8fba83474e3497e13bcf7044579044056ebdb4ee"
+      },
+      "source_line_count": 332,
+      "reviewed_ranges": [
+        {
+          "first_line": 18,
+          "last_line": 128,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/07-hourly-18-128.txt",
+            "sha256": "7314256f310342b6d13ab7ba35158f4f1b750adb82729d1412c505cf0dc9f700"
+          },
+          "size_bytes": 3686
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/producer.rs",
+        "sha256": "8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7"
+      },
+      "source_line_count": 242,
+      "reviewed_ranges": [
+        {
+          "first_line": 30,
+          "last_line": 57,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/08-producer-30-57.txt",
+            "sha256": "a1809f5cb5e3863715f41e1b41d1d257f5d3c731c4b90e54d97d23b71ec5e760"
+          },
+          "size_bytes": 1474
+        },
+        {
+          "first_line": 116,
+          "last_line": 158,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/08-producer-116-158.txt",
+            "sha256": "a6a6a11fe02e070f8684a3b02d76cc5e4ced4f4dd16fbdb889a4e0415dcdc626"
+          },
+          "size_bytes": 1696
+        },
+        {
+          "first_line": 169,
+          "last_line": 237,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/08-producer-169-237.txt",
+            "sha256": "506dc52143149d8a50d7d00c62e3b6de0e0431b02d424f17923538da44a0ccee"
+          },
+          "size_bytes": 3377
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51"
+      },
+      "source_line_count": 502,
+      "reviewed_ranges": [
+        {
+          "first_line": 45,
+          "last_line": 69,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/09-lifecycle-45-69.txt",
+            "sha256": "befe0667809c6b6fb7884b49c0cf3bc3d75e7b6777598163d2824f13cc71cb92"
+          },
+          "size_bytes": 1297
+        },
+        {
+          "first_line": 302,
+          "last_line": 317,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/09-lifecycle-302-317.txt",
+            "sha256": "70a183d158eab85861811d7259787bcc88689fe8e5c02f1eca967cdfa46080ad"
+          },
+          "size_bytes": 692
+        },
+        {
+          "first_line": 328,
+          "last_line": 385,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/09-lifecycle-328-385.txt",
+            "sha256": "bc7d117f9100a2972fdd082dd40bc0e0ddfe6473123393348eeb969ea4d3de6e"
+          },
+          "size_bytes": 2406
+        },
+        {
+          "first_line": 448,
+          "last_line": 502,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/09-lifecycle-448-502.txt",
+            "sha256": "c643f3f53a3815334223dbc81953de09ee68efdfb546dc1421e6624e1c3f404a"
+          },
+          "size_bytes": 2110
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "8ca76c193f9c4fc8fedb85f4e42b175c92b683c9d03aa90fa3130b3a59c2d0b3"
+      },
+      "source_line_count": 318,
+      "reviewed_ranges": [
+        {
+          "first_line": 183,
+          "last_line": 227,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/10-production-183-227.txt",
+            "sha256": "8394da6ff289e6863468e17a89a18f768cfcf7ee9987367f54add501205f6a44"
+          },
+          "size_bytes": 2874
+        },
+        {
+          "first_line": 249,
+          "last_line": 260,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/10-production-249-260.txt",
+            "sha256": "1b488548814029dbf0bd50e0bc5ba6366b88d20f180d8db569afd664ed073828"
+          },
+          "size_bytes": 428
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/current.rs",
+        "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3"
+      },
+      "source_line_count": 207,
+      "reviewed_ranges": [
+        {
+          "first_line": 100,
+          "last_line": 111,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/11-current-100-111.txt",
+            "sha256": "42d0450d7181e6cf5ca2a17ecee99a7fbd2ba040ef84ae3ebce8b4f883d8c0c7"
+          },
+          "size_bytes": 544
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_raw/cursor.rs",
+        "sha256": "8349e4389bcc140b61c360b0b44059e6b8d6ed2eed74d28b80077951ea4e7a4c"
+      },
+      "source_line_count": 329,
+      "reviewed_ranges": [
+        {
+          "first_line": 220,
+          "last_line": 237,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/12-cursor-220-237.txt",
+            "sha256": "c2771932b6ac2163aa96f1aaaf196602e8f577c27fefcb090e9a974b8749f4db"
+          },
+          "size_bytes": 668
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather.rs",
+        "sha256": "e9faeca5edab6541a62acb72deff3b22a5c1f40df231b794f3b16cc0d65e2f2c"
+      },
+      "source_line_count": 1352,
+      "reviewed_ranges": [
+        {
+          "first_line": 198,
+          "last_line": 222,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/13-weather-198-222.txt",
+            "sha256": "7d0d1b44a3d485b8f718dffad20f439001a551b386f8b9f6b1c9fed7f62e1c52"
+          },
+          "size_bytes": 919
+        },
+        {
+          "first_line": 808,
+          "last_line": 827,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/13-weather-808-827.txt",
+            "sha256": "e9c84a8bf98f45904feab05055d730eff55aa56f37f4de861931459870ed16e6"
+          },
+          "size_bytes": 725
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/longwave.rs",
+        "sha256": "72125a1bf3a04affcad7f44b699f71bb85831d7ce584561c5b2bd42bb991e894"
+      },
+      "source_line_count": 147,
+      "reviewed_ranges": [
+        {
+          "first_line": 75,
+          "last_line": 113,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/14-longwave-75-113.txt",
+            "sha256": "64060a84edfc56424b9cdae4d81c371b274c10cd6011170dbe0ce99bc50346f9"
+          },
+          "size_bytes": 1805
+        },
+        {
+          "first_line": 137,
+          "last_line": 147,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/14-longwave-137-147.txt",
+            "sha256": "9e1bad6c6f22e1666f4f882f3adcd035bae6a541fe8a77d5b2d0c45cf2cddbde"
+          },
+          "size_bytes": 368
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "55e0b9ccba8e2ee5f8856f8afc033ff6158c18265b6fb55ae9cea2fce78f7bde"
+      },
+      "source_line_count": 522,
+      "reviewed_ranges": [
+        {
+          "first_line": 14,
+          "last_line": 15,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/15-radiation-14-15.txt",
+            "sha256": "0b28fc3decdb6e03e2a8fff0faea466ed8feebfd875f5c7f5bde0c9c9c8d5f89"
+          },
+          "size_bytes": 110
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+        "sha256": "80746f3388f8d54e9f5f4a16648eda66de07ce0eb9603a7381631693a47d624b"
+      },
+      "source_line_count": 115,
+      "reviewed_ranges": [
+        {
+          "first_line": 66,
+          "last_line": 83,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/16-weather_sampling-66-83.txt",
+            "sha256": "e09fc9ac585ea3d7d903fb04ef23d03c00a6391e28883e9e65905a6336219c69"
+          },
+          "size_bytes": 742
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+        "sha256": "45472043602e3432d86cfcdad7fbecdfed559759002477b860ef7c436940faa6"
+      },
+      "source_line_count": 588,
+      "reviewed_ranges": [
+        {
+          "first_line": 176,
+          "last_line": 189,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/17-surface_balance-176-189.txt",
+            "sha256": "b57a3f316b720ff61c519502e6b791febbfe15e503dc325710b130414328cb79"
+          },
+          "size_bytes": 648
+        },
+        {
+          "first_line": 330,
+          "last_line": 345,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/17-surface_balance-330-345.txt",
+            "sha256": "5c9af4f7feabd8d155d91494c8612dd3ab7e7c1e062847a77377dc0b270cebc7"
+          },
+          "size_bytes": 594
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/clk03_trace.rs",
+        "sha256": "918ede1f8a628c2102e605b54aaa26c35ae641221ae5d36cf127724cfd965ae4"
+      },
+      "source_line_count": 206,
+      "reviewed_ranges": [
+        {
+          "first_line": 22,
+          "last_line": 30,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/18-clk03_trace-22-30.txt",
+            "sha256": "1b5508c87696c217bd6850bd641ff250e6d5062da39dc370bfea6a16a4c1c901"
+          },
+          "size_bytes": 783
+        },
+        {
+          "first_line": 83,
+          "last_line": 93,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/18-clk03_trace-83-93.txt",
+            "sha256": "406933fba3db45f77069cf70823c253208357b54adf51fec821ad7cbe16bae7a"
+          },
+          "size_bytes": 515
+        },
+        {
+          "first_line": 122,
+          "last_line": 140,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/18-clk03_trace-122-140.txt",
+            "sha256": "5ccbdacc10f1571819071621a8b4524658ece384b80f907bc17b8cc37aa65f57"
+          },
+          "size_bytes": 1775
+        },
+        {
+          "first_line": 164,
+          "last_line": 187,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/18-clk03_trace-164-187.txt",
+            "sha256": "ffc9805c6d1e2f64841768791229e0786492840d9aa419079803c3769100b535"
+          },
+          "size_bytes": 2229
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/porting_scope.rs",
+        "sha256": "66665f9026988f91a7455b0f18d8f32048572a46f8e8d8765e7d05263fcc7eeb"
+      },
+      "source_line_count": 458,
+      "reviewed_ranges": [
+        {
+          "first_line": 158,
+          "last_line": 199,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/19-porting_scope-158-199.txt",
+            "sha256": "3be5c65d1e35bba22d02075f939776988c7e7504b0c2f657183eb869d303fa7c"
+          },
+          "size_bytes": 1398
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "tools/porting/clk03_reference_fields.hh",
+        "sha256": "6c9c43a45921c29155b81a7f5a110a1f3a75ddf21937ea06bd62a56bfb93ba66"
+      },
+      "source_line_count": 279,
+      "reviewed_ranges": [
+        {
+          "first_line": 9,
+          "last_line": 17,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/20-clk03_reference_fields-9-17.txt",
+            "sha256": "d67502467d428d729b754b109e422373cb5fdee1015ac8e34c1c9a55bc7b2a30"
+          },
+          "size_bytes": 1503
+        },
+        {
+          "first_line": 169,
+          "last_line": 180,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/20-clk03_reference_fields-169-180.txt",
+            "sha256": "e30b1ce667c30263090a6c01a88f377173cfe437a0e3f1101c29d8e6ed2793c8"
+          },
+          "size_bytes": 1341
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CLK-04/native-prep-03/clk04_reference_fields.hh",
+        "sha256": "861d9438886e177dde5eb3b7923e6a3ded372928ab35ea51aca79ac0f1882cb3"
+      },
+      "source_line_count": 81,
+      "reviewed_ranges": [
+        {
+          "first_line": 32,
+          "last_line": 79,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/21-clk04_reference_fields-32-79.txt",
+            "sha256": "c62b00abebf8fa7912cc69adf77c74e3affac40511272c6b152d2cadb2f2db9b"
+          },
+          "size_bytes": 3107
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CLK-05/native-prep-01/clk05_reference_fields.hh",
+        "sha256": "d3b4f03d82a2e238a9fb85f3202beb3242b589ad17e35a28e70f5e8bb9b507c1"
+      },
+      "source_line_count": 56,
+      "reviewed_ranges": [
+        {
+          "first_line": 31,
+          "last_line": 56,
+          "range_archive": {
+            "path": ".runtime/porting/CLK-06/readiness-audit-01/ranges/22-clk05_reference_fields-31-56.txt",
+            "sha256": "73b7a2da6a91bb122283c5c10e7121d5cff0422f90f3a7f415c5c49a073f4fae"
+          },
+          "size_bytes": 1675
+        }
+      ]
+    }
+  ],
+  "reviewed_card_and_admission_metadata": [
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/source-boundaries.json",
+      "sha256": "8b07ee7975deb10f9405749d70c47ffff78a685d097de83fbf71b86e1b849fea"
+    }
+  ],
+  "admitted_IDF_object_observations": [
+    {
+      "case_id": "A-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "A-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      },
+      "WeatherProperty_SkyTemperature_objects": 0
+    }
+  ],
+  "ordered45_guard_refs_from_existing_scope": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "ordered_guard_ref_count": 45,
+  "weather_and_metadata_payloads_read": false,
+  "primary_source_bytes_match_before_and_after": true,
+  "original_or_Rust_scientific_results_payloads_read": false,
+  "canonical_files_or_gates_written": false,
+  "engines_Cargo_Git_or_scientific_comparers_executed": false,
+  "numerical_contract_cases_tolerances_helper_or_implementation_prepared": false,
+  "numerical_PASS_claimed": false,
+  "author": "/root/clk02_baseline_audit",
+  "authorship_limits": "Author owns selected hourly/producer and prior comparison/native glue. This source audit is not independent certification of own numerical algorithms.",
+  "other_author_scope_coordination": [
+    "Raw: accepted15 IDF/45-binding admission and default-model boundary.",
+    "Header: separate source-only scope-amendment draft."
+  ],
+  "preliminary_metadata_issue": "Range copying completed; IDF parsing initially stopped on an unsupported encoding alias utf8-sig. Corrected to utf-8-sig, reused unchanged exact range bytes; no engine or numerical output was involved."
+}

@@ -1,0 +1,102 @@
+{
+  "schema": "clk06-metadata-scope-amendment.v1",
+  "status": "scope-only-amended-four-gates-pending",
+  "started_utc": "2026-10-09T05:25:18.189943+00:00",
+  "finished_utc": "2026-10-09T05:25:18.991710+00:00",
+  "actual_before_head": "965b6a4acb1c614599279077f2fddd27ae498179",
+  "actual_after_head": "965b6a4acb1c614599279077f2fddd27ae498179",
+  "before": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045"
+    }
+  ],
+  "after": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1"
+    }
+  ],
+  "archived_deltas": [
+    {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "before": {
+        "path": ".runtime/porting/CLK-06/scope-amendment-01/plan.before",
+        "sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-06/scope-amendment-01/plan.after",
+        "sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042"
+      },
+      "full_diff": {
+        "path": ".runtime/porting/CLK-06/scope-amendment-01/plan.diff",
+        "sha256": "da585112daeb916c67f32474f38b95c4bee58b52e02e074b77d6247b0542a3fd"
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/cards/CLK-06.md",
+      "before": {
+        "path": ".runtime/porting/CLK-06/scope-amendment-01/card.before",
+        "sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045"
+      },
+      "proposed": {
+        "path": ".runtime/porting/CLK-06/scope-amendment-01/card.after",
+        "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1"
+      },
+      "full_diff": {
+        "path": ".runtime/porting/CLK-06/scope-amendment-01/card.diff",
+        "sha256": "bec1efdfaa4afb956fd3cc066f01df40e67f151a53766901b395223aa932a3db"
+      }
+    }
+  ],
+  "source_review": {
+    "path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/review.json",
+    "sha256": "e0f255ff52ef0f30a3747fae2a24c26ab8c195edd9ced1ffe3491e249478f0f2"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-scope-writer-source-review-command-01/receipt.json",
+    "sha256": "b8533a06612a93f48ae30482ce928f97ca31fcb6709a3006b8c2403eca5574e8"
+  },
+  "source_authority": [
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.json",
+      "sha256": "4ce884811c9c9a140dbe32963b46bbdc19646ca1b2019d87cfd20f5b8c5b6e84"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.md",
+      "sha256": "3ac867d51535595685bb792f4478ac10327eb80957281498e93efe56f2a3106b"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/readiness-audit-01/manifest.json",
+      "sha256": "1b30852a984c0bc45e00c2070fa54221b912f13ff73fdca6dbd480a4f1fdc53f"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/readiness-audit-01/notes.md",
+      "sha256": "c55179ba25006d67226f832d163b9d713352ca47b8385d27727ff4c06a41ea1f"
+    }
+  ],
+  "actual_applied_writer": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/write_amendment.py",
+    "sha256": "f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e"
+  },
+  "other_task_objects_unchanged": 63,
+  "only_CLK06_semantic_entry_and_card_written": true,
+  "all_four_CLK06_gates_remain_pending": true,
+  "canonical_gates_updated": false,
+  "actual_new_packet_projection_or_precision_freeze_claimed": false,
+  "input_scope_expanded": false,
+  "future_alternative_models_or_SRC08_certification_claimed": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "read_only_Git_metadata_observed": true,
+  "Git_mutations_performed": false,
+  "engines_builds_tests_Cargo_executed": false
+}

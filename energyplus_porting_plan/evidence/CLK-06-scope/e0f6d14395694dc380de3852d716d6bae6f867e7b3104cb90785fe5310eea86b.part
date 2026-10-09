@@ -1,0 +1,84 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime\\porting\\CLK-06\\scope-amendment-prep-02\\write_amendment.py",
+    "--expected-head",
+    "965b6a4acb1c614599279077f2fddd27ae498179",
+    "--expected-plan-sha256",
+    "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6",
+    "--expected-card-sha256",
+    "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045",
+    "--source-review",
+    ".runtime/porting/CLK-06/independent-scope-writer-source-review-01/review.json#e0f255ff52ef0f30a3747fae2a24c26ab8c195edd9ced1ffe3491e249478f0f2",
+    "--source-review-execution",
+    ".runtime/porting/CLK-06/independent-scope-writer-source-review-command-01/receipt.json#b8533a06612a93f48ae30482ce928f97ca31fcb6709a3006b8c2403eca5574e8",
+    "--output-dir",
+    ".runtime\\porting\\CLK-06\\scope-amendment-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-09T05:25:18.108013+00:00",
+  "finished_utc": "2026-10-09T05:25:19.003959+00:00",
+  "elapsed_seconds": 0.8958666000035009,
+  "repository_before": {
+    "head": "965b6a4acb1c614599279077f2fddd27ae498179",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "965b6a4acb1c614599279077f2fddd27ae498179",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CLK-06.md\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/58/583032c89bc878fe107e10ad01193a6bb0519888113190e908913195e0c80ad5",
+    "sha256": "583032c89bc878fe107e10ad01193a6bb0519888113190e908913195e0c80ad5"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-command-01/stdout.log",
+    "sha256": "033e69dff4709d35ac359785714197ab0c9f2363f6e890342c14910a61ea83ee"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-09T05:25:19.003959+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "clk06-scope-amendment-writer-source-preparation.v1",
+  "status": "source-only-held-awaiting-other-author-review-and-Root-execution",
+  "created_utc": "2026-10-09T05:13:06.809814+00:00",
+  "source_review_requires_first_three_source_rows": [
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/write_amendment.py",
+      "sha256": "f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e",
+      "size_bytes": 13254,
+      "line_count": 236
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/task-updates.json",
+      "sha256": "c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d",
+      "size_bytes": 5323,
+      "line_count": 39
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/CLK-06.proposed.md",
+      "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1",
+      "size_bytes": 7986,
+      "line_count": 136
+    }
+  ],
+  "preview_artifacts": [
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/CLK-06.before-task.json",
+      "sha256": "7182dd933211df78b47b6a091162140648bb41b2366e2dfb61abbcf23ca6687d",
+      "size_bytes": 2122,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/CLK-06.proposed-task.json",
+      "sha256": "ae00f7a31019ff380dcf7a369b92f58dd446e98a1072d2791e7a715933076ba4",
+      "size_bytes": 5018,
+      "line_count": 67
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/plan.diff",
+      "sha256": "0acfefd1ac048587c2c7a5247df913efa42fdef4486851ec52411df1ee213493",
+      "size_bytes": 7050,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/card.diff",
+      "sha256": "74d3bdb309a4a0f6c08b5514ecfdc94e4662e741e31264aab916c7b4452f59bd",
+      "size_bytes": 9383,
+      "line_count": 142
+    }
+  ],
+  "observed_before_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045"
+    }
+  ],
+  "current_or_future_HEAD_not_guessed": true,
+  "runtime_before_HEAD_and_document_hashes_required": true,
+  "Root_pre_output_precision_decision_replaces_unfrozen_proposal01_values": true,
+  "actual_future_packet_projection_precision_freeze_pending": true,
+  "other_task_objects_unchanged": 63,
+  "all_four_CLK06_gates_pending": true,
+  "source_authority": [
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.json",
+      "sha256": "4ce884811c9c9a140dbe32963b46bbdc19646ca1b2019d87cfd20f5b8c5b6e84"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.md",
+      "sha256": "3ac867d51535595685bb792f4478ac10327eb80957281498e93efe56f2a3106b"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/readiness-audit-01/manifest.json",
+      "sha256": "1b30852a984c0bc45e00c2070fa54221b912f13ff73fdca6dbd480a4f1fdc53f"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/readiness-audit-01/notes.md",
+      "sha256": "c55179ba25006d67226f832d163b9d713352ca47b8385d27727ff4c06a41ea1f"
+    }
+  ],
+  "canonical_files_written": false,
+  "writer_or_reviewed_targets_imported_or_executed": false,
+  "engines_builds_tests_Cargo_Git_executed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

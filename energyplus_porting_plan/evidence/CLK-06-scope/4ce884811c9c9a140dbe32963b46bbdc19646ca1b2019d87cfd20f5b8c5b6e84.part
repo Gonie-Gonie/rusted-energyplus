@@ -1,0 +1,1033 @@
+{
+  "schema": "clk06-proposed-scope-amendment.v1",
+  "status": "source-only-default-CON-lane-proposal-awaiting-Root-review",
+  "created_utc": "2026-10-09T04:57:00.591450+00:00",
+  "card": "CLK-06",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "current_card": {
+    "path": "energyplus_porting_plan/cards/CLK-06.md",
+    "sha256": "b422d9d3be041c04f038c731e97e5c468095c6bc8b1b85b9cbc4f8cd8c7c2045"
+  },
+  "admitted_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "literal_all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "admitted_IDF_source_facts": [
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    },
+    {
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      },
+      "literal_WeatherProperty_SkyTemperature_object_count": 0,
+      "method": "comment-stripped literal IDF object-type token scan; no claim of whole InputProcessor/converter equivalence"
+    }
+  ],
+  "input_scope_expanded": false,
+  "science_contract_frozen": false,
+  "canonical_card_or_plan_written": false,
+  "scope_decision": {
+    "selected_lane": "CON RunPeriodWeather defaults: WP_Type1=0, skyTempModel=ClarkAllen(0), UseWeatherFileHorizontalIR=true",
+    "source_registration_reason": "All15 admitted IDF inputs contain zero WeatherProperty:SkyTemperature objects; source Environment defaults remain unless conditional WP_Type1 property override exists. Actual prepared model/useIR observations remain required in future reference metadata.",
+    "selected_branches": [
+      "0<IRHoriz<9999: actual supplied IR copied; effective sky computed with source root4.",
+      "IRHoriz<=0 first becomes9999; IRHoriz>=9999 selects default ClarkAllen calculation."
+    ],
+    "future_unverified": [
+      "UseWeatherFileHorizontalIR=false/forced recomputation",
+      "Brunt and Idso with cached PsyPsatFnTemp",
+      "BerdahlMartin",
+      "ScheduleValue/DryBulbDelta/DewPointDelta and post-read schedules",
+      "design-day sky generation/EMS overrides/full InputProcessor parity",
+      "non-hourly source files (NumIntervalsPerHour>1)",
+      "current solar/night geometry and SRC04/SRC08 coefficient/heat-flux numerical parity"
+    ]
+  },
+  "proposed_prerequisites": [
+    "CLK-02",
+    "CLK-03",
+    "CLK-04",
+    "CLK-05"
+  ],
+  "downstream_SRC08_is_not_a_prerequisite_or_pass_claim": true,
+  "selected_input_units": {
+    "DryBulb": "degC, processed hourly or interpolated Today operand",
+    "DewPoint": "degC, processed hourly or interpolated Today operand",
+    "RelHum": "fraction passed to helper; stored OutRelHum remains percent and caller multiplies0.01 exactly; default ClarkAllen does not evaluate RH",
+    "OpaqueSkyCover": "tenths, not fraction; use actual processed opaque cover, not total cover",
+    "IRHoriz": "W/m2 native numerical rate convention at selected source interval1; legacy raw property name Wh_per_m2 is not an instruction to divide by zone steps",
+    "skyTempModel": "exact ClarkAllen enum0",
+    "UseWeatherFileHorizontalIR": "exact true in selected lane"
+  },
+  "selected_output_units": {
+    "ESky": "dimensionless; standalone CalcSkyEmissivity return only, no fabricated observation of calcSky local",
+    "HorizIRSky": "W/m2",
+    "SkyTemp": "degC",
+    "SkyTempKelvin": "K only actual SetCurrent owner copy if explicitly observed"
+  },
+  "source_math": {
+    "minimum": "ObjexxFCL double min(a,b) = a<b ? a:b; admitted default min(DryBulb,DewPoint)",
+    "clear_emissivity": "0.787 + 0.764 * log((min(DryBulb,DewPoint) +273.15)/273.15)",
+    "cloud_multiplier": "1.0 +0.0224*OSky -0.0035*pow2(OSky) +0.00028*pow3(OSky), original left-to-right expression",
+    "missing_IR": "ESky *5.6697e-8 *pow4(DryBulb+273.15)",
+    "missing_SkyTemp": "(DryBulb+273.15)*root4(ESky)-273.15",
+    "valid_IR": "HorizIRSky=IRHoriz; SkyTemp=root4(IRHoriz/5.6697e-8)-273.15",
+    "pow4": "t=x*x; t*t",
+    "root4": "sqrt(sqrt(x))",
+    "no_extra_generic_clamp_or_fallback": "Do not add max(0), air-temperature fallback, emissivity clipping, RH/cover normalization, Horner/FMA rewrite or source counter replay.",
+    "selected_PSY_helper_dependency": null,
+    "mathematical_formulas_are_documented_primary_source_not_reference_answers_supplied_to_production": true
+  },
+  "hourly_owner_order": [
+    "Admit literal source date/hour and parse raw IR mandatory[6], total[16], opaque[17] without altering raw bytes.",
+    "IR<=0 ->9999; negative Total/Opaque ->99 at original preceding scalar positions.",
+    "Apply existing source dry/dew/RH missing/range handling, then cover>=99 substitution from actual missing cache and increment each selected count.",
+    "Write Tomorrow hourly dry/dew/RHpercent/cover; pass RH*0.01 plus processed dry/dew/opaque and IR to actual default calcSky.",
+    "Store actual computed HorizIRSky/SkyTemp in hourly Tomorrow before scalar/cover missing-history update; preserve RH percent/fraction/roundtrip order."
+  ],
+  "subhour_owner_order": [
+    "Only source NumIntervalsPerHour==1 and steps>1 enters interpolation; steps1 keeps hourly outputs and does not advance LastHour/NextHour interpolation caches.",
+    "Copy complete processed hourly carriers; if LastHourSet=false select actual Hour1 or Hour24 per frozen first policy.",
+    "Use stored Interpolation(ts); interpolate processed dry/dew/RHpercent/total/opaque and processed hourly HorizIRSky.",
+    "Call calcSky again with interpolated opaque/dry/dew/RHpercent*0.01 and interpolated processed IR. Do not interpolate SkyTemp or raw sentinel/preview IR.",
+    "A hourly missing-IR calculation may yield a valid processed IR used by the subhour valid-IR branch; record actual branch rather than assuming missing status propagates.",
+    "After all steps of each hour, update complete LastHour with the actual processed hourly carrier; source next cache continues only Beam/Dif/Liquid writes.",
+    "UpdateWeatherData copies completed Tomorrow grid to Today once in existing handoff order before current/consumer."
+  ],
+  "required_production_transport": [
+    "Bind actual selected model/useIR to authenticated absent-object CON inputs before first read; no source/default inference from numerical outputs.",
+    "Observe actual Today.HorizIRSky and Today.SkyTemp at correct hour/step in a new frozen sky2 projection.",
+    "Carry Today.HorizIRSky into ProductionWeatherContext.sample.horizontal_infrared_radiation_w_per_m2 or an explicit owned accessor; existing sample preview IR is not parity.",
+    "Carry actual Today.SkyTemp as owned context.weather.sky_temp; retain source Weather.HorizIRSky and Environment.SkyTemp/SkyTempKelvin only if actual owners are introduced/observed.",
+    "Prove Initialize ->SetCurrent ->actual consumer completion-prefix order; repeated first seed consumer reuses the same actual sky/IR payload, not recalculated metadata.",
+    "Run unchanged A-24H/A-72H/B-BOTH-24H Full and Summary (six ordinary CLI runs) with recorded actual build/source/input/ENV before-after and no expected-output injection.",
+    "Compare native sky2 at matching selected phase plus exact within-Rust Today ->sample/report/thermal operand copies; SRC08 downstream exchange coefficients/heat flux remain unpaired."
+  ],
+  "required_case_families": [
+    {
+      "id": "default-model-registration",
+      "coverage": "All15 admitted IDF absence plus actual prepared ClarkAllen/useIRtrue; invalid or unsupported model inputs are not silently admitted."
+    },
+    {
+      "id": "IR-branch-boundaries",
+      "coverage": "Declared finite IR negative, -0.0, +0.0, small positive, ordinary supplied, immediately below9999, exactly9999 and above9999; real branch/type outcomes retained."
+    },
+    {
+      "id": "opaque-clear-cloudy-minimum",
+      "coverage": "Opaque0/5/10; Dry below/equal/above Dew; cold/warm finite inputs; total and opaque deliberately differ to expose wrong operand."
+    },
+    {
+      "id": "RH-percent-fraction",
+      "coverage": "Stored percent and helper fraction recorded at hourly and subhour calls; default result should have no hidden RH-based alternative helper evaluation."
+    },
+    {
+      "id": "cover-missing-history",
+      "coverage": "Negative and99 boundaries; initial true cache5, prior valid covers, subsequent missing values, separate Total/Opaque counts, warning flag independence and untouched raw/canary fields."
+    },
+    {
+      "id": "hourly-subhour-source-order",
+      "coverage": "Steps1/3/4; constant/ramp/two-day data; Hour1/Hour24 seeds; hour24/hour1 cache carry; processed IR and cloud interpolation before sky calculation; source stored weights canary."
+    },
+    {
+      "id": "handoff-and-consumers",
+      "coverage": "Genuine BeginEnvironment/BeginDay/Run2/end order, appropriate warmup repetition if independently frozen, unchanged other slots/counters/controls, actual owned IR+Sky sample/report/thermal handoff."
+    }
+  ],
+  "proposed_precision_not_frozen": {
+    "ClarkAllen_emissivity": {
+      "unit": "1",
+      "atol": 1e-13,
+      "rtol": 1e-13
+    },
+    "SkyTemp": {
+      "unit": "degC",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    "HorizIRSky": {
+      "unit": "W/m2",
+      "atol": 1e-10,
+      "rtol": 1e-13
+    },
+    "cloud_interpolation_operands": {
+      "unit": "tenths",
+      "atol": 1e-12,
+      "rtol": 0.0
+    },
+    "discrete_controls_counts_shapes_clocks_call_history": "typed exact; no optional-null PASS",
+    "same_owned_value_transport": "exact scalar bit/class identity; no tolerant reinterpretation",
+    "Root_must_read_and_freeze_variable_policy_before_first_new_numerical_outputs": true
+  },
+  "unavailability_limits": [
+    "C5 native Today/Tomorrow/selected-slot serializers are solar2-only; native sky2 was unavailable there. Last/Next/Missing full17 do not prove C5 sky grid generation.",
+    "Existing C3/C4 full17 and current CLI full17 are historical observations, not newly paired C6 evidence. Their source/input/history and selected scope would need a separate preexecution admission before reuse.",
+    "No fabrication of private hourly native locals, local ESky inside calcSky, full Factory state, hidden schedule/PSY counters or current sky globals absent from Rust owners.",
+    "Required selected sky/IR fields must be actual available operands. Both-null remains unavailable/no numerical comparison/no PASS; one-sided absence is an availability failure.",
+    "Nonfinite/out-of-supported-domain cases require separate explicit input admission; no invented finite fallback or zero value.",
+    "Complete actual invocation/returned/sourcefatal/skipped coverage and typed raw scalar bits/classes are mandatory; factual metadata0 cannot become numerical PASS."
+  ],
+  "reuse_review": {
+    "matching_existing_constants": true,
+    "legacy_longwave_helper_default_missing_behavior_equivalent": false,
+    "legacy_longwave_helper_fourth_root_source_order_equivalent": false,
+    "legacy_WeatherTimestepSeries_public_API_preservation_required": true,
+    "canonical_sky_owner_not_yet_ported_or_certified": true,
+    "no_existing_CLK05_sky_claim_extended": true
+  },
+  "source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3200,
+      "end_line": 3226,
+      "range_sha256": "2bf4d27838f76e70056afb020ce79238a7918587910222a7ba65b4d87860828e",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Whole CalcSkyEmissivity authority; only declared ClarkAllen branch selected."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 8873,
+      "end_line": 8907,
+      "range_sha256": "e1d81cb01906a51ae0cb6bbae33c81044a18177d069c320c53523e69ea5aa31a",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Whole calcSky authority and exact IR predicates/output writes."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2738,
+      "end_line": 2747,
+      "range_sha256": "d9bea1150d72de6ac2f0900e0d24b0e3e7e6570c0481fd16156c10851f1948b2",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Hourly IR<=0 normalization before later processing."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2788,
+      "end_line": 2795,
+      "range_sha256": "1042766727de0d20ee9931c571e2fb49134793d43d6c192f32468376ed5fc736",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Negative Total/Opaque cover become99, preserving intervening RH preprocessing order."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2881,
+      "end_line": 2903,
+      "range_sha256": "e6c02689b7573527342cccb19400b6990123651686c23967a225b1ec605b2c7e",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Processed dry/dew/RH missing/range handling before calcSky."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2930,
+      "end_line": 2938,
+      "range_sha256": "700cee47e25c17da9bb98136eeb232544edb2ef3b5b844857a66c36b3879a840",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Total/Opaque>=99 substitution and missed counts."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2955,
+      "end_line": 2967,
+      "range_sha256": "9e9b9711639a3536f55250e4e8627dd44e5435bf67bf077cbf07ae8faa8cf141",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Hourly owner writes, stored RH percent and calcSky RH fraction."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3026,
+      "end_line": 3033,
+      "range_sha256": "9926085a1db74bd6f8b9397d47aa7330ef4efb0ea36457a67ee4169e8a522c7e",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "History updates after hourly calcSky, including RH roundtrip and both covers."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3052,
+      "end_line": 3066,
+      "range_sha256": "63476a1b461f8dae63e5d249f79357e78d5f3c24a550ac2441e2ab8f7648b9d9",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Interval1 multi-step admission, complete processed hourly copy and firstHour1/24 cache seed."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3068,
+      "end_line": 3080,
+      "range_sha256": "071024846244c4a5381bc7bcab342d616ff65ce39cb5e72d6d38fe668d36f4a7",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Hour order and stored scalar weights."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3102,
+      "end_line": 3120,
+      "range_sha256": "c37045eb554cc6cd5e7b7ba12ea5bd185d426125d190bb003d49afd02616bc7f",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Interpolated processed inputs and processed hourly IR passed to calcSky."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3131,
+      "end_line": 3135,
+      "range_sha256": "9b204c39f69ee45e4c5b4f3cccd3e2f17ac154531f89bb3ca99281f3c48cfeff",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "LastHour updated after completing each hour."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 1747,
+      "end_line": 1776,
+      "range_sha256": "e9df000b0803013a4fa827277e757882eea13096171f0b2a528ec5c51a2d46b0",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "BeginEnvironment missing/count initialization; cover defaults5."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 1994,
+      "end_line": 2033,
+      "range_sha256": "ef79f461fc01c045c40dd7a50e45bf789bd91f8efbec45e1fb5d5698927391bf",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Whole handoff copies Tomorrow grid to Today before downstream consumption."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2115,
+      "end_line": 2115,
+      "range_sha256": "d255feca0e7fddbac91023ce10797cc907f6a66d905e74ff0497a82d39118193",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "SetCurrent selects real Today(hour,timestep) operand."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2192,
+      "end_line": 2194,
+      "range_sha256": "3241fbb58f79fec9aba559647021e2d8c28d349cb3c0d187247f0c20543cc427",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Weather.HorizIRSky and environment.SkyTemp/SkyTempKelvin source-owner copies."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 2214,
+      "end_line": 2215,
+      "range_sha256": "f865b48d42d9d998ee9a9d4016bd3e0cf5890cff2c3f34a2289d12af14f0f6fc",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Current cloud covers transport, not a new emissivity formula."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 4734,
+      "end_line": 4744,
+      "range_sha256": "3fd514463f2c059b7b7f3585f36df65e237e7766518655a430192e1ef6247016",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "ReadUserWeatherInput entry."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 4793,
+      "end_line": 4798,
+      "range_sha256": "43eddcbfa6f1feb1377b8f829143ef536140494d1033df78e62bbdc5ed439635",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "RunPeriod metadata acquisition before weather property registration."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 4830,
+      "end_line": 4832,
+      "range_sha256": "d6417b3d60e389a90934b90803b88aa7b0dde7d627f3432016d94c158c2bdcf3",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "SetupEnvironmentTypes then GetWeatherProperties registration."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 6736,
+      "end_line": 6741,
+      "range_sha256": "51a9e00eadbb573d087431a551bdff96f9bb7a4fb19d6b811611ce1da84d30c0",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Sky-property object count and conditional registration loop."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 6889,
+      "end_line": 6905,
+      "range_sha256": "108b271b60f34bccbbef50ff7167b0d538afe26853dd09d35c88e0b6aa68b16b",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Optional property useIR/model assignment, conditional WP_Type1 override only."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc",
+        "sha256": "ced9d22e42c3319d64c505b97f27cdd36c618c0bc3648905c8636de7f8498386"
+      },
+      "start_line": 3136,
+      "end_line": 3179,
+      "range_sha256": "0b0c84882f3fe18ab97a2ae57ed32d5c82f3b2ac850b8d9ae452b16b119bc9a6",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Scheduled sky replacements excluded from this amendment."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "start_line": 163,
+      "end_line": 174,
+      "range_sha256": "215e4792c708f084f9161df0fb156098fd3f2dc4a1069bb2af67939cfcf19698",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "SkyTempModel enum; ClarkAllen literal0, alternatives named but unverified."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "start_line": 206,
+      "end_line": 209,
+      "range_sha256": "580b2546b15629a0bcacdc396aa74380e5beb443ef895b84259b472e441a416e",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "RunPeriod environment default WP_Type1=0/ClarkAllen/useIRtrue."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "start_line": 416,
+      "end_line": 425,
+      "range_sha256": "1fe09fb1dd1e26988abfd3fdb4a21db061d5586dd9e8d0e55e0c8d83d24a9b66",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "WeatherProperties defaults, not proof that an override object exists."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "start_line": 548,
+      "end_line": 549,
+      "range_sha256": "a68a4916da9f419f6e2a51bdc9a774b1e701ad9e6b4ed55358b4007ce9d49a7e",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "CalcSkyEmissivity declaration."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "start_line": 704,
+      "end_line": 711,
+      "range_sha256": "877d8dc73972bc7148beaa9e4e79018139dfc9e2cafefe3a230d85bcebe9dc8d",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "calcSky declaration."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+        "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc"
+      },
+      "start_line": 713,
+      "end_line": 731,
+      "range_sha256": "de94aa4e95274b5502729c6e17103272c14a6bd50db8abd02fa1173932879393",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Actual WeatherVars output carrier and cloud operands."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3"
+      },
+      "start_line": 611,
+      "end_line": 618,
+      "range_sha256": "575aecd26bb0de9d629329247a33dbddb70febcf9ac0672ca7b6348c9070f08a",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Exact Kelvin and Stefan-Boltzmann constants."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+        "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494"
+      },
+      "start_line": 163,
+      "end_line": 181,
+      "range_sha256": "f218a609d97c3127244ea22feb6a630ea0491884b00c7cf32c99c3eb8df882f7",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Imported ObjexxFCL min/power/root aliases."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+        "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+      },
+      "start_line": 90,
+      "end_line": 96,
+      "range_sha256": "e9df9b39ae0aefa1fa2738bf1a676ddde126bd15f70765f28ae6b6dc127be0f9",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "double min returns a<b?a:b; retain tie and evaluation behavior."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+        "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+      },
+      "start_line": 1062,
+      "end_line": 1088,
+      "range_sha256": "77d6bfbfcb5c6431a75a4d5dda5c27c1c4ad07a41d9776b263ddb42301f80edf",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "pow2=x*x; pow3=x*x*x; pow4 uses t=x*x then t*t."
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+        "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c"
+      },
+      "start_line": 1141,
+      "end_line": 1148,
+      "range_sha256": "0b8b67fb2a36bf8a0bf3de43978bc1bcc02a9d9717c778621a5ab8a494c6c008",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "root4=sqrt(sqrt(x))."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_raw/loader.rs",
+        "sha256": "fdc1cbb06897b29153c6a0c8074b080b27735da7826386935a78d76db263992d"
+      },
+      "start_line": 111,
+      "end_line": 135,
+      "range_sha256": "bb84cc76715e48176d3cf10e030da9fec69e768db502a8902ea705c0649e312d",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Raw mandatory IR index6 and cover ownership retained separately."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+        "sha256": "249e4001f941f55006cbfb0a8fba83474e3497e13bcf7044579044056ebdb4ee"
+      },
+      "start_line": 18,
+      "end_line": 128,
+      "range_sha256": "7314256f310342b6d13ab7ba35158f4f1b750adb82729d1412c505cf0dc9f700",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Current processed hourly callback; cloud processing and default calcSky not yet paired/ported."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/producer.rs",
+        "sha256": "8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7"
+      },
+      "start_line": 31,
+      "end_line": 56,
+      "range_sha256": "5a64cfed2f38a6539446250a39fe7284bd43b7cb74f2eec76872a6117e328106",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Existing sky fallback/raw IR compatibility base; not native missing-IR behavior."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/producer.rs",
+        "sha256": "8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7"
+      },
+      "start_line": 138,
+      "end_line": 220,
+      "range_sha256": "37b037544964ac49ad7879eb52572cc85a5960047ddb4751e7acd2e636a5391b",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Current interpolation currently uses preview IR/sky; selected C5 solar remains separate."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51"
+      },
+      "start_line": 302,
+      "end_line": 320,
+      "range_sha256": "bafbebe7bf3ba6ada3d938464d94b2d44f38b135bcdf9888dd470be3d338fd6d",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Actual missing defaults/count resets including covers."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51"
+      },
+      "start_line": 441,
+      "end_line": 492,
+      "range_sha256": "7784fd0ba24350dcc4ce56d8c6b3e8726d813747a0a88d235eafee9df2a74c97",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Real clear/read/hourly callback storage before producer."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "8ca76c193f9c4fc8fedb85f4e42b175c92b683c9d03aa90fa3130b3a59c2d0b3"
+      },
+      "start_line": 212,
+      "end_line": 227,
+      "range_sha256": "19319d00fd7ac8decd3c56d96c8525f5c0d61ae7ad0d1fc22f82209661ddb88a",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Today slot owned; sample IR currently not overwritten from Today."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather.rs",
+        "sha256": "e9faeca5edab6541a62acb72deff3b22a5c1f40df231b794f3b16cc0d65e2f2c"
+      },
+      "start_line": 808,
+      "end_line": 826,
+      "range_sha256": "96a1e52cdc924d71949832d7cace8ffd49875d8970b2dfdba3b0012a77565670",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "IR consumer accessor prefers actual sample; preview is not processed-IR parity."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/longwave.rs",
+        "sha256": "72125a1bf3a04affcad7f44b699f71bb85831d7ce584561c5b2bd42bb991e894"
+      },
+      "start_line": 137,
+      "end_line": 146,
+      "range_sha256": "86eceb4b4d47e4e8641375274ece07b4c67be754a016de7bb4432d23940b6c9a",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Existing compatibility fallbackAir and powf root differ from calcSky; reuse location only."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+        "sha256": "80746f3388f8d54e9f5f4a16648eda66de07ce0eb9603a7381631693a47d624b"
+      },
+      "start_line": 66,
+      "end_line": 83,
+      "range_sha256": "e09fc9ac585ea3d7d903fb04ef23d03c00a6391e28883e9e65905a6336219c69",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Actual IR report operand and owned sky temperature consumer path."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+        "sha256": "45472043602e3432d86cfcdad7fbecdfed559759002477b860ef7c436940faa6"
+      },
+      "start_line": 330,
+      "end_line": 342,
+      "range_sha256": "22284508e69f5b0759bffab7d46ee29df8bc2e76975510474dd4d130a1566f0e",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Actual owned sky operand entering exterior longwave helper; downstream formula unpaired."
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "55e0b9ccba8e2ee5f8856f8afc033ff6158c18265b6fb55ae9cea2fce78f7bde"
+      },
+      "start_line": 14,
+      "end_line": 15,
+      "range_sha256": "0b28fc3decdb6e03e2a8fff0faea466ed8feebfd875f5c7f5bde0c9c9c8d5f89",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Existing matching constants are reusable subject actual source pins."
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/clk03_trace.rs",
+        "sha256": "918ede1f8a628c2102e605b54aaa26c35ae641221ae5d36cf127724cfd965ae4"
+      },
+      "start_line": 22,
+      "end_line": 30,
+      "range_sha256": "1b5508c87696c217bd6850bd641ff250e6d5062da39dc370bfea6a16a4c1c901",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "CLI actual full17 includes sky/IR/cloud payload fields."
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/clk03_trace.rs",
+        "sha256": "918ede1f8a628c2102e605b54aaa26c35ae641221ae5d36cf127724cfd965ae4"
+      },
+      "start_line": 171,
+      "end_line": 183,
+      "range_sha256": "d9022f3c32b4e3c79582b28d072c248f931701439024f35224912752ebd8c49c",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Passive actual consumer raw/sample/Today/current receipts and completion-prefix proof."
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/porting_scope.rs",
+        "sha256": "66665f9026988f91a7455b0f18d8f32048572a46f8e8d8765e7d05263fcc7eeb"
+      },
+      "start_line": 158,
+      "end_line": 199,
+      "range_sha256": "3be5c65d1e35bba22d02075f939776988c7e7504b0c2f657183eb869d303fa7c",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "Actual bounded CON object whitelist excludes WeatherProperty:SkyTemperature."
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CLK-05/native-prep-01/clk05_reference_fields.hh",
+        "sha256": "d3b4f03d82a2e238a9fb85f3202beb3242b589ad17e35a28e70f5e8bb9b507c1"
+      },
+      "start_line": 31,
+      "end_line": 52,
+      "range_sha256": "92915405e792f3fa5ecb56a9018570558c8ead5afc0f39949daaf662f1e9dbb4",
+      "byte_range_rule": "original bytes including retained line terminators",
+      "purpose": "C5 native grids/selected slot replace full17 with solar2; no C5 sky-grid parity evidence."
+    }
+  ],
+  "evidence_supplied_by_peers": {
+    "Raw": "scope45/15 IDF absence, source hashes/existing excluded scope and exact helper/constants refs supplied in collaboration messages; independently checked here.",
+    "Baseline": "hourly/subhour owner order, current consumer IR gap, and actual C5 native solar2-only observation supplied in collaboration messages; independently checked here.",
+    "artifact_refs_pending": "Peer source audit artifact may be appended only in a fresh source version after an actual held identity exists."
+  },
+  "author_limits": "Header authored earlier producer/observer/glue; this is source/inventory and scope drafting, not independent certification of own kernels. Root must full-read and amend actual card/plan before any new science outputs or implementation.",
+  "native_packet_emitted_or_frozen": false,
+  "engines_builds_tests_Cargo_Git_executed": false,
+  "scientific_values_compared": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

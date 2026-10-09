@@ -7092,29 +7092,66 @@
       "title": "하늘 온도·수평면 IR",
       "source": "WeatherManager.cc",
       "symbols": "calcSky; CalcSkyEmissivity",
-      "block": "선정 sky model 및 EPW IR 유효/결측 분기만.",
+      "block": "CON RunPeriodWeather의 실제 기본 ClarkAllen/useIR=true 경로: 제공 IR 및 결측 IR; 시간별 처리·서브시간별 재계산·Tomorrow/Today 소유 상태 전달. 다른 sky model은 미검증.",
       "dependencies": [
         "CLK-02",
-        "CLK-04"
+        "CLK-03",
+        "CLK-04",
+        "CLK-05"
       ],
-      "inputs": "건구/노점[°C], RH, 운량, IR[W/m²], sky model",
-      "outputs": "하늘 온도[°C], IR[W/m²]",
-      "timing": "기상상태 구성",
-      "unit_tests": "IR 제공/결측; 맑음/흐림; 온도 단위 변환",
-      "integration_test": "SRC-08 외부 장파 계수·열유속에 연결",
-      "rust_candidate": "crates/ep_runtime/src/heat_balance/longwave.rs; weather 관련 구현",
+      "inputs": "처리된 건구/노점[°C], 저장 RH[%]→calcSky RH fraction, total/opaque 운량[tenths], IRHoriz[W/m²], 실제 기본 ClarkAllen/useIR=true; source interval1, zone steps1/3/4, 실제 cache/저장 보간가중치",
+      "outputs": "CalcSkyEmissivity 반환 ESky[1]; 처리된 Tomorrow/Today SkyTemp[°C]·HorizIRSky[W/m²]; cover history/count; 실제 owned sample/report/thermal operand 전달",
+      "timing": "시간별 missing/cover 처리→calcSky→history; steps>1에서 처리된 hourly IR·cloud/온도/RH 보간→calcSky 재호출; Tomorrow→Today 이후 실제 zone timestep 소비",
+      "unit_tests": "IR 음수·±0·양수·9999 경계; opaque0/5/10·dry/dew min; RH percent/fraction; cover negative/99 history/count; steps1/3/4·constant/ramp·Hour1/24·두 날짜·저장 weight canary",
+      "integration_test": "A-24H/A-72H/B-BOTH-24H Full/Summary 여섯 실제 CLI: matching-phase native sky2와 Today→owned IR/sample/report 및 sky thermal operand 전달; 반복 초기 seed와 실제 호출 순서. SRC-08 계수·열유속은 후속 미검증.",
+      "rust_candidate": "crates/ep_runtime/src/weather_day/{hourly,producer,production}.rs; 실제 cloud/sky 상태·cache; weather IR accessor/report; 기존 heat_balance/longwave.rs는 source order·결측 의미 재검증 후보",
       "assessment": "기존 구현 재검증",
-      "companion": "WeatherManager.hh",
-      "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
+      "companion": "WeatherManager.hh; DataGlobalConstants.hh; EnergyPlus.hh; ObjexxFCL/Fmath.hh; 실제 hourly/subhour caller와 owned consumer",
+      "excludes": "CON-01 제외 입력을 확대하지 않는다. useIR=false, Brunt/Idso/BerdahlMartin, scheduled sky, design-day/EMS, source intervals>1, 전체 InputProcessor 및 SRC-08 계수·열유속은 미검증. 기존 C5 solar2 관찰을 sky grid 증거로 재분류하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/WeatherManager.cc",
       "scope_review": "미확인",
       "unit_gate": "미확인",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
-      "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "source_boundary_note": "고정 EP 소스의 calcSky8873–8907·CalcSkyEmissivity3200–3226 전체 authority에서 기본 ClarkAllen/useIR=true만 선정. hourly2738–2747/2788–2795/2930–2967/3026–3033 및 subhour3052–3135, 실제 선언·min/power/root/constants를 packet 전에 고정한다. 이 범위 수정은 실제 신규 packet/freeze 또는 numerical PASS가 아니다.",
+      "numeric_policy": "출력 전 Root 결정: ESky atol=2e-15/rtol=0; SkyTemp[°C]와 HorizIRSky[W/m²] 각각 atol=1e-12/rtol=1e-15. Cloud drivers·저장 weights·동일 owned copy는 scalar bit/class 정확 일치(0). Signed zero·type·shape·분기·ID·count·시계·호출 순서는 정확 일치. Null은 unavailable이며 비교/PASS가 아니다. 실제 변수별 packet·projection·freeze는 아직 pending.",
+      "evidence_required": "고정 원본파일/행구간/helper/input 해시와 실제 default model/useIR 등록; Original-first sky2 unit 및 matching-phase owned transport; 실제 호출/consumer prefix·6 CLI·source/build/ENV before-after; unavailable·fatal·skip·실패 보존; EP/fixture 답 주입 부재. 네 gate는 실제 증거가 생길 때까지 미확인.",
+      "scope_preparation_note": "출력 전 기본 CON lane 범위 수정. 15개 IDF의 literal sky property 부재와 원본 default/conditional registration 근거; 실제 prepared metadata는 후속 Original에서 필수. 기존 preview sample IR을 Today IR로 전달해야 하며 C5 native sky grid는 unavailable. 대안 모델이나 SRC-08 인증 없음.",
+      "numeric_profiles": {
+        "ESky": {
+          "unit": "1",
+          "atol": 2e-15,
+          "rtol": 0.0
+        },
+        "SkyTemp": {
+          "unit": "degC",
+          "atol": 1e-12,
+          "rtol": 1e-15
+        },
+        "HorizIRSky": {
+          "unit": "W_per_m2",
+          "atol": 1e-12,
+          "rtol": 1e-15
+        },
+        "cloud_drivers": {
+          "comparison": "scalar_bits_and_class_exact",
+          "atol": 0.0,
+          "rtol": 0.0
+        },
+        "stored_interpolation_weights": {
+          "comparison": "scalar_bits_and_class_exact",
+          "atol": 0.0,
+          "rtol": 0.0
+        },
+        "owned_value_copies": {
+          "comparison": "scalar_bits_and_class_exact",
+          "atol": 0.0,
+          "rtol": 0.0
+        }
+      },
+      "precision_policy_status": "Root-decided-before-new-outputs; actual-CLK06-packet-projection-and-freeze-pending",
+      "exact_metadata_policy": "signed_zero_type_shape_branch_ID_count_clock_call_order_exact; null_unavailable_never_comparison_or_PASS"
     },
     {
       "id": "SCH-01",
