@@ -141,8 +141,11 @@ fn owned_today_drives_solar_rain_and_sky_with_no_legacy_record_array()
 }
 
 #[test]
-fn a_live_weather_entry_preserves_legacy_results_and_raw_initial_ctf_seed()
+fn a_live_weather_reaches_reports_and_preserves_raw_initial_ctf_seed()
 -> Result<(), Box<dyn std::error::Error>> {
+    use crate::weather::day::sky_transport_trace::{
+        self, SkyTransportKind as Kind, SkyTransportSeries as Series, SkyTransportValues as Values,
+    };
     let config = configuration(6, 30, 6, 30, FirstHourInterpolationStartingValues::Hour24)?;
     let mut typed = cube_model();
     typed.timestep.number_of_timesteps_per_hour = 4;
@@ -162,12 +165,19 @@ fn a_live_weather_entry_preserves_legacy_results_and_raw_initial_ctf_seed()
         )
     })?;
     let live = ProductionWeatherTimestepSeries::from_bytes(DECOY_BYTES.to_vec(), config)?;
-    let production = crate::psychrometrics::with_fresh_psychrometric_state(|| {
-        super::simulate_heat_balance_zone_air_temperatures_with_production_weather(
-            &model, &live, options,
-        )
-    })?;
-    assert_eq!(legacy.results, production.results);
+    let ((production, trace), sky_trace) = sky_transport_trace::capture(true, || {
+        crate::weather::day::production_trace::capture(true, || {
+            crate::psychrometrics::with_fresh_psychrometric_state(|| {
+                super::simulate_heat_balance_zone_air_temperatures_with_production_weather(
+                    &model, &live, options,
+                )
+            })
+        })
+    });
+    let production = production?;
+    let trace = trace.ok_or("missing actual weather trace")?;
+    let sky_trace = sky_trace.ok_or("missing actual sky transport trace")?;
+    // The original raw-weather CTF and initial zone-state invariants remain exact.
     assert_eq!(
         legacy.summary.run_period_initial_ctf_history_slots,
         production.summary.run_period_initial_ctf_history_slots
@@ -178,6 +188,243 @@ fn a_live_weather_entry_preserves_legacy_results_and_raw_initial_ctf_seed()
     );
     assert_eq!(production.summary.run_period_timestep_count, 24 * 4);
     assert!(!production.summary.warmup.enabled);
+    assert_eq!(trace.total_operation_count as usize, trace.operations.len());
+    assert_eq!(trace.total_consumer_count as usize, trace.consumers.len());
+    assert_eq!(
+        trace
+            .operations
+            .iter()
+            .filter(|op| op.kind == "SetCurrentWeather")
+            .count(),
+        96
+    );
+    assert_eq!(trace.consumers.len(), 97);
+    for consumer in &trace.consumers[..2] {
+        assert_eq!((consumer.record_index, consumer.timestep), (0, 1));
+        assert_eq!(
+            consumer.completed_operation_count,
+            trace.consumers[0].completed_operation_count
+        );
+    }
+    for consumer in &trace.consumers {
+        assert_eq!(
+            consumer.phase,
+            crate::weather::day::WeatherDayPhase::Run { day: 1 }
+        );
+        assert!(!consumer.caller_state.warmup_flag);
+        let current = trace
+            .operations
+            .iter()
+            .find(|op| op.sequence == consumer.completed_operation_count)
+            .ok_or("consumer has no actual completed weather operation")?;
+        assert_eq!(current.kind, "SetCurrentWeather");
+        assert!(current.error.is_none());
+        let slot = current
+            .after
+            .state
+            .today_values
+            .hour(consumer.record_index + 1)?
+            .get(consumer.timestep as usize - 1)
+            .ok_or("actual Today unavailable")?;
+        assert_eq!(consumer.context.weather, *slot);
+        assert_eq!(
+            consumer.context.current_weather,
+            current.after.state.environment.current_weather
+        );
+        assert_eq!(
+            consumer
+                .context
+                .sample
+                .horizontal_infrared_radiation_w_per_m2
+                .to_bits(),
+            slot.horiz_ir_sky.to_bits()
+        );
+        let stamp = consumer
+            .context
+            .sky_transport_stamp
+            .ok_or("actual context stamp unavailable")?;
+        assert_eq!(
+            (stamp.record_index, stamp.hour, stamp.timestep),
+            (
+                consumer.record_index,
+                consumer.record_index as i32 + 1,
+                consumer.timestep as i32
+            )
+        );
+        assert_eq!(
+            stamp.completed_operation_count,
+            consumer.completed_operation_count
+        );
+    }
+    let sky = production
+        .results
+        .find_series("Environment", "Site Sky Temperature")
+        .ok_or("missing actual sky output series")?;
+    let infrared = production
+        .results
+        .find_series(
+            "Environment",
+            "Site Horizontal Infrared Radiation Rate per Area",
+        )
+        .ok_or("missing actual infrared output series")?;
+    assert_eq!((&*sky.units, &*infrared.units), ("C", "W/m2"));
+    assert_eq!((sky.values.len(), infrared.values.len()), (24, 24));
+    let mut events = sky_trace
+        .retained_by_kind
+        .iter()
+        .flatten()
+        .collect::<Vec<_>>();
+    events.sort_unstable_by_key(|event| event.sequence);
+    assert_eq!(sky_trace.total_event_count as usize, events.len());
+    assert_eq!(
+        sky_trace.completed_operation_count,
+        trace.total_operation_count
+    );
+    for (total, retained) in sky_trace
+        .total_by_kind
+        .iter()
+        .zip(&sky_trace.retained_by_kind)
+    {
+        assert_eq!(*total as usize, retained.len());
+    }
+    let mut contexts = 0;
+    let mut samplers = Vec::new();
+    let mut accumulators = 0;
+    let mut hourly = 0;
+    let mut handoffs = [0, 0];
+    let mut sums = [[0.0_f64; 2]; 24];
+    let mut pushed = [[0.0_f64; 2]; 24];
+    for (index, event) in events.iter().enumerate() {
+        assert_eq!(event.sequence as usize, index + 1);
+        if !matches!(
+            event.kind,
+            Kind::OwnedContextReceipt
+                | Kind::SamplerReturn
+                | Kind::ReportAccumulator
+                | Kind::HourlyOutput
+                | Kind::SeriesHandoff
+        ) {
+            continue;
+        }
+        let stamp = event
+            .stamp
+            .ok_or("actual report operand stamp unavailable")?;
+        assert_eq!(
+            stamp.phase,
+            crate::weather::day::WeatherDayPhase::Run { day: 1 }
+        );
+        match event.values {
+            Values::OwnedContext { today, sample_ir } => {
+                let consumer = &trace.consumers[contexts];
+                assert_eq!(Some(stamp), consumer.context.sky_transport_stamp);
+                let owner = consumer.context.weather;
+                assert_eq!(
+                    today.map(f64::to_bits),
+                    [
+                        owner.sky_temp,
+                        owner.horiz_ir_sky,
+                        owner.total_sky_cover,
+                        owner.opaque_sky_cover
+                    ]
+                    .map(f64::to_bits)
+                );
+                assert_eq!(
+                    sample_ir.to_bits(),
+                    consumer
+                        .context
+                        .sample
+                        .horizontal_infrared_radiation_w_per_m2
+                        .to_bits()
+                );
+                contexts += 1;
+            }
+            Values::Sampler { values, owned } => {
+                let consumer = &trace.consumers[samplers.len() + 1];
+                assert!(owned);
+                assert_eq!(Some(stamp), consumer.context.sky_transport_stamp);
+                assert_eq!(
+                    values.map(f64::to_bits),
+                    [
+                        consumer.context.weather.sky_temp,
+                        consumer
+                            .context
+                            .sample
+                            .horizontal_infrared_radiation_w_per_m2
+                    ]
+                    .map(f64::to_bits)
+                );
+                samplers.push((stamp, values));
+            }
+            Values::Accumulator {
+                hour_index,
+                substep,
+                received,
+                before,
+                after,
+            } => {
+                let (sample_stamp, values) = samplers
+                    .get(accumulators)
+                    .ok_or("accumulator precedes sampler")?;
+                assert_eq!(stamp, *sample_stamp);
+                assert_eq!(
+                    (hour_index, substep),
+                    (accumulators / 4, accumulators as u32 % 4 + 1)
+                );
+                assert_eq!(received.map(f64::to_bits), values.map(f64::to_bits));
+                assert_eq!(before.map(f64::to_bits), sums[hour_index].map(f64::to_bits));
+                assert_eq!(
+                    after.map(f64::to_bits),
+                    [before[0] + received[0], before[1] + received[1]].map(f64::to_bits)
+                );
+                assert!(after.iter().all(|value| value.is_finite()));
+                sums[hour_index] = after;
+                accumulators += 1;
+            }
+            Values::Hourly {
+                hour_index,
+                divisor,
+                pushed: values,
+            } => {
+                assert_eq!(hour_index, hourly);
+                assert_eq!(accumulators, (hour_index + 1) * 4);
+                assert_eq!((stamp.record_index, stamp.timestep), (hour_index, 4));
+                assert_eq!(divisor.to_bits(), 4.0_f64.to_bits());
+                // These are actual report operands, not a reconstructed native oracle.
+                assert_eq!(
+                    values.map(f64::to_bits),
+                    sums[hour_index].map(|value| (value / divisor).to_bits())
+                );
+                assert_eq!(
+                    values.map(f64::to_bits),
+                    [sky.values[hour_index], infrared.values[hour_index]].map(f64::to_bits)
+                );
+                pushed[hour_index] = values;
+                hourly += 1;
+            }
+            Values::Series {
+                hour_index,
+                handle,
+                series,
+                value,
+            } => {
+                let (field, output) = match series {
+                    Series::SkyTemperature => (0, sky),
+                    Series::HorizontalInfrared => (1, infrared),
+                };
+                assert_eq!(hour_index, handoffs[field]);
+                assert_eq!((stamp.record_index, stamp.timestep), (hour_index, 4));
+                assert_eq!(handle, output.handle.0);
+                assert_eq!(value.to_bits(), pushed[hour_index][field].to_bits());
+                assert_eq!(value.to_bits(), output.values[hour_index].to_bits());
+                handoffs[field] += 1;
+            }
+            _ => unreachable!("selected report kind has the wrong actual payload"),
+        }
+    }
+    assert_eq!(
+        (contexts, samplers.len(), accumulators, hourly, handoffs),
+        (97, 96, 96, 24, [24, 24])
+    );
     assert!(live.snapshot().state.global.end_envrn_flag);
     Ok(())
 }
