@@ -1,0 +1,26 @@
+    void ManageWeather(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   May 1997
+        //       MODIFIED       June 1997 (general clean-up)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is the main driver of the weather manager module.
+        // It controls the assignment of weather related global variables as
+        // well as the reads and writes for weather information.
+
+        InitializeWeather(state, state.dataWeather->PrintEnvrnStamp);
+
+        // Cannot call this during sizing, because EMS will not initialize properly until after simulation kickoff
+        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
+            bool anyEMSRan = false;
+            EMSManager::ManageEMS(state,
+                                  EMSManager::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather,
+                                  anyEMSRan,
+                                  ObjexxFCL::Optional_int_const()); // calling point
+        }
+        SetCurrentWeather(state);
+
+        ReportWeatherAndTimeInformation(state, state.dataWeather->PrintEnvrnStamp);

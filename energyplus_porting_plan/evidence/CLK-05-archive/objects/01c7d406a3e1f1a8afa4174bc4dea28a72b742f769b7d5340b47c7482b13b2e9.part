@@ -1,0 +1,4 @@
+    Real64 constexpr EarthRadius(6356000.0);          // Radius of the Earth (m)
+    Real64 constexpr AtmosphericTempGradient(0.0065); // Standard atmospheric air temperature gradient (K/m)
+    Real64 constexpr SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+    Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)

@@ -1,0 +1,192 @@
+"""Authenticate completed Original/QC, baseline and candidate unit evidence only."""
+from pathlib import Path
+from common import (ADMISSION, CONTROL, ROOT, binding, exact, need, read, recorded,
+    ref, script, source_map, timestamp, v)
+
+REQUIRED = ['crates/ep_run/src/pipeline.rs', 'crates/ep_run/src/clk03_trace.rs',
+    'crates/ep_run/src/weather_solar_controls.rs', 'crates/ep_runtime/src/weather_day/production.rs',
+    'crates/ep_runtime/src/weather_day/producer.rs', 'crates/ep_runtime/src/weather_day/hourly.rs',
+    'crates/ep_runtime/src/weather_day/solar.rs', 'crates/ep_runtime/src/weather_day/configuration.rs',
+    'crates/ep_runtime/src/weather_day/lifecycle.rs', 'crates/ep_runtime/src/weather_day/production_trace.rs',
+    'crates/ep_runtime/src/heat_balance/weather_driver.rs']
+
+
+def original(args, checked, admission):
+    qa_ref, execution_ref = ref(args.original_data_review), ref(args.original_data_review_execution)
+    qa = read(checked.check(qa_ref))
+    need(qa['schema'] == 'clk05-independent-original-data-review.v1'
+        and qa['status'] == 'pass-preserved-original-data-before-Rust-baseline'
+        and qa['intended_native_branch_coverage_complete'] is True
+        and qa['actual_operation_invocations'] == admission['requested_counts']['total_operations']
+        and qa['actual_operations_skipped'] == 0 and qa['numerical_PASS_claimed'] is False
+        and qa['scientific_values_compared'] is False and qa['source_unavailable_counted_as_PASS'] is False,
+        'Actual independent intended Original data QC0 required')
+    qc_record, qc_start, qc_finish = recorded(checked, execution_ref, qa)
+    sources = source_map(qa['reviewed_reader_sources'], checked)
+    mains = [archive for owner, archive in sources.items() if owner.endswith('/review_data.py')]
+    need(len(mains) == 1, 'Unique actual data reviewer main required'); script(qc_record, mains[0], checked)
+    need(qc_start <= timestamp(qa['review_started_utc']) <= timestamp(qa['review_completed_utc']) <= qc_finish,
+        'Real QC interval differs')
+    reference = read(checked.check(qa['reviewed_reference']))
+    need(reference['schema'] == 'clk05-original-reference.v1'
+        and reference['status'] == 'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review'
+        and reference['actual_helper_exit_code'] == reference['actual_launcher_exit_code'] == 0
+        and reference['preservation_checks_passed'] is True, 'Authentic completed original0/wrapper0 required')
+    _, outer_start, outer_finish = recorded(checked, qa['reviewed_execution'],
+        {'reference': qa['reviewed_reference'], 'status': reference['status'],
+         'actual_helper_exit_code': 0, 'actual_launcher_exit_code': 0})
+    child = read(checked.check(reference['execution']))
+    need(child['schema'] == 'clk05-original-native-command.v1' and child['spawn_error'] is None
+        and child['external_input_context_preserved_before_and_after_child'] is True
+        and child['terminated_native_process_internal_environment_observed'] is False, 'Actual native context-preserved child0 required')
+    child_start, child_finish = v.execution_interval(child, checked)
+    command = child['command']
+    need(len(command) == 5 and v.path_of(command[0]) == checked.check(reference['executed_helper'])
+        and v.path_of(command[1]) == ROOT and v.path_of(command[2]) == checked.check(admission['helper_request'])
+        and v.path_of(command[3]) == checked.check(ADMISSION), 'Actual native argc5 inputs differ')
+    need(outer_start <= child_start <= child_finish <= outer_finish <= qc_start, 'Genuine Original then data QC chronology differs')
+    for key, expected in [('reviewed_native_execution', reference['execution']), ('reviewed_results', reference['results']),
+        ('reviewed_request', admission['helper_request']), ('reviewed_native_admission_contract', ADMISSION),
+        ('reviewed_projection', admission['projection']), ('reviewed_build', reference['native_driver_build']),
+        ('reviewed_build_review', reference['independent_actual_build_review'])]:
+        binding(qa[key], expected, checked)
+    control = qa['reviewed_control_review']
+    need(type(control) is dict and set(control) == {'review', 'execution'}, 'Exact actual control-review bundle required')
+    for key in ['review', 'execution']:
+        binding(control[key], admission['production_control_review'][key], checked)
+    need(exact(qa['reviewed_contracts'], admission['contracts']) and exact(reference['contracts'], admission['contracts']),
+        'Original/QC six frozen packet identity differs')
+    return {'Original_reference': qa['reviewed_reference'], 'Original_execution': qa['reviewed_execution'],
+        'Original_data_review': qa_ref, 'Original_data_review_execution': execution_ref,
+        'Native_results': reference['results'], 'Native_request': admission['helper_request'],
+        'Native_admission_contract': ADMISSION, 'Native_projection': admission['projection']}, qc_finish
+
+
+def interpreter(record, reported):
+    command = record['command']; admitted = {'python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'}
+    need(type(reported) is list and all(type(value) is str for value in reported) and len(reported) >= 2
+        and Path(command[0]).name.lower() in admitted and Path(reported[0]).name.lower() in admitted
+        and exact(command[1:], reported[1:]), 'Unit reader Python name/tail argv differs')
+    absolute = Path(reported[0]).is_absolute(); parent = record['python']['executable']
+    need(type(parent) is str and Path(parent).is_absolute(), 'Actual recorder parent Python path required')
+    if absolute:
+        need(Path(reported[0]).resolve() == Path(parent).resolve(), 'Absolute reported interpreter differs from recorder Python')
+    else:
+        need(reported[0] == command[0] == Path(reported[0]).name, 'Reported interpreter alias must equal exact recorded alias')
+    return {'reported_argv_zero': reported[0], 'recorded_command_zero': command[0],
+        'recorded_parent_python_executable': parent, 'reported_interpreter_is_absolute': absolute,
+        'child_python_executable_path': reported[0] if absolute else None,
+        'child_python_executable_path_available': absolute,
+        'parent_executable_is_proof_of_child_alias_resolution': False, 'unavailable_child_path_counted_as_PASS': False}
+
+
+def prerequisites(args, checked, admission, request, projection, contracts):
+    original_refs, qc_finish = original(args, checked, admission)
+    gap_ref, gap_execution = ref(args.baseline_gap), ref(args.baseline_gap_execution)
+    gap = read(checked.check(gap_ref))
+    need(gap['schema'] == 'clk05-existing-baseline-gap.v1'
+        and gap['status'] == 'observed-authenticated-existing-solar-differences-and-unavailable-source-scope'
+        and gap['numerical_PASS_claimed'] is False and gap['unavailable_counted_as_PASS'] is False,
+        'Authentic completed baseline observation required; real mismatches remain allowed')
+    gap_record, gap_start, gap_finish = recorded(checked, gap_execution, gap)
+    need(qc_finish <= gap_start, 'Baseline observation preceded actual Original data QC')
+    for key, value in original_refs.items():
+        binding(gap['reviewed_evidence'][key], value, checked)
+    gap_sources = source_map(gap['executed_reader_source_archives'], checked)
+    gap_main = [archive for owner, archive in gap_sources.items() if owner.endswith('/check_clk05.py')]
+    need(len(gap_main) == 1, 'Unique authentic baseline reader main required'); script(gap_record, gap_main[0], checked)
+    unit_ref, unit_execution = ref(args.unit_comparison), ref(args.unit_comparison_execution)
+    unit = read(checked.check(unit_ref))
+    need(unit['schema'] == 'clk05-candidate-comparison.v1' and unit['mode'] == 'candidate'
+        and unit['status'] == 'pass-selected-solar-storage-and-source-history' and unit['numerical_PASS_claimed'] is True
+        and type(unit['comparison']['comparison_count']) is int and unit['comparison']['comparison_count'] > 0
+        and type(unit['comparison']['mismatch_count']) is int and unit['comparison']['mismatch_count'] == 0
+        and unit['unavailable_counted_as_PASS'] is False and unit['gates_updated'] is False, 'Actual candidate unit0 required')
+    unit_record, unit_start, unit_finish = recorded(checked, unit_execution, unit)
+    ledger = unit['actual_call_ledger']
+    need(exact(ledger['requested_counts'], request['requested_counts'])
+        and exact(ledger['actual_invocations'], {'native': request['requested_counts']['total_operations'],
+            'Rust': request['requested_counts']['total_operations']})
+        and exact(ledger['actual_skips'], {'native': 0, 'Rust': 0}), 'Authentic all589 unit source histories required')
+    observed_interpreter = interpreter(unit_record, unit['actual_reader_argv'])
+    for key, value in original_refs.items():
+        binding(unit['reviewed_evidence'][key], value, checked)
+    binding(unit['reviewed_evidence']['existing_baseline_gap'], gap_ref, checked)
+    binding(unit['reviewed_evidence']['existing_baseline_gap_execution'], gap_execution, checked)
+    selected_ref = unit['comparison_projection']; selected = read(checked.check(selected_ref))
+    need(selected['schema'] == 'clk05-comparer-projection.v1' and selected['scientific_execution_performed'] is False
+        and selected['frozen_before_next_Rust_comparison_operand_execution'] is True
+        and exact(selected['numeric_profiles'], contracts['tolerances']['rows'])
+        and exact(selected['numeric_criterion'], contracts['tolerances']['criterion'])
+        and exact(selected['source_selection'], projection['source_selection'])
+        and exact(selected['native_observation_policy'], request['observation_policy']), 'Candidate frozen numerical selection changed')
+    binding(selected['native_admission_contract'], ADMISSION, checked)
+    binding(selected['native_request'], admission['helper_request'], checked)
+    binding(selected['native_observation_projection'], admission['projection'], checked)
+    need(exact(selected['contracts'], admission['contracts']), 'Unit projection contract identity differs')
+    review = read(checked.check(selected['source_review']))
+    need(review['schema'] == 'clk05-independent-comparer-source-review.v1'
+        and review['status'] == 'pass-source-selected-solar-and-authentication-before-comparison'
+        and review['scientific_execution_performed'] is False, 'Actual independent unit source review required')
+    _, _, reviewed_finish = recorded(checked, selected['source_review_execution'], review)
+    frozen = selected['comparer_sources']; reviewed = source_map(review['reviewed_sources'], checked)
+    executed = source_map(unit['executed_reader_source_archives'], checked)
+    need(type(frozen) is list and len(frozen) == len(reviewed) == len(executed) == 8
+        and set(reviewed) == set(executed) == {row['path'] for row in frozen}, 'Exact frozen/reviewed/executed eight unit sources required')
+    for row in frozen:
+        need(checked.check(row).read_bytes() == checked.check(reviewed[row['path']]).read_bytes()
+            == checked.check(executed[row['path']]).read_bytes(), 'Unit executed source differs from pre-execution selected reader')
+    mains = [archive for owner, archive in executed.items() if owner.endswith('/check_clk05.py')]
+    need(len(mains) == 1, 'Unique executed unit comparer required'); script(unit_record, mains[0], checked)
+    _, freeze_start, freeze_finish = recorded(checked, unit['comparison_projection_execution'],
+        {'comparison_projection': selected_ref, 'input_only_source_selection_freeze': True,
+         'scientific_execution_performed': False, 'gates_updated': False})
+    probe_ref = unit['reviewed_evidence']['Rust_build']
+    probe, _, compilation = v.verify_rust_build(probe_ref, checked, kind='example', example='clk05_candidate_probe', committed=True,
+        required_sources=['crates/ep_runtime/examples/clk05_candidate_probe.rs'])
+    run_ref = unit['reviewed_evidence']['Rust_execution']; run, run_start, run_finish = recorded(checked, run_ref)
+    binding(run['stdout'], unit['reviewed_evidence']['Rust_results'], checked)
+    wrapper_ref = unit['reviewed_evidence']['observer_request']
+    need(len(run['command']) == 2 and v.path_of(run['command'][0]) == checked.check(probe['binary'])
+        and v.path_of(run['command'][1]) == checked.check(wrapper_ref), 'Actual candidate receives input-only wrapper argv2')
+    binding(run['source_snapshot'], probe['source_snapshot'], checked)
+    binding(unit_record['source_snapshot'], probe['source_snapshot'], checked)
+    for receipt in [run, unit_record]:
+        need(receipt['repository_before']['head'] == receipt['repository_after']['head'] == probe['implementation_commit']
+            and receipt['repository_before']['worktree_clean'] is True and receipt['repository_after']['worktree_clean'] is True
+            and exact(receipt['executed_launcher'], probe['actual_executed_recorder']), 'Candidate/unit clean source/recorder identity differs')
+    need(qc_finish <= gap_finish <= timestamp(compilation['started_utc']) <= timestamp(compilation['finished_utc']) <= run_start
+        and reviewed_finish <= freeze_start <= timestamp(selected['created_utc']) <= freeze_finish <= run_start
+        <= run_finish <= unit_start <= timestamp(unit['created_utc']) <= unit_finish, 'Actual original/baseline/build/projection/candidate/unit chronology differs')
+    build_ref = ref(args.build)
+    build, available, cli_compile = v.verify_rust_build(build_ref, checked, kind='cli', committed=True, required_sources=REQUIRED)
+    need(build['implementation_commit'] == probe['implementation_commit'] == unit['reviewed_evidence']['implementation_commit']
+        and build['crates_tree'] == probe['crates_tree'] == unit['reviewed_evidence']['crates_tree'], 'Unit and CLI compiled source identities differ')
+    binding(build['source_snapshot'], probe['source_snapshot'], checked)
+    need(exact(build['actual_executed_recorder'], probe['actual_executed_recorder']), 'Unit and CLI actual recorder archives differ')
+    references = {**original_refs, 'baseline_gap': gap_ref, 'baseline_gap_execution': gap_execution,
+        'candidate_unit': unit_ref, 'candidate_unit_execution': unit_execution, 'Rust_build': build_ref,
+        'candidate_build': probe_ref, 'candidate_execution': run_ref, 'candidate_comparison_projection': selected_ref}
+    return {'refs': references, 'build': build, 'available': available,
+        'unit_reader_interpreter_observation': observed_interpreter,
+        'prerequisites_finished_utc': max(unit_finish, timestamp(cli_compile['finished_utc'])).isoformat()}
+
+
+def architecture(available, checked):
+    text = {owner: checked.check(available[owner]).read_text(encoding='utf8') for owner in REQUIRED}
+    pipeline = text['crates/ep_run/src/pipeline.rs']; current = text['crates/ep_runtime/src/weather_day/production.rs']
+    need('capture_environment_inputs()?' in pipeline and 'resolve_controls(raw_model, &environment_inputs)?' in pipeline,
+        'Actual production boundary must capture ENV and raw-model controls')
+    start = current.index('pub fn current_for('); end = current.index('pub fn initial_hourly_dry_bulb_c('); body = current[start:end]
+    need(body.index('session.initialize_weather()?;') < body.index('session.set_current_weather()?;')
+        < body.index('super::production_trace::record_consumer('), 'Archived Initialize/Current/consumer order differs')
+    trace = text['crates/ep_run/src/clk03_trace.rs']
+    need('"Interpolation_allocated":owner.interpolation.is_some()' in trace
+        and '"SolarInterpolation_allocated":owner.solar_interpolation.is_some()' in trace
+        and '"clk05_observation"' in trace and all(name in trace for name in
+            ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']),
+        'Actual ROOT arrays/four control serialization required')
+    need('completed_operation_count: trace.total_operation_count' in text['crates/ep_runtime/src/weather_day/production_trace.rs']
+        and '"completed_operation_count":row.completed_operation_count' in trace, 'Actual passive consumer operation prefix required')
+    return {'actual_archived_registration_and_owner_routing_verified': True,
+        'source_inventory_is_compiler_file_selection_proof': False, 'unselected_physics_certified': False}

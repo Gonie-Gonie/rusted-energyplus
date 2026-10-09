@@ -1,0 +1,107 @@
+{
+  "schema": "clk05-independent-retirement-writer-source-review.v1",
+  "status": "pass-source-before-one-target-retirement-metadata",
+  "review_started_utc": "2026-10-09T04:57:01.996741+00:00",
+  "review_completed_utc": "2026-10-09T04:57:02.070248+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/source/common.py",
+        "sha256": "f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/source/proofs.py",
+        "sha256": "c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/write_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/source/write_plan.py",
+        "sha256": "666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/retire.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/source/retire.py",
+        "sha256": "33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea"
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/executed-source-reviewer.py",
+    "sha256": "698815dce8ef26a96df6f669303d25f1c9b8bce7af399aaf3d6c831f244de69a"
+  },
+  "reviewed_forward_policy": {
+    "path": "energyplus_porting_plan/evidence/native-helper-retention-policy.json",
+    "sha256": "782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379"
+  },
+  "reviewed_predecessor_registry": {
+    "path": ".runtime/porting/CLK-04/retirement-01/registry-retired.json",
+    "sha256": "27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378"
+  },
+  "reviewed_small_native_build": {
+    "path": ".runtime/porting/CLK-05/native-build-01/native-driver-build.json",
+    "sha256": "df8dbf64a983c06b01964916d0fd6e1fadf88325078ae229a7a7b4027df457b0"
+  },
+  "reviewed_small_native_build_review": {
+    "path": ".runtime/porting/CLK-05/independent-native-build-review-01/review.json",
+    "sha256": "39b689c90c67dd13de1084e0f8078f2acaee26f15060ba900586ca0ab0d5f0b2"
+  },
+  "reviewed_small_original_data_review": {
+    "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+    "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+  },
+  "reviewed_actual_native_build_execution": {
+    "path": ".runtime/porting/CLK-05/native-build-command-01/receipt.json",
+    "sha256": "c7c5093484cb702dac70913ca0070b79fc00d448d13b9f063f1e0ac385f246fb"
+  },
+  "reviewed_actual_native_build_stdout_summary": {
+    "path": ".runtime/porting/CLK-05/native-build-command-01/stdout.log",
+    "sha256": "55d670084ac52bfe0c5ab86c6607210bafc928ed6aec2729e488beaacceb60cd"
+  },
+  "preserved_prior_source_review": {
+    "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/review.json",
+    "sha256": "af087f253d971e0ca2b869a7ff0e5c61ea707cd5bec8188d18835088098d87e8"
+  },
+  "preserved_failed_retirement_plan_execution": {
+    "path": ".runtime/porting/CLK-05/retirement-plan-command-01/receipt.json",
+    "sha256": "e465692d4d6598a1e6ba2ba8fa2a5c26698ffdfd822465980f7978e3b909d904"
+  },
+  "prior_source_review_missed_full_report_vs_compact_build_stdout": true,
+  "authentic_historical_native_build_failed": false,
+  "prior_plan_failure_is_before_registry_admission_or_removal": true,
+  "other_stdout_protocols_reviewed": [
+    "PE/OriginalQC/unitQA/productionQA/quality-lineage/closure/sourceQA emit full JSON reports.",
+    "Scientific comparer/gap emit full reports; plan emits its existing bounded five-key summary consumed by retire.py."
+  ],
+  "sole_candidate": {
+    "clk05_reference_helper": {
+      "historical_path": ".runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe",
+      "sha256": "b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc",
+      "size_bytes": 1296986812
+    }
+  },
+  "protected_file_count_required_by_reviewed_source": 21,
+  "reviewed_source_line_count": 782,
+  "actual_C5_closure_or_final_quality_claimed_by_this_source_review": false,
+  "scientific_execution_performed": false,
+  "reviewed_targets_imported_or_executed": false,
+  "native_artifact_bytes_hashed_by_reviewer": false,
+  "native_results_payloads_read": false,
+  "retirement_plan_or_action_executed": false,
+  "canonical_files_or_gates_written": false,
+  "verifier_author": "/root/clk02_baseline_audit",
+  "reviewed_tool_author": "/root/clk02_raw_port",
+  "authorship_limits": "Baseline independently read Raw retention code and small metadata aliases. Baseline authored producer/hourly/native workflow/comparers and closure glue; this review does not independently certify own physics or any numerical kernels.",
+  "limits": [
+    "Source review0 precedes the separate actual closure-gated Root plan/action; no admission/deletion authorized here.",
+    "Actual live target/protected21/source13537/compiler/cache guards run only in the separately reviewed Root tools.",
+    "Historical proofs remain unchanged; actual future quality and closure refs are supplied at plan execution, never guessed."
+  ]
+}

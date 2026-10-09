@@ -1,0 +1,3 @@
+        state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->TimeStepsInHour);
+        state.dataGlobal->MinutesInTimeStep = state.dataGlobal->TimeStepZone * 60;
+        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * Constant::rSecsInHour;

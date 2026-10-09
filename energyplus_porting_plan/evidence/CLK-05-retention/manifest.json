@@ -1,0 +1,197 @@
+{
+  "schema": "clk05-actual-retention-and-documentation-byte-archive.v1",
+  "actual_retirement_exit_code": 0,
+  "actual_documentation_amendment_exit_code": 0,
+  "removed_bytes": 1296986812,
+  "protected_file_count": 21,
+  "retired_registry_sha256": "db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6",
+  "rows": [
+    {
+      "role": "retention-plan",
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-02/plan.json",
+      "sha256": "91bf44133da95735fe2b4a8f80942121331bb710be306d448cc0bb4ed1900efb",
+      "size_bytes": 59283,
+      "archive_path": "objects/91bf44133da95735fe2b4a8f80942121331bb710be306d448cc0bb4ed1900efb.part"
+    },
+    {
+      "role": "retention-plan-execution",
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-command-02/receipt.json",
+      "sha256": "91f5b56550cb91a313c4b9972d9f569a3f8160ddcf5cc73313a5534c5ca19e98",
+      "size_bytes": 4261,
+      "archive_path": "objects/91f5b56550cb91a313c4b9972d9f569a3f8160ddcf5cc73313a5534c5ca19e98.part"
+    },
+    {
+      "role": "preserved-failed-plan-execution",
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-command-01/receipt.json",
+      "sha256": "e465692d4d6598a1e6ba2ba8fa2a5c26698ffdfd822465980f7978e3b909d904",
+      "size_bytes": 4259,
+      "archive_path": "objects/e465692d4d6598a1e6ba2ba8fa2a5c26698ffdfd822465980f7978e3b909d904.part"
+    },
+    {
+      "role": "retirement",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/retirement.json",
+      "sha256": "c3304ededb906298ff85adffebc6c86b78747bfa6bc004ffce00f6d5010a5a3b",
+      "size_bytes": 10064,
+      "archive_path": "objects/c3304ededb906298ff85adffebc6c86b78747bfa6bc004ffce00f6d5010a5a3b.part"
+    },
+    {
+      "role": "retirement-execution",
+      "historical_path": ".runtime/porting/CLK-05/retirement-command-01/receipt.json",
+      "sha256": "f1eeb6c3458bdd6488cb1a0f61d581f91e8c8537a3a09408c422e372f8fba912",
+      "size_bytes": 3927,
+      "archive_path": "objects/f1eeb6c3458bdd6488cb1a0f61d581f91e8c8537a3a09408c422e372f8fba912.part"
+    },
+    {
+      "role": "registry-admitted",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/registry-admitted.json",
+      "sha256": "966e361d657dc19022a825cf62394b610e7a7dd0e6d83bb3634973029814a8ec",
+      "size_bytes": 36393,
+      "archive_path": "objects/966e361d657dc19022a825cf62394b610e7a7dd0e6d83bb3634973029814a8ec.part"
+    },
+    {
+      "role": "registry-retired",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/registry-retired.json",
+      "sha256": "db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6",
+      "size_bytes": 36665,
+      "archive_path": "objects/db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6.part"
+    },
+    {
+      "role": "source-review",
+      "historical_path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/review.json",
+      "sha256": "a37fbe00ff7be21d2731ebe2b7447301c028b16860fd2fceeaa6abaf092ff8a3",
+      "size_bytes": 5594,
+      "archive_path": "objects/a37fbe00ff7be21d2731ebe2b7447301c028b16860fd2fceeaa6abaf092ff8a3.part"
+    },
+    {
+      "role": "source-review-execution",
+      "historical_path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-command-02/receipt.json",
+      "sha256": "c5806291b53a61a4f3bba9b7d747d5b30b442d2e37c5fb90bef0ae5a5bc35bbc",
+      "size_bytes": 3605,
+      "archive_path": "objects/c5806291b53a61a4f3bba9b7d747d5b30b442d2e37c5fb90bef0ae5a5bc35bbc.part"
+    },
+    {
+      "role": "source-reviewer",
+      "historical_path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/executed-source-reviewer.py",
+      "sha256": "698815dce8ef26a96df6f669303d25f1c9b8bce7af399aaf3d6c831f244de69a",
+      "size_bytes": 12590,
+      "archive_path": "objects/698815dce8ef26a96df6f669303d25f1c9b8bce7af399aaf3d6c831f244de69a.part"
+    },
+    {
+      "role": "preserved-prior-source-review",
+      "historical_path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/review.json",
+      "sha256": "af087f253d971e0ca2b869a7ff0e5c61ea707cd5bec8188d18835088098d87e8",
+      "size_bytes": 4279,
+      "archive_path": "objects/af087f253d971e0ca2b869a7ff0e5c61ea707cd5bec8188d18835088098d87e8.part"
+    },
+    {
+      "role": "preserved-prior-source-review-execution",
+      "historical_path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-command-01/receipt.json",
+      "sha256": "71b37ef0258c54ba43c5213316256c58424eb1e4f98833ec1c30c4949611b6d2",
+      "size_bytes": 2863,
+      "archive_path": "objects/71b37ef0258c54ba43c5213316256c58424eb1e4f98833ec1c30c4949611b6d2.part"
+    },
+    {
+      "role": "documentation-amendment",
+      "historical_path": ".runtime/porting/CLK-05/documentation-amendment-01/amendment.json",
+      "sha256": "fd47cf4b961b1df890651b7f89388e84b192644cc7e9579990579dede22dfd4f",
+      "size_bytes": 1834,
+      "archive_path": "objects/fd47cf4b961b1df890651b7f89388e84b192644cc7e9579990579dede22dfd4f.part"
+    },
+    {
+      "role": "documentation-amendment-execution",
+      "historical_path": ".runtime/porting/CLK-05/documentation-amendment-command-01/receipt.json",
+      "sha256": "467badad017fd45e21d3e780f48de90ba7ac9865b18c0b4ef8d24490ca1cb87a",
+      "size_bytes": 3726,
+      "archive_path": "objects/467badad017fd45e21d3e780f48de90ba7ac9865b18c0b4ef8d24490ca1cb87a.part"
+    },
+    {
+      "role": "documentation-writer",
+      "historical_path": ".runtime/porting/CLK-05/documentation-amendment-01/amend_notes.py",
+      "sha256": "bca7d4dcddf611de3b946cca2cda853dd16c65c555bd83d2d405167281ad183c",
+      "size_bytes": 4183,
+      "archive_path": "objects/bca7d4dcddf611de3b946cca2cda853dd16c65c555bd83d2d405167281ad183c.part"
+    },
+    {
+      "role": "corrected-notes",
+      "historical_path": ".runtime/porting/CLK-05/documentation-amendment-01/additional-notes.md",
+      "sha256": "4bea18536154a7315de8ccf1f7e651e1733684fdf1d271681ab12d7a99c49c2e",
+      "size_bytes": 1145,
+      "archive_path": "objects/4bea18536154a7315de8ccf1f7e651e1733684fdf1d271681ab12d7a99c49c2e.part"
+    },
+    {
+      "role": "card-before-note-repair",
+      "historical_path": ".runtime/porting/CLK-05/documentation-amendment-01/card.before.md",
+      "sha256": "8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544",
+      "size_bytes": 9454,
+      "archive_path": "objects/8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544.part"
+    },
+    {
+      "role": "card-after-note-repair",
+      "historical_path": ".runtime/porting/CLK-05/documentation-amendment-01/card.after.md",
+      "sha256": "ee41119985976bac5e184fb34729480092ebb439bb5d0daea716dae499500a50",
+      "size_bytes": 10014,
+      "archive_path": "objects/ee41119985976bac5e184fb34729480092ebb439bb5d0daea716dae499500a50.part"
+    },
+    {
+      "role": "retirement-source-common.py",
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/common.py",
+      "sha256": "f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038",
+      "size_bytes": 5775,
+      "archive_path": "objects/f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038.part"
+    },
+    {
+      "role": "retirement-source-proofs.py",
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/proofs.py",
+      "sha256": "c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302",
+      "size_bytes": 25461,
+      "archive_path": "objects/c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302.part"
+    },
+    {
+      "role": "retirement-source-write_plan.py",
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/write_plan.py",
+      "sha256": "666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a",
+      "size_bytes": 8920,
+      "archive_path": "objects/666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a.part"
+    },
+    {
+      "role": "retirement-source-retire.py",
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-03/retire.py",
+      "sha256": "33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea",
+      "size_bytes": 11648,
+      "archive_path": "objects/33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea.part"
+    },
+    {
+      "role": "actual-single-file-removal",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-removal-receipt.json",
+      "sha256": "e073b1d0c09eb6646636eeae37de073646661ab81ae7ac78637e7dc1bf1dcee0",
+      "size_bytes": 14148,
+      "archive_path": "objects/e073b1d0c09eb6646636eeae37de073646661ab81ae7ac78637e7dc1bf1dcee0.part"
+    },
+    {
+      "role": "literal-powershell-action",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/remove-clk05_reference_helper.ps1",
+      "sha256": "aed5ef7da3101057244b94b39a299713f5e39cb5614c885378721711dcbc7133",
+      "size_bytes": 1727,
+      "archive_path": "objects/aed5ef7da3101057244b94b39a299713f5e39cb5614c885378721711dcbc7133.part"
+    },
+    {
+      "role": "actual-removal-stdout",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-stdout.log",
+      "sha256": "40d4f215d83904febc60f8f567ac8dc4e29fde9386681b1f9931648e96ce8e2c",
+      "size_bytes": 93,
+      "archive_path": "objects/40d4f215d83904febc60f8f567ac8dc4e29fde9386681b1f9931648e96ce8e2c.part"
+    },
+    {
+      "role": "actual-removal-stderr",
+      "historical_path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "archive_path": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.part"
+    }
+  ],
+  "all_copied_bytes_verified": true,
+  "native_artifact_or_results_payload_copied": false,
+  "duplicate_parent_stdout_copied": false,
+  "scientific_execution_performed_by_archival_copy": false,
+  "gates_rewritten_by_archival_copy": false
+}

@@ -1,0 +1,476 @@
+{
+  "schema": "clk05-independent-original-data-review.v1",
+  "status": "pass-preserved-original-data-before-Rust-baseline",
+  "review_started_utc": "2026-10-08T16:21:20.571024+00:00",
+  "reviewed_reference": {
+    "path": ".runtime/porting/CLK-05/original-execution-01/helper-reference.json",
+    "sha256": "e5cb6fee58abb978abd8c1fa92c4ef1bafcd80d2df1efe505a1c156cd512d820"
+  },
+  "reviewed_results": {
+    "path": ".runtime/porting/CLK-05/original-execution-01/native-output/clk05-helper-results.json",
+    "sha256": "b24e2237b7efb0df3cb89714d9a72aa04e51ca359cdcb8f46ac281f74cf39041"
+  },
+  "reviewed_execution": {
+    "path": ".runtime/porting/CLK-05/original-execution-command-01/receipt.json",
+    "sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24"
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CLK-05/original-execution-01/helper-command.json",
+    "sha256": "770e5e1e793fb48bbb28574ec888e902aefc0e1d978ce3557854e56f7f1f4319"
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+    "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+    "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CLK-05/native-build-01/native-driver-build.json",
+    "sha256": "df8dbf64a983c06b01964916d0fd6e1fadf88325078ae229a7a7b4027df457b0"
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CLK-05/native-build-command-01/receipt.json",
+    "sha256": "c7c5093484cb702dac70913ca0070b79fc00d448d13b9f063f1e0ac385f246fb"
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CLK-05/independent-native-build-review-01/review.json",
+    "sha256": "39b689c90c67dd13de1084e0f8078f2acaee26f15060ba900586ca0ab0d5f0b2"
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CLK-05/independent-native-build-review-command-01/receipt.json",
+    "sha256": "e33c0b7bc72a8bd08f7b3c21274a1e40270a014d2941c3b75093027f16e11189"
+  },
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/CLK-05/independent-frozen-contract-review-01/review.json",
+    "sha256": "45b274958989c64b0e987b5944e3695cc294461eb17208c36b32d482d7dcf3ee"
+  },
+  "reviewed_control_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-05/independent-control-input-review-01/review.json",
+      "sha256": "75a0975ed046dae492ca1b58ffba51c346f25038129ff37b88464ed7f673d45e"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/independent-control-input-review-command-01/receipt.json",
+      "sha256": "96c6b93e6c04aa9044720a8440e97a8fc5004f59877f4fff81758670bb74a2d2"
+    }
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "weather_sequences": 36,
+    "GetNextEnvironment": 36,
+    "InitializeWeather": 550,
+    "weather_operations": 586,
+    "total_operations": 589
+  },
+  "actual_operation_invocations": 589,
+  "actual_operations_skipped": 0,
+  "actual_source_function_counts": {
+    "SetupInterpolationValues": 3,
+    "GetNextEnvironment": 36,
+    "InitializeWeather": 550
+  },
+  "actual_source_status_counts": {
+    "source_returned": 589
+  },
+  "intended_native_branch_coverage_complete": true,
+  "intended_native_branch_coverage": [
+    {
+      "sequence_id": "CONSTANT-1-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-1-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-1-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-1-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CACHE-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CACHE-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CACHE-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CACHE-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "SENTINEL-1-WARN-0",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "SENTINEL-1-WARN-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "SENTINEL-3-WARN-0",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "SENTINEL-3-WARN-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "SENTINEL-4-WARN-0",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "SENTINEL-4-WARN-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-3-IgnoreSolarRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-3-IgnoreBeamRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-3-IgnoreDiffuseRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-4-IgnoreSolarRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-4-IgnoreBeamRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-4-IgnoreDiffuseRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONTROL-1-IgnoreSolarRadiation",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-WEIGHTS-3-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-WEIGHTS-3-2",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-WEIGHTS-4-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-WEIGHTS-4-2",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "A-24H",
+      "lane": "production-CON",
+      "requested_operations": 97,
+      "actual_returned_operations": 97,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "A-72H",
+      "lane": "production-CON",
+      "requested_operations": 289,
+      "actual_returned_operations": 289,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "lane": "production-CON",
+      "requested_operations": 97,
+      "actual_returned_operations": 97,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    }
+  ],
+  "actual_typed_validation_visits": {
+    "full_grid": 2064,
+    "scalar": 709796,
+    "snapshot": 2556,
+    "compact_grid": 3048
+  },
+  "actual_scalar_class_validation_visits": {
+    "positive_zero": 479852,
+    "finite": 229070,
+    "negative_zero": 874
+  },
+  "actual_helper_exit_code": 0,
+  "actual_launcher_exit_code": 0,
+  "future_Rust_execution_or_comparison_performed": false,
+  "source_unavailable_counted_as_PASS": false,
+  "scientific_values_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "scientific_execution_performed": false,
+  "whole_original_inventory_rehashed_by_reader": false,
+  "recorded_original_source_preservation_before_after_verified": true,
+  "future_child_ENV_proved_by_prior_capture": false,
+  "actual_launch_external_ENV_recapture_verified": true,
+  "terminated_native_process_internal_ENV_observed": false,
+  "source_array_paths": "native and existing Rust snapshot root arrays; actual consumed Clk03 snapshot178-179",
+  "reviewed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/original-data-review-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/sources/00-metadata.py",
+        "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/original-data-review-prep-01/shape.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/sources/01-shape.py",
+        "sha256": "201a60b84bff352acf2f1d8a1d0fa57ce622422ff8e764b36d9d735d70199fec"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/original-data-review-prep-01/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/sources/02-review_data.py",
+        "sha256": "e82a709ffe54c4e8d61f5894840b0bb39f5958f404aa4d085ca4c976b2593b94"
+      }
+    }
+  ],
+  "verifier_author": "/root/clk02_raw_port",
+  "authorship_limits": "Raw authored this factual QC reader and raw cursor/input/profile drafts. Other-source metadata and storage integrity are checked; own scientific implementation and generated solar values are not independently certified. Runtime executor is separately identified by actual recorder.",
+  "scope_limits": "Solar-only grid observation, all19 counts/full17 caches and actual589 source histories retained. CurrentTime/SimTimeSteps/private weights/current solar/night and other whole physics remain unpaired.",
+  "review_completed_utc": "2026-10-08T16:21:27.859355+00:00"
+}

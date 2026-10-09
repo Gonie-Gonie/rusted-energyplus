@@ -1,0 +1,44 @@
+{
+  "schema": "clk05-root-test-only-clippy-cleanup.v1",
+  "status": "actual-two-clone-on-copy-test-cleanup-source-ready",
+  "recorded_utc": "2026-10-09T04:16:57.759519+00:00",
+  "historical_path": "crates/ep_runtime/src/weather_day/producer_tests.rs",
+  "before": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.before.rs",
+    "sha256": "59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17"
+  },
+  "after": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.after.rs",
+    "sha256": "5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57"
+  },
+  "diff": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.diff",
+    "sha256": "bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018"
+  },
+  "preserved_intermediate_cleanup": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-01/cleanup.json",
+    "sha256": "bf618984cc3df21d5ffcc5014d666ac1ef0d7874485d62463aa08dbc7ae06628"
+  },
+  "preserved_failed_clippy": {
+    "path": ".runtime/porting/CLK-05/final-clippy-command-01/receipt.json",
+    "sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee"
+  },
+  "actual_test_formatter": {
+    "path": ".runtime/porting/CLK-05/test-format-command-01/receipt.json",
+    "sha256": "2be9816290c7c231c697d630957efe6ca476c5c974a28924d75ce701956a16a7"
+  },
+  "literal_replacements": [
+    {
+      "before": "    let before_raw = raw\n        .hours\n        .iter()\n        .map(|slot| slot.raw.clone())\n        .collect::<Vec<_>>();",
+      "after": "    let before_raw = raw.hours.iter().map(|slot| slot.raw).collect::<Vec<_>>();"
+    },
+    {
+      "before": "        raw.hours\n            .iter()\n            .map(|slot| slot.raw.clone())\n            .collect::<Vec<_>>(),",
+      "after": "        raw.hours.iter().map(|slot| slot.raw).collect::<Vec<_>>(),"
+    }
+  ],
+  "literal_replacement_count": 2,
+  "production_math_changed": false,
+  "expected_values_changed": false,
+  "gates_updated": false
+}

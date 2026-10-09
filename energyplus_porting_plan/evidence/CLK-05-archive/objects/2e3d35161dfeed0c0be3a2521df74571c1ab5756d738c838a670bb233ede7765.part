@@ -1,0 +1,305 @@
+"""Metadata only: passive formatting/getter cleanup, exact test-only Copy cleanup, and five actual final quality checks."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+UTILITY = ROOT/'tools/porting/geo03_provenance.py'
+UTILITY_SHA = '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'
+PLAN = ROOT/'.runtime/porting/CLK-05/final-format-plan-prep-06/plan.json'
+PLAN_SHA = '6909999d4a6e61fefbd9abf69554ec1705bcc7e2955e776ece4442ba4f0d9001'
+
+
+def require(value, message):
+    if not value: raise ValueError(message)
+
+
+def snapshot(binding, utility, checked):
+    value = utility.read(checked.check(binding)); rows = value['files']
+    require(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False,
+        'Authentic complete available source/config snapshot required')
+    indexed = utility.archive_map(rows, checked)
+    require(type(rows) is list and len(rows) == len(indexed) == 3744
+        and sum(path.endswith('.rs') for path in indexed) == 3731, 'Actual3731 Rust plus13 config inventory required')
+    for row in rows:
+        require(type(row['size_bytes']) is int and row['size_bytes'] == checked.check(row['archive']).stat().st_size,
+            'Actual archived source size differs')
+    return indexed
+
+
+def recorded(binding, utility, checked, *, mutation=False, expected_exit=0):
+    value = utility.read(checked.check(binding))
+    require(value['schema'] == 'recorded-porting-command.v1' and value['launch_error'] is None
+        and type(value['exit_code']) is int and value['exit_code'] == expected_exit
+        and value['recorder_updates_gates'] is False and value['recorder_supplies_reference_answers'] is False,
+        'Real successful recorded command required')
+    require(type(value['source_bytes_match_before_and_after']) is bool
+        and (mutation or value['source_bytes_match_before_and_after'] is True), 'Actual unchanged read-only source required')
+    before = value['repository_before']; after = value['repository_after']
+    require(before['worktree_clean'] is True and before['head'] == after['head']
+        and (mutation or after['worktree_clean'] is True), 'Actual clean command source boundary differs')
+    start, finish = utility.execution_interval(value, checked, exit_code=expected_exit)
+    launcher = value['executed_launcher']
+    require(launcher['historical_path'] == 'tools/porting/record_command.py'
+        and checked.check(launcher['archive']).read_bytes() == utility.path_of(launcher['historical_path']).read_bytes(),
+        'Authentic metadata recorder archive required')
+    return value, start, finish
+
+
+def test_cleanup(review_ref, scope, original, utility, checked, not_after):
+    review = utility.read(checked.check(review_ref)); cleanup_ref = review['reviewed_cleanup']
+    require(review['schema'] == 'clk05-root-test-only-clippy-diff-review.v1'
+        and review['status'] == 'reviewed-two-clone-on-copy-test-only-blocks' and review['reviewer'] == '/root'
+        and review['actual_final_diff_read_in_full'] is True and review['test_only'] is True
+        and review['expected_values_changed'] is False and review['production_math_changed'] is False
+        and review['scientific_execution_performed'] is False and review['gates_updated'] is False
+        and utility.same_binding(review_ref, scope['test_cleanup_review']) and utility.same_binding(cleanup_ref, scope['test_cleanup'])
+        and utility.timestamp(review['review_recorded_utc']) <= utility.timestamp(not_after), 'Actual Root test-only full diff review required')
+    cleanup = utility.read(checked.check(cleanup_ref)); path = 'crates/ep_runtime/src/weather_day/producer_tests.rs'
+    require(cleanup['schema'] == 'clk05-root-test-only-clippy-cleanup.v1'
+        and cleanup['status'] == 'actual-two-clone-on-copy-test-cleanup-source-ready'
+        and cleanup['historical_path'] == review['historical_path'] == path and scope['test_only_allowed_paths'] == [path]
+        and cleanup['literal_replacement_count'] == review['literal_replacement_count'] == 2
+        and all(cleanup[key] is False for key in ['production_math_changed', 'expected_values_changed', 'gates_updated']),
+        'Exactly one test file and two source-only Copy cleanups required')
+    before = checked.check(cleanup['before']).read_bytes(); after = checked.check(cleanup['after']).read_bytes()
+    require(before == checked.check(original[path]).read_bytes(), 'Cleanup before must equal genuine scientific source')
+    blocks = [
+        {'before':'    let before_raw = raw\n        .hours\n        .iter()\n        .map(|slot| slot.raw.clone())\n        .collect::<Vec<_>>();',
+         'after':'    let before_raw = raw.hours.iter().map(|slot| slot.raw).collect::<Vec<_>>();'},
+        {'before':'        raw.hours\n            .iter()\n            .map(|slot| slot.raw.clone())\n            .collect::<Vec<_>>(),',
+         'after':'        raw.hours.iter().map(|slot| slot.raw).collect::<Vec<_>>(),'}]
+    require(utility.exact(cleanup['literal_replacements'], blocks), 'Only the two audited Copy/format blocks are admitted')
+    reconstructed = before
+    for row in blocks:
+        old = row['before'].encode(); require(reconstructed.count(old) == 1, 'Unique exact original test block required')
+        reconstructed = reconstructed.replace(old, row['after'].encode(), 1)
+    require(reconstructed == after, 'No fixture, assertion, or other source bytes may change')
+    for key, expected in [('reviewed_before', 'before'), ('reviewed_after', 'after'), ('reviewed_full_diff', 'diff')]:
+        require(utility.same_binding(review[key], cleanup[expected]), 'Root reviewed test artifact differs'); checked.check(review[key])
+    parent = 'crates/ep_runtime/src/weather_day/producer.rs'; raw_type = 'crates/ep_runtime/src/weather_raw/record_types.rs'
+    for key, owner in [('reviewed_test_module_guard', parent), ('reviewed_Copy_type_source', raw_type)]:
+        require(checked.check(review[key]).read_bytes() == checked.check(original[owner]).read_bytes()
+            == utility.path_of(owner).read_bytes(), 'Immutable compiled test/Copy source authority differs')
+    require(b'#[cfg(test)]\n#[path = "producer_tests.rs"]\nmod tests;' in checked.check(review['reviewed_test_module_guard']).read_bytes()
+        and b'#[derive(Clone, Copy, Debug, PartialEq)]\npub struct RawEpwOutputs' in checked.check(review['reviewed_Copy_type_source']).read_bytes(),
+        'Actual cfg(test) registration and derived Copy owner required')
+    failed_ref = cleanup['preserved_failed_clippy']; failed, _, failed_finish = recorded(failed_ref, utility, checked, expected_exit=101)
+    require(utility.same_binding(failed_ref, scope['preserved_failed_clippy']), 'Preserved actual Clippy101 differs')
+    intermediate = utility.read(checked.check(cleanup['preserved_intermediate_cleanup']))
+    require(checked.check(intermediate['before']).read_bytes() == before
+        and checked.check(intermediate['after']).read_bytes() == before.replace(b'.map(|slot| slot.raw.clone())', b'.map(|slot| slot.raw)'),
+        'Preserved exact two-Copy intermediate differs')
+    formatter_ref = cleanup['actual_test_formatter']; formatter = utility.read(checked.check(formatter_ref))
+    require(utility.same_binding(formatter_ref, scope['actual_test_formatter'])
+        and formatter['schema'] == 'recorded-porting-command.v1' and formatter['launch_error'] is None
+        and type(formatter['exit_code']) is int and formatter['exit_code'] == 0
+        and formatter['source_bytes_match_before_and_after'] is False
+        and formatter['recorder_updates_gates'] is False and formatter['recorder_supplies_reference_answers'] is False
+        and formatter['command'] == ['rustfmt', '--edition', '2024', '--config', 'skip_children=true', path],
+        'Actual dirty one-test formatter0 must remain separate from observer formatter10')
+    test_start, test_finish = utility.execution_interval(formatter, checked)
+    require(failed_finish <= test_start and formatter['repository_before']['head'] == formatter['repository_after']['head']
+        and all(formatter[key]['worktree_clean'] is False
+            and formatter[key]['porcelain_v1_nul_utf8'] == ' M '+path+'\0' for key in ['repository_before', 'repository_after']),
+        'Honest exact one-test dirty formatter boundary required')
+    incoming = snapshot(formatter['source_snapshot'], utility, checked)
+    require(checked.check(incoming[path]).read_bytes() == checked.check(intermediate['after']).read_bytes(), 'Actual formatter input differs')
+    launcher = formatter['executed_launcher']
+    require(launcher['historical_path'] == 'tools/porting/record_command.py'
+        and checked.check(launcher['archive']).read_bytes() == utility.path_of(launcher['historical_path']).read_bytes(), 'Actual recorder source differs')
+    return path, cleanup_ref, cleanup['after'], failed_ref, formatter_ref, test_finish
+
+
+def observer_cleanup(review_ref, scope, reviewed, utility, checked, not_after):
+    review = utility.read(checked.check(review_ref)); cleanup_ref = review['reviewed_cleanup']
+    require(review['schema'] == 'clk05-root-passive-observer-clippy-diff-review.v1'
+        and review['status'] == 'reviewed-exact-two-passive-let-chain-functions' and review['reviewer'] == '/root'
+        and review['actual_final_diff_read_in_full'] is True and review['passive_observer_only'] is True
+        and all(review[key] is False for key in ['production_math_changed', 'state_write_added', 'observation_fields_changed',
+            'evaluation_order_changed', 'scientific_execution_performed', 'gates_updated'])
+        and utility.same_binding(review_ref, scope['observer_cleanup_review']) and utility.same_binding(cleanup_ref, scope['observer_cleanup'])
+        and utility.timestamp(review['review_recorded_utc']) <= utility.timestamp(not_after), 'Actual Root passive full diff review required')
+    cleanup = utility.read(checked.check(cleanup_ref)); rows = cleanup['files']
+    paths = ['crates/ep_runtime/examples/clk05_existing_support/fields.rs', 'crates/ep_runtime/examples/clk05_candidate_support/fields.rs']
+    require(cleanup['schema'] == 'clk05-root-passive-observer-clippy-cleanup.v1'
+        and cleanup['status'] == 'actual-two-passive-selected-functions-source-ready'
+        and [row['historical_path'] for row in rows] == scope['passive_observer_cleanup_paths'] == paths
+        and len(rows) == 2 and utility.exact(rows, review['reviewed_files']) and cleanup['literal_replacement_count_per_file'] == 1
+        and all(cleanup[key] is False for key in ['production_math_changed', 'state_write_added', 'observation_fields_changed',
+            'evaluation_order_changed', 'gates_updated']), 'Exact two passive getter replacements required')
+    old = cleanup['literal_before'].encode(); new = cleanup['literal_after'].encode()
+    require(hashlib.sha256(old).hexdigest() == 'f1c886a4486e27669a2102db7a3fb28f510ee773df1167ca17dabf201aef6a71'
+        and hashlib.sha256(new).hexdigest() == 'f871bf2d77a60ae34f0da6a83283c9e4942bb74a1ef404e3d92f230c53cdafc2',
+        'Only the fully audited same-order let-chain selected function may replace the nested function')
+    after = {}
+    for row in rows:
+        path = row['historical_path']; before = checked.check(row['before']).read_bytes(); result = checked.check(row['after']).read_bytes()
+        require(before == checked.check(reviewed[path]).read_bytes() and before.count(old) == 1
+            and before.replace(old, new, 1) == result, 'Getter before must equal genuine historical format output; no other bytes may change')
+        checked.check(row['diff']); after[path] = row['after']
+    failed_ref = cleanup['preserved_failed_clippy']; failed, _, _ = recorded(failed_ref, utility, checked, expected_exit=101)
+    require(utility.same_binding(failed_ref, scope['preserved_failed_observer_clippy']), 'Preserved actual second Clippy101 differs')
+    return after, cleanup_ref, failed_ref
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['scientific-build', 'production-data-review', 'production-data-review-execution',
+        'format-execution', 'formatted-source-review', 'test-cleanup-review', 'observer-cleanup-review', 'workspace-tests', 'clippy', 'format-check',
+        'source-quality', 'structure-quality', 'output-dir']:
+        parser.add_argument('--'+key, type=Path, required=True)
+    args = parser.parse_args(); started = datetime.now(timezone.utc).isoformat()
+    require(Path.cwd().resolve() == ROOT and hashlib.sha256(UTILITY.read_bytes()).hexdigest() == UTILITY_SHA
+        and hashlib.sha256(PLAN.read_bytes()).hexdigest() == PLAN_SHA, 'Pinned metadata utility/held plan required before import')
+    spec = importlib.util.spec_from_file_location('geo03_provenance', UTILITY)
+    require(spec is not None and spec.loader is not None, 'Metadata loader unavailable')
+    utility = importlib.util.module_from_spec(spec); spec.loader.exec_module(utility)
+    checked = utility.Bindings(); scope_ref = utility.ref(PLAN); scope = utility.read(checked.check(scope_ref))
+    require(scope['schema'] == 'clk05-proposed-final-quality-source-scope.v1'
+        and scope['status'] == 'source-only-selected-passive-and-test-cleanup-scope'
+        and scope['canonical_files_written'] is False and scope['mathematical_functions_or_production_modules_changed'] is False,
+        'Exact ten passive formats plus one test-only source scope required')
+    plan_ref = scope['observer_format_plan']; plan = utility.read(checked.check(plan_ref))
+    require(plan['schema'] == 'clk05-proposed-observer-format-plan.v1' and plan['status'] == 'source-only-selected-format-scope'
+        and plan['scope_document_authored_after_actual_formatter_started'] is True and plan['frozen_before_actual_formatter_claimed'] is False
+        and plan['format_only'] is True
+        and plan['canonical_files_written'] is False and plan['mathematical_functions_or_production_modules_changed'] is False,
+        'Held format-only prospective scope required')
+    build_ref = utility.ref(args.scientific_build)
+    require(utility.same_binding(build_ref, plan['scientific_build']), 'Actual selected scientific build differs')
+    build, available, _ = utility.verify_rust_build(build_ref, checked, kind='example', example='clk05_candidate_probe', committed=True)
+    original = snapshot(build['source_snapshot'], utility, checked)
+    require(set(original) == set(available) and utility.same_binding(build['source_snapshot'], plan['scientific_source_snapshot']),
+        'Actual scientific inventory differs')
+    rows = plan['observer_files']; allowed = {row['historical_path']:row for row in rows}
+    require(type(rows) is list and len(rows) == len(allowed) == 10
+        and all(path.startswith('crates/ep_runtime/examples/clk05_') for path in allowed), 'Exactly ten passive observer paths required')
+    for path, row in allowed.items():
+        require(path in original and checked.check(row['scientific_before']).read_bytes() == checked.check(original[path]).read_bytes(),
+            'Observer prior bytes differ from actual scientific archive')
+    require(len(plan['immutable_math_control_trace_paths']) == 15
+        and set(plan['immutable_math_control_trace_paths']) <= set(original)-set(allowed), 'Immutable compiled math/control/trace scope differs')
+
+    qa_ref = utility.ref(args.production_data_review); qa = utility.read(checked.check(qa_ref))
+    qa_execution_ref = utility.ref(args.production_data_review_execution)
+    qa_record, qa_start, qa_finish = recorded(qa_execution_ref, utility, checked)
+    require(utility.exact(utility.read(checked.check(qa_record['stdout'])), qa)
+        and qa['schema'] == 'clk05-independent-production-result-review.v1'
+        and qa['status'] == 'pass-authenticated-selected-production-result-and-honest-unavailable-scope'
+        and qa['scientific_execution_performed'] is False and qa['numeric_operands_recomputed'] is False
+        and qa['actual_reported_mismatches'] == 0 and qa['unavailable_counted_as_PASS'] is False,
+        'Authentic actual production factual QA0 required before formatting')
+    require(qa_start <= utility.timestamp(qa['review_started_utc']) <= utility.timestamp(qa['review_completed_utc']) <= qa_finish
+        and qa['actual_implementation_commit'] == build['implementation_commit'] and qa['actual_crates_tree'] == build['crates_tree'],
+        'Real production QA interval/scientific identity differs')
+    for key, expected in [('reviewed_report', 'actual_production_report'), ('comparison_execution', 'actual_production_execution')]:
+        require(utility.same_binding(qa[key], plan[expected]), 'Actual production proof differs'); checked.check(qa[key])
+    source = qa['executed_reader_source_archive']; checked.check(source)
+    command = qa_record['command']; mains = [value for value in command if Path(value).name == 'review_result.py']
+    require(len(mains) == 1 and utility.path_of(mains[0]).read_bytes() == checked.check(source).read_bytes(),
+        'Actually executed factual QA source archive differs')
+    for flag, binding in [('--report', qa['reviewed_report']), ('--comparison-execution', qa['comparison_execution'])]:
+        require(command.count(flag) == 1 and utility.path_of(command[command.index(flag)+1]) == checked.check(binding),
+            'Actual factual QA arguments differ')
+
+    format_ref = utility.ref(args.format_execution); formatter, format_start, format_finish = recorded(format_ref, utility, checked, mutation=True)
+    require(qa_finish <= format_start and formatter['command'][:5] == ['rustfmt', '--edition', '2024', '--config', 'skip_children=true']
+        and len(formatter['command'][5:]) == len(set(formatter['command'][5:])) == 10
+        and {utility.path_of(value) for value in formatter['command'][5:]} == {utility.path_of(value) for value in allowed}
+        and utility.same_binding(format_ref, plan['formatting_receipt_observed_for_argument_order'])
+        and utility.same_binding(formatter['source_snapshot'], build['source_snapshot'])
+        and formatter['repository_before']['head'] == build['implementation_commit'], 'Real ten-file formatter must follow QA0 on exact scientific sources')
+    review_ref = utility.ref(args.formatted_source_review); review = utility.read(checked.check(review_ref))
+    require(review['schema'] == 'clk05-root-observer-format-diff-review.v1'
+        and review['status'] == 'reviewed-actual-passive-observer-format-only-diffs' and review['reviewer'] == '/root'
+        and review['actual_final_diff_read_in_full'] is True and review['formatting_only'] is True
+        and review['mathematical_functions_or_production_modules_changed'] is False
+        and review['scientific_execution_performed'] is False
+        and utility.same_binding(review['reviewed_format_plan'], plan_ref)
+        and utility.same_binding(review['actual_formatting_execution'], format_ref), 'Actual other-author Root full diff read required')
+    require(review['manual_full_diff_read_completed_before_final_quality'] is True
+        and review['exact_diff_read_event_timestamps_available'] is False
+        and format_finish <= utility.timestamp(review['review_recorded_utc']) <= utility.timestamp(started),
+        'Actual manual full read attestation/publication required; exact read-event UTC is not asserted')
+    reviewed = utility.archive_map(review['reviewed_final_sources'], checked)
+    require(len(review['reviewed_final_sources']) == len(reviewed) == 10 and set(reviewed) == set(allowed), 'Root must bind all ten actual formatted observers')
+
+    test_review_ref = utility.ref(args.test_cleanup_review)
+    test_path, cleanup_ref, test_after, failed_clippy_ref, test_format_ref, test_format_finish = test_cleanup(
+        test_review_ref, scope, original, utility, checked, started)
+    require(set(scope['immutable_production_math_control_trace_paths']) == set(plan['immutable_math_control_trace_paths'])-{test_path}
+        and len(scope['immutable_production_math_control_trace_paths']) == 14, 'Fourteen production owners remain immutable')
+    observer_review_ref = utility.ref(args.observer_cleanup_review)
+    observer_after, observer_cleanup_ref, failed_observer_clippy_ref = observer_cleanup(
+        observer_review_ref, scope, reviewed, utility, checked, started)
+    quality = {}; final = None; final_ref = None; head = None
+    for name in ['workspace_tests', 'clippy', 'format_check', 'source_quality', 'structure_quality']:
+        binding = utility.ref(getattr(args, name)); receipt, start, finish = recorded(binding, utility, checked)
+        require(max(format_finish, test_format_finish) <= start, 'Final quality preceded actual formatting/test cleanup')
+        if final is None:
+            final_ref = receipt['source_snapshot']; final = snapshot(final_ref, utility, checked); head = receipt['repository_before']['head']
+        require(head == receipt['repository_before']['head'] and utility.same_binding(final_ref, receipt['source_snapshot']),
+            'All five final checks must use one actual clean HEAD/source snapshot')
+        command = receipt['command']; counts = None
+        if name == 'workspace_tests':
+            require(command == ['cargo', 'test', '--workspace', '-j', '2'], 'Actual whole workspace test command required')
+            matches = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', checked.check(receipt['stdout']).read_text(encoding='utf-8'))
+            require(bool(matches) and sum(int(row[0]) for row in matches) > 0 and all(int(row[1]) == 0 for row in matches), 'Actual workspace pass counts required')
+            counts = {'groups':len(matches), 'passed':sum(int(row[0]) for row in matches), 'failed':sum(int(row[1]) for row in matches), 'ignored':sum(int(row[2]) for row in matches)}
+        elif name == 'clippy':
+            require(command in [['cargo', 'clippy', '--workspace', '--all-targets', '--', '-D', 'warnings'],
+                ['cargo', 'clippy', '--workspace', '--all-targets', '-j', '2', '--', '-D', 'warnings']], 'Real all-targets warning-denying Clippy required')
+        elif name == 'format_check':
+            require(command[:6] == ['rustfmt', '--edition', '2024', '--check', '--config', 'skip_children=true']
+                and len(command[6:]) == len(set(command[6:])) and set(allowed)|set(plan['immutable_math_control_trace_paths']) <= set(command[6:]),
+                'Actual scoped check must include ten observers and fifteen compiled math/control/trace files')
+        else:
+            script = 'source-quality-gate.ps1' if name == 'source_quality' else 'heat-balance-structure-audit.ps1'
+            require(command == ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'scripts/quality/'+script], 'Actual required quality script differs')
+        quality[name] = {'receipt':binding, 'started_utc':receipt['started_utc'], 'finished_utc':receipt['finished_utc'], 'actual_exit_code':0,
+            'repository_before':receipt['repository_before'], 'repository_after':receipt['repository_after'], 'actual_test_counts':counts}
+
+    require(final is not None and set(final) == set(original), 'Final complete source/config inventory changed')
+    changed = []; unchanged = []
+    for path in original:
+        before = checked.check(original[path]).read_bytes(); after = checked.check(final[path]).read_bytes()
+        require(utility.path_of(path).read_bytes() == after, 'Current source differs from final actual quality archive')
+        (unchanged if before == after else changed).append(path)
+        if path in allowed: require(after == checked.check(observer_after[path] if path in observer_after else reviewed[path]).read_bytes(),
+            'Final observer differs from actual reviewed format/getter cleanup output')
+        if path == test_path: require(after == checked.check(test_after).read_bytes(), 'Final test source differs from exact Root-reviewed two-block cleanup')
+    require(test_path in changed and set(changed) <= set(allowed)|{test_path}, 'Only declared passive formats and one exact test cleanup may differ')
+    checked.unchanged(); out = args.output_dir.resolve()
+    require(out.is_relative_to(ROOT/'.runtime/porting/CLK-05') and not out.exists(), 'Fresh ignored output required')
+    out.mkdir(); source = out/'verify_lineage.py'; source.write_bytes(Path(__file__).read_bytes())
+    report = {'schema':'clk05-final-quality-source-lineage.v1', 'status':'pass-exact-passive-and-test-only-source-lineage-and-actual-quality',
+        'review_started_utc':started, 'review_completed_utc':datetime.now(timezone.utc).isoformat(), 'reviewed_scientific_build':build_ref,
+        'historical_scientific_commit':build['implementation_commit'], 'historical_scientific_crates_tree':build['crates_tree'],
+        'historical_scientific_source_snapshot':build['source_snapshot'], 'final_quality_head_at_execution':head, 'final_quality_source_snapshot':final_ref,
+        'available_Rust_source_count':3731, 'complete_source_config_count':3744, 'permitted_formatted_observer_paths':sorted(allowed),
+        'exact_changed_observer_paths':sorted(set(changed)&set(allowed)), 'test_only_changed_paths':[test_path],
+        'exact_changed_source_paths':sorted(changed), 'unchanged_other_source_config_count':len(unchanged),
+        'production_math_and_Cargo_bytes_unchanged':True, 'whole_final_Rust_tree_claimed_identical_to_science_tree':not changed,
+        'reviewed_production_data_review':qa_ref, 'reviewed_production_data_review_execution':qa_execution_ref,
+        'reviewed_format_plan':plan_ref, 'reviewed_final_quality_scope_plan':scope_ref, 'reviewed_test_cleanup':cleanup_ref,
+        'independent_test_cleanup_review':test_review_ref, 'preserved_failed_clippy':failed_clippy_ref,
+        'actual_test_formatting_execution':test_format_ref, 'reviewed_observer_cleanup':observer_cleanup_ref,
+        'independent_observer_cleanup_review':observer_review_ref, 'observer_source_cleanup_paths':sorted(observer_after),
+        'preserved_failed_observer_clippy':failed_observer_clippy_ref, 'actual_formatting_execution':format_ref, 'actual_formatting_argv':formatter['command'],
+        'format_plan_is_scope_description_not_execution_receipt':True, 'plan_authored_before_formatter_claimed':False,
+        'independent_formatted_source_review':review_ref,
+        'formatter_source_bytes_match_before_and_after':formatter['source_bytes_match_before_and_after'], 'actual_final_quality':quality,
+        'executed_metadata_source':utility.ref(source), 'checked_bindings':checked.report(), 'engines_Cargo_tests_comparisons_Git_executed_by_verifier':False,
+        'scientific_values_compared_or_PARITY_extended':False, 'numerical_PASS_claimed':False, 'gates_updated':False,
+        'authorship_disclosure':'Header authored observer and metadata glue. Root independently reads the historical ten format diffs, two same-order passive getter let-chains, and two cfg(test) derived-Copy cleanup blocks; this verifier authenticates exact source bytes and real quality receipts, without independently certifying own mathematics or relabelling historical scientific commits.'}
+    with (out/'lineage.json').open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(report, stream, indent=2, ensure_ascii=False, allow_nan=False); stream.write('\n')
+    print(json.dumps(report, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__': main()

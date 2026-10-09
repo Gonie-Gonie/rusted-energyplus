@@ -1,0 +1,105 @@
+"""Owned stdlib artifact/receipt helpers; no target imports or engines."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+SEEN = {}
+
+def need(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+def instant(value):
+    item = datetime.fromisoformat(value)
+    need(item.tzinfo is not None and item.utcoffset().total_seconds() == 0, 'Aware UTC required')
+    return item
+
+def path(value):
+    item = Path(value)
+    item = (item if item.is_absolute() else ROOT/item).resolve()
+    need(item != ROOT and item.is_relative_to(ROOT), 'Artifact escapes repository')
+    return item
+
+def ref(value):
+    item = path(value)
+    need(item.is_file() and not item.is_symlink(), 'Regular actual artifact required')
+    with item.open('rb') as stream:
+        digest = hashlib.file_digest(stream,'sha256').hexdigest()
+    need(item not in SEEN or SEEN[item] == digest, 'Consumed artifact changed')
+    SEEN[item] = digest
+    return {'path':item.relative_to(ROOT).as_posix(),'sha256':digest}
+
+def check(binding):
+    need(type(binding) is dict and type(binding.get('path')) is str
+         and type(binding.get('sha256')) is str, 'Typed artifact reference required')
+    item = path(binding['path'])
+    need(ref(item)['sha256'] == binding['sha256'], 'Bound bytes differ')
+    for key in ['bytes','size_bytes']:
+        if key in binding:
+            need(type(binding[key]) is int and item.stat().st_size == binding[key], 'Actual artifact size differs')
+    return item
+
+def read(binding):
+    def pairs(rows):
+        result = {}
+        for key,item in rows:
+            need(key not in result,'Duplicate JSON key'); result[key] = item
+        return result
+    return json.loads(check(binding).read_text(encoding='utf-8'),object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonstandard JSON '+token)))
+
+def exact(a,b):
+    if type(a) is not type(b): return False
+    if type(a) is dict: return set(a) == set(b) and all(exact(a[key],b[key]) for key in a)
+    if type(a) is list: return len(a) == len(b) and all(exact(x,y) for x,y in zip(a,b))
+    if type(a) is float: return a.hex() == b.hex()
+    return a == b
+
+def recorded(binding,payload,not_after):
+    item = read(binding)
+    need(item['schema'] == 'recorded-porting-command.v1' and type(item['exit_code']) is int
+         and item['exit_code'] == 0 and item['launch_error'] is None
+         and item['source_bytes_match_before_and_after'] is True
+         and item['recorder_updates_gates'] is False and item['recorder_supplies_reference_answers'] is False,'Actual recorded unchanged0 required')
+    need(Path(item['cwd']).is_absolute() and Path(item['cwd']).resolve() == ROOT
+         and exact(read(item['stdout']),payload),'Actual cwd/full typed stdout differs')
+    check(item['stderr']); check(item['source_snapshot'])
+    source = item['executed_launcher']
+    need(source['historical_path'] == 'tools/porting/record_command.py'
+         and check(source['archive']).read_bytes() == path(source['historical_path']).read_bytes(),'Recorder archive differs')
+    need(instant(item['started_utc']) <= instant(item['finished_utc']) <= instant(not_after),'Actual recorded chronology differs')
+    return item
+
+def actual_review(binding,execution,schema,status,not_after):
+    report = read(binding); record = recorded(execution,report,not_after)
+    need(report['schema'] == schema and report['status'] == status
+         and report['scientific_execution_performed'] is False,'Actual independent metadata review schema/status required')
+    need(instant(record['started_utc']) <= instant(report['review_started_utc'])
+         <= instant(report['review_completed_utc']) <= instant(record['finished_utc']),'Actual review interval differs')
+    return report
+
+def sources(rows):
+    need(type(rows) is list and len(rows) == len({row['historical_path'] for row in rows}),'Unique source inventory required')
+    for row in rows:
+        need(ref(row['historical_path'])['sha256'] == ref(check(row['archive']))['sha256'],'Actual archived source changed')
+
+def save_sources(out,rows):
+    directory = out/'sources'; directory.mkdir()
+    result = []
+    for index,row in enumerate(rows):
+        destination = directory/(f'{index:02}-'+path(row['historical_path']).name)
+        with destination.open('xb') as stream: stream.write(check(row['archive']).read_bytes())
+        result.append({'historical_path':row['historical_path'],'archive':ref(destination)})
+    return result
+
+def finish(out,result):
+    for item,digest in list(SEEN.items()): need(ref(item)['sha256'] == digest,'Consumed bytes changed during metadata review')
+    result['review_completed_utc'] = utc()
+    with (out/'review.json').open('xb') as stream:
+        stream.write((json.dumps(result,indent=2,ensure_ascii=True,allow_nan=False)+'\n').encode('utf-8'))
+    print(json.dumps(result,ensure_ascii=True,allow_nan=False))

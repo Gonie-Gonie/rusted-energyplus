@@ -1,0 +1,5 @@
+    constexpr const char *cReportDuringWarmup("ReportDuringWarmup");
+    constexpr const char *cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
+    constexpr const char *cIgnoreSolarRadiation("IgnoreSolarRadiation");
+    constexpr const char *cIgnoreBeamRadiation("IgnoreBeamRadiation");
+    constexpr const char *cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");

@@ -1,0 +1,43 @@
+
+                    if (ETHoriz >= 9999.0) {
+                        ETHoriz = 0.0;
+                    }
+                    if (ETDirect >= 9999.0) {
+                        ETDirect = 0.0;
+                    }
+                    if (GLBHoriz >= 9999.0) {
+                        GLBHoriz = 0.0;
+                    }
+                    if (DirectRad >= 9999.0) {
+                        DirectRad = 0.0;
+                    }
+                    if (DiffuseRad >= 9999.0) {
+                        DiffuseRad = 0.0;
+                    }
+                    if (GLBHorizIllum >= 999900.0) {
+                        GLBHorizIllum = 0.0;
+                    }
+                    if (DirectNrmIllum >= 999900.0) {
+                        DirectNrmIllum = 0.0;
+                    }
+                    if (DiffuseHorizIllum >= 999900.0) {
+                        DiffuseHorizIllum = 0.0;
+                    }
+                    if (ZenLum >= 99990.0) {
+                        ZenLum = 0.0;
+                    }
+                    if (state.dataEnvrn->IgnoreSolarRadiation) {
+                        GLBHoriz = 0.0;
+                        DirectRad = 0.0;
+                        DiffuseRad = 0.0;
+                    }
+                    if (state.dataEnvrn->IgnoreBeamRadiation) {
+                        DirectRad = 0.0;
+                    }
+                    if (state.dataEnvrn->IgnoreDiffuseRadiation) {
+                        DiffuseRad = 0.0;
+                    }
+
+                    tomorrow.BeamSolarRad = DirectRad;
+                    tomorrow.DifSolarRad = DiffuseRad;
+

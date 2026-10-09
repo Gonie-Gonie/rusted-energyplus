@@ -1,0 +1,11 @@
+        state.dataWeather->HorizIRSky = today.HorizIRSky;
+        state.dataEnvrn->SkyTemp = today.SkyTemp;
+        state.dataEnvrn->SkyTempKelvin = state.dataEnvrn->SkyTemp + Constant::Kelvin;
+        state.dataEnvrn->DifSolarRad = today.DifSolarRad;
+        if (state.dataEnvrn->EMSDifSolarRadOverrideOn) {
+            state.dataEnvrn->DifSolarRad = state.dataEnvrn->EMSDifSolarRadOverrideValue;
+        }
+        state.dataEnvrn->BeamSolarRad = today.BeamSolarRad;
+        if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) {
+            state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
+        }

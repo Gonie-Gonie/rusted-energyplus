@@ -86,7 +86,7 @@ B에서는 그 의존성을 적용한다.
 | [x] | [CLK-02](cards/CLK-02.md) | EPW 헤더·시간별 레코드 해석 | `WeatherManager.cc` · `ProcessEPWHeader; InterpretWeatherDataLine` | CON-01 |
 | [x] | [CLK-03](cards/CLK-03.md) | 기상 레코드 선택·Today/Tomorrow 인계 | `WeatherManager.cc` · `GetNextEnvironment; ReadEPlusWeatherForDay; UpdateWeatherData` | CLK-01, CLK-02 |
 | [x] | [CLK-04](cards/CLK-04.md) | 비일사 기상값 timestep 보간 | `WeatherManager.cc` · `SetupInterpolationValues; ReadEPlusWeatherForDay; SetCurrentWeather; interpolateWindDirection` | CLK-03 |
-| [ ] | [CLK-05](cards/CLK-05.md) | 일사 전용 timestep 보간 | `WeatherManager.cc` · `SetupInterpolationValues; ReadEPlusWeatherForDay` | CLK-03 |
+| [x] | [CLK-05](cards/CLK-05.md) | 일사 전용 timestep 보간 | `WeatherManager.cc` · `SetupInterpolationValues; ReadEPlusWeatherForDay` | CLK-03 |
 | [ ] | [CLK-06](cards/CLK-06.md) | 하늘 온도·수평면 IR | `WeatherManager.cc` · `calcSky; CalcSkyEmissivity` | CLK-02, CLK-04 |
 
 ### 03 스케줄·물성

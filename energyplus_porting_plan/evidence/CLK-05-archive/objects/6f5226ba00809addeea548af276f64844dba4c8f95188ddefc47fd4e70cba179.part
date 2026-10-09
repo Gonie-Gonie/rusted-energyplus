@@ -1,0 +1,74 @@
+"""Freeze six ordinary CLI inputs after real Original/QC/baseline/unit evidence."""
+from pathlib import Path
+import argparse
+import hashlib
+import json
+
+HERE = Path(__file__).resolve().parent
+COMMON_SHA = 'd636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8'
+if hashlib.sha256((HERE / 'common.py').read_bytes()).hexdigest() != COMMON_SHA:
+    raise ValueError('Held metadata source changed before import')
+from common import (ADMISSION, CONTROL, CASE_IDS, archive_sources, binding, boot, environment_inputs,
+    exact, fresh, input_byte_map, need, now, packet, ref, require_environment, routing, timestamp, write)
+
+
+def arguments():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['build', 'original-data-review', 'original-data-review-execution', 'baseline-gap', 'baseline-gap-execution',
+        'unit-comparison', 'unit-comparison-execution', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + key, required=True, type=Path)
+    return parser.parse_args()
+
+
+def main():
+    args = arguments(); started = now()
+    checked, review_ref, review, review_execution, review_finish, evidence = boot(args.source_review, args.source_review_execution)
+    admission, request, projection, contracts, cases = packet(checked)
+    need(review_finish <= timestamp(started), 'Independent source review must complete before plan writer')
+    for key, expected in [('native_admission_contract', ADMISSION), ('helper_request', admission['helper_request']),
+        ('projection', admission['projection']), ('production_control_inputs', CONTROL)]:
+        binding(review['reviewed_native_packet'][key], expected, checked)
+    need(exact(review['reviewed_native_packet']['contracts'], admission['contracts']), 'Reviewed contracts differ')
+    completed = evidence.prerequisites(args, checked, admission, request, projection, contracts)
+    architecture = evidence.architecture(completed['available'], checked)
+    import os
+    captured = environment_inputs(dict(os.environ))
+    for row in cases:
+        require_environment(captured, row['captured_environment_inputs'])
+    output = fresh(args.output_dir); checked.unchanged(); output.mkdir()
+    maps = {}
+    for row in cases:
+        key = (row['weather']['path'], row['weather']['sha256'])
+        if key not in maps:
+            path = output / ('input-byte-map-' + str(len(maps)).zfill(2) + '.json')
+            write(path, input_byte_map(row['weather'], checked)); maps[key] = ref(path)
+        row['external_byte_map'] = maps[key]
+    created = now()
+    need(timestamp(completed['prerequisites_finished_utc']) <= timestamp(created), 'Plan preceded actual completed unit/CLI build')
+    value = {'schema': 'clk05-production-plan.v1', 'created_utc': created,
+        'native_admission_contract': ADMISSION, 'native_request': admission['helper_request'],
+        'native_observation_projection': admission['projection'], 'contracts': admission['contracts'],
+        'fixed_scope': admission['fixed_scope'], 'all_45_guard_refs': admission['all_45_guard_refs'],
+        'production_control_inputs': CONTROL, 'production_control_review': admission['production_control_review'],
+        'cases': cases, 'actual_command_count': 6, 'requested_case_ids': CASE_IDS,
+        'input_routing': routing(projection, contracts['tolerances']), 'prerequisite_evidence': completed['refs'],
+        'unit_reader_interpreter_observation': completed['unit_reader_interpreter_observation'],
+        'source_architecture': architecture, 'independent_sources_review': review_ref,
+        'independent_sources_review_execution': review_execution, 'reader_source_archives': archive_sources(output),
+        'cli_arguments': ['run', '<actual-idf>', '--weather', '<actual-epw>', '--output-dir', '<fresh-output>',
+            '--mode', 'compatibility', '--partial', 'deny', '--trace-level', '<full-or-summary>', '--porting-scope', '<a-or-b>'],
+        'environment_requirement': 'Exactly three inherited presence/raw strings before and after each actual spawn attempt.',
+        'frozen_before_Rust_production_numerical_execution': True, 'frozen_before_Original_execution_claimed': False,
+        'existing_native_six_packet_rewritten': False, 'native_results_read_by_plan_writer': False,
+        'expected_outputs_supplied': False, 'native_results_supplied_as_inputs': False,
+        'numerical_policy_changed': False, 'physical_execution_performed': False, 'gates_updated': False}
+    write(output / 'plan.json', value)
+    for row in cases:
+        require_environment(environment_inputs(dict(os.environ)), row['captured_environment_inputs'])
+    checked.unchanged()
+    print(json.dumps({'plan': ref(output / 'plan.json'), 'input_only_freeze': True,
+        'physical_execution_performed': False, 'gates_updated': False}))
+
+
+if __name__ == '__main__':
+    main()

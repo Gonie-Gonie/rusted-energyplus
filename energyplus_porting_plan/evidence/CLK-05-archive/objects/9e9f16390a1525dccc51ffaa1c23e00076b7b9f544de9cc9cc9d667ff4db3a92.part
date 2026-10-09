@@ -1,0 +1,184 @@
+{
+  "unit_input_domain": {
+    "EPW_intervals_per_hour": 1,
+    "steps_per_hour": [
+      1,
+      3,
+      4
+    ],
+    "first_hour_policy": [
+      "Hour1",
+      "Hour24"
+    ],
+    "nonactual_finite_complete_days": true,
+    "source_ordered_day_callbacks_only": true,
+    "whole_thermal_simulation_registration_claimed": false,
+    "expected_values_or_exits_supplied": false
+  },
+  "source_selection": {
+    "Setup": [
+      "Interpolation_allocated",
+      "Interpolation length/order/all values",
+      "SolarInterpolation_allocated",
+      "SolarInterpolation length/order/all values"
+    ],
+    "ReadDay_solar": [
+      "Tomorrow.BeamSolarRad",
+      "Tomorrow.DifSolarRad",
+      "Today.BeamSolarRad",
+      "Today.DifSolarRad",
+      "LastHourSet",
+      "LastHour.BeamSolarRad",
+      "LastHour.DifSolarRad",
+      "NextHour.BeamSolarRad",
+      "NextHour.DifSolarRad",
+      "NextHour.LiquidPrecip"
+    ],
+    "upstream_counts": [
+      "MissedCounts.BeamSolarRad",
+      "MissedCounts.DifSolarRad",
+      "OutOfRangeCounts.BeamSolarRad",
+      "OutOfRangeCounts.DifSolarRad"
+    ],
+    "effective_controls": [
+      "DisplayWeatherMissingDataWarnings",
+      "IgnoreSolarRadiation",
+      "IgnoreBeamRadiation",
+      "IgnoreDiffuseRadiation"
+    ],
+    "exact_metadata": [
+      "actual allocation/shape/hour-major-step-minor order",
+      "all requested call identities/callers/order/outcomes",
+      "actual caller calendar/flags and enumerated input clocks; passive SetCurrent clocks remain retained and unpaired",
+      "raw header/parser counter owner",
+      "actual semantic stream cursor and input byte boundary identity",
+      "declared input bits/row hashes",
+      "actual cache/counter types and unchanged public canary storage"
+    ],
+    "paired_clock_input_fields": [
+      "global.TimeStepsInHour",
+      "global.TimeStepZone",
+      "weather.TimeStepFraction",
+      "clk05_observation.clock.TimeStepZoneSec",
+      "clk05_observation.clock.MinutesInTimeStep",
+      "caller.DayOfSim",
+      "caller.DayOfSimChr",
+      "caller.HourOfDay",
+      "caller.TimeStep",
+      "explicitly_declared_caller_begin_end_flags"
+    ],
+    "passive_clock_fields_unpaired_in_Initialize_only_native_lane": [
+      "clk05_observation.clock.CurrentTime",
+      "clk05_observation.clock.SimTimeSteps",
+      "global.WeightNow",
+      "global.WeightPreviousHour"
+    ],
+    "count_seed_observation_boundary": "before-GetNext public storage/reset canaries; InitializeWeather1772-1776 resets all19 before first ReadDay, so incoming hourly nonzero counts are not claimed",
+    "counter_19_fields_retained": true,
+    "unselected_counter_generation_cross_native_PASS": false,
+    "within_owner_Update_whole17_copy_bits": "only if genuine incoming/outgoing public copy boundary is directly observed; source-private hourly operands remain unavailable",
+    "unselected_LastHour17_generated_fields_cross_native_PASS": false,
+    "NextHour_unselected14_fields": "strict retained caller input bits where source writes only Beam/Dif/Liquid; no generated-value claim"
+  },
+  "observation_transport": {
+    "full_selected_solar_grids": [
+      "allocated_defaults",
+      "after genuine Setup",
+      "after genuine preparation",
+      "before/after declared caller context",
+      "GetNext before_caller/before/after",
+      "Initialize effective BeginEnvrn or BeginDay before_caller/before/after",
+      "final_state"
+    ],
+    "effective_boundary_flags": "incoming actual flags overwritten only by explicitly declared partial caller writes",
+    "grid_fields": [
+      "BeamSolarRad",
+      "DifSolarRad"
+    ],
+    "other_operation_snapshots": "actual selectedToday solar2 slot, full17 LastHour/NextHour caches, all19 counts and all scalar/control/calendar/header/cursor fields plus exact grid allocation/shape; unobserved grid slots null with explicit reason",
+    "every_operation_retained": true,
+    "observation_selection_never_controls_invocation": true,
+    "selected_slot_before_valid_hour_or_storage": "unavailable; both unavailable yields explicit no-PASS; one-sided unavailability mismatches; selected available day/production operands remain required",
+    "private_hourly_or_transient_weights_observed": false,
+    "transient_weight_RHS_in_observer": false,
+    "binary64_inputs_and_outputs_separate": true
+  },
+  "production_selection": {
+    "existing_CON_bytes_unchanged": true,
+    "all45_ordered_literal_guard_refs_retained_no_dedup": true,
+    "clock_steps": 4,
+    "actual_zone_solar_operands": 480,
+    "Full_Summary_execution_pairs": 3,
+    "Today_to_owned_sample_DNI_DHI_to_thermal_operand_transport": true,
+    "initial_seed_duplicate_consumer_retained_with_explicit_operation_reuse": true,
+    "effective_controls_require_actual_input_registration_and_ENV_capture": true,
+    "effective_false_inferred_from_constructor_or_outputs": false,
+    "registration_protocol_pending_Root_approval": false
+  },
+  "unpaired_or_unavailable_never_PASS": [
+    "native private wvarsHr/hour/source index and transient previous/current/next weight locals",
+    "Sky and current environment solar/night/EMS masks",
+    "solar position/SOLCOS/SunIsUp/SunIsUpPrevTS",
+    "SRC04 incident/absorbed surface solar formulas",
+    "design-day solar models and whole environment/thermal registration",
+    "unobserved constructor/preparation owner fields",
+    "unselected generated weather fields and omitted compact grid contents",
+    "CurrentTime/SimTimeSteps and WeightNow/WeightPreviousHour generated by full CLI SetCurrent versus Initialize-only native history"
+  ],
+  "pure_Setup_invocation_boundary": "one genuine SetupInterpolationValues call per setup_cases row; shared preparation fields are clock/context descriptors and do not assert eight weather preparation invocations",
+  "schema": "clk05-observation-projection.v1",
+  "card": "CLK-05",
+  "created_utc": "2026-10-08T15:43:58.178360+00:00",
+  "frozen_before_numerical_execution": true,
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "helper_request": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+    "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+  },
+  "native_observation_policy": {
+    "full_solar_grid_fields": [
+      "BeamSolarRad",
+      "DifSolarRad"
+    ],
+    "full_solar_grid_snapshots": [
+      "allocated_defaults",
+      "setup",
+      "prepared",
+      "before_context",
+      "after_context",
+      "GetNextEnvironment",
+      "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+      "final_state"
+    ],
+    "effective_boundary_flags": "actual incoming flags overwritten only by declared partial caller writes",
+    "all_operations_executed_independently_of_observation_selection": true,
+    "compact_operation_grid_contents": null,
+    "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected solar grid",
+    "selected_today_solar_slot": "actual allocated in-range HourOfDay/TimeStep, otherwise unavailable",
+    "all19_counts_full17_LastHour_NextHour_retained": true,
+    "native_private_hourly_or_transient_weights_observed": false,
+    "passive_CurrentTime_SimTimeSteps_WeightNow_WeightPreviousHour_paired": false
+  },
+  "profile_proposal": {
+    "path": ".runtime/porting/CLK-05/input-design-prep-02/projection-proposal.json",
+    "sha256": "7bfa5ab5350253e7319871011cb8bdabf1a48ade61789dbdf2b872d40ce6f750"
+  },
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "original_results_supplied_to_Rust": false,
+  "unavailable_counted_as_PASS": false,
+  "historical_CLK04_solar_observations_remain_unpaired": true
+}

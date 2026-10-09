@@ -1,2 +1,5 @@
 * text=auto eol=lf
 
+# Evidence payloads retain their original bytes, including line endings.
+energyplus_porting_plan/evidence/**/*.part binary
+

@@ -1,0 +1,35 @@
+
+        // Compute the Cosine of the Solar Zenith (Altitude) Angle.
+        Real64 CosZenith = state.dataEnvrn->SinLatitude * state.dataWeather->TodayVariables.SinSolarDeclinAngle +
+                           state.dataEnvrn->CosLatitude * state.dataWeather->TodayVariables.CosSolarDeclinAngle * std::cos(H);
+
+        Real64 SolarZenith = std::acos(CosZenith);
+        Real64 SinAltitude = state.dataEnvrn->CosLatitude * state.dataWeather->TodayVariables.CosSolarDeclinAngle * std::cos(H) +
+                             state.dataEnvrn->SinLatitude * state.dataWeather->TodayVariables.SinSolarDeclinAngle;
+        Real64 SolarAltitude = std::asin(SinAltitude);
+        Real64 CosAzimuth = -(state.dataEnvrn->SinLatitude * CosZenith - state.dataWeather->TodayVariables.SinSolarDeclinAngle) /
+                            (state.dataEnvrn->CosLatitude * std::sin(SolarZenith));
+        // Following because above can yield invalid cos value.  (e.g. at south pole)
+        CosAzimuth = max(CosAzimuth, -1.0);
+        CosAzimuth = min(1.0, CosAzimuth);
+        Real64 SolarAzimuth = std::acos(CosAzimuth);
+
+        state.dataWeather->SolarAltitudeAngle = SolarAltitude / Constant::DegToRad;
+        state.dataWeather->SolarAzimuthAngle = SolarAzimuth / Constant::DegToRad;
+        if (state.dataWeather->HrAngle < 0.0) {
+            state.dataWeather->SolarAzimuthAngle = 360.0 - state.dataWeather->SolarAzimuthAngle;
+        }
+
+        SunCOS.z = CosZenith;
+        state.dataEnvrn->SunIsUpPrevTS = state.dataEnvrn->SunIsUp;
+        if (CosZenith < DataEnvironment::SunIsUpValue) {
+            state.dataEnvrn->SunIsUp = false;
+            SunCOS.y = 0.0;
+            SunCOS.x = 0.0;
+        } else {
+            state.dataEnvrn->SunIsUp = true;
+            SunCOS.y = state.dataWeather->TodayVariables.SinSolarDeclinAngle * state.dataEnvrn->CosLatitude -
+                       state.dataWeather->TodayVariables.CosSolarDeclinAngle * state.dataEnvrn->SinLatitude * std::cos(H);
+            SunCOS.x = state.dataWeather->TodayVariables.CosSolarDeclinAngle * std::sin(H);
+        }
+    }

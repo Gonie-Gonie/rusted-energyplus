@@ -1,0 +1,94 @@
+"""Input-only comparer-source freeze; Root alone executes after source review."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+
+
+def authenticated_common():
+    source = HERE / 'common.py'
+    if hashlib.sha256(source.read_bytes()).hexdigest() != COMMON_SHA:
+        raise ValueError('Held metadata module changed before import')
+    spec = importlib.util.spec_from_file_location('common', source)
+    module = importlib.util.module_from_spec(spec); sys.modules['common'] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    for key in ['native-admission-contract', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + key, type=Path, required=True)
+    args = parser.parse_args(); m = authenticated_common(); checked = m.v.Bindings()
+    require, read, ref = m.require, m.read, m.ref
+    require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    output = args.output_dir.resolve(); base = ROOT / '.runtime/porting/CLK-05'
+    require(output.is_relative_to(base) and output != base and not output.exists(), 'Fresh ignored projection output required')
+    manifest_ref = ref(HERE / 'manifest.json')
+    manifest = read(checked.check(manifest_ref))
+    require(manifest['schema'] == 'clk05-comparer-source-preparation.v1', 'Held source manifest required')
+    rows = manifest['sources']; require(len(rows) == 8 and len({row['path'] for row in rows}) == 8, 'Exact7 local plus1 utility sources required')
+    for row in rows:
+        checked.check(row)
+    review_ref, execution_ref = ref(args.source_review), ref(args.source_review_execution)
+    review = read(checked.check(review_ref))
+    require(review['schema'] == 'clk05-independent-comparer-source-review.v1'
+        and review['status'] == 'pass-source-selected-solar-and-authentication-before-comparison'
+        and review['scientific_execution_performed'] is False, 'Actual independent comparer source review required')
+    review_record, start, finish = m.recorded(checked, execution_ref, review)
+    m.script(review_record, review['executed_reader_source_archive'], checked)
+    require(start <= m.timestamp(review['review_started_utc']) <= m.timestamp(review['review_completed_utc']) <= finish,
+        'Independent source review chronology differs')
+    reviewed = m.archives(review['reviewed_sources'], checked)
+    require(len(reviewed) == len(rows) and set(reviewed) == {row['path'] for row in rows}
+        and all(reviewed[row['path']]['sha256'] == row['sha256'] for row in rows), 'Actual independent exact8 source archives required')
+    m.binding(review['reviewed_native_admission_contract'], ref(args.native_admission_contract), checked)
+    admission_ref = ref(args.native_admission_contract)
+    admission = read(checked.check(admission_ref))
+    require(admission['schema'] == 'clk05-native-admission-contract.v1' and admission['frozen_before_numerical_execution'] is True,
+        'Actual one-way native input admission required')
+    request = read(checked.check(admission['helper_request']))
+    projection = read(checked.check(admission['projection']))
+    tolerances = read(checked.check(admission['contracts']['tolerances']))
+    require(projection['schema'] == 'clk05-observation-projection.v1'
+        and m.exact(projection['native_observation_policy'], request['observation_policy']), 'Pre-output native projection must remain exact')
+    checked.recursive(admission['contracts']); checked.check(admission['fixed_scope'])
+    for row in admission['all_45_guard_refs']:
+        checked.check(row)
+    created = datetime.now(timezone.utc).isoformat()
+    require(finish <= m.timestamp(created), 'Comparer policy freeze preceded source review completion')
+    result = {'schema': 'clk05-comparer-projection.v1', 'created_utc': created,
+        'source_review': review_ref, 'source_review_execution': execution_ref, 'source_manifest': manifest_ref,
+        'comparer_sources': rows, 'reviewed_source_archives': review['reviewed_sources'],
+        'native_admission_contract': admission_ref, 'native_request': admission['helper_request'],
+        'native_observation_projection': admission['projection'], 'contracts': admission['contracts'],
+        'fixed_scope': admission['fixed_scope'], 'requested_counts': request['requested_counts'],
+        'native_observation_policy': request['observation_policy'], 'source_selection': projection['source_selection'],
+        'numeric_profiles': tolerances['rows'], 'numeric_criterion': tolerances['criterion'],
+        'array_path_mapping': {'native_snapshot': 'root', 'Rust_snapshot': 'root', 'value_transform': False},
+        'every589_requested_operation_retained': True, 'mask_controls_invocation': False,
+        'legacy_missing_solar_controls': 'explicitly unavailable/unapplied; no numerical PASS',
+        'candidate_effective_controls': 'four actual bools required, strict matching native caller context',
+        'unpaired': projection['unpaired_or_unavailable_never_PASS'],
+        'legacy_exit0': 'authenticated factual comparison completed; real mismatches remain, no numerical PASS',
+        'candidate_exit0': 'all selected available comparisons satisfy frozen profiles with honest unavailable scope',
+        'frozen_before_next_Rust_comparison_operand_execution': True,
+        'original_or_Rust_output_payloads_read': False, 'scientific_execution_performed': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None,
+        'numerical_PASS_claimed': False, 'gates_updated': False}
+    checked.unchanged(); output.mkdir()
+    with (output / 'projection.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False); stream.write('\n')
+    print(json.dumps({'comparison_projection': ref(output / 'projection.json'),
+        'input_only_source_selection_freeze': True, 'scientific_execution_performed': False, 'gates_updated': False}))
+
+
+if __name__ == '__main__':
+    main()

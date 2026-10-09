@@ -1,0 +1,186 @@
+{
+  "schema": "clk05-root-actual-passive-observer-format.v1",
+  "formatter_execution": {
+    "path": ".runtime/porting/CLK-05/observer-format-command-01/receipt.json",
+    "sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc"
+  },
+  "scientific_build": {
+    "path": ".runtime/porting/CLK-05/candidate-observer-build-03/build-receipt.json",
+    "sha256": "639a47b5555c2038d80957fd14d8dc3f67f4813a147719426f5ab5197fe63910"
+  },
+  "files": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_observer.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/00-clk05_existing_observer.rs",
+        "sha256": "7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/00-clk05_existing_observer.rs",
+        "sha256": "42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/00-clk05_existing_observer.rs.diff",
+        "sha256": "0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e"
+      },
+      "changed": true,
+      "diff_lines": 195
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/inputs.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/01-inputs.rs",
+        "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/01-inputs.rs",
+        "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/01-inputs.rs.diff",
+        "sha256": "d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd"
+      },
+      "changed": true,
+      "diff_lines": 83
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/02-fields.rs",
+        "sha256": "204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/02-fields.rs",
+        "sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/02-fields.rs.diff",
+        "sha256": "8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931"
+      },
+      "changed": true,
+      "diff_lines": 101
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/observe.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/03-observe.rs",
+        "sha256": "f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/03-observe.rs",
+        "sha256": "4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/03-observe.rs.diff",
+        "sha256": "8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06"
+      },
+      "changed": true,
+      "diff_lines": 179
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/seeds.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/04-seeds.rs",
+        "sha256": "e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/04-seeds.rs",
+        "sha256": "73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/04-seeds.rs.diff",
+        "sha256": "bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85"
+      },
+      "changed": true,
+      "diff_lines": 62
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/05-clk05_candidate_probe.rs",
+        "sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/05-clk05_candidate_probe.rs",
+        "sha256": "dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/05-clk05_candidate_probe.rs.diff",
+        "sha256": "72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7"
+      },
+      "changed": true,
+      "diff_lines": 210
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/06-inputs.rs",
+        "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/06-inputs.rs",
+        "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/06-inputs.rs.diff",
+        "sha256": "49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84"
+      },
+      "changed": true,
+      "diff_lines": 83
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/07-fields.rs",
+        "sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/07-fields.rs",
+        "sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/07-fields.rs.diff",
+        "sha256": "061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c"
+      },
+      "changed": true,
+      "diff_lines": 85
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/08-observe.rs",
+        "sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/08-observe.rs",
+        "sha256": "0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/08-observe.rs.diff",
+        "sha256": "7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979"
+      },
+      "changed": true,
+      "diff_lines": 184
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs",
+      "before_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/09-seeds.rs",
+        "sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070"
+      },
+      "after_archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/09-seeds.rs",
+        "sha256": "909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/09-seeds.rs.diff",
+        "sha256": "a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e"
+      },
+      "changed": true,
+      "diff_lines": 90
+    }
+  ],
+  "actual_formatter_exit_code": 0,
+  "format_only_review_pending": true,
+  "gates_updated": false
+}

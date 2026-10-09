@@ -1,0 +1,1332 @@
+{
+  "schema": "clk05-production-matrix.v1",
+  "started_utc": "2026-10-09T03:46:49.935470+00:00",
+  "build": {
+    "path": ".runtime/porting/CLK-05/production-CLI-build-04/build-receipt.json",
+    "sha256": "f970221e37ae5aa04d57089c47de429e5dd96c9d426026a4798c4217e5061318"
+  },
+  "prerequisite_evidence": {
+    "Original_reference": {
+      "path": ".runtime/porting/CLK-05/original-execution-01/helper-reference.json",
+      "sha256": "e5cb6fee58abb978abd8c1fa92c4ef1bafcd80d2df1efe505a1c156cd512d820"
+    },
+    "Original_execution": {
+      "path": ".runtime/porting/CLK-05/original-execution-command-01/receipt.json",
+      "sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24"
+    },
+    "Original_data_review": {
+      "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+      "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+    },
+    "Original_data_review_execution": {
+      "path": ".runtime/porting/CLK-05/independent-original-data-review-command-01/receipt.json",
+      "sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562"
+    },
+    "Native_results": {
+      "path": ".runtime/porting/CLK-05/original-execution-01/native-output/clk05-helper-results.json",
+      "sha256": "b24e2237b7efb0df3cb89714d9a72aa04e51ca359cdcb8f46ac281f74cf39041"
+    },
+    "Native_request": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+      "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+    },
+    "Native_admission_contract": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+      "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+    },
+    "Native_projection": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+      "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+    },
+    "baseline_gap": {
+      "path": ".runtime/porting/CLK-05/existing-baseline-gap-01/gap.json",
+      "sha256": "dae13dac1e3f655ed2c30ff989cea902208430a351dd7508c24da18b02c52814"
+    },
+    "baseline_gap_execution": {
+      "path": ".runtime/porting/CLK-05/existing-baseline-gap-command-01/receipt.json",
+      "sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5"
+    },
+    "candidate_unit": {
+      "path": ".runtime/porting/CLK-05/candidate-unit-comparison-03/unit-comparison.json",
+      "sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90"
+    },
+    "candidate_unit_execution": {
+      "path": ".runtime/porting/CLK-05/candidate-unit-comparison-command-03/receipt.json",
+      "sha256": "f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6"
+    },
+    "Rust_build": {
+      "path": ".runtime/porting/CLK-05/production-CLI-build-04/build-receipt.json",
+      "sha256": "f970221e37ae5aa04d57089c47de429e5dd96c9d426026a4798c4217e5061318"
+    },
+    "candidate_build": {
+      "path": ".runtime/porting/CLK-05/candidate-observer-build-03/build-receipt.json",
+      "sha256": "639a47b5555c2038d80957fd14d8dc3f67f4813a147719426f5ab5197fe63910"
+    },
+    "candidate_execution": {
+      "path": ".runtime/porting/CLK-05/candidate-observer-execution-command-03/receipt.json",
+      "sha256": "15ef2cd1bb661c304e32467215b2c57bc0fe052de74bd47028674cb849e8bdd2"
+    },
+    "candidate_comparison_projection": {
+      "path": ".runtime/porting/CLK-05/comparison-projection-01/projection.json",
+      "sha256": "d133500982ec92367c66ccd23694e0ce3c2bebfe7a61f8ae71fa61eaf6b38aaf"
+    }
+  },
+  "declared_plan": {
+    "path": ".runtime/porting/CLK-05/production-plan-03/plan.json",
+    "sha256": "48b1ec7643c7574d3a61a8a847194791f4f1cf0c63b9f2a90f6c348c2ee62665"
+  },
+  "declared_plan_execution": {
+    "path": ".runtime/porting/CLK-05/production-plan-command-03/receipt.json",
+    "sha256": "1ec752d232f756898635f23a409039fb162e3344ad21f9cf1455cf80ee9f0783"
+  },
+  "independent_sources_review": {
+    "path": ".runtime/porting/CLK-05/independent-production-workflow-source-review-01/review.json",
+    "sha256": "ce7d272bbc88d3ab0efeaf80af56765e62ab83491e188ed90ea423d0131c2d70"
+  },
+  "independent_sources_review_execution": {
+    "path": ".runtime/porting/CLK-05/independent-production-workflow-source-review-command-01/receipt.json",
+    "sha256": "01203ce63c69fdac55902f7cca08338d4d7f60af93601e06489082650366c683"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "production_control_inputs": {
+    "path": ".runtime/porting/CLK-05/production-control-capture-01/production-control-inputs.json",
+    "sha256": "b30d5a9be74fd2d9e868715888f94be981e711f3aedb58d913023b2e8a73fdd2"
+  },
+  "executed_launcher": {
+    "path": ".runtime/porting/CLK-05/production-matrix-02/launcher.py",
+    "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961"
+  },
+  "implementation_commit": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+  "crates_tree": "a6d6c49f7576cc9bfaff246fc379a5b197b9bf2a",
+  "cases": [
+    {
+      "case_id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      },
+      "Full": {
+        "started_utc": "2026-10-09T03:47:08.087567+00:00",
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-CLI-build-04\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-matrix-02\\A-24H\\full",
+          "--mode",
+          "compatibility",
+          "--partial",
+          "deny",
+          "--trace-level",
+          "full",
+          "--porting-scope",
+          "a"
+        ],
+        "constructed_inherited_child_ENV": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "actual_parent_ENV_before_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "spawn_error": null,
+        "actual_recorder_exit_code": 0,
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full-command/receipt.json",
+          "sha256": "f155b441dc46f3925dbb2c2b5cf548772bf139b89d17e2d2590e074d4170b386"
+        },
+        "output_directory": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/clk02-weather-production-trace.json",
+            "sha256": "7e11312b7f584f8081ab369e6098944295c8c79e79ff9bf252adaa1f29e7139e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/clk03-weather-day-production-trace.json",
+            "sha256": "1c09b6e044c9bd871c232f26253327c44106b3a984e1139fba1b6b1a0e3c5e8d"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/clock-calls.json",
+            "sha256": "e3822268d3cfe821d02e9b7d283e24b5a2a04c20cb9ed47fbebaaab6494d0ace"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/compiled-geometry.json",
+            "sha256": "53fb10ea4f95f3d1dd00360ff6e18a3560d26b7c5c3ee6ccff4ea2a1029dc096"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/diagnostics.json",
+            "sha256": "4936b8f5582717dbe19e253cc45b54252b3c9a0689d1fddbf5613999fd9aec77"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/eplusrs.err",
+            "sha256": "34ba5df25d7f6b07915f4527e231996a61bef1f00a510e381c6272a23ae7b311"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/geo02-geometry-operands.json",
+            "sha256": "3c8bfec120f35682506af49c157413e8393a342f21c12a8d87ff99437fd1453a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/geo02-geometry.json",
+            "sha256": "9303cd74009e3b0a3f584e2b37520fd8c7e5827e8bbf94c55c32eb2b9ecd5776"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/geo03-zone-volume.json",
+            "sha256": "6bb0545bb66c895eebcf080a9a0f278cf08d709abbd15436ad113e28d3c3ed4b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/geometry-consumers.json",
+            "sha256": "4c4177b9a1ce19390259394919c69875997b65850d574b240da6b252d793982d"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/input/converted.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/input/input-hashes.json",
+            "sha256": "c9259eca6d01d4fd0ffee57bcd05e6ee9a39ebbfb33ac5ca5aca064973057e34"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/input/original.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/input/original.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/logs/source-order-stage-state-snapshots.json",
+            "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/model/execution-plan.json",
+            "sha256": "7ca632ab84962388293d7c1f2f7935bb7e5d5f2d3c344146d2ee63714d38c519"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/porting_scope.json",
+            "sha256": "c22e24c537892979abbf036d27a4169ed618a6d7edbe8126f98e5cde7afea0a8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/psy02-calls.json",
+            "sha256": "91884d3d2d791eb9f541268966831e8b3d97c3f5bd9454538ee2df2036136c2a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/psychrometrics-calls.json",
+            "sha256": "7560e421a841d5452e8589b969b2d8271f70448f1781b2fc6ba77f545a4e2da5"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/results/result-store.json",
+            "sha256": "a7e20a57ae6399ba3947919e51d4dfbe404214db6f28f912f7e47692f84fc3be"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/results/selected-outputs.csv",
+            "sha256": "92497d92c6b0eaabaa50f82b18f433a02ff9e67cc8893c9a5d3f19a23110f95e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/run-summary.json",
+            "sha256": "52c792c9f711b7ad8eb719ec9fc86e19514d1ee6b504d27ca8857a7c26e7525c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/support-assessment.json",
+            "sha256": "f596567ce69683dd9daae372cc7355f92ceef3621fa8ede89d1851a689377ae9"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/full/zon01-initialization.json",
+            "sha256": "b53a0eb555dcbe34c1f238dcb641e5910b9caf9c1380603d1baa910891304a69"
+          }
+        ],
+        "actual_parent_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "prospective_inherited_child_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "finished_utc": "2026-10-09T03:47:44.250377+00:00",
+        "terminated_CLI_process_internal_ENV_observed": false,
+        "external_input_context_preserved": true
+      },
+      "Summary": {
+        "started_utc": "2026-10-09T03:47:44.588987+00:00",
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-CLI-build-04\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-matrix-02\\A-24H\\summary",
+          "--mode",
+          "compatibility",
+          "--partial",
+          "deny",
+          "--trace-level",
+          "summary",
+          "--porting-scope",
+          "a"
+        ],
+        "constructed_inherited_child_ENV": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "actual_parent_ENV_before_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "spawn_error": null,
+        "actual_recorder_exit_code": 0,
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary-command/receipt.json",
+          "sha256": "0f7e2886feb56591f726ee159d5f351eef97fe6b3a8eec8e56c65e2864663e9c"
+        },
+        "output_directory": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/diagnostics.json",
+            "sha256": "56bade8a60dc6947d6fa82215d9661727082ef72718affaee6c3d7258c53a5e6"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/eplusrs.err",
+            "sha256": "527d99d1a0a21390fd0b02fa62c0374628ac25c67d58f9a134ddf7eeeb8177b4"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/input/converted.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/input/input-hashes.json",
+            "sha256": "152971e6a9184cc9ba6505ab562567d74a950d40f859464a5ea99124eeb59dd7"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/input/original.epJSON",
+            "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/input/original.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/model/execution-plan.json",
+            "sha256": "1c79d234cb867ebe9067405d1745df24e99227313502018efe10bf0fda195caa"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/porting_scope.json",
+            "sha256": "c22e24c537892979abbf036d27a4169ed618a6d7edbe8126f98e5cde7afea0a8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/results/result-store.json",
+            "sha256": "a7e20a57ae6399ba3947919e51d4dfbe404214db6f28f912f7e47692f84fc3be"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/results/selected-outputs.csv",
+            "sha256": "92497d92c6b0eaabaa50f82b18f433a02ff9e67cc8893c9a5d3f19a23110f95e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/run-summary.json",
+            "sha256": "245b1dc1009549b8bfb6ef4ed011999dbaac020f7990e4001f054711c6efca24"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/support-assessment.json",
+            "sha256": "0851f26b7143f29c4dab759b91fb6f4fee924295ca0f8968dd8f91ea267d7b9c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-24H/summary/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          }
+        ],
+        "actual_parent_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "prospective_inherited_child_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "finished_utc": "2026-10-09T03:47:57.186437+00:00",
+        "terminated_CLI_process_internal_ENV_observed": false,
+        "external_input_context_preserved": true
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      },
+      "Full": {
+        "started_utc": "2026-10-09T03:47:57.379115+00:00",
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-CLI-build-04\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-matrix-02\\A-72H\\full",
+          "--mode",
+          "compatibility",
+          "--partial",
+          "deny",
+          "--trace-level",
+          "full",
+          "--porting-scope",
+          "a"
+        ],
+        "constructed_inherited_child_ENV": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "actual_parent_ENV_before_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "spawn_error": null,
+        "actual_recorder_exit_code": 0,
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full-command/receipt.json",
+          "sha256": "21078338b735a69e051042ac97a11b3760275be04dd24f2db9ab8903b997986e"
+        },
+        "output_directory": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/clk02-weather-production-trace.json",
+            "sha256": "83daadbb42bbddc8bf47f216daf731b7df09af2e7916d0df645e426143052355"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/clk03-weather-day-production-trace.json",
+            "sha256": "0470fba7ca93265e8fcfeda588a43ab0edefd922565a8ebe82f57c8929aa1e83"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/clock-calls.json",
+            "sha256": "51e6b1467af9cdd666ce6cb1c44aaff3c2bb256250922b08e7c81a059d08d0fb"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/compiled-geometry.json",
+            "sha256": "1280f252948bedc51f098479adf9c951560de426ecc0667b07d3cb6c96556665"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/diagnostics.json",
+            "sha256": "a10c5490217303f30a269be050fd49af85eaaa044d9850b6432610b5e324a519"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/eplusrs.err",
+            "sha256": "2f0a676e6ce49b8ea20ffd4e5e91814b756ad919e628bb51a2b52d65bac0e021"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/geo02-geometry-operands.json",
+            "sha256": "453f9eca554f4fe7eaaf1b0d5e06a028c2fc397bf6484da762417917dbaa4855"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/geo02-geometry.json",
+            "sha256": "8b9fc2ed14c5f562c62c15b30518fb0e954f87ed2f19ad3334e448957eac096c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/geo03-zone-volume.json",
+            "sha256": "6bb0545bb66c895eebcf080a9a0f278cf08d709abbd15436ad113e28d3c3ed4b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/geometry-consumers.json",
+            "sha256": "98662e8d9971b87640c66a9c1efd658beb677fcfab9e1873dd99947ab2ca3b5d"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/input/converted.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/input/input-hashes.json",
+            "sha256": "4c5d2fc3ae025ce50e18bfc27a16425334a28ceec3ee989bee0c0f787ccf6900"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/input/original.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/input/original.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/logs/source-order-stage-state-snapshots.json",
+            "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/model/execution-plan.json",
+            "sha256": "7ca632ab84962388293d7c1f2f7935bb7e5d5f2d3c344146d2ee63714d38c519"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/porting_scope.json",
+            "sha256": "bbfed308053d866a61b2e67bd3d40205934506e9a3d4eaa73c029c70dc94599b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/psy02-calls.json",
+            "sha256": "394b06ef5ad9ac5b857d351083daf4966000d092d0de8d90202eb12bb9a3941e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/psychrometrics-calls.json",
+            "sha256": "c5c9ef425c848e9cac8e53358a133387df2ccaa4c247d55e021e3ad23912d7e9"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/results/result-store.json",
+            "sha256": "509d427ce49f40487428ef217c65b6ec4141e32b63c0c868fc09e15f14cd13f5"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/results/selected-outputs.csv",
+            "sha256": "7ca27c02a578619a24d15dd2f0147deb5b5e7040705249ecff83c6c394292324"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/run-summary.json",
+            "sha256": "ee424f3785e19e430b002f753f10a1fd388105750e5679c3cc2ed20157b59452"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/support-assessment.json",
+            "sha256": "f596567ce69683dd9daae372cc7355f92ceef3621fa8ede89d1851a689377ae9"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/full/zon01-initialization.json",
+            "sha256": "15deacdf2473dfd637c6e4d8e3bd6469f770f0b730f96d25ec4caba3b24cc952"
+          }
+        ],
+        "actual_parent_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "prospective_inherited_child_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "finished_utc": "2026-10-09T03:49:18.244108+00:00",
+        "terminated_CLI_process_internal_ENV_observed": false,
+        "external_input_context_preserved": true
+      },
+      "Summary": {
+        "started_utc": "2026-10-09T03:49:18.856098+00:00",
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-CLI-build-04\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-72H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-matrix-02\\A-72H\\summary",
+          "--mode",
+          "compatibility",
+          "--partial",
+          "deny",
+          "--trace-level",
+          "summary",
+          "--porting-scope",
+          "a"
+        ],
+        "constructed_inherited_child_ENV": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "actual_parent_ENV_before_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "spawn_error": null,
+        "actual_recorder_exit_code": 0,
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary-command/receipt.json",
+          "sha256": "b81c86ddf3856af4e956b3e9016826a027e74f71552571e0d6141629859b20d4"
+        },
+        "output_directory": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/diagnostics.json",
+            "sha256": "62382ce3d9152a87f15669582bbdba0693ada21a96c5580c81abc935acf93d8e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/eplusrs.err",
+            "sha256": "e81cc0845aaba5c3555cb5558f4b874cba4d9d93928bfd38803d503a3aa9a2f6"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/input/converted.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/input/input-hashes.json",
+            "sha256": "13c579537f509263682f1e88566b6cdd7f5f4a999517e6dee358676a5f9c7f59"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/input/original.epJSON",
+            "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/input/original.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/model/execution-plan.json",
+            "sha256": "1c79d234cb867ebe9067405d1745df24e99227313502018efe10bf0fda195caa"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/model/graph-summary.json",
+            "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/model/raw-model-summary.json",
+            "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/model/typed-model-summary.json",
+            "sha256": "b7e97e84171de45a37f389b8253fd3479b8a610e1d2d1b45365f0920fa759ed8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/porting_scope.json",
+            "sha256": "bbfed308053d866a61b2e67bd3d40205934506e9a3d4eaa73c029c70dc94599b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/reports/compatibility-boundary.md",
+            "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/reports/run-report.md",
+            "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/results/result-store.json",
+            "sha256": "509d427ce49f40487428ef217c65b6ec4141e32b63c0c868fc09e15f14cd13f5"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/results/selected-outputs.csv",
+            "sha256": "7ca27c02a578619a24d15dd2f0147deb5b5e7040705249ecff83c6c394292324"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/run-summary.json",
+            "sha256": "b8c22f90e50a85f094d6c1b716956d70bdada6b7e3be730cd72e7bd27418ed01"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/support-assessment.json",
+            "sha256": "0851f26b7143f29c4dab759b91fb6f4fee924295ca0f8968dd8f91ea267d7b9c"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/A-72H/summary/support-report.md",
+            "sha256": "798686d2f4683ec2bd15f922c66d68907cbdb3e71119c693a3b726b3f59a01ab"
+          }
+        ],
+        "actual_parent_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "prospective_inherited_child_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "finished_utc": "2026-10-09T03:49:31.096262+00:00",
+        "terminated_CLI_process_internal_ENV_observed": false,
+        "external_input_context_preserved": true
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      },
+      "Full": {
+        "started_utc": "2026-10-09T03:49:31.286029+00:00",
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-CLI-build-04\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-matrix-02\\B-BOTH-24H\\full",
+          "--mode",
+          "compatibility",
+          "--partial",
+          "deny",
+          "--trace-level",
+          "full",
+          "--porting-scope",
+          "b"
+        ],
+        "constructed_inherited_child_ENV": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "actual_parent_ENV_before_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "spawn_error": null,
+        "actual_recorder_exit_code": 0,
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full-command/receipt.json",
+          "sha256": "7cff85ef5a4348817febb8ec29a9ec45eac2902a4781852967f168cc7754c299"
+        },
+        "output_directory": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/clk02-weather-production-trace.json",
+            "sha256": "7e11312b7f584f8081ab369e6098944295c8c79e79ff9bf252adaa1f29e7139e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/clk03-weather-day-production-trace.json",
+            "sha256": "d46a2d4e41b9c0069e4d69081171c00ec523a39137ff3c1989ac55f91c5f9a13"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/clock-calls.json",
+            "sha256": "1324209cdceca3ec6c1762869ab2c17b229ba11ecf55e78b93a37f85a696650a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/compiled-geometry.json",
+            "sha256": "8cea8f0b0e077c8bef11807752d9750bc5c25d250a4e77a23196880c7a55d8d2"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/diagnostics.json",
+            "sha256": "059de5c4c37e455c8ad469665e5035fd1f01c08e6b590427bea3d956740d7e46"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/eplusrs.err",
+            "sha256": "011a9d8de9f046ef75e7e76dd68edf0068384fab927a725054fffb4ca18acc88"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/geo02-geometry-operands.json",
+            "sha256": "24d9bbcebcf4aeb81da006a4a05358a6841ffe0e6a07c30015982158402da3c5"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/geo02-geometry.json",
+            "sha256": "30f4b54678a2f972bcab9140628fbc00a2cfc60fb99a8dcccbb58446ebbc53d7"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/geo03-zone-volume.json",
+            "sha256": "5dc2c30d6072766bb97b9c3e69421d2cd37a4cc4097854d91443b2b6d17878af"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/geometry-consumers.json",
+            "sha256": "609fbce8359b00eb0cb30d53609e6b3dc8744a5c9536e387d78a84fe45343524"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/input/converted.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/input/input-hashes.json",
+            "sha256": "928edc1e73fc663415751a43774169d33918d2182563370f9f56bd9552fe2db0"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/input/original.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/input/original.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/logs/source-order-stage-state-snapshots.json",
+            "sha256": "daebe9bde2d889f52e0ed722483ad968b1d9b62c62554bce4fc6ea957c610beb"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/model/execution-plan.json",
+            "sha256": "70ca026a2af871e72dea0fccb6ba9054efb60e3cdc6b7ba60387a528be38d358"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/model/graph-summary.json",
+            "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/model/raw-model-summary.json",
+            "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/model/typed-model-summary.json",
+            "sha256": "adc67bb7fb889a7ac644864309af9beef2e5a6209af454a14576bbf2c04e385a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/porting_scope.json",
+            "sha256": "6c70446d6fb5ecfce4d468dd67d3aba59e5d1835c759cceebdc6f8c362284c86"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/psy02-calls.json",
+            "sha256": "af34a2872efd2eea38ce627fed0d49089b0a4a2b50484916ee6bd509675f3164"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/psychrometrics-calls.json",
+            "sha256": "db526c07679e4d1dd1287e2754ad3bdfb0f4c364f25547eef9cf1b0e84fbf564"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/reports/compatibility-boundary.md",
+            "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/reports/run-report.md",
+            "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/results/result-store.json",
+            "sha256": "fe1ac8d865b0c21cf385ea2747c7ffd905bed24e0cc9447bc921d758c540ea6e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/results/selected-outputs.csv",
+            "sha256": "8e818151cc8eb10aff92a7da0615ae7c958328df0acfe8eec09130d7c15fcad4"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/run-summary.json",
+            "sha256": "e63f51fd91080af66718cfe8f0bb86fb82960176d2e4332866c21be01369ef8f"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/support-assessment.json",
+            "sha256": "ba0685d062b0b41dd4c21bdd7ed6ee1e15417551913806a694b80b243317895b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/support-report.md",
+            "sha256": "1f6f0c0be130066f73fba39d7682cfb7d7d3b08b6abf5d7ea248387b4eac21f8"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/full/zon01-initialization.json",
+            "sha256": "f23542259fb2fb65076c4c8bcb0d8711e93659d26d5995db58abe5d515dfc244"
+          }
+        ],
+        "actual_parent_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "prospective_inherited_child_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "finished_utc": "2026-10-09T03:52:41.079949+00:00",
+        "terminated_CLI_process_internal_ENV_observed": false,
+        "external_input_context_preserved": true
+      },
+      "Summary": {
+        "started_utc": "2026-10-09T03:52:41.505058+00:00",
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-CLI-build-04\\eplus-rs.exe",
+          "run",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf",
+          "--weather",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+          "--output-dir",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\production-matrix-02\\B-BOTH-24H\\summary",
+          "--mode",
+          "compatibility",
+          "--partial",
+          "deny",
+          "--trace-level",
+          "summary",
+          "--porting-scope",
+          "b"
+        ],
+        "constructed_inherited_child_ENV": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "actual_parent_ENV_before_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "spawn_error": null,
+        "actual_recorder_exit_code": 0,
+        "command_receipt": {
+          "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary-command/receipt.json",
+          "sha256": "e65f14852da1eb40ffa3e0fb7169a11c4f73b563e262ccaff4c704c9a3eb1a4a"
+        },
+        "output_directory": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary",
+        "artifacts": [
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/diagnostics.json",
+            "sha256": "239c9c1124118b09e10971072c435d52a3069c4e4015b8b1b37421372b33a4bf"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/eplusrs.err",
+            "sha256": "6370b08de1ae636892a9e13fee5f31e5d0ec9eef6f3d3670c417438e4c7d1972"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/input/converted.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/input/input-hashes.json",
+            "sha256": "52ced0f51d9d7510ff4e599da7c48eb007ce13b849b99c9b76dd6fa530b6edc6"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/input/original.epJSON",
+            "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/input/original.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/logs/command.log",
+            "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/model/execution-plan.json",
+            "sha256": "7d93e096cfb8e3f21369a54da4888e5d4ee73059225131fbe0b3b11722ad6e81"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/model/graph-summary.json",
+            "sha256": "403527743bf7636bfcb0a70021b5747fe1af240da42fbe7fa988f30fab0a0e2d"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/model/raw-model-summary.json",
+            "sha256": "3cf2657f0b43d17124bf86c95623a224a8846eaf0b299ba6e65151f0b790f414"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/model/typed-model-summary.json",
+            "sha256": "adc67bb7fb889a7ac644864309af9beef2e5a6209af454a14576bbf2c04e385a"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/porting_scope.json",
+            "sha256": "6c70446d6fb5ecfce4d468dd67d3aba59e5d1835c759cceebdc6f8c362284c86"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/reports/compatibility-boundary.md",
+            "sha256": "db51610781d728d181cac653b2f6020287646537f762a48e005ab9fb4a9fb354"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/reports/run-report.md",
+            "sha256": "4d1152db0ff915d61fda48351e8b81e0328e2e9748b019d9abb991527c44318b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/results/meters.csv",
+            "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/results/result-store.json",
+            "sha256": "fe1ac8d865b0c21cf385ea2747c7ffd905bed24e0cc9447bc921d758c540ea6e"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/results/selected-outputs.csv",
+            "sha256": "8e818151cc8eb10aff92a7da0615ae7c958328df0acfe8eec09130d7c15fcad4"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/run-summary.json",
+            "sha256": "43a55b9a0f912089310e3c0104f1d51c0b55e32c2ff8420a1498304a1321e34d"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/support-assessment.json",
+            "sha256": "4d5c90d5ff4e188fb8d32c1058969c31882abf78455446aaeb9058b28231cc32"
+          },
+          {
+            "path": ".runtime/porting/CLK-05/production-matrix-02/B-BOTH-24H/summary/support-report.md",
+            "sha256": "1f6f0c0be130066f73fba39d7682cfb7d7d3b08b6abf5d7ea248387b4eac21f8"
+          }
+        ],
+        "actual_parent_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "prospective_inherited_child_ENV_after_child": {
+          "IgnoreSolarRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreBeamRadiation": {
+            "present": false,
+            "raw_value": ""
+          },
+          "IgnoreDiffuseRadiation": {
+            "present": false,
+            "raw_value": ""
+          }
+        },
+        "finished_utc": "2026-10-09T03:54:33.721697+00:00",
+        "terminated_CLI_process_internal_ENV_observed": false,
+        "external_input_context_preserved": true
+      }
+    }
+  ],
+  "actual_command_count": 6,
+  "complete": true,
+  "native_engine_executed": false,
+  "original_outputs_supplied_to_Rust": false,
+  "scientific_comparison_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "all_bound_inputs_unchanged": true,
+  "finished_utc": "2026-10-09T03:54:33.914408+00:00"
+}

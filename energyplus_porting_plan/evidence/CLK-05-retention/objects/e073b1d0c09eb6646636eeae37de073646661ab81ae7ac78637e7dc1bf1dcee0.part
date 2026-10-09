@@ -1,0 +1,388 @@
+{
+  "schema": "native-new-target-removal-receipt.v1",
+  "target": "clk05_reference_helper",
+  "action_started_utc": "2026-10-09T05:04:49.095916+00:00",
+  "action_completed_utc": "2026-10-09T05:04:51.724621+00:00",
+  "historical_original": {
+    "historical_path": ".runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe",
+    "sha256": "b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc",
+    "size_bytes": 1296986812
+  },
+  "resolved_target": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\clk05_reference_helper.exe",
+  "resolved_products_directory": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products",
+  "actual_native_command": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\retirement-01\\remove-clk05_reference_helper.ps1"
+  ],
+  "executed_script": {
+    "path": ".runtime/porting/CLK-05/retirement-01/remove-clk05_reference_helper.ps1",
+    "sha256": "aed5ef7da3101057244b94b39a299713f5e39cb5614c885378721711dcbc7133"
+  },
+  "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "actual_command_exit_code": 0,
+  "spawn_error": null,
+  "stdout": {
+    "path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-stdout.log",
+    "sha256": "40d4f215d83904febc60f8f567ac8dc4e29fde9386681b1f9931648e96ce8e2c"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "actual_original_absence": true,
+  "retained_derivative": {
+    "path": ".runtime/porting/CLK-05/native-build-01/derivation/derived-helper.exe",
+    "sha256": "132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217",
+    "size_bytes": 150455372
+  },
+  "protected_before": [
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/clk01_reference.exe",
+        "sha256": "ace586a027c4e9a7fc69a30fda2f300d1b53cba37241d2e899a125f24193243a"
+      },
+      "size_bytes": 1295075960
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo01_reference.exe",
+        "sha256": "17326cef0a4031f4b8bcec74a0c28fd5bdfd50d411f6f13ac79170e838793525"
+      },
+      "size_bytes": 10461347
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference.exe",
+        "sha256": "c156d4f9ade6513a62cca3de914a284393747bc3f473c42d3ac2e4d9c9798376"
+      },
+      "size_bytes": 10725212
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference_helper.exe",
+        "sha256": "c4b6f40a63c74edbde5ef75f86f3ca7dc6f4c7a767092eea0118189379f8fbed"
+      },
+      "size_bytes": 1296114664
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference.exe",
+        "sha256": "4e4bcf739a9f8d060c8490b73460f287ba4c01de1670afbd31040cc06a850cb5"
+      },
+      "size_bytes": 10670219
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference_helper.exe",
+        "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95"
+      },
+      "size_bytes": 1297356300
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reachability.exe",
+        "sha256": "a22c1f764d8e5e65d4a5af1fdc1787ad318ba9fa0cef218b32789a9ea7e29320"
+      },
+      "size_bytes": 8073860
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference.exe",
+        "sha256": "fa26b9313975bfbb974aa5e3ee0722e1a8bb247436e0a3bd42bd5abbe814b400"
+      },
+      "size_bytes": 1293674975
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference_replay.exe",
+        "sha256": "5e5731a185cc6aa70b9597864c0a3033cd21f66f03e8ea27d5427843ec3e6f72"
+      },
+      "size_bytes": 1293675487
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference.exe",
+        "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+      },
+      "size_bytes": 9941020
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+        "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+      },
+      "size_bytes": 1296118832
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694"
+      },
+      "size_bytes": 1832731010
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+        "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33"
+      },
+      "size_bytes": 1305150896
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libobjexx.a",
+        "sha256": "578c18d523cb1fed2d377c60eb79b4e1e27bdea66da172c91d9a018010a7968c"
+      },
+      "size_bytes": 1752352
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-02/native-build-01/derivation/derived-helper.exe",
+        "sha256": "e41e8daf807dafed76ba61fc94637cedfb6f2d6cf9bb6cfbb7b3ab24a1fd9447"
+      },
+      "size_bytes": 149804630
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-03/derivation/derived-helper.exe",
+        "sha256": "b6890f2a1fac5f485a0d8c75ef99c9949094cd5680ab40226f8077a3a89690e2"
+      },
+      "size_bytes": 150145144
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/matched-native-build-01/derivation/derived-helper.exe",
+        "sha256": "3100aba0fce1e09438d61e8647ef6c2ad90dec2196e051094087ab2576da03f6"
+      },
+      "size_bytes": 150396414
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/retained-failed-original/clk03_reference_helper.exe",
+        "sha256": "1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3"
+      },
+      "size_bytes": 1296271028
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/derivation/derived-helper.exe",
+        "sha256": "4ca6866f0e6558a2fcbaf425e95ff7907f8a6e9d7740f3e82f73d6aa54929854"
+      },
+      "size_bytes": 150101996
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+        "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+      },
+      "size_bytes": 150539944
+    },
+    {
+      "role": "CLK05-accepted-retained-derivative",
+      "binary": {
+        "path": ".runtime/porting/CLK-05/native-build-01/derivation/derived-helper.exe",
+        "sha256": "132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217"
+      },
+      "size_bytes": 150455372
+    }
+  ],
+  "protected_after": [
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/clk01_reference.exe",
+        "sha256": "ace586a027c4e9a7fc69a30fda2f300d1b53cba37241d2e899a125f24193243a"
+      },
+      "size_bytes": 1295075960
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo01_reference.exe",
+        "sha256": "17326cef0a4031f4b8bcec74a0c28fd5bdfd50d411f6f13ac79170e838793525"
+      },
+      "size_bytes": 10461347
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference.exe",
+        "sha256": "c156d4f9ade6513a62cca3de914a284393747bc3f473c42d3ac2e4d9c9798376"
+      },
+      "size_bytes": 10725212
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference_helper.exe",
+        "sha256": "c4b6f40a63c74edbde5ef75f86f3ca7dc6f4c7a767092eea0118189379f8fbed"
+      },
+      "size_bytes": 1296114664
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference.exe",
+        "sha256": "4e4bcf739a9f8d060c8490b73460f287ba4c01de1670afbd31040cc06a850cb5"
+      },
+      "size_bytes": 10670219
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference_helper.exe",
+        "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95"
+      },
+      "size_bytes": 1297356300
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reachability.exe",
+        "sha256": "a22c1f764d8e5e65d4a5af1fdc1787ad318ba9fa0cef218b32789a9ea7e29320"
+      },
+      "size_bytes": 8073860
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference.exe",
+        "sha256": "fa26b9313975bfbb974aa5e3ee0722e1a8bb247436e0a3bd42bd5abbe814b400"
+      },
+      "size_bytes": 1293674975
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference_replay.exe",
+        "sha256": "5e5731a185cc6aa70b9597864c0a3033cd21f66f03e8ea27d5427843ec3e6f72"
+      },
+      "size_bytes": 1293675487
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference.exe",
+        "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+      },
+      "size_bytes": 9941020
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+        "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+      },
+      "size_bytes": 1296118832
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694"
+      },
+      "size_bytes": 1832731010
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+        "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33"
+      },
+      "size_bytes": 1305150896
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libobjexx.a",
+        "sha256": "578c18d523cb1fed2d377c60eb79b4e1e27bdea66da172c91d9a018010a7968c"
+      },
+      "size_bytes": 1752352
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-02/native-build-01/derivation/derived-helper.exe",
+        "sha256": "e41e8daf807dafed76ba61fc94637cedfb6f2d6cf9bb6cfbb7b3ab24a1fd9447"
+      },
+      "size_bytes": 149804630
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-03/derivation/derived-helper.exe",
+        "sha256": "b6890f2a1fac5f485a0d8c75ef99c9949094cd5680ab40226f8077a3a89690e2"
+      },
+      "size_bytes": 150145144
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/matched-native-build-01/derivation/derived-helper.exe",
+        "sha256": "3100aba0fce1e09438d61e8647ef6c2ad90dec2196e051094087ab2576da03f6"
+      },
+      "size_bytes": 150396414
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/retained-failed-original/clk03_reference_helper.exe",
+        "sha256": "1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3"
+      },
+      "size_bytes": 1296271028
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/derivation/derived-helper.exe",
+        "sha256": "4ca6866f0e6558a2fcbaf425e95ff7907f8a6e9d7740f3e82f73d6aa54929854"
+      },
+      "size_bytes": 150101996
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+        "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+      },
+      "size_bytes": 150539944
+    },
+    {
+      "role": "CLK05-accepted-retained-derivative",
+      "binary": {
+        "path": ".runtime/porting/CLK-05/native-build-01/derivation/derived-helper.exe",
+        "sha256": "132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217"
+      },
+      "size_bytes": 150455372
+    }
+  ],
+  "preservation_guard_failure": null,
+  "prior_metadata_bytes_unchanged": true,
+  "actual_retirement_accepted": true,
+  "realized_removed_bytes": 1296986812,
+  "no_full_debug_copy_created": true,
+  "engines_or_scientific_comparers_executed": false
+}

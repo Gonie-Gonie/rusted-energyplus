@@ -1,0 +1,13 @@
+    bool SunIsUp = false;                         // True when Sun is over horizon, False when not
+    bool SunIsUpPrevTS = false;                   // True when Sun is over horizon in the previous timestep, False when not in the previous timestep
+    bool PreviousSolRadPositive = false; // True when Sun is over horizon at the previous timestep, and BeamSolarRad + GndSolarRad + DifSolarRad > 0.0
+    Real64 WindDir = 0.0;                // Current outdoor air wind direction
+    bool EMSWindDirOverrideOn = false;   // EMS flag for outdoor air wind direction
+    Real64 EMSWindDirOverrideValue = 0.0;                       // EMS override value for outdoor air wind direction
+    Real64 WindSpeed = 0.0;                                     // Current outdoor air wind speed
+    bool EMSWindSpeedOverrideOn = false;                        // EMS flag for outdoor air wind speed
+    Real64 EMSWindSpeedOverrideValue = 0.0;                     // EMS override value for outdoor air wind speed
+    Real64 WaterMainsTemp = 0.0;                                // Current water mains temperature
+    int Year = 0;                                               // Current calendar year of the simulation from the weather file
+    int YearTomorrow = 0;                                       // Tomorrow's calendar year of the simulation
+    Vector3<Real64> SOLCOS = {0.0, 0.0, 0.0};                   // Solar direction cosines at current time step

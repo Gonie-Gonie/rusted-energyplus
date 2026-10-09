@@ -1,0 +1,69 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\candidate-observer-build-03\\clk05_candidate_probe.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CLK-05\\candidate-observer-input-02\\observer-request.json"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-09T03:31:41.429432+00:00",
+  "finished_utc": "2026-10-09T03:32:59.055272+00:00",
+  "elapsed_seconds": 77.62593740000011,
+  "repository_before": {
+    "head": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/11/1179442835e8b0de58e4cbb6992c00950042a0ca82c30f9e7818889c22e9b8ab",
+    "sha256": "1179442835e8b0de58e4cbb6992c00950042a0ca82c30f9e7818889c22e9b8ab"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CLK-05/candidate-observer-execution-command-03/stdout.log",
+    "sha256": "d8ab4fa757f74efd01a96e9d044af6f4377bf27f640db6f06155572292694baa"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-05/candidate-observer-execution-command-03/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-09T03:32:59.055272+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

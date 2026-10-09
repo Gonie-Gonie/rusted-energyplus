@@ -1,0 +1,76 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "-j",
+    "2",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 101,
+  "launch_error": null,
+  "started_utc": "2026-10-09T04:13:14.619592+00:00",
+  "finished_utc": "2026-10-09T04:14:40.411743+00:00",
+  "elapsed_seconds": 85.79198110000289,
+  "repository_before": {
+    "head": "0a1ca3f552936d9c976f24a41ede107bc67b2aa1",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "0a1ca3f552936d9c976f24a41ede107bc67b2aa1",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/aa/aafb08fe69e928bda15044d40c8f958c3837bc73d26fd74eb4f80e82b944d16b",
+    "sha256": "aafb08fe69e928bda15044d40c8f958c3837bc73d26fd74eb4f80e82b944d16b"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CLK-05/final-clippy-command-01/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CLK-05/final-clippy-command-01/stderr.log",
+    "sha256": "a6eced5278206dee630af20cf3e3e8218390e7d59c8164a7d1c738e9b64b9f23"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-09T04:14:40.411743+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

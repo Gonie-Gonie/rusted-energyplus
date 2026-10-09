@@ -1,0 +1,80 @@
+{
+  "schema": "clk05-metadata-card-closure.v1",
+  "completed_utc": "2026-10-09T04:46:11.882771+00:00",
+  "before": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "6ecc1bccf94c10fcf21ba90e3c0bf904a1ccfb371947e62d6acd60732f7c16e5"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-05.md",
+      "sha256": "8a2045fefb9342bf67a59d143b2f30bd0f2f88f72119e7592e640f3c946f3466"
+    }
+  ],
+  "previously_absent_evidence": "energyplus_porting_plan/evidence/CLK-05.json",
+  "after": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-05.md",
+      "sha256": "8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CLK-05.json",
+      "sha256": "faf2e50516145ebec3060c245fc217a6b5c181c48b9ec986f2d04cd68999c8ef"
+    }
+  ],
+  "only_CLK05_gates_updated": true,
+  "other_63_tasks_unchanged": true,
+  "all_four_actual_gates": "통과",
+  "executed_writer_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/closure-prep-02/close_card.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/closure-01/close_card.py",
+        "sha256": "010c6598b3de0b7e71a23d1dcb42fc5eae393b9f81b58158db08763cf17f44a0"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/closure-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/closure-01/common.py",
+        "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/completion-approved-01/closure-bindings.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/closure-01/closure-bindings.json",
+        "sha256": "cf774f5975522fdb1d7c539c6a92d29f28341e469713583e8595f5ddd5ca26a0"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/completion-approved-01/source-mapping.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/closure-01/source-mapping.json",
+        "sha256": "714de0056af197c753f8f881feae004abaa0e74e691b0003328353716d67821b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/completion-approved-01/card-notes.md",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/closure-01/card-notes.md",
+        "sha256": "0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23"
+      }
+    }
+  ],
+  "actual_quality_lineage": {
+    "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+    "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+  },
+  "actual_archive": {
+    "path": "energyplus_porting_plan/evidence/CLK-05-archive/archive.json",
+    "sha256": "6ac6759f3801dcefebcc71400cddb875ca0bcf895c467e2b1c4e3abe0f1c9b5d"
+  },
+  "scientific_comparer_or_engine_Cargo_Git_executed": false,
+  "HTML_or_other_views_synchronized": false,
+  "native_retirement_admitted_or_performed": false
+}

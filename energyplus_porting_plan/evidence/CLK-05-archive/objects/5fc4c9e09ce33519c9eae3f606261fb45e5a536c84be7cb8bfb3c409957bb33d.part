@@ -1,0 +1,149 @@
+{
+  "schema": "clk05-proposed-observer-format-plan.v1",
+  "status": "source-only-selected-format-scope",
+  "scientific_build": {
+    "path": ".runtime/porting/CLK-05/candidate-observer-build-03/build-receipt.json",
+    "sha256": "639a47b5555c2038d80957fd14d8dc3f67f4813a147719426f5ab5197fe63910"
+  },
+  "scientific_source_snapshot": {
+    "path": ".runtime/porting/source-objects/11/1179442835e8b0de58e4cbb6992c00950042a0ca82c30f9e7818889c22e9b8ab",
+    "sha256": "1179442835e8b0de58e4cbb6992c00950042a0ca82c30f9e7818889c22e9b8ab"
+  },
+  "historical_scientific_head": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+  "historical_scientific_crates_tree": "a6d6c49f7576cc9bfaff246fc379a5b197b9bf2a",
+  "complete_source_config_count": 3744,
+  "available_Rust_source_count": 3731,
+  "observer_files": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/11/112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485",
+        "sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/dc/dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a",
+        "sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/62/62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+        "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/b1/b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98",
+        "sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/84/846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070",
+        "sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_observer.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/7f/7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d",
+        "sha256": "7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/20/204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed",
+        "sha256": "204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/inputs.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/62/62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+        "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/observe.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/f2/f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f",
+        "sha256": "f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/seeds.rs",
+      "scientific_before": {
+        "path": ".runtime/porting/source-objects/e3/e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727",
+        "sha256": "e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727"
+      }
+    }
+  ],
+  "immutable_math_control_trace_paths": [
+    "crates/ep_runtime/src/weather_day/context.rs",
+    "crates/ep_runtime/src/weather_day/hourly.rs",
+    "crates/ep_runtime/src/weather_day/mod.rs",
+    "crates/ep_runtime/src/weather_day/producer.rs",
+    "crates/ep_runtime/src/weather_day/producer_tests.rs",
+    "crates/ep_runtime/src/weather_day/production.rs",
+    "crates/ep_runtime/src/weather_day/solar.rs",
+    "crates/ep_runtime/src/weather_day/solar_tests.rs",
+    "crates/ep_runtime/src/weather_day/tests.rs",
+    "crates/ep_runtime/src/weather_day/configuration.rs",
+    "crates/ep_runtime/src/weather_day/lifecycle.rs",
+    "crates/ep_run/src/weather_solar_controls.rs",
+    "crates/ep_run/src/lib.rs",
+    "crates/ep_run/src/pipeline.rs",
+    "crates/ep_run/src/clk03_trace.rs"
+  ],
+  "format_command": [
+    "rustfmt",
+    "--edition",
+    "2024",
+    "--config",
+    "skip_children=true",
+    "crates/ep_runtime/examples/clk05_existing_observer.rs",
+    "crates/ep_runtime/examples/clk05_existing_support/inputs.rs",
+    "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+    "crates/ep_runtime/examples/clk05_existing_support/observe.rs",
+    "crates/ep_runtime/examples/clk05_existing_support/seeds.rs",
+    "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+    "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+    "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+    "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+    "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs"
+  ],
+  "actual_production_report": {
+    "path": ".runtime/porting/CLK-05/production-comparison-02/production-comparison.json",
+    "sha256": "882ecb56871a64841ae17c41cb15c3f72a42c8fc2c1ab3a18e05d2a0488fd24a"
+  },
+  "actual_production_execution": {
+    "path": ".runtime/porting/CLK-05/production-comparison-command-02/receipt.json",
+    "sha256": "9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734"
+  },
+  "actual_production_data_review_required_before_formatting": true,
+  "permitted_changed_paths_are_subset_of_observer_files": true,
+  "format_only": true,
+  "source_normalization_outside_observers_allowed": false,
+  "mathematical_functions_or_production_modules_changed": false,
+  "canonical_files_written": false,
+  "final_quality_claimed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "inventory_scope": "Actual available Rust/Cargo/config source bytes from recorded scientific build; this is not a list of files compiled into the executable.",
+  "future_receipt_scope": "Direct canonical formatter may truthfully record source_bytes_match_before_and_after=false; final read-only quality checks require clean before/after, unchanged source, and one common final HEAD/snapshot.",
+  "scope_document_created_utc": "2026-10-09T04:09:24.155102+00:00",
+  "scope_document_authored_after_actual_formatter_started": true,
+  "frozen_before_actual_formatter_claimed": false,
+  "source_author_executed_formatter": false,
+  "formatting_receipt_observed_for_argument_order": {
+    "path": ".runtime/porting/CLK-05/observer-format-command-01/receipt.json",
+    "sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc"
+  }
+}

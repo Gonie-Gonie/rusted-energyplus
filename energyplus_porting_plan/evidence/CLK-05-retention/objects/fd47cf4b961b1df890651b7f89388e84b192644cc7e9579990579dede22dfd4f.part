@@ -1,0 +1,44 @@
+{
+  "schema": "clk05-documentation-encoding-amendment.v1",
+  "before": {
+    "path": "energyplus_porting_plan/cards/CLK-05.md",
+    "sha256": "8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544"
+  },
+  "after": {
+    "path": "energyplus_porting_plan/cards/CLK-05.md",
+    "sha256": "ee41119985976bac5e184fb34729480092ebb439bb5d0daea716dae499500a50"
+  },
+  "actual_prior_closure": {
+    "path": ".runtime/porting/CLK-05/closure-01/closure-result.json",
+    "sha256": "1a87c229c2b427432401580f5ad35747d0acf93f3d78617aa91e11676bff70ce"
+  },
+  "actual_prior_retirement": {
+    "path": ".runtime/porting/CLK-05/retirement-01/retirement.json",
+    "sha256": "c3304ededb906298ff85adffebc6c86b78747bfa6bc004ffce00f6d5010a5a3b"
+  },
+  "actual_prior_retirement_execution": {
+    "path": ".runtime/porting/CLK-05/retirement-command-01/receipt.json",
+    "sha256": "f1eeb6c3458bdd6488cb1a0f61d581f91e8c8537a3a09408c422e372f8fba912"
+  },
+  "only_card_explanatory_notes_changed": true,
+  "gates_or_science_changed": false,
+  "historical_notes_and_archives_rewritten": false,
+  "sources": [
+    {
+      "path": ".runtime/porting/CLK-05/documentation-amendment-01/amend_notes.py",
+      "sha256": "bca7d4dcddf611de3b946cca2cda853dd16c65c555bd83d2d405167281ad183c"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/documentation-amendment-01/additional-notes.md",
+      "sha256": "4bea18536154a7315de8ccf1f7e651e1733684fdf1d271681ab12d7a99c49c2e"
+    }
+  ],
+  "before_archive": {
+    "path": ".runtime/porting/CLK-05/documentation-amendment-01/card.before.md",
+    "sha256": "8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544"
+  },
+  "after_archive": {
+    "path": ".runtime/porting/CLK-05/documentation-amendment-01/card.after.md",
+    "sha256": "ee41119985976bac5e184fb34729480092ebb439bb5d0daea716dae499500a50"
+  }
+}

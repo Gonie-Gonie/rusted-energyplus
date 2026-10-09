@@ -1,0 +1,49 @@
+{
+  "schema": "clk05-root-passive-observer-clippy-cleanup.v1",
+  "status": "actual-two-passive-selected-functions-source-ready",
+  "recorded_utc": "2026-10-09T04:24:29.257695+00:00",
+  "files": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/0-fields.before.rs",
+        "sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781"
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/0-fields.after.rs",
+        "sha256": "b6effce5951730de90e7109726ea0bf8e3b5364773826560ea08a66ad326e5ec"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/0-fields.diff",
+        "sha256": "5e72e154f6e8c945fab1949cbbd6d7aa00bcb7149f821868a63ea01d76ea4a59"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "before": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/1-fields.before.rs",
+        "sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865"
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/1-fields.after.rs",
+        "sha256": "3da29493dbd731541bd2393a1ca86e765f54d62354f97b6264df47a6e847ec54"
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/1-fields.diff",
+        "sha256": "4e39e0c15d8f8bf5785630663e8e411906f9e03b2cc1b94caf748cb587ade844"
+      }
+    }
+  ],
+  "literal_before": "fn selected(state: &WeatherDayState) -> Value {\n    if let (Ok(hour), Ok(step)) = (\n        usize::try_from(state.global.hour_of_day),\n        usize::try_from(state.global.time_step),\n    ) {\n        if let Ok(values) = state.today_values.hour(hour) {\n            if let Some(value) = step.checked_sub(1).and_then(|i| values.get(i)) {\n                return json!({\"hour\":hour,\"time_step\":step,\"value\":{\n                    \"BeamSolarRad\":raw_dto::scalar(value.beam_solar_rad),\n                    \"DifSolarRad\":raw_dto::scalar(value.dif_solar_rad)}});\n            }\n        }\n    }\n    Value::Null\n}",
+  "literal_after": "fn selected(state: &WeatherDayState) -> Value {\n    if let (Ok(hour), Ok(step)) = (\n        usize::try_from(state.global.hour_of_day),\n        usize::try_from(state.global.time_step),\n    ) && let Ok(values) = state.today_values.hour(hour)\n        && let Some(value) = step.checked_sub(1).and_then(|i| values.get(i))\n    {\n        return json!({\"hour\":hour,\"time_step\":step,\"value\":{\n            \"BeamSolarRad\":raw_dto::scalar(value.beam_solar_rad),\n            \"DifSolarRad\":raw_dto::scalar(value.dif_solar_rad)}});\n    }\n    Value::Null\n}",
+  "literal_replacement_count_per_file": 1,
+  "preserved_failed_clippy": {
+    "path": ".runtime/porting/CLK-05/final-clippy-command-02/receipt.json",
+    "sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e"
+  },
+  "production_math_changed": false,
+  "state_write_added": false,
+  "observation_fields_changed": false,
+  "evaluation_order_changed": false,
+  "gates_updated": false
+}

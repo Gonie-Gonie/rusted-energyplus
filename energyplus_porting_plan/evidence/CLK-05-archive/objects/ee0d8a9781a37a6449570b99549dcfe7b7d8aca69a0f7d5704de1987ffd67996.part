@@ -1,0 +1,332 @@
+{
+  "schema": "clk05-candidate-observer-projection.v1",
+  "created_utc": "2026-10-08T17:02:20.349349+00:00",
+  "native_request": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+    "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+    "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+  },
+  "native_observation_policy": {
+    "full_solar_grid_fields": [
+      "BeamSolarRad",
+      "DifSolarRad"
+    ],
+    "full_solar_grid_snapshots": [
+      "allocated_defaults",
+      "setup",
+      "prepared",
+      "before_context",
+      "after_context",
+      "GetNextEnvironment",
+      "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+      "final_state"
+    ],
+    "effective_boundary_flags": "actual incoming flags overwritten only by declared partial caller writes",
+    "all_operations_executed_independently_of_observation_selection": true,
+    "compact_operation_grid_contents": null,
+    "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected solar grid",
+    "selected_today_solar_slot": "actual allocated in-range HourOfDay/TimeStep, otherwise unavailable",
+    "all19_counts_full17_LastHour_NextHour_retained": true,
+    "native_private_hourly_or_transient_weights_observed": false,
+    "passive_CurrentTime_SimTimeSteps_WeightNow_WeightPreviousHour_paired": false
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "observer_sources": [
+    {
+      "path": ".runtime/porting/CLK-05/candidate-observer-prep-02/clk05_candidate_probe.rs",
+      "sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/candidate-observer-prep-02/write_observer_inputs.py",
+      "sha256": "26d07fa8d58c0994e1988c79b0c250d1f4f2a1631fb1f772802d76bc1a211e51"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/candidate-observer-prep-02/inputs.rs",
+      "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/candidate-observer-prep-02/fields.rs",
+      "sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/candidate-observer-prep-02/observe.rs",
+      "sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/candidate-observer-prep-02/seeds.rs",
+      "sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/dto.rs",
+      "sha256": "ca9d7dc40371b3128e01a080aa67815700f10aeaeacfb9755a3bd8c07c3192f5"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk03_candidate_support/fields.rs",
+      "sha256": "b1d6c02107c4a2629bb7b19e9aa02dd196705652257c38da56ce1a91815002a1"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk03_candidate_support/inputs.rs",
+      "sha256": "e2bad1313702880b6b756d40de5b866c6493d656572a0bf6d47fedf9c08c6b2c"
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_runtime/src/weather.rs",
+      "sha256": "e9faeca5edab6541a62acb72deff3b22a5c1f40df231b794f3b16cc0d65e2f2c"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/configuration.rs",
+      "sha256": "9c159f7dca667858934f342ad2e381a15f06899ba0a9403c9cf8394feb1905c2"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/state.rs",
+      "sha256": "aa34b4daa3a9136866283c76664580edddd7eb3ee0fa3d030ca19eb9c5642f5f"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/producer.rs",
+      "sha256": "8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+      "sha256": "249e4001f941f55006cbfb0a8fba83474e3497e13bcf7044579044056ebdb4ee"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/handoff.rs",
+      "sha256": "71090dad629e39a04695f723860992ee726cd87ac202fdc93e57203633eee405"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/solar.rs",
+      "sha256": "6e5a5d3044e9663c31b0da79f56513e7a14e5cd8d8875baee79e78367c60ec76"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "0a0fd991a4fefaed5025ea93e195f97d7635febd6927d0e3a9e1823b27e1bf5a"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "8ca76c193f9c4fc8fedb85f4e42b175c92b683c9d03aa90fa3130b3a59c2d0b3"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/cursor.rs",
+      "sha256": "8349e4389bcc140b61c360b0b44059e6b8d6ed2eed74d28b80077951ea4e7a4c"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/day_read.rs",
+      "sha256": "9e116bd8a35177c099ad4f1391d4fbc29d325a891d7e75e1bc2749ff34c3d149"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/input.rs",
+      "sha256": "b69ce6654d719e4f92e195ecd5f57416d72ec3f7cd1f505d9cbb5ef641dc01c0"
+    },
+    {
+      "path": "crates/ep_run/src/weather_solar_controls.rs",
+      "sha256": "c78fb52163f0ca71a0ecb45edae049b2b5af986bb524468beda426df79798977"
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "175d47d00af937a8d8098da096b986139ac1eb0182d761752fbd323d043bf7c7"
+    },
+    {
+      "path": "crates/ep_run/src/clk03_trace.rs",
+      "sha256": "918ede1f8a628c2102e605b54aaa26c35ae641221ae5d36cf127724cfd965ae4"
+    }
+  ],
+  "source_authorities": {
+    "source_audit": {
+      "path": ".runtime/porting/CLK-05/source-audit-01/audit.json",
+      "sha256": "036e412833de482f7b3e931cd593f20e1cea715027dcaf0db02b4fe24bfeebc0"
+    },
+    "input_design02": {
+      "path": ".runtime/porting/CLK-05/input-design-prep-02/manifest.json",
+      "sha256": "ae49c692b62f60bb54d163b394782208e5bce55b41fc28fa018885b23a51ef4e"
+    },
+    "control_registration_proposal": {
+      "path": ".runtime/porting/CLK-05/control-registration-mirrors-01/proposal.json",
+      "sha256": "f8f94f6c45e48f8be851e0bb34fd94c89b63013dbfc55939c3d7c1fc4181b550"
+    },
+    "math_promotion_source_bundle": {
+      "path": ".runtime/porting/CLK-05/promotion-bundle-prep-01/bundle.json",
+      "sha256": "12f8e3c9f113489451d58c7f55c6a9c39d88e753288da5ccf653a3ecc6cec7f6"
+    },
+    "native_source_draft01": {
+      "path": ".runtime/porting/CLK-05/native-prep-01/manifest.json",
+      "sha256": "dbc43a030fe6588cc1b5f7607cceada409145ceb4be692ee6558725f3d109fe8"
+    }
+  },
+  "actual_promoted_observer_sources": [
+    {
+      "path": "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+      "sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+      "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+      "sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs",
+      "sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070"
+    }
+  ],
+  "actual_original_data_review": {
+    "artifact": {
+      "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+      "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/independent-original-data-review-command-01/receipt.json",
+      "sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562"
+    }
+  },
+  "actual_preserved_existing_baseline": {
+    "artifact": {
+      "path": ".runtime/porting/CLK-05/existing-baseline-gap-01/gap.json",
+      "sha256": "dae13dac1e3f655ed2c30ff989cea902208430a351dd7508c24da18b02c52814"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/existing-baseline-gap-command-01/receipt.json",
+      "sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5"
+    }
+  },
+  "prerequisites_are_metadata_bindings_not_weather_or_expected_operands": true,
+  "independent_source_review": {
+    "path": ".runtime/porting/CLK-05/independent-candidate-observer-source-review-02/review.json",
+    "sha256": "c5136b16d2d962f7e864bc33bc8cc54cfc0550a3fc243bb2a493c52c34985e6f"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "weather_sequences": 36,
+    "GetNextEnvironment": 36,
+    "InitializeWeather": 550,
+    "weather_operations": 586,
+    "total_operations": 589
+  },
+  "frozen_before_Rust_candidate_numerical_execution": true,
+  "expected_values_supplied": false,
+  "native_results_supplied": false,
+  "Rust_outputs_supplied_as_inputs": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "native_request_bytes_changed": false,
+  "observer_request": {
+    "path": ".runtime/porting/CLK-05/candidate-observer-input-02/observer-request.json",
+    "sha256": "317eac6baff04b3dd7e786e91cf9fa70dc23dec6d935cb9faaa597f122b4e8da"
+  },
+  "complete_operation_order_retained": true,
+  "actual_public_API": [
+    "WeatherDayState::setup_interpolation_values",
+    "WeatherSession::new",
+    "WeatherSession::setup_interpolation_values",
+    "WeatherSession::get_next_environment",
+    "WeatherSession::initialize_weather"
+  ],
+  "full_solar_grid_boundaries": [
+    "pure Setup snapshots",
+    "actual constructor post-Setup return",
+    "prepared",
+    "before/after declared caller context",
+    "GetNextEnvironment",
+    "InitializeWeather effective BeginDay or BeginEnvrn",
+    "final"
+  ],
+  "compact_operations": "all scalar/calendar/header/cursor/count19/cache17 retained; solar grids allocation/shape/order retained, slots=null",
+  "solar_grid_fields": [
+    "BeamSolarRad",
+    "DifSolarRad"
+  ],
+  "all_19_count_fields_retained": true,
+  "stored_array_owner_path_mapping": {
+    "native": [
+      "snapshot.Interpolation_allocated",
+      "snapshot.Interpolation",
+      "snapshot.SolarInterpolation_allocated",
+      "snapshot.SolarInterpolation"
+    ],
+    "candidate_Rust": [
+      "snapshot.Interpolation_allocated",
+      "snapshot.Interpolation",
+      "snapshot.SolarInterpolation_allocated",
+      "snapshot.SolarInterpolation"
+    ],
+    "actual_Rust_owner": "WeatherDayState.weather.interpolation/solar_interpolation",
+    "numeric_values_transformed_to_make_alias": false
+  },
+  "all_17_LastHour_NextHour_fields_retained": true,
+  "declared_seed_and_stored_override_are_input_only": true,
+  "four_requested_controls": {
+    "names": [
+      "DisplayWeatherMissingDataWarnings",
+      "IgnoreSolarRadiation",
+      "IgnoreBeamRadiation",
+      "IgnoreDiffuseRadiation"
+    ],
+    "owned_in_candidate": true,
+    "applied": true,
+    "requested_context_retained_separately": true,
+    "whole_production_registration_certified_by_probe": false,
+    "actual_context_boundary": "after genuine preparation, before GetNext/read, matching native seed_context"
+  },
+  "pure_Setup_TimeStepFraction": "descriptor checked but weather owner not assigned; actual stored value observed",
+  "weather_TimeStepFraction": "literal declared input applied after actual Setup",
+  "before_GetNext_count_seeds": "observable caller storage reset canaries, not incoming hourly nonzero counts",
+  "passive_unpaired_clock_fields": [
+    "CurrentTime",
+    "SimTimeSteps",
+    "WeightNow",
+    "WeightPreviousHour"
+  ],
+  "whole_native_Factory_constant_initialization_preparation_available": false,
+  "unavailable_counted_as_PASS": false,
+  "source_private_hourly_or_weight_locals_observed": false,
+  "metadata_preview_weather_values_supplied_to_live_owner": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false
+}

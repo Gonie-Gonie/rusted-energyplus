@@ -1,0 +1,62 @@
+--- crates/ep_runtime/examples/clk05_existing_support/seeds.rs before
++++ crates/ep_runtime/examples/clk05_existing_support/seeds.rs after
+@@ -1,11 +1,17 @@
+ //! Typed literal public owner writes; no expected weather/interpolation answers.
+-use super::{Result, inputs::{array, flag, real, require}};
++use super::{
++    Result,
++    inputs::{array, flag, real, require},
++};
+ use ep_runtime::weather::day::{WeatherDayState, WeatherVarCounts, WeatherVars};
+ use serde_json::Value;
+ 
+ fn count(value: &Value) -> Result<i32> {
+     let value = value.as_i64().ok_or("typed bounded count input required")?;
+-    require((0..=1_000_000).contains(&value), "count outside nonoverflow domain")?;
++    require(
++        (0..=1_000_000).contains(&value),
++        "count outside nonoverflow domain",
++    )?;
+     Ok(i32::try_from(value)?)
+ }
+ fn counts(owner: &mut WeatherVarCounts, input: &Value) -> Result<()> {
+@@ -70,10 +76,14 @@
+                 "next_hour" => weather(&mut state.next_hour, value)?,
+                 "last_hour" => weather(&mut state.last_hour, value)?,
+                 "weather" => {
+-                    require(value.as_object().is_some_and(|v| v.len() == 1 && v.contains_key("LastHourSet")),
+-                        "only LastHourSet weather seed admitted")?;
++                    require(
++                        value
++                            .as_object()
++                            .is_some_and(|v| v.len() == 1 && v.contains_key("LastHourSet")),
++                        "only LastHourSet weather seed admitted",
++                    )?;
+                     state.weather.last_hour_set = flag(&value["LastHourSet"])?;
+-                },
++                }
+                 _ => return Err(format!("unknown closed seed group {key}").into()),
+             }
+         }
+@@ -81,9 +91,18 @@
+     if let Some(override_input) = input.get("stored_solar_interpolation_override") {
+         let values = array(override_input)?;
+         let steps = usize::try_from(state.global.time_steps_in_hour)?;
+-        let owner = state.weather.solar_interpolation.as_mut().ok_or("actual Setup solar allocation required")?;
+-        require(owner.len() == steps && values.len() == steps, "literal stored override length differs")?;
+-        for (target, value) in owner.iter_mut().zip(values) {*target = real(value)?;}
++        let owner = state
++            .weather
++            .solar_interpolation
++            .as_mut()
++            .ok_or("actual Setup solar allocation required")?;
++        require(
++            owner.len() == steps && values.len() == steps,
++            "literal stored override length differs",
++        )?;
++        for (target, value) in owner.iter_mut().zip(values) {
++            *target = real(value)?;
++        }
+     }
+     // All four requested controls remain unavailable/unapplied in this baseline.
+     Ok(())

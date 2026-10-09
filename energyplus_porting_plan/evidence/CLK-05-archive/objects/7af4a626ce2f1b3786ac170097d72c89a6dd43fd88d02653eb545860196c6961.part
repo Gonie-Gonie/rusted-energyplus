@@ -1,0 +1,196 @@
+"""Root-only six real CLI calls with exact frozen external input context guards."""
+from pathlib import Path
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import traceback
+
+HERE = Path(__file__).resolve().parent
+COMMON_SHA = 'd636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8'
+if hashlib.sha256((HERE / 'common.py').read_bytes()).hexdigest() != COMMON_SHA:
+    raise ValueError('Held metadata source changed before import')
+from common import (ADMISSION, CONTROL, CASE_IDS, ROOT, binding, boot, environment_inputs,
+    exact, fresh, input_byte_map, need, now, packet, read, recorded, ref,
+    require_environment, routing, script, source_map, source_paths, timestamp, v)
+
+TRACE_NAME = 'clk03-weather-day-production-trace.json'
+FULL_ONLY = {TRACE_NAME, 'clk02-weather-production-trace.json', 'clock-calls.json', 'psy02-calls.json',
+    'psychrometrics-calls.json', 'zon01-initialization.json', 'compiled-geometry.json', 'geometry-consumers.json',
+    'geo02-geometry.json', 'geo02-geometry-operands.json', 'geo03-zone-volume.json'}
+
+
+def arguments():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['build', 'original-data-review', 'original-data-review-execution', 'baseline-gap', 'baseline-gap-execution',
+        'unit-comparison', 'unit-comparison-execution', 'plan', 'plan-execution', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + key, required=True, type=Path)
+    return parser.parse_args()
+
+
+def validate_plan(args, checked, admission, request, projection, contracts, cases, review_ref, review_execution, reviewed_finish):
+    plan_ref = ref(args.plan); plan = read(checked.check(plan_ref))
+    need(plan['schema'] == 'clk05-production-plan.v1' and plan['actual_command_count'] == 6
+        and plan['requested_case_ids'] == CASE_IDS and plan['physical_execution_performed'] is False
+        and plan['existing_native_six_packet_rewritten'] is False and plan['native_results_supplied_as_inputs'] is False
+        and plan['expected_outputs_supplied'] is False and plan['numerical_policy_changed'] is False
+        and plan['gates_updated'] is False and plan['frozen_before_Rust_production_numerical_execution'] is True,
+        'Exact reviewed input-only six CLI plan required')
+    for key, expected in [('native_admission_contract', ADMISSION), ('native_request', admission['helper_request']),
+        ('native_observation_projection', admission['projection']), ('production_control_inputs', CONTROL),
+        ('independent_sources_review', review_ref), ('independent_sources_review_execution', review_execution)]:
+        binding(plan[key], expected, checked)
+    need(exact(plan['contracts'], admission['contracts']) and exact(plan['input_routing'], routing(projection, contracts['tolerances']))
+        and exact(plan['all_45_guard_refs'], admission['all_45_guard_refs']) and len(plan['cases']) == 3, 'Frozen production routing/policy differs')
+    for row, expected in zip(plan['cases'], cases, strict=True):
+        need(set(row) == set(expected) | {'external_byte_map'} and all(exact(row[key], value) for key, value in expected.items()),
+            'Frozen case duration/trace/controls/input identity differs')
+        need(exact(read(checked.check(row['external_byte_map'])), input_byte_map(row['weather'], checked)),
+            'Frozen input map differs from authentic supplied EPW bytes')
+    reviewed = source_map(plan['reader_source_archives'], checked)
+    need(set(reviewed) == {path.relative_to(ROOT).as_posix() for path in source_paths()}, 'Frozen workflow source inventory differs')
+    execution_ref = ref(args.plan_execution)
+    record, start, finish = recorded(checked, execution_ref,
+        {'plan': plan_ref, 'input_only_freeze': True, 'physical_execution_performed': False, 'gates_updated': False})
+    script(record, reviewed[(HERE / 'prepare_plan.py').relative_to(ROOT).as_posix()], checked)
+    for flag, expected in [('--source-review', review_ref), ('--source-review-execution', review_execution)]:
+        need(record['command'].count(flag) == 1 and v.path_of(record['command'][record['command'].index(flag) + 1]) == checked.check(expected),
+            'Actual plan source review argument differs')
+    need(reviewed_finish <= start <= timestamp(plan['created_utc']) <= finish, 'Source review then real plan freeze chronology differs')
+    return plan_ref, plan, execution_ref, finish
+
+
+def check_run(item, case, level, completed, planned, checked):
+    receipt = read(checked.check(item['command_receipt'])); build = completed['build']
+    start, finish = v.execution_interval(receipt, checked)
+    need(receipt['schema'] == 'recorded-porting-command.v1' and receipt['launch_error'] is None
+        and receipt['source_bytes_match_before_and_after'] is True
+        and receipt['recorder_updates_gates'] is False and receipt['recorder_supplies_reference_answers'] is False,
+        'Actual guarded ordinary CLI0 required')
+    need(max(timestamp(completed['prerequisites_finished_utc']), planned) <= start, 'CLI preceded actual prerequisite/plan completion')
+    binding(receipt['source_snapshot'], build['source_snapshot'], checked)
+    need(receipt['repository_before']['head'] == receipt['repository_after']['head'] == build['implementation_commit']
+        and receipt['repository_before']['worktree_clean'] is True and receipt['repository_after']['worktree_clean'] is True
+        and exact(receipt['executed_launcher'], build['actual_executed_recorder']), 'Actual CLI build/source/recorder identity differs')
+    output = v.path_of(item['output_directory']); artifacts = {checked.check(row): row for row in item['artifacts']}
+    need(len(artifacts) == len(item['artifacts']) and set(artifacts) == {path.resolve() for path in output.rglob('*') if path.is_file()}
+        and all(path.is_relative_to(output) for path in artifacts), 'Complete unique actual output inventory required')
+    summary = read(checked.check(artifacts[output / 'run-summary.json'])); config = summary['config']
+    need(summary['status'] == 'success' and summary['exit_code'] == 0 and summary['source_order_gate']['matches'] is True
+        and summary['selected_algorithm_lane']['diagnostic_probe_used'] is False, 'Actual successful physical runtime required')
+    need(config['mode'] == 'compatibility' and config['partial_policy'] == 'deny' and config['trace_level'] == level.lower()
+        and config['dry_run'] is False and config['hours'] is None and config['oracle_baseline'] is False and config['compare_oracle'] is False
+        and summary['oracle'] is None and summary['comparison'] is None and summary['oracle_status'] == summary['compare_status'] == 'not-requested',
+        'Oracle/fixture injection or unexpected no-oracle metadata')
+    need(summary['rust_runtime']['samples'] == (72 if case['duration'] == '72H' else 24)
+        and summary['support']['conformance_claim'] is False, 'Actual CON duration/unavailable certification scope differs')
+    if case['scope'] == 'B':
+        need(summary['rust_runtime']['fixture_demand_injection_used'] is False
+            and type(summary['rust_runtime']['purchased_air_coupling_call_count']) is int
+            and summary['rust_runtime']['purchased_air_coupling_call_count'] > 0, 'Actual B thermal demand coupling required')
+    else:
+        need(summary['rust_runtime']['runtime_class'] == 'one-zone-heat-balance-compatibility'
+            and summary['rust_runtime']['fixture_demand_injection_used'] is None
+            and summary['rust_runtime']['purchased_air_coupling_call_count'] is None, 'A coupling must remain honestly unavailable')
+    scope = read(checked.check(artifacts[output / 'porting_scope.json']))
+    need(scope['schema'] == 'porting-scope.v1' and scope['scope'] == case['scope'] and scope['admissible'] is True
+        and scope['violations'] == [], 'Actual scope admission differs')
+    need((output / TRACE_NAME in artifacts) if level == 'Full' else not any((output / name).exists() for name in FULL_ONLY),
+        'Actual Full/Summary output boundary differs')
+    return finish
+
+
+def main():
+    args = arguments(); started = now()
+    checked, review_ref, review, review_execution, review_finish, evidence = boot(args.source_review, args.source_review_execution)
+    admission, request, projection, contracts, cases = packet(checked)
+    plan_ref, plan, plan_execution, planned = validate_plan(args, checked, admission, request, projection, contracts,
+        cases, review_ref, review_execution, review_finish)
+    completed = evidence.prerequisites(args, checked, admission, request, projection, contracts)
+    need(exact(plan['prerequisite_evidence'], completed['refs'])
+        and exact(plan['unit_reader_interpreter_observation'], completed['unit_reader_interpreter_observation']), 'Actual prerequisite evidence differs from frozen plan')
+    evidence.architecture(completed['available'], checked)
+    output = fresh(args.output_dir); checked.unchanged(); output.mkdir()
+    launcher = output / 'launcher.py'; shutil.copyfile(Path(__file__), launcher)
+    need(launcher.read_bytes() == Path(__file__).read_bytes(), 'Executed launcher archive differs')
+    matrix = {'schema': 'clk05-production-matrix.v1', 'started_utc': started, 'build': completed['refs']['Rust_build'],
+        'prerequisite_evidence': completed['refs'], 'declared_plan': plan_ref, 'declared_plan_execution': plan_execution,
+        'independent_sources_review': review_ref, 'independent_sources_review_execution': review_execution,
+        'contracts': admission['contracts'], 'native_admission_contract': ADMISSION, 'production_control_inputs': CONTROL,
+        'executed_launcher': ref(launcher), 'implementation_commit': completed['build']['implementation_commit'],
+        'crates_tree': completed['build']['crates_tree'], 'cases': [], 'actual_command_count': 0, 'complete': False,
+        'native_engine_executed': False, 'original_outputs_supplied_to_Rust': False,
+        'scientific_comparison_performed': False, 'numerical_PASS_claimed': False, 'gates_updated': False}
+    path = output / 'matrix.json'
+    def update():
+        path.write_text(json.dumps(matrix, ensure_ascii=False, indent=2, allow_nan=False) + '\n', encoding='utf8', newline='\n')
+    update(); recorder_archive = checked.check(completed['build']['actual_executed_recorder']['archive'])
+    recorder = checked.check(ref(ROOT / 'tools/porting/record_command.py'))
+    need(recorder_archive.read_bytes() == recorder.read_bytes(), 'Current CLI recorder differs from accepted build archive')
+    try:
+        for case in plan['cases']:
+            row = {key: case[key] for key in ['case_id', 'scope', 'duration', 'input', 'weather', 'metadata']}; matrix['cases'].append(row)
+            directory = output / case['case_id']; directory.mkdir()
+            for level in case['trace_levels']:
+                destination = directory / level.lower(); receipt_dir = directory / (level.lower() + '-command')
+                command = [str(checked.check(completed['build']['binary'])), 'run', str(checked.check(case['input'])), '--weather',
+                    str(checked.check(case['weather'])), '--output-dir', str(destination), '--mode', 'compatibility', '--partial', 'deny',
+                    '--trace-level', level.lower(), '--porting-scope', case['scope'].lower()]
+                env = dict(os.environ); before = environment_inputs(env)
+                require_environment(before, case['captured_environment_inputs']); checked.unchanged()
+                attempt = {'started_utc': now(), 'command': command, 'constructed_inherited_child_ENV': before,
+                    'actual_parent_ENV_before_child': environment_inputs(dict(os.environ)), 'spawn_error': None,
+                    'actual_recorder_exit_code': None, 'command_receipt': None,
+                    'output_directory': destination.relative_to(ROOT).as_posix(), 'artifacts': []}
+                require_environment(attempt['actual_parent_ENV_before_child'], case['captured_environment_inputs'])
+                need(max(timestamp(completed['prerequisites_finished_utc']), planned, review_finish)
+                    <= timestamp(attempt['started_utc']), 'Actual prerequisites/source review/plan must precede child launch')
+                row[level] = attempt; update()
+                try:
+                    attempt['actual_recorder_exit_code'] = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(recorder),
+                        '--output-dir', str(receipt_dir), '--', *command], cwd=ROOT, env=env, check=False,
+                        creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0)).returncode
+                except Exception as error:
+                    attempt['spawn_error'] = {'type': type(error).__name__, 'message': str(error)}
+                finally:
+                    after = environment_inputs(dict(os.environ)); attempt['actual_parent_ENV_after_child'] = after
+                    attempt['prospective_inherited_child_ENV_after_child'] = environment_inputs(dict(os.environ))
+                    attempt['finished_utc'] = now(); attempt['terminated_CLI_process_internal_ENV_observed'] = False
+                    attempt['external_input_context_preserved'] = exact(before, after) and exact(after, case['captured_environment_inputs'])
+                    attempt['external_input_context_preserved'] = attempt['external_input_context_preserved'] and exact(
+                        attempt['prospective_inherited_child_ENV_after_child'], after)
+                    receipt_path = receipt_dir / 'receipt.json'
+                    if receipt_path.is_file():
+                        attempt['command_receipt'] = ref(receipt_path)
+                    if destination.is_dir():
+                        attempt['artifacts'] = [ref(item) for item in sorted(destination.rglob('*')) if item.is_file()]
+                    matrix['actual_command_count'] += 1; update()
+                need(attempt['external_input_context_preserved'], 'Post-child ENV changed; real child receipt/logs retained')
+                need(attempt['spawn_error'] is None and attempt['actual_recorder_exit_code'] == 0
+                    and attempt['command_receipt'] is not None, 'Actual CLI/recorder failed; partial matrix retained')
+                receipt = read(checked.check(attempt['command_receipt']))
+                need(exact(receipt['command'], command), 'Actual recorder CLI argv differs')
+                check_run(attempt, case, level, completed, planned, checked); checked.unchanged()
+                print(case['case_id'] + ' ' + level + ' actual_exit=0', flush=True)
+        matrix['complete'] = matrix['actual_command_count'] == 6
+    except Exception as error:
+        matrix['failure'] = {'type': type(error).__name__, 'message': str(error)}
+        (output / 'failure.log').write_text(traceback.format_exc(), encoding='utf8', newline='\n')
+        raise
+    finally:
+        try:
+            checked.unchanged(); matrix['all_bound_inputs_unchanged'] = True
+        except Exception as error:
+            matrix['complete'] = False; matrix['all_bound_inputs_unchanged'] = False
+            matrix['final_preservation_failure'] = {'type': type(error).__name__, 'message': str(error)}
+            raise
+        finally:
+            matrix['finished_utc'] = now(); update()
+    print(json.dumps({'matrix': ref(path), 'actual_command_count': matrix['actual_command_count'], 'complete': matrix['complete']}))
+
+
+if __name__ == '__main__':
+    main()

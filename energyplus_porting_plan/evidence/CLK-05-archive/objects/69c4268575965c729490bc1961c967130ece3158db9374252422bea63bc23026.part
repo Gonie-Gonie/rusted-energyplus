@@ -1,0 +1,17 @@
+    void UpdateWeatherData(EnergyPlusData &state);
+
+    void SetCurrentWeather(EnergyPlusData &state);
+
+    void ReadWeatherForDay(EnergyPlusData &state,
+                           int DayToRead,          // =1 when starting out, otherwise signifies next day
+                           int Environ,            // Environment being simulated
+                           bool BackSpaceAfterRead // True if weather file is to be backspaced after read
+    );
+
+    void ReadEPlusWeatherForDay(EnergyPlusData &state,
+                                int DayToRead,          // =1 when starting out, otherwise signifies next day
+                                int Environ,            // Environment being simulated
+                                bool BackSpaceAfterRead // True if weather file is to be backspaced after read
+    );
+
+    Real64 interpolateWindDirection(Real64 prevHrWindDir, Real64 curHrWindDir, Real64 curHrWeight);

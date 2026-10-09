@@ -1,0 +1,21 @@
+    Array2D<Weather::WeatherVars> wvarsHrTsToday;
+    Array2D<Weather::WeatherVars> wvarsHrTsTomorrow;
+
+    EPVector<Array2D<Weather::DesDayMods>> desDayMods;
+
+    int RptIsRain = 0;  // Rain Report Value
+    int RptIsSnow = 0;  // Snow Report Value
+    int RptDayType = 0; // DayType Report Value
+
+    Real64 HrAngle = 0.0;            // Current Hour Angle
+    Real64 SolarAltitudeAngle = 0.0; // Angle of Solar Altitude (degrees)
+    Real64 SolarAzimuthAngle = 0.0;  // Angle of Solar Azimuth (degrees)
+    Real64 HorizIRSky = 0.0;         // Horizontal Infrared Radiation Intensity (W/m2)
+    Real64 TimeStepFraction = 0.0;   // Fraction of hour each time step represents
+
+    EPVector<Weather::SPSiteSchedules> spSiteSchedules;
+    std::vector<int> spSiteSchedNums;
+
+    // Number of hours of missing data
+    Array1D<Real64> Interpolation;      // Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
+    Array1D<Real64> SolarInterpolation; // Solar Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)

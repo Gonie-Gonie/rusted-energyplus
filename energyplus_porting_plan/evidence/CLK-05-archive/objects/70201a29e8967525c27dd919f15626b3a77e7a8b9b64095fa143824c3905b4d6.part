@@ -1,0 +1,39 @@
+{
+  "schema": "clk05-root-test-only-clippy-diff-review.v1",
+  "status": "reviewed-two-clone-on-copy-test-only-blocks",
+  "reviewer": "/root",
+  "review_recorded_utc": "2026-10-09T04:18:19.070040+00:00",
+  "reviewed_cleanup": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/cleanup.json",
+    "sha256": "dbd6c5042b2f5de0ccd7c7f6246b572e487e71d18c51dbc997942f15420cef64"
+  },
+  "historical_path": "crates/ep_runtime/src/weather_day/producer_tests.rs",
+  "reviewed_before": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.before.rs",
+    "sha256": "59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17"
+  },
+  "reviewed_after": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.after.rs",
+    "sha256": "5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57"
+  },
+  "reviewed_full_diff": {
+    "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.diff",
+    "sha256": "bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018"
+  },
+  "actual_final_diff_read_in_full": true,
+  "literal_replacement_count": 2,
+  "test_only": true,
+  "expected_values_changed": false,
+  "production_math_changed": false,
+  "reviewed_test_module_guard": {
+    "path": ".runtime/porting/source-objects/8b/8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7",
+    "sha256": "8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7"
+  },
+  "reviewed_Copy_type_source": {
+    "path": ".runtime/porting/source-objects/6f/6fb4182a46f19a5c04cc925cc505e910e99c18e8aadfe68e3e758fb632fa354a",
+    "sha256": "6fb4182a46f19a5c04cc925cc505e910e99c18e8aadfe68e3e758fb632fa354a"
+  },
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "scope": "Exactly two derived Clone+Copy value snapshots use Copy, retaining all raw bits, assertions and fixture values. Only layout of those chains also changed. Test module is cfg(test); production sources remain byte-exact."
+}

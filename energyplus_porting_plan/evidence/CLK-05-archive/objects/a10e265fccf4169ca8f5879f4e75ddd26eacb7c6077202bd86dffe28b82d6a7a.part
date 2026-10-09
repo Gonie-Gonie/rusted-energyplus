@@ -1,0 +1,8 @@
+        get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
+        if (!cEnvValue.empty()) {
+            state.dataEnvrn->IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+        }
+
+        get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
+        if (!cEnvValue.empty()) {
+            state.dataEnvrn->IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True

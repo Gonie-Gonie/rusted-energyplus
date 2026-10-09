@@ -1,0 +1,232 @@
+{
+  "schema": "clk05-independent-production-comparer-source-review.v1",
+  "status": "pass-source-selected-solar-and-owned-transport-before-production",
+  "review_started_utc": "2026-10-09T03:42:06.037071+00:00",
+  "review_completed_utc": "2026-10-09T03:42:06.395104+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/00-proofs.py",
+        "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/adapter.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/01-adapter.py",
+        "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/observations.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/02-observations.py",
+        "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/03-freeze_projection.py",
+        "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/04-check_production.py",
+        "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/05-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/06-numeric.py",
+        "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/07-state.py",
+        "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/08-history.py",
+        "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/09-metadata.py",
+        "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/10-freeze_projection.py",
+        "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/11-check_clk05.py",
+        "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/12-common.py",
+        "sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/13-evidence.py",
+        "sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/14-prepare_plan.py",
+        "sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/15-run_production.py",
+        "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/16-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_source_manifest": {
+    "path": ".runtime/porting/CLK-05/production-comparer-prep-03/manifest.json",
+    "sha256": "85f6d9b48ff9451df2d2e0f9f8e6ff37d582b5c397367b8dff3dae9767fccc90"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "reviewed_native_request": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+    "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+  },
+  "reviewed_native_projection": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+    "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "reviewed_fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/executed-source-reviewer.py",
+    "sha256": "8605806632f3a97ef30ec511e4fc2f4a6464632b40206d064271f22b9a68d648"
+  },
+  "reviewed_CLK04_data_review": {
+    "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+    "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+  },
+  "reviewed_CLK04_data_review_execution": {
+    "path": ".runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json",
+    "sha256": "1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0"
+  },
+  "reviewed_preserved_production_failure": {
+    "report": {
+      "path": ".runtime/porting/CLK-05/production-comparison-01/production-comparison.json",
+      "sha256": "c36ae50d49b6022c438ee43d3864a8a65be96104bc3374b56013808fb68b644e"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/production-comparison-command-01/receipt.json",
+      "sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f"
+    }
+  },
+  "owned_metadata_helper": {
+    "path": ".runtime/porting/CLK-05/gate-review-prep-01/metadata.py",
+    "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d"
+  },
+  "actual_reader_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-05/production-comparer-source-review-prep-02/review_sources.py",
+    "--native-admission-contract",
+    ".runtime\\porting\\CLK-05\\frozen-packet-01\\native-admission-contract.json",
+    "--output-dir",
+    ".runtime\\porting\\CLK-05\\independent-production-comparer-source-review-02"
+  ],
+  "source_review_method": "Raw read all five held03 bodies and complete01-to03 diffs, plus previously read all unchanged unit/workflow bodies. Raw directly read pinned original writer and accepted small C4 provenance metadata, verified input-only lane equivalence, and did not read C4/C5 numerical payloads. Root separately reads the new source. This command authenticates exact17 bytes/syntax and accepted small QA metadata without importing reviewed targets or reading scientific result values.",
+  "source_facts": {
+    "reviewed_source_count": 17,
+    "native_production_call_count": 483,
+    "observed_unpaired_Rust_Current_count": 480,
+    "ordinary_CLI_command_count": 6,
+    "native_root_to_CLI_root_array_mapping": true,
+    "actual_full17_storage_to_solar2_projection_has_no_numeric_value_transform": true,
+    "actual_consumer_operation_prefix_and_initial_duplicate_receipts_retained": true,
+    "stored_Today_to_owned_sample_solar2_and_shared_thermal_route_checked": true,
+    "inherited_archives_default_current_true_checks_reviewed_bytes_before_freeze": true,
+    "declared_no_oracle_metadata_nulls_unavailable_not_PASS": true,
+    "frozen_profiles_or_cases_changed": false,
+    "sole_schedule_native_operand_uses_same_id_C4_before_after": true,
+    "routed_discrete_field_observation_count": 966,
+    "C4_solar_or_Current_physical_fields_promoted_to_PAIR": false,
+    "ordinal_formula_recomputed": false
+  },
+  "prior_source_read_interpretation_correction": "Raw initially overlooked common.archives(current=True), then directly verified its current-source/archive equality guard. The held01 pre-freeze guard already existed; no missing-guard, unsafe-source or failed-source claim is made.",
+  "routing_scope_limits": "Only environment.DayOfYear_Schedule uses authentic same-phase C4 history. Native0/wrapper1/recovery0 remain separate. Source review authenticates accepted metadata and input/source guards, not numerical values. Large native/recovery payloads are not parsed or rehashed here; actual comparison must independently authenticate them. The earlier failed C5 result and old SourceQA remain unchanged.",
+  "authorship_limits": "Raw authored this factual archival verifier, earlier input/cursor code and prior comparers. Baseline authored the new five, reused unit comparer and earlier carrier/hourly/producer; Header authored execution/control wrappers. Source/protocol review does not independently certify reviewers own scientific formulas; actual executor is identified by its recorder.",
+  "scientific_execution_performed": false,
+  "reviewed_targets_imported_or_executed": false,
+  "scientific_values_read_or_compared": false,
+  "native_or_Rust_outputs_supplied_as_inputs": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unavailable_counted_as_PASS": false,
+  "independent_own_math_certification_claimed": false,
+  "future_child_or_result_completion_inferred": false,
+  "source_review_claimed_to_precede_existing_Original": false,
+  "source_review_claimed_to_precede_prior_matrix_or_failure": false,
+  "gates_updated": false
+}

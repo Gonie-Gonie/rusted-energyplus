@@ -1,0 +1,24 @@
+                    // Sky emissivity now takes interpolated timestep inputs rather than interpolated calculation esky results
+                    calcSky(state,
+                            tomorrowTs.HorizIRSky,
+                            tomorrowTs.SkyTemp,
+                            tomorrowTs.OpaqueSkyCover,
+                            tomorrowTs.OutDryBulbTemp,
+                            tomorrowTs.OutDewPointTemp,
+                            tomorrowTs.OutRelHum * 0.01,
+                            state.dataWeather->wvarsLastHr.HorizIRSky * wgtPrevHr + wvarsH.HorizIRSky * wgtCurrHr);
+
+                    tomorrowTs.DifSolarRad = state.dataWeather->wvarsLastHr.DifSolarRad * wgtPrevHrSolar + wvarsH.DifSolarRad * wgtCurrHrSolar +
+                                             state.dataWeather->wvarsNextHr.DifSolarRad * wgtNextHrSolar;
+                    tomorrowTs.BeamSolarRad = state.dataWeather->wvarsLastHr.BeamSolarRad * wgtPrevHrSolar + wvarsH.BeamSolarRad * wgtCurrHrSolar +
+                                              state.dataWeather->wvarsNextHr.BeamSolarRad * wgtNextHrSolar;
+
+                    tomorrowTs.LiquidPrecip = state.dataWeather->wvarsLastHr.LiquidPrecip * wgtPrevHr + wvarsH.LiquidPrecip * wgtCurrHr;
+                    tomorrowTs.LiquidPrecip /= double(state.dataGlobal->TimeStepsInHour);
+                    tomorrowTs.IsRain = tomorrowTs.LiquidPrecip >= state.dataWeather->IsRainThreshold; // Wthr%IsRain
+                    tomorrowTs.IsSnow = wvarsH.IsSnow;
+                } // End of TS Loop
+
+                state.dataWeather->wvarsLastHr = wvarsHr(hour);
+            } // End of Hour Loop
+        }

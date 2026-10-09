@@ -1,0 +1,157 @@
+"""Execution-free byte guards shared by Root's one-target retention tools."""
+from __future__ import annotations
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = '.runtime/porting/CLK-05/'
+POLICY = 'energyplus_porting_plan/evidence/native-helper-retention-policy.json'
+REGISTRY = '.runtime/porting/CLK-04/retirement-01/registry-retired.json'
+POLICY_SHA = '782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379'
+REGISTRY_SHA = '27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378'
+TARGETS = {
+    'clk05_reference_helper': {
+        'historical_path': '.runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe',
+        'sha256': 'b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc',
+        'size_bytes': 1296986812,
+    },
+}
+GATES = ('scope_review', 'unit_gate', 'integration_gate', 'production_gate')
+SEEN = {}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def time_of(value):
+    stamp = datetime.fromisoformat(value)
+    require(stamp.tzinfo is not None and stamp.utcoffset().total_seconds() == 0, 'Actual UTC timestamp required')
+    return stamp
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    if type(left) is float:
+        return left.hex() == right.hex()
+    return left == right
+
+
+def absent(value):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    require(raw.parent.resolve().is_relative_to(ROOT), 'Absence path outside repository')
+    try:
+        raw.lstat()
+    except FileNotFoundError:
+        return True
+    return False
+
+
+def path_of(value, exists=True):
+    require(isinstance(value, (str, Path)), 'Typed path required')
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    path = raw.resolve(strict=exists)
+    require(path.is_relative_to(ROOT) and path != ROOT, 'Path escapes repository')
+    return path
+
+
+def regular(value):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse file required: ' + str(value))
+    return path_of(raw)
+
+
+def digest(path):
+    before = path.stat()
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    after = path.stat()
+    require((before.st_size, before.st_mtime_ns, before.st_ctime_ns)
+            == (after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Bytes changed while hashing')
+    return sha
+
+
+def ref(value, expected=None, size=None, remember=True):
+    path = regular(value)
+    sha = digest(path)
+    require(expected is None or sha == expected, 'Bound SHA differs: ' + str(value))
+    require(size is None or type(size) is int and path.stat().st_size == size, 'Bound size differs')
+    if remember:
+        require(path not in SEEN or SEEN[path] == sha, 'Previously read bytes changed')
+        SEEN[path] = sha
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha}
+
+
+def bound(value, remember=True):
+    require(type(value) is dict and set(value) == {'path', 'sha256'}, 'Exact path/hash binding required')
+    require(ref(value['path'], value['sha256'], remember=remember) == value, 'Literal artifact binding differs')
+    return dict(value)
+
+
+def read(value, expected=None):
+    binding = ref(value, expected)
+    def pairs(rows):
+        out = {}
+        for key, item in rows:
+            require(key not in out, 'Duplicate JSON key')
+            out[key] = item
+        return out
+    def invalid(token):
+        raise ValueError('Nonstandard JSON token: ' + token)
+    return json.loads(path_of(binding['path']).read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def recorded(value, exit_code=0):
+    item = read(value)
+    require(item['schema'] == 'recorded-porting-command.v1' and type(item['exit_code']) is int
+            and item['exit_code'] == exit_code and item['launch_error'] is None
+            and item['source_bytes_match_before_and_after'] is True
+            and item['recorder_updates_gates'] is False and item['recorder_supplies_reference_answers'] is False,
+            'Actual guarded recorded command required')
+    require(Path(item['cwd']).resolve() == ROOT, 'Actual repository cwd required')
+    require(item['repository_before']['head'] == item['repository_after']['head'], 'Recorded HEAD changed')
+    for key in ['stdout', 'stderr', 'source_snapshot']:
+        bound(item[key])
+    bound(item['executed_launcher']['archive'])
+    require(time_of(item['started_utc']) <= time_of(item['finished_utc']), 'Actual command interval differs')
+    return item
+
+
+def unchanged():
+    for path, sha in SEEN.items():
+        require(regular(path) == path and digest(path) == sha, 'Retained proof bytes changed: ' + str(path))
+
+
+def fresh_output(value):
+    output = path_of(value, exists=False)
+    require(output.is_relative_to(ROOT / BASE) and output != ROOT / BASE and not output.exists(), 'Fresh ignored output required')
+    return output
+
+
+def encoded(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf8')
+
+
+def write(output, name, value):
+    destination = output / name
+    with destination.open('xb') as stream:
+        stream.write(encoded(value))
+    return ref(destination)

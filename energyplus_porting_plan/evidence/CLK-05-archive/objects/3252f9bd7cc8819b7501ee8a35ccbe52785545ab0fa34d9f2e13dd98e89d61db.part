@@ -1,0 +1,80 @@
+    void SetCurrentWeather(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Russ Taylor
+        //       DATE WRITTEN   March 1990
+        //       MODIFIED       Aug94 (LKL) Fixed improper weighting
+        //                      Nov98 (FCW) Added call to get exterior illuminances
+        //                      Jan02 (FCW) Changed how ground reflectance for daylighting is set
+        //                      Mar12 (LKL) Changed settings for leap years/ current years.
+        //       RE-ENGINEERED  Apr97,May97 (RKS)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // The purpose of this subroutine is to interpolate the hourly
+        // environment data for the sub-hourly time steps in EnergyPlus.  In
+        // other words, this subroutine puts the current weather conditions
+        // into the proper variables.  Rather than using the same data for
+        // each time step, environment data is interpolated as a continuum
+        // throughout the day.
+
+        // METHODOLOGY EMPLOYED:
+        // The current hour (DataGlobals::HourOfDay) as well as the next hour are used
+        // to come up with environment data per time step interval.  Method
+        // used is to assign a weighting for the current hour's data and
+        // (1-that weighting) to the next hour's data.  Actual method is:  if
+        // the current time step is 15 minutes into hour, the interpolated dry
+        // bulb temperature should be 3/4*dry bulb temperature of current hour
+        // and 1/4*dry bulb temperature of next environment hourly data.  At
+        // day boundary (current hour = 24), the next hour is hour 1 of next
+        // weather data day (Tomorrow%).
+
+        static constexpr std::string_view RoutineName("SetCurrentWeather");
+
+        state.dataWeather->NextHour = state.dataGlobal->HourOfDay + 1;
+
+        if (state.dataGlobal->HourOfDay == 24) { // Should investigate whether EndDayFlag is always set here and use that instead
+            state.dataWeather->NextHour = 1;
+        }
+
+        if (state.dataGlobal->HourOfDay == 1) { // Should investigate whether DataGlobals::BeginDayFlag is always set here and use that instead
+            state.dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, 1);
+        }
+
+        Sched::UpdateScheduleVals(state);
+
+        state.dataEnvrn->CurMnDyHr = EnergyPlus::format(
+            "{:02d}/{:02d} {:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
+        state.dataEnvrn->CurMnDy = EnergyPlus::format("{:02d}/{:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        state.dataEnvrn->CurMnDyYr =
+            EnergyPlus::format("{:02d}/{:02d}/{:04d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
+
+        state.dataGlobal->WeightNow = state.dataWeather->Interpolation(state.dataGlobal->TimeStep);
+        state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
+
+        state.dataGlobal->CurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * (state.dataWeather->TimeStepFraction);
+        state.dataGlobal->SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->TimeStepsInHour +
+                                         (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->TimeStepsInHour + state.dataGlobal->TimeStep;
+
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] =
+            state.dataWeather->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTempKelvin = state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] + Constant::Kelvin;
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod] =
+            state.dataWeather->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow] =
+            state.dataWeather->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep] =
+            state.dataWeather->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GndReflectance = state.dataWeather->GroundReflectances(state.dataEnvrn->Month);
+        state.dataEnvrn->GndReflectanceForDayltg = state.dataEnvrn->GndReflectance;
+
+        CalcWaterMainsTemp(state);
+
+        // Determine if Sun is up or down, set Solar Cosine values for time step.
+        DetermineSunUpDown(state, state.dataEnvrn->SOLCOS);
+        if (state.dataEnvrn->SunIsUp && state.dataWeather->SolarAltitudeAngle < 0.0) {
+            ShowFatalError(state,
+                           EnergyPlus::format("SetCurrentWeather: At {} Sun is Up but Solar Altitude Angle is < 0.0", state.dataEnvrn->CurMnDyHr));
+        }
+
+        auto const &today = state.dataWeather->wvarsHrTsToday(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);

@@ -6045,15 +6045,1046 @@
       "companion": "WeatherManager.hh; DataEnvironment.hh; selected SimulationManager/DataSystemVariables/UtilityRoutines control registration",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/WeatherManager.cc",
-      "scope_review": "미확인",
-      "unit_gate": "미확인",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "scope_review": "통과",
+      "unit_gate": "통과",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
       "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
-      "scope_preparation_note": "Pre-output source correction: daily stored solar2 owner and caller-control boundary; exact step1 outer guard and same-day hour24 NextHour. CurrentTime/SimTimeSteps versus Initialize-only native history and SRC04/current-night physics remain unpaired. Four gates pending actual scientific verification."
+      "scope_preparation_note": "Pre-output source correction: daily stored solar2 owner and caller-control boundary; exact step1 outer guard and same-day hour24 NextHour. CurrentTime/SimTimeSteps versus Initialize-only native history and SRC04/current-night physics remain unpaired. Four gates pending actual scientific verification.",
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "SetupInterpolationValues",
+            "start_line": 8328,
+            "end_line": 8386,
+            "helpers": []
+          },
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "ReadWeatherForDay",
+            "start_line": 2275,
+            "end_line": 2292,
+            "helpers": [
+              "ReadEPlusWeatherForDay"
+            ],
+            "projection_note": "Dispatcher call boundary; selected solar producer only"
+          },
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "ReadEPlusWeatherForDay",
+            "start_line": 2294,
+            "end_line": 3135,
+            "helpers": [
+              "InterpretWeatherDataLine",
+              "SetupInterpolationValues"
+            ],
+            "projection_note": "Only frozen solar preprocessing/interpolation blocks paired; other physical fields unpaired"
+          },
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "InitializeWeather",
+            "start_line": 1725,
+            "end_line": 1980,
+            "helpers": [
+              "ReadWeatherForDay",
+              "UpdateWeatherData"
+            ]
+          },
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "GetNextEnvironment",
+            "start_line": 348,
+            "end_line": 1216,
+            "helpers": [
+              "SetupInterpolationValues",
+              "ReadUserWeatherInput"
+            ]
+          },
+          {
+            "path": "src/EnergyPlus/WeatherManager.cc",
+            "symbol": "SetCurrentWeather",
+            "start_line": 2036,
+            "end_line": 2115,
+            "helpers": [],
+            "scope": "historical CLK04 ScheduleDOY metadata only; no new Current numerical pairing"
+          }
+        ],
+        "input_hashes": [
+          {
+            "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+            "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+            "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+            "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+            "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+            "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+            "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+            "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+            "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+            "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+            "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+            "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+            "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+            "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+            "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+            "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+            "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+            "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+            "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+            "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+            "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+            "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+            "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+            "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+            "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": ".runtime/porting/CLK-05/original-execution-01/helper-reference.json",
+              "sha256": "e5cb6fee58abb978abd8c1fa92c4ef1bafcd80d2df1efe505a1c156cd512d820"
+            },
+            {
+              "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+              "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "python -X utf8 -B .runtime/porting/CLK-05/comparer-prep-01/check_clk05.py --mode candidate --native-admission-contract .runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json --original-reference .runtime/porting/CLK-05/original-execution-01/helper-reference.json --original-execution .runtime/porting/CLK-05/original-execution-command-01/receipt.json --original-data-review .runtime/porting/CLK-05/independent-original-data-review-01/review.json --original-data-review-execution .runtime/porting/CLK-05/independent-original-data-review-command-01/receipt.json --observer-request .runtime/porting/CLK-05/candidate-observer-input-02/observer-request.json --observer-projection .runtime/porting/CLK-05/candidate-observer-input-02/projection.json --observer-source-review-execution .runtime/porting/CLK-05/independent-candidate-observer-source-review-command-02/receipt.json --observer-input-execution .runtime/porting/CLK-05/candidate-observer-input-command-02/receipt.json --rust-build .runtime\\porting\\CLK-05\\candidate-observer-build-03\\build-receipt.json --rust-execution .runtime\\porting\\CLK-05\\candidate-observer-execution-command-03\\receipt.json --comparison-projection .runtime/porting/CLK-05/comparison-projection-01/projection.json --comparison-projection-execution .runtime/porting/CLK-05/comparison-projection-command-01/receipt.json --baseline-gap .runtime/porting/CLK-05/existing-baseline-gap-01/gap.json --baseline-gap-execution .runtime/porting/CLK-05/existing-baseline-gap-command-01/receipt.json --output-dir .runtime\\porting\\CLK-05\\candidate-unit-comparison-03",
+            "commit": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-05/candidate-unit-comparison-03/unit-comparison.json",
+                "sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90"
+              },
+              {
+                "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-02/review.json",
+                "sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518"
+              }
+            ]
+          },
+          "unit_gate": {
+            "command": "python -X utf8 -B .runtime/porting/CLK-05/comparer-prep-01/check_clk05.py --mode candidate --native-admission-contract .runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json --original-reference .runtime/porting/CLK-05/original-execution-01/helper-reference.json --original-execution .runtime/porting/CLK-05/original-execution-command-01/receipt.json --original-data-review .runtime/porting/CLK-05/independent-original-data-review-01/review.json --original-data-review-execution .runtime/porting/CLK-05/independent-original-data-review-command-01/receipt.json --observer-request .runtime/porting/CLK-05/candidate-observer-input-02/observer-request.json --observer-projection .runtime/porting/CLK-05/candidate-observer-input-02/projection.json --observer-source-review-execution .runtime/porting/CLK-05/independent-candidate-observer-source-review-command-02/receipt.json --observer-input-execution .runtime/porting/CLK-05/candidate-observer-input-command-02/receipt.json --rust-build .runtime\\porting\\CLK-05\\candidate-observer-build-03\\build-receipt.json --rust-execution .runtime\\porting\\CLK-05\\candidate-observer-execution-command-03\\receipt.json --comparison-projection .runtime/porting/CLK-05/comparison-projection-01/projection.json --comparison-projection-execution .runtime/porting/CLK-05/comparison-projection-command-01/receipt.json --baseline-gap .runtime/porting/CLK-05/existing-baseline-gap-01/gap.json --baseline-gap-execution .runtime/porting/CLK-05/existing-baseline-gap-command-01/receipt.json --output-dir .runtime\\porting\\CLK-05\\candidate-unit-comparison-03",
+            "commit": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-05/candidate-unit-comparison-03/unit-comparison.json",
+                "sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90"
+              },
+              {
+                "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-02/review.json",
+                "sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518"
+              }
+            ]
+          },
+          "integration_gate": {
+            "command": "python -X utf8 -B .runtime/porting/CLK-05/production-comparer-prep-03/check_production.py --matrix .runtime\\porting\\CLK-05\\production-matrix-02\\matrix.json --matrix-execution .runtime\\porting\\CLK-05\\production-matrix-command-02\\receipt.json --comparison-projection .runtime\\porting\\CLK-05\\production-comparison-projection-02\\projection.json --comparison-projection-execution .runtime\\porting\\CLK-05\\production-comparison-projection-command-02\\receipt.json --output-dir .runtime\\porting\\CLK-05\\production-comparison-02",
+            "commit": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-05/production-comparison-02/production-comparison.json",
+                "sha256": "882ecb56871a64841ae17c41cb15c3f72a42c8fc2c1ab3a18e05d2a0488fd24a"
+              },
+              {
+                "path": ".runtime/porting/CLK-05/independent-production-result-review-02/review.json",
+                "sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a"
+              },
+              {
+                "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+                "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+              }
+            ]
+          },
+          "production_gate": {
+            "command": "python -X utf8 -B .runtime/porting/CLK-05/production-comparer-prep-03/check_production.py --matrix .runtime\\porting\\CLK-05\\production-matrix-02\\matrix.json --matrix-execution .runtime\\porting\\CLK-05\\production-matrix-command-02\\receipt.json --comparison-projection .runtime\\porting\\CLK-05\\production-comparison-projection-02\\projection.json --comparison-projection-execution .runtime\\porting\\CLK-05\\production-comparison-projection-command-02\\receipt.json --output-dir .runtime\\porting\\CLK-05\\production-comparison-02",
+            "commit": "728e253205efe3466345759fd3c4b7bf9520e2b5",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": ".runtime/porting/CLK-05/production-comparison-02/production-comparison.json",
+                "sha256": "882ecb56871a64841ae17c41cb15c3f72a42c8fc2c1ab3a18e05d2a0488fd24a"
+              },
+              {
+                "path": ".runtime/porting/CLK-05/independent-production-result-review-02/review.json",
+                "sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a"
+              },
+              {
+                "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+                "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+              }
+            ]
+          }
+        },
+        "production": {
+          "rust_entrypoint": "ep_cli -> live WeatherSession Today -> owned sample -> thermal solar operand",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false
+        },
+        "comparison": {
+          "contract": {
+            "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+            "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+          },
+          "report": {
+            "path": ".runtime/porting/CLK-05/candidate-unit-comparison-03/unit-comparison.json",
+            "sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90"
+          }
+        },
+        "byte_faithful_archive": {
+          "path": "energyplus_porting_plan/evidence/CLK-05-archive/archive.json",
+          "sha256": "6ac6759f3801dcefebcc71400cddb875ca0bcf895c467e2b1c4e3abe0f1c9b5d"
+        },
+        "final_quality_lineage": {
+          "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+          "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+        },
+        "final_quality_commit": "87108b269cbb393f2426c2fefc4dfaeab81a4575",
+        "helper_granularity": [
+          {
+            "path": "crates/ep_runtime/src/weather_day/solar.rs",
+            "line_count": 66,
+            "source_archive": {
+              "path": ".runtime/porting/source-objects/6e/6e5a5d3044e9663c31b0da79f56513e7a14e5cd8d8875baee79e78367c60ec76",
+              "sha256": "6e5a5d3044e9663c31b0da79f56513e7a14e5cd8d8875baee79e78367c60ec76"
+            }
+          },
+          {
+            "path": "crates/ep_runtime/src/weather_day/producer.rs",
+            "line_count": 242,
+            "source_archive": {
+              "path": ".runtime/porting/source-objects/8b/8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7",
+              "sha256": "8bcae0a88b20401dc93510e3ad9fb717853274209257b4bfe7673e63562572b7"
+            }
+          },
+          {
+            "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+            "line_count": 332,
+            "source_archive": {
+              "path": ".runtime/porting/source-objects/24/249e4001f941f55006cbfb0a8fba83474e3497e13bcf7044579044056ebdb4ee",
+              "sha256": "249e4001f941f55006cbfb0a8fba83474e3497e13bcf7044579044056ebdb4ee"
+            }
+          },
+          {
+            "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+            "line_count": 502,
+            "source_archive": {
+              "path": ".runtime/porting/source-objects/6f/6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+              "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51"
+            }
+          },
+          {
+            "path": "crates/ep_runtime/src/weather_day/production.rs",
+            "line_count": 318,
+            "source_archive": {
+              "path": ".runtime/porting/source-objects/8c/8ca76c193f9c4fc8fedb85f4e42b175c92b683c9d03aa90fa3130b3a59c2d0b3",
+              "sha256": "8ca76c193f9c4fc8fedb85f4e42b175c92b683c9d03aa90fa3130b3a59c2d0b3"
+            }
+          },
+          {
+            "path": "crates/ep_runtime/src/weather_day/context.rs",
+            "line_count": 352,
+            "source_archive": {
+              "path": ".runtime/porting/source-objects/3a/3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057",
+              "sha256": "3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057"
+            }
+          }
+        ],
+        "supplemental_day_of_year_schedule": {
+          "schema": "clk05-production-schedule-routing.v1",
+          "field": "environment.DayOfYear_Schedule",
+          "operand_card": "CLK-04",
+          "same_id_direct_kinds": [
+            "GetNextEnvironment",
+            "InitializeWeather"
+          ],
+          "phases": [
+            "before",
+            "after"
+          ],
+          "matched_direct_operation_ids": {
+            "A-24H": [
+              "get-next-environment",
+              "zone-D001-H01-T01",
+              "zone-D001-H01-T02",
+              "zone-D001-H01-T03",
+              "zone-D001-H01-T04",
+              "zone-D001-H02-T01",
+              "zone-D001-H02-T02",
+              "zone-D001-H02-T03",
+              "zone-D001-H02-T04",
+              "zone-D001-H03-T01",
+              "zone-D001-H03-T02",
+              "zone-D001-H03-T03",
+              "zone-D001-H03-T04",
+              "zone-D001-H04-T01",
+              "zone-D001-H04-T02",
+              "zone-D001-H04-T03",
+              "zone-D001-H04-T04",
+              "zone-D001-H05-T01",
+              "zone-D001-H05-T02",
+              "zone-D001-H05-T03",
+              "zone-D001-H05-T04",
+              "zone-D001-H06-T01",
+              "zone-D001-H06-T02",
+              "zone-D001-H06-T03",
+              "zone-D001-H06-T04",
+              "zone-D001-H07-T01",
+              "zone-D001-H07-T02",
+              "zone-D001-H07-T03",
+              "zone-D001-H07-T04",
+              "zone-D001-H08-T01",
+              "zone-D001-H08-T02",
+              "zone-D001-H08-T03",
+              "zone-D001-H08-T04",
+              "zone-D001-H09-T01",
+              "zone-D001-H09-T02",
+              "zone-D001-H09-T03",
+              "zone-D001-H09-T04",
+              "zone-D001-H10-T01",
+              "zone-D001-H10-T02",
+              "zone-D001-H10-T03",
+              "zone-D001-H10-T04",
+              "zone-D001-H11-T01",
+              "zone-D001-H11-T02",
+              "zone-D001-H11-T03",
+              "zone-D001-H11-T04",
+              "zone-D001-H12-T01",
+              "zone-D001-H12-T02",
+              "zone-D001-H12-T03",
+              "zone-D001-H12-T04",
+              "zone-D001-H13-T01",
+              "zone-D001-H13-T02",
+              "zone-D001-H13-T03",
+              "zone-D001-H13-T04",
+              "zone-D001-H14-T01",
+              "zone-D001-H14-T02",
+              "zone-D001-H14-T03",
+              "zone-D001-H14-T04",
+              "zone-D001-H15-T01",
+              "zone-D001-H15-T02",
+              "zone-D001-H15-T03",
+              "zone-D001-H15-T04",
+              "zone-D001-H16-T01",
+              "zone-D001-H16-T02",
+              "zone-D001-H16-T03",
+              "zone-D001-H16-T04",
+              "zone-D001-H17-T01",
+              "zone-D001-H17-T02",
+              "zone-D001-H17-T03",
+              "zone-D001-H17-T04",
+              "zone-D001-H18-T01",
+              "zone-D001-H18-T02",
+              "zone-D001-H18-T03",
+              "zone-D001-H18-T04",
+              "zone-D001-H19-T01",
+              "zone-D001-H19-T02",
+              "zone-D001-H19-T03",
+              "zone-D001-H19-T04",
+              "zone-D001-H20-T01",
+              "zone-D001-H20-T02",
+              "zone-D001-H20-T03",
+              "zone-D001-H20-T04",
+              "zone-D001-H21-T01",
+              "zone-D001-H21-T02",
+              "zone-D001-H21-T03",
+              "zone-D001-H21-T04",
+              "zone-D001-H22-T01",
+              "zone-D001-H22-T02",
+              "zone-D001-H22-T03",
+              "zone-D001-H22-T04",
+              "zone-D001-H23-T01",
+              "zone-D001-H23-T02",
+              "zone-D001-H23-T03",
+              "zone-D001-H23-T04",
+              "zone-D001-H24-T01",
+              "zone-D001-H24-T02",
+              "zone-D001-H24-T03",
+              "zone-D001-H24-T04"
+            ],
+            "A-72H": [
+              "get-next-environment",
+              "zone-D001-H01-T01",
+              "zone-D001-H01-T02",
+              "zone-D001-H01-T03",
+              "zone-D001-H01-T04",
+              "zone-D001-H02-T01",
+              "zone-D001-H02-T02",
+              "zone-D001-H02-T03",
+              "zone-D001-H02-T04",
+              "zone-D001-H03-T01",
+              "zone-D001-H03-T02",
+              "zone-D001-H03-T03",
+              "zone-D001-H03-T04",
+              "zone-D001-H04-T01",
+              "zone-D001-H04-T02",
+              "zone-D001-H04-T03",
+              "zone-D001-H04-T04",
+              "zone-D001-H05-T01",
+              "zone-D001-H05-T02",
+              "zone-D001-H05-T03",
+              "zone-D001-H05-T04",
+              "zone-D001-H06-T01",
+              "zone-D001-H06-T02",
+              "zone-D001-H06-T03",
+              "zone-D001-H06-T04",
+              "zone-D001-H07-T01",
+              "zone-D001-H07-T02",
+              "zone-D001-H07-T03",
+              "zone-D001-H07-T04",
+              "zone-D001-H08-T01",
+              "zone-D001-H08-T02",
+              "zone-D001-H08-T03",
+              "zone-D001-H08-T04",
+              "zone-D001-H09-T01",
+              "zone-D001-H09-T02",
+              "zone-D001-H09-T03",
+              "zone-D001-H09-T04",
+              "zone-D001-H10-T01",
+              "zone-D001-H10-T02",
+              "zone-D001-H10-T03",
+              "zone-D001-H10-T04",
+              "zone-D001-H11-T01",
+              "zone-D001-H11-T02",
+              "zone-D001-H11-T03",
+              "zone-D001-H11-T04",
+              "zone-D001-H12-T01",
+              "zone-D001-H12-T02",
+              "zone-D001-H12-T03",
+              "zone-D001-H12-T04",
+              "zone-D001-H13-T01",
+              "zone-D001-H13-T02",
+              "zone-D001-H13-T03",
+              "zone-D001-H13-T04",
+              "zone-D001-H14-T01",
+              "zone-D001-H14-T02",
+              "zone-D001-H14-T03",
+              "zone-D001-H14-T04",
+              "zone-D001-H15-T01",
+              "zone-D001-H15-T02",
+              "zone-D001-H15-T03",
+              "zone-D001-H15-T04",
+              "zone-D001-H16-T01",
+              "zone-D001-H16-T02",
+              "zone-D001-H16-T03",
+              "zone-D001-H16-T04",
+              "zone-D001-H17-T01",
+              "zone-D001-H17-T02",
+              "zone-D001-H17-T03",
+              "zone-D001-H17-T04",
+              "zone-D001-H18-T01",
+              "zone-D001-H18-T02",
+              "zone-D001-H18-T03",
+              "zone-D001-H18-T04",
+              "zone-D001-H19-T01",
+              "zone-D001-H19-T02",
+              "zone-D001-H19-T03",
+              "zone-D001-H19-T04",
+              "zone-D001-H20-T01",
+              "zone-D001-H20-T02",
+              "zone-D001-H20-T03",
+              "zone-D001-H20-T04",
+              "zone-D001-H21-T01",
+              "zone-D001-H21-T02",
+              "zone-D001-H21-T03",
+              "zone-D001-H21-T04",
+              "zone-D001-H22-T01",
+              "zone-D001-H22-T02",
+              "zone-D001-H22-T03",
+              "zone-D001-H22-T04",
+              "zone-D001-H23-T01",
+              "zone-D001-H23-T02",
+              "zone-D001-H23-T03",
+              "zone-D001-H23-T04",
+              "zone-D001-H24-T01",
+              "zone-D001-H24-T02",
+              "zone-D001-H24-T03",
+              "zone-D001-H24-T04",
+              "zone-D002-H01-T01",
+              "zone-D002-H01-T02",
+              "zone-D002-H01-T03",
+              "zone-D002-H01-T04",
+              "zone-D002-H02-T01",
+              "zone-D002-H02-T02",
+              "zone-D002-H02-T03",
+              "zone-D002-H02-T04",
+              "zone-D002-H03-T01",
+              "zone-D002-H03-T02",
+              "zone-D002-H03-T03",
+              "zone-D002-H03-T04",
+              "zone-D002-H04-T01",
+              "zone-D002-H04-T02",
+              "zone-D002-H04-T03",
+              "zone-D002-H04-T04",
+              "zone-D002-H05-T01",
+              "zone-D002-H05-T02",
+              "zone-D002-H05-T03",
+              "zone-D002-H05-T04",
+              "zone-D002-H06-T01",
+              "zone-D002-H06-T02",
+              "zone-D002-H06-T03",
+              "zone-D002-H06-T04",
+              "zone-D002-H07-T01",
+              "zone-D002-H07-T02",
+              "zone-D002-H07-T03",
+              "zone-D002-H07-T04",
+              "zone-D002-H08-T01",
+              "zone-D002-H08-T02",
+              "zone-D002-H08-T03",
+              "zone-D002-H08-T04",
+              "zone-D002-H09-T01",
+              "zone-D002-H09-T02",
+              "zone-D002-H09-T03",
+              "zone-D002-H09-T04",
+              "zone-D002-H10-T01",
+              "zone-D002-H10-T02",
+              "zone-D002-H10-T03",
+              "zone-D002-H10-T04",
+              "zone-D002-H11-T01",
+              "zone-D002-H11-T02",
+              "zone-D002-H11-T03",
+              "zone-D002-H11-T04",
+              "zone-D002-H12-T01",
+              "zone-D002-H12-T02",
+              "zone-D002-H12-T03",
+              "zone-D002-H12-T04",
+              "zone-D002-H13-T01",
+              "zone-D002-H13-T02",
+              "zone-D002-H13-T03",
+              "zone-D002-H13-T04",
+              "zone-D002-H14-T01",
+              "zone-D002-H14-T02",
+              "zone-D002-H14-T03",
+              "zone-D002-H14-T04",
+              "zone-D002-H15-T01",
+              "zone-D002-H15-T02",
+              "zone-D002-H15-T03",
+              "zone-D002-H15-T04",
+              "zone-D002-H16-T01",
+              "zone-D002-H16-T02",
+              "zone-D002-H16-T03",
+              "zone-D002-H16-T04",
+              "zone-D002-H17-T01",
+              "zone-D002-H17-T02",
+              "zone-D002-H17-T03",
+              "zone-D002-H17-T04",
+              "zone-D002-H18-T01",
+              "zone-D002-H18-T02",
+              "zone-D002-H18-T03",
+              "zone-D002-H18-T04",
+              "zone-D002-H19-T01",
+              "zone-D002-H19-T02",
+              "zone-D002-H19-T03",
+              "zone-D002-H19-T04",
+              "zone-D002-H20-T01",
+              "zone-D002-H20-T02",
+              "zone-D002-H20-T03",
+              "zone-D002-H20-T04",
+              "zone-D002-H21-T01",
+              "zone-D002-H21-T02",
+              "zone-D002-H21-T03",
+              "zone-D002-H21-T04",
+              "zone-D002-H22-T01",
+              "zone-D002-H22-T02",
+              "zone-D002-H22-T03",
+              "zone-D002-H22-T04",
+              "zone-D002-H23-T01",
+              "zone-D002-H23-T02",
+              "zone-D002-H23-T03",
+              "zone-D002-H23-T04",
+              "zone-D002-H24-T01",
+              "zone-D002-H24-T02",
+              "zone-D002-H24-T03",
+              "zone-D002-H24-T04",
+              "zone-D003-H01-T01",
+              "zone-D003-H01-T02",
+              "zone-D003-H01-T03",
+              "zone-D003-H01-T04",
+              "zone-D003-H02-T01",
+              "zone-D003-H02-T02",
+              "zone-D003-H02-T03",
+              "zone-D003-H02-T04",
+              "zone-D003-H03-T01",
+              "zone-D003-H03-T02",
+              "zone-D003-H03-T03",
+              "zone-D003-H03-T04",
+              "zone-D003-H04-T01",
+              "zone-D003-H04-T02",
+              "zone-D003-H04-T03",
+              "zone-D003-H04-T04",
+              "zone-D003-H05-T01",
+              "zone-D003-H05-T02",
+              "zone-D003-H05-T03",
+              "zone-D003-H05-T04",
+              "zone-D003-H06-T01",
+              "zone-D003-H06-T02",
+              "zone-D003-H06-T03",
+              "zone-D003-H06-T04",
+              "zone-D003-H07-T01",
+              "zone-D003-H07-T02",
+              "zone-D003-H07-T03",
+              "zone-D003-H07-T04",
+              "zone-D003-H08-T01",
+              "zone-D003-H08-T02",
+              "zone-D003-H08-T03",
+              "zone-D003-H08-T04",
+              "zone-D003-H09-T01",
+              "zone-D003-H09-T02",
+              "zone-D003-H09-T03",
+              "zone-D003-H09-T04",
+              "zone-D003-H10-T01",
+              "zone-D003-H10-T02",
+              "zone-D003-H10-T03",
+              "zone-D003-H10-T04",
+              "zone-D003-H11-T01",
+              "zone-D003-H11-T02",
+              "zone-D003-H11-T03",
+              "zone-D003-H11-T04",
+              "zone-D003-H12-T01",
+              "zone-D003-H12-T02",
+              "zone-D003-H12-T03",
+              "zone-D003-H12-T04",
+              "zone-D003-H13-T01",
+              "zone-D003-H13-T02",
+              "zone-D003-H13-T03",
+              "zone-D003-H13-T04",
+              "zone-D003-H14-T01",
+              "zone-D003-H14-T02",
+              "zone-D003-H14-T03",
+              "zone-D003-H14-T04",
+              "zone-D003-H15-T01",
+              "zone-D003-H15-T02",
+              "zone-D003-H15-T03",
+              "zone-D003-H15-T04",
+              "zone-D003-H16-T01",
+              "zone-D003-H16-T02",
+              "zone-D003-H16-T03",
+              "zone-D003-H16-T04",
+              "zone-D003-H17-T01",
+              "zone-D003-H17-T02",
+              "zone-D003-H17-T03",
+              "zone-D003-H17-T04",
+              "zone-D003-H18-T01",
+              "zone-D003-H18-T02",
+              "zone-D003-H18-T03",
+              "zone-D003-H18-T04",
+              "zone-D003-H19-T01",
+              "zone-D003-H19-T02",
+              "zone-D003-H19-T03",
+              "zone-D003-H19-T04",
+              "zone-D003-H20-T01",
+              "zone-D003-H20-T02",
+              "zone-D003-H20-T03",
+              "zone-D003-H20-T04",
+              "zone-D003-H21-T01",
+              "zone-D003-H21-T02",
+              "zone-D003-H21-T03",
+              "zone-D003-H21-T04",
+              "zone-D003-H22-T01",
+              "zone-D003-H22-T02",
+              "zone-D003-H22-T03",
+              "zone-D003-H22-T04",
+              "zone-D003-H23-T01",
+              "zone-D003-H23-T02",
+              "zone-D003-H23-T03",
+              "zone-D003-H23-T04",
+              "zone-D003-H24-T01",
+              "zone-D003-H24-T02",
+              "zone-D003-H24-T03",
+              "zone-D003-H24-T04"
+            ],
+            "B-BOTH-24H": [
+              "get-next-environment",
+              "zone-D001-H01-T01",
+              "zone-D001-H01-T02",
+              "zone-D001-H01-T03",
+              "zone-D001-H01-T04",
+              "zone-D001-H02-T01",
+              "zone-D001-H02-T02",
+              "zone-D001-H02-T03",
+              "zone-D001-H02-T04",
+              "zone-D001-H03-T01",
+              "zone-D001-H03-T02",
+              "zone-D001-H03-T03",
+              "zone-D001-H03-T04",
+              "zone-D001-H04-T01",
+              "zone-D001-H04-T02",
+              "zone-D001-H04-T03",
+              "zone-D001-H04-T04",
+              "zone-D001-H05-T01",
+              "zone-D001-H05-T02",
+              "zone-D001-H05-T03",
+              "zone-D001-H05-T04",
+              "zone-D001-H06-T01",
+              "zone-D001-H06-T02",
+              "zone-D001-H06-T03",
+              "zone-D001-H06-T04",
+              "zone-D001-H07-T01",
+              "zone-D001-H07-T02",
+              "zone-D001-H07-T03",
+              "zone-D001-H07-T04",
+              "zone-D001-H08-T01",
+              "zone-D001-H08-T02",
+              "zone-D001-H08-T03",
+              "zone-D001-H08-T04",
+              "zone-D001-H09-T01",
+              "zone-D001-H09-T02",
+              "zone-D001-H09-T03",
+              "zone-D001-H09-T04",
+              "zone-D001-H10-T01",
+              "zone-D001-H10-T02",
+              "zone-D001-H10-T03",
+              "zone-D001-H10-T04",
+              "zone-D001-H11-T01",
+              "zone-D001-H11-T02",
+              "zone-D001-H11-T03",
+              "zone-D001-H11-T04",
+              "zone-D001-H12-T01",
+              "zone-D001-H12-T02",
+              "zone-D001-H12-T03",
+              "zone-D001-H12-T04",
+              "zone-D001-H13-T01",
+              "zone-D001-H13-T02",
+              "zone-D001-H13-T03",
+              "zone-D001-H13-T04",
+              "zone-D001-H14-T01",
+              "zone-D001-H14-T02",
+              "zone-D001-H14-T03",
+              "zone-D001-H14-T04",
+              "zone-D001-H15-T01",
+              "zone-D001-H15-T02",
+              "zone-D001-H15-T03",
+              "zone-D001-H15-T04",
+              "zone-D001-H16-T01",
+              "zone-D001-H16-T02",
+              "zone-D001-H16-T03",
+              "zone-D001-H16-T04",
+              "zone-D001-H17-T01",
+              "zone-D001-H17-T02",
+              "zone-D001-H17-T03",
+              "zone-D001-H17-T04",
+              "zone-D001-H18-T01",
+              "zone-D001-H18-T02",
+              "zone-D001-H18-T03",
+              "zone-D001-H18-T04",
+              "zone-D001-H19-T01",
+              "zone-D001-H19-T02",
+              "zone-D001-H19-T03",
+              "zone-D001-H19-T04",
+              "zone-D001-H20-T01",
+              "zone-D001-H20-T02",
+              "zone-D001-H20-T03",
+              "zone-D001-H20-T04",
+              "zone-D001-H21-T01",
+              "zone-D001-H21-T02",
+              "zone-D001-H21-T03",
+              "zone-D001-H21-T04",
+              "zone-D001-H22-T01",
+              "zone-D001-H22-T02",
+              "zone-D001-H22-T03",
+              "zone-D001-H22-T04",
+              "zone-D001-H23-T01",
+              "zone-D001-H23-T02",
+              "zone-D001-H23-T03",
+              "zone-D001-H23-T04",
+              "zone-D001-H24-T01",
+              "zone-D001-H24-T02",
+              "zone-D001-H24-T03",
+              "zone-D001-H24-T04"
+            ]
+          },
+          "lane_counts": {
+            "A-24H": {
+              "all_native_operations": 193,
+              "direct_operations": 97,
+              "unpaired_Current_operations": 96
+            },
+            "A-72H": {
+              "all_native_operations": 577,
+              "direct_operations": 289,
+              "unpaired_Current_operations": 288
+            },
+            "B-BOTH-24H": {
+              "all_native_operations": 193,
+              "direct_operations": 97,
+              "unpaired_Current_operations": 96
+            }
+          },
+          "paired_fieldset": [
+            "environment.DayOfYear_Schedule"
+          ],
+          "direct_field_observation_count": 966,
+          "evidence": {
+            "data_review": {
+              "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+              "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+            },
+            "data_review_execution": {
+              "path": ".runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json",
+              "sha256": "1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0"
+            },
+            "recovery": {
+              "path": ".runtime/porting/CLK-04/original-recovery-01/recovery.json",
+              "sha256": "9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6"
+            },
+            "recovery_execution": {
+              "path": ".runtime/porting/CLK-04/original-recovery-command-01/receipt.json",
+              "sha256": "31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130"
+            },
+            "preserved_original_reference": {
+              "path": ".runtime/porting/CLK-04/original-first-02/helper-reference.json",
+              "sha256": "c146f3e6568e3e6f3337bc83f8224f7dc2d072d85e0df26e7f5b1697bbef27e0"
+            },
+            "failed_original_execution": {
+              "path": ".runtime/porting/CLK-04/original-first-command-02/receipt.json",
+              "sha256": "b28ddaa77873187959beb732915200d332dd75ff368e51eaadc0b85d0d93ec9e"
+            },
+            "native_execution": {
+              "path": ".runtime/porting/CLK-04/original-first-02/helper-command.json",
+              "sha256": "50493a818d2c2c79f08dc6deffa0cc78a327434e3a5013452588b0f71a347a93"
+            },
+            "native_results": {
+              "path": ".runtime/porting/CLK-04/original-first-02/native-output/clk04-helper-results.json",
+              "sha256": "d84b696a34c720004ede289e47719bcc3d066ee48652f4a7d1a9431a1b825dba"
+            },
+            "native_request": {
+              "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+              "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+            },
+            "native_admission_contract": {
+              "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+              "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+            },
+            "native_projection": {
+              "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+              "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+            },
+            "contracts": {
+              "source": {
+                "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+                "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+              },
+              "cases": {
+                "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+                "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+              },
+              "tolerances": {
+                "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+                "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+              }
+            },
+            "native_build": {
+              "path": ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+              "sha256": "1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc"
+            },
+            "native_build_review": {
+              "path": ".runtime/porting/CLK-04/independent-native-build-review-01/review.json",
+              "sha256": "95b786ddce451f154054585e67e00106785246fd691c28ceca8d9c987e4b1400"
+            },
+            "native_build_review_execution": {
+              "path": ".runtime/porting/CLK-04/independent-native-build-review-command-01/receipt.json",
+              "sha256": "803ff81f35a9210fd71ed7c1a83da7b69bc038cdf1c368087aa3ebc64ebc6fc5"
+            },
+            "retained_derivative": {
+              "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+              "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+            },
+            "retired_original_registry": {
+              "path": ".runtime/porting/CLK-04/retirement-01/registry-retired.json",
+              "sha256": "27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378"
+            }
+          },
+          "all_other_selected_operands_card": "CLK-05",
+          "new_Current_comparisons_performed": false,
+          "native_results_supplied_to_Rust": false,
+          "selected_field_counts_unchanged": true,
+          "numeric_profiles_changed": false,
+          "case_or_scope_expanded": false,
+          "ordinal_recomputed_or_synthesized": false,
+          "native_results_parsed_by_freezer": false,
+          "historical_native_exit_code": 0,
+          "historical_wrapper_exit_code": 1,
+          "metadata_recovery_exit_code": 0,
+          "historical_failed_wrapper_relabelled_zero": false,
+          "unavailable_counted_as_PASS": false
+        }
+      },
+      "completion_evidence": {
+        "path": "energyplus_porting_plan/evidence/CLK-05.json",
+        "sha256": "faf2e50516145ebec3060c245fc217a6b5c181c48b9ec986f2d04cd68999c8ef"
+      },
+      "note": "Selected solar storage/history and live A/B owned transport passed; current/night/SRC04 physics remains unpaired."
     },
     {
       "id": "CLK-06",

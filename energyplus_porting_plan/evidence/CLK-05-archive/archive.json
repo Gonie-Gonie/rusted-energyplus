@@ -1,0 +1,3926 @@
+{
+  "schema": "clk05-selected-byte-evidence-archive.v1",
+  "completed_utc": "2026-10-09T04:44:30.088385+00:00",
+  "approved_plan": {
+    "path": ".runtime/porting/CLK-05/completion-approved-01/archive-plan.json",
+    "sha256": "868d77dcb6d1a53b191c74e794ac70424797576d118619f6f013b4a1232ae59b"
+  },
+  "rows": [
+    {
+      "role": "unit-comparison",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-unit-comparison-03/unit-comparison.json",
+        "sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90",
+        "original_size_bytes": 2809151,
+        "stored_payload_sha256": "3475936f84e68168e164a8cf94d9ad50a8e66a670b9325c0312f1fa945feae08",
+        "stored_payload_size_bytes": 208907,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/3475936f84e68168e164a8cf94d9ad50a8e66a670b9325c0312f1fa945feae08.gz",
+            "sha256": "3475936f84e68168e164a8cf94d9ad50a8e66a670b9325c0312f1fa945feae08",
+            "size_bytes": 208907
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-unit-comparison-command-03/receipt.json",
+        "sha256": "f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6",
+        "original_size_bytes": 4474,
+        "stored_payload_sha256": "f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6",
+        "stored_payload_size_bytes": 4474,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6.part",
+            "sha256": "f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6",
+            "size_bytes": 4474
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-result-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-02/review.json",
+        "sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518",
+        "original_size_bytes": 8397,
+        "stored_payload_sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518",
+        "stored_payload_size_bytes": 8397,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518.part",
+            "sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518",
+            "size_bytes": 8397
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-review-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-command-02/receipt.json",
+        "sha256": "63c22ff3e735be316886d8facbdf5f4a48837938fcae5e4814ba114375aa44b1"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "63c22ff3e735be316886d8facbdf5f4a48837938fcae5e4814ba114375aa44b1",
+        "original_size_bytes": 3061,
+        "stored_payload_sha256": "63c22ff3e735be316886d8facbdf5f4a48837938fcae5e4814ba114375aa44b1",
+        "stored_payload_size_bytes": 3061,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/63c22ff3e735be316886d8facbdf5f4a48837938fcae5e4814ba114375aa44b1.part",
+            "sha256": "63c22ff3e735be316886d8facbdf5f4a48837938fcae5e4814ba114375aa44b1",
+            "size_bytes": 3061
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-comparison",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/production-comparison.json",
+        "sha256": "882ecb56871a64841ae17c41cb15c3f72a42c8fc2c1ab3a18e05d2a0488fd24a"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "882ecb56871a64841ae17c41cb15c3f72a42c8fc2c1ab3a18e05d2a0488fd24a",
+        "original_size_bytes": 2806841,
+        "stored_payload_sha256": "18f617e6ae83828d05fe515b17e7ce3a4c757617850ecd6e167ef19faa777383",
+        "stored_payload_size_bytes": 381872,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/18f617e6ae83828d05fe515b17e7ce3a4c757617850ecd6e167ef19faa777383.gz",
+            "sha256": "18f617e6ae83828d05fe515b17e7ce3a4c757617850ecd6e167ef19faa777383",
+            "size_bytes": 381872
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-command-02/receipt.json",
+        "sha256": "9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734",
+        "original_size_bytes": 3231,
+        "stored_payload_sha256": "9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734",
+        "stored_payload_size_bytes": 3231,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734.part",
+            "sha256": "9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734",
+            "size_bytes": 3231
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-result-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-production-result-review-02/review.json",
+        "sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a",
+        "original_size_bytes": 32561,
+        "stored_payload_sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a",
+        "stored_payload_size_bytes": 32561,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a.part",
+            "sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a",
+            "size_bytes": 32561
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-review-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-production-result-review-command-02/receipt.json",
+        "sha256": "24e6d7ef3e2facff84f2f10c41152c2fcf5d8ac61f69d3a23536e3dc9b1fc170"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "24e6d7ef3e2facff84f2f10c41152c2fcf5d8ac61f69d3a23536e3dc9b1fc170",
+        "original_size_bytes": 3058,
+        "stored_payload_sha256": "24e6d7ef3e2facff84f2f10c41152c2fcf5d8ac61f69d3a23536e3dc9b1fc170",
+        "stored_payload_size_bytes": 3058,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/24e6d7ef3e2facff84f2f10c41152c2fcf5d8ac61f69d3a23536e3dc9b1fc170.part",
+            "sha256": "24e6d7ef3e2facff84f2f10c41152c2fcf5d8ac61f69d3a23536e3dc9b1fc170",
+            "size_bytes": 3058
+          }
+        ]
+      }
+    },
+    {
+      "role": "legacy-gap",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/existing-baseline-gap-01/gap.json",
+        "sha256": "dae13dac1e3f655ed2c30ff989cea902208430a351dd7508c24da18b02c52814"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "dae13dac1e3f655ed2c30ff989cea902208430a351dd7508c24da18b02c52814",
+        "original_size_bytes": 6006899,
+        "stored_payload_sha256": "3b122e955c8e5b6c476f6412782347736af409998005c6cd4e50ce8c3d692f3a",
+        "stored_payload_size_bytes": 250782,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/3b122e955c8e5b6c476f6412782347736af409998005c6cd4e50ce8c3d692f3a.gz",
+            "sha256": "3b122e955c8e5b6c476f6412782347736af409998005c6cd4e50ce8c3d692f3a",
+            "size_bytes": 250782
+          }
+        ]
+      }
+    },
+    {
+      "role": "legacy-gap-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/existing-baseline-gap-command-01/receipt.json",
+        "sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5",
+        "original_size_bytes": 4246,
+        "stored_payload_sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5",
+        "stored_payload_size_bytes": 4246,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5.part",
+            "sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5",
+            "size_bytes": 4246
+          }
+        ]
+      }
+    },
+    {
+      "role": "original-reference",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/original-execution-01/helper-reference.json",
+        "sha256": "e5cb6fee58abb978abd8c1fa92c4ef1bafcd80d2df1efe505a1c156cd512d820"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "e5cb6fee58abb978abd8c1fa92c4ef1bafcd80d2df1efe505a1c156cd512d820",
+        "original_size_bytes": 45442396,
+        "stored_payload_sha256": "77a2dcf77d2816f295bb845df02555fc9d86657b6d9db06e2a8321ff18b79da1",
+        "stored_payload_size_bytes": 1923950,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/77a2dcf77d2816f295bb845df02555fc9d86657b6d9db06e2a8321ff18b79da1.gz",
+            "sha256": "77a2dcf77d2816f295bb845df02555fc9d86657b6d9db06e2a8321ff18b79da1",
+            "size_bytes": 1923950
+          }
+        ]
+      }
+    },
+    {
+      "role": "original-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/original-execution-command-01/receipt.json",
+        "sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24",
+        "original_size_bytes": 3432,
+        "stored_payload_sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24",
+        "stored_payload_size_bytes": 3432,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24.part",
+            "sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24",
+            "size_bytes": 3432
+          }
+        ]
+      }
+    },
+    {
+      "role": "original-data-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+        "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd",
+        "original_size_bytes": 16670,
+        "stored_payload_sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd",
+        "stored_payload_size_bytes": 16670,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd.part",
+            "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd",
+            "size_bytes": 16670
+          }
+        ]
+      }
+    },
+    {
+      "role": "original-data-review-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-command-01/receipt.json",
+        "sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562",
+        "original_size_bytes": 3005,
+        "stored_payload_sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562",
+        "stored_payload_size_bytes": 3005,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562.part",
+            "sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562",
+            "size_bytes": 3005
+          }
+        ]
+      }
+    },
+    {
+      "role": "frozen-source",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+        "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53",
+        "original_size_bytes": 21126,
+        "stored_payload_sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53",
+        "stored_payload_size_bytes": 21126,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53.part",
+            "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53",
+            "size_bytes": 21126
+          }
+        ]
+      }
+    },
+    {
+      "role": "frozen-cases",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+        "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6",
+        "original_size_bytes": 29797,
+        "stored_payload_sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6",
+        "stored_payload_size_bytes": 29797,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6.part",
+            "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6",
+            "size_bytes": 29797
+          }
+        ]
+      }
+    },
+    {
+      "role": "frozen-tolerances",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+        "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61",
+        "original_size_bytes": 1783,
+        "stored_payload_sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61",
+        "stored_payload_size_bytes": 1783,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61.part",
+            "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61",
+            "size_bytes": 1783
+          }
+        ]
+      }
+    },
+    {
+      "role": "frozen-helper-request",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+        "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed",
+        "original_size_bytes": 492487,
+        "stored_payload_sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed",
+        "stored_payload_size_bytes": 492487,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed.part",
+            "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed",
+            "size_bytes": 492487
+          }
+        ]
+      }
+    },
+    {
+      "role": "frozen-observation-projection",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+        "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92",
+        "original_size_bytes": 8138,
+        "stored_payload_sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92",
+        "stored_payload_size_bytes": 8138,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92.part",
+            "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92",
+            "size_bytes": 8138
+          }
+        ]
+      }
+    },
+    {
+      "role": "frozen-native-admission",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+        "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd",
+        "original_size_bytes": 12682,
+        "stored_payload_sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd",
+        "stored_payload_size_bytes": 12682,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd.part",
+            "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd",
+            "size_bytes": 12682
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-unit-comparison",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-unit-comparison-01/unit-comparison.json",
+        "sha256": "0f8184435f249a2725f2b6b625735e5efa6c539f552401789d96e9748b42885b"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "0f8184435f249a2725f2b6b625735e5efa6c539f552401789d96e9748b42885b",
+        "original_size_bytes": 2851500,
+        "stored_payload_sha256": "873314ed86a5acb5ca79b83febf0df6da85cd50f2fa6898b5612fd2abb89f626",
+        "stored_payload_size_bytes": 210245,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/873314ed86a5acb5ca79b83febf0df6da85cd50f2fa6898b5612fd2abb89f626.gz",
+            "sha256": "873314ed86a5acb5ca79b83febf0df6da85cd50f2fa6898b5612fd2abb89f626",
+            "size_bytes": 210245
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-unit-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-unit-comparison-command-01/receipt.json",
+        "sha256": "5886218de1259d226c469b92dfb86695021539236501d77b055a9ad0e9ca021c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5886218de1259d226c469b92dfb86695021539236501d77b055a9ad0e9ca021c",
+        "original_size_bytes": 4463,
+        "stored_payload_sha256": "5886218de1259d226c469b92dfb86695021539236501d77b055a9ad0e9ca021c",
+        "stored_payload_size_bytes": 4463,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5886218de1259d226c469b92dfb86695021539236501d77b055a9ad0e9ca021c.part",
+            "sha256": "5886218de1259d226c469b92dfb86695021539236501d77b055a9ad0e9ca021c",
+            "size_bytes": 4463
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-workspace-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/workspace-test-command-01/receipt.json",
+        "sha256": "e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1",
+        "original_size_bytes": 2640,
+        "stored_payload_sha256": "e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1",
+        "stored_payload_size_bytes": 2640,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1.part",
+            "sha256": "e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1",
+            "size_bytes": 2640
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-production-comparison",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-01/production-comparison.json",
+        "sha256": "c36ae50d49b6022c438ee43d3864a8a65be96104bc3374b56013808fb68b644e"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "c36ae50d49b6022c438ee43d3864a8a65be96104bc3374b56013808fb68b644e",
+        "original_size_bytes": 2963248,
+        "stored_payload_sha256": "d7f92fc49829d5fa8eb29e3ab99b57bd370bfad140f679ab389f880e9661c00e",
+        "stored_payload_size_bytes": 381247,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d7f92fc49829d5fa8eb29e3ab99b57bd370bfad140f679ab389f880e9661c00e.gz",
+            "sha256": "d7f92fc49829d5fa8eb29e3ab99b57bd370bfad140f679ab389f880e9661c00e",
+            "size_bytes": 381247
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-production-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-command-01/receipt.json",
+        "sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f",
+        "original_size_bytes": 3212,
+        "stored_payload_sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f",
+        "stored_payload_size_bytes": 3212,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f.part",
+            "sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f",
+            "size_bytes": 3212
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-plan-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-plan-command-01/receipt.json",
+        "sha256": "75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6",
+        "original_size_bytes": 3760,
+        "stored_payload_sha256": "75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6",
+        "stored_payload_size_bytes": 3760,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6.part",
+            "sha256": "75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6",
+            "size_bytes": 3760
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-wrong-package-CLI-freeze-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-CLI-build-freeze-command-01/receipt.json",
+        "sha256": "e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8",
+        "original_size_bytes": 2879,
+        "stored_payload_sha256": "e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8",
+        "stored_payload_size_bytes": 2879,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8.part",
+            "sha256": "e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8",
+            "size_bytes": 2879
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-production-result-review-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-production-result-review-command-01/receipt.json",
+        "sha256": "cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9",
+        "original_size_bytes": 3058,
+        "stored_payload_sha256": "cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9",
+        "stored_payload_size_bytes": 3058,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9.part",
+            "sha256": "cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9",
+            "size_bytes": 3058
+          }
+        ]
+      }
+    },
+    {
+      "role": "observer-format-plan",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-format-plan-prep-02/plan.json",
+        "sha256": "5fc4c9e09ce33519c9eae3f606261fb45e5a536c84be7cb8bfb3c409957bb33d"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5fc4c9e09ce33519c9eae3f606261fb45e5a536c84be7cb8bfb3c409957bb33d",
+        "original_size_bytes": 7445,
+        "stored_payload_sha256": "5fc4c9e09ce33519c9eae3f606261fb45e5a536c84be7cb8bfb3c409957bb33d",
+        "stored_payload_size_bytes": 7445,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5fc4c9e09ce33519c9eae3f606261fb45e5a536c84be7cb8bfb3c409957bb33d.part",
+            "sha256": "5fc4c9e09ce33519c9eae3f606261fb45e5a536c84be7cb8bfb3c409957bb33d",
+            "size_bytes": 7445
+          }
+        ]
+      }
+    },
+    {
+      "role": "observer-format-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-command-01/receipt.json",
+        "sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc",
+        "original_size_bytes": 3996,
+        "stored_payload_sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc",
+        "stored_payload_size_bytes": 3996,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc.part",
+            "sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc",
+            "size_bytes": 3996
+          }
+        ]
+      }
+    },
+    {
+      "role": "observer-format-summary",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/format.json",
+        "sha256": "0662f4e204a94c22d580a2369959b8fe411a1c0f0714807086667ea876619622"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "0662f4e204a94c22d580a2369959b8fe411a1c0f0714807086667ea876619622",
+        "original_size_bytes": 8294,
+        "stored_payload_sha256": "0662f4e204a94c22d580a2369959b8fe411a1c0f0714807086667ea876619622",
+        "stored_payload_size_bytes": 8294,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/0662f4e204a94c22d580a2369959b8fe411a1c0f0714807086667ea876619622.part",
+            "sha256": "0662f4e204a94c22d580a2369959b8fe411a1c0f0714807086667ea876619622",
+            "size_bytes": 8294
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-Root-diff-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-diff-review-01/review.json",
+        "sha256": "e0c8be4c7fd3c34af45f51653abf41f6fddca569d7de5212958e152cfd9cdf34"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e0c8be4c7fd3c34af45f51653abf41f6fddca569d7de5212958e152cfd9cdf34",
+        "original_size_bytes": 6458,
+        "stored_payload_sha256": "e0c8be4c7fd3c34af45f51653abf41f6fddca569d7de5212958e152cfd9cdf34",
+        "stored_payload_size_bytes": 6458,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e0c8be4c7fd3c34af45f51653abf41f6fddca569d7de5212958e152cfd9cdf34.part",
+            "sha256": "e0c8be4c7fd3c34af45f51653abf41f6fddca569d7de5212958e152cfd9cdf34",
+            "size_bytes": 6458
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-projection",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/comparison-projection-01/projection.json",
+        "sha256": "d133500982ec92367c66ccd23694e0ce3c2bebfe7a61f8ae71fa61eaf6b38aaf"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d133500982ec92367c66ccd23694e0ce3c2bebfe7a61f8ae71fa61eaf6b38aaf",
+        "original_size_bytes": 12477,
+        "stored_payload_sha256": "d133500982ec92367c66ccd23694e0ce3c2bebfe7a61f8ae71fa61eaf6b38aaf",
+        "stored_payload_size_bytes": 12477,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d133500982ec92367c66ccd23694e0ce3c2bebfe7a61f8ae71fa61eaf6b38aaf.part",
+            "sha256": "d133500982ec92367c66ccd23694e0ce3c2bebfe7a61f8ae71fa61eaf6b38aaf",
+            "size_bytes": 12477
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-projection-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/comparison-projection-command-01/receipt.json",
+        "sha256": "03043622a1671b80722fbafdd7343ed5d462259ba5bddf88245b6a47f24686d3"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "03043622a1671b80722fbafdd7343ed5d462259ba5bddf88245b6a47f24686d3",
+        "original_size_bytes": 3122,
+        "stored_payload_sha256": "03043622a1671b80722fbafdd7343ed5d462259ba5bddf88245b6a47f24686d3",
+        "stored_payload_size_bytes": 3122,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/03043622a1671b80722fbafdd7343ed5d462259ba5bddf88245b6a47f24686d3.part",
+            "sha256": "03043622a1671b80722fbafdd7343ed5d462259ba5bddf88245b6a47f24686d3",
+            "size_bytes": 3122
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-source-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/review.json",
+        "sha256": "c03d4ff3a4852cdfaf77e29a51129d3a6e49c4fa0a92d5b65c42a5d173ae8892"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "c03d4ff3a4852cdfaf77e29a51129d3a6e49c4fa0a92d5b65c42a5d173ae8892",
+        "original_size_bytes": 4736,
+        "stored_payload_sha256": "c03d4ff3a4852cdfaf77e29a51129d3a6e49c4fa0a92d5b65c42a5d173ae8892",
+        "stored_payload_size_bytes": 4736,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/c03d4ff3a4852cdfaf77e29a51129d3a6e49c4fa0a92d5b65c42a5d173ae8892.part",
+            "sha256": "c03d4ff3a4852cdfaf77e29a51129d3a6e49c4fa0a92d5b65c42a5d173ae8892",
+            "size_bytes": 4736
+          }
+        ]
+      }
+    },
+    {
+      "role": "unit-source-review-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-command-01/receipt.json",
+        "sha256": "b6c338ee3b14876f6b26545a139cedd6d92df44f3c81509361ea4099d5d624c2"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "b6c338ee3b14876f6b26545a139cedd6d92df44f3c81509361ea4099d5d624c2",
+        "original_size_bytes": 2945,
+        "stored_payload_sha256": "b6c338ee3b14876f6b26545a139cedd6d92df44f3c81509361ea4099d5d624c2",
+        "stored_payload_size_bytes": 2945,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b6c338ee3b14876f6b26545a139cedd6d92df44f3c81509361ea4099d5d624c2.part",
+            "sha256": "b6c338ee3b14876f6b26545a139cedd6d92df44f3c81509361ea4099d5d624c2",
+            "size_bytes": 2945
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-projection",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/projection.json",
+        "sha256": "621964c11fd9684e430399957471b423822193d86dc911dbcfbe3fc5ecf3d107"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "621964c11fd9684e430399957471b423822193d86dc911dbcfbe3fc5ecf3d107",
+        "original_size_bytes": 50606,
+        "stored_payload_sha256": "621964c11fd9684e430399957471b423822193d86dc911dbcfbe3fc5ecf3d107",
+        "stored_payload_size_bytes": 50606,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/621964c11fd9684e430399957471b423822193d86dc911dbcfbe3fc5ecf3d107.part",
+            "sha256": "621964c11fd9684e430399957471b423822193d86dc911dbcfbe3fc5ecf3d107",
+            "size_bytes": 50606
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-projection-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-command-02/receipt.json",
+        "sha256": "babb23ff3d5cc183dbb2e916746e9479f478ec00c68b7a09b9b75775ee9dc6bf"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "babb23ff3d5cc183dbb2e916746e9479f478ec00c68b7a09b9b75775ee9dc6bf",
+        "original_size_bytes": 3201,
+        "stored_payload_sha256": "babb23ff3d5cc183dbb2e916746e9479f478ec00c68b7a09b9b75775ee9dc6bf",
+        "stored_payload_size_bytes": 3201,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/babb23ff3d5cc183dbb2e916746e9479f478ec00c68b7a09b9b75775ee9dc6bf.part",
+            "sha256": "babb23ff3d5cc183dbb2e916746e9479f478ec00c68b7a09b9b75775ee9dc6bf",
+            "size_bytes": 3201
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-source-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/review.json",
+        "sha256": "4e407849618a99ea2d6af3bb0a63ef4bada6f6db5d54d87c387ae8869d224bc3"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "4e407849618a99ea2d6af3bb0a63ef4bada6f6db5d54d87c387ae8869d224bc3",
+        "original_size_bytes": 12268,
+        "stored_payload_sha256": "4e407849618a99ea2d6af3bb0a63ef4bada6f6db5d54d87c387ae8869d224bc3",
+        "stored_payload_size_bytes": 12268,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/4e407849618a99ea2d6af3bb0a63ef4bada6f6db5d54d87c387ae8869d224bc3.part",
+            "sha256": "4e407849618a99ea2d6af3bb0a63ef4bada6f6db5d54d87c387ae8869d224bc3",
+            "size_bytes": 12268
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-source-review-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-command-02/receipt.json",
+        "sha256": "8c8602e131b42c4df73930d98caa5191089bb1af877b1fcbe40221b9ba7fb086"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "8c8602e131b42c4df73930d98caa5191089bb1af877b1fcbe40221b9ba7fb086",
+        "original_size_bytes": 2993,
+        "stored_payload_sha256": "8c8602e131b42c4df73930d98caa5191089bb1af877b1fcbe40221b9ba7fb086",
+        "stored_payload_size_bytes": 2993,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/8c8602e131b42c4df73930d98caa5191089bb1af877b1fcbe40221b9ba7fb086.part",
+            "sha256": "8c8602e131b42c4df73930d98caa5191089bb1af877b1fcbe40221b9ba7fb086",
+            "size_bytes": 2993
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-plan",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-plan-03/plan.json",
+        "sha256": "48b1ec7643c7574d3a61a8a847194791f4f1cf0c63b9f2a90f6c348c2ee62665"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "48b1ec7643c7574d3a61a8a847194791f4f1cf0c63b9f2a90f6c348c2ee62665",
+        "original_size_bytes": 27706,
+        "stored_payload_sha256": "48b1ec7643c7574d3a61a8a847194791f4f1cf0c63b9f2a90f6c348c2ee62665",
+        "stored_payload_size_bytes": 27706,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/48b1ec7643c7574d3a61a8a847194791f4f1cf0c63b9f2a90f6c348c2ee62665.part",
+            "sha256": "48b1ec7643c7574d3a61a8a847194791f4f1cf0c63b9f2a90f6c348c2ee62665",
+            "size_bytes": 27706
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-plan-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-plan-command-03/receipt.json",
+        "sha256": "1ec752d232f756898635f23a409039fb162e3344ad21f9cf1455cf80ee9f0783"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "1ec752d232f756898635f23a409039fb162e3344ad21f9cf1455cf80ee9f0783",
+        "original_size_bytes": 3776,
+        "stored_payload_sha256": "1ec752d232f756898635f23a409039fb162e3344ad21f9cf1455cf80ee9f0783",
+        "stored_payload_size_bytes": 3776,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1ec752d232f756898635f23a409039fb162e3344ad21f9cf1455cf80ee9f0783.part",
+            "sha256": "1ec752d232f756898635f23a409039fb162e3344ad21f9cf1455cf80ee9f0783",
+            "size_bytes": 3776
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-matrix",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-matrix-02/matrix.json",
+        "sha256": "adf7600f01dd3b1e872f932991a654df0fdba8a46b4345e6af7edd604337899e"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "adf7600f01dd3b1e872f932991a654df0fdba8a46b4345e6af7edd604337899e",
+        "original_size_bytes": 60424,
+        "stored_payload_sha256": "adf7600f01dd3b1e872f932991a654df0fdba8a46b4345e6af7edd604337899e",
+        "stored_payload_size_bytes": 60424,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/adf7600f01dd3b1e872f932991a654df0fdba8a46b4345e6af7edd604337899e.part",
+            "sha256": "adf7600f01dd3b1e872f932991a654df0fdba8a46b4345e6af7edd604337899e",
+            "size_bytes": 60424
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-matrix-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-matrix-command-02/receipt.json",
+        "sha256": "2c1d0feac4d64eda41d0e9f41092ea016c35fd8e459b6e9914749729f64de877"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "2c1d0feac4d64eda41d0e9f41092ea016c35fd8e459b6e9914749729f64de877",
+        "original_size_bytes": 3960,
+        "stored_payload_sha256": "2c1d0feac4d64eda41d0e9f41092ea016c35fd8e459b6e9914749729f64de877",
+        "stored_payload_size_bytes": 3960,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/2c1d0feac4d64eda41d0e9f41092ea016c35fd8e459b6e9914749729f64de877.part",
+            "sha256": "2c1d0feac4d64eda41d0e9f41092ea016c35fd8e459b6e9914749729f64de877",
+            "size_bytes": 3960
+          }
+        ]
+      }
+    },
+    {
+      "role": "candidate-build",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-observer-build-03/build-receipt.json",
+        "sha256": "639a47b5555c2038d80957fd14d8dc3f67f4813a147719426f5ab5197fe63910"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "639a47b5555c2038d80957fd14d8dc3f67f4813a147719426f5ab5197fe63910",
+        "original_size_bytes": 1353470,
+        "stored_payload_sha256": "59eb3abdc0a378306d6b8c10ea01746bc13a1f8391e0eb43949abe6b6fde5be0",
+        "stored_payload_size_bytes": 197263,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/59eb3abdc0a378306d6b8c10ea01746bc13a1f8391e0eb43949abe6b6fde5be0.gz",
+            "sha256": "59eb3abdc0a378306d6b8c10ea01746bc13a1f8391e0eb43949abe6b6fde5be0",
+            "size_bytes": 197263
+          }
+        ]
+      }
+    },
+    {
+      "role": "candidate-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-observer-execution-command-03/receipt.json",
+        "sha256": "15ef2cd1bb661c304e32467215b2c57bc0fe052de74bd47028674cb849e8bdd2"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "15ef2cd1bb661c304e32467215b2c57bc0fe052de74bd47028674cb849e8bdd2",
+        "original_size_bytes": 2898,
+        "stored_payload_sha256": "15ef2cd1bb661c304e32467215b2c57bc0fe052de74bd47028674cb849e8bdd2",
+        "stored_payload_size_bytes": 2898,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/15ef2cd1bb661c304e32467215b2c57bc0fe052de74bd47028674cb849e8bdd2.part",
+            "sha256": "15ef2cd1bb661c304e32467215b2c57bc0fe052de74bd47028674cb849e8bdd2",
+            "size_bytes": 2898
+          }
+        ]
+      }
+    },
+    {
+      "role": "production-CLI-build",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-CLI-build-04/build-receipt.json",
+        "sha256": "f970221e37ae5aa04d57089c47de429e5dd96c9d426026a4798c4217e5061318"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "f970221e37ae5aa04d57089c47de429e5dd96c9d426026a4798c4217e5061318",
+        "original_size_bytes": 1353238,
+        "stored_payload_sha256": "b22688b0d9d6cc311ada96ad73c1428b57b9c66680c00cfdd7384d2febd6db24",
+        "stored_payload_size_bytes": 197253,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b22688b0d9d6cc311ada96ad73c1428b57b9c66680c00cfdd7384d2febd6db24.gz",
+            "sha256": "b22688b0d9d6cc311ada96ad73c1428b57b9c66680c00cfdd7384d2febd6db24",
+            "size_bytes": 197253
+          }
+        ]
+      }
+    },
+    {
+      "role": "existing-build",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/existing-observer-build-01/build-receipt.json",
+        "sha256": "49f963105032633e6e24281dd8a67facbe7a7d5637a76a4cb351a92cd334803e"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "49f963105032633e6e24281dd8a67facbe7a7d5637a76a4cb351a92cd334803e",
+        "original_size_bytes": 1351120,
+        "stored_payload_sha256": "a863bb54ebe0347437f86245dade4b560a06caed004720bf65c68c12145427ad",
+        "stored_payload_size_bytes": 196836,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a863bb54ebe0347437f86245dade4b560a06caed004720bf65c68c12145427ad.gz",
+            "sha256": "a863bb54ebe0347437f86245dade4b560a06caed004720bf65c68c12145427ad",
+            "size_bytes": 196836
+          }
+        ]
+      }
+    },
+    {
+      "role": "existing-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/existing-observer-execution-command-01/receipt.json",
+        "sha256": "a5bf39e214daa9d133575e709a8c394008a4c6906fc5002bd0147ed0398ba52c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a5bf39e214daa9d133575e709a8c394008a4c6906fc5002bd0147ed0398ba52c",
+        "original_size_bytes": 2765,
+        "stored_payload_sha256": "a5bf39e214daa9d133575e709a8c394008a4c6906fc5002bd0147ed0398ba52c",
+        "stored_payload_size_bytes": 2765,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a5bf39e214daa9d133575e709a8c394008a4c6906fc5002bd0147ed0398ba52c.part",
+            "sha256": "a5bf39e214daa9d133575e709a8c394008a4c6906fc5002bd0147ed0398ba52c",
+            "size_bytes": 2765
+          }
+        ]
+      }
+    },
+    {
+      "role": "observer-inputs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-observer-input-02/observer-request.json",
+        "sha256": "317eac6baff04b3dd7e786e91cf9fa70dc23dec6d935cb9faaa597f122b4e8da"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "317eac6baff04b3dd7e786e91cf9fa70dc23dec6d935cb9faaa597f122b4e8da",
+        "original_size_bytes": 10637,
+        "stored_payload_sha256": "317eac6baff04b3dd7e786e91cf9fa70dc23dec6d935cb9faaa597f122b4e8da",
+        "stored_payload_size_bytes": 10637,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/317eac6baff04b3dd7e786e91cf9fa70dc23dec6d935cb9faaa597f122b4e8da.part",
+            "sha256": "317eac6baff04b3dd7e786e91cf9fa70dc23dec6d935cb9faaa597f122b4e8da",
+            "size_bytes": 10637
+          }
+        ]
+      }
+    },
+    {
+      "role": "observer-input-projection",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/candidate-observer-input-02/projection.json",
+        "sha256": "ee0d8a9781a37a6449570b99549dcfe7b7d8aca69a0f7d5704de1987ffd67996"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "ee0d8a9781a37a6449570b99549dcfe7b7d8aca69a0f7d5704de1987ffd67996",
+        "original_size_bytes": 13566,
+        "stored_payload_sha256": "ee0d8a9781a37a6449570b99549dcfe7b7d8aca69a0f7d5704de1987ffd67996",
+        "stored_payload_size_bytes": 13566,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/ee0d8a9781a37a6449570b99549dcfe7b7d8aca69a0f7d5704de1987ffd67996.part",
+            "sha256": "ee0d8a9781a37a6449570b99549dcfe7b7d8aca69a0f7d5704de1987ffd67996",
+            "size_bytes": 13566
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-quality-lineage",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+        "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+      },
+      "storage": {
+        "encoding": "gzip",
+        "original_sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f",
+        "original_size_bytes": 825663,
+        "stored_payload_sha256": "1a92f98964b3d99ab77eb4ea918f6dd59239de533af9ff7694ede99358b7c4f9",
+        "stored_payload_size_bytes": 171156,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1a92f98964b3d99ab77eb4ea918f6dd59239de533af9ff7694ede99358b7c4f9.gz",
+            "sha256": "1a92f98964b3d99ab77eb4ea918f6dd59239de533af9ff7694ede99358b7c4f9",
+            "size_bytes": 171156
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-quality-lineage-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-quality-lineage-command-01/receipt.json",
+        "sha256": "9c437117c64548f54aeb2d6cf982150179ca858d7b741a3d439f9f971835c706"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "9c437117c64548f54aeb2d6cf982150179ca858d7b741a3d439f9f971835c706",
+        "original_size_bytes": 4077,
+        "stored_payload_sha256": "9c437117c64548f54aeb2d6cf982150179ca858d7b741a3d439f9f971835c706",
+        "stored_payload_size_bytes": 4077,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9c437117c64548f54aeb2d6cf982150179ca858d7b741a3d439f9f971835c706.part",
+            "sha256": "9c437117c64548f54aeb2d6cf982150179ca858d7b741a3d439f9f971835c706",
+            "size_bytes": 4077
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-workspace-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/workspace-test-command-04/receipt.json",
+        "sha256": "659f3a4759e3da3165110b3fd2b216228d3902c336a60c571edf97ad5ed8c9d6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "659f3a4759e3da3165110b3fd2b216228d3902c336a60c571edf97ad5ed8c9d6",
+        "original_size_bytes": 2637,
+        "stored_payload_sha256": "659f3a4759e3da3165110b3fd2b216228d3902c336a60c571edf97ad5ed8c9d6",
+        "stored_payload_size_bytes": 2637,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/659f3a4759e3da3165110b3fd2b216228d3902c336a60c571edf97ad5ed8c9d6.part",
+            "sha256": "659f3a4759e3da3165110b3fd2b216228d3902c336a60c571edf97ad5ed8c9d6",
+            "size_bytes": 2637
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-clippy-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-clippy-command-03/receipt.json",
+        "sha256": "cbc55fde667e4287596cdbfea69ce6359a3765ab6bac6f09a02993d95511135f"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "cbc55fde667e4287596cdbfea69ce6359a3765ab6bac6f09a02993d95511135f",
+        "original_size_bytes": 2691,
+        "stored_payload_sha256": "cbc55fde667e4287596cdbfea69ce6359a3765ab6bac6f09a02993d95511135f",
+        "stored_payload_size_bytes": 2691,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/cbc55fde667e4287596cdbfea69ce6359a3765ab6bac6f09a02993d95511135f.part",
+            "sha256": "cbc55fde667e4287596cdbfea69ce6359a3765ab6bac6f09a02993d95511135f",
+            "size_bytes": 2691
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-format-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-format-check-command-01/receipt.json",
+        "sha256": "cfef56c87f99a471a257317141ff44896637ef100f94ea584f1dfed3b8024eac"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "cfef56c87f99a471a257317141ff44896637ef100f94ea584f1dfed3b8024eac",
+        "original_size_bytes": 4091,
+        "stored_payload_sha256": "cfef56c87f99a471a257317141ff44896637ef100f94ea584f1dfed3b8024eac",
+        "stored_payload_size_bytes": 4091,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/cfef56c87f99a471a257317141ff44896637ef100f94ea584f1dfed3b8024eac.part",
+            "sha256": "cfef56c87f99a471a257317141ff44896637ef100f94ea584f1dfed3b8024eac",
+            "size_bytes": 4091
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-source-quality-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/source-quality-command-01/receipt.json",
+        "sha256": "e2b92c80e4813e204ce66bc3ba444be53e4be640c7192dab1b8974d0a94bd572"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e2b92c80e4813e204ce66bc3ba444be53e4be640c7192dab1b8974d0a94bd572",
+        "original_size_bytes": 2708,
+        "stored_payload_sha256": "e2b92c80e4813e204ce66bc3ba444be53e4be640c7192dab1b8974d0a94bd572",
+        "stored_payload_size_bytes": 2708,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e2b92c80e4813e204ce66bc3ba444be53e4be640c7192dab1b8974d0a94bd572.part",
+            "sha256": "e2b92c80e4813e204ce66bc3ba444be53e4be640c7192dab1b8974d0a94bd572",
+            "size_bytes": 2708
+          }
+        ]
+      }
+    },
+    {
+      "role": "final-structure-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/structure-quality-command-01/receipt.json",
+        "sha256": "5284db31fa14c621ce308fc2b9ee5f4425f6da56cccbf3a9175cd812efc5f02a"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5284db31fa14c621ce308fc2b9ee5f4425f6da56cccbf3a9175cd812efc5f02a",
+        "original_size_bytes": 2724,
+        "stored_payload_sha256": "5284db31fa14c621ce308fc2b9ee5f4425f6da56cccbf3a9175cd812efc5f02a",
+        "stored_payload_size_bytes": 2724,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5284db31fa14c621ce308fc2b9ee5f4425f6da56cccbf3a9175cd812efc5f02a.part",
+            "sha256": "5284db31fa14c621ce308fc2b9ee5f4425f6da56cccbf3a9175cd812efc5f02a",
+            "size_bytes": 2724
+          }
+        ]
+      }
+    },
+    {
+      "role": "test-only-cleanup",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/cleanup.json",
+        "sha256": "dbd6c5042b2f5de0ccd7c7f6246b572e487e71d18c51dbc997942f15420cef64"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "dbd6c5042b2f5de0ccd7c7f6246b572e487e71d18c51dbc997942f15420cef64",
+        "original_size_bytes": 2085,
+        "stored_payload_sha256": "dbd6c5042b2f5de0ccd7c7f6246b572e487e71d18c51dbc997942f15420cef64",
+        "stored_payload_size_bytes": 2085,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/dbd6c5042b2f5de0ccd7c7f6246b572e487e71d18c51dbc997942f15420cef64.part",
+            "sha256": "dbd6c5042b2f5de0ccd7c7f6246b572e487e71d18c51dbc997942f15420cef64",
+            "size_bytes": 2085
+          }
+        ]
+      }
+    },
+    {
+      "role": "test-only-format-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/test-format-command-01/receipt.json",
+        "sha256": "2be9816290c7c231c697d630957efe6ca476c5c974a28924d75ce701956a16a7"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "2be9816290c7c231c697d630957efe6ca476c5c974a28924d75ce701956a16a7",
+        "original_size_bytes": 2838,
+        "stored_payload_sha256": "2be9816290c7c231c697d630957efe6ca476c5c974a28924d75ce701956a16a7",
+        "stored_payload_size_bytes": 2838,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/2be9816290c7c231c697d630957efe6ca476c5c974a28924d75ce701956a16a7.part",
+            "sha256": "2be9816290c7c231c697d630957efe6ca476c5c974a28924d75ce701956a16a7",
+            "size_bytes": 2838
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-final-clippy-execution",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-clippy-command-01/receipt.json",
+        "sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee",
+        "original_size_bytes": 2694,
+        "stored_payload_sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee",
+        "stored_payload_size_bytes": 2694,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee.part",
+            "sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee",
+            "size_bytes": 2694
+          }
+        ]
+      }
+    },
+    {
+      "role": "passive-observer-cleanup",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/cleanup.json",
+        "sha256": "05907cf20f00b36b5e6e39b2dc101a2dc136ec6ecce401bb37653f7db9a4a08b"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "05907cf20f00b36b5e6e39b2dc101a2dc136ec6ecce401bb37653f7db9a4a08b",
+        "original_size_bytes": 3276,
+        "stored_payload_sha256": "05907cf20f00b36b5e6e39b2dc101a2dc136ec6ecce401bb37653f7db9a4a08b",
+        "stored_payload_size_bytes": 3276,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/05907cf20f00b36b5e6e39b2dc101a2dc136ec6ecce401bb37653f7db9a4a08b.part",
+            "sha256": "05907cf20f00b36b5e6e39b2dc101a2dc136ec6ecce401bb37653f7db9a4a08b",
+            "size_bytes": 3276
+          }
+        ]
+      }
+    },
+    {
+      "role": "passive-observer-cleanup-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-diff-review-01/review.json",
+        "sha256": "f2f4d537337ce19bd7ffdb7eeaf96ca57cacdc57ae358974e30fc120cd03fc40"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f2f4d537337ce19bd7ffdb7eeaf96ca57cacdc57ae358974e30fc120cd03fc40",
+        "original_size_bytes": 2432,
+        "stored_payload_sha256": "f2f4d537337ce19bd7ffdb7eeaf96ca57cacdc57ae358974e30fc120cd03fc40",
+        "stored_payload_size_bytes": 2432,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f2f4d537337ce19bd7ffdb7eeaf96ca57cacdc57ae358974e30fc120cd03fc40.part",
+            "sha256": "f2f4d537337ce19bd7ffdb7eeaf96ca57cacdc57ae358974e30fc120cd03fc40",
+            "size_bytes": 2432
+          }
+        ]
+      }
+    },
+    {
+      "role": "test-only-cleanup-review",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/test-clippy-diff-review-01/review.json",
+        "sha256": "70201a29e8967525c27dd919f15626b3a77e7a8b9b64095fa143824c3905b4d6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "70201a29e8967525c27dd919f15626b3a77e7a8b9b64095fa143824c3905b4d6",
+        "original_size_bytes": 2027,
+        "stored_payload_sha256": "70201a29e8967525c27dd919f15626b3a77e7a8b9b64095fa143824c3905b4d6",
+        "stored_payload_size_bytes": 2027,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/70201a29e8967525c27dd919f15626b3a77e7a8b9b64095fa143824c3905b4d6.part",
+            "sha256": "70201a29e8967525c27dd919f15626b3a77e7a8b9b64095fa143824c3905b4d6",
+            "size_bytes": 2027
+          }
+        ]
+      }
+    },
+    {
+      "role": "preserved-failed-final-clippy-execution-02",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-clippy-command-02/receipt.json",
+        "sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e",
+        "original_size_bytes": 2695,
+        "stored_payload_sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e",
+        "stored_payload_size_bytes": 2695,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e.part",
+            "sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e",
+            "size_bytes": 2695
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/00-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a",
+        "original_size_bytes": 3407,
+        "stored_payload_sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a",
+        "stored_payload_size_bytes": 3407,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a.part",
+            "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a",
+            "size_bytes": 3407
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/01-numeric.py",
+        "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b",
+        "original_size_bytes": 7515,
+        "stored_payload_sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b",
+        "stored_payload_size_bytes": 7515,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b.part",
+            "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b",
+            "size_bytes": 7515
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/02-state.py",
+        "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6",
+        "original_size_bytes": 15307,
+        "stored_payload_sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6",
+        "stored_payload_size_bytes": 15307,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6.part",
+            "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6",
+            "size_bytes": 15307
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/03-history.py",
+        "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe",
+        "original_size_bytes": 11093,
+        "stored_payload_sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe",
+        "stored_payload_size_bytes": 11093,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe.part",
+            "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe",
+            "size_bytes": 11093
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/04-metadata.py",
+        "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67",
+        "original_size_bytes": 19810,
+        "stored_payload_sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67",
+        "stored_payload_size_bytes": 19810,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67.part",
+            "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67",
+            "size_bytes": 19810
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/05-freeze_projection.py",
+        "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af",
+        "original_size_bytes": 6296,
+        "stored_payload_sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af",
+        "stored_payload_size_bytes": 6296,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af.part",
+            "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af",
+            "size_bytes": 6296
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/06-check_clk05.py",
+        "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263",
+        "original_size_bytes": 7821,
+        "stored_payload_sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263",
+        "stored_payload_size_bytes": 7821,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263.part",
+            "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263",
+            "size_bytes": 7821
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "tools/porting/geo03_provenance.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/07-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5",
+        "original_size_bytes": 38906,
+        "stored_payload_sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5",
+        "stored_payload_size_bytes": 38906,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5.part",
+            "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5",
+            "size_bytes": 38906
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-comparer-prep-03/proofs.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/00-proofs.py",
+        "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424",
+        "original_size_bytes": 26185,
+        "stored_payload_sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424",
+        "stored_payload_size_bytes": 26185,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424.part",
+            "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424",
+            "size_bytes": 26185
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-comparer-prep-03/adapter.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/01-adapter.py",
+        "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd",
+        "original_size_bytes": 10125,
+        "stored_payload_sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd",
+        "stored_payload_size_bytes": 10125,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd.part",
+            "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd",
+            "size_bytes": 10125
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-comparer-prep-03/observations.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/02-observations.py",
+        "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9",
+        "original_size_bytes": 13990,
+        "stored_payload_sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9",
+        "stored_payload_size_bytes": 13990,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9.part",
+            "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9",
+            "size_bytes": 13990
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-comparer-prep-03/freeze_projection.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/03-freeze_projection.py",
+        "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d",
+        "original_size_bytes": 5168,
+        "stored_payload_sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d",
+        "stored_payload_size_bytes": 5168,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d.part",
+            "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d",
+            "size_bytes": 5168
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-comparer-prep-03/check_production.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/04-check_production.py",
+        "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9",
+        "original_size_bytes": 13874,
+        "stored_payload_sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9",
+        "stored_payload_size_bytes": 13874,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9.part",
+            "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9",
+            "size_bytes": 13874
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-workflow-prep-03/common.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/12-common.py",
+        "sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8",
+        "original_size_bytes": 14373,
+        "stored_payload_sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8",
+        "stored_payload_size_bytes": 14373,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8.part",
+            "sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8",
+            "size_bytes": 14373
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-workflow-prep-03/evidence.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/13-evidence.py",
+        "sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d",
+        "original_size_bytes": 16456,
+        "stored_payload_sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d",
+        "stored_payload_size_bytes": 16456,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d.part",
+            "sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d",
+            "size_bytes": 16456
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-workflow-prep-03/prepare_plan.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/14-prepare_plan.py",
+        "sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179",
+        "original_size_bytes": 4861,
+        "stored_payload_sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179",
+        "stored_payload_size_bytes": 4861,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179.part",
+            "sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179",
+            "size_bytes": 4861
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/production-workflow-prep-03/run_production.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/production-comparison-02/15-run_production.py",
+        "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961",
+        "original_size_bytes": 15535,
+        "stored_payload_sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961",
+        "stored_payload_size_bytes": 15535,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961.part",
+            "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961",
+            "size_bytes": 15535
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/archive-prep-01/archive_selected.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/archive-prep-01/archive_selected.py",
+        "sha256": "f7749c42efded9571920951afc8d46d3ddc436ebeadfa79577c17572acc5e5cb"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f7749c42efded9571920951afc8d46d3ddc436ebeadfa79577c17572acc5e5cb",
+        "original_size_bytes": 11459,
+        "stored_payload_sha256": "f7749c42efded9571920951afc8d46d3ddc436ebeadfa79577c17572acc5e5cb",
+        "stored_payload_size_bytes": 11459,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f7749c42efded9571920951afc8d46d3ddc436ebeadfa79577c17572acc5e5cb.part",
+            "sha256": "f7749c42efded9571920951afc8d46d3ddc436ebeadfa79577c17572acc5e5cb",
+            "size_bytes": 11459
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/archive-prep-01/verify_archive.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/archive-prep-01/verify_archive.py",
+        "sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983",
+        "original_size_bytes": 2773,
+        "stored_payload_sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983",
+        "stored_payload_size_bytes": 2773,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983.part",
+            "sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983",
+            "size_bytes": 2773
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/closure-prep-01/close_card.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/closure-prep-01/close_card.py",
+        "sha256": "dfebb30082094b43e2406da2f642f5642d1ab12167089236e1d4ed99002c65e7"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "dfebb30082094b43e2406da2f642f5642d1ab12167089236e1d4ed99002c65e7",
+        "original_size_bytes": 21804,
+        "stored_payload_sha256": "dfebb30082094b43e2406da2f642f5642d1ab12167089236e1d4ed99002c65e7",
+        "stored_payload_size_bytes": 21804,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/dfebb30082094b43e2406da2f642f5642d1ab12167089236e1d4ed99002c65e7.part",
+            "sha256": "dfebb30082094b43e2406da2f642f5642d1ab12167089236e1d4ed99002c65e7",
+            "size_bytes": 21804
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/closure-prep-01/common.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/closure-prep-01/common.py",
+        "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+        "original_size_bytes": 6308,
+        "stored_payload_sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+        "stored_payload_size_bytes": 6308,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7.part",
+            "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+            "size_bytes": 6308
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/independent-production-result-review-02/executed-result-reviewer.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-production-result-review-02/executed-result-reviewer.py",
+        "sha256": "59e0ea3fabb49b031e07848460b047bcc39606c91cc516408f0d79a28a6e6452"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "59e0ea3fabb49b031e07848460b047bcc39606c91cc516408f0d79a28a6e6452",
+        "original_size_bytes": 42463,
+        "stored_payload_sha256": "59e0ea3fabb49b031e07848460b047bcc39606c91cc516408f0d79a28a6e6452",
+        "stored_payload_size_bytes": 42463,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/59e0ea3fabb49b031e07848460b047bcc39606c91cc516408f0d79a28a6e6452.part",
+            "sha256": "59e0ea3fabb49b031e07848460b047bcc39606c91cc516408f0d79a28a6e6452",
+            "size_bytes": 42463
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-02/executed-result-reviewer.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-02/executed-result-reviewer.py",
+        "sha256": "c283cc681004f2438a23e995ddf0949627402f64dbaefdeaddecb6fd5aa7f323"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "c283cc681004f2438a23e995ddf0949627402f64dbaefdeaddecb6fd5aa7f323",
+        "original_size_bytes": 21898,
+        "stored_payload_sha256": "c283cc681004f2438a23e995ddf0949627402f64dbaefdeaddecb6fd5aa7f323",
+        "stored_payload_size_bytes": 21898,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/c283cc681004f2438a23e995ddf0949627402f64dbaefdeaddecb6fd5aa7f323.part",
+            "sha256": "c283cc681004f2438a23e995ddf0949627402f64dbaefdeaddecb6fd5aa7f323",
+            "size_bytes": 21898
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/original-data-review-prep-01/metadata.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/sources/00-metadata.py",
+        "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d",
+        "original_size_bytes": 5043,
+        "stored_payload_sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d",
+        "stored_payload_size_bytes": 5043,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d.part",
+            "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d",
+            "size_bytes": 5043
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/original-data-review-prep-01/shape.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/sources/01-shape.py",
+        "sha256": "201a60b84bff352acf2f1d8a1d0fa57ce622422ff8e764b36d9d735d70199fec"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "201a60b84bff352acf2f1d8a1d0fa57ce622422ff8e764b36d9d735d70199fec",
+        "original_size_bytes": 7083,
+        "stored_payload_sha256": "201a60b84bff352acf2f1d8a1d0fa57ce622422ff8e764b36d9d735d70199fec",
+        "stored_payload_size_bytes": 7083,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/201a60b84bff352acf2f1d8a1d0fa57ce622422ff8e764b36d9d735d70199fec.part",
+            "sha256": "201a60b84bff352acf2f1d8a1d0fa57ce622422ff8e764b36d9d735d70199fec",
+            "size_bytes": 7083
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/original-data-review-prep-01/review_data.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/independent-original-data-review-01/sources/02-review_data.py",
+        "sha256": "e82a709ffe54c4e8d61f5894840b0bb39f5958f404aa4d085ca4c976b2593b94"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e82a709ffe54c4e8d61f5894840b0bb39f5958f404aa4d085ca4c976b2593b94",
+        "original_size_bytes": 21642,
+        "stored_payload_sha256": "e82a709ffe54c4e8d61f5894840b0bb39f5958f404aa4d085ca4c976b2593b94",
+        "stored_payload_size_bytes": 21642,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e82a709ffe54c4e8d61f5894840b0bb39f5958f404aa4d085ca4c976b2593b94.part",
+            "sha256": "e82a709ffe54c4e8d61f5894840b0bb39f5958f404aa4d085ca4c976b2593b94",
+            "size_bytes": 21642
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/000-WeatherManager.cc-131-156.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/000-WeatherManager.cc-131-156.txt",
+        "sha256": "b049223d49edeca9a4f55a18db6aa6866cdf31a602259449fd3d242bd9423800"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "b049223d49edeca9a4f55a18db6aa6866cdf31a602259449fd3d242bd9423800",
+        "original_size_bytes": 1203,
+        "stored_payload_sha256": "b049223d49edeca9a4f55a18db6aa6866cdf31a602259449fd3d242bd9423800",
+        "stored_payload_size_bytes": 1203,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b049223d49edeca9a4f55a18db6aa6866cdf31a602259449fd3d242bd9423800.part",
+            "sha256": "b049223d49edeca9a4f55a18db6aa6866cdf31a602259449fd3d242bd9423800",
+            "size_bytes": 1203
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/001-WeatherManager.cc-2036-2115.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/001-WeatherManager.cc-2036-2115.txt",
+        "sha256": "3252f9bd7cc8819b7501ee8a35ccbe52785545ab0fa34d9f2e13dd98e89d61db"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "3252f9bd7cc8819b7501ee8a35ccbe52785545ab0fa34d9f2e13dd98e89d61db",
+        "original_size_bytes": 5230,
+        "stored_payload_sha256": "3252f9bd7cc8819b7501ee8a35ccbe52785545ab0fa34d9f2e13dd98e89d61db",
+        "stored_payload_size_bytes": 5230,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/3252f9bd7cc8819b7501ee8a35ccbe52785545ab0fa34d9f2e13dd98e89d61db.part",
+            "sha256": "3252f9bd7cc8819b7501ee8a35ccbe52785545ab0fa34d9f2e13dd98e89d61db",
+            "size_bytes": 5230
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/002-WeatherManager.cc-2192-2202.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/002-WeatherManager.cc-2192-2202.txt",
+        "sha256": "99a58fecc2f1c0f3b2eff387c4e180a53880c4c9740f9c2ccd056c7c0119496c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "99a58fecc2f1c0f3b2eff387c4e180a53880c4c9740f9c2ccd056c7c0119496c",
+        "original_size_bytes": 627,
+        "stored_payload_sha256": "99a58fecc2f1c0f3b2eff387c4e180a53880c4c9740f9c2ccd056c7c0119496c",
+        "stored_payload_size_bytes": 627,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/99a58fecc2f1c0f3b2eff387c4e180a53880c4c9740f9c2ccd056c7c0119496c.part",
+            "sha256": "99a58fecc2f1c0f3b2eff387c4e180a53880c4c9740f9c2ccd056c7c0119496c",
+            "size_bytes": 627
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/003-WeatherManager.cc-2234-2247.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/003-WeatherManager.cc-2234-2247.txt",
+        "sha256": "6660eb29a8565182fa6bca255291b0edbb0c827a9e4825901b7284e3d1e60159"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "6660eb29a8565182fa6bca255291b0edbb0c827a9e4825901b7284e3d1e60159",
+        "original_size_bytes": 755,
+        "stored_payload_sha256": "6660eb29a8565182fa6bca255291b0edbb0c827a9e4825901b7284e3d1e60159",
+        "stored_payload_size_bytes": 755,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6660eb29a8565182fa6bca255291b0edbb0c827a9e4825901b7284e3d1e60159.part",
+            "sha256": "6660eb29a8565182fa6bca255291b0edbb0c827a9e4825901b7284e3d1e60159",
+            "size_bytes": 755
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/004-WeatherManager.cc-2738-2766.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/004-WeatherManager.cc-2738-2766.txt",
+        "sha256": "a9b206d93008077b838be9e22c83bcd6fe143959ffd059c363563cfb94010225"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a9b206d93008077b838be9e22c83bcd6fe143959ffd059c363563cfb94010225",
+        "original_size_bytes": 1367,
+        "stored_payload_sha256": "a9b206d93008077b838be9e22c83bcd6fe143959ffd059c363563cfb94010225",
+        "stored_payload_size_bytes": 1367,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a9b206d93008077b838be9e22c83bcd6fe143959ffd059c363563cfb94010225.part",
+            "sha256": "a9b206d93008077b838be9e22c83bcd6fe143959ffd059c363563cfb94010225",
+            "size_bytes": 1367
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/005-WeatherManager.cc-2968-3010.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/005-WeatherManager.cc-2968-3010.txt",
+        "sha256": "d2861f1283c683b19d5575d456cd789ea2944f4462c002ca70e8211319dfdbab"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d2861f1283c683b19d5575d456cd789ea2944f4462c002ca70e8211319dfdbab",
+        "original_size_bytes": 1600,
+        "stored_payload_sha256": "d2861f1283c683b19d5575d456cd789ea2944f4462c002ca70e8211319dfdbab",
+        "stored_payload_size_bytes": 1600,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d2861f1283c683b19d5575d456cd789ea2944f4462c002ca70e8211319dfdbab.part",
+            "sha256": "d2861f1283c683b19d5575d456cd789ea2944f4462c002ca70e8211319dfdbab",
+            "size_bytes": 1600
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/006-WeatherManager.cc-3045-3103.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/006-WeatherManager.cc-3045-3103.txt",
+        "sha256": "1be6f6dc8a022e309a624b3a7c7fe9e19b2fb14e0ee5d97fc620a5677a0d55f0"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "1be6f6dc8a022e309a624b3a7c7fe9e19b2fb14e0ee5d97fc620a5677a0d55f0",
+        "original_size_bytes": 2819,
+        "stored_payload_sha256": "1be6f6dc8a022e309a624b3a7c7fe9e19b2fb14e0ee5d97fc620a5677a0d55f0",
+        "stored_payload_size_bytes": 2819,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1be6f6dc8a022e309a624b3a7c7fe9e19b2fb14e0ee5d97fc620a5677a0d55f0.part",
+            "sha256": "1be6f6dc8a022e309a624b3a7c7fe9e19b2fb14e0ee5d97fc620a5677a0d55f0",
+            "size_bytes": 2819
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/007-WeatherManager.cc-3112-3135.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/007-WeatherManager.cc-3112-3135.txt",
+        "sha256": "e19559bff5a31d2ecda5ff01731c942695af20f1ffecb32a45d1ef67e82345a2"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e19559bff5a31d2ecda5ff01731c942695af20f1ffecb32a45d1ef67e82345a2",
+        "original_size_bytes": 1654,
+        "stored_payload_sha256": "e19559bff5a31d2ecda5ff01731c942695af20f1ffecb32a45d1ef67e82345a2",
+        "stored_payload_size_bytes": 1654,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e19559bff5a31d2ecda5ff01731c942695af20f1ffecb32a45d1ef67e82345a2.part",
+            "sha256": "e19559bff5a31d2ecda5ff01731c942695af20f1ffecb32a45d1ef67e82345a2",
+            "size_bytes": 1654
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/008-WeatherManager.cc-4300-4334.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/008-WeatherManager.cc-4300-4334.txt",
+        "sha256": "903de299845fdb66a834cc25e7eca03316b4dc5079c74a886de3adfad6e8483c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "903de299845fdb66a834cc25e7eca03316b4dc5079c74a886de3adfad6e8483c",
+        "original_size_bytes": 2084,
+        "stored_payload_sha256": "903de299845fdb66a834cc25e7eca03316b4dc5079c74a886de3adfad6e8483c",
+        "stored_payload_size_bytes": 2084,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/903de299845fdb66a834cc25e7eca03316b4dc5079c74a886de3adfad6e8483c.part",
+            "sha256": "903de299845fdb66a834cc25e7eca03316b4dc5079c74a886de3adfad6e8483c",
+            "size_bytes": 2084
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/009-WeatherManager.cc-8328-8386.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/009-WeatherManager.cc-8328-8386.txt",
+        "sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606",
+        "original_size_bytes": 3210,
+        "stored_payload_sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606",
+        "stored_payload_size_bytes": 3210,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606.part",
+            "sha256": "1a0896c3aa73079937e7981e65e4ef08941f076468ed7ba6a585df4567fad606",
+            "size_bytes": 3210
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/010-WeatherManager.hh-481-497.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/010-WeatherManager.hh-481-497.txt",
+        "sha256": "69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026",
+        "original_size_bytes": 926,
+        "stored_payload_sha256": "69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026",
+        "stored_payload_size_bytes": 926,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026.part",
+            "sha256": "69c4268575965c729490bc1961c967130ece3158db9374252422bea63bc23026",
+            "size_bytes": 926
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/011-WeatherManager.hh-666-666.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/011-WeatherManager.hh-666-666.txt",
+        "sha256": "937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831",
+        "original_size_bytes": 58,
+        "stored_payload_sha256": "937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831",
+        "stored_payload_size_bytes": 58,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831.part",
+            "sha256": "937aa135c0fd0b409a72ef27fed8e09abbfb2355a0dc31008827fd34bb5a2831",
+            "size_bytes": 58
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/012-WeatherManager.hh-713-732.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/012-WeatherManager.hh-713-732.txt",
+        "sha256": "c34988367a59c7e9b98fcf36e3f3b1f5a07a5c49a7f0ffe84bb270ca2f0fc0dd"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "c34988367a59c7e9b98fcf36e3f3b1f5a07a5c49a7f0ffe84bb270ca2f0fc0dd",
+        "original_size_bytes": 665,
+        "stored_payload_sha256": "c34988367a59c7e9b98fcf36e3f3b1f5a07a5c49a7f0ffe84bb270ca2f0fc0dd",
+        "stored_payload_size_bytes": 665,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/c34988367a59c7e9b98fcf36e3f3b1f5a07a5c49a7f0ffe84bb270ca2f0fc0dd.part",
+            "sha256": "c34988367a59c7e9b98fcf36e3f3b1f5a07a5c49a7f0ffe84bb270ca2f0fc0dd",
+            "size_bytes": 665
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/013-WeatherManager.hh-840-860.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/013-WeatherManager.hh-840-860.txt",
+        "sha256": "a3cdb9acfd9d109146ad79a71ca37b44021ae03bda1884ce5adee82340b33759"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a3cdb9acfd9d109146ad79a71ca37b44021ae03bda1884ce5adee82340b33759",
+        "original_size_bytes": 1066,
+        "stored_payload_sha256": "a3cdb9acfd9d109146ad79a71ca37b44021ae03bda1884ce5adee82340b33759",
+        "stored_payload_size_bytes": 1066,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a3cdb9acfd9d109146ad79a71ca37b44021ae03bda1884ce5adee82340b33759.part",
+            "sha256": "a3cdb9acfd9d109146ad79a71ca37b44021ae03bda1884ce5adee82340b33759",
+            "size_bytes": 1066
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/014-WeatherManager.hh-916-927.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/014-WeatherManager.hh-916-927.txt",
+        "sha256": "f13dafba7957b7403cab21dc6184b9c4e2658b8d16c30723d51a24800153b06b"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f13dafba7957b7403cab21dc6184b9c4e2658b8d16c30723d51a24800153b06b",
+        "original_size_bytes": 403,
+        "stored_payload_sha256": "f13dafba7957b7403cab21dc6184b9c4e2658b8d16c30723d51a24800153b06b",
+        "stored_payload_size_bytes": 403,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f13dafba7957b7403cab21dc6184b9c4e2658b8d16c30723d51a24800153b06b.part",
+            "sha256": "f13dafba7957b7403cab21dc6184b9c4e2658b8d16c30723d51a24800153b06b",
+            "size_bytes": 403
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/015-DataEnvironment.hh-79-82.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/015-DataEnvironment.hh-79-82.txt",
+        "sha256": "01c7d406a3e1f1a8afa4174bc4dea28a72b742f769b7d5340b47c7482b13b2e9"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "01c7d406a3e1f1a8afa4174bc4dea28a72b742f769b7d5340b47c7482b13b2e9",
+        "original_size_bytes": 416,
+        "stored_payload_sha256": "01c7d406a3e1f1a8afa4174bc4dea28a72b742f769b7d5340b47c7482b13b2e9",
+        "stored_payload_size_bytes": 416,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/01c7d406a3e1f1a8afa4174bc4dea28a72b742f769b7d5340b47c7482b13b2e9.part",
+            "sha256": "01c7d406a3e1f1a8afa4174bc4dea28a72b742f769b7d5340b47c7482b13b2e9",
+            "size_bytes": 416
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/016-DataEnvironment.hh-96-110.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/016-DataEnvironment.hh-96-110.txt",
+        "sha256": "033b89a611d9e3fc3ad15c6dc3308d5c81a19a05bc91ec308a07096e062ca880"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "033b89a611d9e3fc3ad15c6dc3308d5c81a19a05bc91ec308a07096e062ca880",
+        "original_size_bytes": 1294,
+        "stored_payload_sha256": "033b89a611d9e3fc3ad15c6dc3308d5c81a19a05bc91ec308a07096e062ca880",
+        "stored_payload_size_bytes": 1294,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/033b89a611d9e3fc3ad15c6dc3308d5c81a19a05bc91ec308a07096e062ca880.part",
+            "sha256": "033b89a611d9e3fc3ad15c6dc3308d5c81a19a05bc91ec308a07096e062ca880",
+            "size_bytes": 1294
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/017-DataEnvironment.hh-146-158.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/017-DataEnvironment.hh-146-158.txt",
+        "sha256": "c66798f18a8fb722137de317630b61f758591d2273f1283b620d69fd355f0fd5"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "c66798f18a8fb722137de317630b61f758591d2273f1283b620d69fd355f0fd5",
+        "original_size_bytes": 1443,
+        "stored_payload_sha256": "c66798f18a8fb722137de317630b61f758591d2273f1283b620d69fd355f0fd5",
+        "stored_payload_size_bytes": 1443,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/c66798f18a8fb722137de317630b61f758591d2273f1283b620d69fd355f0fd5.part",
+            "sha256": "c66798f18a8fb722137de317630b61f758591d2273f1283b620d69fd355f0fd5",
+            "size_bytes": 1443
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/018-DataEnvironment.hh-199-203.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/018-DataEnvironment.hh-199-203.txt",
+        "sha256": "bda26a4d12fdce172acf8f99a74c8b69426ae07687e9a63d14ceaaaabbf57958"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "bda26a4d12fdce172acf8f99a74c8b69426ae07687e9a63d14ceaaaabbf57958",
+        "original_size_bytes": 426,
+        "stored_payload_sha256": "bda26a4d12fdce172acf8f99a74c8b69426ae07687e9a63d14ceaaaabbf57958",
+        "stored_payload_size_bytes": 426,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/bda26a4d12fdce172acf8f99a74c8b69426ae07687e9a63d14ceaaaabbf57958.part",
+            "sha256": "bda26a4d12fdce172acf8f99a74c8b69426ae07687e9a63d14ceaaaabbf57958",
+            "size_bytes": 426
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/019-SimulationManager.cc-1015-1024.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/019-SimulationManager.cc-1015-1024.txt",
+        "sha256": "2aa680f2aeff727a771e49a13ca987781493f0aa435fd1e2967772ae903a57fb"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "2aa680f2aeff727a771e49a13ca987781493f0aa435fd1e2967772ae903a57fb",
+        "original_size_bytes": 1007,
+        "stored_payload_sha256": "2aa680f2aeff727a771e49a13ca987781493f0aa435fd1e2967772ae903a57fb",
+        "stored_payload_size_bytes": 1007,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/2aa680f2aeff727a771e49a13ca987781493f0aa435fd1e2967772ae903a57fb.part",
+            "sha256": "2aa680f2aeff727a771e49a13ca987781493f0aa435fd1e2967772ae903a57fb",
+            "size_bytes": 1007
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/020-DataSystemVariables.cc-277-280.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/020-DataSystemVariables.cc-277-280.txt",
+        "sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb",
+        "original_size_bytes": 202,
+        "stored_payload_sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb",
+        "stored_payload_size_bytes": 202,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb.part",
+            "sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb",
+            "size_bytes": 202
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/021-DataSystemVariables.cc-302-309.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/021-DataSystemVariables.cc-302-309.txt",
+        "sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a",
+        "original_size_bytes": 397,
+        "stored_payload_sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a",
+        "stored_payload_size_bytes": 397,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a.part",
+            "sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a",
+            "size_bytes": 397
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/022-WeatherManager.cc-704-714.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/022-WeatherManager.cc-704-714.txt",
+        "sha256": "3b7af809c3096969313c8e9fc450d1e2832b0ad9ae437b3bbc4d7e231a7c3ddc"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "3b7af809c3096969313c8e9fc450d1e2832b0ad9ae437b3bbc4d7e231a7c3ddc",
+        "original_size_bytes": 714,
+        "stored_payload_sha256": "3b7af809c3096969313c8e9fc450d1e2832b0ad9ae437b3bbc4d7e231a7c3ddc",
+        "stored_payload_size_bytes": 714,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/3b7af809c3096969313c8e9fc450d1e2832b0ad9ae437b3bbc4d7e231a7c3ddc.part",
+            "sha256": "3b7af809c3096969313c8e9fc450d1e2832b0ad9ae437b3bbc4d7e231a7c3ddc",
+            "size_bytes": 714
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/023-WeatherManager.cc-1788-1837.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/023-WeatherManager.cc-1788-1837.txt",
+        "sha256": "05c24b29fc8d92d4edf42ec9a5f0a2fa538d0c18ddc7d3e4867b4b65295e8466"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "05c24b29fc8d92d4edf42ec9a5f0a2fa538d0c18ddc7d3e4867b4b65295e8466",
+        "original_size_bytes": 3042,
+        "stored_payload_sha256": "05c24b29fc8d92d4edf42ec9a5f0a2fa538d0c18ddc7d3e4867b4b65295e8466",
+        "stored_payload_size_bytes": 3042,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/05c24b29fc8d92d4edf42ec9a5f0a2fa538d0c18ddc7d3e4867b4b65295e8466.part",
+            "sha256": "05c24b29fc8d92d4edf42ec9a5f0a2fa538d0c18ddc7d3e4867b4b65295e8466",
+            "size_bytes": 3042
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/024-SimulationManager.cc-878-880.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/024-SimulationManager.cc-878-880.txt",
+        "sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91",
+        "original_size_bytes": 273,
+        "stored_payload_sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91",
+        "stored_payload_size_bytes": 273,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91.part",
+            "sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91",
+            "size_bytes": 273
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/025-SimulationManager.cc-963-1024.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/025-SimulationManager.cc-963-1024.txt",
+        "sha256": "947016a31a34f6cd4d04821e14e001f6a4a2c46a8a985ed3204c4af165d36c77"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "947016a31a34f6cd4d04821e14e001f6a4a2c46a8a985ed3204c4af165d36c77",
+        "original_size_bytes": 4855,
+        "stored_payload_sha256": "947016a31a34f6cd4d04821e14e001f6a4a2c46a8a985ed3204c4af165d36c77",
+        "stored_payload_size_bytes": 4855,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/947016a31a34f6cd4d04821e14e001f6a4a2c46a8a985ed3204c4af165d36c77.part",
+            "sha256": "947016a31a34f6cd4d04821e14e001f6a4a2c46a8a985ed3204c4af165d36c77",
+            "size_bytes": 4855
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/026-SimulationManager.hh-97-111.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/026-SimulationManager.hh-97-111.txt",
+        "sha256": "90be3372afc2aee70ce46f72274d4b0e234220c700819907a43816fe3b4aaad6"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "90be3372afc2aee70ce46f72274d4b0e234220c700819907a43816fe3b4aaad6",
+        "original_size_bytes": 388,
+        "stored_payload_sha256": "90be3372afc2aee70ce46f72274d4b0e234220c700819907a43816fe3b4aaad6",
+        "stored_payload_size_bytes": 388,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/90be3372afc2aee70ce46f72274d4b0e234220c700819907a43816fe3b4aaad6.part",
+            "sha256": "90be3372afc2aee70ce46f72274d4b0e234220c700819907a43816fe3b4aaad6",
+            "size_bytes": 388
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/027-DataEnvironment.hh-200-203.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/027-DataEnvironment.hh-200-203.txt",
+        "sha256": "35619992df2c79a310e694d02c06d50e97f3560e36dce61c513c0b0c48dbc825"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "35619992df2c79a310e694d02c06d50e97f3560e36dce61c513c0b0c48dbc825",
+        "original_size_bytes": 425,
+        "stored_payload_sha256": "35619992df2c79a310e694d02c06d50e97f3560e36dce61c513c0b0c48dbc825",
+        "stored_payload_size_bytes": 425,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/35619992df2c79a310e694d02c06d50e97f3560e36dce61c513c0b0c48dbc825.part",
+            "sha256": "35619992df2c79a310e694d02c06d50e97f3560e36dce61c513c0b0c48dbc825",
+            "size_bytes": 425
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/028-DataSystemVariables.cc-89-93.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/028-DataSystemVariables.cc-89-93.txt",
+        "sha256": "644d8740521883298704f66d8568958346783054fc39dab19fe781305c4df6b1"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "644d8740521883298704f66d8568958346783054fc39dab19fe781305c4df6b1",
+        "original_size_bytes": 387,
+        "stored_payload_sha256": "644d8740521883298704f66d8568958346783054fc39dab19fe781305c4df6b1",
+        "stored_payload_size_bytes": 387,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/644d8740521883298704f66d8568958346783054fc39dab19fe781305c4df6b1.part",
+            "sha256": "644d8740521883298704f66d8568958346783054fc39dab19fe781305c4df6b1",
+            "size_bytes": 387
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/029-DataSystemVariables.cc-277-280.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/029-DataSystemVariables.cc-277-280.txt",
+        "sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb",
+        "original_size_bytes": 202,
+        "stored_payload_sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb",
+        "stored_payload_size_bytes": 202,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb.part",
+            "sha256": "9b36dca245adc7602a74f0beeb5c9751af57e5a9ae4012472e2a633bf013c2fb",
+            "size_bytes": 202
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/030-DataSystemVariables.cc-302-309.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/030-DataSystemVariables.cc-302-309.txt",
+        "sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a",
+        "original_size_bytes": 397,
+        "stored_payload_sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a",
+        "stored_payload_size_bytes": 397,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a.part",
+            "sha256": "a10e265fccf4169ca8f5879f4e75ddd26eacb7c6077202bd86dffe28b82d6a7a",
+            "size_bytes": 397
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/031-UtilityRoutines.cc-691-702.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/031-UtilityRoutines.cc-691-702.txt",
+        "sha256": "4031e37487f8bf4f45f86b846e8979043693952f6b86d651beb3b6e7750b2b9e"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "4031e37487f8bf4f45f86b846e8979043693952f6b86d651beb3b6e7750b2b9e",
+        "original_size_bytes": 369,
+        "stored_payload_sha256": "4031e37487f8bf4f45f86b846e8979043693952f6b86d651beb3b6e7750b2b9e",
+        "stored_payload_size_bytes": 369,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/4031e37487f8bf4f45f86b846e8979043693952f6b86d651beb3b6e7750b2b9e.part",
+            "sha256": "4031e37487f8bf4f45f86b846e8979043693952f6b86d651beb3b6e7750b2b9e",
+            "size_bytes": 369
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/032-EnergyPlusPgm.cc-287-290.txt",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/frozen-packet-01/original-ranges/032-EnergyPlusPgm.cc-287-290.txt",
+        "sha256": "955b770fdc1583ee54d4780625f5d0cc297a4a719218309ddaa5fb86d185cdeb"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "955b770fdc1583ee54d4780625f5d0cc297a4a719218309ddaa5fb86d185cdeb",
+        "original_size_bytes": 181,
+        "stored_payload_sha256": "955b770fdc1583ee54d4780625f5d0cc297a4a719218309ddaa5fb86d185cdeb",
+        "stored_payload_size_bytes": 181,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/955b770fdc1583ee54d4780625f5d0cc297a4a719218309ddaa5fb86d185cdeb.part",
+            "sha256": "955b770fdc1583ee54d4780625f5d0cc297a4a719218309ddaa5fb86d185cdeb",
+            "size_bytes": 181
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_observer.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/00-clk05_existing_observer.rs",
+        "sha256": "7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d",
+        "original_size_bytes": 6138,
+        "stored_payload_sha256": "7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d",
+        "stored_payload_size_bytes": 6138,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d.part",
+            "sha256": "7fc979ff05a7d88ab1c311e19ca4d1c98e6b90990237b00c489acab280d6992d",
+            "size_bytes": 6138
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_observer.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/00-clk05_existing_observer.rs",
+        "sha256": "42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3",
+        "original_size_bytes": 6607,
+        "stored_payload_sha256": "42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3",
+        "stored_payload_size_bytes": 6607,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3.part",
+            "sha256": "42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3",
+            "size_bytes": 6607
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/00-clk05_existing_observer.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/00-clk05_existing_observer.rs.diff",
+        "sha256": "0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e",
+        "original_size_bytes": 10111,
+        "stored_payload_sha256": "0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e",
+        "stored_payload_size_bytes": 10111,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e.part",
+            "sha256": "0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e",
+            "size_bytes": 10111
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/inputs.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/01-inputs.rs",
+        "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+        "original_size_bytes": 13042,
+        "stored_payload_sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+        "stored_payload_size_bytes": 13042,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657.part",
+            "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+            "size_bytes": 13042
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/inputs.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/01-inputs.rs",
+        "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456",
+        "original_size_bytes": 13317,
+        "stored_payload_sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456",
+        "stored_payload_size_bytes": 13317,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456.part",
+            "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456",
+            "size_bytes": 13317
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/01-inputs.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/01-inputs.rs.diff",
+        "sha256": "d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd",
+        "original_size_bytes": 3740,
+        "stored_payload_sha256": "d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd",
+        "stored_payload_size_bytes": 3740,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd.part",
+            "sha256": "d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd",
+            "size_bytes": 3740
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/02-fields.rs",
+        "sha256": "204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed",
+        "original_size_bytes": 4805,
+        "stored_payload_sha256": "204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed",
+        "stored_payload_size_bytes": 4805,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed.part",
+            "sha256": "204950b5ebfc8a08c19f2f4da14dd3ab9a7f6044c5a88fe1bd9d5aefa4b3b6ed",
+            "size_bytes": 4805
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/02-fields.rs",
+        "sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781",
+        "original_size_bytes": 5198,
+        "stored_payload_sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781",
+        "stored_payload_size_bytes": 5198,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781.part",
+            "sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781",
+            "size_bytes": 5198
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/02-fields.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/02-fields.rs.diff",
+        "sha256": "8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931",
+        "original_size_bytes": 4380,
+        "stored_payload_sha256": "8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931",
+        "stored_payload_size_bytes": 4380,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931.part",
+            "sha256": "8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931",
+            "size_bytes": 4380
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/observe.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/03-observe.rs",
+        "sha256": "f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f",
+        "original_size_bytes": 8176,
+        "stored_payload_sha256": "f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f",
+        "stored_payload_size_bytes": 8176,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f.part",
+            "sha256": "f2cf632711005c0c92c711ed4f559ce121bfda0d437c0a3a2c14810d5770846f",
+            "size_bytes": 8176
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/observe.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/03-observe.rs",
+        "sha256": "4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024",
+        "original_size_bytes": 8898,
+        "stored_payload_sha256": "4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024",
+        "stored_payload_size_bytes": 8898,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024.part",
+            "sha256": "4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024",
+            "size_bytes": 8898
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/03-observe.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/03-observe.rs.diff",
+        "sha256": "8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06",
+        "original_size_bytes": 9448,
+        "stored_payload_sha256": "8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06",
+        "stored_payload_size_bytes": 9448,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06.part",
+            "sha256": "8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06",
+            "size_bytes": 9448
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/seeds.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/04-seeds.rs",
+        "sha256": "e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727",
+        "original_size_bytes": 4828,
+        "stored_payload_sha256": "e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727",
+        "stored_payload_size_bytes": 4828,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727.part",
+            "sha256": "e334b697c627af2bd5a8b2c204577c227d0d93e6c6f89c728b7890aeedbd5727",
+            "size_bytes": 4828
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/seeds.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/04-seeds.rs",
+        "sha256": "73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c",
+        "original_size_bytes": 5075,
+        "stored_payload_sha256": "73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c",
+        "stored_payload_size_bytes": 5075,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c.part",
+            "sha256": "73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c",
+            "size_bytes": 5075
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/04-seeds.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/04-seeds.rs.diff",
+        "sha256": "bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85",
+        "original_size_bytes": 2858,
+        "stored_payload_sha256": "bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85",
+        "stored_payload_size_bytes": 2858,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85.part",
+            "sha256": "bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85",
+            "size_bytes": 2858
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/05-clk05_candidate_probe.rs",
+        "sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485",
+        "original_size_bytes": 6414,
+        "stored_payload_sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485",
+        "stored_payload_size_bytes": 6414,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485.part",
+            "sha256": "112adcae2e7cc97b8e42794a64c08dd59fc6f3d1288785fe3f35570977044485",
+            "size_bytes": 6414
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/05-clk05_candidate_probe.rs",
+        "sha256": "dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e",
+        "original_size_bytes": 6959,
+        "stored_payload_sha256": "dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e",
+        "stored_payload_size_bytes": 6959,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e.part",
+            "sha256": "dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e",
+            "size_bytes": 6959
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/05-clk05_candidate_probe.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/05-clk05_candidate_probe.rs.diff",
+        "sha256": "72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7",
+        "original_size_bytes": 10697,
+        "stored_payload_sha256": "72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7",
+        "stored_payload_size_bytes": 10697,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7.part",
+            "sha256": "72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7",
+            "size_bytes": 10697
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/06-inputs.rs",
+        "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+        "original_size_bytes": 13042,
+        "stored_payload_sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+        "stored_payload_size_bytes": 13042,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657.part",
+            "sha256": "62f66a89d9464e22ad9aacd4fae4385a4c2cf6a719cd73b35b37e5caeeeb4657",
+            "size_bytes": 13042
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/06-inputs.rs",
+        "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456",
+        "original_size_bytes": 13317,
+        "stored_payload_sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456",
+        "stored_payload_size_bytes": 13317,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456.part",
+            "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456",
+            "size_bytes": 13317
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/06-inputs.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/06-inputs.rs.diff",
+        "sha256": "49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84",
+        "original_size_bytes": 3742,
+        "stored_payload_sha256": "49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84",
+        "stored_payload_size_bytes": 3742,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84.part",
+            "sha256": "49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84",
+            "size_bytes": 3742
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/07-fields.rs",
+        "sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a",
+        "original_size_bytes": 4889,
+        "stored_payload_sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a",
+        "stored_payload_size_bytes": 4889,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a.part",
+            "sha256": "dcd6f3d3d69c0f1ab1eb98e7ac62a86f1adbe126e65c21546d93068b11b72b2a",
+            "size_bytes": 4889
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/07-fields.rs",
+        "sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865",
+        "original_size_bytes": 5239,
+        "stored_payload_sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865",
+        "stored_payload_size_bytes": 5239,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865.part",
+            "sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865",
+            "size_bytes": 5239
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/07-fields.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/07-fields.rs.diff",
+        "sha256": "061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c",
+        "original_size_bytes": 3758,
+        "stored_payload_sha256": "061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c",
+        "stored_payload_size_bytes": 3758,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c.part",
+            "sha256": "061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c",
+            "size_bytes": 3758
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/08-observe.rs",
+        "sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98",
+        "original_size_bytes": 8262,
+        "stored_payload_sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98",
+        "stored_payload_size_bytes": 8262,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98.part",
+            "sha256": "b13cdec81d97e18784c377ed3a6378284bb99e0b087b5c1567a298ca060f8f98",
+            "size_bytes": 8262
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/08-observe.rs",
+        "sha256": "0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239",
+        "original_size_bytes": 9002,
+        "stored_payload_sha256": "0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239",
+        "stored_payload_size_bytes": 9002,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239.part",
+            "sha256": "0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239",
+            "size_bytes": 9002
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/08-observe.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/08-observe.rs.diff",
+        "sha256": "7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979",
+        "original_size_bytes": 9760,
+        "stored_payload_sha256": "7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979",
+        "stored_payload_size_bytes": 9760,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979.part",
+            "sha256": "7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979",
+            "size_bytes": 9760
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/before/09-seeds.rs",
+        "sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070",
+        "original_size_bytes": 5529,
+        "stored_payload_sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070",
+        "stored_payload_size_bytes": 5529,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070.part",
+            "sha256": "846c07873854cdbcd20b6445b1ea62dc80468bb0137a34570e263b2a741dd070",
+            "size_bytes": 5529
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/09-seeds.rs",
+        "sha256": "909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309",
+        "original_size_bytes": 5849,
+        "stored_payload_sha256": "909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309",
+        "stored_payload_size_bytes": 5849,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309.part",
+            "sha256": "909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309",
+            "size_bytes": 5849
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-format-01/diffs/09-seeds.rs.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/diffs/09-seeds.rs.diff",
+        "sha256": "a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e",
+        "original_size_bytes": 4562,
+        "stored_payload_sha256": "a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e",
+        "stored_payload_size_bytes": 4562,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e.part",
+            "sha256": "a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e",
+            "size_bytes": 4562
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/archive-prep-02/archive_selected.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/archive-prep-02/archive_selected.py",
+        "sha256": "e5309366023c2aad93222a542c4a3a0dda3793d435b081de1afcf2e160c77825"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "e5309366023c2aad93222a542c4a3a0dda3793d435b081de1afcf2e160c77825",
+        "original_size_bytes": 11604,
+        "stored_payload_sha256": "e5309366023c2aad93222a542c4a3a0dda3793d435b081de1afcf2e160c77825",
+        "stored_payload_size_bytes": 11604,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/e5309366023c2aad93222a542c4a3a0dda3793d435b081de1afcf2e160c77825.part",
+            "sha256": "e5309366023c2aad93222a542c4a3a0dda3793d435b081de1afcf2e160c77825",
+            "size_bytes": 11604
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/archive-prep-02/verify_archive.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/archive-prep-02/verify_archive.py",
+        "sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983",
+        "original_size_bytes": 2773,
+        "stored_payload_sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983",
+        "stored_payload_size_bytes": 2773,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983.part",
+            "sha256": "d09287f0554bd25afb94ed2b2cfa800980d06d36ed306c6c60de21faae49a983",
+            "size_bytes": 2773
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/closure-prep-02/close_card.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/closure-prep-02/close_card.py",
+        "sha256": "010c6598b3de0b7e71a23d1dcb42fc5eae393b9f81b58158db08763cf17f44a0"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "010c6598b3de0b7e71a23d1dcb42fc5eae393b9f81b58158db08763cf17f44a0",
+        "original_size_bytes": 25169,
+        "stored_payload_sha256": "010c6598b3de0b7e71a23d1dcb42fc5eae393b9f81b58158db08763cf17f44a0",
+        "stored_payload_size_bytes": 25169,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/010c6598b3de0b7e71a23d1dcb42fc5eae393b9f81b58158db08763cf17f44a0.part",
+            "sha256": "010c6598b3de0b7e71a23d1dcb42fc5eae393b9f81b58158db08763cf17f44a0",
+            "size_bytes": 25169
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/closure-prep-02/common.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/closure-prep-02/common.py",
+        "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+        "original_size_bytes": 6308,
+        "stored_payload_sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+        "stored_payload_size_bytes": 6308,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7.part",
+            "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7",
+            "size_bytes": 6308
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/final-quality-lineage-prep-06/verify_lineage.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/final-quality-lineage-prep-06/verify_lineage.py",
+        "sha256": "2e3d35161dfeed0c0be3a2521df74571c1ab5756d738c838a670bb233ede7765"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "2e3d35161dfeed0c0be3a2521df74571c1ab5756d738c838a670bb233ede7765",
+        "original_size_bytes": 27608,
+        "stored_payload_sha256": "2e3d35161dfeed0c0be3a2521df74571c1ab5756d738c838a670bb233ede7765",
+        "stored_payload_size_bytes": 27608,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/2e3d35161dfeed0c0be3a2521df74571c1ab5756d738c838a670bb233ede7765.part",
+            "sha256": "2e3d35161dfeed0c0be3a2521df74571c1ab5756d738c838a670bb233ede7765",
+            "size_bytes": 27608
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/retirement-source-review-prep-01/review_sources.py",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/retirement-source-review-prep-01/review_sources.py",
+        "sha256": "f543994bbbc86a7c5a2ba439b350f91ca6fbc12f98c39dbedfbafaa1732dde3c"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "f543994bbbc86a7c5a2ba439b350f91ca6fbc12f98c39dbedfbafaa1732dde3c",
+        "original_size_bytes": 10176,
+        "stored_payload_sha256": "f543994bbbc86a7c5a2ba439b350f91ca6fbc12f98c39dbedfbafaa1732dde3c",
+        "stored_payload_size_bytes": 10176,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/f543994bbbc86a7c5a2ba439b350f91ca6fbc12f98c39dbedfbafaa1732dde3c.part",
+            "sha256": "f543994bbbc86a7c5a2ba439b350f91ca6fbc12f98c39dbedfbafaa1732dde3c",
+            "size_bytes": 10176
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/src/weather_day/producer_tests.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.before.rs",
+        "sha256": "59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17",
+        "original_size_bytes": 15161,
+        "stored_payload_sha256": "59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17",
+        "stored_payload_size_bytes": 15161,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17.part",
+            "sha256": "59d60590c31bb05c61e59f28cc68611c5d9d54417b544b57700af6edc94a1f17",
+            "size_bytes": 15161
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/src/weather_day/producer_tests.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.after.rs",
+        "sha256": "5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57",
+        "original_size_bytes": 15070,
+        "stored_payload_sha256": "5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57",
+        "stored_payload_size_bytes": 15070,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57.part",
+            "sha256": "5e1021de3eee732d40524ab10bf2e123d7ba0029ef42bedd6eb59513a0189b57",
+            "size_bytes": 15070
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/test-clippy-cleanup-02/producer_tests.diff",
+        "sha256": "bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018",
+        "original_size_bytes": 1011,
+        "stored_payload_sha256": "bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018",
+        "stored_payload_size_bytes": 1011,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018.part",
+            "sha256": "bf6c4d2ed340e1898db97c75b7b219de6f3a885acbdf102e25ac93bf55fad018",
+            "size_bytes": 1011
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/0-fields.after.rs",
+        "sha256": "b6effce5951730de90e7109726ea0bf8e3b5364773826560ea08a66ad326e5ec"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "b6effce5951730de90e7109726ea0bf8e3b5364773826560ea08a66ad326e5ec",
+        "original_size_bytes": 5138,
+        "stored_payload_sha256": "b6effce5951730de90e7109726ea0bf8e3b5364773826560ea08a66ad326e5ec",
+        "stored_payload_size_bytes": 5138,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/b6effce5951730de90e7109726ea0bf8e3b5364773826560ea08a66ad326e5ec.part",
+            "sha256": "b6effce5951730de90e7109726ea0bf8e3b5364773826560ea08a66ad326e5ec",
+            "size_bytes": 5138
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/0-fields.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/0-fields.diff",
+        "sha256": "5e72e154f6e8c945fab1949cbbd6d7aa00bcb7149f821868a63ea01d76ea4a59"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "5e72e154f6e8c945fab1949cbbd6d7aa00bcb7149f821868a63ea01d76ea4a59",
+        "original_size_bytes": 1067,
+        "stored_payload_sha256": "5e72e154f6e8c945fab1949cbbd6d7aa00bcb7149f821868a63ea01d76ea4a59",
+        "stored_payload_size_bytes": 1067,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/5e72e154f6e8c945fab1949cbbd6d7aa00bcb7149f821868a63ea01d76ea4a59.part",
+            "sha256": "5e72e154f6e8c945fab1949cbbd6d7aa00bcb7149f821868a63ea01d76ea4a59",
+            "size_bytes": 1067
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/1-fields.after.rs",
+        "sha256": "3da29493dbd731541bd2393a1ca86e765f54d62354f97b6264df47a6e847ec54"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "3da29493dbd731541bd2393a1ca86e765f54d62354f97b6264df47a6e847ec54",
+        "original_size_bytes": 5179,
+        "stored_payload_sha256": "3da29493dbd731541bd2393a1ca86e765f54d62354f97b6264df47a6e847ec54",
+        "stored_payload_size_bytes": 5179,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/3da29493dbd731541bd2393a1ca86e765f54d62354f97b6264df47a6e847ec54.part",
+            "sha256": "3da29493dbd731541bd2393a1ca86e765f54d62354f97b6264df47a6e847ec54",
+            "size_bytes": 5179
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/1-fields.diff",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/observer-clippy-cleanup-01/1-fields.diff",
+        "sha256": "4e39e0c15d8f8bf5785630663e8e411906f9e03b2cc1b94caf748cb587ade844"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "4e39e0c15d8f8bf5785630663e8e411906f9e03b2cc1b94caf748cb587ade844",
+        "original_size_bytes": 1069,
+        "stored_payload_sha256": "4e39e0c15d8f8bf5785630663e8e411906f9e03b2cc1b94caf748cb587ade844",
+        "stored_payload_size_bytes": 1069,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/4e39e0c15d8f8bf5785630663e8e411906f9e03b2cc1b94caf748cb587ade844.part",
+            "sha256": "4e39e0c15d8f8bf5785630663e8e411906f9e03b2cc1b94caf748cb587ade844",
+            "size_bytes": 1069
+          }
+        ]
+      }
+    },
+    {
+      "source_owner": ".runtime/porting/CLK-05/completion-approved-01/card-notes.md",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/completion-approved-01/card-notes.md",
+        "sha256": "0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23"
+      },
+      "storage": {
+        "encoding": "identity",
+        "original_sha256": "0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23",
+        "original_size_bytes": 4303,
+        "stored_payload_sha256": "0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23",
+        "stored_payload_size_bytes": 4303,
+        "parts": [
+          {
+            "index": 0,
+            "offset": 0,
+            "relative_path": "objects/0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23.part",
+            "sha256": "0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23",
+            "size_bytes": 4303
+          }
+        ]
+      }
+    }
+  ],
+  "inherited_archives": [
+    {
+      "path": "energyplus_porting_plan/evidence/CLK-04-archive/archive.json",
+      "sha256": "6b13dd23e867364eb28f1101c614b04f4fe58fa307cd0390e0645b402e45e690"
+    }
+  ],
+  "local_only_large_proofs": [
+    {
+      "role": "genuine-CLK05-native-results",
+      "binding": {
+        "path": ".runtime/porting/CLK-05/original-execution-01/native-output/clk05-helper-results.json",
+        "sha256": "b24e2237b7efb0df3cb89714d9a72aa04e51ca359cdcb8f46ac281f74cf39041"
+      },
+      "size_bytes": 179766913,
+      "rehashed_by_archiver": false
+    },
+    {
+      "role": "supplemental-CLK04-native-results",
+      "binding": {
+        "path": ".runtime/porting/CLK-04/original-first-02/native-output/clk04-helper-results.json",
+        "sha256": "d84b696a34c720004ede289e47719bcc3d066ee48652f4a7d1a9431a1b825dba"
+      },
+      "size_bytes": 678510427,
+      "rehashed_by_archiver": false
+    }
+  ],
+  "history_notes": {
+    "native_CLK05": "genuine helper0/wrapper0; no recovery required",
+    "supplemental_CLK04": "genuine native0/historical wrapper1/metadata recovery0; sole ScheduleDOY966; huge retained results local-only",
+    "preserved_actual_failures": "unit198, workspace101, production954, plan1, wrong-package CLI freeze1, production metadata QA1 without report, final Clippy101; second final Clippy101 retained separately",
+    "CLI_build_freeze02": "no authentic receipt available; unknown outcome, not a projection failure",
+    "final_quality": "Actual five checks0, workspace4605/0fail/0ignored, actual source lineage0 at clean87108 commit; no new numerical parity extension.",
+    "manual_diff_read": "Root attests full10diff read before final quality; exact event UTC unavailable; publication time separately recorded",
+    "manual_test_cleanup": "Manual source edits have no separate execution receipt; explicit formatter0 and two Clippy101 receipts/full-diff reviews retained."
+  },
+  "exact_decompressed_bytes_verified": true,
+  "original_bytes_rewritten_or_JSON_reserialized": false,
+  "gzip": {
+    "mtime": 0,
+    "filename": "",
+    "compresslevel": 9,
+    "zlib_version": "1.3.1"
+  },
+  "individual_stored_artifact_max_bytes": 4000000,
+  "unique_original_documents_and_sources": 162,
+  "unique_stored_payload_bytes": 5793438,
+  "native_binary_or_full_native_trace_copied": false,
+  "duplicate_stdout_copied": false,
+  "scientific_comparer_or_engine_Cargo_Git_executed": false,
+  "gates_updated": false,
+  "canonical_plan_card_evidence_changed": false,
+  "writer_source_sha256": "e5309366023c2aad93222a542c4a3a0dda3793d435b081de1afcf2e160c77825"
+}

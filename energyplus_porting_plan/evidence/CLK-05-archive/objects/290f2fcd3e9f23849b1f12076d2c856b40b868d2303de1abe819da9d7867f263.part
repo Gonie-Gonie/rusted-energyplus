@@ -1,0 +1,100 @@
+"""Compare authenticated actual solar observations; engines never run here."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+
+
+def load(name):
+    spec = importlib.util.spec_from_file_location(name, HERE / (name + '.py'))
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode', choices=['legacy', 'candidate'], required=True)
+    for flag in ['native-admission-contract', 'original-reference', 'original-execution', 'original-data-review',
+        'original-data-review-execution', 'observer-request', 'observer-projection', 'observer-source-review-execution',
+        'observer-input-execution', 'rust-build', 'rust-execution', 'comparison-projection', 'comparison-projection-execution', 'output-dir']:
+        parser.add_argument('--' + flag, type=Path, required=True)
+    for flag in ['baseline-gap', 'baseline-gap-execution']:
+        parser.add_argument('--' + flag, type=Path)
+    args = parser.parse_args()
+    if hashlib.sha256((HERE / 'common.py').read_bytes()).hexdigest() != COMMON_SHA:
+        raise ValueError('Authenticated metadata utility changed before import')
+    m = load('common'); checked = m.v.Bindings()
+    m.require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    out = args.output_dir.resolve(); allowed = ROOT / '.runtime/porting/CLK-05'
+    m.require(out.is_relative_to(allowed) and out != allowed and not out.exists(), 'Fresh ignored comparison output required')
+    projection_ref = m.ref(args.comparison_projection)
+    declared = m.read(checked.check(projection_ref))
+    m.require(declared['schema'] == 'clk05-comparer-projection.v1' and declared['scientific_execution_performed'] is False,
+        'Actual pre-execution comparer source/projection freeze required')
+    source_review = m.read(checked.check(declared['source_review']))
+    review_record, review_start, review_finish = m.recorded(checked, declared['source_review_execution'], source_review)
+    m.require(source_review['schema'] == 'clk05-independent-comparer-source-review.v1'
+        and source_review['status'] == 'pass-source-selected-solar-and-authentication-before-comparison'
+        and source_review['scientific_execution_performed'] is False, 'Actual independent comparer source review required')
+    m.script(review_record, source_review['executed_reader_source_archive'], checked)
+    m.require(review_start <= m.timestamp(source_review['review_started_utc']) <= m.timestamp(source_review['review_completed_utc']) <= review_finish,
+        'Actual independent source-review interval differs')
+    sources = declared['comparer_sources']
+    reviewed = m.archives(source_review['reviewed_sources'], checked)
+    m.require(len(sources) == len(reviewed) == 8 and len({row['path'] for row in sources}) == 8
+        and set(reviewed) == {row['path'] for row in sources}, 'Exact independently reviewed eight sources required')
+    for row in sources:
+        checked.check(row)
+        m.require(reviewed[row['path']]['sha256'] == row['sha256'], 'Frozen/imported comparer source archive differs')
+    m.require(set(row['path'] for row in sources) == {str((HERE / (name + '.py')).relative_to(ROOT)).replace('\\', '/')
+        for name in ['common', 'numeric', 'state', 'history', 'metadata', 'freeze_projection', 'check_clk05']} | {m.UTILITY['path']}, 'Unexpected imported scientific module inventory')
+    freeze_record, freeze_start, freeze_finish = m.recorded(checked, m.ref(args.comparison_projection_execution),
+        {'comparison_projection': projection_ref, 'input_only_source_selection_freeze': True, 'scientific_execution_performed': False, 'gates_updated': False})
+    m.script(freeze_record, next(row for row in sources if row['path'].endswith('/freeze_projection.py')), checked)
+    m.argument(freeze_record, '--native-admission-contract', declared['native_admission_contract'], checked)
+    m.argument(freeze_record, '--source-review', declared['source_review'], checked)
+    m.argument(freeze_record, '--source-review-execution', declared['source_review_execution'], checked)
+    m.require(review_finish <= freeze_start <= m.timestamp(declared['created_utc']) <= freeze_finish,
+        'Actual projection freeze must follow completed independent source review')
+    numeric, state, history, metadata = [load(name) for name in ['numeric', 'state', 'history', 'metadata']]
+    admission_ref, admission, request, tolerances, native_projection = metadata.packet(args, checked)
+    m.binding(admission_ref, declared['native_admission_contract'], checked)
+    m.binding(source_review['reviewed_native_admission_contract'], admission_ref, checked)
+    m.require(m.exact(tolerances['rows'], declared['numeric_profiles']) and m.exact(native_projection['source_selection'], declared['source_selection'])
+        and m.exact(native_projection['native_observation_policy'], declared['native_observation_policy']), 'Frozen scientific selection/profile changed')
+    native, reference, data_finish, evidence = metadata.original(args, checked, admission_ref, admission)
+    rust, evidence, rust_start = metadata.rust(args, checked, admission_ref, admission, reference, data_finish, evidence)
+    m.require(freeze_finish <= rust_start, 'Numerical Rust operand execution preceded fixed comparer/source projection')
+    check = numeric.Comparison(tolerances)
+    ledger = history.compare(check, native, rust, request, args.mode)
+    compared = check.report(); candidate_pass = args.mode == 'candidate' and compared['mismatch_count'] == 0
+    status = 'observed-authenticated-existing-solar-differences-and-unavailable-source-scope' if args.mode == 'legacy' else (
+        'pass-selected-solar-storage-and-source-history' if candidate_pass else 'fail-selected-solar-storage-or-source-history')
+    report = {'schema': 'clk05-existing-baseline-gap.v1' if args.mode == 'legacy' else 'clk05-candidate-comparison.v1',
+        'status': status, 'mode': args.mode, 'created_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_evidence': evidence, 'comparison_projection': projection_ref,
+        'comparison_projection_execution': m.ref(args.comparison_projection_execution),
+        'executed_reader_source_archives': source_review['reviewed_sources'], 'actual_reader_argv': list(sys.orig_argv),
+        'actual_call_ledger': ledger, 'comparison': compared, 'unpaired_scope': declared['unpaired'],
+        'unavailable_counted_as_PASS': False, 'numerical_PASS_claimed': candidate_pass,
+        'legacy_metadata0_is_numerical_PASS': False, 'expected_values_supplied_to_Rust': False,
+        'Source_or_Rust_physics_recomputed_by_comparer': False, 'gates_updated': False,
+        'authorship_limits': 'Baseline authored earlier carrier/hourly/compatibility-producer algorithms and this comparer. This is no self-independent physics certification; independent source reviewers and Root execute/assess the genuine evidence separately.'}
+    checked.unchanged(); report['authenticated_artifacts'] = checked.report(); out.mkdir()
+    name = 'gap.json' if args.mode == 'legacy' else 'unit-comparison.json'
+    with (out / name).open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(report, stream, indent=2, ensure_ascii=True, allow_nan=False); stream.write('\n')
+    print(json.dumps(report, ensure_ascii=True, allow_nan=False))
+    return 0 if args.mode == 'legacy' or candidate_pass else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

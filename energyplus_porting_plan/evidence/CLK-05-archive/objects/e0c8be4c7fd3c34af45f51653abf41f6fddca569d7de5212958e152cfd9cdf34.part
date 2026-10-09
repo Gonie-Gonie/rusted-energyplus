@@ -1,0 +1,141 @@
+{
+  "schema": "clk05-root-observer-format-diff-review.v1",
+  "status": "reviewed-actual-passive-observer-format-only-diffs",
+  "reviewer": "/root",
+  "review_recorded_utc": "2026-10-09T04:10:59.672102+00:00",
+  "manual_full_diff_read_completed_before_final_quality": true,
+  "exact_diff_read_event_timestamps_available": false,
+  "actual_final_diff_read_in_full": true,
+  "formatting_only": true,
+  "mathematical_functions_or_production_modules_changed": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "reviewed_format_plan": {
+    "path": ".runtime/porting/CLK-05/final-format-plan-prep-02/plan.json",
+    "sha256": "5fc4c9e09ce33519c9eae3f606261fb45e5a536c84be7cb8bfb3c409957bb33d"
+  },
+  "actual_formatting_execution": {
+    "path": ".runtime/porting/CLK-05/observer-format-command-01/receipt.json",
+    "sha256": "4146009deb4a1dec1d9a967be00bbf728db05b8e9c282fd7adb5fb3c8788a2bc"
+  },
+  "reviewed_actual_format_summary": {
+    "path": ".runtime/porting/CLK-05/observer-format-01/format.json",
+    "sha256": "0662f4e204a94c22d580a2369959b8fe411a1c0f0714807086667ea876619622"
+  },
+  "reviewed_final_sources": [
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_observer.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/00-clk05_existing_observer.rs",
+        "sha256": "42200d1ac686530ee367b3be19c777689fe82969e9011e10be7cb77f1dd1bdd3"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/inputs.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/01-inputs.rs",
+        "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/fields.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/02-fields.rs",
+        "sha256": "6110bac2a1851b477ba33a94675a4985d0fcb8f0a2fc864941d33aba0afbb781"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/observe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/03-observe.rs",
+        "sha256": "4f32676e76aeaaa4ec53656afb4eebab1b93f63145ad63fda68c0deabdfdc024"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_existing_support/seeds.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/04-seeds.rs",
+        "sha256": "73da6159242c896b7c28447ac17078f80cae8af9eb186dac1cf90f0a30d0a62c"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_probe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/05-clk05_candidate_probe.rs",
+        "sha256": "dad6b69c9c4b0e2840ec70299be570dcbb38f1d5ee5518ce5183c75ebc2b997e"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/inputs.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/06-inputs.rs",
+        "sha256": "e6803e20be71976c5aed9b628f82c7b47aeb844276ec39cf67483e6268e0c456"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/fields.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/07-fields.rs",
+        "sha256": "03b58e1f071405928d82231f8fe531481c39148d40d3988720da2a0cc3742865"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/observe.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/08-observe.rs",
+        "sha256": "0499e61ff552dbfb10fd8f7b7874049af63be2d1b3db42ecebfef810a1a4b239"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/examples/clk05_candidate_support/seeds.rs",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/observer-format-01/after/09-seeds.rs",
+        "sha256": "909f202e34d5bf027b2e25b89c2eee1013452c147a721c8e5ef5120a62186309"
+      }
+    }
+  ],
+  "reviewed_full_diffs": [
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/00-clk05_existing_observer.rs.diff",
+      "sha256": "0f7c9faaba806dc01f662dba08eeed65d0d4206e71c247d7b3e92d44f899b55e"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/01-inputs.rs.diff",
+      "sha256": "d0282e1a0483e168a70b935254ad0835a7597b01cc3f5b0c16b7e50f379294fd"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/02-fields.rs.diff",
+      "sha256": "8a3e7a1db9aabe4e12bc16fa8967c3907e8979672d95b6d2fcc01eca2df6d931"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/03-observe.rs.diff",
+      "sha256": "8e902f20de5f9de2565481ff6f821f61f81478b4e8189d3c6d327bfb521ecf06"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/04-seeds.rs.diff",
+      "sha256": "bc612edd0e776c2847b563c37ceb40afad06023128785625dd66eab7260eab85"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/05-clk05_candidate_probe.rs.diff",
+      "sha256": "72335f05e342d418a44bdcfedbf88a94305f708b44f67e531152be82ee244fd7"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/06-inputs.rs.diff",
+      "sha256": "49224dc072f2c1848b8a2deeea2808cf28ae23666b0dbcfb3bbab0d4abbd3a84"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/07-fields.rs.diff",
+      "sha256": "061054585444306fe44bf81c89618d2203029a634c27fa5bdace17dc7255fa5c"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/08-observe.rs.diff",
+      "sha256": "7cdc0145948cf6a446897c91aa4d5b96f6acde74d6e01dc2d3f2db2eccda7979"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/observer-format-01/diffs/09-seeds.rs.diff",
+      "sha256": "a7dd2564574b2bd11c9490eec3957addea15118b22981477579a5db396e5545e"
+    }
+  ],
+  "diff_line_count": 1272,
+  "review_scope": "Root read all1272 actual diff lines before committing formatted files and starting final quality; timestamps of individual manual read events were not separately captured. This attests layout, module/use import ordering and optional commas only, retaining genuine counter setter and call order."
+}

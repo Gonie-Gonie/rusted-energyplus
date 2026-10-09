@@ -1,0 +1,234 @@
+"""Authenticated input and execution metadata; no numerical comparison kernels."""
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import os
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+OWN = Path(__file__).resolve().parent
+BASE = ROOT / '.runtime/porting/CLK-05'
+NAMES = ['common.py', 'evidence.py', 'prepare_plan.py', 'run_production.py']
+UTILITY = {'path': 'tools/porting/geo03_provenance.py',
+    'sha256': '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'}
+ADMISSION = {'path': '.runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json',
+    'sha256': 'd05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd'}
+CONTROL = {'path': '.runtime/porting/CLK-05/production-control-capture-01/production-control-inputs.json',
+    'sha256': 'b30d5a9be74fd2d9e868715888f94be981e711f3aedb58d913023b2e8a73fdd2'}
+CASE_IDS = ['A-24H', 'A-72H', 'B-BOTH-24H']
+ENV_NAMES = ['IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+CONTROLS = ['DisplayWeatherMissingDataWarnings', *ENV_NAMES]
+SCHEMA = 'clk05-independent-production-workflow-source-review.v1'
+STATUS = 'pass-input-control-and-actual-CLI-provenance-before-production'
+
+
+def need(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    need(spec is not None and spec.loader is not None, 'Metadata module loader unavailable')
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+need(hashlib.sha256((ROOT / UTILITY['path']).read_bytes()).hexdigest() == UTILITY['sha256'],
+    'Pinned execution-free metadata utility differs before import')
+v = load('geo03_provenance', ROOT / UTILITY['path'])
+read, ref, exact, timestamp = v.read, v.ref, v.exact, v.timestamp
+
+
+def binding(actual, expected, checked):
+    checked.check(actual); checked.check(expected)
+    need(v.same_binding(actual, expected), 'Actual contained path/hash binding differs')
+
+
+def recorded(checked, reference, payload=None):
+    record = read(checked.check(reference))
+    need(record['schema'] == 'recorded-porting-command.v1' and record['launch_error'] is None
+        and record['source_bytes_match_before_and_after'] is True
+        and record['recorder_updates_gates'] is False and record['recorder_supplies_reference_answers'] is False,
+        'Real guarded recorded command required')
+    start, finish = v.execution_interval(record, checked)
+    checked.check(record['executed_launcher']['archive'])
+    if payload is not None:
+        need(exact(read(checked.check(record['stdout'])), payload), 'Actual full JSON stdout differs from report')
+    return record, start, finish
+
+
+def script(record, archive, checked):
+    command = record['command']; index = 1; seen = set()
+    need(len(command) >= 2 and Path(command[0]).name.lower() in
+        ['python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'], 'Admitted Python interpreter required')
+    while index < len(command) and command[index] in ['-X', '-B']:
+        option = command[index]; need(option not in seen, 'Repeated Python option'); seen.add(option); index += 1
+        if option == '-X':
+            need(index < len(command) and command[index] == 'utf8', 'Only UTF8 Python mode admitted'); index += 1
+    need(index < len(command) and command[index].endswith('.py')
+        and v.path_of(command[index]).read_bytes() == checked.check(archive).read_bytes(),
+        'Actual executed Python source/archive differs')
+
+
+def source_map(rows, checked):
+    need(type(rows) is list, 'Actual typed source archive list required')
+    result = v.archive_map(rows, checked)
+    need(len(rows) == len(result), 'Duplicate source archive owner')
+    for owner, archive in result.items():
+        need(v.path_of(owner).read_bytes() == checked.check(archive).read_bytes(), 'Reviewed source changed: ' + owner)
+    return result
+
+
+def source_paths():
+    return [*[OWN / name for name in NAMES], ROOT / UTILITY['path']]
+
+
+def boot(review_path, execution_path):
+    need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    checked = v.Bindings(); review_ref, execution_ref = ref(review_path), ref(execution_path)
+    review = read(checked.check(review_ref))
+    need(review['schema'] == SCHEMA and review['status'] == STATUS
+        and review['scientific_execution_performed'] is False, 'Independent production source review required')
+    reviewed = source_map(review['reviewed_sources'], checked)
+    names = {path.relative_to(ROOT).as_posix() for path in source_paths()}
+    need(set(reviewed) == names and len(reviewed) == len(source_paths()), 'Exact four own modules plus utility review required')
+    for path in source_paths():
+        checked.check(ref(path))
+    record, start, finish = recorded(checked, execution_ref, review)
+    script(record, review['executed_reader_source_archive'], checked)
+    need(start <= timestamp(review['review_started_utc']) <= timestamp(review['review_completed_utc']) <= finish,
+        'Actual independent source review interval differs')
+    module = load('clk05_production_evidence', OWN / 'evidence.py')
+    return checked, review_ref, review, execution_ref, finish, module
+
+
+def environment_inputs(environment):
+    need(os.name == 'nt' and all(type(key) is str and type(value) is str for key, value in environment.items()),
+        'Actual Windows string environment required')
+    captured = {}
+    for name in ENV_NAMES:
+        matches = [value for key, value in environment.items() if key.casefold() == name.casefold()]
+        need(len(matches) <= 1, 'Conflicting case aliases in child environment')
+        captured[name] = {'present': bool(matches), 'raw_value': matches[0] if matches else ''}
+    return captured
+
+
+def require_environment(actual, expected):
+    need(type(expected) is dict and set(expected) == set(ENV_NAMES), 'Exactly three frozen ENV inputs required')
+    for row in expected.values():
+        need(type(row) is dict and set(row) == {'present', 'raw_value'} and type(row['present']) is bool
+            and type(row['raw_value']) is str and (row['present'] or row['raw_value'] == ''), 'Typed presence/raw ENV input required')
+    need(exact(actual, expected), 'Actual ENV differs from frozen presence/raw strings')
+
+
+def packet(checked):
+    admission = read(checked.check(ADMISSION))
+    need(admission['schema'] == 'clk05-native-admission-contract.v1' and admission['frozen_before_numerical_execution'] is True,
+        'Authentic unchanged native admission required')
+    for flag in ['expected_values_supplied', 'expected_exits_supplied', 'scientific_execution_performed', 'gates_updated']:
+        need(admission[flag] is False, 'Native input-only boundary differs')
+    need(set(admission['contracts']) == {'source', 'cases', 'tolerances'}, 'Exact three native contracts required')
+    request = read(checked.check(admission['helper_request'])); projection = read(checked.check(admission['projection']))
+    contracts = {key: read(checked.check(row)) for key, row in admission['contracts'].items()}
+    for key, contract in contracts.items():
+        need(contract['schema'] == 'clk05-' + key + '-contract.v1' and contract['card'] == 'CLK-05'
+            and contract['frozen_before_numerical_execution'] is True, 'Frozen native contract differs')
+    need(request['schema'] == 'clk05-helper-cases.v1' and request['energyplus_commit'] == v.PIN
+        and exact(request['contracts'], {key: admission['contracts'][key] for key in ['source', 'tolerances']}), 'One-way native request differs')
+    binding(contracts['cases']['helper_request'], admission['helper_request'], checked)
+    binding(projection['helper_request'], admission['helper_request'], checked)
+    need(projection['schema'] == 'clk05-observation-projection.v1' and exact(projection['contracts'], admission['contracts'])
+        and exact(projection['native_observation_policy'], request['observation_policy']), 'Frozen native selection differs')
+    scope = read(checked.check(admission['fixed_scope']))
+    rows = [row[key] for row in scope['cases'] for key in ['input', 'weather', 'metadata']]
+    need(len(rows) == 45 and exact(rows, admission['all_45_guard_refs']) and exact(rows, request['all_45_guard_refs']), 'Ordered45 guard differs')
+    checked.recursive(rows); checked.recursive(contracts['cases']['input_artifacts'])
+    binding(request['production_control_inputs'], CONTROL, checked)
+    control = read(checked.check(CONTROL)); control_review_ref = admission['production_control_review']['review']
+    control_review = read(checked.check(control_review_ref))
+    need(control_review['schema'] == 'clk05-independent-production-control-input-review.v1'
+        and control_review['status'] == 'pass-input-registration-and-captured-environment-before-original'
+        and control_review['scientific_execution_performed'] is False, 'Actual literal registration review required')
+    binding(control_review['reviewed_control_inputs'], CONTROL, checked)
+    recorded(checked, admission['production_control_review']['execution'], control_review)
+    source_map(control_review['reviewed_sources'], checked)
+    need(control['schema'] == 'clk05-production-control-inputs.v1'
+        and control['status'] == 'captured-literal-inputs-and-selected-registration-no-science'
+        and [row['case_id'] for row in control['cases']] == CASE_IDS, 'Actual ordered three-CON control capture required')
+    controls = {row['case_id']: row for row in control['cases']}
+    lanes = [row for row in request['weather_sequences'] if row['lane'] == 'production-CON']
+    need([row['id'] for row in lanes] == CASE_IDS, 'Only existing three production native lanes admitted')
+    indexed = {row['id']: row for row in scope['cases']}; cases = []
+    counts = {'GetNextEnvironment': 0, 'InitializeWeather': 0}
+    for lane in lanes:
+        case = indexed[lane['id']]; registration = controls[lane['id']]
+        for key in ['input', 'weather']:
+            binding(lane[key], case[key], checked)
+        binding(registration['input'], case['input'], checked)
+        binding(lane['production_control_inputs'], CONTROL, checked)
+        need(set(lane['solar_controls']) == set(CONTROLS) and all(type(value) is bool for value in lane['solar_controls'].values())
+            and exact(lane['solar_controls'], registration['solar_controls']), 'Four source caller controls differ')
+        for operation in lane['operations']:
+            need(operation['kind'] in counts, 'Production lane added a new native function'); counts[operation['kind']] += 1
+        cases.append({'case_id': lane['id'], **{key: case[key] for key in ['scope', 'duration', 'input', 'weather', 'metadata']},
+            'native_sequence_id': lane['id'], 'trace_levels': ['Full', 'Summary'],
+            'solar_controls': registration['solar_controls'], 'captured_environment_inputs': registration['captured_environment_inputs']})
+    need(counts == {'GetNextEnvironment': 3, 'InitializeWeather': 480}, 'Literal existing production history differs')
+    checked.recursive([row['registration_source_archives'] for row in control['cases']])
+    return admission, request, projection, contracts, cases
+
+
+def fresh(directory):
+    directory = Path(directory).resolve()
+    need(directory.is_relative_to(BASE) and directory != BASE and not directory.exists(), 'Fresh contained ignored output required')
+    return directory
+
+
+def write(path, value):
+    with Path(path).open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False); stream.write('\n')
+
+
+def archive_sources(directory):
+    rows = []
+    for index, source in enumerate(source_paths()):
+        archive = directory / f'{index:02}-{source.name}'; shutil.copyfile(source, archive)
+        need(source.read_bytes() == archive.read_bytes(), 'Actual archived workflow source differs')
+        rows.append({'historical_path': source.relative_to(ROOT).as_posix(), 'archive': ref(archive)})
+    return rows
+
+
+def input_byte_map(weather_ref, checked):
+    data = checked.check(weather_ref).read_bytes(); ranges = []; start = 0
+    while start < len(data):
+        newline = data.find(b'\n', start); end = len(data) if newline < 0 else newline + 1
+        ranges.append((start, end)); start = end
+    need(len(ranges) > 8, 'Complete eight-header EPW source required')
+    return {'schema': 'clk05-production-input-byte-map.v1', 'input': weather_ref, 'header_line_count': 8,
+        'input_byte_length': len(data), 'record_line_map': [{'source_record_index': index, 'start_byte': left, 'end_byte': right,
+            'input_row_sha256': hashlib.sha256(data[left:right]).hexdigest()} for index, (left, right) in enumerate(ranges[8:])],
+        'scientific_expected_values_supplied': False, 'native_internal_source_index_claimed': False}
+
+
+def routing(projection, tolerances):
+    return {'schema': 'clk05-production-input-routing.v1', 'native_source_selection': projection['source_selection'],
+        'native_observation_policy': projection['native_observation_policy'], 'numeric_profiles': tolerances['rows'],
+        'numeric_criterion': tolerances['criterion'], 'array_path_mapping': {'native_snapshot': 'root', 'CLI_snapshot': 'root',
+            'actual_Rust_storage_owner': 'state.weather', 'value_transform': False},
+        'solar_transport': {'Today.BeamSolarRad': 'received_sample.direct_normal_radiation_w_per_m2',
+            'Today.DifSolarRad': 'received_sample.diffuse_horizontal_radiation_w_per_m2'},
+        'native_CON_source_calls': {'GetNextEnvironment': 3, 'InitializeWeather': 480, 'total_operations': 483},
+        'CLI_Current_calls': 'retained actual existing per-zone operations; current-solar/night math remains unpaired',
+        'consumer_order_receipt': 'actual completed_operation_count, not an invented joint event clock',
+        'all_selected_solar2_boundaries_and_cache_fields_retained': True, 'full_Today_transport_is_within_Rust_owner_copy': True,
+        'unavailable_counted_as_PASS': False, 'numeric_policy_changed': False,
+        'incident_absorbed_SRC04_or_current_solar_night_certification_claimed': False}

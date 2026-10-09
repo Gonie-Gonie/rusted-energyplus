@@ -1,0 +1,340 @@
+"""Authenticated evidence routing only; no engine execution or weather RHS."""
+from pathlib import Path
+from types import SimpleNamespace
+import importlib.util
+import json
+import sys
+
+from common import (ROOT, archives, binding, exact, read, recorded, ref,
+    require, script, timestamp, v, argument)
+
+HERE = Path(__file__).resolve().parent
+UNIT = ROOT / '.runtime/porting/CLK-05/comparer-prep-01'
+WORKFLOW = ROOT / '.runtime/porting/CLK-05/production-workflow-prep-03'
+OWN_NAMES = ['proofs.py', 'adapter.py', 'observations.py', 'freeze_projection.py', 'check_production.py']
+UNIT_NAMES = ['common.py', 'numeric.py', 'state.py', 'history.py', 'metadata.py', 'freeze_projection.py', 'check_clk05.py']
+WORKFLOW_NAMES = ['common.py', 'evidence.py', 'prepare_plan.py', 'run_production.py']
+REVIEW_SCHEMA = 'clk05-independent-production-comparer-source-review.v1'
+REVIEW_STATUS = 'pass-source-selected-solar-and-owned-transport-before-production'
+CLK04_QC = {'path': '.runtime/porting/CLK-04/independent-original-data-review-01/review.json',
+    'sha256': '164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1'}
+CLK04_QC_EXECUTION = {'path': '.runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json',
+    'sha256': '1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0'}
+CLK04_REGISTRY = {'path': '.runtime/porting/CLK-04/retirement-01/registry-retired.json',
+    'sha256': '27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378'}
+PRESERVED_FAILURE = {
+    'report': {'path': '.runtime/porting/CLK-05/production-comparison-01/production-comparison.json',
+        'sha256': 'c36ae50d49b6022c438ee43d3864a8a65be96104bc3374b56013808fb68b644e'},
+    'execution': {'path': '.runtime/porting/CLK-05/production-comparison-command-01/receipt.json',
+        'sha256': '9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f'}}
+SCHEDULE_FIELD = 'environment.DayOfYear_Schedule'
+
+
+def schedule_routing(admission, checked):
+    """Authenticate retained metadata and input history, without parsing native values."""
+    qc = read(checked.check(CLK04_QC)); qc_record, qc_start, qc_finish = recorded(checked, CLK04_QC_EXECUTION, qc)
+    require(qc['schema'] == 'clk04-independent-original-data-review.v1'
+        and qc['status'] == 'pass-preserved-original-data-before-Rust-baseline'
+        and qc['intended_native_branch_coverage_complete'] is True
+        and qc['actual_operation_invocations'] == 3239 and qc['actual_operations_skipped'] == 0
+        and qc['actual_historical_native_exit_code'] == 0 and qc['actual_historical_wrapper_exit_code'] == 1
+        and qc['actual_metadata_recovery_exit_code'] == 0 and qc['historical_failed_wrapper_relabelled_zero'] is False
+        and qc['native_engine_reexecuted'] is False and qc['scientific_values_compared'] is False
+        and qc['numerical_PASS_claimed'] is False and qc['source_unavailable_counted_as_PASS'] is False,
+        'Genuine CLK04 native0/wrapper1/recovery0 and independent data QC0 required')
+    require(qc_start <= timestamp(qc['review_started_utc']) <= timestamp(qc['review_completed_utc']) <= qc_finish,
+        'Actual retained CLK04 data review interval differs')
+    reviewed = archives(qc['executed_reader_sources'], checked)
+    mains = [row for owner, row in reviewed.items() if owner.endswith('/review_data.py')]
+    require(len(mains) == 1 and len(reviewed) == 2, 'Actual CLK04 two-source metadata reviewer required')
+    script(qc_record, mains[0], checked)
+    argument(qc_record, '--reference', qc['reviewed_reference'], checked)
+    argument(qc_record, '--execution', qc['reviewed_execution'], checked)
+    recovery, recovery_start, recovery_finish = recorded(checked, qc['reviewed_execution'])
+    failed = read(checked.check(qc['reviewed_failed_original_execution']))
+    failed_start, failed_finish = v.execution_interval(failed, checked, exit_code=1)
+    require(failed['schema'] == 'recorded-porting-command.v1' and failed['launch_error'] is None
+        and failed['source_bytes_match_before_and_after'] is True
+        and failed['recorder_updates_gates'] is False and failed['recorder_supplies_reference_answers'] is False,
+        'Preserved actual CLK04 failed wrapper1 cannot be relabelled zero')
+    checked.check(failed['executed_launcher']['archive']); checked.check(failed['source_snapshot'])
+    child = read(checked.check(qc['reviewed_native_execution'])); child_start, child_finish = v.execution_interval(child, checked)
+    require(child['schema'] == 'clk04-original-native-command.v1' and child['spawn_error'] is None
+        and len(child['command']) == 5 and v.path_of(child['command'][1]) == ROOT,
+        'Actual CLK04 original native0 and exclusive argc5 required')
+    for index, key in [(2, 'reviewed_request'), (3, 'reviewed_native_admission_contract')]:
+        require(v.path_of(child['command'][index]) == checked.check(qc[key]), 'Retained native input argv differs')
+    binding(child['request'], qc['reviewed_request'], checked)
+    binding(child['native_admission_contract'], qc['reviewed_native_admission_contract'], checked)
+    binding(child['observation_projection'], qc['reviewed_projection'], checked)
+    require(v.path_of(child['command'][4]) == checked.check(qc['reviewed_results']).parent,
+        'Actual native output directory must own the preserved results')
+    require(failed_start <= child_start <= child_finish <= failed_finish <= recovery_start <= recovery_finish <= qc_start,
+        'Retained native0/wrapper1 then recovery0 then independent QC0 chronology differs')
+    build = read(checked.check(qc['reviewed_build'])); peer = read(checked.check(qc['reviewed_build_review']))
+    require(build['schema'] == 'clk04-native-driver-build.v1' and build['checks_passed'] is True
+        and build['assertions_enabled'] is True and build['fp_contract'] == 'off'
+        and peer['schema'] == 'clk04-independent-native-build-review.v1'
+        and peer['status'] == 'pass-build-and-derivative-before-original-execution'
+        and peer['scientific_execution_performed'] is False, 'Authentic retained whole-core build/independent PE review required')
+    binding(peer['reviewed_build'], qc['reviewed_build'], checked)
+    binding(child['native_driver_build'], qc['reviewed_build'], checked)
+    binding(child['binary'], build['helper_binary'], checked)
+    binding(peer['reviewed_binary'], build['helper_binary'], checked)
+    require(v.path_of(child['command'][0]) == checked.check(build['helper_binary']),
+        'Actual native executable argv must match the retained derived binary')
+    _, _, peer_finish = recorded(checked, qc['reviewed_build_review_execution'], peer)
+    require(peer_finish <= failed_start, 'Independent actual build review must precede native invocation')
+    registry = read(checked.check(CLK04_REGISTRY))
+    entries = [row for row in registry['new_targets'] if row['target'] == 'clk04_reference_helper']
+    require(registry['schema'] == 'native-retained-artifact-registry.v4' and len(entries) == 1
+        and entries[0]['status'] == 'retained-derivative-original-retired'
+        and entries[0]['actual_removal_observed'] is True
+        and entries[0]['unstripped_original']['full_debug_bytes_available'] is False,
+        'Legitimate retired original is historical; retained derivative and data remain usable')
+    binding(entries[0]['retained_derivative'], build['helper_binary'], checked)
+    binding(entries[0]['evidence']['native-build'], qc['reviewed_build'], checked)
+    binding(entries[0]['evidence']['original-data-review'], CLK04_QC, checked)
+    binding(entries[0]['evidence']['original-data-review-execution'], CLK04_QC_EXECUTION, checked)
+    c4 = read(checked.check(qc['reviewed_request'])); c5 = read(checked.check(admission['helper_request']))
+    require(c4['schema'] == 'clk04-helper-cases.v1' and c5['schema'] == 'clk05-helper-cases.v1'
+        and c4['energyplus_commit'] == c5['energyplus_commit']
+        and exact(c4['fixed_scope'], c5['fixed_scope']) and exact(c4['all_45_guard_refs'], c5['all_45_guard_refs'])
+        and len(c4['all_45_guard_refs']) == 45, 'Same pinned original and ordered45 CON inputs required')
+    for row in c4['all_45_guard_refs']: checked.check(row)
+    c4_admission = read(checked.check(qc['reviewed_native_admission_contract']))
+    require(c4_admission['schema'] == 'clk04-native-admission-contract.v1'
+        and c4_admission['energyplus_commit'] == c4['energyplus_commit']
+        and exact(qc['reviewed_contracts'], c4_admission['contracts']), 'Retained CLK04 six-packet identity differs')
+    binding(c4_admission['helper_request'], qc['reviewed_request'], checked)
+    binding(c4_admission['projection'], qc['reviewed_projection'], checked)
+    sources = [read(checked.check(row['source'])) for row in [c4_admission['contracts'], admission['contracts']]]
+    for owner in ['src/EnergyPlus/WeatherManager.cc', 'src/EnergyPlus/DataEnvironment.hh']:
+        rows = [[row for row in source['source_files'] if row['path'] == owner] for source in sources]
+        require(all(len(group) == 1 for group in rows) and rows[0][0]['sha256'] == rows[1][0]['sha256'],
+            'Actual schedule-writer/default-owner source identity differs')
+        for group in rows:
+            checked.check(group[0]['original']); checked.check(group[0]['archive'])
+    left = {row['id']: row for row in c4['weather_sequences'] if row['lane'] == 'production-CON'}
+    right = {row['id']: row for row in c5['weather_sequences'] if row['lane'] == 'production-CON'}
+    require(list(left) == list(right) == ['A-24H', 'A-72H', 'B-BOTH-24H'], 'Exact retained production lanes required')
+    direct_ids = {}; lane_counts = {}
+    def literal_operation(row):
+        return {key: value for key, value in row.items()
+            if key not in ['selected_observation', 'full_solar_grid_observation_declared']}
+    for name in left:
+        for key in ['input', 'weather', 'run_period', 'time_steps_per_hour', 'prepared_environment_lane', 'native_preparation']:
+            require(exact(left[name][key], right[name][key]), 'Retained input/preparation differs: ' + name + '/' + key)
+        direct = [row for row in left[name]['operations'] if row['kind'] != 'SetCurrentWeather']
+        require(all(row['kind'] in ['GetNextEnvironment', 'InitializeWeather'] for row in direct)
+            and len(direct) == len({row['id'] for row in direct})
+            and exact([literal_operation(row) for row in direct], [literal_operation(row) for row in right[name]['operations']]),
+            'Same direct operation IDs/kinds/literal caller inputs required before values are read')
+        direct_ids[name] = [row['id'] for row in direct]
+        lane_counts[name] = {'all_native_operations': len(left[name]['operations']), 'direct_operations': len(direct),
+            'unpaired_Current_operations': len(left[name]['operations']) - len(direct)}
+    require(sum(map(len, direct_ids.values())) == 483, 'All483 direct schedule observation routes required')
+    evidence = {'data_review': CLK04_QC, 'data_review_execution': CLK04_QC_EXECUTION,
+        'recovery': qc['reviewed_reference'], 'recovery_execution': qc['reviewed_execution'],
+        'preserved_original_reference': qc['reviewed_original_reference'],
+        'failed_original_execution': qc['reviewed_failed_original_execution'],
+        'native_execution': qc['reviewed_native_execution'], 'native_results': qc['reviewed_results'],
+        'native_request': qc['reviewed_request'], 'native_admission_contract': qc['reviewed_native_admission_contract'],
+        'native_projection': qc['reviewed_projection'], 'contracts': qc['reviewed_contracts'],
+        'native_build': qc['reviewed_build'], 'native_build_review': qc['reviewed_build_review'],
+        'native_build_review_execution': qc['reviewed_build_review_execution'],
+        'retained_derivative': build['helper_binary'], 'retired_original_registry': CLK04_REGISTRY}
+    checked.recursive(evidence)
+    return {'schema': 'clk05-production-schedule-routing.v1', 'field': SCHEDULE_FIELD,
+        'operand_card': 'CLK-04', 'same_id_direct_kinds': ['GetNextEnvironment', 'InitializeWeather'],
+        'phases': ['before', 'after'], 'matched_direct_operation_ids': direct_ids, 'lane_counts': lane_counts,
+        'paired_fieldset': [SCHEDULE_FIELD], 'direct_field_observation_count': 966, 'evidence': evidence,
+        'all_other_selected_operands_card': 'CLK-05', 'new_Current_comparisons_performed': False,
+        'native_results_supplied_to_Rust': False, 'selected_field_counts_unchanged': True,
+        'numeric_profiles_changed': False, 'case_or_scope_expanded': False,
+        'ordinal_recomputed_or_synthesized': False, 'native_results_parsed_by_freezer': False,
+        'historical_native_exit_code': 0, 'historical_wrapper_exit_code': 1, 'metadata_recovery_exit_code': 0,
+        'historical_failed_wrapper_relabelled_zero': False, 'unavailable_counted_as_PASS': False}
+
+
+def schedule_observations(routing, checked):
+    """Return only actual typed field observations from already authenticated native JSON."""
+    evidence = routing['evidence']; request = read(checked.check(evidence['native_request']))
+    result = read(checked.check(evidence['native_results']))
+    require(result['schema'] == 'clk04-helper-results.v1' and result['complete'] is True
+        and result['energyplus_commit'] == request['energyplus_commit'],
+        'Preserved authentic CLK04 native results required')
+    for key, expected in [('actual_request', evidence['native_request']),
+        ('native_admission_contract', evidence['native_admission_contract']), ('observation_projection', evidence['native_projection'])]:
+        binding(result[key], expected, checked)
+    v.verify_contract_bindings(result['contracts'], evidence['contracts'], checked)
+    native = {row['id']: row for row in result['weather_sequences']}
+    require(len(native) == len(result['weather_sequences']), 'No duplicated native lane identity')
+    requested = {row['id']: row for row in request['weather_sequences']}; observed = {}
+    for name, ids in routing['matched_direct_operation_ids'].items():
+        rows = native[name]['operations']; inputs = requested[name]['operations']
+        require(len(rows) == len(inputs), 'All actual retained whole-call history required')
+        found = {}
+        for actual, supplied in zip(rows, inputs, strict=True):
+            require(actual['id'] == supplied['id'] and actual['kind'] == supplied['kind']
+                and exact(actual['requested_operation'], supplied) and actual['actual_source_invoked'] is True
+                and actual['call_outcome']['status'] == 'source_returned' and actual['call_outcome']['source_fatal'] is False,
+                'Retained genuine whole-call request/availability differs')
+            require(all(exact(actual['before']['global'][key], value) for key, value in supplied['caller'].items()),
+                'Actual retained literal caller transport differs')
+            if supplied['kind'] == 'SetCurrentWeather': continue
+            values = {phase: actual[phase]['environment']['DayOfYear_Schedule'] for phase in routing['phases']}
+            require(all(type(value) is int and -(2**31) <= value < 2**31 for value in values.values()),
+                'Actual native schedule ordinal observation must be typed i32')
+            require(actual['id'] not in found, 'No duplicated direct operation identity')
+            found[actual['id']] = values
+        require(list(found) == ids, 'Exact frozen direct field routes required')
+        observed[name] = found
+    return observed
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    require(spec is not None and spec.loader is not None, 'Actual module loader unavailable')
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def json_line(value):
+    def pairs(rows):
+        result = {}
+        for key, item in rows:
+            require(key not in result, 'Duplicate actual stdout JSON key'); result[key] = item
+        return result
+    return json.loads(value, object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonfinite actual stdout token: ' + token)))
+
+
+def sources():
+    return [*[HERE / name for name in OWN_NAMES], *[UNIT / name for name in UNIT_NAMES],
+        *[WORKFLOW / name for name in WORKFLOW_NAMES], ROOT / 'tools/porting/geo03_provenance.py']
+
+
+def selection(native, tolerances):
+    return {'schema': 'clk05-production-comparer-selection.v1',
+        'native_source_selection': native['source_selection'],
+        'native_observation_policy': native['native_observation_policy'],
+        'numeric_profiles': tolerances['rows'], 'numeric_criterion': tolerances['criterion'],
+        'actual_CON_cases': ['A-24H', 'A-72H', 'B-BOTH-24H'],
+        'native_direct_source_calls': {'GetNextEnvironment': 3, 'InitializeWeather': 480, 'total_operations': 483},
+        'Rust_Current_calls': 480, 'native_Current_or_thermal_callback_parity_claimed': False,
+        'grid_conversion': 'actual full17 CLI slots projected to selected solar2; no numeric value transform',
+        'array_DTO_mapping': 'native ROOT to CLI ROOT identity',
+        'native_stream_file_path_operand': 'unavailable in CLI byte-stream DTO; real weather file bound externally',
+        'consumer_receipt': 'actual completed_operation_count and owned full17 Today, no reconstructed native event time',
+        'solar_sample_fields': {'BeamSolarRad': 'direct_normal_radiation_w_per_m2',
+            'DifSolarRad': 'diffuse_horizontal_radiation_w_per_m2'},
+        'CurrentTime_SimTimeSteps_weights': 'retained typed actual observations, unpaired cross-native',
+        'unselected_physics': ['current-solar', 'night', 'solar-position', 'SRC04-incident-absorbed',
+            'native-thermal-callback', 'unselected-full17-generation'],
+        'ordinary_nullable_metadata': {'oracle': None, 'comparison': None,
+            'both_null_required': False, 'one_sided_null_is_failure': True},
+        'unavailable_counted_as_PASS': False, 'numeric_policy_changed': False}
+
+
+def source_review(review_ref, execution_ref, checked):
+    review = read(checked.check(review_ref))
+    require(review['schema'] == REVIEW_SCHEMA and review['status'] == REVIEW_STATUS
+        and review['scientific_execution_performed'] is False, 'Independent held production reader source review required')
+    indexed = archives(review['reviewed_sources'], checked)
+    names = {path.relative_to(ROOT).as_posix() for path in sources()}
+    require(len(indexed) == len(review['reviewed_sources']) == len(names) == 17 and set(indexed) == names,
+        'Exactly five reader modules, seven unit modules, four workflow modules and utility required')
+    receipt, start, finish = recorded(checked, execution_ref, review)
+    script(receipt, review['executed_reader_source_archive'], checked)
+    binding(review['reviewed_CLK04_data_review'], CLK04_QC, checked)
+    binding(review['reviewed_CLK04_data_review_execution'], CLK04_QC_EXECUTION, checked)
+    require(exact(review['reviewed_preserved_production_failure'], PRESERVED_FAILURE),
+        'Actual used failed production proof must remain separately bound')
+    checked.recursive(PRESERVED_FAILURE)
+    failure = read(checked.check(PRESERVED_FAILURE['execution']))
+    _, failed_finish = v.execution_interval(failure, checked, exit_code=1)
+    require(failure['schema'] == 'recorded-porting-command.v1' and failure['launch_error'] is None
+        and failure['source_bytes_match_before_and_after'] is True
+        and failure['recorder_updates_gates'] is False and failure['recorder_supplies_reference_answers'] is False,
+        'Preserved genuine scientific failure1 cannot become metadata0 or PASS')
+    require(start <= timestamp(review['review_started_utc']) <= timestamp(review['review_completed_utc']) <= finish,
+        'Actual independent source-review interval differs')
+    require(failed_finish <= start, 'Fresh source review must follow preserved actual comparison failure')
+    for path in sources():
+        checked.check(ref(path))
+    return review, indexed, finish
+
+
+def workflow(checked, source_review_ref, source_execution_ref):
+    previous = sys.modules['common']
+    try:
+        module = load('common', WORKFLOW / 'common.py')
+        bound, review_ref, review, execution_ref, reviewed_finish, evidence = module.boot(
+            checked.check(source_review_ref), checked.check(source_execution_ref))
+        runner = load('clk05_production_actual_runner', WORKFLOW / 'run_production.py')
+    finally:
+        sys.modules['common'] = previous
+    return module, runner, evidence, bound, review_ref, review, execution_ref, reviewed_finish
+
+
+def matrix_input(args, checked):
+    matrix_ref = ref(args.matrix); matrix = read(checked.check(matrix_ref))
+    require(matrix['schema'] == 'clk05-production-matrix.v1' and matrix['complete'] is True
+        and type(matrix['actual_command_count']) is int and matrix['actual_command_count'] == 6
+        and matrix['all_bound_inputs_unchanged'] is True, 'Complete authenticated six actual CLI matrix required')
+    for flag in ['native_engine_executed', 'original_outputs_supplied_to_Rust', 'scientific_comparison_performed',
+        'numerical_PASS_claimed', 'gates_updated']:
+        require(matrix[flag] is False, 'Actual ordinary production boundary differs')
+    h, runner, evidence, bound, source_ref, reviewed, source_exec, reviewed_finish = workflow(
+        checked, matrix['independent_sources_review'], matrix['independent_sources_review_execution'])
+    admission, request, native_policy, contracts, cases = h.packet(bound)
+    refs = matrix['prerequisite_evidence']
+    ns = SimpleNamespace(**{key: bound.check(refs[owner]) for key, owner in [
+        ('build', 'Rust_build'), ('original_data_review', 'Original_data_review'),
+        ('original_data_review_execution', 'Original_data_review_execution'), ('baseline_gap', 'baseline_gap'),
+        ('baseline_gap_execution', 'baseline_gap_execution'), ('unit_comparison', 'candidate_unit'),
+        ('unit_comparison_execution', 'candidate_unit_execution')]}, plan=bound.check(matrix['declared_plan']),
+        plan_execution=bound.check(matrix['declared_plan_execution']))
+    plan_ref, plan, plan_exec, plan_finish = runner.validate_plan(ns, bound, admission, request, native_policy,
+        contracts, cases, source_ref, source_exec, reviewed_finish)
+    completed = evidence.prerequisites(ns, bound, admission, request, native_policy, contracts)
+    require(exact(plan['prerequisite_evidence'], refs) and exact(refs, completed['refs']), 'Actual frozen prerequisite identities differ')
+    require(exact(matrix['contracts'], admission['contracts']), 'Matrix contracts differ from unchanged six packet')
+    binding(matrix['native_admission_contract'], h.ADMISSION, bound)
+    binding(matrix['build'], completed['refs']['Rust_build'], bound)
+    binding(matrix['production_control_inputs'], h.CONTROL, bound)
+    require(matrix['implementation_commit'] == completed['build']['implementation_commit']
+        and matrix['crates_tree'] == completed['build']['crates_tree'], 'Actual CLI implementation identity differs')
+    require(bound.check(matrix['executed_launcher']).read_bytes() == (WORKFLOW / 'run_production.py').read_bytes(),
+        'Actually executed matrix launcher archive differs')
+    execution_ref = ref(args.matrix_execution); receipt, start, finish = recorded(bound, execution_ref)
+    workflow_sources = archives(reviewed['reviewed_sources'], bound)
+    script(receipt, workflow_sources[(WORKFLOW / 'run_production.py').relative_to(ROOT).as_posix()], bound)
+    for flag, expected in [('--plan', plan_ref), ('--plan-execution', plan_exec),
+        ('--source-review', source_ref), ('--source-review-execution', source_exec),
+        ('--build', completed['refs']['Rust_build']), ('--original-data-review', refs['Original_data_review']),
+        ('--original-data-review-execution', refs['Original_data_review_execution']), ('--baseline-gap', refs['baseline_gap']),
+        ('--baseline-gap-execution', refs['baseline_gap_execution']), ('--unit-comparison', refs['candidate_unit']),
+        ('--unit-comparison-execution', refs['candidate_unit_execution'])]:
+        command = receipt['command']; require(command.count(flag) == 1, 'Unique actual production argument required: ' + flag)
+        require(v.path_of(command[command.index(flag) + 1]) == bound.check(expected), 'Actual production evidence argument differs: ' + flag)
+    binding(receipt['source_snapshot'], completed['build']['source_snapshot'], bound)
+    require(exact(receipt['executed_launcher'], completed['build']['actual_executed_recorder'])
+        and receipt['repository_before']['head'] == receipt['repository_after']['head'] == completed['build']['implementation_commit']
+        and receipt['repository_before']['worktree_clean'] is True and receipt['repository_after']['worktree_clean'] is True,
+        'Actual matrix recorder/source/head differs')
+    lines = bound.check(receipt['stdout']).read_text(encoding='utf8').splitlines()
+    require(lines and exact(json_line(lines[-1]), {'matrix': matrix_ref, 'actual_command_count': 6, 'complete': True}),
+        'Actual matrix final stdout binding differs; child stdout is retained separately')
+    require(plan_finish <= start <= timestamp(matrix['started_utc']) <= timestamp(matrix['finished_utc']) <= finish,
+        'Actual plan then six-child matrix chronology differs')
+    evidence.architecture(completed['available'], bound)
+    checked.recursive(bound.report())
+    return {'matrix_ref': matrix_ref, 'matrix': matrix, 'matrix_execution': execution_ref,
+        'plan_ref': plan_ref, 'plan': plan, 'plan_execution': plan_exec, 'plan_finish': plan_finish,
+        'helper': h, 'runner': runner, 'evidence': evidence, 'checked': bound,
+        'admission': admission, 'request': request, 'native_policy': native_policy, 'contracts': contracts,
+        'completed': completed, 'source_review': source_ref, 'source_review_execution': source_exec,
+        'matrix_finish': finish}

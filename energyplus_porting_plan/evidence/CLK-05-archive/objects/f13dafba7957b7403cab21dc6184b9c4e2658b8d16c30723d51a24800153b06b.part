@@ -1,0 +1,12 @@
+    // SetCurrentWeather static vars
+    int NextHour = 1;
+
+    // ReadEPlusWeatherForDay static vars
+    int CurDayOfWeek = 1;
+    Real64 ReadEPlusWeatherCurTime = 1.0;
+    bool LastHourSet = false;
+
+    Weather::WeatherVars wvarsLastHr;
+    Weather::WeatherVars wvarsNextHr;
+
+    Real64 IsRainThreshold = 0.8; // precipitation threshold (mm) for timestep IsRain (divided later by NumOfTimeStepInHour)

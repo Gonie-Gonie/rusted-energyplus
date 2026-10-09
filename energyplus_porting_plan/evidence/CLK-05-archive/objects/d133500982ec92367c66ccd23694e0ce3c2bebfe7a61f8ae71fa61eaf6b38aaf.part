@@ -1,0 +1,306 @@
+{
+  "schema": "clk05-comparer-projection.v1",
+  "created_utc": "2026-10-08T16:28:11.988924+00:00",
+  "source_review": {
+    "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/review.json",
+    "sha256": "c03d4ff3a4852cdfaf77e29a51129d3a6e49c4fa0a92d5b65c42a5d173ae8892"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-05/independent-comparer-source-review-command-01/receipt.json",
+    "sha256": "b6c338ee3b14876f6b26545a139cedd6d92df44f3c81509361ea4099d5d624c2"
+  },
+  "source_manifest": {
+    "path": ".runtime/porting/CLK-05/comparer-prep-01/manifest.json",
+    "sha256": "8301073f07650975b4109634851e97925783e6f5ccc87dae30067e27d95081be"
+  },
+  "comparer_sources": [
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+    },
+    {
+      "path": "tools/porting/geo03_provenance.py",
+      "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/00-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/01-numeric.py",
+        "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/02-state.py",
+        "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/03-history.py",
+        "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/04-metadata.py",
+        "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/05-freeze_projection.py",
+        "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/06-check_clk05.py",
+        "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/07-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "native_request": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+    "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+    "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "weather_sequences": 36,
+    "GetNextEnvironment": 36,
+    "InitializeWeather": 550,
+    "weather_operations": 586,
+    "total_operations": 589
+  },
+  "native_observation_policy": {
+    "full_solar_grid_fields": [
+      "BeamSolarRad",
+      "DifSolarRad"
+    ],
+    "full_solar_grid_snapshots": [
+      "allocated_defaults",
+      "setup",
+      "prepared",
+      "before_context",
+      "after_context",
+      "GetNextEnvironment",
+      "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+      "final_state"
+    ],
+    "effective_boundary_flags": "actual incoming flags overwritten only by declared partial caller writes",
+    "all_operations_executed_independently_of_observation_selection": true,
+    "compact_operation_grid_contents": null,
+    "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected solar grid",
+    "selected_today_solar_slot": "actual allocated in-range HourOfDay/TimeStep, otherwise unavailable",
+    "all19_counts_full17_LastHour_NextHour_retained": true,
+    "native_private_hourly_or_transient_weights_observed": false,
+    "passive_CurrentTime_SimTimeSteps_WeightNow_WeightPreviousHour_paired": false
+  },
+  "source_selection": {
+    "Setup": [
+      "Interpolation_allocated",
+      "Interpolation length/order/all values",
+      "SolarInterpolation_allocated",
+      "SolarInterpolation length/order/all values"
+    ],
+    "ReadDay_solar": [
+      "Tomorrow.BeamSolarRad",
+      "Tomorrow.DifSolarRad",
+      "Today.BeamSolarRad",
+      "Today.DifSolarRad",
+      "LastHourSet",
+      "LastHour.BeamSolarRad",
+      "LastHour.DifSolarRad",
+      "NextHour.BeamSolarRad",
+      "NextHour.DifSolarRad",
+      "NextHour.LiquidPrecip"
+    ],
+    "upstream_counts": [
+      "MissedCounts.BeamSolarRad",
+      "MissedCounts.DifSolarRad",
+      "OutOfRangeCounts.BeamSolarRad",
+      "OutOfRangeCounts.DifSolarRad"
+    ],
+    "effective_controls": [
+      "DisplayWeatherMissingDataWarnings",
+      "IgnoreSolarRadiation",
+      "IgnoreBeamRadiation",
+      "IgnoreDiffuseRadiation"
+    ],
+    "exact_metadata": [
+      "actual allocation/shape/hour-major-step-minor order",
+      "all requested call identities/callers/order/outcomes",
+      "actual caller calendar/flags and enumerated input clocks; passive SetCurrent clocks remain retained and unpaired",
+      "raw header/parser counter owner",
+      "actual semantic stream cursor and input byte boundary identity",
+      "declared input bits/row hashes",
+      "actual cache/counter types and unchanged public canary storage"
+    ],
+    "paired_clock_input_fields": [
+      "global.TimeStepsInHour",
+      "global.TimeStepZone",
+      "weather.TimeStepFraction",
+      "clk05_observation.clock.TimeStepZoneSec",
+      "clk05_observation.clock.MinutesInTimeStep",
+      "caller.DayOfSim",
+      "caller.DayOfSimChr",
+      "caller.HourOfDay",
+      "caller.TimeStep",
+      "explicitly_declared_caller_begin_end_flags"
+    ],
+    "passive_clock_fields_unpaired_in_Initialize_only_native_lane": [
+      "clk05_observation.clock.CurrentTime",
+      "clk05_observation.clock.SimTimeSteps",
+      "global.WeightNow",
+      "global.WeightPreviousHour"
+    ],
+    "count_seed_observation_boundary": "before-GetNext public storage/reset canaries; InitializeWeather1772-1776 resets all19 before first ReadDay, so incoming hourly nonzero counts are not claimed",
+    "counter_19_fields_retained": true,
+    "unselected_counter_generation_cross_native_PASS": false,
+    "within_owner_Update_whole17_copy_bits": "only if genuine incoming/outgoing public copy boundary is directly observed; source-private hourly operands remain unavailable",
+    "unselected_LastHour17_generated_fields_cross_native_PASS": false,
+    "NextHour_unselected14_fields": "strict retained caller input bits where source writes only Beam/Dif/Liquid; no generated-value claim"
+  },
+  "numeric_profiles": [
+    {
+      "field": "Interpolation",
+      "unit": "dimensionless",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "SolarInterpolation",
+      "unit": "dimensionless",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "BeamSolarRad",
+      "unit": "W/m2",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "DifSolarRad",
+      "unit": "W/m2",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "NextHour.LiquidPrecip",
+      "unit": "mm/zone-timestep",
+      "atol": 1e-12,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "inherited_contract": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+        "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+      },
+      "inherited_profile": "day_grid_and_raw_hour_cache/LiquidPrecip"
+    }
+  ],
+  "numeric_criterion": "abs(Rust-original)<=field.atol+field.rtol*abs(original); exact IEEE classification and signed-zero sign when both operands are zero; no generic tolerance fallback",
+  "array_path_mapping": {
+    "native_snapshot": "root",
+    "Rust_snapshot": "root",
+    "value_transform": false
+  },
+  "every589_requested_operation_retained": true,
+  "mask_controls_invocation": false,
+  "legacy_missing_solar_controls": "explicitly unavailable/unapplied; no numerical PASS",
+  "candidate_effective_controls": "four actual bools required, strict matching native caller context",
+  "unpaired": [
+    "native private wvarsHr/hour/source index and transient previous/current/next weight locals",
+    "Sky and current environment solar/night/EMS masks",
+    "solar position/SOLCOS/SunIsUp/SunIsUpPrevTS",
+    "SRC04 incident/absorbed surface solar formulas",
+    "design-day solar models and whole environment/thermal registration",
+    "unobserved constructor/preparation owner fields",
+    "unselected generated weather fields and omitted compact grid contents",
+    "CurrentTime/SimTimeSteps and WeightNow/WeightPreviousHour generated by full CLI SetCurrent versus Initialize-only native history"
+  ],
+  "legacy_exit0": "authenticated factual comparison completed; real mismatches remain, no numerical PASS",
+  "candidate_exit0": "all selected available comparisons satisfy frozen profiles with honest unavailable scope",
+  "frozen_before_next_Rust_comparison_operand_execution": true,
+  "original_or_Rust_output_payloads_read": false,
+  "scientific_execution_performed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

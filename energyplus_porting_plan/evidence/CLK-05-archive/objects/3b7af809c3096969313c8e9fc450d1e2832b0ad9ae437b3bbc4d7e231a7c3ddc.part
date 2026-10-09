@@ -1,0 +1,11 @@
+        if (state.dataWeather->GetBranchInputOneTimeFlag) {
+
+            SetupInterpolationValues(state);
+            state.dataWeather->TimeStepFraction = 1.0 / double(state.dataGlobal->TimeStepsInHour);
+            state.dataEnvrn->rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(
+                state, DataEnvironment::StdPressureSeaLevel, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
+            OpenWeatherFile(state, ErrorsFound); // moved here because of possibility of special days on EPW file
+            CloseWeatherFile(state);
+            ReadUserWeatherInput(state);
+            AllocateWeatherData(state);
+            if (state.dataWeather->NumIntervalsPerHour != 1) {

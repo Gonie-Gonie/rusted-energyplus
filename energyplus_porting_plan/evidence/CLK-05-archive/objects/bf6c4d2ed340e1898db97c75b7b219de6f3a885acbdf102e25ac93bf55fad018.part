@@ -1,0 +1,27 @@
+--- crates/ep_runtime/src/weather_day/producer_tests.rs science before
++++ crates/ep_runtime/src/weather_day/producer_tests.rs final after
+@@ -365,11 +365,7 @@
+     raw.hours[0].raw.mandatory_reals[9] = -3.0;
+     raw.hours[1].raw.mandatory_reals[8] = 9999.0;
+     raw.hours[1].raw.mandatory_reals[9] = 9999.0;
+-    let before_raw = raw
+-        .hours
+-        .iter()
+-        .map(|slot| slot.raw.clone())
+-        .collect::<Vec<_>>();
++    let before_raw = raw.hours.iter().map(|slot| slot.raw).collect::<Vec<_>>();
+     for warnings in [false, true] {
+         let mut owner = state(4);
+         owner.environment.display_weather_missing_data_warnings = warnings;
+@@ -429,10 +425,7 @@
+         assert_eq!((owner.missed_counts, owner.out_of_range_counts), counts);
+     }
+     assert_eq!(
+-        raw.hours
+-            .iter()
+-            .map(|slot| slot.raw.clone())
+-            .collect::<Vec<_>>(),
++        raw.hours.iter().map(|slot| slot.raw).collect::<Vec<_>>(),
+         before_raw
+     );
+ }

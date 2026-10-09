@@ -1,0 +1,95 @@
+{
+  "schema": "clk05-independent-comparer-source-review.v1",
+  "status": "pass-source-selected-solar-and-authentication-before-comparison",
+  "review_started_utc": "2026-10-08T16:25:32.651346+00:00",
+  "review_completed_utc": "2026-10-08T16:25:32.776003+00:00",
+  "reviewed_source_manifest": {
+    "path": ".runtime/porting/CLK-05/comparer-prep-01/manifest.json",
+    "sha256": "8301073f07650975b4109634851e97925783e6f5ccc87dae30067e27d95081be"
+  },
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/00-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/01-numeric.py",
+        "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/02-state.py",
+        "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/03-history.py",
+        "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/04-metadata.py",
+        "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/05-freeze_projection.py",
+        "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/06-check_clk05.py",
+        "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/07-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-05/independent-comparer-source-review-01/executed-source-reviewer.py",
+    "sha256": "8b7e8dedfed1629ccec0af654009dfd2b56b856e2dab80784e7606e4a2f099cc"
+  },
+  "actual_reader_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-05/comparer-source-review-prep-01/review_sources.py",
+    "--native-admission-contract",
+    ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "--output-dir",
+    ".runtime/porting/CLK-05/independent-comparer-source-review-01"
+  ],
+  "source_review_method": "Root read all seven new bodies and consumed retained utility functions before this archival metadata command; this reader authenticates those exact bytes and syntax, without importing the reviewed targets.",
+  "reviewed_policy": "Five unchanged frozen field profiles; genuine589 operation history; native/Rust root arrays; typed19 counters and17 caches; unavailable scope never PASS; actual OriginalQC before committed observer build/run; legacy gap0 is factual completion with actual mismatches retained.",
+  "authorship_limits": "Baseline authored comparer and earlier carrier/hourly/producer. Root independently reviewed these bodies and authored the seven-line passive CLI trace addition, separately reviewed by Header; this command certifies source/protocol bytes and no own scientific numerical result.",
+  "scientific_execution_performed": false,
+  "reviewed_targets_imported_or_executed": false,
+  "scientific_values_read_or_compared": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

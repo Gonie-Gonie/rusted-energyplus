@@ -1,0 +1,133 @@
+"""Root-only metadata plan; no registry admission, deletion, move, or scientific execution."""
+import argparse
+import copy
+import sys
+from common import *
+from proofs import all_proofs, actual_closure, protected, executed_script
+
+NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+
+
+def source_review(review_path, execution_path, started):
+    review = read(review_path)
+    command = recorded(execution_path)
+    require(review['schema'] == 'clk05-independent-retirement-writer-source-review.v1'
+            and review['status'] == 'pass-source-before-one-target-retirement-metadata'
+            and review['scientific_execution_performed'] is False, 'Independent exact retirement source review required')
+    require(exact(read(command['stdout']['path']), review), 'Actual full source review stdout differs')
+    executed_script(command, review['executed_reader_source_archive'])
+    require(time_of(command['started_utc']) <= time_of(review['review_started_utc'])
+            <= time_of(review['review_completed_utc']) <= time_of(command['finished_utc']) <= time_of(started),
+            'Source review must precede metadata/action')
+    rows = review['reviewed_sources']
+    require(type(rows) is list and len(rows) == len(NAMES), 'Exactly four reviewed source modules required')
+    keyed = {row['historical_path']: row['archive'] for row in rows}
+    require(len(keyed) == len(NAMES), 'Duplicate source review binding')
+    for name in NAMES:
+        source = Path(__file__).parent / name
+        key = source.relative_to(ROOT).as_posix()
+        require(key in keyed and bound(keyed[key])['sha256'] == ref(source)['sha256'], 'Reviewed source changed')
+    return {'review': ref(review_path), 'execution': ref(execution_path)}
+
+
+def candidate(target):
+    original = TARGETS[target]
+    raw_products = ROOT / '.runtime/ep261-gcc13-o0/Products'
+    products = path_of(raw_products)
+    require(products == raw_products and products.is_dir()
+            and not getattr(raw_products.lstat(), 'st_file_attributes', 0) & 0x400,
+            'Exact regular Products directory required')
+    value = regular(original['historical_path'])
+    require(value == ROOT / original['historical_path'] and value.parent == products
+            and value.name == target + '.exe', 'Exact contained single target required')
+    ref(value, original['sha256'], original['size_bytes'], remember=False)
+    return {**original, 'resolved_absolute_path': str(value), 'resolved_products_directory': str(products),
+            'currently_present': True, 'regular_non_reparse_file': True}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['proof-bindings', 'closure', 'closure-execution', 'quality-lineage', 'quality-lineage-execution', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + key, type=Path, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    output = fresh_output(args.output_dir)
+    started = now()
+    reviewed = source_review(args.source_review, args.source_review_execution, started)
+    policy = read(POLICY, POLICY_SHA)
+    registry = read(REGISTRY, REGISTRY_SHA)
+    require(policy['schema'] == 'native-helper-forward-retention-policy.v1'
+            and policy['forward_policy_accepted_by_root'] is True, 'Accepted forward-only policy required')
+    records, refs, retained = all_proofs(args.proof_bindings)
+    require(ref(args.quality_lineage) == refs['quality-lineage'] and ref(args.quality_lineage_execution) == refs['quality-lineage-execution'], 'Actual quality lineage differs')
+    closure = actual_closure(args.closure, args.closure_execution, refs)
+    entry = {'schema': 'native-new-target-retention-entry.proposed.v1', 'card': 'CLK-05',
+        'target': 'clk05_reference_helper', 'retention_class': 'new-validated-derivative',
+        'status': 'proposed-live-original-not-admitted', 'original_link': TARGETS['clk05_reference_helper'],
+        'retained_derivative': retained, 'evidence': refs,
+        'historical_native_exit_code': 0, 'historical_wrapper_exit_code': 0, 'metadata_recovery_performed': False,
+        'unstripped_original': {**TARGETS['clk05_reference_helper'], 'disposition': 'live-original',
+            'full_debug_archive_created': False, 'hash_or_map_recovers_discarded_debug_bytes': False,
+            'deterministic_relink_recovery_claimed': False, 'full_debug_bytes_available': True}}
+    kept = protected(registry, retained)
+    candidates = {target: candidate(target) for target in TARGETS}
+    successor = copy.deepcopy(registry)
+    for key in ['admission_utc', 'admission_plan', 'actual_card_closure']:
+        successor.pop(key)
+    successor.update({'schema': 'native-retained-artifact-registry.proposed.v5', 'predecessor': ref(REGISTRY, REGISTRY_SHA),
+                      'new_targets': copy.deepcopy(registry['new_targets']) + [entry],
+                      'admitted_by_this_plan': False, 'admitted_by_Root_after_actual_card_closure': False})
+    require(successor['legacy_products'] == registry['legacy_products']
+            and successor['protected_core_API_and_container'] == registry['protected_core_API_and_container']
+            and successor['new_targets'][:4] == registry['new_targets'], 'Previous registry entries changed')
+    unchanged()
+    output.mkdir()
+    archive_dir = output / 'source'
+    archive_dir.mkdir()
+    archives = []
+    for name in NAMES:
+        source = Path(__file__).parent / name
+        destination = archive_dir / name
+        with destination.open('xb') as stream:
+            stream.write(source.read_bytes())
+        require(ref(source)['sha256'] == ref(destination)['sha256'], 'Executed source/archive mismatch')
+        archives.append({'historical_path': source.relative_to(ROOT).as_posix(), 'archive': ref(destination)})
+    pins_target = archive_dir / 'proof-bindings.json'
+    with pins_target.open('xb') as stream:
+        stream.write(path_of(args.proof_bindings).read_bytes())
+    require(ref(pins_target)['sha256'] == ref(args.proof_bindings)['sha256'], 'Actual runtime proof-bindings archive differs')
+    plan = {
+        'schema': 'clk05-single-target-retention-removal-plan.v1',
+        'status': 'pass-actual-closure-and-prerequisites-removal-not-performed',
+        'started_utc': started, 'completed_utc': now(), 'actual_writer_command': list(sys.orig_argv),
+        'actual_writer_cwd': str(ROOT), 'source_review': reviewed,
+        'accepted_policy': ref(POLICY, POLICY_SHA), 'predecessor_registry': ref(REGISTRY, REGISTRY_SHA),
+        'actual_card_closure': closure, 'evidence': refs, 'only_candidates': candidates,
+        'protected_and_retained_observations': kept, 'proposed_successor_registry': successor,
+        'executed_source_archives': archives, 'authenticated_proof_bindings_archive': ref(pins_target),
+        'historical_native_exit_code': 0, 'historical_wrapper_exit_code': 0, 'metadata_recovery_performed': False,
+        'failed_historical_wrapper_relabelled_zero': False, 'native_engine_reexecuted_for_recovery': False,
+        'actual_quality_lineage': refs['quality-lineage'], 'actual_quality_lineage_execution': refs['quality-lineage-execution'],
+        'all_four_actual_canonical_gates_already_pass': True,
+        'removal_authorized_by_this_plan': False, 'registry_admission_performed': False,
+        'deletion_or_move_performed': False, 'full_debug_copy_created': False,
+        'actual_storage_savings_bytes': 0,
+        'potential_exact_original_removal_bytes': sum(item['size_bytes'] for item in TARGETS.values()),
+        'engines_Cargo_Git_compilers_strip_or_comparers_executed': False,
+        'limits': [
+            'Only the one explicitly named successful CLK05 debug original is contemplated. No directories/wildcards or failed original are eligible.',
+            'Twenty-one protected files remain live: fourteen legacy/library files, four retired-card derivatives, failed CLK03 debug/derivative, and the CLK05 accepted derivative.',
+            'Historical original-first launchers require live originals for a fresh run and remain byte unchanged; they will fail after retirement.',
+            'Future builders must authenticate explicit version5 registry tombstones, actual removal receipts and retained derivatives.',
+            'Hash/PE maps cannot recover discarded debug bytes; deterministic relink recovery is not claimed.',
+            'This ignored plan does not admit deletion. Root must separately invoke reviewed retire.py --apply after rechecking exact identities.'
+        ],
+    }
+    unchanged()
+    result = write(output, 'plan.json', plan)
+    print(json.dumps({'plan': result, 'status': plan['status'], 'targets': list(TARGETS),
+                      'deletion_performed': False, 'registry_admission_performed': False}, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

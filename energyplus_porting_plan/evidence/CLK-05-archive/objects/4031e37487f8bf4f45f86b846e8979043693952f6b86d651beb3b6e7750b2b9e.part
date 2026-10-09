@@ -1,0 +1,12 @@
+bool env_var_on(std::string const &env_var_str)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Stuart G. Mentzer
+    //       DATE WRITTEN   April 2014
+
+    // PURPOSE OF THIS FUNCTION:
+    // Test if a boolean environment variable value is "on" (has value starting with Y or T)
+
+    return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
+}

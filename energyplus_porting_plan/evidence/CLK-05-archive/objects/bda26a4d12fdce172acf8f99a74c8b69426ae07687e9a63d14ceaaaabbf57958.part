@@ -1,0 +1,5 @@
+
+    bool DisplayWeatherMissingDataWarnings = false; // Display missing/out of range weather warnings
+    bool IgnoreSolarRadiation = false;              // TRUE if all solar radiation is to be ignored
+    bool IgnoreBeamRadiation = false;               // TRUE if beam (aka direct normal) radiation is to be ignored
+    bool IgnoreDiffuseRadiation = false;            // TRUE if diffuse horizontal radiation is to be ignored

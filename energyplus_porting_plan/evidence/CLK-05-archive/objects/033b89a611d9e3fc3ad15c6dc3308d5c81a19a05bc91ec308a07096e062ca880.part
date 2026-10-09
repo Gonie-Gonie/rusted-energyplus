@@ -1,0 +1,15 @@
+struct EnvironmentData : BaseGlobalStruct
+{
+    Real64 BeamSolarRad = 0.0;                 // Current beam normal solar irradiance
+    bool EMSBeamSolarRadOverrideOn = false;    // EMS flag for beam normal solar irradiance
+    Real64 EMSBeamSolarRadOverrideValue = 0.0; // EMS override value for beam normal solar irradiance
+    int DayOfMonth = 0;                        // Current day of the month
+    int DayOfMonthTomorrow = 0;                // Tomorrow's day of the month
+    int DayOfWeek = 0;                         // Current day of the week (Sunday=1, Monday=2, ...)
+    int DayOfWeekTomorrow = 0;                 // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
+    int DayOfYear = 0;                         // Current day of the year (01JAN=1, 02JAN=2, ...)
+    int DayOfYear_Schedule = 0;                // Schedule manager always assumes leap years...
+    Real64 DifSolarRad = 0.0;                  // Current sky diffuse solar horizontal irradiance
+    bool EMSDifSolarRadOverrideOn = false;     // EMS flag for sky diffuse solar horizontal irradiance
+    Real64 EMSDifSolarRadOverrideValue = 0.0;  // EMS override value for sky diffuse solar horizontal irradiance
+    int DSTIndicator = 0;                      // Daylight Saving Time Indicator (1=yes, 0=no) for Today

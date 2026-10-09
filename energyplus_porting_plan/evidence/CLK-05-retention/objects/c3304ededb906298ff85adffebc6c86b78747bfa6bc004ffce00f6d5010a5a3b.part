@@ -1,0 +1,268 @@
+{
+  "schema": "clk05-single-target-native-helper-retirement.v1",
+  "status": "pass-precise-removal-and-retained-artifact-guards",
+  "started_utc": "2026-10-09T05:02:27.988401+00:00",
+  "completed_utc": "2026-10-09T05:06:32.012881+00:00",
+  "actual_writer_command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime\\porting\\CLK-05\\retention-prep-03\\retire.py",
+    "--plan",
+    ".runtime\\porting\\CLK-05\\retirement-plan-02\\plan.json",
+    "--plan-execution",
+    ".runtime\\porting\\CLK-05\\retirement-plan-command-02\\receipt.json",
+    "--source-review",
+    ".runtime\\porting\\CLK-05\\independent-retirement-writer-source-review-02\\review.json",
+    "--source-review-execution",
+    ".runtime\\porting\\CLK-05\\independent-retirement-writer-source-review-command-02\\receipt.json",
+    "--output-dir",
+    ".runtime\\porting\\CLK-05\\retirement-01",
+    "--apply"
+  ],
+  "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "retention_plan": {
+    "path": ".runtime/porting/CLK-05/retirement-plan-02/plan.json",
+    "sha256": "91bf44133da95735fe2b4a8f80942121331bb710be306d448cc0bb4ed1900efb"
+  },
+  "retention_plan_execution": {
+    "path": ".runtime/porting/CLK-05/retirement-plan-command-02/receipt.json",
+    "sha256": "91f5b56550cb91a313c4b9972d9f569a3f8160ddcf5cc73313a5534c5ca19e98"
+  },
+  "source_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-02/review.json",
+      "sha256": "a37fbe00ff7be21d2731ebe2b7447301c028b16860fd2fceeaa6abaf092ff8a3"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-command-02/receipt.json",
+      "sha256": "c5806291b53a61a4f3bba9b7d747d5b30b442d2e37c5fb90bef0ae5a5bc35bbc"
+    }
+  },
+  "actual_card_closure": {
+    "closure": {
+      "path": ".runtime/porting/CLK-05/closure-01/closure-result.json",
+      "sha256": "1a87c229c2b427432401580f5ad35747d0acf93f3d78617aa91e11676bff70ce"
+    },
+    "closure_execution": {
+      "path": ".runtime/porting/CLK-05/closure-command-01/receipt.json",
+      "sha256": "1e2e4ffd6dc044a48cae2d3a3fd860775f3cfd87f7e84aa99984a1379c67e6e8"
+    },
+    "canonical_after": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6"
+      },
+      {
+        "path": "energyplus_porting_plan/cards/CLK-05.md",
+        "sha256": "8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-05.json",
+        "sha256": "faf2e50516145ebec3060c245fc217a6b5c181c48b9ec986f2d04cd68999c8ef"
+      }
+    ]
+  },
+  "historical_native_exit_code": 0,
+  "historical_wrapper_exit_code": 0,
+  "metadata_recovery_performed": false,
+  "historical_failed_wrapper_relabelled_zero": false,
+  "actual_quality_lineage": {
+    "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+    "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+  },
+  "admitted_registry": {
+    "path": ".runtime/porting/CLK-05/retirement-01/registry-admitted.json",
+    "sha256": "966e361d657dc19022a825cf62394b610e7a7dd0e6d83bb3634973029814a8ec"
+  },
+  "retired_registry": {
+    "path": ".runtime/porting/CLK-05/retirement-01/registry-retired.json",
+    "sha256": "db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6"
+  },
+  "actual_removal_receipts": [
+    {
+      "path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-removal-receipt.json",
+      "sha256": "e073b1d0c09eb6646636eeae37de073646661ab81ae7ac78637e7dc1bf1dcee0"
+    }
+  ],
+  "sole_exact_new_original_absent": true,
+  "realized_removed_bytes": 1296986812,
+  "protected_and_retained_after": [
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/clk01_reference.exe",
+        "sha256": "ace586a027c4e9a7fc69a30fda2f300d1b53cba37241d2e899a125f24193243a"
+      },
+      "size_bytes": 1295075960
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo01_reference.exe",
+        "sha256": "17326cef0a4031f4b8bcec74a0c28fd5bdfd50d411f6f13ac79170e838793525"
+      },
+      "size_bytes": 10461347
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference.exe",
+        "sha256": "c156d4f9ade6513a62cca3de914a284393747bc3f473c42d3ac2e4d9c9798376"
+      },
+      "size_bytes": 10725212
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference_helper.exe",
+        "sha256": "c4b6f40a63c74edbde5ef75f86f3ca7dc6f4c7a767092eea0118189379f8fbed"
+      },
+      "size_bytes": 1296114664
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference.exe",
+        "sha256": "4e4bcf739a9f8d060c8490b73460f287ba4c01de1670afbd31040cc06a850cb5"
+      },
+      "size_bytes": 10670219
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference_helper.exe",
+        "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95"
+      },
+      "size_bytes": 1297356300
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reachability.exe",
+        "sha256": "a22c1f764d8e5e65d4a5af1fdc1787ad318ba9fa0cef218b32789a9ea7e29320"
+      },
+      "size_bytes": 8073860
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference.exe",
+        "sha256": "fa26b9313975bfbb974aa5e3ee0722e1a8bb247436e0a3bd42bd5abbe814b400"
+      },
+      "size_bytes": 1293674975
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference_replay.exe",
+        "sha256": "5e5731a185cc6aa70b9597864c0a3033cd21f66f03e8ea27d5427843ec3e6f72"
+      },
+      "size_bytes": 1293675487
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference.exe",
+        "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+      },
+      "size_bytes": 9941020
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+        "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+      },
+      "size_bytes": 1296118832
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694"
+      },
+      "size_bytes": 1832731010
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+        "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33"
+      },
+      "size_bytes": 1305150896
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libobjexx.a",
+        "sha256": "578c18d523cb1fed2d377c60eb79b4e1e27bdea66da172c91d9a018010a7968c"
+      },
+      "size_bytes": 1752352
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-02/native-build-01/derivation/derived-helper.exe",
+        "sha256": "e41e8daf807dafed76ba61fc94637cedfb6f2d6cf9bb6cfbb7b3ab24a1fd9447"
+      },
+      "size_bytes": 149804630
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-03/derivation/derived-helper.exe",
+        "sha256": "b6890f2a1fac5f485a0d8c75ef99c9949094cd5680ab40226f8077a3a89690e2"
+      },
+      "size_bytes": 150145144
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/matched-native-build-01/derivation/derived-helper.exe",
+        "sha256": "3100aba0fce1e09438d61e8647ef6c2ad90dec2196e051094087ab2576da03f6"
+      },
+      "size_bytes": 150396414
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/retained-failed-original/clk03_reference_helper.exe",
+        "sha256": "1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3"
+      },
+      "size_bytes": 1296271028
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/derivation/derived-helper.exe",
+        "sha256": "4ca6866f0e6558a2fcbaf425e95ff7907f8a6e9d7740f3e82f73d6aa54929854"
+      },
+      "size_bytes": 150101996
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+        "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+      },
+      "size_bytes": 150539944
+    },
+    {
+      "role": "CLK05-accepted-retained-derivative",
+      "binary": {
+        "path": ".runtime/porting/CLK-05/native-build-01/derivation/derived-helper.exe",
+        "sha256": "132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217"
+      },
+      "size_bytes": 150455372
+    }
+  ],
+  "prior_metadata_bytes_unchanged": true,
+  "historical_proofs_or_launchers_rewritten": false,
+  "full_debug_copy_created": false,
+  "canonical_files_or_gates_written": false,
+  "scientific_execution_repeated": false,
+  "discarded_debug_bytes_recoverable_from_hash_or_map": false,
+  "deterministic_relink_recovery_claimed": false
+}

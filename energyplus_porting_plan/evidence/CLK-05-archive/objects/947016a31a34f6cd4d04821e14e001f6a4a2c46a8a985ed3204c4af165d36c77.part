@@ -1,0 +1,62 @@
+        {
+            CurrentModuleObject = "Output:Diagnostics";
+            Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+            if (Num > 1) {
+                // Let it slide, but warn
+                // ErrorsFound = true;
+                ShowWarningError(
+                    state, EnergyPlus::format("{}: More than 1 occurrence of this object found, only first will be used.", CurrentModuleObject));
+            }
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+
+            if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    std::string const &thisObjectName = instance.key();
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
+
+                    auto diagnosticsExtensibles = fields.find("diagnostics");
+                    if (diagnosticsExtensibles != fields.end()) {
+                        for (auto &diagnosticsExtensible : diagnosticsExtensibles.value()) {
+
+                            // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+                            // Which happens if you put an "empty" entry in the extensible portion
+                            auto it = diagnosticsExtensible.find("key");
+                            if (it == diagnosticsExtensible.end()) {
+                                ShowWarningError(
+                                    state,
+                                    EnergyPlus::format("{}: empty key found, consider removing it to avoid this warning.", CurrentModuleObject));
+                                continue;
+                            }
+                            std::string diagnosticName = it->get<std::string>();
+
+                            if (Util::SameString(diagnosticName, "DisplayExtraWarnings")) {
+                                state.dataGlobal->DisplayExtraWarnings = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
+                                state.dataGlobal->DisplayAdvancedReportVariables = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayAllWarnings")) {
+                                state.dataGlobal->DisplayAllWarnings = true;
+                                state.dataGlobal->DisplayExtraWarnings = true;
+                                state.dataGlobal->DisplayUnusedObjects = true;
+                                state.dataGlobal->DisplayUnusedSchedules = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayUnusedObjects")) {
+                                state.dataGlobal->DisplayUnusedObjects = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayUnusedSchedules")) {
+                                state.dataGlobal->DisplayUnusedSchedules = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
+                                state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance = true;
+                            } else if (Util::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
+                                state.dataReportFlag->MakeMirroredDetachedShading = false;
+                            } else if (Util::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
+                                state.dataReportFlag->MakeMirroredAttachedShading = false;
+                            } else if (Util::SameString(diagnosticName, "ReportDuringWarmup")) {
+                                state.dataSysVars->ReportDuringWarmup = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
+                                state.dataEnvrn->DisplayWeatherMissingDataWarnings = true;
+                            } else if (Util::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
+                                state.dataEnvrn->IgnoreSolarRadiation = true;
+                            } else if (Util::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
+                                state.dataEnvrn->IgnoreBeamRadiation = true;
+                            } else if (Util::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
+                                state.dataEnvrn->IgnoreDiffuseRadiation = true;

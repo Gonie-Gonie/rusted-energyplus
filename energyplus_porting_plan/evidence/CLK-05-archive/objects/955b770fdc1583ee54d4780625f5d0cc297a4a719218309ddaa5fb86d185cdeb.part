@@ -1,0 +1,4 @@
+    state.dataStrGlobals->VerStringVar = DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
+
+    DataSystemVariables::processEnvironmentVariables(state);
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "clk05-independent-retirement-writer-source-review.v1",
+  "status": "pass-source-before-one-target-retirement-metadata",
+  "review_started_utc": "2026-10-09T04:42:12.973398+00:00",
+  "review_completed_utc": "2026-10-09T04:42:13.042381+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/source/common.py",
+        "sha256": "f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-02/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/source/proofs.py",
+        "sha256": "8b4836ee67ca1755e755e6581cb6ee0e8697302c05656bf02371d5e1528c3598"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-02/write_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/source/write_plan.py",
+        "sha256": "666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retention-prep-02/retire.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/source/retire.py",
+        "sha256": "33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea"
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-05/independent-retirement-writer-source-review-01/executed-source-reviewer.py",
+    "sha256": "f543994bbbc86a7c5a2ba439b350f91ca6fbc12f98c39dbedfbafaa1732dde3c"
+  },
+  "reviewed_forward_policy": {
+    "path": "energyplus_porting_plan/evidence/native-helper-retention-policy.json",
+    "sha256": "782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379"
+  },
+  "reviewed_predecessor_registry": {
+    "path": ".runtime/porting/CLK-04/retirement-01/registry-retired.json",
+    "sha256": "27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378"
+  },
+  "reviewed_small_native_build": {
+    "path": ".runtime/porting/CLK-05/native-build-01/native-driver-build.json",
+    "sha256": "df8dbf64a983c06b01964916d0fd6e1fadf88325078ae229a7a7b4027df457b0"
+  },
+  "reviewed_small_native_build_review": {
+    "path": ".runtime/porting/CLK-05/independent-native-build-review-01/review.json",
+    "sha256": "39b689c90c67dd13de1084e0f8078f2acaee26f15060ba900586ca0ab0d5f0b2"
+  },
+  "reviewed_small_original_data_review": {
+    "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+    "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+  },
+  "sole_candidate": {
+    "clk05_reference_helper": {
+      "historical_path": ".runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe",
+      "sha256": "b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc",
+      "size_bytes": 1296986812
+    }
+  },
+  "protected_file_count_required_by_reviewed_source": 21,
+  "reviewed_source_line_count": 777,
+  "actual_C5_closure_or_final_quality_claimed_by_this_source_review": false,
+  "scientific_execution_performed": false,
+  "reviewed_targets_imported_or_executed": false,
+  "native_artifact_bytes_hashed_by_reviewer": false,
+  "native_results_payloads_read": false,
+  "retirement_plan_or_action_executed": false,
+  "canonical_files_or_gates_written": false,
+  "verifier_author": "/root/clk02_baseline_audit",
+  "reviewed_tool_author": "/root/clk02_raw_port",
+  "authorship_limits": "Baseline independently read Raw retention code and small metadata aliases. Baseline authored producer/hourly/native workflow/comparers and closure glue; this review does not independently certify own physics or any numerical kernels.",
+  "limits": [
+    "Source review0 precedes the separate actual closure-gated Root plan/action; no admission/deletion authorized here.",
+    "Actual live target/protected21/source13537/compiler/cache guards run only in the separately reviewed Root tools.",
+    "Historical proofs remain unchanged; actual future quality and closure refs are supplied at plan execution, never guessed."
+  ]
+}

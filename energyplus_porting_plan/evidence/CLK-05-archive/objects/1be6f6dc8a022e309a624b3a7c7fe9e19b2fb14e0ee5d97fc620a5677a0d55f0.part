@@ -1,0 +1,59 @@
+
+        } // Try Again While Loop
+
+        if (BackSpaceAfterRead) {
+            state.files.inputWeatherFile.backspace();
+        }
+
+        if (state.dataWeather->NumIntervalsPerHour == 1 && state.dataGlobal->TimeStepsInHour > 1) {
+            // Create interpolated weather for timestep orientation
+            // First copy ts=1 (hourly) from data arrays to Wthr structure
+            for (int hour = 1; hour <= Constant::iHoursInDay; ++hour) {
+                wvarsHr(hour) = state.dataWeather->wvarsHrTsTomorrow(1, hour);
+            }
+
+            if (!state.dataWeather->LastHourSet) {
+                // For first day of weather, all time steps of the first hour will be
+                // equal to the first hour's value.
+                // 2021-06: An additional input is added to here to allow the user to have chosen which hour to use
+                int HrUsedtoInterp = thisEnviron.firstHrInterpUseHr1 ? 1 : 24;
+                state.dataWeather->wvarsLastHr = wvarsHr(HrUsedtoInterp);
+                state.dataWeather->LastHourSet = true;
+            }
+
+            for (int hour = 1; hour <= Constant::iHoursInDay; ++hour) {
+
+                int NextHr = (hour == Constant::iHoursInDay) ? 1 : hour + 1;
+
+                state.dataWeather->wvarsNextHr.BeamSolarRad = wvarsHr(NextHr).BeamSolarRad;
+                state.dataWeather->wvarsNextHr.DifSolarRad = wvarsHr(NextHr).DifSolarRad;
+                state.dataWeather->wvarsNextHr.LiquidPrecip = wvarsHr(NextHr).LiquidPrecip;
+
+                for (int ts = 1; ts <= state.dataGlobal->TimeStepsInHour; ++ts) {
+
+                    Real64 wgtCurrHr = state.dataWeather->Interpolation(ts);
+                    Real64 wgtPrevHr = 1.0 - wgtCurrHr;
+
+                    // Do Solar "weighting"
+
+                    Real64 wgtCurrHrSolar = state.dataWeather->SolarInterpolation(ts);
+                    Real64 wgtPrevHrSolar;
+                    Real64 wgtNextHrSolar;
+
+                    if (state.dataGlobal->TimeStepsInHour == 1) {
+                        wgtNextHrSolar = 1.0 - wgtCurrHr;
+                        wgtPrevHrSolar = 0.0;
+                    } else if (wgtCurrHrSolar == 1.0) {
+                        //  It's at the half hour
+                        wgtPrevHrSolar = 0.0;
+                        wgtNextHrSolar = 0.0;
+                    } else if (ts * state.dataWeather->TimeStepFraction < 0.5) {
+                        wgtPrevHrSolar = 1.0 - wgtCurrHrSolar;
+                        wgtNextHrSolar = 0.0;
+                    } else { // After the half hour
+                        wgtPrevHrSolar = 0.0;
+                        wgtNextHrSolar = 1.0 - wgtCurrHrSolar;
+                    }
+
+                    auto &tomorrowTs = state.dataWeather->wvarsHrTsTomorrow(ts, hour);
+                    auto const &wvarsH = wvarsHr(hour);

@@ -1,0 +1,50 @@
+            if ((state.dataGlobal->KindOfSim != Constant::KindOfSim::DesignDay) &&
+                (state.dataGlobal->KindOfSim != Constant::KindOfSim::HVACSizeDesignDay)) {
+                ReadWeatherForDay(state, 1, state.dataWeather->Envrn, false); // Read first day's weather
+            } else {
+                state.dataWeather->TomorrowVariables = state.dataWeather->DesignDay(envCurr.DesignDayNum);
+            }
+
+        } // ... end of DataGlobals::BeginEnvrnFlag IF-THEN block.
+
+        if (state.dataGlobal->BeginDayFlag) {
+
+            // Check Holidays, Daylight Saving Time, Ground Temperatures, etc.
+
+            UpdateWeatherData(state); // Update daily weather info
+
+            // Read tomorrow's weather only if necessary.  This means that the
+            // simulation is out of warmup, is using a weather tape for this
+            // environment, and is not on the last day (day after last day is
+            // assumed to be equal to last day).
+
+            // Following code checks whether the present day of simulation matches the start month and start day.
+            // In a multi year simulation with run period less than 365, we need to position the weather line
+            // appropriately.
+
+            if ((!state.dataGlobal->WarmupFlag) &&
+                ((envCurr.KindOfEnvrn != Constant::KindOfSim::DesignDay) && (envCurr.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay))) {
+                if (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
+                    if (state.dataGlobal->DayOfSim == state.dataWeather->curSimDayForEndOfRunPeriod) {
+                        state.dataWeather->curSimDayForEndOfRunPeriod += envCurr.RawSimDays;
+                        if (state.dataWeather->StartDatesCycleShouldBeReset) {
+                            ResetWeekDaysByMonth(state,
+                                                 envCurr.MonWeekDay,
+                                                 state.dataWeather->LeapYearAdd,
+                                                 envCurr.StartMonth,
+                                                 envCurr.StartDay,
+                                                 envCurr.EndMonth,
+                                                 envCurr.EndDay,
+                                                 envCurr.RollDayTypeOnRepeat);
+                            if (state.dataWeather->DaylightSavingIsActive) {
+                                SetDSTDateRanges(state, envCurr.MonWeekDay, state.dataWeather->DSTIndex);
+                            }
+                            SetSpecialDayDates(state, envCurr.MonWeekDay);
+                        }
+                        ++state.dataWeather->YearOfSim;
+                        ReadWeatherForDay(state, 1, state.dataWeather->Envrn, false); // Read tomorrow's weather
+                    } else {
+                        ReadWeatherForDay(state, state.dataGlobal->DayOfSim + 1, state.dataWeather->Envrn, false); // Read tomorrow's weather
+                    }
+                }
+            }

@@ -1,0 +1,158 @@
+"""Independent source/metadata review; never import or execute retention tools."""
+import argparse
+import ast
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = '.runtime/porting/CLK-05/retention-prep-03/'
+HELD = {
+    'common.py': 'f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038',
+    'proofs.py': 'c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302',
+    'write_plan.py': '666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a',
+    'retire.py': '33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea'}
+POLICY = {'path': 'energyplus_porting_plan/evidence/native-helper-retention-policy.json',
+    'sha256': '782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379'}
+REGISTRY = {'path': '.runtime/porting/CLK-04/retirement-01/registry-retired.json',
+    'sha256': '27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378'}
+SEEN = {}
+
+
+def need(value, message):
+    if not value: raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def path(value):
+    raw = Path(value); raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat(); result = raw.resolve(strict=True)
+    need(result != ROOT and result.is_relative_to(ROOT) and stat.S_ISREG(info.st_mode)
+        and not getattr(info, 'st_file_attributes', 0) & 0x400, 'Contained non-reparse metadata/source file required')
+    need((result.suffix.lower() in {'.py', '.json', '.diff'}
+        or result == ROOT / '.runtime/porting/CLK-05/native-build-command-01/stdout.log') and info.st_size <= 4_000_000,
+        'Only bounded source/small metadata; no native results, binary, DLL or cache bytes')
+    return result
+
+
+def ref(value, expected=None):
+    candidate = path(value); digest = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    need(expected is None or digest == expected, 'Held bytes differ')
+    need(SEEN.setdefault(candidate, digest) == digest, 'Already-read bytes changed')
+    return {'path': candidate.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def read(binding):
+    need(ref(binding['path'], binding['sha256']) == binding, 'Normalized small metadata binding required')
+    return json.loads(path(binding['path']).read_bytes())
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path, required=True); args = parser.parse_args()
+    need(Path.cwd().resolve() == ROOT, 'Repository cwd required'); started = now()
+    out = args.output_dir.resolve()
+    need(out != ROOT / '.runtime/porting/CLK-05' and out.is_relative_to(ROOT / '.runtime/porting/CLK-05')
+        and not out.exists(), 'Fresh ignored review output required')
+    texts, trees = {}, {}
+    for name, digest in HELD.items():
+        ref(PREP + name, digest); texts[name] = path(PREP + name).read_text(encoding='utf8')
+        trees[name] = ast.parse(texts[name], filename=PREP + name)
+    constants = {node.targets[0].id: ast.literal_eval(node.value) for node in trees['common.py'].body
+        if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id in {'TARGETS', 'POLICY_SHA', 'REGISTRY_SHA'}}
+    target = {'clk05_reference_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe',
+        'sha256': 'b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc', 'size_bytes': 1296986812}}
+    need(constants['TARGETS'] == target and constants['POLICY_SHA'] == POLICY['sha256']
+        and constants['REGISTRY_SHA'] == REGISTRY['sha256'], 'Sole target/accepted predecessor policy differs')
+    fragments = {
+        'common.py': ['stat.S_ISREG(info.st_mode)', 'st_file_attributes', "item['source_bytes_match_before_and_after'] is True"],
+        'proofs.py': ["== 21", "len(registry['new_targets']) == 4", "value['sha256'] == expected['sha256']",
+            "data['actual_helper_exit_code'] == data['actual_launcher_exit_code'] == 0", "data['actual_operation_invocations'] == 589",
+            "item['unavailable_counted_as_PASS'] is False", "gap['numerical_PASS_claimed'] is False",
+            "pass-exact-passive-and-test-only-source-lineage-and-actual-quality",
+            "same(lineage['reviewed_scientific_build'], records['unit-result-review']['Rust_build'])",
+            "same(unit_build['source_snapshot'], cli_build['source_snapshot'])",
+            "set(build_summary) == {'driver_build', 'checks_passed', 'helper_binary'}",
+            "build_summary['checks_passed'] is True", "same(build_summary['driver_build'], refs['native-build'])",
+            "same(build_summary['helper_binary'], build['helper_binary'])",
+            "len(closure['before']) == 2", "len(closure['after']) == 3", "card.count('- [x] ') == 4"],
+        'write_plan.py': ["remember=False", "len(rows) == len(NAMES)", "successor['new_targets'][:4] == registry['new_targets']",
+            "'removal_authorized_by_this_plan': False", "'registry_admission_performed': False"],
+        'retire.py': ["args.apply is True", "Remove-Item -LiteralPath $targetPath -Force", "Resolve-Path -LiteralPath",
+            "[IO.FileAttributes]::ReparsePoint", "Get-FileHash -LiteralPath $targetPath -Algorithm SHA256",
+            "spawn_error is None and original_absent and guard_failure is None", "before == after",
+            "registry['new_targets'][:4] == predecessor['new_targets']", "'canonical_files_or_gates_written': False"]}
+    for name, tokens in fragments.items(): need(all(token in texts[name] for token in tokens), 'Reviewed source guard differs: ' + name)
+    need(texts['retire.py'].count('Remove-Item ') == 1 and '-Recurse' not in texts['retire.py']
+        and 'Set-ExecutionPolicy' not in texts['retire.py'], 'One nonrecursive literal native deletion only')
+    need(sum(isinstance(node, ast.Constant) and node.value == '\uD1B5\uACFC' for node in ast.walk(trees['proofs.py'])) == 1,
+        'Decoded actual canonical gate literal differs')
+    policy, registry = read(POLICY), read(REGISTRY)
+    need(policy['forward_policy_accepted_by_root'] is True and registry['schema'] == 'native-retained-artifact-registry.v4'
+        and len(registry['legacy_products']) == 11 and len(registry['protected_core_API_and_container']) == 3
+        and len(registry['new_targets']) == 4, 'Accepted actual predecessor metadata differs')
+    need(all(key in registry for key in ['admission_utc', 'admission_plan', 'actual_card_closure']), 'Successor-pop metadata aliases absent')
+    build_ref = ref('.runtime/porting/CLK-05/native-build-01/native-driver-build.json'); build = read(build_ref)
+    need(build['schema'] == 'clk05-native-driver-build.v1' and build['linked_original'] == target['clk05_reference_helper']
+        and build['checks_passed'] is True and build['assertions_enabled'] is True and build['fp_contract'] == 'off',
+        'Actual historical native target/ABI metadata differs')
+    command_ref = ref('.runtime/porting/CLK-05/native-build-command-01/receipt.json'); command = read(command_ref)
+    need(command['schema'] == 'recorded-porting-command.v1' and type(command['exit_code']) is int and command['exit_code'] == 0
+        and command['launch_error'] is None and command['source_bytes_match_before_and_after'] is True,
+        'Actual unchanged-source native build command0 required')
+    summary_ref = ref(command['stdout']['path'], command['stdout']['sha256']); summary = read(summary_ref)
+    need(type(summary) is dict and set(summary) == {'driver_build', 'checks_passed', 'helper_binary'}
+        and summary['checks_passed'] is True and summary['driver_build'] == build_ref
+        and summary['helper_binary'] == build['helper_binary'], 'Actual bounded three-key build summary differs')
+    prior_review_ref = ref('.runtime/porting/CLK-05/independent-retirement-writer-source-review-01/review.json')
+    failed_plan_ref = ref('.runtime/porting/CLK-05/retirement-plan-command-01/receipt.json'); failed_plan = read(failed_plan_ref)
+    need(type(failed_plan['exit_code']) is int and failed_plan['exit_code'] == 1 and failed_plan['launch_error'] is None
+        and failed_plan['source_bytes_match_before_and_after'] is True, 'Preserved pre-action plan failure must remain actual1')
+    peer_ref = ref('.runtime/porting/CLK-05/independent-native-build-review-01/review.json'); peer = read(peer_ref)
+    need(peer['reviewed_build'] == build_ref and peer['actual_compile_rows'] == 659 and peer['historical_compile_rows'] == 658
+        and peer['frozen_core_rows'] == 643 and 'executed_reader' in peer, 'Actual PE-reader aliases/compile metadata differ')
+    data_ref = ref('.runtime/porting/CLK-05/independent-original-data-review-01/review.json'); data = read(data_ref)
+    need(data['schema'] == 'clk05-independent-original-data-review.v1' and data['actual_helper_exit_code'] == data['actual_launcher_exit_code'] == 0
+        and data['actual_operation_invocations'] == 589 and data['actual_operations_skipped'] == 0
+        and data['numerical_PASS_claimed'] is False and data['reviewed_build_execution'] == peer['actual_build_command'],
+        'Actual native0/wrapper0 factual data-review metadata differs')
+    for item, digest in list(SEEN.items()): need(hashlib.sha256(item.read_bytes()).hexdigest() == digest, 'Consumed source/metadata changed')
+    out.mkdir(); (out / 'source').mkdir(); rows = []
+    for name, digest in HELD.items():
+        destination = out / 'source' / name; destination.write_bytes(path(PREP + name).read_bytes())
+        rows.append({'historical_path': PREP + name, 'archive': ref(destination, digest)})
+    own = out / 'executed-source-reviewer.py'; own.write_bytes(Path(__file__).read_bytes())
+    result = {'schema': 'clk05-independent-retirement-writer-source-review.v1',
+        'status': 'pass-source-before-one-target-retirement-metadata', 'review_started_utc': started, 'review_completed_utc': now(),
+        'reviewed_sources': rows, 'executed_reader_source_archive': ref(own), 'reviewed_forward_policy': POLICY,
+        'reviewed_predecessor_registry': REGISTRY, 'reviewed_small_native_build': build_ref,
+        'reviewed_small_native_build_review': peer_ref, 'reviewed_small_original_data_review': data_ref,
+        'reviewed_actual_native_build_execution': command_ref, 'reviewed_actual_native_build_stdout_summary': summary_ref,
+        'preserved_prior_source_review': prior_review_ref, 'preserved_failed_retirement_plan_execution': failed_plan_ref,
+        'prior_source_review_missed_full_report_vs_compact_build_stdout': True,
+        'authentic_historical_native_build_failed': False,
+        'prior_plan_failure_is_before_registry_admission_or_removal': True,
+        'other_stdout_protocols_reviewed': ['PE/OriginalQC/unitQA/productionQA/quality-lineage/closure/sourceQA emit full JSON reports.',
+            'Scientific comparer/gap emit full reports; plan emits its existing bounded five-key summary consumed by retire.py.'],
+        'sole_candidate': target, 'protected_file_count_required_by_reviewed_source': 21,
+        'reviewed_source_line_count': sum(len(text.splitlines()) for text in texts.values()),
+        'actual_C5_closure_or_final_quality_claimed_by_this_source_review': False,
+        'scientific_execution_performed': False, 'reviewed_targets_imported_or_executed': False,
+        'native_artifact_bytes_hashed_by_reviewer': False, 'native_results_payloads_read': False,
+        'retirement_plan_or_action_executed': False, 'canonical_files_or_gates_written': False,
+        'verifier_author': '/root/clk02_baseline_audit', 'reviewed_tool_author': '/root/clk02_raw_port',
+        'authorship_limits': 'Baseline independently read Raw retention code and small metadata aliases. Baseline authored producer/hourly/native workflow/comparers and closure glue; this review does not independently certify own physics or any numerical kernels.',
+        'limits': ['Source review0 precedes the separate actual closure-gated Root plan/action; no admission/deletion authorized here.',
+            'Actual live target/protected21/source13537/compiler/cache guards run only in the separately reviewed Root tools.',
+            'Historical proofs remain unchanged; actual future quality and closure refs are supplied at plan execution, never guessed.']}
+    (out / 'review.json').write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__': main()

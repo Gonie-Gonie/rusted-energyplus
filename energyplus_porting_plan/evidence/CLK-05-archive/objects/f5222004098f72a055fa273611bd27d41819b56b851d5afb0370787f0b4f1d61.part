@@ -1,0 +1,58 @@
+{
+  "schema": "clk05-tolerances-contract.v1",
+  "card": "CLK-05",
+  "created_utc": "2026-10-08T15:43:58.178360+00:00",
+  "frozen_before_numerical_execution": true,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "rows": [
+    {
+      "field": "Interpolation",
+      "unit": "dimensionless",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "SolarInterpolation",
+      "unit": "dimensionless",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "BeamSolarRad",
+      "unit": "W/m2",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "DifSolarRad",
+      "unit": "W/m2",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true
+    },
+    {
+      "field": "NextHour.LiquidPrecip",
+      "unit": "mm/zone-timestep",
+      "atol": 1e-12,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "inherited_contract": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+        "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+      },
+      "inherited_profile": "day_grid_and_raw_hour_cache/LiquidPrecip"
+    }
+  ],
+  "criterion": "abs(Rust-original)<=field.atol+field.rtol*abs(original); exact IEEE classification and signed-zero sign when both operands are zero; no generic tolerance fallback",
+  "IEEE_classification_and_signed_zero_exact": true,
+  "missing_operand_counted_as_PASS": false,
+  "generic_profile_fallback": false,
+  "profile_proposal": {
+    "path": ".runtime/porting/CLK-05/input-design-prep-02/projection-proposal.json",
+    "sha256": "7bfa5ab5350253e7319871011cb8bdabf1a48ade61789dbdf2b872d40ce6f750"
+  }
+}

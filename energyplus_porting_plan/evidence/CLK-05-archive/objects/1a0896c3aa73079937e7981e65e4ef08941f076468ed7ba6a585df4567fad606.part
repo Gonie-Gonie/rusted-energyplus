@@ -1,0 +1,59 @@
+    void SetupInterpolationValues(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   November 2002
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine creates the "interpolation" values / weights that are used for
+        // interpolating weather data from hourly down to the time step level.
+
+        // METHODOLOGY EMPLOYED:
+        // Create arrays (InterpolationValues, SolarInterpolationValues) dependent on
+        // Number of Time Steps in Hour.  This will be used in the "SetCurrentWeather" procedure.
+
+        state.dataWeather->Interpolation.allocate(state.dataGlobal->TimeStepsInHour);
+        state.dataWeather->SolarInterpolation.allocate(state.dataGlobal->TimeStepsInHour);
+        state.dataWeather->Interpolation = 0.0;
+        state.dataWeather->SolarInterpolation = 0.0;
+
+        for (int tloop = 1; tloop <= state.dataGlobal->TimeStepsInHour; ++tloop) {
+            state.dataWeather->Interpolation(tloop) =
+                (state.dataGlobal->TimeStepsInHour == 1) ? 1.0 : min(1.0, (double(tloop) / double(state.dataGlobal->TimeStepsInHour)));
+        }
+
+        if (mod(state.dataGlobal->TimeStepsInHour, 2) == 0) {
+            // even number of time steps.
+            int halfpoint = state.dataGlobal->TimeStepsInHour / 2;
+
+            state.dataWeather->SolarInterpolation(halfpoint) = 1.0;
+            Real64 tweight = 1.0 / double(state.dataGlobal->TimeStepsInHour);
+            for (int tloop = halfpoint + 1, hpoint = 1; tloop <= state.dataGlobal->TimeStepsInHour; ++tloop, ++hpoint) {
+                state.dataWeather->SolarInterpolation(tloop) = 1.0 - hpoint * tweight;
+            }
+            for (int tloop = halfpoint - 1, hpoint = 1; tloop >= 1; --tloop, ++hpoint) {
+                state.dataWeather->SolarInterpolation(tloop) = 1.0 - hpoint * tweight;
+            }
+        } else { // odd number of time steps
+            if (state.dataGlobal->TimeStepsInHour == 1) {
+                state.dataWeather->SolarInterpolation(1) = 0.5;
+            } else if (state.dataGlobal->TimeStepsInHour == 3) {
+                state.dataWeather->SolarInterpolation(1) = 5.0 / 6.0;
+                state.dataWeather->SolarInterpolation(2) = 5.0 / 6.0;
+                state.dataWeather->SolarInterpolation(3) = 0.5;
+            } else {
+                Real64 tweight = 1.0 / double(state.dataGlobal->TimeStepsInHour);
+                int halfpoint = state.dataGlobal->TimeStepsInHour / 2;
+                Real64 tweight1 = 1.0 - tweight / 2.0;
+                state.dataWeather->SolarInterpolation(halfpoint) = tweight1;
+                state.dataWeather->SolarInterpolation(halfpoint + 1) = tweight1;
+                for (int tloop = halfpoint + 2, hpoint = 1; tloop <= state.dataGlobal->TimeStepsInHour; ++tloop, ++hpoint) {
+                    state.dataWeather->SolarInterpolation(tloop) = tweight1 - hpoint * tweight;
+                }
+                for (int tloop = halfpoint - 1, hpoint = 1; tloop >= 1; --tloop, ++hpoint) {
+                    state.dataWeather->SolarInterpolation(tloop) = tweight1 - hpoint * tweight;
+                }
+            }
+        }
+    }

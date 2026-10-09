@@ -1,0 +1,70 @@
+"""Authenticated metadata utility; never launch engines or synthesize outputs."""
+from pathlib import Path
+import importlib.util
+import hashlib
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+UTILITY = {'path': 'tools/porting/geo03_provenance.py',
+    'sha256': '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5'}
+payload = (ROOT / UTILITY['path']).read_bytes()
+if hashlib.sha256(payload).hexdigest() != UTILITY['sha256']:
+    raise ValueError('Authenticated metadata verifier bytes changed')
+spec = importlib.util.spec_from_file_location('geo03_provenance', ROOT / UTILITY['path'])
+v = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = v
+spec.loader.exec_module(v)
+require, exact, read, ref, path_of, timestamp = v.require, v.exact, v.read, v.ref, v.path_of, v.timestamp
+
+
+def binding(actual, expected, checked):
+    checked.check(actual); checked.check(expected)
+    require(v.same_binding(actual, expected), 'Contained path/hash identity differs')
+
+
+def recorded(checked, reference, payload=None):
+    record = read(checked.check(reference))
+    require(record['schema'] == 'recorded-porting-command.v1' and record['launch_error'] is None
+        and record['source_bytes_match_before_and_after'] is True
+        and record['recorder_updates_gates'] is False and record['recorder_supplies_reference_answers'] is False,
+        'Authentic recorded metadata/engine command required')
+    start, finish = v.execution_interval(record, checked)
+    checked.check(record['executed_launcher']['archive'])
+    if payload is not None:
+        require(exact(read(checked.check(record['stdout'])), payload), 'Actual full stdout differs from report')
+    return record, start, finish
+
+
+def script(record, archive, checked):
+    command = record['command']
+    require(len(command) >= 2 and Path(command[0]).name.lower() in
+        ['python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'], 'Admitted Python interpreter required')
+    index, seen = 1, set()
+    while index < len(command) and command[index] in ['-X', '-B']:
+        option = command[index]; require(option not in seen, 'Repeated metadata Python option')
+        seen.add(option); index += 1
+        if option == '-X':
+            require(index < len(command) and command[index] == 'utf8', 'Only Python UTF8 mode admitted')
+            index += 1
+    require(index < len(command) and command[index].endswith('.py') and not command[index].startswith('-')
+        and path_of(command[index]).read_bytes() == checked.check(archive).read_bytes(), 'Actually executed script/archive differs')
+
+
+def archives(rows, checked, current=True):
+    result = v.archive_map(rows, checked)
+    if current:
+        for owner, archive in result.items():
+            require(path_of(owner).read_bytes() == checked.check(archive).read_bytes(), 'Held source/archive differs: ' + owner)
+    return result
+
+
+def normalized_path(value):
+    require(type(value) is str, 'Actual stream path must be text')
+    return '' if not value else path_of(value).relative_to(ROOT).as_posix()
+
+
+def argument(record, flag, expected, checked):
+    command = record['command']
+    require(command.count(flag) == 1, 'Unique actual input argument required: ' + flag)
+    index = command.index(flag)
+    require(index + 1 < len(command) and path_of(command[index + 1]) == checked.check(expected), 'Actual argument identity differs')

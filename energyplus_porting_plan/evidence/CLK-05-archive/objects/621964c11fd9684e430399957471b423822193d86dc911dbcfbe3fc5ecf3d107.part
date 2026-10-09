@@ -1,0 +1,1342 @@
+{
+  "schema": "clk05-production-comparer-projection.v1",
+  "created_utc": "2026-10-09T03:43:30.323846+00:00",
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/native-admission-contract.json",
+    "sha256": "d05d32733dd029e3a15ac6d5bc222ed64ade333305bf58bed85fe08919be7edd"
+  },
+  "native_request": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/helper-request.json",
+    "sha256": "eb7acd87a29ac260e3d2441b3de2a2d62832b162931a88908bf63e80db110aed"
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-05/frozen-packet-01/projection.json",
+    "sha256": "9e9f16390a1525dccc51ffaa1c23e00076b7b9f544de9cc9cc9d667ff4db3a92"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/source.json",
+      "sha256": "7774a279b7062679a42a0009c67e2de277a0b4ba2de2bbecb4471a7213978d53"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/cases.json",
+      "sha256": "81bdd49fbafbe892a6a221dbf2eb901f5ac7b13145b413b520b0d726f8f0a7f6"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-05/frozen-packet-01/tolerances.json",
+      "sha256": "f5222004098f72a055fa273611bd27d41819b56b851d5afb0370787f0b4f1d61"
+    }
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "selection": {
+    "schema": "clk05-production-comparer-selection.v1",
+    "native_source_selection": {
+      "Setup": [
+        "Interpolation_allocated",
+        "Interpolation length/order/all values",
+        "SolarInterpolation_allocated",
+        "SolarInterpolation length/order/all values"
+      ],
+      "ReadDay_solar": [
+        "Tomorrow.BeamSolarRad",
+        "Tomorrow.DifSolarRad",
+        "Today.BeamSolarRad",
+        "Today.DifSolarRad",
+        "LastHourSet",
+        "LastHour.BeamSolarRad",
+        "LastHour.DifSolarRad",
+        "NextHour.BeamSolarRad",
+        "NextHour.DifSolarRad",
+        "NextHour.LiquidPrecip"
+      ],
+      "upstream_counts": [
+        "MissedCounts.BeamSolarRad",
+        "MissedCounts.DifSolarRad",
+        "OutOfRangeCounts.BeamSolarRad",
+        "OutOfRangeCounts.DifSolarRad"
+      ],
+      "effective_controls": [
+        "DisplayWeatherMissingDataWarnings",
+        "IgnoreSolarRadiation",
+        "IgnoreBeamRadiation",
+        "IgnoreDiffuseRadiation"
+      ],
+      "exact_metadata": [
+        "actual allocation/shape/hour-major-step-minor order",
+        "all requested call identities/callers/order/outcomes",
+        "actual caller calendar/flags and enumerated input clocks; passive SetCurrent clocks remain retained and unpaired",
+        "raw header/parser counter owner",
+        "actual semantic stream cursor and input byte boundary identity",
+        "declared input bits/row hashes",
+        "actual cache/counter types and unchanged public canary storage"
+      ],
+      "paired_clock_input_fields": [
+        "global.TimeStepsInHour",
+        "global.TimeStepZone",
+        "weather.TimeStepFraction",
+        "clk05_observation.clock.TimeStepZoneSec",
+        "clk05_observation.clock.MinutesInTimeStep",
+        "caller.DayOfSim",
+        "caller.DayOfSimChr",
+        "caller.HourOfDay",
+        "caller.TimeStep",
+        "explicitly_declared_caller_begin_end_flags"
+      ],
+      "passive_clock_fields_unpaired_in_Initialize_only_native_lane": [
+        "clk05_observation.clock.CurrentTime",
+        "clk05_observation.clock.SimTimeSteps",
+        "global.WeightNow",
+        "global.WeightPreviousHour"
+      ],
+      "count_seed_observation_boundary": "before-GetNext public storage/reset canaries; InitializeWeather1772-1776 resets all19 before first ReadDay, so incoming hourly nonzero counts are not claimed",
+      "counter_19_fields_retained": true,
+      "unselected_counter_generation_cross_native_PASS": false,
+      "within_owner_Update_whole17_copy_bits": "only if genuine incoming/outgoing public copy boundary is directly observed; source-private hourly operands remain unavailable",
+      "unselected_LastHour17_generated_fields_cross_native_PASS": false,
+      "NextHour_unselected14_fields": "strict retained caller input bits where source writes only Beam/Dif/Liquid; no generated-value claim"
+    },
+    "native_observation_policy": {
+      "full_solar_grid_fields": [
+        "BeamSolarRad",
+        "DifSolarRad"
+      ],
+      "full_solar_grid_snapshots": [
+        "allocated_defaults",
+        "setup",
+        "prepared",
+        "before_context",
+        "after_context",
+        "GetNextEnvironment",
+        "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+        "final_state"
+      ],
+      "effective_boundary_flags": "actual incoming flags overwritten only by declared partial caller writes",
+      "all_operations_executed_independently_of_observation_selection": true,
+      "compact_operation_grid_contents": null,
+      "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected solar grid",
+      "selected_today_solar_slot": "actual allocated in-range HourOfDay/TimeStep, otherwise unavailable",
+      "all19_counts_full17_LastHour_NextHour_retained": true,
+      "native_private_hourly_or_transient_weights_observed": false,
+      "passive_CurrentTime_SimTimeSteps_WeightNow_WeightPreviousHour_paired": false
+    },
+    "numeric_profiles": [
+      {
+        "field": "Interpolation",
+        "unit": "dimensionless",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true
+      },
+      {
+        "field": "SolarInterpolation",
+        "unit": "dimensionless",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true
+      },
+      {
+        "field": "BeamSolarRad",
+        "unit": "W/m2",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true
+      },
+      {
+        "field": "DifSolarRad",
+        "unit": "W/m2",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true
+      },
+      {
+        "field": "NextHour.LiquidPrecip",
+        "unit": "mm/zone-timestep",
+        "atol": 1e-12,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "inherited_contract": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+          "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+        },
+        "inherited_profile": "day_grid_and_raw_hour_cache/LiquidPrecip"
+      }
+    ],
+    "numeric_criterion": "abs(Rust-original)<=field.atol+field.rtol*abs(original); exact IEEE classification and signed-zero sign when both operands are zero; no generic tolerance fallback",
+    "actual_CON_cases": [
+      "A-24H",
+      "A-72H",
+      "B-BOTH-24H"
+    ],
+    "native_direct_source_calls": {
+      "GetNextEnvironment": 3,
+      "InitializeWeather": 480,
+      "total_operations": 483
+    },
+    "Rust_Current_calls": 480,
+    "native_Current_or_thermal_callback_parity_claimed": false,
+    "grid_conversion": "actual full17 CLI slots projected to selected solar2; no numeric value transform",
+    "array_DTO_mapping": "native ROOT to CLI ROOT identity",
+    "native_stream_file_path_operand": "unavailable in CLI byte-stream DTO; real weather file bound externally",
+    "consumer_receipt": "actual completed_operation_count and owned full17 Today, no reconstructed native event time",
+    "solar_sample_fields": {
+      "BeamSolarRad": "direct_normal_radiation_w_per_m2",
+      "DifSolarRad": "diffuse_horizontal_radiation_w_per_m2"
+    },
+    "CurrentTime_SimTimeSteps_weights": "retained typed actual observations, unpaired cross-native",
+    "unselected_physics": [
+      "current-solar",
+      "night",
+      "solar-position",
+      "SRC04-incident-absorbed",
+      "native-thermal-callback",
+      "unselected-full17-generation"
+    ],
+    "ordinary_nullable_metadata": {
+      "oracle": null,
+      "comparison": null,
+      "both_null_required": false,
+      "one_sided_null_is_failure": true
+    },
+    "unavailable_counted_as_PASS": false,
+    "numeric_policy_changed": false
+  },
+  "supplemental_day_of_year_schedule": {
+    "schema": "clk05-production-schedule-routing.v1",
+    "field": "environment.DayOfYear_Schedule",
+    "operand_card": "CLK-04",
+    "same_id_direct_kinds": [
+      "GetNextEnvironment",
+      "InitializeWeather"
+    ],
+    "phases": [
+      "before",
+      "after"
+    ],
+    "matched_direct_operation_ids": {
+      "A-24H": [
+        "get-next-environment",
+        "zone-D001-H01-T01",
+        "zone-D001-H01-T02",
+        "zone-D001-H01-T03",
+        "zone-D001-H01-T04",
+        "zone-D001-H02-T01",
+        "zone-D001-H02-T02",
+        "zone-D001-H02-T03",
+        "zone-D001-H02-T04",
+        "zone-D001-H03-T01",
+        "zone-D001-H03-T02",
+        "zone-D001-H03-T03",
+        "zone-D001-H03-T04",
+        "zone-D001-H04-T01",
+        "zone-D001-H04-T02",
+        "zone-D001-H04-T03",
+        "zone-D001-H04-T04",
+        "zone-D001-H05-T01",
+        "zone-D001-H05-T02",
+        "zone-D001-H05-T03",
+        "zone-D001-H05-T04",
+        "zone-D001-H06-T01",
+        "zone-D001-H06-T02",
+        "zone-D001-H06-T03",
+        "zone-D001-H06-T04",
+        "zone-D001-H07-T01",
+        "zone-D001-H07-T02",
+        "zone-D001-H07-T03",
+        "zone-D001-H07-T04",
+        "zone-D001-H08-T01",
+        "zone-D001-H08-T02",
+        "zone-D001-H08-T03",
+        "zone-D001-H08-T04",
+        "zone-D001-H09-T01",
+        "zone-D001-H09-T02",
+        "zone-D001-H09-T03",
+        "zone-D001-H09-T04",
+        "zone-D001-H10-T01",
+        "zone-D001-H10-T02",
+        "zone-D001-H10-T03",
+        "zone-D001-H10-T04",
+        "zone-D001-H11-T01",
+        "zone-D001-H11-T02",
+        "zone-D001-H11-T03",
+        "zone-D001-H11-T04",
+        "zone-D001-H12-T01",
+        "zone-D001-H12-T02",
+        "zone-D001-H12-T03",
+        "zone-D001-H12-T04",
+        "zone-D001-H13-T01",
+        "zone-D001-H13-T02",
+        "zone-D001-H13-T03",
+        "zone-D001-H13-T04",
+        "zone-D001-H14-T01",
+        "zone-D001-H14-T02",
+        "zone-D001-H14-T03",
+        "zone-D001-H14-T04",
+        "zone-D001-H15-T01",
+        "zone-D001-H15-T02",
+        "zone-D001-H15-T03",
+        "zone-D001-H15-T04",
+        "zone-D001-H16-T01",
+        "zone-D001-H16-T02",
+        "zone-D001-H16-T03",
+        "zone-D001-H16-T04",
+        "zone-D001-H17-T01",
+        "zone-D001-H17-T02",
+        "zone-D001-H17-T03",
+        "zone-D001-H17-T04",
+        "zone-D001-H18-T01",
+        "zone-D001-H18-T02",
+        "zone-D001-H18-T03",
+        "zone-D001-H18-T04",
+        "zone-D001-H19-T01",
+        "zone-D001-H19-T02",
+        "zone-D001-H19-T03",
+        "zone-D001-H19-T04",
+        "zone-D001-H20-T01",
+        "zone-D001-H20-T02",
+        "zone-D001-H20-T03",
+        "zone-D001-H20-T04",
+        "zone-D001-H21-T01",
+        "zone-D001-H21-T02",
+        "zone-D001-H21-T03",
+        "zone-D001-H21-T04",
+        "zone-D001-H22-T01",
+        "zone-D001-H22-T02",
+        "zone-D001-H22-T03",
+        "zone-D001-H22-T04",
+        "zone-D001-H23-T01",
+        "zone-D001-H23-T02",
+        "zone-D001-H23-T03",
+        "zone-D001-H23-T04",
+        "zone-D001-H24-T01",
+        "zone-D001-H24-T02",
+        "zone-D001-H24-T03",
+        "zone-D001-H24-T04"
+      ],
+      "A-72H": [
+        "get-next-environment",
+        "zone-D001-H01-T01",
+        "zone-D001-H01-T02",
+        "zone-D001-H01-T03",
+        "zone-D001-H01-T04",
+        "zone-D001-H02-T01",
+        "zone-D001-H02-T02",
+        "zone-D001-H02-T03",
+        "zone-D001-H02-T04",
+        "zone-D001-H03-T01",
+        "zone-D001-H03-T02",
+        "zone-D001-H03-T03",
+        "zone-D001-H03-T04",
+        "zone-D001-H04-T01",
+        "zone-D001-H04-T02",
+        "zone-D001-H04-T03",
+        "zone-D001-H04-T04",
+        "zone-D001-H05-T01",
+        "zone-D001-H05-T02",
+        "zone-D001-H05-T03",
+        "zone-D001-H05-T04",
+        "zone-D001-H06-T01",
+        "zone-D001-H06-T02",
+        "zone-D001-H06-T03",
+        "zone-D001-H06-T04",
+        "zone-D001-H07-T01",
+        "zone-D001-H07-T02",
+        "zone-D001-H07-T03",
+        "zone-D001-H07-T04",
+        "zone-D001-H08-T01",
+        "zone-D001-H08-T02",
+        "zone-D001-H08-T03",
+        "zone-D001-H08-T04",
+        "zone-D001-H09-T01",
+        "zone-D001-H09-T02",
+        "zone-D001-H09-T03",
+        "zone-D001-H09-T04",
+        "zone-D001-H10-T01",
+        "zone-D001-H10-T02",
+        "zone-D001-H10-T03",
+        "zone-D001-H10-T04",
+        "zone-D001-H11-T01",
+        "zone-D001-H11-T02",
+        "zone-D001-H11-T03",
+        "zone-D001-H11-T04",
+        "zone-D001-H12-T01",
+        "zone-D001-H12-T02",
+        "zone-D001-H12-T03",
+        "zone-D001-H12-T04",
+        "zone-D001-H13-T01",
+        "zone-D001-H13-T02",
+        "zone-D001-H13-T03",
+        "zone-D001-H13-T04",
+        "zone-D001-H14-T01",
+        "zone-D001-H14-T02",
+        "zone-D001-H14-T03",
+        "zone-D001-H14-T04",
+        "zone-D001-H15-T01",
+        "zone-D001-H15-T02",
+        "zone-D001-H15-T03",
+        "zone-D001-H15-T04",
+        "zone-D001-H16-T01",
+        "zone-D001-H16-T02",
+        "zone-D001-H16-T03",
+        "zone-D001-H16-T04",
+        "zone-D001-H17-T01",
+        "zone-D001-H17-T02",
+        "zone-D001-H17-T03",
+        "zone-D001-H17-T04",
+        "zone-D001-H18-T01",
+        "zone-D001-H18-T02",
+        "zone-D001-H18-T03",
+        "zone-D001-H18-T04",
+        "zone-D001-H19-T01",
+        "zone-D001-H19-T02",
+        "zone-D001-H19-T03",
+        "zone-D001-H19-T04",
+        "zone-D001-H20-T01",
+        "zone-D001-H20-T02",
+        "zone-D001-H20-T03",
+        "zone-D001-H20-T04",
+        "zone-D001-H21-T01",
+        "zone-D001-H21-T02",
+        "zone-D001-H21-T03",
+        "zone-D001-H21-T04",
+        "zone-D001-H22-T01",
+        "zone-D001-H22-T02",
+        "zone-D001-H22-T03",
+        "zone-D001-H22-T04",
+        "zone-D001-H23-T01",
+        "zone-D001-H23-T02",
+        "zone-D001-H23-T03",
+        "zone-D001-H23-T04",
+        "zone-D001-H24-T01",
+        "zone-D001-H24-T02",
+        "zone-D001-H24-T03",
+        "zone-D001-H24-T04",
+        "zone-D002-H01-T01",
+        "zone-D002-H01-T02",
+        "zone-D002-H01-T03",
+        "zone-D002-H01-T04",
+        "zone-D002-H02-T01",
+        "zone-D002-H02-T02",
+        "zone-D002-H02-T03",
+        "zone-D002-H02-T04",
+        "zone-D002-H03-T01",
+        "zone-D002-H03-T02",
+        "zone-D002-H03-T03",
+        "zone-D002-H03-T04",
+        "zone-D002-H04-T01",
+        "zone-D002-H04-T02",
+        "zone-D002-H04-T03",
+        "zone-D002-H04-T04",
+        "zone-D002-H05-T01",
+        "zone-D002-H05-T02",
+        "zone-D002-H05-T03",
+        "zone-D002-H05-T04",
+        "zone-D002-H06-T01",
+        "zone-D002-H06-T02",
+        "zone-D002-H06-T03",
+        "zone-D002-H06-T04",
+        "zone-D002-H07-T01",
+        "zone-D002-H07-T02",
+        "zone-D002-H07-T03",
+        "zone-D002-H07-T04",
+        "zone-D002-H08-T01",
+        "zone-D002-H08-T02",
+        "zone-D002-H08-T03",
+        "zone-D002-H08-T04",
+        "zone-D002-H09-T01",
+        "zone-D002-H09-T02",
+        "zone-D002-H09-T03",
+        "zone-D002-H09-T04",
+        "zone-D002-H10-T01",
+        "zone-D002-H10-T02",
+        "zone-D002-H10-T03",
+        "zone-D002-H10-T04",
+        "zone-D002-H11-T01",
+        "zone-D002-H11-T02",
+        "zone-D002-H11-T03",
+        "zone-D002-H11-T04",
+        "zone-D002-H12-T01",
+        "zone-D002-H12-T02",
+        "zone-D002-H12-T03",
+        "zone-D002-H12-T04",
+        "zone-D002-H13-T01",
+        "zone-D002-H13-T02",
+        "zone-D002-H13-T03",
+        "zone-D002-H13-T04",
+        "zone-D002-H14-T01",
+        "zone-D002-H14-T02",
+        "zone-D002-H14-T03",
+        "zone-D002-H14-T04",
+        "zone-D002-H15-T01",
+        "zone-D002-H15-T02",
+        "zone-D002-H15-T03",
+        "zone-D002-H15-T04",
+        "zone-D002-H16-T01",
+        "zone-D002-H16-T02",
+        "zone-D002-H16-T03",
+        "zone-D002-H16-T04",
+        "zone-D002-H17-T01",
+        "zone-D002-H17-T02",
+        "zone-D002-H17-T03",
+        "zone-D002-H17-T04",
+        "zone-D002-H18-T01",
+        "zone-D002-H18-T02",
+        "zone-D002-H18-T03",
+        "zone-D002-H18-T04",
+        "zone-D002-H19-T01",
+        "zone-D002-H19-T02",
+        "zone-D002-H19-T03",
+        "zone-D002-H19-T04",
+        "zone-D002-H20-T01",
+        "zone-D002-H20-T02",
+        "zone-D002-H20-T03",
+        "zone-D002-H20-T04",
+        "zone-D002-H21-T01",
+        "zone-D002-H21-T02",
+        "zone-D002-H21-T03",
+        "zone-D002-H21-T04",
+        "zone-D002-H22-T01",
+        "zone-D002-H22-T02",
+        "zone-D002-H22-T03",
+        "zone-D002-H22-T04",
+        "zone-D002-H23-T01",
+        "zone-D002-H23-T02",
+        "zone-D002-H23-T03",
+        "zone-D002-H23-T04",
+        "zone-D002-H24-T01",
+        "zone-D002-H24-T02",
+        "zone-D002-H24-T03",
+        "zone-D002-H24-T04",
+        "zone-D003-H01-T01",
+        "zone-D003-H01-T02",
+        "zone-D003-H01-T03",
+        "zone-D003-H01-T04",
+        "zone-D003-H02-T01",
+        "zone-D003-H02-T02",
+        "zone-D003-H02-T03",
+        "zone-D003-H02-T04",
+        "zone-D003-H03-T01",
+        "zone-D003-H03-T02",
+        "zone-D003-H03-T03",
+        "zone-D003-H03-T04",
+        "zone-D003-H04-T01",
+        "zone-D003-H04-T02",
+        "zone-D003-H04-T03",
+        "zone-D003-H04-T04",
+        "zone-D003-H05-T01",
+        "zone-D003-H05-T02",
+        "zone-D003-H05-T03",
+        "zone-D003-H05-T04",
+        "zone-D003-H06-T01",
+        "zone-D003-H06-T02",
+        "zone-D003-H06-T03",
+        "zone-D003-H06-T04",
+        "zone-D003-H07-T01",
+        "zone-D003-H07-T02",
+        "zone-D003-H07-T03",
+        "zone-D003-H07-T04",
+        "zone-D003-H08-T01",
+        "zone-D003-H08-T02",
+        "zone-D003-H08-T03",
+        "zone-D003-H08-T04",
+        "zone-D003-H09-T01",
+        "zone-D003-H09-T02",
+        "zone-D003-H09-T03",
+        "zone-D003-H09-T04",
+        "zone-D003-H10-T01",
+        "zone-D003-H10-T02",
+        "zone-D003-H10-T03",
+        "zone-D003-H10-T04",
+        "zone-D003-H11-T01",
+        "zone-D003-H11-T02",
+        "zone-D003-H11-T03",
+        "zone-D003-H11-T04",
+        "zone-D003-H12-T01",
+        "zone-D003-H12-T02",
+        "zone-D003-H12-T03",
+        "zone-D003-H12-T04",
+        "zone-D003-H13-T01",
+        "zone-D003-H13-T02",
+        "zone-D003-H13-T03",
+        "zone-D003-H13-T04",
+        "zone-D003-H14-T01",
+        "zone-D003-H14-T02",
+        "zone-D003-H14-T03",
+        "zone-D003-H14-T04",
+        "zone-D003-H15-T01",
+        "zone-D003-H15-T02",
+        "zone-D003-H15-T03",
+        "zone-D003-H15-T04",
+        "zone-D003-H16-T01",
+        "zone-D003-H16-T02",
+        "zone-D003-H16-T03",
+        "zone-D003-H16-T04",
+        "zone-D003-H17-T01",
+        "zone-D003-H17-T02",
+        "zone-D003-H17-T03",
+        "zone-D003-H17-T04",
+        "zone-D003-H18-T01",
+        "zone-D003-H18-T02",
+        "zone-D003-H18-T03",
+        "zone-D003-H18-T04",
+        "zone-D003-H19-T01",
+        "zone-D003-H19-T02",
+        "zone-D003-H19-T03",
+        "zone-D003-H19-T04",
+        "zone-D003-H20-T01",
+        "zone-D003-H20-T02",
+        "zone-D003-H20-T03",
+        "zone-D003-H20-T04",
+        "zone-D003-H21-T01",
+        "zone-D003-H21-T02",
+        "zone-D003-H21-T03",
+        "zone-D003-H21-T04",
+        "zone-D003-H22-T01",
+        "zone-D003-H22-T02",
+        "zone-D003-H22-T03",
+        "zone-D003-H22-T04",
+        "zone-D003-H23-T01",
+        "zone-D003-H23-T02",
+        "zone-D003-H23-T03",
+        "zone-D003-H23-T04",
+        "zone-D003-H24-T01",
+        "zone-D003-H24-T02",
+        "zone-D003-H24-T03",
+        "zone-D003-H24-T04"
+      ],
+      "B-BOTH-24H": [
+        "get-next-environment",
+        "zone-D001-H01-T01",
+        "zone-D001-H01-T02",
+        "zone-D001-H01-T03",
+        "zone-D001-H01-T04",
+        "zone-D001-H02-T01",
+        "zone-D001-H02-T02",
+        "zone-D001-H02-T03",
+        "zone-D001-H02-T04",
+        "zone-D001-H03-T01",
+        "zone-D001-H03-T02",
+        "zone-D001-H03-T03",
+        "zone-D001-H03-T04",
+        "zone-D001-H04-T01",
+        "zone-D001-H04-T02",
+        "zone-D001-H04-T03",
+        "zone-D001-H04-T04",
+        "zone-D001-H05-T01",
+        "zone-D001-H05-T02",
+        "zone-D001-H05-T03",
+        "zone-D001-H05-T04",
+        "zone-D001-H06-T01",
+        "zone-D001-H06-T02",
+        "zone-D001-H06-T03",
+        "zone-D001-H06-T04",
+        "zone-D001-H07-T01",
+        "zone-D001-H07-T02",
+        "zone-D001-H07-T03",
+        "zone-D001-H07-T04",
+        "zone-D001-H08-T01",
+        "zone-D001-H08-T02",
+        "zone-D001-H08-T03",
+        "zone-D001-H08-T04",
+        "zone-D001-H09-T01",
+        "zone-D001-H09-T02",
+        "zone-D001-H09-T03",
+        "zone-D001-H09-T04",
+        "zone-D001-H10-T01",
+        "zone-D001-H10-T02",
+        "zone-D001-H10-T03",
+        "zone-D001-H10-T04",
+        "zone-D001-H11-T01",
+        "zone-D001-H11-T02",
+        "zone-D001-H11-T03",
+        "zone-D001-H11-T04",
+        "zone-D001-H12-T01",
+        "zone-D001-H12-T02",
+        "zone-D001-H12-T03",
+        "zone-D001-H12-T04",
+        "zone-D001-H13-T01",
+        "zone-D001-H13-T02",
+        "zone-D001-H13-T03",
+        "zone-D001-H13-T04",
+        "zone-D001-H14-T01",
+        "zone-D001-H14-T02",
+        "zone-D001-H14-T03",
+        "zone-D001-H14-T04",
+        "zone-D001-H15-T01",
+        "zone-D001-H15-T02",
+        "zone-D001-H15-T03",
+        "zone-D001-H15-T04",
+        "zone-D001-H16-T01",
+        "zone-D001-H16-T02",
+        "zone-D001-H16-T03",
+        "zone-D001-H16-T04",
+        "zone-D001-H17-T01",
+        "zone-D001-H17-T02",
+        "zone-D001-H17-T03",
+        "zone-D001-H17-T04",
+        "zone-D001-H18-T01",
+        "zone-D001-H18-T02",
+        "zone-D001-H18-T03",
+        "zone-D001-H18-T04",
+        "zone-D001-H19-T01",
+        "zone-D001-H19-T02",
+        "zone-D001-H19-T03",
+        "zone-D001-H19-T04",
+        "zone-D001-H20-T01",
+        "zone-D001-H20-T02",
+        "zone-D001-H20-T03",
+        "zone-D001-H20-T04",
+        "zone-D001-H21-T01",
+        "zone-D001-H21-T02",
+        "zone-D001-H21-T03",
+        "zone-D001-H21-T04",
+        "zone-D001-H22-T01",
+        "zone-D001-H22-T02",
+        "zone-D001-H22-T03",
+        "zone-D001-H22-T04",
+        "zone-D001-H23-T01",
+        "zone-D001-H23-T02",
+        "zone-D001-H23-T03",
+        "zone-D001-H23-T04",
+        "zone-D001-H24-T01",
+        "zone-D001-H24-T02",
+        "zone-D001-H24-T03",
+        "zone-D001-H24-T04"
+      ]
+    },
+    "lane_counts": {
+      "A-24H": {
+        "all_native_operations": 193,
+        "direct_operations": 97,
+        "unpaired_Current_operations": 96
+      },
+      "A-72H": {
+        "all_native_operations": 577,
+        "direct_operations": 289,
+        "unpaired_Current_operations": 288
+      },
+      "B-BOTH-24H": {
+        "all_native_operations": 193,
+        "direct_operations": 97,
+        "unpaired_Current_operations": 96
+      }
+    },
+    "paired_fieldset": [
+      "environment.DayOfYear_Schedule"
+    ],
+    "direct_field_observation_count": 966,
+    "evidence": {
+      "data_review": {
+        "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+        "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+      },
+      "data_review_execution": {
+        "path": ".runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json",
+        "sha256": "1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0"
+      },
+      "recovery": {
+        "path": ".runtime/porting/CLK-04/original-recovery-01/recovery.json",
+        "sha256": "9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6"
+      },
+      "recovery_execution": {
+        "path": ".runtime/porting/CLK-04/original-recovery-command-01/receipt.json",
+        "sha256": "31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130"
+      },
+      "preserved_original_reference": {
+        "path": ".runtime/porting/CLK-04/original-first-02/helper-reference.json",
+        "sha256": "c146f3e6568e3e6f3337bc83f8224f7dc2d072d85e0df26e7f5b1697bbef27e0"
+      },
+      "failed_original_execution": {
+        "path": ".runtime/porting/CLK-04/original-first-command-02/receipt.json",
+        "sha256": "b28ddaa77873187959beb732915200d332dd75ff368e51eaadc0b85d0d93ec9e"
+      },
+      "native_execution": {
+        "path": ".runtime/porting/CLK-04/original-first-02/helper-command.json",
+        "sha256": "50493a818d2c2c79f08dc6deffa0cc78a327434e3a5013452588b0f71a347a93"
+      },
+      "native_results": {
+        "path": ".runtime/porting/CLK-04/original-first-02/native-output/clk04-helper-results.json",
+        "sha256": "d84b696a34c720004ede289e47719bcc3d066ee48652f4a7d1a9431a1b825dba"
+      },
+      "native_request": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/helper-request.json",
+        "sha256": "db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054"
+      },
+      "native_admission_contract": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/native-admission-contract.json",
+        "sha256": "c9e960c0b1c7d819db6b56fa7517e8c0d74b43c1cdf3e328af3d9b7e9b3437c1"
+      },
+      "native_projection": {
+        "path": ".runtime/porting/CLK-04/frozen-packet-01/projection.json",
+        "sha256": "fdc6ebd09475bbe6906bbe64947d5cacaa6387cd700a7503ec41bcf6f59e9b51"
+      },
+      "contracts": {
+        "source": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/source.json",
+          "sha256": "8c95f10fb689f3fa46b79c9c61be2555d307c92be61e879f5d9596640eec2b4e"
+        },
+        "cases": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/cases.json",
+          "sha256": "99da708cd313fe68622f77ef991d3f15c4eb96d7a461e32468aed9b5aed6fb08"
+        },
+        "tolerances": {
+          "path": ".runtime/porting/CLK-04/frozen-packet-01/tolerances.json",
+          "sha256": "f3ce173673617fa446bfcf96b4eb095a402c5fa4972e5f1082ae23650cf4f0f5"
+        }
+      },
+      "native_build": {
+        "path": ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+        "sha256": "1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc"
+      },
+      "native_build_review": {
+        "path": ".runtime/porting/CLK-04/independent-native-build-review-01/review.json",
+        "sha256": "95b786ddce451f154054585e67e00106785246fd691c28ceca8d9c987e4b1400"
+      },
+      "native_build_review_execution": {
+        "path": ".runtime/porting/CLK-04/independent-native-build-review-command-01/receipt.json",
+        "sha256": "803ff81f35a9210fd71ed7c1a83da7b69bc038cdf1c368087aa3ebc64ebc6fc5"
+      },
+      "retained_derivative": {
+        "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+        "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+      },
+      "retired_original_registry": {
+        "path": ".runtime/porting/CLK-04/retirement-01/registry-retired.json",
+        "sha256": "27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378"
+      }
+    },
+    "all_other_selected_operands_card": "CLK-05",
+    "new_Current_comparisons_performed": false,
+    "native_results_supplied_to_Rust": false,
+    "selected_field_counts_unchanged": true,
+    "numeric_profiles_changed": false,
+    "case_or_scope_expanded": false,
+    "ordinal_recomputed_or_synthesized": false,
+    "native_results_parsed_by_freezer": false,
+    "historical_native_exit_code": 0,
+    "historical_wrapper_exit_code": 1,
+    "metadata_recovery_exit_code": 0,
+    "historical_failed_wrapper_relabelled_zero": false,
+    "unavailable_counted_as_PASS": false
+  },
+  "preserved_production_failure": {
+    "report": {
+      "path": ".runtime/porting/CLK-05/production-comparison-01/production-comparison.json",
+      "sha256": "c36ae50d49b6022c438ee43d3864a8a65be96104bc3374b56013808fb68b644e"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/production-comparison-command-01/receipt.json",
+      "sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f"
+    }
+  },
+  "source_review": {
+    "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/review.json",
+    "sha256": "4e407849618a99ea2d6af3bb0a63ef4bada6f6db5d54d87c387ae8869d224bc3"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-command-02/receipt.json",
+    "sha256": "8c8602e131b42c4df73930d98caa5191089bb1af877b1fcbe40221b9ba7fb086"
+  },
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/00-proofs.py",
+        "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/adapter.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/01-adapter.py",
+        "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/observations.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/02-observations.py",
+        "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/03-freeze_projection.py",
+        "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/04-check_production.py",
+        "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/05-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/06-numeric.py",
+        "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/07-state.py",
+        "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/08-history.py",
+        "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/09-metadata.py",
+        "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/10-freeze_projection.py",
+        "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/11-check_clk05.py",
+        "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/12-common.py",
+        "sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/13-evidence.py",
+        "sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/14-prepare_plan.py",
+        "sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/15-run_production.py",
+        "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/independent-production-comparer-source-review-02/sources/16-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reader_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/00-proofs.py",
+        "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/adapter.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/01-adapter.py",
+        "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/observations.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/02-observations.py",
+        "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/03-freeze_projection.py",
+        "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-comparer-prep-03/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/04-check_production.py",
+        "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/05-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/06-numeric.py",
+        "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/07-state.py",
+        "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/08-history.py",
+        "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/09-metadata.py",
+        "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/10-freeze_projection.py",
+        "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/11-check_clk05.py",
+        "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/12-common.py",
+        "sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/13-evidence.py",
+        "sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/14-prepare_plan.py",
+        "sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/15-run_production.py",
+        "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-05/production-comparison-projection-02/16-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reader_sources": [
+    {
+      "path": ".runtime/porting/CLK-05/production-comparer-prep-03/proofs.py",
+      "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-comparer-prep-03/adapter.py",
+      "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-comparer-prep-03/observations.py",
+      "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-comparer-prep-03/freeze_projection.py",
+      "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-comparer-prep-03/check_production.py",
+      "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/common.py",
+      "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/numeric.py",
+      "sha256": "36437c149926451fc60c76fdf0d36c28ecae6836a0a32a47fe93f5a12f92977b"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/state.py",
+      "sha256": "64c4eb7de6fdc6280b52ceddda704d0a952d723b2140819c67a3dbf09a6e90b6"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/history.py",
+      "sha256": "aaf4f3e7eb2c250c4ae567d866ec925221ab99a0d7f12b6afce33e981b3bcdfe"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/metadata.py",
+      "sha256": "65ec33547dfd6919ef1cd6293ac49cc7653f4da3ef2899e3d6bc79c48a392e67"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/freeze_projection.py",
+      "sha256": "6c7cafe5dfbb275e61dffcd9eb4a36d5bd8c0a78eee78f1105991b29469e02af"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/comparer-prep-01/check_clk05.py",
+      "sha256": "290f2fcd3e9f23849b1f12076d2c856b40b868d2303de1abe819da9d7867f263"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-workflow-prep-03/common.py",
+      "sha256": "d636e147ae056170cf5e5803170a280da58d013601d011e99a186c7b51bc8ec8"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-workflow-prep-03/evidence.py",
+      "sha256": "fe30435c596f284348e5028b871e6358baa6e4118e3ed9f519d42173e69c610d"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-workflow-prep-03/prepare_plan.py",
+      "sha256": "6f5226ba00809addeea548af276f64844dba4c8f95188ddefc47fd4e70cba179"
+    },
+    {
+      "path": ".runtime/porting/CLK-05/production-workflow-prep-03/run_production.py",
+      "sha256": "7af4a626ce2f1b3786ac170097d72c89a6dd43fd88d02653eb545860196c6961"
+    },
+    {
+      "path": "tools/porting/geo03_provenance.py",
+      "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+    }
+  ],
+  "frozen_before_all_six_Rust_production_calls": true,
+  "native_results_read_by_freezer": false,
+  "scientific_execution_performed": false,
+  "numeric_policy_changed": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false
+}

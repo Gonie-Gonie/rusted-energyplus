@@ -1,0 +1,17 @@
+{
+  "schema": "clk05-actual-closure-archive.v1",
+  "scientific_execution_performed": false,
+  "actual_closure_exit_code": 0,
+  "files": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/closure-01/closure-result.json",
+      "archive_path": "energyplus_porting_plan/evidence/CLK-05-closure/closure-result.json",
+      "sha256": "1a87c229c2b427432401580f5ad35747d0acf93f3d78617aa91e11676bff70ce"
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/closure-command-01/receipt.json",
+      "archive_path": "energyplus_porting_plan/evidence/CLK-05-closure/closure-execution.json",
+      "sha256": "1e2e4ffd6dc044a48cae2d3a3fd860775f3cfd87f7e84aa99984a1379c67e6e8"
+    }
+  ]
+}

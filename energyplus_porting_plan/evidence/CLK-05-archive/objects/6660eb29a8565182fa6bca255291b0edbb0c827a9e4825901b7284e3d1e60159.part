@@ -1,0 +1,14 @@
+        if (state.dataEnvrn->IsSnow) {
+            state.dataEnvrn->GndReflectance = max(min(state.dataEnvrn->GndReflectance * state.dataWeather->SnowGndRefModifier, 1.0), 0.0);
+            state.dataEnvrn->GndReflectanceForDayltg =
+                max(min(state.dataEnvrn->GndReflectanceForDayltg * state.dataWeather->SnowGndRefModifierForDayltg, 1.0), 0.0);
+        }
+
+        state.dataEnvrn->GndSolarRad =
+            max((state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS.z + state.dataEnvrn->DifSolarRad) * state.dataEnvrn->GndReflectance, 0.0);
+
+        if (!state.dataEnvrn->SunIsUp) {
+            state.dataEnvrn->DifSolarRad = 0.0;
+            state.dataEnvrn->BeamSolarRad = 0.0;
+            state.dataEnvrn->GndSolarRad = 0.0;
+        }

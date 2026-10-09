@@ -1,0 +1,83 @@
+--- crates/ep_runtime/examples/clk05_candidate_support/inputs.rs before
++++ crates/ep_runtime/examples/clk05_candidate_support/inputs.rs after
+@@ -60,7 +60,10 @@
+ }
+ pub(super) fn bound_file(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
+     let path = root.join(text(&binding["path"])?).canonicalize()?;
+-    require(path.starts_with(root) && path != root, "input path escapes repository")?;
++    require(
++        path.starts_with(root) && path != root,
++        "input path escapes repository",
++    )?;
+     let bytes = std::fs::read(&path)?;
+     require(
+         digest::sha256(&bytes) == text(&binding["sha256"])?,
+@@ -69,7 +72,10 @@
+     Ok((path, bytes))
+ }
+ pub(super) fn bindings(native: &Value) -> Result<Vec<Value>> {
+-    let mut result = vec![native["fixed_scope"].clone(), native["production_control_inputs"].clone()];
++    let mut result = vec![
++        native["fixed_scope"].clone(),
++        native["production_control_inputs"].clone(),
++    ];
+     result.extend_from_slice(array(&native["all_45_guard_refs"])?);
+     for name in ["source", "tolerances"] {
+         result.push(native["contracts"][name].clone());
+@@ -111,9 +117,15 @@
+     let mut lane_counts = [0u32; 2];
+     let mut setup_steps = BTreeSet::new();
+     for setup in array(&native["setup_cases"])? {
+-        require(setup_steps.insert(integer(&setup["time_steps_per_hour"])?), "duplicate setup steps")?;
+-    }
+-    require(setup_steps == BTreeSet::from([1, 3, 4]), "closed setup steps differ")?;
++        require(
++            setup_steps.insert(integer(&setup["time_steps_per_hour"])?),
++            "duplicate setup steps",
++        )?;
++    }
++    require(
++        setup_steps == BTreeSet::from([1, 3, 4]),
++        "closed setup steps differ",
++    )?;
+     for seq in array(&native["weather_sequences"])? {
+         require(names.insert(text(&seq["id"])?), "duplicate sequence ID")?;
+         let lane = match text(&seq["lane"])? {
+@@ -122,10 +134,23 @@
+             _ => return Err("closed declared operating lane required".into()),
+         };
+         lane_counts[lane] += 1;
+-        require([1, 3, 4].contains(&integer(&seq["time_steps_per_hour"])?), "closed sequence steps differ")?;
+-        let controls = seq["solar_controls"].as_object().ok_or("four typed controls required")?;
+-        require(controls.len() == 4, "exactly four declared controls required")?;
+-        for key in ["DisplayWeatherMissingDataWarnings", "IgnoreSolarRadiation", "IgnoreBeamRadiation", "IgnoreDiffuseRadiation"] {
++        require(
++            [1, 3, 4].contains(&integer(&seq["time_steps_per_hour"])?),
++            "closed sequence steps differ",
++        )?;
++        let controls = seq["solar_controls"]
++            .as_object()
++            .ok_or("four typed controls required")?;
++        require(
++            controls.len() == 4,
++            "exactly four declared controls required",
++        )?;
++        for key in [
++            "DisplayWeatherMissingDataWarnings",
++            "IgnoreSolarRadiation",
++            "IgnoreBeamRadiation",
++            "IgnoreDiffuseRadiation",
++        ] {
+             flag(&seq["solar_controls"][key])?;
+         }
+         let mut ids = BTreeSet::new();
+@@ -142,7 +167,8 @@
+     }
+     require(
+         counts == [36, 550]
+-            && native["requested_counts"] == serde_json::json!({"setup_cases":3,"weather_sequences":36,
++            && native["requested_counts"]
++                == serde_json::json!({"setup_cases":3,"weather_sequences":36,
+                 "GetNextEnvironment":counts[0],"InitializeWeather":counts[1],
+                 "weather_operations":counts.iter().sum::<u32>(),"total_operations":3+counts.iter().sum::<u32>()})
+             && lane_counts == [33, 3],

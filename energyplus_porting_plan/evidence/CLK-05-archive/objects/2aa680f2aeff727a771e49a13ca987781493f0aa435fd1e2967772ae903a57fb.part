@@ -1,0 +1,10 @@
+                            } else if (Util::SameString(diagnosticName, "ReportDuringWarmup")) {
+                                state.dataSysVars->ReportDuringWarmup = true;
+                            } else if (Util::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
+                                state.dataEnvrn->DisplayWeatherMissingDataWarnings = true;
+                            } else if (Util::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
+                                state.dataEnvrn->IgnoreSolarRadiation = true;
+                            } else if (Util::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
+                                state.dataEnvrn->IgnoreBeamRadiation = true;
+                            } else if (Util::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
+                                state.dataEnvrn->IgnoreDiffuseRadiation = true;

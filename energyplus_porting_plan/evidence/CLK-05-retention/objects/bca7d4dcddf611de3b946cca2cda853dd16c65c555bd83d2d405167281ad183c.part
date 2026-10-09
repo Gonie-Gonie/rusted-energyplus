@@ -1,0 +1,81 @@
+"""Repair a documented Windows stdin encoding error after authentic closure/retirement."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-05'
+
+
+def ref(path):
+    return {'path': path.relative_to(ROOT).as_posix(),
+            'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--retirement', type=Path, required=True)
+    parser.add_argument('--retirement-execution', type=Path, required=True)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args()
+    assert Path.cwd().resolve() == ROOT
+    out = args.output_dir.resolve()
+    assert out.is_relative_to(BASE) and out != BASE and not out.exists()
+    retirement_path = args.retirement.resolve(strict=True)
+    execution_path = args.retirement_execution.resolve(strict=True)
+    assert retirement_path.is_relative_to(BASE) and execution_path.is_relative_to(BASE)
+    retirement = json.loads(retirement_path.read_bytes())
+    receipt = json.loads(execution_path.read_bytes())
+    assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after'] is True
+    assert json.loads((ROOT / receipt['stdout']['path']).read_bytes()) == retirement
+    assert (ROOT / receipt['stderr']['path']).stat().st_size == 0
+    assert retirement['schema'] == 'clk05-single-target-native-helper-retirement.v1'
+    assert retirement['status'] == 'pass-precise-removal-and-retained-artifact-guards'
+    assert retirement['sole_exact_new_original_absent'] is True
+    assert retirement['canonical_files_or_gates_written'] is False
+    closure_path = BASE / 'closure-01/closure-result.json'
+    closure = json.loads(closure_path.read_bytes())
+    for binding in closure['after']:
+        assert ref(ROOT / binding['path']) == binding
+    card = ROOT / 'energyplus_porting_plan/cards/CLK-05.md'
+    old_notes = BASE / 'completion-approved-01/card-notes.md'
+    draft = BASE / 'completion-draft/card-notes.md'
+    assert ref(old_notes)['sha256'] == '0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23'
+    assert ref(draft)['sha256'] == '63f783f8747be10c341b890af0d743a370d7e21424d0807624b9effb66d21026'
+    old = old_notes.read_text(encoding='utf8')
+    before_bytes = card.read_bytes()
+    before_text = before_bytes.decode('utf8')
+    assert before_text.endswith(old) and old.count('?') == 282
+    extra = Path(__file__).with_name('additional-notes.md')
+    addition = extra.read_text(encoding='utf8')
+    assert '?' not in addition and sum(ord(c) > 127 for c in addition) > 100
+    replacement = draft.read_text(encoding='utf8') + addition
+    updated = before_text[:-len(old)] + replacement
+    assert updated.count('- [x] ') == before_text.count('- [x] ') == 4
+    out.mkdir()
+    (out / 'card.before.md').write_bytes(before_bytes)
+    (out / 'card.after.md').write_bytes(updated.encode('utf8'))
+    for source in [Path(__file__), extra]:
+        shutil.copyfile(source, out / source.name)
+    before = ref(card)
+    card.write_bytes(updated.encode('utf8'))
+    for binding in closure['after']:
+        if binding['path'] != card.relative_to(ROOT).as_posix():
+            assert ref(ROOT / binding['path']) == binding
+    result = {'schema': 'clk05-documentation-encoding-amendment.v1',
+              'before': before, 'after': ref(card), 'actual_prior_closure': ref(closure_path),
+              'actual_prior_retirement': ref(retirement_path),
+              'actual_prior_retirement_execution': ref(execution_path),
+              'only_card_explanatory_notes_changed': True, 'gates_or_science_changed': False,
+              'historical_notes_and_archives_rewritten': False,
+              'sources': [ref(out / source.name) for source in [Path(__file__), extra]],
+              'before_archive': ref(out / 'card.before.md'),
+              'after_archive': ref(out / 'card.after.md')}
+    (out / 'amendment.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps(result))
+
+
+if __name__ == '__main__':
+    main()
