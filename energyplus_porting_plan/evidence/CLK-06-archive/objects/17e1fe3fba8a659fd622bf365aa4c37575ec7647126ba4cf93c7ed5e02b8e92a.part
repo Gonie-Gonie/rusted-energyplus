@@ -1,0 +1,418 @@
+{
+  "schema": "clk06-comparer-projection.v1",
+  "created_utc": "2026-10-09T07:08:16.093468+00:00",
+  "source_review": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/review.json",
+    "sha256": "49a36bbc3b85947f869b251b6da03f916da9cd4ed13fde25ae3cbe3c95f9836d"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-command-02/receipt.json",
+    "sha256": "ae9a2c89c63d9925613436eceee020a73698c0cbd14af0fc6bf3ab0c2d5ffad2"
+  },
+  "source_manifest": {
+    "path": ".runtime/porting/CLK-06/comparer-prep-02/manifest.json",
+    "sha256": "062da3b85b74c5958ee8004213f458c4a7323f50245c67b6732631907ed136ca"
+  },
+  "comparer_sources": [
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a",
+      "size_bytes": 3407,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7",
+      "size_bytes": 10225,
+      "line_count": 171
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1",
+      "size_bytes": 15695,
+      "line_count": 209
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b",
+      "size_bytes": 14380,
+      "line_count": 193
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc",
+      "size_bytes": 23878,
+      "line_count": 288
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9",
+      "size_bytes": 8134,
+      "line_count": 115
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98",
+      "size_bytes": 8417,
+      "line_count": 105
+    },
+    {
+      "path": "tools/porting/geo03_provenance.py",
+      "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5",
+      "size_bytes": 38906,
+      "line_count": 635
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/0-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/1-numeric.py",
+        "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/2-state.py",
+        "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/3-history.py",
+        "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/4-metadata.py",
+        "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/5-freeze_projection.py",
+        "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/6-check_clk06.py",
+        "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/7-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "native_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "native_observation_policy": {
+    "full_weather_grid_fields": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "full_weather_grid_snapshots": [
+      "allocated_defaults",
+      "setup",
+      "prepared",
+      "before_caller_context",
+      "after_caller_context",
+      "GetNextEnvironment",
+      "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+      "final_state"
+    ],
+    "effective_boundary_flags": "incoming flags overwritten only by declared partial caller writes",
+    "all_operations_executed_independently_of_observation_selection": true,
+    "compact_operation_grid_contents": null,
+    "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected sky/cloud grid",
+    "selected_today_slot_fields": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "selected_today_slot_index": "actual allocated in-range HourOfDay/TimeStep, otherwise explicitly unavailable",
+    "all19_counts_full17_LastHour_NextHour_Missing_retained": true,
+    "selected_cloud_history_fields": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "selected_cloud_missed_and_out_of_range_count_fields": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "native_private_hourly_or_calcSky_ESky_locals_observed": false,
+    "default_model_metadata": [
+      "WP_Type1",
+      "skyTempModel",
+      "UseWeatherFileHorizontalIR"
+    ],
+    "default_model_must_be_actual_prepared_and_selected_not_forced": true,
+    "paired_native_current_globals": [],
+    "native_only_current_globals": [
+      "weather.HorizIRSky",
+      "environment.SkyTemp",
+      "environment.SkyTempKelvin",
+      "environment.TotalCloudCover",
+      "environment.OpaqueCloudCover"
+    ],
+    "current13_solar_night_SRC08_physics_paired": false
+  },
+  "source_selection": {
+    "direct_emissivity": [
+      "ESky"
+    ],
+    "direct_calcSky": [
+      "SkyTemp",
+      "HorizIRSky"
+    ],
+    "day_grids_and_selected_Today": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "cloud_history_and_counts": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "stored_arrays_at_DTO_ROOT": [
+      "Interpolation",
+      "SolarInterpolation"
+    ],
+    "private_ESky_hourly_locals_and_native_current_globals": "unavailable_or_unpaired_never_PASS"
+  },
+  "numeric_profiles": {
+    "ESky": {
+      "unit": "1",
+      "atol": 2e-15,
+      "rtol": 0.0
+    },
+    "SkyTemp": {
+      "unit": "degC",
+      "atol": 1e-12,
+      "rtol": 1e-15
+    },
+    "HorizIRSky": {
+      "unit": "W_per_m2",
+      "atol": 1e-12,
+      "rtol": 1e-15
+    },
+    "cloud_drivers": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "stored_interpolation_weights": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "owned_value_copies": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    }
+  },
+  "numeric_rows": [
+    {
+      "profile": "direct_emissivity",
+      "field": "ESky",
+      "unit": "1",
+      "atol": 2e-15,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "direct_calcSky_and_day_grid",
+      "field": "SkyTemp",
+      "unit": "degC",
+      "atol": 1e-12,
+      "rtol": 1e-15,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "direct_calcSky_and_day_grid",
+      "field": "HorizIRSky",
+      "unit": "W_per_m2",
+      "atol": 1e-12,
+      "rtol": 1e-15,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "cloud_driver_and_history",
+      "field": "TotalSkyCover",
+      "unit": "tenths",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "cloud_driver_and_history",
+      "field": "OpaqueSkyCover",
+      "unit": "tenths",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "actual_stored_weights",
+      "field": "Interpolation",
+      "unit": "1",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "actual_stored_weights",
+      "field": "SolarInterpolation",
+      "unit": "1",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "same_owner_transport_copy",
+      "field": "SkyTemp",
+      "unit": "degC",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "same_owner_transport_copy",
+      "field": "HorizIRSky",
+      "unit": "W_per_m2",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    }
+  ],
+  "numeric_criterion": "abs(actual-reference) <= atol + rtol*abs(reference)",
+  "array_path_mapping": {
+    "native_snapshot": "root",
+    "Rust_snapshot": "root",
+    "value_transform": false
+  },
+  "all_requested_operations_retained": true,
+  "mask_controls_invocation": false,
+  "required_direct_roles": {
+    "CalcSkyEmissivity": [
+      "actual_return.ESky"
+    ],
+    "calcSky": [
+      "formal_outputs_before.HorizIRSky",
+      "formal_outputs_before.SkyTemp",
+      "formal_outputs_after.HorizIRSky",
+      "formal_outputs_after.SkyTemp"
+    ]
+  },
+  "required_roles_apply_identically_to_legacy_and_candidate": true,
+  "required_one_sided_unavailability": "availability failure, zero numerical comparisons/PASS for missing operands",
+  "both_null": "explicit unavailable, zero comparisons/noPASS",
+  "native_current_sky_globals_paired": false,
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "production_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "unpaired": {
+    "native_current_globals": [
+      "weather.HorizIRSky",
+      "environment.SkyTemp",
+      "environment.SkyTempKelvin",
+      "environment.TotalCloudCover",
+      "environment.OpaqueCloudCover"
+    ],
+    "private_hourly_ESky_and_branch_locals": "unavailable",
+    "Rust_sky_Environment_registry": "unavailable",
+    "existing_Current13_and_solar_night_SRC08_physics": "context only, unpaired",
+    "production_transport_roles": "separate actual production observations required; unit probe cannot certify them"
+  },
+  "legacy_exit0": "authenticated factual comparison completed; real mismatches remain, no numerical PASS",
+  "candidate_exit0": "all required available comparisons satisfy frozen profiles with honest unavailable scope",
+  "frozen_before_next_Rust_comparison_operand_execution": true,
+  "original_or_Rust_output_payloads_read": false,
+  "scientific_execution_performed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

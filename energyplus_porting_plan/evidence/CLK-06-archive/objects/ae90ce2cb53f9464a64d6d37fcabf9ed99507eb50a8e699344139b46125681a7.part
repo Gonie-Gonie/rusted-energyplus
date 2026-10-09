@@ -1,0 +1,192 @@
+"""Root-only --apply: retire one exact successful new debug file using native PowerShell."""
+import argparse
+import copy
+import subprocess
+import sys
+from common import *
+from proofs import all_proofs, actual_closure, protected
+from write_plan import source_review, candidate
+
+
+def guards(plan):
+    registry = read(REGISTRY, REGISTRY_SHA)
+    kept = protected(registry, plan['proposed_successor_registry']['new_targets'][-1]['retained_derivative'])
+    require(kept == plan['protected_and_retained_observations'], 'Protected or retained observations differ')
+    for value in plan['evidence'].values():
+        bound(value)
+    actual_closure(plan['actual_card_closure']['closure']['path'],
+                   plan['actual_card_closure']['closure_execution']['path'], plan['evidence'])
+    unchanged()
+    return kept
+
+
+def ps_quote(value):
+    return "'" + str(value).replace("'", "''") + "'"
+
+
+def removal_script(target):
+    item = TARGETS[target]
+    exact = ROOT / item['historical_path']
+    products = ROOT / '.runtime/ep261-gcc13-o0/Products'
+    # Literal arguments below come only from the source-reviewed fixed TARGETS.
+    return "\n".join([
+        "$ErrorActionPreference = 'Stop'",
+        "$workspacePath = (Get-Location).Path",
+        "if ($workspacePath -ne " + ps_quote(ROOT) + ") { throw 'Exact repository cwd required' }",
+        "$productsPath = (Resolve-Path -LiteralPath " + ps_quote(products) + ").Path",
+        "$productsItem = Get-Item -LiteralPath $productsPath",
+        "if ($productsPath -ne " + ps_quote(products) + " -or ($productsItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Exact non-reparse Products directory required' }",
+        "$targetPath = (Resolve-Path -LiteralPath " + ps_quote(exact) + ").Path",
+        "$targetItem = Get-Item -LiteralPath $targetPath",
+        "if ($targetItem.PSIsContainer -or ($targetItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Regular non-reparse file required' }",
+        "if ([IO.Path]::GetDirectoryName($targetPath) -ne $productsPath -or $targetItem.Name -ne " + ps_quote(target + '.exe') + ") { throw 'Target outside exact Products file' }",
+        "if ($targetItem.Length -ne " + str(item['size_bytes']) + " -or (Get-FileHash -LiteralPath $targetPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne " + ps_quote(item['sha256']) + ") { throw 'Actual pre-action file identity differs' }",
+        "Remove-Item -LiteralPath $targetPath -Force",
+        "if (Test-Path -LiteralPath " + ps_quote(exact) + ") { throw 'Original still present' }",
+        "Write-Output " + ps_quote('Removed exact validated new ' + target + ' debug original; actual absence verified.'),
+        '',
+    ])
+
+
+def single_action(output, target, plan, registry):
+    original = TARGETS[target]
+    require(candidate(target) == plan['only_candidates'][target], 'Frozen precise target identity changed')
+    before = guards(plan)
+    script = output / ('remove-' + target + '.ps1')
+    with script.open('xb') as stream:
+        stream.write(removal_script(target).encode('utf8'))
+    argv = ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', str(script)]
+    started = now()
+    stdout = output / (target + '-stdout.log')
+    stderr = output / (target + '-stderr.log')
+    spawn_error = None
+    code = None
+    with stdout.open('xb') as out, stderr.open('xb') as err:
+        try:
+            completed = subprocess.run(argv, cwd=ROOT, stdout=out, stderr=err, check=False)
+            code = completed.returncode
+        except OSError as error:
+            spawn_error = str(error)
+            err.write(spawn_error.encode('utf8'))
+    finished = now()
+    exact = ROOT / original['historical_path']
+    original_absent = absent(original['historical_path'])
+    guard_failure = None
+    after = None
+    try:
+        after = guards(plan)
+        require(before == after, 'Protected before/after observations differ')
+    except Exception as error:
+        guard_failure = str(error)
+    success = type(code) is int and code == 0 and spawn_error is None and original_absent and guard_failure is None
+    receipt = {
+        'schema': 'native-new-target-removal-receipt.v1', 'target': target,
+        'action_started_utc': started, 'action_completed_utc': finished,
+        'historical_original': original, 'resolved_target': str(exact.resolve()),
+        'resolved_products_directory': str(exact.parent.resolve()),
+        'actual_native_command': argv, 'executed_script': ref(script), 'cwd': str(ROOT),
+        'actual_command_exit_code': code, 'spawn_error': spawn_error,
+        'stdout': ref(stdout), 'stderr': ref(stderr), 'actual_original_absence': original_absent,
+        'retained_derivative': next(row['retained_derivative'] for row in registry['new_targets'] if row['target'] == target),
+        'protected_before': before, 'protected_after': after, 'preservation_guard_failure': guard_failure,
+        'prior_metadata_bytes_unchanged': guard_failure is None, 'actual_retirement_accepted': success,
+        'realized_removed_bytes': original['size_bytes'] if success else 0,
+        'no_full_debug_copy_created': True, 'engines_or_scientific_comparers_executed': False,
+    }
+    binding = write(output, target + '-removal-receipt.json', receipt)
+    entry = next(row for row in registry['new_targets'] if row['target'] == target)
+    entry['removal_receipt'] = binding
+    entry['actual_removal_observed'] = original_absent
+    entry['status'] = 'retained-derivative-original-retired' if success else 'retirement-action-failed-or-unverified'
+    entry['unstripped_original'].update({
+        'disposition': 'removed-with-actual-absence-receipt' if success else 'see-actual-failed-action-receipt',
+        'full_debug_bytes_available': not original_absent,
+    })
+    state = write(output, target + '-registry-attempt.json', registry)
+    require(success, 'Actual precise retirement failed; preserved action receipt/registry: ' + state['path'])
+    return binding, receipt
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['plan', 'plan-execution', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + key, type=Path, required=True)
+    parser.add_argument('--apply', action='store_true', required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT and args.apply is True, 'Root explicit --apply and repository cwd required')
+    output = fresh_output(args.output_dir)
+    started = now()
+    reviewed = source_review(args.source_review, args.source_review_execution, started)
+    plan = read(args.plan)
+    command = recorded(args.plan_execution)
+    require(plan['schema'] == 'clk06-single-target-retention-removal-plan.v1'
+            and plan['status'] == 'pass-actual-closure-and-prerequisites-removal-not-performed'
+            and plan['registry_admission_performed'] is False and plan['deletion_or_move_performed'] is False,
+            'Actual accepted one-target metadata plan required')
+    require(exact(read(command['stdout']['path']), {'plan': ref(args.plan), 'status': plan['status'],
+            'targets': list(TARGETS), 'deletion_performed': False, 'registry_admission_performed': False}),
+            'Actual plan recorder stdout differs')
+    require(plan['source_review'] == reviewed and set(plan['only_candidates']) == set(TARGETS), 'Exact source-review/target plan required')
+    require(time_of(command['finished_utc']) <= time_of(started), 'Actual metadata plan must precede action')
+    for row in plan['executed_source_archives']:
+        archive = bound(row['archive'])
+        require(archive['sha256'] == ref(row['historical_path'])['sha256'], 'Plan/retirement source identity differs')
+    records, refs, retained = all_proofs(plan['authenticated_proof_bindings_archive']['path'],
+        plan['actual_card_closure']['closure']['path'], plan['actual_card_closure']['closure_execution']['path'])
+    require(refs == plan['evidence'], 'Actual science/independent QA prerequisites differ')
+    actual_closure(plan['actual_card_closure']['closure']['path'],
+                   plan['actual_card_closure']['closure_execution']['path'], refs)
+    registry = copy.deepcopy(plan['proposed_successor_registry'])
+    predecessor = read(REGISTRY, REGISTRY_SHA)
+    require(registry['predecessor'] == ref(REGISTRY, REGISTRY_SHA)
+            and registry['legacy_products'] == predecessor['legacy_products']
+            and registry['protected_core_API_and_container'] == predecessor['protected_core_API_and_container']
+            and registry['new_targets'][:5] == predecessor['new_targets']
+            and [row['target'] for row in registry['new_targets'][5:]] == list(TARGETS), 'Exact previous registry plus one new entry required')
+    require(registry['new_targets'][-1]['original_link'] == TARGETS['clk06_reference_helper']
+            and registry['new_targets'][-1]['retained_derivative'] == retained
+            and registry['new_targets'][-1]['evidence'] == refs, 'Exact new entry/proof binding differs')
+    guards(plan)
+    for target in TARGETS:
+        require(candidate(target) == plan['only_candidates'][target], 'Actual pre-admission target changed')
+    registry.update({'schema': 'native-retained-artifact-registry.v6', 'admitted_by_this_plan': False,
+                     'admitted_by_Root_after_actual_card_closure': True, 'admission_utc': now(),
+                     'admission_plan': ref(args.plan), 'actual_card_closure': plan['actual_card_closure']['closure']})
+    for entry in registry['new_targets'][5:]:
+        entry['schema'] = 'native-new-target-retention-entry.v1'
+        entry['status'] = 'admitted-live-original-pending-precise-retirement'
+    output.mkdir()
+    admitted = write(output, 'registry-admitted.json', registry)
+    removals = []
+    actual = []
+    for target in TARGETS:
+        binding, receipt = single_action(output, target, plan, registry)
+        removals.append(binding)
+        actual.append(receipt)
+    final_guards = guards(plan)
+    require(all(absent(row['historical_path']) for row in TARGETS.values()), 'The sole exact original must be absent without stub')
+    registry['predecessor'] = admitted
+    final = write(output, 'registry-retired.json', registry)
+    result = {
+        'schema': 'clk06-single-target-native-helper-retirement.v1', 'status': 'pass-precise-removal-and-retained-artifact-guards',
+        'started_utc': started, 'completed_utc': now(), 'actual_writer_command': list(sys.orig_argv), 'cwd': str(ROOT),
+        'retention_plan': ref(args.plan), 'retention_plan_execution': ref(args.plan_execution), 'source_review': reviewed,
+        'actual_card_closure': plan['actual_card_closure'],
+        'historical_native_exit_code': 0, 'historical_wrapper_exit_code': 0, 'metadata_recovery_performed': False,
+        'historical_failed_wrapper_relabelled_zero': False, 'actual_final_quality': plan['actual_final_quality'],
+        'actual_archive': plan['actual_archive'],
+        'admitted_registry': admitted, 'retired_registry': final,
+        'actual_removal_receipts': removals, 'sole_exact_new_original_absent': True,
+        'realized_removed_bytes': sum(row['realized_removed_bytes'] for row in actual),
+        'protected_and_retained_after': final_guards, 'prior_metadata_bytes_unchanged': True,
+        'historical_proofs_or_launchers_rewritten': False, 'full_debug_copy_created': False,
+        'canonical_files_or_gates_written': False, 'scientific_execution_repeated': False,
+        'discarded_debug_bytes_recoverable_from_hash_or_map': False, 'deterministic_relink_recovery_claimed': False,
+    }
+    unchanged()
+    write(output, 'retirement.json', result)
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

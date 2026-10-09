@@ -1,0 +1,12 @@
+    enum class SkyTempModel
+    {
+        Invalid = -1,
+        ClarkAllen,    // Use Clark & Allen model for sky emissivity calculation
+        ScheduleValue, // User entered Schedule value for Weather Property
+        DryBulbDelta,  // User entered DryBulb difference Schedule value for Weather Property
+        DewPointDelta, // User entered Dewpoint difference Schedule value for Weather Property
+        Brunt,         // Use Brunt model for sky emissivity calculation
+        Idso,          // Use Isdo model for sky emissivity calculation
+        BerdahlMartin, // Use Martin & Berdahl model for sky emissivity calculation
+        Num
+    };

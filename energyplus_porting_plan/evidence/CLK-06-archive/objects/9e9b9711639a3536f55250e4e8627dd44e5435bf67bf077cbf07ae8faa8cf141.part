@@ -1,0 +1,13 @@
+                    auto &tomorrow = state.dataWeather->wvarsHrTsTomorrow(CurTimeStep, hour);
+                    tomorrow.OutDryBulbTemp = DryBulb;
+                    tomorrow.OutDewPointTemp = DewPoint;
+                    tomorrow.OutBaroPress = AtmPress;
+                    tomorrow.OutRelHum = RelHum;
+                    RelHum *= 0.01;
+                    tomorrow.WindSpeed = WindSpeed;
+                    tomorrow.WindDir = WindDir;
+                    tomorrow.LiquidPrecip = LiquidPrecip;
+                    tomorrow.TotalSkyCover = TotalSkyCover;
+                    tomorrow.OpaqueSkyCover = OpaqueSkyCover;
+
+                    calcSky(state, tomorrow.HorizIRSky, tomorrow.SkyTemp, OpaqueSkyCover, DryBulb, DewPoint, RelHum, IRHoriz);

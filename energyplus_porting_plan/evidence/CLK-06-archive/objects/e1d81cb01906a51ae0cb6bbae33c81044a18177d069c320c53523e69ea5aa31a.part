@@ -1,0 +1,35 @@
+    void calcSky(EnergyPlusData &state,
+                 Real64 &HorizIRSky,
+                 Real64 &SkyTemp,
+                 Real64 OpaqueSkyCover,
+                 Real64 DryBulb,
+                 Real64 DewPoint,
+                 Real64 RelHum,
+                 Real64 IRHoriz)
+    {
+        if (IRHoriz <= 0.0) {
+            IRHoriz = 9999.0;
+        }
+
+        auto const &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
+        if (!envCurr.UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
+            Real64 ESky = CalcSkyEmissivity(state, envCurr.skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+            HorizIRSky = ESky * Constant::StefanBoltzmann * pow_4(DryBulb + Constant::Kelvin);
+            if (envCurr.skyTempModel == SkyTempModel::Brunt || envCurr.skyTempModel == SkyTempModel::Idso ||
+                envCurr.skyTempModel == SkyTempModel::BerdahlMartin || envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
+                SkyTemp = (DryBulb + Constant::Kelvin) * root_4(ESky) - Constant::Kelvin;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
+        } else {
+            // Valid IR from weather files
+            HorizIRSky = IRHoriz;
+            if (envCurr.skyTempModel == SkyTempModel::Brunt || envCurr.skyTempModel == SkyTempModel::Idso ||
+                envCurr.skyTempModel == SkyTempModel::BerdahlMartin || envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
+                SkyTemp = root_4(IRHoriz / Constant::StefanBoltzmann) - Constant::Kelvin;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
+        }
+    }

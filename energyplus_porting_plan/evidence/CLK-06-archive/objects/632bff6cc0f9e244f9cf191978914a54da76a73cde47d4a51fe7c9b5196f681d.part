@@ -1,0 +1,79 @@
+"""Input-only freeze of a reviewed production reader before all six CLI calls."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+UNIT = ROOT / '.runtime/porting/CLK-05/comparer-prep-01'
+COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+PROOFS_SHA = '6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424'
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module); return module
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for flag in ['native-admission-contract', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + flag, type=Path, required=True)
+    args = parser.parse_args(); started = datetime.now(timezone.utc).isoformat()
+    for path, digest in [(UNIT / 'common.py', COMMON_SHA), (HERE / 'proofs.py', PROOFS_SHA)]:
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            raise ValueError('Authenticated metadata source differs before import')
+    m = load('common', UNIT / 'common.py'); p = load('clk05_production_proofs', HERE / 'proofs.py')
+    checked = m.v.Bindings(); m.require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    review_ref, execution_ref = m.ref(args.source_review), m.ref(args.source_review_execution)
+    review, reviewed, finish = p.source_review(review_ref, execution_ref, checked)
+    admission_ref = m.ref(args.native_admission_contract); admission = m.read(checked.check(admission_ref))
+    m.require(admission['schema'] == 'clk05-native-admission-contract.v1'
+        and admission['frozen_before_numerical_execution'] is True, 'Frozen native admission required')
+    m.binding(review['reviewed_native_admission_contract'], admission_ref, checked)
+    projection = m.read(checked.check(admission['projection'])); request = m.read(checked.check(admission['helper_request']))
+    tolerances = m.read(checked.check(admission['contracts']['tolerances']))
+    checked.recursive([admission['contracts'], admission['all_45_guard_refs'], admission['fixed_scope']])
+    m.require(projection['schema'] == 'clk05-observation-projection.v1'
+        and request['schema'] == 'clk05-helper-cases.v1' and tolerances['schema'] == 'clk05-tolerances-contract.v1'
+        and m.exact(projection['native_observation_policy'], request['observation_policy'])
+        and m.exact(projection['contracts'], admission['contracts']), 'Unchanged native six-packet policy required')
+    m.binding(projection['helper_request'], admission['helper_request'], checked)
+    supplemental = p.schedule_routing(admission, checked)
+    out = args.output_dir.resolve(); base = ROOT / '.runtime/porting/CLK-05'
+    m.require(out.is_relative_to(base) and out != base and not out.exists(), 'Fresh ignored projection output required')
+    m.require(finish <= m.timestamp(started), 'Actual source review must precede this freeze')
+    checked.unchanged(); out.mkdir(); archived = []
+    for index, path in enumerate(p.sources()):
+        copy = out / (str(index).zfill(2) + '-' + path.name); shutil.copyfile(path, copy)
+        m.require(copy.read_bytes() == path.read_bytes(), 'Frozen production comparer source archive differs')
+        archived.append({'historical_path': path.relative_to(ROOT).as_posix(), 'archive': m.ref(copy)})
+    value = {'schema': 'clk05-production-comparer-projection.v1',
+        'created_utc': datetime.now(timezone.utc).isoformat(), 'native_admission_contract': admission_ref,
+        'native_request': admission['helper_request'], 'native_observation_projection': admission['projection'],
+        'contracts': admission['contracts'], 'fixed_scope': admission['fixed_scope'],
+        'all_45_guard_refs': admission['all_45_guard_refs'], 'selection': p.selection(projection, tolerances),
+        'supplemental_day_of_year_schedule': supplemental,
+        'preserved_production_failure': p.PRESERVED_FAILURE,
+        'source_review': review_ref, 'source_review_execution': execution_ref,
+        'reviewed_source_archives': review['reviewed_sources'], 'reader_source_archives': archived,
+        'reader_sources': [m.ref(path) for path in p.sources()],
+        'frozen_before_all_six_Rust_production_calls': True, 'native_results_read_by_freezer': False,
+        'scientific_execution_performed': False, 'numeric_policy_changed': False,
+        'unavailable_counted_as_PASS': False, 'gates_updated': False}
+    path = out / 'projection.json'
+    with path.open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False); stream.write('\n')
+    checked.unchanged()
+    print(json.dumps({'production_comparison_projection': m.ref(path), 'input_only_source_selection_freeze': True,
+        'scientific_execution_performed': False, 'gates_updated': False}))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,183 @@
+--- .runtime/porting/CLK-05/comparer-prep-01/history.py
++++ .runtime/porting/CLK-06/comparer-prep-02/history.py
+@@ -1,10 +1,7 @@
+ """Ordered genuine calls and observed within-owner copies, never expected physics."""
+ from collections import Counter
+ from numeric import require, exact
+-from state import snapshot, continuity, ALL_WEATHER, SOLAR, GRID
+-
+-COUNTS = {'setup_cases': 3, 'weather_sequences': 36, 'GetNextEnvironment': 36,
+-    'InitializeWeather': 550, 'weather_operations': 586, 'total_operations': 589}
++from state import snapshot, continuity, shape, ALL_WEATHER, SKY, GRID
+ 
+ 
+ def outcome(row, native):
+@@ -12,14 +9,18 @@
+     value = row['call_outcome']; require(type(invoked) is bool and type(value) is dict, 'Actual typed invocation/outcome required')
+     status = value['status']
+     skipped = 'not-invoked-after-prior-source-outcome' if native else 'not-invoked-after-prior-Rust-outcome'
+-    require(status in ['source_returned', 'source_fatal', skipped] + ([] if native else ['rust_admission_error']),
++    absent = status == 'unavailable-public-Rust-API'
++    require(status in ['source_returned', 'source_fatal', skipped] + ([] if native else ['rust_admission_error','unavailable-public-Rust-API']),
+         'Observed status outside real native/Rust call domain')
+-    require(invoked is (status != skipped) and value['source_fatal'] is
+-        (None if status == skipped else status == 'source_fatal'), 'Actual invocation/fatal availability differs')
++    require(invoked is (status != skipped and not absent) and value['source_fatal'] is
++        (None if status == skipped or absent else status == 'source_fatal'), 'Actual invocation/fatal availability differs')
++    if absent:
++        require(not native and row['kind'] in ['CalcSkyEmissivity','calcSky']
++            and value['counted_as_PASS'] is False, 'Only explicitly missing direct APIs may be unavailable')
+     if status == 'source_fatal':
+         text = value['exception_message' if native else 'actual_rust_error']
+         require(type(text) is str and bool(text), 'Actual source-fatal error availability required; text parity is unclaimed')
+-    return invoked, ('not_invoked' if not invoked else status)
++    return invoked, ('unavailable' if absent else 'not_invoked' if not invoked else status)
+ 
+ 
+ def full(row, declared):
+@@ -47,17 +48,17 @@
+             and exact(row['requested_operation'], declared), 'Complete actual call identity/input/order differs')
+     a, b = outcome(actual, False), outcome(native, True)
+     if not a[0] or not b[0]:
+-        check.availability(a if a[0] else None, b if b[0] else None, label + '/actual_call', False)
++        check.availability(a if a[0] else None, b if b[0] else None, label + '/actual_call')
+     else:
+         check.discrete(list(a), list(b), label + '/actual_outcome')
+     boundary = full(native, declared)
+-    require(full(actual, declared) is boundary and native['full_solar_grid_observation_declared'] is boundary
+-        and actual['full_solar_grid_observation_declared'] is boundary, 'Pre-output full/compact selection changed')
++    require(full(actual, declared) is boundary and native['full_sky_grid_observation_declared'] is boundary
++        and actual['full_sky_grid_observation_declared'] is boundary, 'Pre-output full/compact selection changed')
+     for phase in ['before_caller', 'before', 'after']:
+         snapshot(check, actual[phase], native[phase], label + '/' + phase, boundary, mode)
+     for lane, row in [('Rust', actual), ('original', native)]:
+         invoked = row['actual_rust_invoked' if lane == 'Rust' else 'actual_source_invoked']
+-        if invoked:
++        if invoked or row['call_outcome']['status'] == 'unavailable-public-Rust-API':
+             caller_transport(check, row, declared, lane + '/' + label)
+         if row['call_outcome']['status'] != 'source_returned':
+             continue
+@@ -66,26 +67,47 @@
+             if before['global']['BeginDayFlag'] and not before['global']['BeginEnvrnFlag']:
+                 check.exact_value(after['today_variables'], before['tomorrow_variables'], lane + '/' + label + '/daily_full11_copy')
+                 for field in GRID + ['slots']:
+-                    check.exact_value(after['today_values'][field], before['tomorrow_values'][field], lane + '/' + label + '/solar2_grid_copy/' + field)
++                    check.exact_value(after['today_values'][field], before['tomorrow_values'][field], lane + '/' + label + '/sky4_grid_copy/' + field)
+             elif before['global']['BeginDayFlag'] and before['global']['BeginEnvrnFlag']:
+                 check.excluded(lane + '/' + label + '/interior_first_read_handoff', 'Whole Initialize does not expose post-first-read/pre-handoff operand')
+             for field in ALL_WEATHER:
+-                if field not in SOLAR + ['LiquidPrecip']:
++                if field not in ['BeamSolarRad','DifSolarRad','LiquidPrecip']:
+                     check.exact_value(after['next_hour'][field], before['next_hour'][field], lane + '/' + label + '/next_hour_retained/' + field)
+     for key in ['returned_bool', 'Available', 'ErrorsFound', 'print_environment_stamp_before', 'print_environment_stamp_after']:
+         if key in native:
+             require(key in actual, 'Actual real call result field absent: ' + key)
+             check.discrete(actual[key], native[key], label + '/' + key, key != 'returned_bool')
++    if declared['kind'] == 'calcSky':
++        for phase in ['before','after']:
++            n = native.get('formal_outputs_' + phase)
++            r = actual.get('formal_outputs_' + phase)
++            if check.availability(r,n,label + '/formal_outputs_' + phase):
++                require(set(n) == set(r) == {'SkyTemp','HorizIRSky'}, 'Exactly two actual formal outputs required')
++                for field in ['SkyTemp','HorizIRSky']:
++                    if phase == 'before':
++                        check.literal(r[field],n[field],label + '/formal_outputs_before/' + field)
++                    else:
++                        check.numeric(r[field],n[field],label + '/formal_outputs_after/' + field,field)
+     return a, b
+ 
+ 
+ def compare(check, native, rust, request, mode):
+-    require(native['schema'] == 'clk05-helper-results.v1' and rust['schema'] ==
+-        ('clk05-existing-probe-results.v1' if mode == 'legacy' else 'clk05-candidate-probe-results.v1'), 'Actual observer schemas differ')
++    require(native['schema'] == 'clk06-helper-results.v1' and rust['schema'] ==
++        ('clk06-existing-probe-results.v1' if mode == 'legacy' else 'clk06-candidate-probe-results.v1'), 'Actual observer schemas differ')
+     native_counts = native['requested_counts']
+     counts, native_calls, actual_calls = Counter(), Counter(), Counter()
+     native_status, actual_status = Counter(), Counter()
+     invocations = {'native': 0, 'Rust': 0}; skips = {'native': 0, 'Rust': 0}
++    unavailable = {'native': 0, 'Rust': 0}
++    def observe(lane, row, result, kind, calls, statuses):
++        status = row['call_outcome']['status']; statuses[status] += 1
++        invocations[lane] += int(result[0])
++        if result[0]:
++            calls[kind] += 1
++        elif result[1] == 'unavailable':
++            unavailable[lane] += 1
++        else:
++            skips[lane] += 1
+     require(type(native['setup_cases']) is list and type(rust['setup_cases']) is list
+         and len(native['setup_cases']) == len(rust['setup_cases']) == len(request['setup_cases']), 'All3 actual Setup calls required')
+     for index, (n, r, declared) in enumerate(zip(native['setup_cases'], rust['setup_cases'], request['setup_cases'], strict=True)):
+@@ -97,12 +119,31 @@
+         check.discrete(list(a), list(b), label + '/outcome')
+         for phase in ['before', 'after']:
+             snapshot(check, r[phase], n[phase], label + '/' + phase, True, mode, False)
+-        for lane, result, ledger, statuses in [('native', b, native_calls, native_status), ('Rust', a, actual_calls, actual_status)]:
+-            invocations[lane] += int(result[0]); skips[lane] += int(not result[0]); statuses[result[1]] += 1
+-            if result[0]: ledger['SetupInterpolationValues'] += 1
++        observe('native', n, b, 'SetupInterpolationValues', native_calls, native_status)
++        observe('Rust', r, a, 'SetupInterpolationValues', actual_calls, actual_status)
+         counts['setup_cases'] += 1; counts['total_operations'] += 1
++    require(len(native['emissivity_cases']) == len(rust['emissivity_cases']) == len(request['emissivity_cases']),
++            'Every ordered direct emissivity input retained')
++    for n,r,declared in zip(native['emissivity_cases'],rust['emissivity_cases'],request['emissivity_cases'],strict=True):
++        label = 'emissivity/' + declared['id']
++        for row,lane in [(n,'native'),(r,mode)]:
++            require(row['id'] == declared['id'] and row['kind'] == 'CalcSkyEmissivity'
++                and exact(row['requested_operation'],declared), 'Exact actual direct emissivity identity required')
++            for phase in ['before','after']:
++                shape(row[phase],True,label + '/' + lane + '/' + phase,lane)
++        a,b = outcome(r,False),outcome(n,True)
++        if a[1] == 'unavailable':
++            require(r['actual_return'] is None and r['actual_return_available'] is False, 'Unavailable API cannot fabricate return')
++        if not a[0] or not b[0]:
++            check.availability(a if a[0] else None,b if b[0] else None,label + '/actual_call')
++        if a[0] and b[0]:
++            check.discrete(list(a),list(b),label + '/outcome')
++        check.numeric(r['actual_return'],n['actual_return'],label + '/actual_return','ESky')
++        observe('native', n, b, 'CalcSkyEmissivity', native_calls, native_status)
++        observe('Rust', r, a, 'CalcSkyEmissivity', actual_calls, actual_status)
++        counts['emissivity_cases'] += 1;counts['CalcSkyEmissivity'] += 1;counts['total_operations'] += 1
+     require(type(native['weather_sequences']) is list and type(rust['weather_sequences']) is list
+-        and len(native['weather_sequences']) == len(rust['weather_sequences']) == len(request['weather_sequences']), 'All36 ordered weather sequences required')
++        and len(native['weather_sequences']) == len(rust['weather_sequences']) == len(request['weather_sequences']), 'All ordered weather sequences required')
+     for n, r, declared in zip(native['weather_sequences'], rust['weather_sequences'], request['weather_sequences'], strict=True):
+         label = declared['id']; counts['weather_sequences'] += 1
+         for row in [n, r]:
+@@ -122,9 +163,8 @@
+             continuity(check, previous_n, n_op['before_caller'], 'original/' + op_label + '/adjacent')
+             continuity(check, previous_r, r_op['before_caller'], 'Rust/' + op_label + '/adjacent')
+             a, b = operation(check, r_op, n_op, op, op_label, mode)
+-            for lane, result, ledger, statuses in [('native', b, native_calls, native_status), ('Rust', a, actual_calls, actual_status)]:
+-                invocations[lane] += int(result[0]); skips[lane] += int(not result[0]); statuses[result[1]] += 1
+-                if result[0]: ledger[op['kind']] += 1
++            observe('native', n_op, b, op['kind'], native_calls, native_status)
++            observe('Rust', r_op, a, op['kind'], actual_calls, actual_status)
+             counts[op['kind']] += 1; counts['weather_operations'] += 1; counts['total_operations'] += 1
+             previous_n, previous_r = n_op['after'], r_op['after']
+         continuity(check, previous_n, n['final_state'], 'original/' + label + '/final')
+@@ -132,12 +172,22 @@
+         snapshot(check, r['final_state'], n['final_state'], label + '/final_state', True, mode)
+         for root_phase in ['constructor', 'after_constant_initialization', 'preparation_calls']:
+             check.excluded(label + '/' + root_phase, 'Whole native Factory/constant/eight-call preparation is not the public Rust constructor phase')
+-    require(exact(dict(counts), COUNTS) and exact(native_counts, COUNTS) and exact(request['requested_counts'], COUNTS), 'Computed literal requested cardinality differs')
++    for key in request['requested_counts']:
++        counts.setdefault(key,0)
++    require(exact(dict(counts), native_counts) and exact(native_counts, request['requested_counts']), 'Computed literal requested cardinality differs')
+     check.discrete(rust['requested_counts'], native_counts, 'root/requested_counts')
+     require(native['actual_operation_invocations'] == invocations['native'] and native['actual_operations_skipped'] == skips['native']
+         and exact(native['actual_source_function_counts'], dict(native_calls))
+         and exact(native['actual_source_status_counts'], dict(native_status)), 'Real native ledger differs from actual call rows')
++    require(exact(rust['actual_rust_function_counts'], dict(actual_calls))
++        and exact(rust['actual_rust_status_counts'], dict(actual_status))
++        and rust['actual_rust_unavailable_direct_API_operations'] == unavailable['Rust']
++        and rust['actual_rust_not_invoked_after_prior_outcome'] == skips['Rust'],
++        'Disjoint actual Rust invocation/unavailable/stopped ledger differs')
++    require(sum(invocations.values()) + sum(skips.values()) + sum(unavailable.values()) == 2 * counts['total_operations'],
++        'Every actual row must have one disjoint invocation status')
+     return {'requested_counts': dict(counts), 'actual_invocations': invocations, 'actual_skips': skips,
++        'actual_unavailable_direct_API_operations': unavailable,
+         'actual_native_function_counts': dict(native_calls), 'actual_Rust_API_counts': dict(actual_calls),
+         'actual_native_status_counts': dict(native_status), 'actual_Rust_status_counts': dict(actual_status),
+         'exception_text_parity_claimed': False, 'private_hourly_or_transient_weight_operands_reconstructed': False}

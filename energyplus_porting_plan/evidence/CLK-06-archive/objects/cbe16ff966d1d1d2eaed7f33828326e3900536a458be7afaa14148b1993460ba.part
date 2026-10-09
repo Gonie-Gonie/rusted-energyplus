@@ -1,0 +1,346 @@
+"""Authenticate a completed unit comparison without importing numerical readers.
+
+Only factual result ledgers and provenance are inspected. No engine, oracle,
+weather operand recomputation or independent certification of own formulas.
+"""
+import argparse
+from collections import Counter
+import hashlib
+import importlib.util
+import math
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OWNED = ROOT/'.runtime/porting/CLK-05/gate-review-prep-01/metadata.py'
+GEO = ROOT/'tools/porting/geo03_provenance.py'
+
+
+def module(name, source, digest):
+    if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+        raise ValueError('Metadata-only dependency differs before import')
+    spec = importlib.util.spec_from_file_location(name,source)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    return value
+
+
+m = module('clk06_owned_metadata',OWNED,'196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d')
+v = module('clk06_retained_metadata',GEO,'5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5')
+DECISION = {'path':'.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+    'sha256':'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+FIELDS = {'ESky','SkyTemp','HorizIRSky','TotalSkyCover','OpaqueSkyCover','Interpolation','SolarInterpolation'}
+EXACT_FIELDS = {'TotalSkyCover','OpaqueSkyCover','Interpolation','SolarInterpolation'}
+
+
+def requested(request):
+    direct=len(request['emissivity_cases'])
+    counts={'setup_cases':len(request['setup_cases']),'emissivity_cases':direct,
+        'weather_sequences':len(request['weather_sequences']),'CalcSkyEmissivity':direct,
+        **{kind:0 for kind in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky']},
+        'weather_operations':0,'total_operations':len(request['setup_cases'])+direct}
+    for sequence in request['weather_sequences']:
+        for operation in sequence['operations']:
+            m.need(operation['kind'] in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky'],
+                   'Unadmitted operation kind')
+            for key in [operation['kind'],'weather_operations','total_operations']: counts[key]+=1
+    m.need(m.exact(counts,request['requested_counts']),'Frozen actual input cardinality differs')
+    return counts
+
+
+def identity(actual,expected):
+    m.check(actual); m.check(expected)
+    m.need(v.same_binding(actual,expected),'Actual contained file/hash identity differs')
+
+
+def fact_binding(actual,expected):
+    # These exact path/hash operands were authenticated by actual DataQC0; no large binary/result rehash.
+    m.need(type(actual) is dict and type(expected) is dict and type(actual.get('sha256')) is str
+        and len(actual['sha256'])==64 and all(c in '0123456789abcdef' for c in actual['sha256'])
+        and v.same_binding(actual,expected),'DataQC-reviewed exact binding identity differs')
+
+
+def script(record,archive,reported=None):
+    command = record['command']; admitted = {'python','python.exe','python3','python3.exe','python3.12','python3.12.exe'}
+    m.need(len(command)>=2 and Path(command[0]).name.lower() in admitted,'Admitted Python interpreter required')
+    index,seen = 1,set()
+    while index<len(command) and command[index] in ['-X','-B']:
+        option=command[index]; m.need(option not in seen,'Repeated Python option'); seen.add(option); index+=1
+        if option=='-X': m.need(index<len(command) and command[index]=='utf8','Only UTF8 mode admitted'); index+=1
+    m.need(index<len(command) and command[index].endswith('.py') and not command[index].startswith('-')
+           and m.path(command[index]).read_bytes()==m.check(archive).read_bytes(),'Actual script/archive differs')
+    if reported is None: return None
+    m.need(type(reported) is list and len(reported)>=2 and all(type(x) is str for x in reported)
+           and Path(reported[0]).name.lower() in admitted and m.exact(command[1:],reported[1:]),'Reported interpreter/argv tail differs')
+    parent=record['python']['executable']; absolute=Path(reported[0]).is_absolute()
+    m.need(type(parent) is str and Path(parent).is_absolute(),'Recorded parent interpreter path required')
+    if absolute: m.need(Path(reported[0]).resolve()==Path(parent).resolve(),'Absolute reported interpreter differs')
+    else: m.need(reported[0]==command[0]==Path(reported[0]).name,'Reported alias must equal actual recorded alias')
+    return {'reported_argv_zero':reported[0],'recorded_parent_python_executable':parent,
+        'child_executable_path':reported[0] if absolute else None,'child_executable_path_available':absolute,
+        'parent_executable_is_proof_of_child_alias_resolution':False,'unavailable_child_path_counted_as_PASS':False}
+
+
+def argument(record,name,binding):
+    command=record['command']; m.need(command.count(name)==1,'Unique actual argument required: '+name)
+    index=command.index(name); m.need(index+1<len(command),'Argument value absent')
+    m.need(m.path(command[index+1])==m.check(binding),'Actual argument identity differs: '+name)
+
+
+def source_rows(rows):
+    m.need(type(rows) is list and len(rows)==len({row['historical_path'] for row in rows}),'Unique source archives required')
+    result={row['historical_path']:row['archive'] for row in rows}
+    for binding in result.values(): m.check(binding)
+    return result
+
+
+def observer_inputs(evidence,available,admission,counts,run_started,started):
+    wrapper=m.read(evidence['observer_request']); projection=m.read(evidence['observer_projection'])
+    qa=m.actual_review(evidence['observer_source_review'],evidence['observer_source_review_execution'],
+        'clk06-independent-candidate-observer-source-review.v1','pass-input-only-candidate-observer-and-projection-before-execution',started)
+    qa_command=m.read(evidence['observer_source_review_execution']); script(qa_command,qa['executed_reader_source_archive'])
+    m.need(wrapper['schema']=='clk06-candidate-observer-request.v1' and projection['schema']=='clk06-candidate-observer-projection.v1'
+        and wrapper['frozen_before_Rust_candidate_numerical_execution'] is True
+        and all(wrapper[key] is False for key in ['expected_values_supplied','native_results_supplied','Rust_outputs_supplied_as_inputs',
+            'scientific_execution_performed','gates_updated']) and projection['unavailable_counted_as_PASS'] is False,
+        'Actual input-only candidate wrapper/projection required')
+    identity(projection['observer_request'],evidence['observer_request']); identity(wrapper['independent_source_review'],evidence['observer_source_review'])
+    identity(wrapper['native_request'],admission['helper_request']); identity(wrapper['native_observation_projection'],admission['projection'])
+    m.need(m.exact(wrapper['contracts'],admission['contracts']) and m.exact(wrapper['requested_counts'],counts)
+        and m.exact(projection['native_observation_policy'],wrapper['native_observation_policy']),'Observer cannot alter frozen native policy')
+    for value in [wrapper,projection,qa]: identity(value['root_preoutput_decision'],DECISION)
+    identity(wrapper['native_admission_contract'],evidence['Native_admission_contract'])
+    rows=wrapper['observer_sources']+wrapper['actual_public_API_sources']+wrapper['actual_promoted_observer_sources']
+    reviewed=source_rows(qa['reviewed_sources'])
+    m.need(len(rows)==len(reviewed) and len(rows)==len({row['path'] for row in rows})
+        and set(reviewed)=={row['path'] for row in rows},'Actual reviewed observer/API inventory differs')
+    for row in rows:
+        m.need(row['sha256']==reviewed[row['path']]['sha256'],'Reviewed observer bytes differ')
+        owner=row['path']
+        if '/candidate-observer-prep-' in owner and owner.endswith('.rs'):
+            name=Path(owner).name; owner='crates/ep_runtime/examples/'+(name if name=='clk06_candidate_probe.rs' else 'clk06_candidate_support/'+name)
+        if owner.startswith('crates/'): m.need(owner in available and available[owner]['sha256']==row['sha256'],'Actual compiled observer/API differs')
+    emitted=m.recorded(evidence['observer_input_execution'],{'observer_request':evidence['observer_request'],
+        'projection':evidence['observer_projection'],'native_request_unchanged':True,'all_bound_inputs_unchanged':True,
+        'input_only_emission':True,'scientific_execution_performed':False,'gates_updated':False},started)
+    writers=[row for row in rows if row['path'].endswith('/write_observer_inputs.py')]
+    m.need(len(writers)==1,'Unique actual input emitter required'); script(emitted,writers[0])
+    m.need(m.instant(qa_command['finished_utc'])<=m.instant(emitted['started_utc'])<=m.instant(wrapper['created_utc'])
+        ==m.instant(projection['created_utc'])<=m.instant(emitted['finished_utc'])<=m.instant(run_started),'Source review/emission/candidate chronology differs')
+    gap=m.read(evidence['existing_baseline_gap']); gap_command=m.recorded(evidence['existing_baseline_gap_execution'],gap,started)
+    m.need(gap['schema']=='clk06-existing-baseline-gap.v1'
+        and gap['status']=='observed-authenticated-existing-sky-differences-and-unavailable-source-scope' and gap['numerical_PASS_claimed'] is False
+        and gap['unavailable_counted_as_PASS'] is False and m.instant(gap_command['finished_utc'])<=m.instant(run_started),
+        'Actual preserved baseline completion must precede candidate, without numerical PASS')
+    for key in ['Original_reference','Original_data_review','Native_request','Native_admission_contract','Native_projection']:
+        identity(gap['reviewed_evidence'][key],evidence[key])
+
+
+def metrics(report,counts):
+    comparison=report['comparison']; ledger=report['actual_call_ledger']; total=counts['total_operations']
+    functions={'SetupInterpolationValues':counts['setup_cases'],**{key:counts[key] for key in
+        ['CalcSkyEmissivity','GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky']}}
+    m.need(m.exact(ledger['requested_counts'],counts)
+        and m.exact(ledger['actual_invocations'],{'native':total,'Rust':total})
+        and m.exact(ledger['actual_skips'],{'native':0,'Rust':0})
+        and m.exact(ledger['actual_unavailable_direct_API_operations'],{'native':0,'Rust':0})
+        and m.exact(ledger['actual_native_function_counts'],functions)
+        and m.exact(ledger['actual_Rust_API_counts'],functions)
+        and m.exact(ledger['actual_native_status_counts'],{'source_returned':total})
+        and m.exact(ledger['actual_Rust_status_counts'],{'source_returned':total}),
+        'All dynamically declared histories/direct APIs must actually return without skip')
+    integers=['numeric_comparison_count','literal_binary64_comparison_count','metadata_comparison_count','comparison_count','mismatch_count']
+    m.need(all(type(comparison[key]) is int and comparison[key]>=0 for key in integers)
+        and comparison['comparison_count']==sum(comparison[key] for key in integers[:3])
+        and all(comparison[key]>0 for key in integers[:4]) and comparison['mismatch_count']==0
+        and comparison['mismatches']==[] and comparison['mismatch_payloads_truncated'] is False
+        and comparison['mismatch_payload_limit']==1000
+        and all(type(comparison[key]) is int and comparison[key]==0 for key in
+            ['availability_failures','numeric_mismatches','literal_binary64_mismatches','metadata_mismatches']),
+        'Actual positive typed comparison ledger and all zero failure categories required')
+    rows=comparison['field_error_metrics']; categories=comparison['categories']
+    m.need(type(rows) is dict and set(rows)==FIELDS and type(categories) is dict
+        and set(categories)==FIELDS|{'typed_metadata','literal_binary64'}
+        and all(type(value) is int and value>=0 for value in categories.values()),'Seven actual metric categories required')
+    for field,row in rows.items():
+        m.need(set(row)=={'comparison_count','mismatch_count','maximum_absolute_error','RMSE'}
+            and type(row['comparison_count']) is int and row['comparison_count']>0
+            and type(row['mismatch_count']) is int and row['mismatch_count']==0
+            and all(type(row[key]) is float and math.isfinite(row[key]) and row[key]>=0.0 for key in ['maximum_absolute_error','RMSE'])
+            and row['RMSE']<=row['maximum_absolute_error'] and categories[field]==row['comparison_count'],
+            'Finite positive factual field metric differs: '+field)
+        if field in EXACT_FIELDS:
+            m.need(row['maximum_absolute_error']==row['RMSE']==0.0,'Frozen bit-exact field metric differs')
+        if field=='ESky':
+            m.need(row['maximum_absolute_error']<=2e-15,'Frozen zero-relative-tolerance emissivity bound differs')
+    m.need(sum(row['comparison_count'] for row in rows.values())==comparison['numeric_comparison_count']
+        and categories['typed_metadata']==comparison['metadata_comparison_count']
+        and categories['literal_binary64']==comparison['literal_binary64_comparison_count']
+        and sum(categories.values())==comparison['comparison_count'],'Actual category sums differ')
+    unavailable=comparison['unavailable_paths']; groups=Counter(); required_both_null=0
+    m.need(type(unavailable) is list and comparison['unavailable_counted_as_PASS'] is False,'Unavailable is never PASS')
+    for row in unavailable:
+        m.need(type(row) is dict and type(row['location']) is str and type(row['reason']) is str
+            and all(type(row[key]) is bool for key in ['actual_available','original_available','required'])
+            and row['counted_as_PASS'] is False,'Typed honest unavailable scope required')
+        if row['required']:
+            m.need(row['actual_available'] is row['original_available'] is False,'One-sided required absence cannot PASS')
+            required_both_null+=1
+        groups[row['reason']]+=1
+    return {'actual_call_ledger':ledger,'comparison_counts':{key:comparison[key] for key in integers},
+        'field_error_metrics':rows,'categories':categories,'unavailable_entry_count':len(unavailable),
+        'required_both_null_unavailable_count':required_both_null,'unavailable_reason_counts':dict(groups),
+        'unavailable_arrays_copied_into_this_report':False,
+        'relative_tolerance_metrics_recomputed':False}
+
+
+def main():
+    parser=argparse.ArgumentParser()
+    for key in ['report','comparison-execution','output-dir']: parser.add_argument('--'+key,type=Path,required=True)
+    args=parser.parse_args(); started=m.utc(); verifier=m.ref(Path(__file__)); out=m.path(args.output_dir); base=ROOT/'.runtime/porting/CLK-06'
+    m.need(out.is_relative_to(base) and out!=base and not out.exists(),'Fresh ignored result-review directory required')
+    report_ref,execution_ref=m.ref(args.report),m.ref(args.comparison_execution)
+    report=m.read(report_ref); record=m.recorded(execution_ref,report,started)
+    m.need(report['schema']=='clk06-candidate-comparison.v1' and report['mode']=='candidate'
+           and report['status']=='pass-selected-sky-storage-and-source-history' and report['numerical_PASS_claimed'] is True
+           and all(report[key] is False for key in ['unavailable_counted_as_PASS','legacy_metadata0_is_numerical_PASS',
+               'expected_values_supplied_to_Rust','Source_or_Rust_physics_recomputed_by_comparer','gates_updated']),
+           'Genuine selected candidate unit PASS with honest scope required')
+    m.need(m.instant(record['started_utc'])<=m.instant(report['created_utc'])<=m.instant(record['finished_utc']),
+           'Actual comparison report interval differs')
+    evidence=report['reviewed_evidence']; projection=m.read(report['comparison_projection'])
+    source_review=m.actual_review(projection['source_review'],projection['source_review_execution'],
+        'clk06-independent-comparer-source-review.v1','pass-source-selected-sky-and-authentication-before-comparison',started)
+    script(m.read(projection['source_review_execution']),source_review['executed_reader_source_archive'])
+    identity(source_review['reviewed_native_admission_contract'],projection['native_admission_contract'])
+    reviewed=source_rows(source_review['reviewed_sources']); executed=source_rows(report['executed_reader_source_archives'])
+    frozen=projection['comparer_sources']; m.need(len(frozen)==len(reviewed)==len(executed)==8
+        and set(reviewed)==set(executed)=={row['path'] for row in frozen},'Actual reviewed/frozen/executed eight sources differ')
+    for row in frozen:
+        m.need(row['sha256']==reviewed[row['path']]['sha256']==executed[row['path']]['sha256']
+            and m.check(reviewed[row['path']]).read_bytes()==m.check(executed[row['path']]).read_bytes(),
+               'Actually executed reader differs from pre-execution source')
+    mains=[row for owner,row in executed.items() if owner.endswith('/check_clk06.py')]
+    freezers=[row for owner,row in executed.items() if owner.endswith('/freeze_projection.py')]
+    m.need(len(mains)==len(freezers)==1,'Unique actual comparer and freezer sources required')
+    interpreter=script(record,mains[0],report['actual_reader_argv'])
+    freeze=m.recorded(report['comparison_projection_execution'],{'comparison_projection':report['comparison_projection'],
+        'input_only_source_selection_freeze':True,'scientific_execution_performed':False,'gates_updated':False},started)
+    script(freeze,freezers[0])
+    for flag,binding in [('--native-admission-contract',projection['native_admission_contract']),
+                         ('--source-review',projection['source_review']),('--source-review-execution',projection['source_review_execution'])]: argument(freeze,flag,binding)
+    admission=m.read(projection['native_admission_contract']); request=m.read(admission['helper_request']); counts=requested(request)
+    native_projection=m.read(admission['projection']); tolerances=m.read(admission['contracts']['tolerances'])
+    m.need(projection['schema']=='clk06-comparer-projection.v1' and projection['scientific_execution_performed'] is False
+           and projection['frozen_before_next_Rust_comparison_operand_execution'] is True
+           and m.exact(projection['numeric_profiles'],tolerances['numeric_profiles'])
+           and m.exact(projection['numeric_rows'],tolerances['rows']) and len(tolerances['rows'])==9
+           and m.exact(tolerances['numeric_profiles'],m.read(DECISION)['numeric_profiles'])
+           and m.exact(projection['numeric_criterion'],tolerances['criterion'])
+           and m.exact(projection['source_selection'],native_projection['source_selection'])
+           and m.exact(projection['native_observation_policy'],request['observation_policy'])
+           and m.exact(projection['requested_counts'],counts),'Authentic frozen numerical policy differs')
+    for value in [admission,request,projection,native_projection]: identity(value['root_preoutput_decision'],DECISION)
+    m.need(projection['native_current_sky_globals_paired'] is False
+        and projection['all_requested_operations_retained'] is True and projection['mask_controls_invocation'] is False
+        and projection['required_roles_apply_identically_to_legacy_and_candidate'] is True
+        and report['required_roles_apply_identically_to_legacy_and_candidate'] is True
+        and m.exact(report['unpaired_scope'],projection['unpaired'])
+        and m.exact(projection['unpaired']['native_current_globals'],m.read(DECISION)['native_only_unpaired_globals'])
+        and m.exact(projection['array_path_mapping'],{'native_snapshot':'root','Rust_snapshot':'root','value_transform':False}),
+        'Frozen source phase, root arrays and unavailable Current5 boundary differ')
+    m.need(len(admission['all_45_guard_refs'])==45 and set(admission['contracts'])=={'source','cases','tolerances'},'Exact45/three-contract scope required')
+    for binding in [admission['fixed_scope'],*admission['contracts'].values(),*admission['all_45_guard_refs']]: m.check(binding)
+    identity(evidence['Native_admission_contract'],projection['native_admission_contract'])
+    identity(evidence['Native_request'],admission['helper_request']); identity(evidence['Native_projection'],admission['projection'])
+    qc=m.actual_review(evidence['Original_data_review'],evidence['Original_data_review_execution'],
+        'clk06-independent-original-data-review.v1','pass-preserved-original-data-before-Rust-baseline',started)
+    script(m.read(evidence['Original_data_review_execution']),qc['executed_reader_source_archive'])
+    fact_binding(qc['reviewed_reference'],evidence['Original_reference']); fact_binding(qc['reviewed_results'],evidence['Native_results'])
+    for key,expected in [('reviewed_request',admission['helper_request']),('reviewed_native_admission_contract',projection['native_admission_contract']),
+                         ('reviewed_projection',admission['projection'])]: identity(qc[key],expected)
+    m.need(qc['intended_native_branch_coverage_complete'] is True and qc['actual_operation_invocations']==counts['total_operations']
+           and qc['actual_operations_skipped']==0 and qc['numerical_PASS_claimed'] is False
+           and qc['scientific_values_compared'] is False and qc['source_unavailable_counted_as_PASS'] is False
+           and qc['numerical_comparison_count'] is None and qc['numerical_mismatch_count'] is None,'Genuine Original QC coverage required')
+    # Reuse actual DataQC0 for the large wrapper/results/binary, rather than reparsing scientific snapshots.
+    original_outer=m.recorded(evidence['Original_execution'],{'reference':evidence['Original_reference'],
+        'status':'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review',
+        'actual_helper_exit_code':0,'actual_launcher_exit_code':0},started)
+    fact_binding(qc['reviewed_execution'],evidence['Original_execution'])
+    m.need(m.exact(qc['reviewed_contracts'],admission['contracts']),'Actual Original/QC contract inventory differs')
+    checked=v.Bindings(); native_child=m.read(qc['reviewed_native_execution'])
+    native_start,native_finish=v.execution_interval(native_child,checked)
+    native_build=m.read(qc['reviewed_build']); command=native_child['command']
+    m.need(native_build['schema']=='clk06-native-driver-build.v1' and native_build['checks_passed'] is True
+        and native_build['target']=='clk06_reference_helper','Actual DataQC-reviewed native build metadata differs')
+    fact_binding(native_child['binary'],native_build['helper_binary'])
+    fact_binding(native_child['native_driver_build'],qc['reviewed_build'])
+    m.need(native_child['schema']=='clk06-original-native-command.v1' and native_child['spawn_error'] is None
+        and len(command)==5 and m.path(command[0])==m.path(native_build['helper_binary']['path'])
+        and Path(command[1]).resolve()==ROOT and m.path(command[2])==m.check(admission['helper_request'])
+        and m.path(command[3])==m.check(evidence['Native_admission_contract'])
+        and m.path(command[4])==m.path(evidence['Native_results']['path']).parent
+        and m.instant(original_outer['started_utc'])<=native_start<=native_finish<=m.instant(original_outer['finished_utc'])
+        <=m.instant(qc['review_started_utc']),'Actual native argc5/child0/Original/QC chronology differs')
+    build,available,compilation=v.verify_rust_build(evidence['Rust_build'],checked,
+        kind='example',example='clk06_candidate_probe',committed=True,required_sources=['crates/ep_runtime/examples/clk06_candidate_probe.rs'])
+    run=m.read(evidence['Rust_execution']); v.execution_interval(run,checked)
+    for item in [run,record]:
+        m.need(item['schema']=='recorded-porting-command.v1' and item['exit_code']==0 and item['launch_error'] is None
+               and item['source_bytes_match_before_and_after'] is True
+               and item['repository_before']['head']==item['repository_after']['head']==build['implementation_commit']
+               and item['repository_before']['worktree_clean'] is True and item['repository_after']['worktree_clean'] is True
+               and m.exact(item['executed_launcher'],build['actual_executed_recorder']),'Actual clean candidate/reader build identity differs')
+        identity(item['source_snapshot'],build['source_snapshot'])
+    identity(run['stdout'],evidence['Rust_results'])
+    m.need(len(run['command'])==2 and m.path(run['command'][0])==m.check(build['binary'])
+           and m.path(run['command'][1])==m.check(evidence['observer_request']),'Actual candidate argv must be only executable plus input wrapper')
+    observer_inputs(evidence,available,admission,counts,run['started_utc'],started)
+    m.need(m.instant(qc['review_completed_utc'])<=m.instant(compilation['started_utc'])
+           and m.instant(m.read(evidence['existing_baseline_gap_execution'])['finished_utc'])<=m.instant(compilation['started_utc'])
+           and m.instant(source_review['review_completed_utc'])<=m.instant(freeze['started_utc'])
+           <=m.instant(projection['created_utc'])<=m.instant(freeze['finished_utc'])<=m.instant(run['started_utc'])
+           <=m.instant(run['finished_utc'])<=m.instant(record['started_utc']),'Actual Original/sourcefreeze/candidate/comparison chronology differs')
+    m.need(record['command'].count('--mode')==1 and record['command'][record['command'].index('--mode')+1]=='candidate',
+        'Actual comparer must execute candidate mode')
+    for flag,key in [('native-admission-contract','Native_admission_contract'),
+        ('baseline-gap','existing_baseline_gap'),('baseline-gap-execution','existing_baseline_gap_execution'),
+        ('observer-source-review-execution','observer_source_review_execution'),('observer-input-execution','observer_input_execution'),
+        ('original-reference','Original_reference'),('original-execution','Original_execution'),
+        ('original-data-review','Original_data_review'),('original-data-review-execution','Original_data_review_execution'),
+        ('observer-request','observer_request'),('observer-projection','observer_projection'),('rust-build','Rust_build'),('rust-execution','Rust_execution')]:
+        argument(record,'--'+flag,evidence[key])
+    argument(record,'--comparison-projection',report['comparison_projection']); argument(record,'--comparison-projection-execution',report['comparison_projection_execution'])
+    facts=metrics(report,counts); checked.unchanged()
+    for item in checked.report(): m.check(item)
+    m.need(m.check(record['stderr']).stat().st_size==m.check(run['stderr']).stat().st_size==0,'Actual successful stderr must be empty')
+    out.mkdir(parents=True); own=out/'executed-result-reviewer.py'; own.write_bytes(Path(__file__).read_bytes())
+    helper=out/'executed-metadata.py'; helper.write_bytes(OWNED.read_bytes())
+    m.need(m.ref(own)['sha256']==verifier['sha256'],'Actual reviewer copy differs')
+    m.finish(out,{'schema':'clk06-independent-candidate-unit-result-review.v1',
+        'status':'pass-authenticated-selected-unit-result-and-honest-unavailable-scope','review_started_utc':started,
+        'reviewed_report':report_ref,'comparison_execution':execution_ref,'Rust_build':evidence['Rust_build'],
+        'Rust_execution':evidence['Rust_execution'],'Native_reference':evidence['Original_reference'],
+        'Native_results':evidence['Native_results'],'Original_data_review':evidence['Original_data_review'],
+        'observer_source_review':evidence['observer_source_review'],'observer_source_review_execution':evidence['observer_source_review_execution'],
+        'observer_request':evidence['observer_request'],'observer_projection':evidence['observer_projection'],
+        'preserved_existing_baseline_gap':evidence['existing_baseline_gap'],
+        'comparison_projection':report['comparison_projection'],'comparison_projection_execution':report['comparison_projection_execution'],
+        'source_review':projection['source_review'],'source_review_execution':projection['source_review_execution'],
+        'native_admission_contract':projection['native_admission_contract'],'contracts':admission['contracts'],
+        'actual_implementation_commit':build['implementation_commit'],'actual_crates_tree':build['crates_tree'],
+        'actual_available_source_inventory_count':len(available),'current_canonical_equal_to_science_build_claimed':False,
+        'actual_reader_interpreter_observation':interpreter,**facts,'executed_reader_source_archive':m.ref(own),
+        'executed_metadata_source_archive':m.ref(helper),'reviewed_verifier_source':verifier,
+        'reviewed_metadata_utility':m.ref(GEO),'reviewed_root_preoutput_decision':DECISION,
+        'factual_result_only_no_new_numerical_certification':True,'SkyTemp_and_HorizIRSky_zero_mismatch_profiles_authenticated_not_recomputed':True,
+        'scientific_execution_performed':False,'numeric_operands_recomputed':False,'engines_or_numerical_readers_imported':False,'full_Native_and_Rust_results_payloads_parsed':False,
+        'large_Original_wrapper_with_scientific_snapshots_parsed':False,
+        'large_Native_results_or_binary_rehashed':False,
+        'actual_Original_data_QA_reused_for_large_source_artifacts':True,
+        'existing_baseline_gap_full_JSON_including_retained_mismatch_payloads_parsed':True,
+        'existing_baseline_gap_numeric_mismatches_recomputed':False,
+        'whole_formula_or_own_code_independently_certified':False,'unavailable_counted_as_PASS':False,'gates_updated':False,
+        'authorship_limits':'Raw authored this factual verifier, earlier raw cursor/input drafts and prior comparers; those formulas are not independently certified here. Baseline authored the bound numerical comparer; genuine Root execution and archived result are authenticated without rerunning science.'})
+
+
+if __name__=='__main__': main()

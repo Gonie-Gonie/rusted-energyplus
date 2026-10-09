@@ -1,0 +1,168 @@
+"""Authenticated imported metadata guards; no native action in this module."""
+from .common import ROOT, PIN, TARGET, argv_binding, exact, identity, instant, path, python_script, read, recorded, ref, require, review_execution, sha, unchanged, verify
+import importlib.util
+from pathlib import Path
+from types import SimpleNamespace
+import zipfile
+import hashlib
+
+BUILDER = ROOT / '.runtime/porting/CLK-06/builder-prep-01/build_native.py'
+RUNTIME_BIN = ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin'
+DLLS = ['libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll']
+
+
+def admit(args, launcher_started):
+    build_ref = ref(args.build_receipt)
+    build = read(verify(build_ref))
+    require(build['schema'] == 'clk06-native-driver-build.v1' and build['checks_passed'] is True
+        and build['source_commit'] == PIN and build['target'] == TARGET, 'Actual unique CLK06 whole-core build required')
+    for key in ['scientific_source_patches', 'scientific_execution_performed', 'Cargo_or_Git_executed', 'gates_updated',
+                'original_removed', 'full_linked_original_copied', 'existing_unit_packet_or_actual_receipts_rewritten']:
+        require(build[key] is False, 'Actual build scope differs: ' + key)
+    for key in ['original_core_and_API_bytes_unchanged', 'same_compiler_owned_state',
+                'original_directory_and_target_definitions_inherited', 'assertions_enabled', 'existing_target_compile_commands_unchanged']:
+        require(build[key] is True, 'Actual build preservation differs: ' + key)
+    prior = read(verify(build['prior_native_build']))
+    previous_rows = read(verify(prior['compile_commands']))
+    current_rows = read(verify(build['compile_commands']))
+    core_rows = read(verify(build['frozen_original_build_commands']))
+    require(prior['schema'] == 'clk05-native-driver-build.v1' and prior['checks_passed'] is True
+        and build['fp_contract'] == 'off' and build['previous_compile_row_count'] == len(previous_rows) == 659
+        and len(current_rows) == 660
+        and [row for row in current_rows if Path(row['file']).name != TARGET + '.cpp'] == previous_rows
+        and build['frozen_core_compile_row_count'] == len(core_rows) == 643
+        and all(row in current_rows for row in core_rows),
+        'Actual compiler-emitted predecessor/core/FP foundation differs')
+    unchanged(build['executed_source_archives'])
+    prior_sources = {row['historical_path']: row['archive']['sha256'] for row in prior['executed_source_archives']}
+    actual_sources = {row['historical_path']: row['archive']['sha256'] for row in build['executed_source_archives']}
+    require(prior_sources.items() <= actual_sources.items(), 'All actual predecessor source bytes must remain archived')
+    require(sum(path(row['historical_path']) == BUILDER for row in build['executed_source_archives']) == 1, 'Built metadata utility missing')
+    build_stdout = {'driver_build': build_ref, 'checks_passed': True, 'helper_binary': build['helper_binary']}
+    build_execution_ref, build_execution = recorded(args.build_execution, build_stdout, launcher_started)
+    command = build_execution['command']
+    python_script(command, BUILDER)
+    require(command.count('--build-driver') == 1, 'Actual targeted builder command required')
+    argv_binding(command, '--contract', build['native_admission_contract'])
+    for flag, key in [('contract-review', 'independent_contract_review'), ('helper-static-review', 'independent_helper_static_review'),
+                      ('builder-review', 'independent_builder_static_review')]:
+        argv_binding(command, '--' + flag, build[key])
+    for flag, key in [('registry', 'retained_registry'), ('retirement', 'actual_retirement'), ('retirement-execution', 'actual_retirement_execution')]:
+        argv_binding(command, '--' + flag, build[key])
+    require(instant(build_execution['started_utc']) <= instant(build['started_utc'])
+        <= instant(build['finished_utc']) <= instant(build_execution['finished_utc']), 'Actual build interval differs')
+    peer_ref = ref(args.build_review)
+    peer = read(verify(peer_ref))
+    require(peer['schema'] == 'clk06-independent-native-build-review.v1'
+        and peer['status'] == 'pass-build-and-derivative-before-original-execution'
+        and peer['scientific_execution_performed'] is False, 'Independent actual build and PE review required')
+    identity(peer['reviewed_build'], build_ref)
+    identity(peer['actual_build_command'], build_execution_ref)
+    require(exact(peer['reviewed_source_archives'], build['executed_source_archives']),
+        'Independent actual build review must bind the same actual executed source archives')
+    for key, owner in [('reviewed_native_admission_contract', 'native_admission_contract'), ('reviewed_helper_request', 'helper_request'),
+                       ('reviewed_projection', 'projection'), ('reviewed_binary', 'helper_binary')]:
+        identity(peer[key], build[owner]); verify(peer[key])
+    require(peer['reviewed_contracts'] == build['contracts'], 'Actual build review six-packet identity differs')
+    for key, owner in [('reviewed_contract_review', 'independent_contract_review'), ('reviewed_helper_static_review', 'independent_helper_static_review'),
+                       ('reviewed_builder_static_review', 'independent_builder_static_review')]:
+        identity(peer[key], build[owner])
+    linked = build['linked_original']
+    identity(peer['actual_linked_original'], {'path': linked['historical_path'], 'sha256': linked['sha256']})
+    verify(peer['actual_linked_original']); verify(peer['actual_independent_PE_validation'])
+    require(instant(build['finished_utc']) <= instant(peer['review_started_utc']), 'Actual review must follow actual completed build')
+    peer_execution_ref, peer_execution = recorded(args.build_review_execution, peer, launcher_started)
+    require(instant(peer_execution['started_utc']) <= instant(peer['review_started_utc'])
+        <= instant(peer['review_completed_utc']) <= instant(peer_execution['finished_utc']), 'Actual build/PE review interval differs')
+    peer_archive = peer.get('executed_reader_source_archive')
+    if peer_archive is not None:
+        require(sha(python_script(peer_execution['command'])) == sha(verify(peer_archive)), 'Actual build/PE reader archive differs')
+    peer_source_provenance = {'direct_executed_reader_source_archive': peer_archive,
+        'direct_reader_archive_available': peer_archive is not None,
+        'unspecified_PE_reader_archive_key_manufactured': False,
+        'unavailable_reader_archive_counted_as_PASS': False}
+    launcher_ref = ref(args.launcher_review)
+    launch = read(verify(launcher_ref))
+    require(launch['schema'] == 'clk06-independent-original-launcher-static-review.v1'
+        and launch['status'] == 'pass-source-and-input-contract-before-original-execution'
+        and launch['scientific_execution_performed'] is False, 'Independent exact launcher source review required')
+    identity(launch['reviewed_contract_review'], build['independent_contract_review'])
+    unchanged(launch['reviewed_sources'])
+    own = ROOT / '.runtime/porting/CLK-06/original-launcher-prep-01'
+    expected = {str((own / name).relative_to(ROOT)).replace('\\', '/')
+        for name in ['run_original.py', 'launcher_support/common.py', 'launcher_support/admission.py', 'launcher_support/outcomes.py', 'launcher_support/__init__.py']}
+    actual_reviewed = {row['historical_path'] for row in launch['reviewed_sources']}
+    require(len(actual_reviewed) == len(launch['reviewed_sources']) and expected <= actual_reviewed,
+        'All actual unique launcher sources must be reviewed')
+    identity(launch['reviewed_metadata_utility'], ref(BUILDER))
+    launcher_execution_ref = review_execution(args.launcher_review_execution, launch, launcher_started)
+    # Every imported metadata byte is built and independently reviewed first.
+    static = read(verify(build['independent_builder_static_review']))
+    unchanged(static['reviewed_sources'])
+    require(any(path(row['historical_path']) == BUILDER for row in static['reviewed_sources']), 'Imported builder must be independently reviewed')
+    spec = importlib.util.spec_from_file_location('clk06_original_authenticated_metadata', BUILDER)
+    require(spec is not None and spec.loader is not None, 'Authenticated metadata module unavailable')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    bound = module.packet(verify(build['native_admission_contract']))
+    require(all(exact(build[key], value) for key, value in bound.items()), 'Frozen native six-packet differs from genuine build')
+    review_args = SimpleNamespace(**{name: build[key]['path'] for name, key in [
+        ('contract_review', 'independent_contract_review'), ('helper_static_review', 'independent_helper_static_review'),
+        ('builder_review', 'independent_builder_static_review')]},
+        **{name + '_execution': value['path'] for name, value in build['reviewed_source_executions'].items()})
+    checked = module.reviews(review_args, bound, launcher_started)
+    require(all(exact(build[key], value) for key, value in checked.items()), 'Actual frozen contract/source reviews differ')
+    module.prior_identity()
+    require(module.old.old.validate_derivative(read(verify(build['validated_derivative'])), linked) == build['helper_binary'],
+        'Actual genuine helper derivative identity differs')
+    for key in ['configure', 'compile_link', 'derivation_command']:
+        receipt = read(verify(build[key]))
+        require(type(receipt['exit_code']) is int and receipt['exit_code'] == 0, 'Actual native build command failed')
+        verify(receipt['stdout']); verify(receipt['stderr'])
+    return module, build, {'actual_build': build_ref, 'actual_build_execution': build_execution_ref,
+        'actual_build_review': peer_ref, 'actual_build_review_execution': peer_execution_ref,
+        'launcher_source_review': launcher_ref, 'launcher_source_review_execution': launcher_execution_ref,
+        'actual_source_reviews': checked, 'actual_build_review_reader_provenance': peer_source_provenance}
+
+
+def runtime_identity(core):
+    publisher_ref = core['compiler']['toolchain_publisher_receipt']
+    publisher = read(verify(publisher_ref))
+    require(publisher['checksums_match'] is True
+        and publisher['installation'] == RUNTIME_BIN.parents[1].relative_to(ROOT).as_posix(), 'GNU runtime publisher owner differs')
+    archive = path(publisher['archive'])
+    require(sha(archive) == publisher['publisher_checksums']['sha256'] == publisher['actual_checksums']['sha256'], 'Publisher ZIP identity differs')
+    require(verify(core['compiler']['binary']).parent == RUNTIME_BIN, 'Genuine compiler PATH owner differs')
+    rows = []
+    with zipfile.ZipFile(archive) as package:
+        for name in DLLS:
+            member = 'mingw64/bin/' + name
+            expected = hashlib.sha256(package.read(member)).hexdigest()
+            installed = RUNTIME_BIN / name
+            require(sha(installed) == expected, 'Installed runtime DLL differs: ' + name)
+            rows.append({'archive_member': member, 'member_sha256': expected, 'installed_binary': ref(installed)})
+    return {'publisher_receipt': publisher_ref, 'publisher_archive': ref(archive),
+        'runtime_path_prefix': str(RUNTIME_BIN), 'runtime_libraries': rows}
+
+
+def guard(module, build, runtime):
+    bound = module.packet(verify(build['native_admission_contract']))
+    require(all(exact(build[key], value) for key, value in bound.items()), 'Frozen packet changed')
+    core = read(verify(build['core_build']))
+    baseline = read(verify(build['previous_compile_commands']))
+    frozen = read(verify(build['frozen_original_build_commands']))
+    before = build['preservation_observations']['before_configure']['source_guard']
+    observed = module.preservation(baseline, frozen, core, before, build['executed_source_archives'], verify(build['retained_registry']),
+        verify(build['actual_retirement']), verify(build['actual_retirement_execution']), bound)
+    require(exact(read(module.BUILD / 'compile_commands.json'), read(verify(build['compile_commands'])))
+        and (module.BUILD / 'CMakeCache.txt').read_bytes() == verify(build['cache']).read_bytes(), 'Actual all-target cache/command archive differs')
+    linked = build['linked_original']
+    live = path(linked['historical_path'])
+    require(live.parent == module.BUILD / 'Products' and live.name == TARGET + '.exe'
+        and live.is_file() and not live.is_symlink() and sha(live) == linked['sha256']
+        and live.stat().st_size == linked['size_bytes'], 'Actual fresh original identity differs')
+    verify(build['helper_binary']); verify(runtime['publisher_archive'])
+    for row in runtime['runtime_libraries']:
+        verify(row['installed_binary'])
+    return {**observed, 'actual_unique_original': linked, 'execution_derivative': build['helper_binary'],
+        'all_target_compile_commands': build['compile_commands'], 'all_target_cache': build['cache'],
+        'native_input_packet': bound, 'runtime_publisher_bytes_unchanged': True}

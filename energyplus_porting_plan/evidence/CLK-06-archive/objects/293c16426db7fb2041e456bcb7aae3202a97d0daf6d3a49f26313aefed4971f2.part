@@ -1,0 +1,637 @@
+{
+  "schema": "clk06-cases-contract.v1",
+  "card": "CLK-06",
+  "created_utc": "2026-10-09T06:21:57.621427+00:00",
+  "frozen_before_numerical_execution": true,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "helper_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "source": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+    "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+  },
+  "tolerances": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+    "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+  },
+  "fixed_CON_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-1-HOUR1.idf",
+      "sha256": "e89514e5387fd836cb5aaa0507a774eb9c42eb569476cfb9c5eb8e69af017183"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-1-HOUR1.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-1-HOUR1-byte-map.json",
+      "sha256": "0be7ee9303a0cb90bfdbbad45222979ccc62c48873c641ab025c9a9bd37327fb"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-1-HOUR24.idf",
+      "sha256": "3f74ce07a5af624e1fbcd1759c4d116d54db0ea16215e941f62e7533d5398548"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-1-HOUR24.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-1-HOUR24-byte-map.json",
+      "sha256": "65199c51775c7e95297efaa5e691dbcf32f16c1f75e247e2a8e4a0fb61436dd2"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-3-HOUR1.idf",
+      "sha256": "3ec20c3e6f77393076743d328842a5309e7fb68194027f5bd80dd41b2df74de5"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-3-HOUR1.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-3-HOUR1-byte-map.json",
+      "sha256": "76964103d699c9d808ee67bd835c7724120843e3c4023497b4582f70ac51d65f"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-3-HOUR24.idf",
+      "sha256": "bc491fc1565aef2efb0dc69d67b3c1c831fc6d36a0bb8fadf9321e66f5e042d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-3-HOUR24.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-3-HOUR24-byte-map.json",
+      "sha256": "65d4dbf82ad6e0ffb1c87321f1dcfda6280416ecfe2af0e7ef91b22001f83099"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-4-HOUR1.idf",
+      "sha256": "35b8449dcee93572e735fd9ce9a1dcb03e831bd00fa49e59606de76408887b54"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-4-HOUR1.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-4-HOUR1-byte-map.json",
+      "sha256": "71ab76707f2a4205e13aecad0e903db2c8c55da333c5d7a7fd14c1eae0c3ba2c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-4-HOUR24.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-4-HOUR24.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CONSTANT-4-HOUR24-byte-map.json",
+      "sha256": "2066741b680f04ff89f5695ab29869ea0fa20412f2edd5cc92d62fba5d5ec63b"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-1-HOUR1.idf",
+      "sha256": "e89514e5387fd836cb5aaa0507a774eb9c42eb569476cfb9c5eb8e69af017183"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-1-HOUR1.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-1-HOUR1-byte-map.json",
+      "sha256": "83d1d2eb97486149a81ee4b718fe14faf1be2de0def47c17c7d97d5f99450e9a"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-1-HOUR24.idf",
+      "sha256": "3f74ce07a5af624e1fbcd1759c4d116d54db0ea16215e941f62e7533d5398548"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-1-HOUR24.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-1-HOUR24-byte-map.json",
+      "sha256": "2d13a2c38343d4efcc0c8ff355df26025777de5fd382f0d7db66280899851f14"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-3-HOUR1.idf",
+      "sha256": "3ec20c3e6f77393076743d328842a5309e7fb68194027f5bd80dd41b2df74de5"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-3-HOUR1.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-3-HOUR1-byte-map.json",
+      "sha256": "4d60a6719574ad555e1c91a4c58ccf4ada96d3a0782c99bbf3e368f9240e8dbc"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-3-HOUR24.idf",
+      "sha256": "bc491fc1565aef2efb0dc69d67b3c1c831fc6d36a0bb8fadf9321e66f5e042d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-3-HOUR24.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-3-HOUR24-byte-map.json",
+      "sha256": "f43ba7fd1a214780ecfcddaf692ec13aaaa60d19ff67dd931eccf62edc186370"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-4-HOUR1.idf",
+      "sha256": "35b8449dcee93572e735fd9ce9a1dcb03e831bd00fa49e59606de76408887b54"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-4-HOUR1.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-4-HOUR1-byte-map.json",
+      "sha256": "502f74dc400a574795c0694e9ac90d37646220e1d8c27ec63962e679880e24d4"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-4-HOUR24.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-4-HOUR24.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/RAMP-4-HOUR24-byte-map.json",
+      "sha256": "ec573f205351dc61458df129016b5b21eca3df376bb20a7703e0370a7ee62bb6"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-3-HOUR1.idf",
+      "sha256": "c47b835435722c735e8135bf25f371de23c9502e6ef83a5b73e5f9fc6b16d254"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-3-HOUR1.epw",
+      "sha256": "dad6e352993fd03b331181f1015b88c07fc564d07971ebbef183f48eafa4a0ae"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-3-HOUR1-byte-map.json",
+      "sha256": "a55401643ef9d2df2bad873f04d8182e8fad11f034f36d0a44972014195a5490"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-3-HOUR24.idf",
+      "sha256": "f5cc78115c6b7cf4adb925a5bfa893d2b918edf1fb007c6dcd073b457f8df1d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-3-HOUR24.epw",
+      "sha256": "dad6e352993fd03b331181f1015b88c07fc564d07971ebbef183f48eafa4a0ae"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-3-HOUR24-byte-map.json",
+      "sha256": "ae35fe895c5576ffda8e58b58a099ed5c04d491b1658ef88d2c10d2be4cc4b09"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-4-HOUR1.idf",
+      "sha256": "1b8eaa239c8452f7f70f85118eef7064957406948b2815eedd7f75d1422b86ed"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-4-HOUR1.epw",
+      "sha256": "dad6e352993fd03b331181f1015b88c07fc564d07971ebbef183f48eafa4a0ae"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-4-HOUR1-byte-map.json",
+      "sha256": "1df7feea253e4920c503a900282d824e0a1d92ff0527be3997bb8f332c15a09f"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-4-HOUR24.idf",
+      "sha256": "18ef5b3c59eece0b0e55d02c6ba71d7401cc48cd10901bc37b9930589da7edfe"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-4-HOUR24.epw",
+      "sha256": "dad6e352993fd03b331181f1015b88c07fc564d07971ebbef183f48eafa4a0ae"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-CLOUD-4-HOUR24-byte-map.json",
+      "sha256": "b9197ace89a646e88479d4d65f5aafaec46216026988a22aa3276d6db79e25bb"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-3-HOUR1.idf",
+      "sha256": "c47b835435722c735e8135bf25f371de23c9502e6ef83a5b73e5f9fc6b16d254"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-3-HOUR1.epw",
+      "sha256": "096d839ba1a4e73c2e6d70327ec6b1322b98f74363337e80794aded5adcac850"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-3-HOUR1-byte-map.json",
+      "sha256": "d3886b7cf150c07a683803827738a9bbc8861d599cd5663ee6ef8e4f179495e8"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-3-HOUR24.idf",
+      "sha256": "f5cc78115c6b7cf4adb925a5bfa893d2b918edf1fb007c6dcd073b457f8df1d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-3-HOUR24.epw",
+      "sha256": "096d839ba1a4e73c2e6d70327ec6b1322b98f74363337e80794aded5adcac850"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-3-HOUR24-byte-map.json",
+      "sha256": "06e545c7f42b615ee5d59f82fb2c2a50c95b2c887ddf1561de7fca7c45dc3070"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-4-HOUR1.idf",
+      "sha256": "1b8eaa239c8452f7f70f85118eef7064957406948b2815eedd7f75d1422b86ed"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-4-HOUR1.epw",
+      "sha256": "096d839ba1a4e73c2e6d70327ec6b1322b98f74363337e80794aded5adcac850"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-4-HOUR1-byte-map.json",
+      "sha256": "a26db3dafe898edb0c8aacd76b9a03a64d56e36a63e7c3fc06352204e5418186"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-4-HOUR24.idf",
+      "sha256": "18ef5b3c59eece0b0e55d02c6ba71d7401cc48cd10901bc37b9930589da7edfe"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-4-HOUR24.epw",
+      "sha256": "096d839ba1a4e73c2e6d70327ec6b1322b98f74363337e80794aded5adcac850"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/TWO-DAY-MISSING-IR-4-HOUR24-byte-map.json",
+      "sha256": "af8adbbf0abb793ab5f445186e6e868840a6dce6dacf04d1481737e776919040"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-1.idf",
+      "sha256": "3f74ce07a5af624e1fbcd1759c4d116d54db0ea16215e941f62e7533d5398548"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-1.epw",
+      "sha256": "1d36210b13365864808ed3cf29503adb5c03f07ccff017a7c6567adf6c0c9e48"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-1-byte-map.json",
+      "sha256": "11d9d040b672b0fdd66c105f5a6944497b22e606d2c9036bf5102ae1e8f14e18"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-3.idf",
+      "sha256": "bc491fc1565aef2efb0dc69d67b3c1c831fc6d36a0bb8fadf9321e66f5e042d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-3.epw",
+      "sha256": "1d36210b13365864808ed3cf29503adb5c03f07ccff017a7c6567adf6c0c9e48"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-3-byte-map.json",
+      "sha256": "bb7358eda5eaec4f2fc4d8a32839aaa2a5e032e76ae01c87edecdf13fc975293"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-4.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-4.epw",
+      "sha256": "1d36210b13365864808ed3cf29503adb5c03f07ccff017a7c6567adf6c0c9e48"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/IR-BOUNDARY-4-byte-map.json",
+      "sha256": "606b180c4e6fdbd6e9ca7c2d2f8bf5f172ae19dad368ff734fc69dc42842da57"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-1.idf",
+      "sha256": "3f74ce07a5af624e1fbcd1759c4d116d54db0ea16215e941f62e7533d5398548"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-1.epw",
+      "sha256": "ff6b815b9c05e3cb70e7ba2d97d5d66d8fd9d75bba2084be6d4f4e28e4b73314"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-1-byte-map.json",
+      "sha256": "c149a807aa1d38c7a4232046b753362b568324ab507f46b0f32b635b01b08c53"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-3.idf",
+      "sha256": "bc491fc1565aef2efb0dc69d67b3c1c831fc6d36a0bb8fadf9321e66f5e042d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-3.epw",
+      "sha256": "ff6b815b9c05e3cb70e7ba2d97d5d66d8fd9d75bba2084be6d4f4e28e4b73314"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-3-byte-map.json",
+      "sha256": "5346b3e2012cded0468b60e8e6f6ad00971ecdc4eb0d595006003d1b62818c1c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-4.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-4.epw",
+      "sha256": "ff6b815b9c05e3cb70e7ba2d97d5d66d8fd9d75bba2084be6d4f4e28e4b73314"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/CLOUD-BOUNDARY-4-byte-map.json",
+      "sha256": "05a168602e7486caa744052954a1fb409c15663871db528312090110e1e4b086"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-3-1.idf",
+      "sha256": "bc491fc1565aef2efb0dc69d67b3c1c831fc6d36a0bb8fadf9321e66f5e042d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-3-1.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-3-1-byte-map.json",
+      "sha256": "9cb2ce59fb8ae146dad4790ffadfce3226e0e953ef3dfd9e11b9d9bf574dfa73"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-3-2.idf",
+      "sha256": "bc491fc1565aef2efb0dc69d67b3c1c831fc6d36a0bb8fadf9321e66f5e042d1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-3-2.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-3-2-byte-map.json",
+      "sha256": "fe5e5c7c0eea851e7cf3af25a27079c9ebabfaaf3ffbda047de25e894427fc17"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-4-1.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-4-1.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-4-1-byte-map.json",
+      "sha256": "67cb1c3b23d3ecf1215137e5e979099924b6460e6048be941ca424dca1b776f8"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-4-2.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-4-2.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/STORED-LINEAR-4-2-byte-map.json",
+      "sha256": "50afb6acc8ab4e6ec866dd0ae45faaa07a2345688757655f0b4809ee849e8850"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/ONE-STEP-CACHE-CANARY.idf",
+      "sha256": "3f74ce07a5af624e1fbcd1759c4d116d54db0ea16215e941f62e7533d5398548"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/ONE-STEP-CACHE-CANARY.epw",
+      "sha256": "773057ccccb818b14824edccf633eb86a3a652eb45aa53de85cb27f9baa1224c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/ONE-STEP-CACHE-CANARY-byte-map.json",
+      "sha256": "6a80b3056059c58f84a12640ab8358164e71915b72993aaba433a51c25fb12a9"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/DIRECT-CALCSKY.idf",
+      "sha256": "100de06ef6bfc60f5e959540417a357d082f61d5fbbdd6a71954cef21c7ca9c7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/DIRECT-CALCSKY.epw",
+      "sha256": "bbfdcb3e97419941809b645b111c12d0d3f650862d7267bbf0846c7f55a40f62"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/inputs/DIRECT-CALCSKY-byte-map.json",
+      "sha256": "dc337ea3a37a32e7f8d65a867bc657b4bb68bca4b91ebb1011df8dbf02755697"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    }
+  ],
+  "catalogue_manifest": {
+    "path": ".runtime/porting/CLK-06/input-design-prep-02/manifest.json",
+    "sha256": "2e4f6fec8e3e863bc6294661c337daffd64cf83b0852661f0ff1da40d2cd3f73"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "original_initial_data_QA_required_before_Rust_baseline": true
+}

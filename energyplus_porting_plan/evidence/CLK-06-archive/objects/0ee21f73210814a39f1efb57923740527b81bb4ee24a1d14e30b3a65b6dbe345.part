@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\original-data-review-prep-01\review_data.py", line 429, in <module>
+    main()
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\original-data-review-prep-01\review_data.py", line 384, in main
+    reference_ref, outer_ref, reference, build, child, result_path = original(args, started)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\original-data-review-prep-01\review_data.py", line 139, in original
+    m.recorded(reference['actual_build_execution'], {'driver_build': build_ref, 'checks_passed': True,
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-02\metadata.py", line 102, in recorded
+    binding = ref(value)
+              ^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-02\metadata.py", line 37, in ref
+    raw = Path(value)
+          ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1162, in __init__
+    super().__init__(*args)
+  File "C:\Users\GonieGonie\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 373, in __init__
+    raise TypeError(
+TypeError: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'dict'

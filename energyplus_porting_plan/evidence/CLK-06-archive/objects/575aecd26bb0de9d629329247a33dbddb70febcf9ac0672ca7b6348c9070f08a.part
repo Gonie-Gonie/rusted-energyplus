@@ -1,0 +1,8 @@
+    Real64 constexpr Kelvin = 273.15; // Conversion factor for C to K and K to C
+    Real64 constexpr TriplePointOfWaterTempKelvin = 273.16; // The triple point of water, in Kelvin
+    Real64 constexpr InitConvTemp = 5.05;                   // [deg C], standard init vol to mass flow conversion temp
+    Real64 constexpr AutoCalculate = -99999.0;              // automatically calculate some fields.
+    Real64 constexpr CWInitConvTemp = 5.05;                 // [deg C], standard init chilled water vol to mass flow conversion temp
+    Real64 constexpr HWInitConvTemp = 60.0;                 // [deg C], standard init hot water vol to mass flow conversion temp
+    Real64 constexpr SteamInitConvTemp = 100.0;             // [deg C], standard init steam vol to mass flow conversion temp
+    Real64 constexpr StefanBoltzmann = 5.6697E-8;           // Stefan-Boltzmann constant in W/(m2*K4)

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-01\review_frozen.py", line 164, in <module>
+    main()
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-01\review_frozen.py", line 57, in main
+    outer, record = m.recorded(args.freeze_execution, freeze, started)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-01\metadata.py", line 107, in recorded
+    verify(record['source_snapshot']); verify(record['executed_launcher']['archive'])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-01\metadata.py", line 54, in verify
+    item = path(ref(binding['path'], binding['sha256'])['path'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-01\metadata.py", line 42, in ref
+    need(item.suffix.lower() in {'.py', '.json', '.md', '.txt', '.log', '.idf', '.epw', '.rs', '.cpp', '.cc', '.hh', '.cmake'}
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-01\metadata.py", line 15, in need
+    raise ValueError(message)
+ValueError: Bounded input/source metadata only; no engine binaries or numerical results

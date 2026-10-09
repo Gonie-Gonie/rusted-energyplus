@@ -1,0 +1,75 @@
+"""Freeze reviewed source selection before the six genuine Rust CLI operands."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+UNIT = ROOT / '.runtime/porting/CLK-06/comparer-prep-02'
+COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+PROOFS_SHA = 'ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a'
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module); return module
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['native-admission-contract', 'source-review', 'source-review-execution', 'output-dir']:
+        parser.add_argument('--' + key, required=True, type=Path)
+    args = parser.parse_args()
+    for path, digest in [(UNIT / 'common.py', COMMON_SHA), (HERE / 'proofs.py', PROOFS_SHA)]:
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            raise ValueError('Reviewed metadata bootstrap differs before import')
+    m = load('common', UNIT / 'common.py'); p = load('clk06_production_proofs', HERE / 'proofs.py')
+    checked = m.v.Bindings(); m.require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    review_ref, execution_ref = m.ref(args.source_review), m.ref(args.source_review_execution)
+    review, indexed, finish = p.source_review(review_ref, execution_ref, checked)
+    meta = load('clk06_native_input_metadata', UNIT / 'metadata.py')
+    admission_ref, admission, request, tolerances, native = meta.packet(args, checked)
+    m.binding(review['reviewed_native_admission_contract'], admission_ref, checked)
+    m.binding(admission['root_preoutput_decision'], p.DECISION, checked)
+    m.binding(admission['production_transport_source_inventory'], p.TRANSPORT, checked)
+    design = m.read(checked.check(p.DESIGN))
+    m.require(design['schema'] == 'clk06-production-run-source-design.v1' and design['not_an_actual_production_plan'] is True
+        and design['scientific_execution_performed'] is False and design['actual_six_run_configuration_cap_certified'] is False,
+        'Reviewed source-only six-run design is not actual run proof')
+    created = datetime.now(timezone.utc).isoformat()
+    m.require(finish <= m.timestamp(created), 'Actual source review must precede freeze')
+    output = args.output_dir.resolve(); base = ROOT / '.runtime/porting/CLK-06'
+    m.require(output.is_relative_to(base) and output != base and not output.exists(), 'Fresh ignored freeze directory required')
+    checked.unchanged(); output.mkdir(); copied = []
+    for index, path in enumerate(p.sources()):
+        archive = output / (str(index).zfill(2) + '-' + path.name); shutil.copyfile(path, archive)
+        m.require(path.read_bytes() == archive.read_bytes() == checked.check(indexed[path.relative_to(ROOT).as_posix()]).read_bytes(),
+            'Freeze source archive differs from independently reviewed current bytes')
+        copied.append({'historical_path': path.relative_to(ROOT).as_posix(), 'archive': m.ref(archive)})
+    value = {'schema': 'clk06-production-comparison-projection.v1', 'created_utc': created,
+        'native_admission_contract': admission_ref, 'native_request': admission['helper_request'],
+        'native_observation_projection': admission['projection'], 'contracts': admission['contracts'],
+        'fixed_scope': admission['fixed_scope'], 'all_45_guard_refs': admission['all_45_guard_refs'],
+        'root_preoutput_decision': admission['root_preoutput_decision'],
+        'production_transport_source_inventory': admission['production_transport_source_inventory'],
+        'production_run_design': p.DESIGN, 'selection': p.selection(native, tolerances),
+        'source_review': review_ref, 'source_review_execution': execution_ref,
+        'reader_sources': [m.ref(path) for path in p.sources()], 'reader_source_archives': copied,
+        'reviewed_source_archives': review['reviewed_sources'], 'frozen_before_all_six_Rust_production_calls': True,
+        'native_results_read_by_freezer': False, 'scientific_execution_performed': False,
+        'numeric_policy_changed': False, 'unavailable_counted_as_PASS': False, 'gates_updated': False}
+    with (output / 'projection.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(value, stream, ensure_ascii=True, indent=2, allow_nan=False); stream.write('\n')
+    checked.unchanged()
+    print(json.dumps({'production_comparison_projection': m.ref(output / 'projection.json'),
+        'input_only_source_selection_freeze': True, 'scientific_execution_performed': False, 'gates_updated': False}))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,373 @@
+{
+  "schema": "clk06-candidate-observer-projection.v1",
+  "created_utc": "2026-10-09T07:43:09.704432+00:00",
+  "native_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "native_observation_policy": {
+    "full_weather_grid_fields": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "full_weather_grid_snapshots": [
+      "allocated_defaults",
+      "setup",
+      "prepared",
+      "before_caller_context",
+      "after_caller_context",
+      "GetNextEnvironment",
+      "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+      "final_state"
+    ],
+    "effective_boundary_flags": "incoming flags overwritten only by declared partial caller writes",
+    "all_operations_executed_independently_of_observation_selection": true,
+    "compact_operation_grid_contents": null,
+    "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected sky/cloud grid",
+    "selected_today_slot_fields": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "selected_today_slot_index": "actual allocated in-range HourOfDay/TimeStep, otherwise explicitly unavailable",
+    "all19_counts_full17_LastHour_NextHour_Missing_retained": true,
+    "selected_cloud_history_fields": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "selected_cloud_missed_and_out_of_range_count_fields": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "native_private_hourly_or_calcSky_ESky_locals_observed": false,
+    "default_model_metadata": [
+      "WP_Type1",
+      "skyTempModel",
+      "UseWeatherFileHorizontalIR"
+    ],
+    "default_model_must_be_actual_prepared_and_selected_not_forced": true,
+    "paired_native_current_globals": [],
+    "native_only_current_globals": [
+      "weather.HorizIRSky",
+      "environment.SkyTemp",
+      "environment.SkyTempKelvin",
+      "environment.TotalCloudCover",
+      "environment.OpaqueCloudCover"
+    ],
+    "current13_solar_night_SRC08_physics_paired": false
+  },
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "production_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "observer_sources": [
+    {
+      "path": ".runtime/porting/CLK-06/candidate-observer-prep-03/clk06_candidate_probe.rs",
+      "sha256": "d544bd39e159d1314e42f276f6618ba344fbb5fdcc52b5b7f802f214be3f0193"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/candidate-observer-prep-03/write_observer_inputs.py",
+      "sha256": "3707b08cd419e1cfa887dfb9935f2243f678462c67f32b2beaa6b9948fd56ca5"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/candidate-observer-prep-03/inputs.rs",
+      "sha256": "529cee16198ffbc1b8184c29183e52f90ef34372b4d56eea691a134fd4edec91"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/candidate-observer-prep-03/fields.rs",
+      "sha256": "2dd6bee8f0602d19524188555ef320fb601f5369f42be6e6207cff5d908b458c"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/candidate-observer-prep-03/observe.rs",
+      "sha256": "1742538bfc878c1b3e3b3e894a8ab9416f68529c601677ece4e3596c45cbd02d"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/candidate-observer-prep-03/seeds.rs",
+      "sha256": "c32764173940b32ef918bff32aa10511986f6999b8dbc4832d590f85abbfcda6"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/dto.rs",
+      "sha256": "ca9d7dc40371b3128e01a080aa67815700f10aeaeacfb9755a3bd8c07c3192f5"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk03_candidate_support/fields.rs",
+      "sha256": "b1d6c02107c4a2629bb7b19e9aa02dd196705652257c38da56ce1a91815002a1"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk03_candidate_support/inputs.rs",
+      "sha256": "e2bad1313702880b6b756d40de5b866c6493d656572a0bf6d47fedf9c08c6b2c"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk04_candidate_support/fields.rs",
+      "sha256": "6f9498c8d57cb1c798e346d89cfe8d9adcbdd8b5e473559a3baf9eed153bd2cf"
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_runtime/src/weather.rs",
+      "sha256": "e9faeca5edab6541a62acb72deff3b22a5c1f40df231b794f3b16cc0d65e2f2c"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/configuration.rs",
+      "sha256": "9c159f7dca667858934f342ad2e381a15f06899ba0a9403c9cf8394feb1905c2"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/state.rs",
+      "sha256": "aa34b4daa3a9136866283c76664580edddd7eb3ee0fa3d030ca19eb9c5642f5f"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/context.rs",
+      "sha256": "3a960adf9d990d0654d84e73aa434ae2cb13ae15818133e0b6ef07fe249ea057"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/producer.rs",
+      "sha256": "9b01da47c728dbf92ba7f68ed35e400fe74a5653c14fba6924a356f668841617"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+      "sha256": "e54bbe6d2fc73ef36679e184a086370f288fec0ab2723a4d32d34934308a9bc0"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/handoff.rs",
+      "sha256": "71090dad629e39a04695f723860992ee726cd87ac202fdc93e57203633eee405"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/sky.rs",
+      "sha256": "5ce0edde536590435097087561f2c9a25beb1b7cef3b98d8220279a288f127bc"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/solar.rs",
+      "sha256": "4ffe393e5670883f37648d1ef02bb0e82389e968f965337fe146529569962525"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "d733ff335205e7cffe60ad4a43f06bf7b6cfd63508f31ff011b03c92abf786b9"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/cursor.rs",
+      "sha256": "8349e4389bcc140b61c360b0b44059e6b8d6ed2eed74d28b80077951ea4e7a4c"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/day_read.rs",
+      "sha256": "9e116bd8a35177c099ad4f1391d4fbc29d325a891d7e75e1bc2749ff34c3d149"
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/input.rs",
+      "sha256": "b69ce6654d719e4f92e195ecd5f57416d72ec3f7cd1f505d9cbb5ef641dc01c0"
+    }
+  ],
+  "source_authorities": {
+    "catalogue": {
+      "path": ".runtime/porting/CLK-06/input-design-prep-02/manifest.json",
+      "sha256": "2e4f6fec8e3e863bc6294661c337daffd64cf83b0852661f0ff1da40d2cd3f73"
+    },
+    "native_source": {
+      "path": ".runtime/porting/CLK-06/native-prep-01/manifest.json",
+      "sha256": "0261e5932c81dbe4daa8760a53f5366f4436905c4f93678a296fdc88ad3bdce1"
+    },
+    "transport_source": {
+      "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+      "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+    }
+  },
+  "actual_promoted_observer_sources": [
+    {
+      "path": "crates/ep_runtime/examples/clk06_candidate_probe.rs",
+      "sha256": "d544bd39e159d1314e42f276f6618ba344fbb5fdcc52b5b7f802f214be3f0193"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk06_candidate_support/inputs.rs",
+      "sha256": "529cee16198ffbc1b8184c29183e52f90ef34372b4d56eea691a134fd4edec91"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk06_candidate_support/fields.rs",
+      "sha256": "2dd6bee8f0602d19524188555ef320fb601f5369f42be6e6207cff5d908b458c"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk06_candidate_support/observe.rs",
+      "sha256": "1742538bfc878c1b3e3b3e894a8ab9416f68529c601677ece4e3596c45cbd02d"
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk06_candidate_support/seeds.rs",
+      "sha256": "c32764173940b32ef918bff32aa10511986f6999b8dbc4832d590f85abbfcda6"
+    }
+  ],
+  "independent_source_review": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-observer-source-review-01/review.json",
+    "sha256": "37f9be08b625911e7343692a4dea2a908d124dcbdbbefc5010d301174c0b2f7e"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "frozen_before_Rust_candidate_numerical_execution": true,
+  "expected_values_supplied": false,
+  "native_results_supplied": false,
+  "Rust_outputs_supplied_as_inputs": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "native_request_bytes_changed": false,
+  "observer_request": {
+    "path": ".runtime/porting/CLK-06/candidate-observer-input-01/observer-request.json",
+    "sha256": "d07f97923122fd777178f671d51a1976db1443de91e88c4847dc33a865dbe394"
+  },
+  "complete_operation_order_retained": true,
+  "sky_grid_fields": [
+    "SkyTemp",
+    "HorizIRSky",
+    "TotalSkyCover",
+    "OpaqueSkyCover"
+  ],
+  "prerequisite_evidence": {
+    "Original_data_review": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+      "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+    },
+    "Original_data_review_execution": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-command-02/receipt.json",
+      "sha256": "29e648e600a070e80b19f08f9f1f39a1a72f72da818a3eb5674f8f01e8ce8884"
+    },
+    "existing_baseline_gap": {
+      "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+      "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+    },
+    "existing_baseline_gap_execution": {
+      "path": ".runtime/porting/CLK-06/existing-baseline-gap-command-01/receipt.json",
+      "sha256": "bb86b0233042f77444884e18594903cc37ccd1bb658cbb7536d28be0c12d2b98"
+    },
+    "baseline_Rust_build": {
+      "path": ".runtime/porting/CLK-06/existing-observer-build-01/build-receipt.json",
+      "sha256": "baa89872e699dc6193eff6637aafac7a6f013b3ef2f4381a88d5375c97424f23"
+    },
+    "baseline_Rust_execution": {
+      "path": ".runtime/porting/CLK-06/existing-observer-execution-command-01/receipt.json",
+      "sha256": "1e77c3f435241ed521e3dcde86517c64a477857e5fa39e3e7db7f55221c65014"
+    },
+    "baseline_build_execution": {
+      "path": ".runtime/porting/CLK-06/existing-observer-build-command-01/receipt.json",
+      "sha256": "0d9553738ddc941accce0c9612ec0995682641fe6d40c47ec62f10a93b0c1865"
+    },
+    "Root_math_release": {
+      "path": ".runtime/porting/CLK-06/math-release-01/decision.json",
+      "sha256": "43895e26c1df4086069670bcbe8f667594d396280aaba13b0126709b852c8e15"
+    }
+  },
+  "prerequisite_evidence_supplied_to_Rust_request": false,
+  "actual_public_API": [
+    "WeatherDayState::setup_interpolation_values",
+    "WeatherSession::new",
+    "WeatherSession::setup_interpolation_values",
+    "WeatherSession::get_next_environment",
+    "WeatherSession::initialize_weather",
+    "WeatherSession::set_current_weather",
+    "default_clark_allen_sky_emissivity",
+    "default_weather_file_sky"
+  ],
+  "unavailable_direct_API": [],
+  "actual_direct_API": [
+    "default_clark_allen_sky_emissivity",
+    "default_weather_file_sky"
+  ],
+  "direct_API_unavailability_stops_later_history": false,
+  "full_sky_grid_boundaries": [
+    "allocated_defaults",
+    "setup",
+    "prepared",
+    "before_caller_context",
+    "after_caller_context",
+    "GetNextEnvironment",
+    "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+    "final_state"
+  ],
+  "compact_operations": "all scalar/calendar/header/cursor/count19/cache17 retained; sky4 grids shape retained, slots=null",
+  "stored_array_owner_path_mapping": {
+    "native": "snapshot ROOT",
+    "candidate_Rust": "snapshot ROOT",
+    "actual_Rust_owner": "WeatherDayState.weather.interpolation/solar_interpolation",
+    "values_transformed": false
+  },
+  "four_requested_controls": {
+    "names": [
+      "DisplayWeatherMissingDataWarnings",
+      "IgnoreSolarRadiation",
+      "IgnoreBeamRadiation",
+      "IgnoreDiffuseRadiation"
+    ],
+    "owned_in_candidate": true,
+    "applied": true,
+    "application_boundary": "after actual preparation, before GetNextEnvironment"
+  },
+  "linear_override": "literal input assigned only to actual Setup-allocated weather.interpolation",
+  "whole_native_sky_model_Environment_owner_available": false,
+  "native_only_unpaired_globals": [
+    "weather.HorizIRSky",
+    "environment.SkyTemp",
+    "environment.SkyTempKelvin",
+    "environment.TotalCloudCover",
+    "environment.OpaqueCloudCover"
+  ],
+  "current13_is_passive_context_not_CLK06_physical_certification": true,
+  "existing_current_context_selected_full17_is_unpaired_generation_context": true,
+  "pure_Setup_TimeStepFraction": "descriptor checked, weather owner unassigned, actual storage observed",
+  "weather_TimeStepFraction": "literal declared input applied after actual Setup",
+  "whole_native_Factory_constant_initialization_preparation_available": false,
+  "OriginalDataQA0_and_genuine_legacy_gap0_before_candidate": true,
+  "unavailable_counted_as_PASS": false,
+  "private_hourly_ESky_or_branch_locals_observed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false
+}

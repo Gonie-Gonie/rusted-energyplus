@@ -1,0 +1,183 @@
+--- .runtime/porting/CLK-05/comparer-prep-01/state.py
++++ .runtime/porting/CLK-06/comparer-prep-02/state.py
+@@ -1,8 +1,9 @@
+-"""Source-selected solar storage/metadata only; no interpolation RHS."""
++"""Source-selected sky/cloud storage/metadata only; no interpolation RHS."""
+ from numeric import require, scalar, unavailable
+ from common import normalized_path
+ 
+-SOLAR = ['BeamSolarRad', 'DifSolarRad']
++SKY = ['SkyTemp','HorizIRSky','TotalSkyCover','OpaqueSkyCover']
++CLOUD = ['TotalSkyCover','OpaqueSkyCover']
+ CONTROLS = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+ ALL_COUNTS = 'OutDryBulbTemp OutDewPointTemp OutRelHum OutBaroPress WindDir WindSpeed BeamSolarRad DifSolarRad TotalSkyCover OpaqueSkyCover Visibility Ceiling LiquidPrecip WaterPrecip AerOptDepth SnowDepth DaysLastSnow WeathCodes Albedo'.split()
+ ALL_WEATHER = 'IsRain IsSnow OutDryBulbTemp OutDewPointTemp OutBaroPress OutRelHum WindSpeed WindDir SkyTemp HorizIRSky BeamSolarRad DifSolarRad Albedo WaterPrecip LiquidPrecip TotalSkyCover OpaqueSkyCover'.split()
+@@ -16,7 +17,7 @@
+ GRID = ['allocated', 'time_steps', 'hours', 'ordering']
+ HEADER = 'EPWHeaderTitle WeatherFileLocationTitle WeatherFileLatitude WeatherFileLongitude WeatherFileTimeZone WeatherFileElevation WFAllowsLeapYears EPWDaylightSaving EPWDST DST NumSpecialDays SpecialDays NumDataPeriods NumIntervalsPerHour DataPeriods SpecialDays_allocated DataPeriods_allocated LeapYearAdd EndDayOfMonth wvarsMissedCounts.WeathCodes'.split()
+ STREAM_BOOL = ['is_open', 'good', 'eof', 'fail', 'bad', 'position_available']
+-COMPACT = 'pre-execution declared compact unselected solar grid'
++COMPACT = 'pre-execution declared compact unselected sky/cloud grid'
+ 
+ 
+ def typed(row, keys, kind, label):
+@@ -34,30 +35,30 @@
+         scalar(row[field], label + '/' + field)
+ 
+ 
+-def solar(row, label):
+-    require(type(row) is dict and set(row) == set(SOLAR), 'Exact selected solar2 fields required: ' + label)
+-    for field in SOLAR:
++def sky(row, label):
++    require(type(row) is dict and set(row) == set(SKY), 'Exact selected sky4 fields required: ' + label)
++    for field in SKY:
+         scalar(row[field], label + '/' + field)
+ 
+ 
+ def grid(row, full, label):
+     typed(row, ['allocated', 'contents_available'], bool, label)
+     typed(row, ['time_steps', 'hours'], int, label)
+-    require(row['ordering'] == 'hour-major,timestep-minor' and row['observed_fields'] == SOLAR,
+-        'Actual solar grid order/selection differs')
++    require(row['ordering'] == 'hour-major,timestep-minor' and row['observed_fields'] == SKY,
++        'Actual sky/cloud grid order/selection differs')
+     require((row['time_steps'] in [1, 3, 4] and row['hours'] == 24) if row['allocated'] else
+         (row['time_steps'] == row['hours'] == 0), 'Actual allocation/dimensions differ')
+     require(row['contents_available'] is full, 'Declared full/compact grid projection differs')
+     if not full:
+         require(row['slots'] is None and row['unavailability_reason'] == COMPACT, 'Compact array must remain explicitly unavailable')
+         return
+-    require(type(row['slots']) is list and len(row['slots']) == row['time_steps'] * row['hours'], 'Full solar grid cardinality differs')
++    require(type(row['slots']) is list and len(row['slots']) == row['time_steps'] * row['hours'], 'Full sky/cloud grid cardinality differs')
+     for index, slot in enumerate(row['slots']):
+-        require(type(slot) is dict and set(slot) == {'hour', 'time_step', 'value'}, 'Actual indexed solar slot required')
++        require(type(slot) is dict and set(slot) == {'hour', 'time_step', 'value'}, 'Actual indexed sky/cloud slot required')
+         typed(slot, ['hour', 'time_step'], int, label)
+         require(slot['hour'] == index // row['time_steps'] + 1 and slot['time_step'] == index % row['time_steps'] + 1,
+             'Actual hour-major source slot order differs')
+-        solar(slot['value'], label + '/' + str(index))
++        sky(slot['value'], label + '/' + str(index))
+ 
+ 
+ def shape(row, full, label, mode):
+@@ -80,8 +81,8 @@
+             scalar(row[owner][field], label + '/' + owner + '/' + field)
+     for owner in ['today_values', 'tomorrow_values']:
+         grid(row[owner], full, label + '/' + owner)
+-    require(row['full_solar_grid_contents_available'] is full and row['full_17_field_grid_generation_parity_claimed'] is False,
+-        'Actual solar-only grid observation scope differs')
++    require(row['full_sky_grid_contents_available'] is full and row['full_17_field_grid_generation_parity_claimed'] is False,
++        'Actual sky/cloud-only grid observation scope differs')
+     for owner in ['last_hour', 'next_hour']:
+         weather(row[owner], label + '/' + owner)
+     missing = row['missing_values']
+@@ -99,30 +100,32 @@
+             require(len(row[field]) == row['global']['TimeStepsInHour'], 'Actual Setup array cardinality differs')
+         for index, value in enumerate(row[field]):
+             scalar(value, label + '/' + field + '/' + str(index))
+-    observation = row['clk05_observation']
+-    require(observation['private_hourly_or_weight_locals_observed'] is False
+-        and observation['current_solar_night_physics_paired'] is False, 'No fabricated private/Current/night pairing')
+-    controls = observation['solar_controls']
++    observation = row['clk06_observation']
++    require(observation['private_hourly_ESky_or_branch_locals_observed'] is False
++        and observation['whole_other_current_physics_paired'] is False, 'No fabricated private/Current/night pairing')
++    controls = observation['caller_controls']
+     require(set(controls) == set(CONTROLS), 'Exactly four retained effective control fields required')
+-    if mode == 'legacy':
+-        for control in controls.values():
+-            require(type(control) is dict and control['available'] is False and control['value'] is None
+-                and control['counted_as_PASS'] is False and type(control['reason']) is str, 'Legacy absent control must remain unavailable')
+-    else:
+-        typed(controls, CONTROLS, bool, label)
+-    clock = observation['clock']
++    typed(controls, CONTROLS, bool, label)
++    require(observation['native_current_sky_globals_paired'] is False, 'Native current-sky globals remain unpaired')
++    if mode != 'native':
++        require(unavailable(observation['actual_sky_environment']), 'Absent Rust sky Environment must remain unavailable')
++        globals_ = observation['native_current_sky_globals']
++        require(set(globals_) == {'weather.HorizIRSky','environment.SkyTemp','environment.SkyTempKelvin',
++            'environment.TotalCloudCover','environment.OpaqueCloudCover'} and all(unavailable(x) for x in globals_.values()),
++            'Absent Rust current-sky globals must remain unavailable')
++    clock = observation['existing_current_context']['clock']
+     typed(clock, ['MinutesInTimeStep', 'SimTimeSteps'], int, label)
+     for field in ['TimeStepZoneSec', 'CurrentTime']:
+         scalar(clock[field], label + '/clock/' + field)
+-    selected = observation['selected_today_solar_slot']
++    selected = observation['selected_today_sky_slot']
+     today, g = row['today_values'], row['global']
+     valid = today['allocated'] and 1 <= g['HourOfDay'] <= today['hours'] and 1 <= g['TimeStep'] <= today['time_steps']
+     require((selected is not None) is bool(valid), 'Actual selected slot availability/index differs')
+     if valid:
+-        require(type(selected) is dict and set(selected) == {'hour', 'time_step', 'value'}, 'Selected solar slot identity required')
++        require(type(selected) is dict and set(selected) == {'hour', 'time_step', 'value'}, 'Selected sky/cloud slot identity required')
+         typed(selected, ['hour', 'time_step'], int, label)
+         require(selected['hour'] == g['HourOfDay'] and selected['time_step'] == g['TimeStep'], 'Actual selected Today index differs')
+-        solar(selected['value'], label + '/selected_today_solar_slot')
++        sky(selected['value'], label + '/selected_today_sky_slot')
+ 
+ 
+ def snapshot(check, actual, native, label, full, mode, metadata=True):
+@@ -139,30 +142,29 @@
+             check.discrete(len(actual[owner]['slots']), len(native[owner]['slots']), label + '/' + owner + '/length')
+             for index, (a, b) in enumerate(zip(actual[owner]['slots'], native[owner]['slots'])):
+                 check.discrete([a['hour'], a['time_step']], [b['hour'], b['time_step']], label + '/' + owner + '/' + str(index) + '/index')
+-                for field in SOLAR:
++                for field in SKY:
+                     check.numeric(a['value'][field], b['value'][field], label + '/' + owner + '/' + str(index) + '/' + field, field)
+         else:
+             check.availability(None, None, label + '/' + owner + '/contents', False)
+-    for owner in ['last_hour', 'next_hour']:
+-        for field in SOLAR:
++    for owner in ['last_hour','next_hour','missing_values']:
++        for field in CLOUD:
+             check.numeric(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field, field)
+-    check.numeric(actual['next_hour']['LiquidPrecip'], native['next_hour']['LiquidPrecip'], label + '/next_hour/LiquidPrecip', 'NextHour.LiquidPrecip')
+-    for owner in ['missed_counts', 'out_of_range_counts']:
+-        for field in SOLAR:
++    for owner in ['missed_counts','out_of_range_counts']:
++        for field in CLOUD:
+             check.discrete(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+     check.discrete(actual['missed_counts']['WeathCodes'], native['missed_counts']['WeathCodes'], label + '/shared_parser_counter')
+     check.discrete(actual['weather']['LastHourSet'], native['weather']['LastHourSet'], label + '/LastHourSet')
+     for field in CONTROLS:
+-        a, b = actual['clk05_observation']['solar_controls'][field], native['clk05_observation']['solar_controls'][field]
+-        if mode == 'legacy':
+-            check.excluded(label + '/solar_controls/' + field, 'Existing baseline owns no solar-control registration; requested context is separately retained')
+-        else:
+-            check.discrete(a, b, label + '/solar_controls/' + field)
+-    a, b = actual['clk05_observation']['selected_today_solar_slot'], native['clk05_observation']['selected_today_solar_slot']
+-    if check.availability(a, b, label + '/selected_today_solar_slot', False):
+-        check.discrete([a['hour'], a['time_step']], [b['hour'], b['time_step']], label + '/selected_today_solar_slot/index')
+-        for field in SOLAR:
+-            check.numeric(a['value'][field], b['value'][field], label + '/selected_today_solar_slot/' + field, field)
++        a, b = actual['clk06_observation']['caller_controls'][field], native['clk06_observation']['caller_controls'][field]
++        check.discrete(a, b, label + '/caller_controls/' + field)
++    for field in ['actual_sky_environment','native_current_sky_globals','existing_current_context']:
++        check.excluded(label + '/clk06_observation/' + field,
++            'Native default model/current5 and existing Current13 are passive context, no new CLK06 physical certification')
++    a, b = actual['clk06_observation']['selected_today_sky_slot'], native['clk06_observation']['selected_today_sky_slot']
++    if check.availability(a, b, label + '/selected_today_sky_slot'):
++        check.discrete([a['hour'], a['time_step']], [b['hour'], b['time_step']], label + '/selected_today_sky_slot/index')
++        for field in SKY:
++            check.numeric(a['value'][field], b['value'][field], label + '/selected_today_sky_slot/' + field, field)
+     if not metadata:
+         check.excluded(label + '/whole_native_constructor_or_preparation', 'Different public constructor/preparation observation phase', True, True)
+         return
+@@ -175,7 +177,7 @@
+         for field in DAY_INT:
+             check.discrete(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+     for field in ['TimeStepZoneSec', 'MinutesInTimeStep']:
+-        check.exact_value(actual['clk05_observation']['clock'][field], native['clk05_observation']['clock'][field], label + '/clock/' + field)
++        check.exact_value(actual['clk06_observation']['existing_current_context']['clock'][field], native['clk06_observation']['existing_current_context']['clock'][field], label + '/clock/' + field)
+     for field in HEADER:
+         check.exact_value(actual['header'][field], native['header'][field], label + '/header/' + field)
+     for row in [actual['stream'], native['stream']]:
+@@ -203,5 +205,5 @@
+             check.exact_value(left[owner]['slots'], right[owner]['slots'], label + '/' + owner + '/slots')
+         else:
+             check.excluded(label + '/' + owner + '/slots', 'Declared compact boundary leaves full contents unobserved', False, False)
+-    a, b = [row['clk05_observation']['selected_today_solar_slot'] for row in [left, right]]
+-    check.exact_value(a, b, label + '/selected_today_solar_slot', not (a is None and b is None))
++    a, b = [row['clk06_observation']['selected_today_sky_slot'] for row in [left, right]]
++    check.exact_value(a, b, label + '/selected_today_sky_slot', not (a is None and b is None))

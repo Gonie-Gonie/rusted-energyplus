@@ -1,0 +1,14 @@
+   Compiling ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+   Compiling ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5m 50s
+     Running unittests src\main.rs (target\debug\deps\eplus_rs-dfdce69381af6960.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compare-3bf4640254bb210c.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compiler-4e22e7fd720cb275.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_conformance-231861d2db97950d.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_model-6c290119b93e77fd.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_oracle-f01e655ff43aca1e.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_raw_model-e915a6579ab39df4.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_run-019a2c94a2e9c96f.exe)
+     Running tests\arbitrary_run.rs (target\debug\deps\arbitrary_run-d9725998c35ae1cb.exe)
+error: test failed, to rerun pass `-p ep_run --test arbitrary_run`

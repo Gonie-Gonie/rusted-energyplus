@@ -1,0 +1,186 @@
+"""Other-author source/archive review; never import or execute the amendment writer."""
+import argparse
+import ast
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = '.runtime/porting/CLK-06/scope-amendment-prep-02/'
+HELD = {
+    'write_amendment.py': 'f0e12e4df968590cbc95be2e97ffa232eb5b6ab95aa80bb7e48a5275c9b1a63e',
+    'task-updates.json': 'c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d',
+    'CLK-06.proposed.md': '395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1'}
+GATES = ['scope_review', 'unit_gate', 'integration_gate', 'production_gate']
+PENDING, PASSED = '\ubbf8\ud655\uc778', '\ud1b5\uacfc'
+SEEN = {}
+
+
+def need(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def contained(value, exists=True):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    result = raw.resolve(strict=exists)
+    need(result != ROOT and result.is_relative_to(ROOT), 'Contained source/input metadata required')
+    return result
+
+
+def reference(value, expected=None):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    item = contained(raw)
+    need(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+         'Regular non-reparse source/input required')
+    need(item.suffix.lower() in {'.py', '.json', '.md', '.idf', '.epw', '.rs', '.cc', '.hh', '.txt'}
+         and info.st_size <= 16_000_000, 'Bounded sources and declared CON inputs only; no native results or binaries')
+    with item.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    need(expected is None or digest == expected, 'Actual held source/input SHA differs')
+    need(SEEN.setdefault(item, digest) == digest, 'Previously consumed bytes changed')
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def read(binding):
+    need(type(binding) is dict and set(binding) == {'path', 'sha256'}
+         and reference(binding['path'], binding['sha256']) == binding, 'Exact contained reference required')
+    return json.loads(contained(binding['path']).read_bytes())
+
+
+def unchanged():
+    for item, digest in list(SEEN.items()):
+        reference(item, digest)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args()
+    need(Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    started = now()
+    out = contained(args.output_dir, exists=False)
+    need(out.is_relative_to(ROOT / '.runtime/porting/CLK-06')
+         and out != ROOT / '.runtime/porting/CLK-06' and not out.exists(), 'Fresh ignored review output required')
+    refs = {name: reference(PREP + name, digest) for name, digest in HELD.items()}
+    text = contained(refs['write_amendment.py']['path']).read_text(encoding='utf8')
+    tree = ast.parse(text, filename=PREP + 'write_amendment.py')
+    imports = {node.names[0].name for node in tree.body if isinstance(node, ast.Import)}
+    need(imports == {'argparse', 'difflib', 'hashlib', 'json', 're', 'subprocess'}, 'Reviewed stdlib imports differ')
+    git_calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)
+                 and isinstance(node.func, ast.Name) and node.func.id == 'git']
+    need(git_calls and all(node.args and isinstance(node.args[0], ast.Constant)
+         and node.args[0].value in {'rev-parse', 'status', 'check-ignore'} for node in git_calls),
+         'Writer Git calls must remain read-only metadata')
+    tokens = ["len(rows) == 64", "One of other63 tasks changed", "all(old[key] == PENDING for key in GATES)",
+        "new['dependencies'] == ['CLK-02', 'CLK-03', 'CLK-04', 'CLK-05']", "Exact three amendment source paths required",
+        "Reviewed amendment source differs", "Actual executed source reviewer archive required",
+        "Source review must finish before amendment", "Only exact two canonical scope files may differ",
+        "for file in [PLAN, CARD]:", "file.write_bytes(after[file])", "actual_new_packet_projection_or_precision_freeze_claimed"]
+    need(all(token in text for token in tokens), 'Fully reviewed amendment guard source differs')
+    patch = read(refs['task-updates.json'])
+    need(patch['schema'] == 'clk06-scope-only-task-updates.v1' and patch['card'] == 'CLK-06'
+         and patch['gates_must_remain_pending'] == GATES and patch['actual_packet_or_precision_freeze_claimed'] is False
+         and patch['numerical_PASS_claimed'] is False, 'Scope-only input patch differs')
+    updates = patch['updates']
+    need(not ({'id', *GATES, 'evidence'} & set(updates))
+         and updates['dependencies'] == ['CLK-02', 'CLK-03', 'CLK-04', 'CLK-05'], 'No IDs/gates/evidence or other-card dependencies permitted')
+    profiles = updates['numeric_profiles']
+    expected = {'ESky': {'unit': '1', 'atol': 2e-15, 'rtol': 0.0},
+        'SkyTemp': {'unit': 'degC', 'atol': 1e-12, 'rtol': 1e-15},
+        'HorizIRSky': {'unit': 'W_per_m2', 'atol': 1e-12, 'rtol': 1e-15}}
+    for name in ['cloud_drivers', 'stored_interpolation_weights', 'owned_value_copies']:
+        expected[name] = {'comparison': 'scalar_bits_and_class_exact', 'atol': 0.0, 'rtol': 0.0}
+    need(profiles == expected, 'Root pre-output separately named precision decision differs')
+    for profile in profiles.values():
+        need(type(profile['atol']) is float and type(profile['rtol']) is float, 'Typed precision literals required')
+    card = contained(refs['CLK-06.proposed.md']['path']).read_text(encoding='utf8')
+    need(card.startswith('# CLK-06') and card.count('- [ ] ') == 4 and '- [x]' not in card
+         and all(token in card for token in ['ClarkAllen/useIR=true', 'solar2-only', 'SRC-08', '2e-15', '1e-12', '1e-15']),
+         'Proposed bounded default-lane card/four pending gates differs')
+    authority = patch['source_authority']
+    need(len(authority) == 4 and len({row['path'] for row in authority}) == 4, 'Exact four reviewed authority documents required')
+    for binding in authority:
+        reference(binding['path'], binding['sha256'])
+    proposal = read(authority[0])
+    need(proposal['schema'] == 'clk06-proposed-scope-amendment.v1' and proposal['card'] == 'CLK-06'
+         and proposal['energyplus_commit'] == '6f2e40d10250a105b49966baa24d843711e61048'
+         and proposal['input_scope_expanded'] is False and proposal['native_packet_emitted_or_frozen'] is False
+         and proposal['numerical_PASS_claimed'] is False, 'Historical unfrozen source proposal differs')
+    ranges = proposal['source_ranges']
+    need(len(ranges) == 50, 'Exact reviewed primary range inventory required')
+    for row in ranges:
+        reference(row['source']['path'], row['source']['sha256'])
+        data = contained(row['source']['path']).read_bytes().splitlines(keepends=True)
+        first, last = row['start_line'], row['end_line']
+        need(type(first) is int and type(last) is int and 1 <= first <= last <= len(data)
+             and hashlib.sha256(b''.join(data[first-1:last])).hexdigest() == row['range_sha256'], 'Exact source range bytes differ')
+    scope = read(proposal['admitted_scope'])
+    guards = [case[key] for case in scope['cases'] for key in ['input', 'weather', 'metadata']]
+    need(len(scope['cases']) == 15 and len(guards) == 45 and guards == proposal['literal_all_45_guard_refs'],
+         'Existing ordered15/45 CON admission differs')
+    for binding in guards:
+        reference(binding['path'], binding['sha256'])
+    for case in scope['cases']:
+        body = contained(case['input']['path']).read_text(encoding='utf-8-sig')
+        body = re.sub(r'![^\r\n]*', '', body)
+        names = [item.split(',', 1)[0].strip().casefold() for item in body.split(';') if item.strip()]
+        need('weatherproperty:skytemperature' not in names, 'Literal CON input admission changed')
+    plan_ref = reference('energyplus_porting_plan/plan.json')
+    before_card_ref = reference('energyplus_porting_plan/cards/CLK-06.md')
+    tasks = read(plan_ref)['tasks']
+    need(len(tasks) == len({task['id'] for task in tasks}) == 64, 'Existing64 unique tasks required')
+    indexed = {task['id']: task for task in tasks}
+    need(all(indexed['CLK-06'][key] == PENDING for key in GATES)
+         and all(indexed[name][key] == PASSED for name in ['CLK-02', 'CLK-03', 'CLK-04', 'CLK-05'] for key in GATES),
+         'Actual four prior cards complete and CLK06 four gates pending required')
+    before_card = contained(before_card_ref['path']).read_text(encoding='utf8')
+    need(before_card.count('- [ ] ') == 4 and '- [x]' not in before_card, 'Actual before card gates differ')
+    unchanged()
+    out.mkdir(parents=True)
+    (out / 'source').mkdir()
+    copies = []
+    for name, digest in HELD.items():
+        destination = out / 'source' / name
+        with destination.open('xb') as stream:
+            stream.write(contained(refs[name]['path']).read_bytes())
+        copies.append({'historical_path': PREP + name, 'archive': reference(destination, digest)})
+    own = out / 'executed-source-reviewer.py'
+    with own.open('xb') as stream:
+        stream.write(Path(__file__).read_bytes())
+    result = {'schema': 'clk06-independent-scope-amendment-writer-source-review.v1',
+        'status': 'pass-scope-only-source-before-canonical-metadata-amendment',
+        'review_started_utc': started, 'review_completed_utc': now(), 'reviewed_sources': copies,
+        'executed_reader_source_archive': reference(own), 'reviewed_source_authority': authority,
+        'actual_before_documents': [plan_ref, before_card_ref], 'actual_primary_range_count': 50,
+        'actual_admitted_IDF_count': 15, 'actual_ordered_guard_ref_count': 45,
+        'Root_decided_variable_profiles_before_future_outputs': profiles,
+        'scope_proposal01_is_historical_unfrozen_and_superseded_in_precision_by_reviewed_patch': True,
+        'scientific_execution_performed': False, 'numeric_operands_evaluated_or_compared': False,
+        'reviewed_writer_imported_or_executed': False, 'Git_or_process_runner_called_by_reviewer': False,
+        'canonical_files_or_gates_written': False, 'actual_packet_projection_precision_freeze_claimed': False,
+        'numerical_PASS_claimed': False, 'reviewed_tool_author': '/root/clk02_header_port',
+        'verifier_author': '/root/clk02_baseline_audit',
+        'authorship_limits': 'Baseline independently read Header document mutation/provenance guards. Baseline authored referenced readiness audit, hourly/producer and prior native/comparison glue; this does not independently certify own source physics or any scientific implementation.',
+        'limits': ['Only Root executes the separately reviewed two-document writer after a committed clean stage.',
+            'Other63 tasks and four pending CLK06 gates are protected by that writer; no new science gate is passed here.',
+            'Default ClarkAllen/useIRtrue remains the sole admitted proposal; alternatives and SRC08 remain unverified.']}
+    unchanged()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False)
+        stream.write('\n')
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,109 @@
+"""Authenticate independently read closure source bytes; no reviewed imports or science."""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+HELPER = ROOT / '.runtime/porting/CLK-06/gate-review-prep-02/metadata.py'
+HELPER_SHA = '02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526'
+if hashlib.sha256(HELPER.read_bytes()).hexdigest() != HELPER_SHA:
+    raise ValueError('Metadata-only helper differs before import')
+spec = importlib.util.spec_from_file_location('clk06_closure_source_metadata', HELPER)
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+MANIFEST = {'path': '.runtime/porting/CLK-06/closure-prep-04/manifest.json',
+    'sha256': 'd984b5b1435fba2c28e31484ba773c9ebe2f610a083949e7b1d03bddfa87af7c'}
+PREFIX = '.runtime/porting/CLK-06/closure-prep-04/'
+SOURCES = [('close_card.py', 'f0995b2536c57d8c37a2aee45c8c96a26a0568cf4c15f0b73c55c1d891d8eb8a'),
+    ('common.py', 'ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7')]
+SCHEMA = 'clk06-independent-closure-source-review.v1'
+STATUS = 'pass-metadata-closure-source-and-proof-interface-before-document-write'
+
+
+def inspect_sources(manifest):
+    m.need(manifest['schema'] == 'clk06-closure-source-preparation.v1'
+        and manifest['status'] == 'SOURCE-READY-HELD', 'Exact held closure preparation required')
+    rows = manifest['sources']
+    m.need(type(rows) is list and len(rows) == 2 and [row['path'] for row in rows]
+        == [PREFIX + name for name, _ in SOURCES], 'Exact ordered two closure source owners required')
+    texts = {}; originals = []
+    for row, (name, digest) in zip(rows, SOURCES, strict=True):
+        m.need(row['sha256'] == digest, 'Independently read held source identity differs')
+        path = m.verify(row); raw = path.read_bytes()
+        m.need(len(raw.splitlines()) == row['lines'], 'Held source line metadata differs')
+        text = raw.decode('utf-8-sig'); tree = ast.parse(text, filename=str(path))
+        texts[name] = text; originals.append(path)
+        modules = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import): modules.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom): modules.add(node.module)
+        allowed = {'pathlib','datetime','argparse','hashlib','importlib.util','json','re','shutil','struct'}
+        m.need(modules <= allowed, 'Closure sources must retain reviewed metadata-only import scope')
+    main = texts['close_card.py']; common = texts['common.py']
+    for token in [SCHEMA, STATUS, "v.exact(unit_qa['contracts'], admission['contracts'])",
+        "actual_final_quality", "archived_deltas"]:
+        m.need(token in main, 'Reviewed closure source/protocol predicate absent: ' + token)
+    for token in ["all_four_CLK06_gates_remain_pending", "other_63_raw_task_object_bytes_unchanged",
+        "only_CLK06_gates_updated", "source_snapshot", "production_ESky_metric_invented",
+        "pass-authenticated-selected-production-result-and-honest-unavailable-scope"]:
+        m.need(token in main, 'Reviewed scope/quality/no-invention predicate absent: ' + token)
+    m.need("def record(" in common and "def review(" in common and "def source_rows(" in common,
+        'Exact receipt/source authentication API required')
+    protocol = manifest['source_review_interface']
+    m.need(protocol['schema'] == SCHEMA and protocol['status'] == STATUS
+        and protocol['reviewed_sources_count'] == 2
+        and protocol['reviewed_sources_keys'] == ['historical_path','archive']
+        and protocol['executed_reader_source_archive_required'] is True
+        and protocol['actual_recorded_full_JSON_stdout_required'] is True,
+        'Closure writer SourceQA interface differs')
+    m.need(manifest['new_quality_lineage_execution_stage_introduced'] is False
+        and manifest['actual_SourceQA_or_closure_execution_performed'] is False
+        and manifest['scientific_execution_performed'] is False and manifest['canonical_files_changed'] is False,
+        'A source preparation cannot claim execution or changed gates')
+    return originals
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', required=True)
+    args = parser.parse_args()
+    m.need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    started = m.utc(); own = m.ref(__file__); helper = m.ref(HELPER, HELPER_SHA)
+    manifest = m.read(MANIFEST); originals = inspect_sources(manifest)
+    out = m.path(args.output_dir, exists=False)
+    m.need(out.is_relative_to(m.BASE) and out != m.BASE and not out.exists(), 'Fresh ignored review output required')
+    m.finish(); out.mkdir(parents=True)
+    reviewed = []
+    for index, original in enumerate(originals):
+        destination = out / (f'{index:02d}-' + original.name)
+        with destination.open('xb') as stream: stream.write(original.read_bytes())
+        archive = m.ref(destination)
+        m.need(archive['sha256'] == m.ref(original)['sha256'], 'Reviewed source copy differs')
+        reviewed.append({'historical_path': original.relative_to(ROOT).as_posix(), 'archive': archive})
+    archives = []
+    for name, original, declared in [('executed-source-reviewer.py', Path(__file__), own),
+        ('executed-metadata.py', HELPER, helper)]:
+        destination = out / name
+        with destination.open('xb') as stream: stream.write(original.read_bytes())
+        archive = m.ref(destination)
+        m.need(archive['sha256'] == declared['sha256'], 'Actual reviewer dependency copy differs')
+        archives.append(archive)
+    report = {'schema': SCHEMA, 'status': STATUS, 'review_started_utc': started,
+        'reviewed_source_manifest': MANIFEST, 'reviewed_sources': reviewed,
+        'executed_reader_source_archive': archives[0], 'executed_metadata_source_archive': archives[1],
+        'reviewer_source_path': own, 'metadata_utility': helper,
+        'source_only_static_read_and_AST': True, 'reviewed_modules_imported_or_executed': False,
+        'scientific_execution_performed': False, 'numerical_result_payloads_read': False,
+        'future_proof_outcomes_or_hashes_guessed': False, 'canonical_files_changed': False, 'gates_updated': False,
+        'extra_quality_lineage_execution_stage_required': False,
+        'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header independently read Baseline closure metadata writer, not its reused scientific algorithms. Header authored earlier sky/helper/workflow/source-review code; own physics is not independently self-certified. Root and Raw review this recorder and Root alone performs actual execution.'}
+    m.finish(); report['review_completed_utc'] = m.utc()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(report, stream, ensure_ascii=True, indent=2, allow_nan=False); stream.write('\n')
+    m.finish(); print(json.dumps(report, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__': main()

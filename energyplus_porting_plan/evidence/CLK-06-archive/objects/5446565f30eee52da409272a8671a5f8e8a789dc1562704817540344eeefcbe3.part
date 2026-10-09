@@ -1,0 +1,265 @@
+--- .runtime/porting/CLK-05/comparer-prep-01/metadata.py
++++ .runtime/porting/CLK-06/comparer-prep-02/metadata.py
+@@ -3,34 +3,55 @@
+ from common import (v, ROOT, require, exact, read, ref, binding, recorded, archives,
+     script, argument, path_of, timestamp)
+ 
+-COUNTS = {'setup_cases': 3, 'weather_sequences': 36, 'GetNextEnvironment': 36,
+-    'InitializeWeather': 550, 'weather_operations': 586, 'total_operations': 589}
++DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
++    'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
++
++
++def requested(request):
++    direct = len(request['emissivity_cases'])
++    counts = {'setup_cases': len(request['setup_cases']), 'emissivity_cases': direct,
++        'weather_sequences': len(request['weather_sequences']), 'CalcSkyEmissivity': direct,
++        **{kind: 0 for kind in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky']},
++        'weather_operations': 0, 'total_operations': len(request['setup_cases']) + direct}
++    for sequence in request['weather_sequences']:
++        for operation in sequence['operations']:
++            require(operation['kind'] in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky'],
++                'Closed source operation kind required')
++            for key in [operation['kind'], 'weather_operations','total_operations']:
++                counts[key] += 1
++    require(exact(request['requested_counts'], counts), 'Derived request cardinality differs')
++    return counts
+ 
+ 
+ def packet(args, checked):
+     admission_ref = ref(args.native_admission_contract)
+     admission = read(checked.check(admission_ref))
+-    require(admission['schema'] == 'clk05-native-admission-contract.v1' and admission['frozen_before_numerical_execution'] is True,
+-        'Actual frozen one-way C5 native admission required')
++    require(admission['schema'] == 'clk06-native-admission-contract.v1' and admission['frozen_before_numerical_execution'] is True,
++        'Actual frozen one-way C6 native admission required')
+     for field in ['expected_values_supplied', 'expected_exits_supplied', 'scientific_execution_performed', 'gates_updated']:
+         require(admission[field] is False, 'Input-only admission boundary differs')
+     require(set(admission['contracts']) == {'source', 'cases', 'tolerances'}, 'Exactly three source/case/tolerance contracts required')
+     contracts = {key: read(checked.check(row)) for key, row in admission['contracts'].items()}
+     for key, row in contracts.items():
+-        require(row['schema'] == 'clk05-' + key + '-contract.v1' and row['frozen_before_numerical_execution'] is True
+-            and row['card'] == 'CLK-05', 'Actual frozen C5 contract required')
++        require(row['schema'] == 'clk06-' + key + '-contract.v1' and row['frozen_before_numerical_execution'] is True
++            and row['card'] == 'CLK-06', 'Actual frozen C6 contract required')
+     request = read(checked.check(admission['helper_request']))
+     projection = read(checked.check(admission['projection']))
+-    require(request['schema'] == 'clk05-helper-cases.v1' and request['energyplus_commit'] == v.PIN
++    require(request['schema'] == 'clk06-helper-cases.v1' and request['energyplus_commit'] == v.PIN
+         and exact(request['contracts'], {key: admission['contracts'][key] for key in ['source', 'tolerances']}), 'One-way native request differs')
+     for field in ['expected_values_supplied', 'expected_exits_supplied', 'original_results_supplied_to_Rust', 'scientific_execution_performed']:
+         require(request[field] is False, 'Request supplied source outputs/expected answers')
+     binding(contracts['cases']['helper_request'], admission['helper_request'], checked)
+     binding(projection['helper_request'], admission['helper_request'], checked)
+-    require(projection['schema'] == 'clk05-observation-projection.v1' and exact(projection['contracts'], admission['contracts'])
++    require(projection['schema'] == 'clk06-observation-projection.v1' and exact(projection['contracts'], admission['contracts'])
+         and exact(projection['native_observation_policy'], request['observation_policy'])
+-        and projection['unavailable_counted_as_PASS'] is False, 'Original frozen solar projection differs')
+-    require(exact(request['requested_counts'], COUNTS) and exact(admission['requested_counts'], COUNTS), 'Declared cardinality differs')
++        and projection['unavailable_counted_as_PASS'] is False, 'Original frozen sky/cloud projection differs')
++    require(exact(admission['requested_counts'], requested(request)), 'Declared cardinality differs')
++    for item in [admission, request, projection, *contracts.values()]:
++        binding(item['root_preoutput_decision'], DECISION, checked)
++    decision = read(checked.check(DECISION))
++    require(exact(contracts['tolerances']['numeric_profiles'], decision['numeric_profiles']), 'Root precision profiles differ')
++    binding(projection['production_transport_source_inventory'], admission['production_transport_source_inventory'], checked)
+     scope = read(checked.check(admission['fixed_scope']))
+     rows = [row[key] for row in scope['cases'] for key in ['input', 'weather', 'metadata']]
+     require(len(rows) == 45 and exact(rows, admission['all_45_guard_refs']) and exact(rows, request['all_45_guard_refs']), 'Ordered45 CON input guard differs')
+@@ -51,7 +72,7 @@
+ def original(args, checked, admission_ref, admission):
+     reference_ref = ref(args.original_reference)
+     reference = read(checked.check(reference_ref))
+-    require(reference['schema'] == 'clk05-original-reference.v1'
++    require(reference['schema'] == 'clk06-original-reference.v1'
+         and reference['status'] == 'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review'
+         and reference['actual_helper_exit_code'] == reference['actual_launcher_exit_code'] == 0
+         and reference['preservation_checks_passed'] is True, 'Genuine completed native0/wrapper0 reference required')
+@@ -63,29 +84,39 @@
+         'actual_helper_exit_code': 0, 'actual_launcher_exit_code': 0}
+     outer, outer_start, outer_finish = recorded(checked, ref(args.original_execution), outer_payload)
+     child = read(checked.check(reference['execution']))
+-    require(child['schema'] == 'clk05-original-native-command.v1' and child['spawn_error'] is None, 'Real native child receipt required')
++    require(child['schema'] == 'clk06-original-native-command.v1' and child['spawn_error'] is None, 'Real native child receipt required')
+     child_start, child_finish = v.execution_interval(child, checked)
+     require(outer_start <= child_start <= child_finish <= outer_finish, 'Native child lies outside its recorded launcher interval')
+     command = child['command']
+     require(len(command) == 5 and path_of(command[0]) == checked.check(reference['executed_helper'])
+         and path_of(command[1]) == ROOT and path_of(command[2]) == checked.check(admission['helper_request'])
+-        and path_of(command[3]) == checked.check(admission_ref), 'Genuine argc5 native child inputs differ')
++        and path_of(command[3]) == checked.check(admission_ref)
++        and path_of(command[4]) == checked.check(reference['results']).parent, 'Genuine argc5 native child inputs differ')
+     native_build = read(checked.check(reference['native_driver_build']))
+-    require(native_build['schema'] == 'clk05-native-driver-build.v1' and native_build['checks_passed'] is True
+-        and native_build['target'] == 'clk05_reference_helper', 'Actual accepted unique native build required')
++    require(native_build['schema'] == 'clk06-native-driver-build.v1' and native_build['checks_passed'] is True
++        and native_build['target'] == 'clk06_reference_helper', 'Actual accepted unique native build required')
+     binding(reference['executed_helper'], native_build['helper_binary'], checked)
++    for key, expected in [('binary', reference['executed_helper']), ('request', admission['helper_request']),
++        ('native_admission_contract', admission_ref), ('observation_projection', admission['projection']),
++        ('native_driver_build', reference['native_driver_build'])]:
++        binding(child[key], expected, checked)
+     qa_ref, qa_execution_ref = ref(args.original_data_review), ref(args.original_data_review_execution)
+     qa = read(checked.check(qa_ref))
+-    require(qa['schema'] == 'clk05-independent-original-data-review.v1'
++    require(qa['schema'] == 'clk06-independent-original-data-review.v1'
+         and qa['status'] == 'pass-preserved-original-data-before-Rust-baseline'
+         and qa['intended_native_branch_coverage_complete'] is True and qa['scientific_values_compared'] is False
+-        and qa['actual_operation_invocations'] == 589 and qa['actual_operations_skipped'] == 0,
++        and qa['actual_operation_invocations'] == admission['requested_counts']['total_operations'] and qa['actual_operations_skipped'] == 0,
+         'Actual independent intended native data coverage required before Rust')
+     qa_record, qa_start, qa_finish = recorded(checked, qa_execution_ref, qa)
+     qa_sources = archives(qa['reviewed_reader_sources'], checked)
+     require(len(qa_sources) == 3, 'Actual recorded three-module data reviewer source required')
+     qa_main = [row for owner, row in qa_sources.items() if owner.endswith('/review_data.py')]
+     require(len(qa_main) == 1, 'Unique actual metadata data-reviewer main required')
++    binding(qa['executed_reader_source_archive'], qa_main[0], checked)
++    for field, suffix in [('executed_metadata_source_archive','/metadata.py'), ('executed_shape_source_archive','/shape.py')]:
++        candidates = [archive for owner, archive in qa_sources.items() if owner.endswith(suffix)]
++        require(len(candidates) == 1, 'Unique authenticated data-review dependency required')
++        binding(qa[field], candidates[0], checked)
+     script(qa_record, qa_main[0], checked)
+     require(outer_finish <= qa_start <= timestamp(qa['review_started_utc']) <= timestamp(qa['review_completed_utc']) <= qa_finish,
+         'Original data review chronology differs')
+@@ -93,19 +124,26 @@
+         ('reviewed_execution', ref(args.original_execution)), ('reviewed_native_execution', reference['execution']),
+         ('reviewed_request', admission['helper_request']), ('reviewed_native_admission_contract', admission_ref),
+         ('reviewed_projection', admission['projection']), ('reviewed_build', reference['native_driver_build']),
++        ('reviewed_build_execution', reference['actual_build_execution']),
+         ('reviewed_build_review', reference['independent_actual_build_review']),
+-        ('reviewed_build_review_execution', reference['independent_actual_build_review_execution'])]:
++        ('reviewed_build_review_execution', reference['independent_actual_build_review_execution']),
++        ('reviewed_contract_review', native_build['independent_contract_review']),
++        ('reviewed_root_preoutput_decision', admission['root_preoutput_decision'])]:
+         binding(qa[key], expected, checked)
+     require(exact(qa['reviewed_contracts'], admission['contracts']), 'Actual original QA contract inventory differs')
+     control = admission['production_control_review']
+-    require(set(qa['reviewed_control_review']) == {'review', 'execution'}, 'Actual control-review bundle required')
++    require(exact(qa['reviewed_control_review'], control), 'Actual complete control-review bundle differs')
+     for key in ['review', 'execution']:
+         binding(qa['reviewed_control_review'][key], control[key], checked)
+     require(qa['numerical_PASS_claimed'] is False and qa['source_unavailable_counted_as_PASS'] is False, 'Data QA cannot substitute scientific PASS')
++    require(qa['numerical_comparison_count'] is None and qa['numerical_mismatch_count'] is None,
++        'Actual Original data review cannot forge numerical comparison counts')
+     native = read(checked.check(reference['results']))
+-    require(native['schema'] == 'clk05-helper-results.v1' and native['complete'] is True
++    require(native['schema'] == 'clk06-helper-results.v1' and native['complete'] is True
++        and native['energyplus_commit'] == v.PIN
+         and native['scientific_comparison_performed'] is False and native['full_simulation_or_selected_scope_PASS_claimed'] is False,
+         'Actual passive original observations required')
++    binding(native['root_preoutput_decision'], admission['root_preoutput_decision'], checked)
+     for key, expected in [('actual_request', admission['helper_request']), ('native_admission_contract', admission_ref),
+         ('observation_projection', admission['projection'])]:
+         binding(native[key], expected, checked)
+@@ -123,8 +161,8 @@
+     if marker not in owner or not owner.endswith('.rs'):
+         return owner
+     name = Path(owner).name
+-    stem = 'clk05_existing' if mode == 'legacy' else 'clk05_candidate'
+-    main = 'clk05_existing_observer.rs' if mode == 'legacy' else 'clk05_candidate_probe.rs'
++    stem = 'clk06_existing' if mode == 'legacy' else 'clk06_candidate'
++    main = 'clk06_existing_observer.rs' if mode == 'legacy' else 'clk06_candidate_probe.rs'
+     return 'crates/ep_runtime/examples/' + (main if name == main else stem + '_support/' + name)
+ 
+ 
+@@ -133,8 +171,8 @@
+     wrapper_ref, projection_ref = ref(args.observer_request), ref(args.observer_projection)
+     wrapper, projection = read(checked.check(wrapper_ref)), read(checked.check(projection_ref))
+     prefix = 'existing' if mode == 'legacy' else 'candidate'
+-    require(wrapper['schema'] == 'clk05-' + prefix + '-observer-request.v1' and projection['schema'] ==
+-        'clk05-' + prefix + '-observer-projection.v1', 'Actual mode-specific input-only observer wrapper/projection required')
++    require(wrapper['schema'] == 'clk06-' + prefix + '-observer-request.v1' and projection['schema'] ==
++        'clk06-' + prefix + '-observer-projection.v1', 'Actual mode-specific input-only observer wrapper/projection required')
+     for field in ['expected_values_supplied', 'native_results_supplied', 'Rust_outputs_supplied_as_inputs', 'scientific_execution_performed', 'gates_updated']:
+         require(wrapper[field] is False, 'Observer was supplied expected/source outputs')
+     for key, expected in [('native_request', admission['helper_request']), ('native_admission_contract', admission_ref),
+@@ -142,17 +180,20 @@
+         binding(wrapper[key], expected, checked)
+     binding(projection['observer_request'], wrapper_ref, checked)
+     require(exact(wrapper['contracts'], admission['contracts']) and exact(projection['contracts'], admission['contracts'])
+-        and exact(wrapper['requested_counts'], COUNTS) and projection['unavailable_counted_as_PASS'] is False,
++        and exact(wrapper['requested_counts'], admission['requested_counts']) and projection['unavailable_counted_as_PASS'] is False,
+         'Observer projection cannot alter native selections or input counts')
+     for field in ['native_observation_policy', 'observer_sources', 'actual_public_API_sources', 'requested_counts']:
+         require(exact(projection[field], wrapper[field]), 'Separate observer projection differs from input wrapper')
+     source_qa = read(checked.check(wrapper['independent_source_review']))
+-    require(source_qa['schema'] == 'clk05-independent-' + prefix + '-observer-source-review.v1'
++    require(source_qa['schema'] == 'clk06-independent-' + prefix + '-observer-source-review.v1'
+         and source_qa['status'] == 'pass-input-only-' + prefix + '-observer-and-projection-before-execution'
+         and source_qa['scientific_execution_performed'] is False, 'Actual independent observer source review required')
+     source_record, source_start, source_finish = recorded(checked, ref(args.observer_source_review_execution), source_qa)
+     require(source_start <= timestamp(source_qa['review_started_utc']) <= timestamp(source_qa['review_completed_utc']) <= source_finish
+         <= timestamp(wrapper['created_utc']), 'Source QA must predate wrapper emission')
++    binding(source_qa['reviewed_helper_request'], admission['helper_request'], checked)
++    binding(source_qa['reviewed_native_contract'], admission_ref, checked)
++    binding(source_qa['root_preoutput_decision'], DECISION, checked)
+     reviewed = archives(source_qa['reviewed_sources'], checked)
+     script(source_record, source_qa['executed_reader_source_archive'], checked)
+     rows = wrapper['observer_sources'] + wrapper['actual_public_API_sources']
+@@ -174,7 +215,7 @@
+     argument(emission, '--source-review', wrapper['independent_source_review'], checked)
+     require(emission_start <= timestamp(wrapper['created_utc']) == timestamp(projection['created_utc']) <= emission_finish,
+         'Actual observer input emission interval differs')
+-    example = 'clk05_existing_observer' if mode == 'legacy' else 'clk05_candidate_probe'
++    example = 'clk06_existing_observer' if mode == 'legacy' else 'clk06_candidate_probe'
+     build_ref, execution_ref = ref(args.rust_build), ref(args.rust_execution)
+     build, available, compilation = v.verify_rust_build(build_ref, checked, kind='example', example=example, committed=True,
+         required_sources=['crates/ep_runtime/examples/' + example + '.rs', 'crates/ep_runtime/src/weather_day/producer.rs'])
+@@ -193,7 +234,19 @@
+         owner = compiled_owner(row['path'], mode)
+         if owner.startswith('crates/'):
+             require(owner in available and available[owner]['sha256'] == row['sha256'], 'Actual compiled source/API differs from reviewed wrapper: ' + owner)
+-    require(result['schema'] == 'clk05-' + prefix + '-probe-results.v1' and result['all_bound_inputs_unchanged'] is True,
++    if mode == 'legacy':
++        before = read(checked.check(source_record['source_snapshot']))
++        require(before['schema'] == 'rust-command-source-snapshot.v1' and before['bytes_normalized'] is False,
++            'Actual pre-promotion raw source snapshot required')
++        previous = v.archive_map(before['files'], checked)
++        additions = {compiled_owner(row['path'], mode) for row in wrapper['observer_sources']
++            if '/legacy-observer-prep-' in row['path'] and row['path'].endswith('.rs')}
++        require(len(additions) == 5 and not (set(previous) & additions)
++            and set(available) == set(previous) | additions, 'Only five reviewed observation files may be added before legacy build')
++        for owner, archive in previous.items():
++            require(archive['sha256'] == available[owner]['sha256'],
++                'Pre-existing Rust/source/config bytes changed before legacy: ' + owner)
++    require(result['schema'] == 'clk06-' + prefix + '-probe-results.v1' and result['all_bound_inputs_unchanged'] is True,
+         'Actual mode-specific Rust stdout observations required')
+     binding(result['actual_request'], wrapper_ref, checked)
+     binding(result['actual_native_request'], admission['helper_request'], checked)
+@@ -203,21 +256,22 @@
+         require(result[field] is False, 'Rust observer falsely claimed expected/native inputs or numerical certification')
+     require(result['numerical_comparison_count'] is None and result['numerical_mismatch_count'] is None,
+         'Actual observer observation must not forge comparator counts')
++    require(result['solar_control_owned_storage_available'] is True and result['requested_solar_controls_applied'] is True
++        and result['native_current_sky_globals_paired'] is False
++        and result['whole_native_sky_environment_owner_available'] is False,
++        'Actual four controls and unavailable sky Environment/current5 ownership boundary differs')
++    for obj in [wrapper, projection, result]:
++        binding(obj['root_preoutput_decision'], DECISION, checked)
+     if mode == 'legacy':
+         require(wrapper['frozen_before_existing_Rust_observer_numerical_execution'] is True,
+             'Existing observer input freeze must predate genuine numerical execution')
+-        require(result['solar_control_registration_available'] is False and result['requested_solar_controls_applied'] is False,
+-            'Existing missing control owner must remain unavailable/unapplied')
+     else:
+         require(wrapper['frozen_before_Rust_candidate_numerical_execution'] is True,
+             'Candidate wrapper must predate genuine candidate numerical execution')
+-        require(result['solar_control_owner_available'] is True and result['requested_solar_controls_applied'] is True
+-            and result['whole_production_registration_certified_by_probe'] is False,
+-            'Actual selected control ownership is distinct from whole simulation registration')
+         require(args.baseline_gap is not None and args.baseline_gap_execution is not None, 'Candidate admission requires authentic completed baseline gap')
+         gap_ref = ref(args.baseline_gap); gap = read(checked.check(gap_ref))
+-        require(gap['schema'] == 'clk05-existing-baseline-gap.v1'
+-            and gap['status'] == 'observed-authenticated-existing-solar-differences-and-unavailable-source-scope'
++        require(gap['schema'] == 'clk06-existing-baseline-gap.v1'
++            and gap['status'] == 'observed-authenticated-existing-sky-differences-and-unavailable-source-scope'
+             and gap['numerical_PASS_claimed'] is False and gap['unavailable_counted_as_PASS'] is False,
+             'Baseline observation completion is distinct from numerical PASS')
+         _, _, gap_finish = recorded(checked, ref(args.baseline_gap_execution), gap)
+@@ -229,5 +283,6 @@
+         'observer_source_review': wrapper['independent_source_review'], 'observer_source_review_execution': ref(args.observer_source_review_execution),
+         'observer_input_execution': ref(args.observer_input_execution), 'Rust_build': build_ref, 'Rust_execution': execution_ref,
+         'Rust_results': run['stdout'], 'implementation_commit': build['implementation_commit'], 'crates_tree': build['crates_tree'],
++        'existing_scientific_source_bytes_unchanged_except_five_observer_additions': mode == 'legacy',
+         'available_source_inventory_count': len(available), 'actual_Rust_completed_utc': run_finish.isoformat()})
+     return result, evidence, run_start

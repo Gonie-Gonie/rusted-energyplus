@@ -1,0 +1,11 @@
+--- .runtime/porting/CLK-06/comparer-prep-01/state.py
++++ .runtime/porting/CLK-06/comparer-prep-02/state.py
+@@ -161,7 +161,7 @@
+         check.excluded(label + '/clk06_observation/' + field,
+             'Native default model/current5 and existing Current13 are passive context, no new CLK06 physical certification')
+     a, b = actual['clk06_observation']['selected_today_sky_slot'], native['clk06_observation']['selected_today_sky_slot']
+-    if check.availability(a, b, label + '/selected_today_sky_slot', False):
++    if check.availability(a, b, label + '/selected_today_sky_slot'):
+         check.discrete([a['hour'], a['time_step']], [b['hour'], b['time_step']], label + '/selected_today_sky_slot/index')
+         for field in SKY:
+             check.numeric(a['value'][field], b['value'][field], label + '/selected_today_sky_slot/' + field, field)

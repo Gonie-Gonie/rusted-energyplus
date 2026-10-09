@@ -1,0 +1,1296 @@
+{
+  "schema": "clk06-single-target-retention-removal-plan.v1",
+  "status": "pass-actual-closure-and-prerequisites-removal-not-performed",
+  "started_utc": "2026-10-09T10:04:37.647528+00:00",
+  "completed_utc": "2026-10-09T10:07:37.903825+00:00",
+  "actual_writer_command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime\\porting\\CLK-06\\retention-prep-03\\write_plan.py",
+    "--proof-bindings",
+    ".runtime\\porting\\CLK-06\\root-approved-completion-01\\retirement-proof-bindings.json",
+    "--closure",
+    ".runtime\\porting\\CLK-06\\closure-01\\closure-result.json",
+    "--closure-execution",
+    ".runtime\\porting\\CLK-06\\closure-command-01\\receipt.json",
+    "--source-review",
+    ".runtime\\porting\\CLK-06\\independent-retirement-writer-source-review-02\\review.json",
+    "--source-review-execution",
+    ".runtime\\porting\\CLK-06\\independent-retirement-writer-source-review-command-02\\receipt.json",
+    "--output-dir",
+    ".runtime\\porting\\CLK-06\\retirement-plan-01"
+  ],
+  "actual_writer_cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "source_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-02/review.json",
+      "sha256": "90b1319511f305ef890b14a25e9a163d379666d6b114a4b29d4a712508cfacd1"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-command-02/receipt.json",
+      "sha256": "917e8cac5d18af2d86bb98b278594206cec14e512e2f2e24115de8f4c2fcea30"
+    }
+  },
+  "accepted_policy": {
+    "path": "energyplus_porting_plan/evidence/native-helper-retention-policy.json",
+    "sha256": "782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379"
+  },
+  "predecessor_registry": {
+    "path": ".runtime/porting/CLK-05/retirement-01/registry-retired.json",
+    "sha256": "db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6"
+  },
+  "actual_card_closure": {
+    "closure": {
+      "path": ".runtime/porting/CLK-06/closure-01/closure-result.json",
+      "sha256": "0a8b8801886c61f3d98ad9e3266f8dbe15e4b364180e89174e80eb7971bb3c1a"
+    },
+    "closure_execution": {
+      "path": ".runtime/porting/CLK-06/closure-command-01/receipt.json",
+      "sha256": "6b53de2f03137c049bdc6f51d3646a49be46a238c7d2e92e3d598676adfa4417"
+    },
+    "canonical_after": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "34268f7ee2b75265879388a8837f65927adffffa89a8249d14fe05de4aea3eb1"
+      },
+      {
+        "path": "energyplus_porting_plan/cards/CLK-06.md",
+        "sha256": "533094776492a66810adbb3a92180fd035199b4a4fa0a9a5a80524b603ad50fd"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-06.json",
+        "sha256": "798a9b075eedc343fa28fae9840dccc560a8d862b76baf5b69a7c19983d28d33"
+      }
+    ]
+  },
+  "evidence": {
+    "native-build": {
+      "path": ".runtime/porting/CLK-06/native-build-01/native-driver-build.json",
+      "sha256": "eafcb354a1eeab9d86d584394d08c5335e00e977505fd0de95dc0c36bed10994"
+    },
+    "native-build-execution": {
+      "path": ".runtime/porting/CLK-06/native-build-command-01/receipt.json",
+      "sha256": "d5918e1c10f82ab8e83a463170a0fdacaf5d6dfd46355ca4e9a525cf280a4b09"
+    },
+    "native-build-review": {
+      "path": ".runtime/porting/CLK-06/independent-native-build-review-01/review.json",
+      "sha256": "2a9377fe5330ba0bb28e7cbd94014fdb4d21b181a7ec27c40540f5219484fb1f"
+    },
+    "native-build-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-native-build-review-command-01/receipt.json",
+      "sha256": "dbe6e678585aec0a9547d0f320109cfda4365c595051d265060fc0d4af309668"
+    },
+    "original-data-review": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+      "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+    },
+    "original-data-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-command-02/receipt.json",
+      "sha256": "29e648e600a070e80b19f08f9f1f39a1a72f72da818a3eb5674f8f01e8ce8884"
+    },
+    "legacy-gap": {
+      "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+      "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+    },
+    "legacy-gap-execution": {
+      "path": ".runtime/porting/CLK-06/existing-baseline-gap-command-01/receipt.json",
+      "sha256": "bb86b0233042f77444884e18594903cc37ccd1bb658cbb7536d28be0c12d2b98"
+    },
+    "unit-comparison": {
+      "path": ".runtime/porting/CLK-06/candidate-unit-comparison-01/unit-comparison.json",
+      "sha256": "50da815d739269907fde1cec18f775aa21018b0aa5b5fc3bc09bf258fb7404d3"
+    },
+    "unit-execution": {
+      "path": ".runtime/porting/CLK-06/candidate-unit-comparison-command-01/receipt.json",
+      "sha256": "d017f971d60cc9158b96da3b45f63d88bfe768b731a7a58dce76a257d4d81b74"
+    },
+    "unit-result-review": {
+      "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/review.json",
+      "sha256": "04da992e1a8e34bc64e6d1f8fdd736b19dd7196794ddd3df9198f39e3443ab85"
+    },
+    "unit-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-command-01/receipt.json",
+      "sha256": "3f2f5206265509e0538c5717eb5aff4851d430b6570ac194e2a63ae945290835"
+    },
+    "production-comparison": {
+      "path": ".runtime/porting/CLK-06/production-comparison-02/production-comparison.json",
+      "sha256": "4e5c1f7b21b2933eea27af25f03489c4077c3b2cc65980d25e4cc52780821625"
+    },
+    "production-execution": {
+      "path": ".runtime/porting/CLK-06/production-comparison-command-02/receipt.json",
+      "sha256": "127b4c3fc3a2f8e3b23640bbf5d8ea29a7fb3b04d8358f2799e4384ac2affb83"
+    },
+    "production-result-review": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-03/review.json",
+      "sha256": "b693cd52c73cd0ac475da19a50458b15e7004cce22119e2c9c41479898125b3a"
+    },
+    "production-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-command-03/receipt.json",
+      "sha256": "528140cd8c207fca28ce10355619e9d4c0a0c7418280d29ef041887b1441b845"
+    },
+    "final-workspace-execution": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-03/receipt.json",
+      "sha256": "90d51a4b7f7a270eddd7a940cb375063f95e3329b06e7ba0d83a92a9565588fc"
+    },
+    "final-clippy-execution": {
+      "path": ".runtime/porting/CLK-06/clippy-command-02/receipt.json",
+      "sha256": "278443659d8629ca7210afaeb113d523666788895cbc13a89bfa6101013c6ddc"
+    },
+    "final-format-execution": {
+      "path": ".runtime/porting/CLK-06/final-format-check-command-03/receipt.json",
+      "sha256": "12eec5fa9e40598118cf8fb979aafea6fe59d134eaf726f497ea9685568af7f7"
+    },
+    "final-source-quality-execution": {
+      "path": ".runtime/porting/CLK-06/source-quality-command-05/receipt.json",
+      "sha256": "12329c4c876bb6a877e9521a9ccd3bc1bb5a0dc8c5a408af088a48ecfc1c485a"
+    },
+    "final-structure-execution": {
+      "path": ".runtime/porting/CLK-06/structure-quality-command-04/receipt.json",
+      "sha256": "5ba52c4f86dc821e87e0d4e0a1ef80d1d0d2addf0e73966b7a9e864c45989f42"
+    },
+    "archive": {
+      "path": "energyplus_porting_plan/evidence/CLK-06-archive/archive.json",
+      "sha256": "9e028c79e43397b372d076634be810a2ce2e04686574f5313a762f4ae1450f57"
+    },
+    "archive-execution": {
+      "path": ".runtime/porting/CLK-06/archive-command-01/receipt.json",
+      "sha256": "dcc54bc86cc361a4853926e8de55119dfb1230184dd38e1d3a95b66476ca8942"
+    },
+    "archive-verification-execution": {
+      "path": ".runtime/porting/CLK-06/archive-verification-command-01/receipt.json",
+      "sha256": "6ce655a2ed608544bec73b6bfde94df00148dbce54eb255d93bbdd1a881723d8"
+    }
+  },
+  "only_candidates": {
+    "clk06_reference_helper": {
+      "historical_path": ".runtime/ep261-gcc13-o0/Products/clk06_reference_helper.exe",
+      "sha256": "672dfd6b708833bbcc0f1869c5933a595423be86404b06142b5a179392545fb4",
+      "size_bytes": 1297365278,
+      "resolved_absolute_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\clk06_reference_helper.exe",
+      "resolved_products_directory": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products",
+      "currently_present": true,
+      "regular_non_reparse_file": true
+    }
+  },
+  "protected_and_retained_observations": [
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/clk01_reference.exe",
+        "sha256": "ace586a027c4e9a7fc69a30fda2f300d1b53cba37241d2e899a125f24193243a"
+      },
+      "size_bytes": 1295075960
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo01_reference.exe",
+        "sha256": "17326cef0a4031f4b8bcec74a0c28fd5bdfd50d411f6f13ac79170e838793525"
+      },
+      "size_bytes": 10461347
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference.exe",
+        "sha256": "c156d4f9ade6513a62cca3de914a284393747bc3f473c42d3ac2e4d9c9798376"
+      },
+      "size_bytes": 10725212
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference_helper.exe",
+        "sha256": "c4b6f40a63c74edbde5ef75f86f3ca7dc6f4c7a767092eea0118189379f8fbed"
+      },
+      "size_bytes": 1296114664
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference.exe",
+        "sha256": "4e4bcf739a9f8d060c8490b73460f287ba4c01de1670afbd31040cc06a850cb5"
+      },
+      "size_bytes": 10670219
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference_helper.exe",
+        "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95"
+      },
+      "size_bytes": 1297356300
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reachability.exe",
+        "sha256": "a22c1f764d8e5e65d4a5af1fdc1787ad318ba9fa0cef218b32789a9ea7e29320"
+      },
+      "size_bytes": 8073860
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference.exe",
+        "sha256": "fa26b9313975bfbb974aa5e3ee0722e1a8bb247436e0a3bd42bd5abbe814b400"
+      },
+      "size_bytes": 1293674975
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference_replay.exe",
+        "sha256": "5e5731a185cc6aa70b9597864c0a3033cd21f66f03e8ea27d5427843ec3e6f72"
+      },
+      "size_bytes": 1293675487
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference.exe",
+        "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+      },
+      "size_bytes": 9941020
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+        "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+      },
+      "size_bytes": 1296118832
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694"
+      },
+      "size_bytes": 1832731010
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+        "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33"
+      },
+      "size_bytes": 1305150896
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/ep261-gcc13-o0/Products/libobjexx.a",
+        "sha256": "578c18d523cb1fed2d377c60eb79b4e1e27bdea66da172c91d9a018010a7968c"
+      },
+      "size_bytes": 1752352
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-02/native-build-01/derivation/derived-helper.exe",
+        "sha256": "e41e8daf807dafed76ba61fc94637cedfb6f2d6cf9bb6cfbb7b3ab24a1fd9447"
+      },
+      "size_bytes": 149804630
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-03/derivation/derived-helper.exe",
+        "sha256": "b6890f2a1fac5f485a0d8c75ef99c9949094cd5680ab40226f8077a3a89690e2"
+      },
+      "size_bytes": 150145144
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/matched-native-build-01/derivation/derived-helper.exe",
+        "sha256": "3100aba0fce1e09438d61e8647ef6c2ad90dec2196e051094087ab2576da03f6"
+      },
+      "size_bytes": 150396414
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/retained-failed-original/clk03_reference_helper.exe",
+        "sha256": "1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3"
+      },
+      "size_bytes": 1296271028
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-03/native-build-02/derivation/derived-helper.exe",
+        "sha256": "4ca6866f0e6558a2fcbaf425e95ff7907f8a6e9d7740f3e82f73d6aa54929854"
+      },
+      "size_bytes": 150101996
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+        "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb"
+      },
+      "size_bytes": 150539944
+    },
+    {
+      "role": "previously-protected-live-file",
+      "binary": {
+        "path": ".runtime/porting/CLK-05/native-build-01/derivation/derived-helper.exe",
+        "sha256": "132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217"
+      },
+      "size_bytes": 150455372
+    },
+    {
+      "role": "CLK06-accepted-retained-derivative",
+      "binary": {
+        "path": ".runtime/porting/CLK-06/native-build-01/derivation/derived-helper.exe",
+        "sha256": "7e60b98d56fa25e203eb42df6395bee598146091a9dcc0483aee0e04afdefc8d"
+      },
+      "size_bytes": 150595264
+    }
+  ],
+  "proposed_successor_registry": {
+    "schema": "native-retained-artifact-registry.proposed.v6",
+    "predecessor": {
+      "path": ".runtime/porting/CLK-05/retirement-01/registry-retired.json",
+      "sha256": "db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6"
+    },
+    "legacy_products": [
+      {
+        "target": "clk01_reference",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/clk01_reference.exe",
+          "sha256": "ace586a027c4e9a7fc69a30fda2f300d1b53cba37241d2e899a125f24193243a"
+        },
+        "size_bytes": 1295075960,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[0]"
+      },
+      {
+        "target": "geo01_reference",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/geo01_reference.exe",
+          "sha256": "17326cef0a4031f4b8bcec74a0c28fd5bdfd50d411f6f13ac79170e838793525"
+        },
+        "size_bytes": 10461347,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[1]"
+      },
+      {
+        "target": "geo02_reference",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference.exe",
+          "sha256": "c156d4f9ade6513a62cca3de914a284393747bc3f473c42d3ac2e4d9c9798376"
+        },
+        "size_bytes": 10725212,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[2]"
+      },
+      {
+        "target": "geo02_reference_helper",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/geo02_reference_helper.exe",
+          "sha256": "c4b6f40a63c74edbde5ef75f86f3ca7dc6f4c7a767092eea0118189379f8fbed"
+        },
+        "size_bytes": 1296114664,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[3]"
+      },
+      {
+        "target": "geo03_reference",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference.exe",
+          "sha256": "4e4bcf739a9f8d060c8490b73460f287ba4c01de1670afbd31040cc06a850cb5"
+        },
+        "size_bytes": 10670219,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[4]"
+      },
+      {
+        "target": "geo03_reference_helper",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/geo03_reference_helper.exe",
+          "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95"
+        },
+        "size_bytes": 1297356300,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[5]"
+      },
+      {
+        "target": "psy02_reachability",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/psy02_reachability.exe",
+          "sha256": "a22c1f764d8e5e65d4a5af1fdc1787ad318ba9fa0cef218b32789a9ea7e29320"
+        },
+        "size_bytes": 8073860,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[6]"
+      },
+      {
+        "target": "psy02_reference",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference.exe",
+          "sha256": "fa26b9313975bfbb974aa5e3ee0722e1a8bb247436e0a3bd42bd5abbe814b400"
+        },
+        "size_bytes": 1293674975,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[7]"
+      },
+      {
+        "target": "psy02_reference_replay",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/psy02_reference_replay.exe",
+          "sha256": "5e5731a185cc6aa70b9597864c0a3033cd21f66f03e8ea27d5427843ec3e6f72"
+        },
+        "size_bytes": 1293675487,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "previous_card_products[8]"
+      },
+      {
+        "target": "zon01_reference",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference.exe",
+          "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+        },
+        "size_bytes": 9941020,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "binaries.zon01_reference.linked_build_binary",
+        "original_historical_identity": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/zon01_reference.exe",
+          "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+        },
+        "existing_execution_archive": {
+          "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference.exe",
+          "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+        }
+      },
+      {
+        "target": "zon01_reference_helper",
+        "retention_class": "legacy-live-product",
+        "binary": {
+          "path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+          "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+        },
+        "size_bytes": 1296118832,
+        "originating_receipt": {
+          "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+          "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+        },
+        "receipt_selector": "binaries.zon01_reference_helper.linked_build_binary",
+        "original_historical_identity": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/zon01_reference_helper.exe",
+          "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+        },
+        "existing_execution_archive": {
+          "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+          "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+        }
+      }
+    ],
+    "legacy_product_count": 11,
+    "protected_core_API_and_container": [
+      {
+        "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+        "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694",
+        "bytes": 1832731010
+      },
+      {
+        "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+        "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33",
+        "bytes": 1305150896
+      },
+      {
+        "path": ".runtime/ep261-gcc13-o0/Products/libobjexx.a",
+        "sha256": "578c18d523cb1fed2d377c60eb79b4e1e27bdea66da172c91d9a018010a7968c",
+        "bytes": 1752352
+      }
+    ],
+    "new_targets": [
+      {
+        "schema": "native-new-target-retention-entry.v1",
+        "card": "CLK-02",
+        "target": "clk02_reference_helper",
+        "retention_class": "new-validated-derivative",
+        "status": "retained-derivative-original-retired",
+        "original_link": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk02_reference_helper.exe",
+          "sha256": "c862da2948be4630f859bed0569e099ebe8e9738365ca146d9add7c790f85339",
+          "size_bytes": 1295668993
+        },
+        "retained_derivative": {
+          "path": ".runtime/porting/CLK-02/native-build-01/derivation/derived-helper.exe",
+          "sha256": "e41e8daf807dafed76ba61fc94637cedfb6f2d6cf9bb6cfbb7b3ab24a1fd9447",
+          "size_bytes": 149804630
+        },
+        "evidence": {
+          "accepted_policy": {
+            "path": "energyplus_porting_plan/evidence/native-helper-retention-policy.json",
+            "sha256": "782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379"
+          },
+          "protected_baseline_registry": {
+            "path": ".runtime/porting/native-retention-transition-01/registry.json",
+            "sha256": "f2455dc3cc74f5840fab60b58aba79b01b250bb15dcf399932915ddd6a43abc6"
+          },
+          "genuine_build": {
+            "path": ".runtime/porting/CLK-02/native-build-01/native-driver-build.json",
+            "sha256": "b9f727f19b6835a17457322a64446d1e904aabc92add04ef6871a62ec4af617b"
+          },
+          "validated_derivative": {
+            "path": ".runtime/porting/CLK-02/native-build-01/derivation/receipt.json",
+            "sha256": "7c370a48729c1b9ef1405cd1be3f98a4ff06c4e577e0e6f7c8a23b212d6a4a5f"
+          },
+          "independent_build_and_actual_PE_review": {
+            "path": ".runtime/porting/CLK-02/independent-native-build-review-02/review.json",
+            "sha256": "933d4d674901653fe18a931bf5127b93d40351aee83fc94b5c22022ca6adbce8"
+          },
+          "actual_original_first": {
+            "path": ".runtime/porting/CLK-02/original-helper-first-01/helper-reference.json",
+            "sha256": "afa446961b4df0651c916a84a24a816814da8becb48b952e511049e7cc4bc3d0"
+          },
+          "independent_initial_original_data_review": {
+            "path": ".runtime/porting/CLK-02/independent-original-data-review-01/review.json",
+            "sha256": "a1acff78956de2f20ac101caef5e90e7a4970b2d4f62ec925fef158d39492b28"
+          },
+          "completed_unit_report": {
+            "path": ".runtime/porting/CLK-02/canonical-unit-comparison-01/unit-comparison.json",
+            "sha256": "502dd9e0e74ffddf675c288a0dd4d474b576cbfa67f7c33f22aeef7737403e09"
+          },
+          "completed_production_report": {
+            "path": ".runtime/porting/CLK-02/canonical-production-comparison-01/production-comparison.json",
+            "sha256": "fc3a10e90c1b5bcf82b51d332d4218986776f2a21caf97b747ca8caad30c1966"
+          }
+        },
+        "unstripped_original": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk02_reference_helper.exe",
+          "sha256": "c862da2948be4630f859bed0569e099ebe8e9738365ca146d9add7c790f85339",
+          "size_bytes": 1295668993,
+          "disposition": "removed-with-actual-absence-receipt",
+          "full_debug_archive_created": false,
+          "hash_or_map_recovers_discarded_debug_bytes": false,
+          "deterministic_relink_recovery_claimed": false,
+          "full_debug_bytes_available": false
+        },
+        "removal_receipt": {
+          "path": ".runtime/porting/CLK-02/retirement-command-01/removal-receipt.json",
+          "sha256": "e8aa4b71e5b6679905bc52a798422a4779564ea527db4bbc09a04201aa57cc53"
+        },
+        "actual_removal_observed": true
+      },
+      {
+        "schema": "native-new-target-retention-entry.v1",
+        "card": "CLK-03",
+        "target": "clk03_reference_helper",
+        "retention_class": "new-validated-derivative",
+        "status": "retained-derivative-original-retired",
+        "original_link": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk03_reference_helper.exe",
+          "sha256": "7844273b5f9d28c2de8c91f8029a4949130701ccefadd896f5518f5b3450fcfc",
+          "size_bytes": 1296364990
+        },
+        "retained_derivative": {
+          "path": ".runtime/porting/CLK-03/native-build-03/derivation/derived-helper.exe",
+          "sha256": "b6890f2a1fac5f485a0d8c75ef99c9949094cd5680ab40226f8077a3a89690e2",
+          "size_bytes": 150145144
+        },
+        "evidence": {
+          "build": {
+            "path": ".runtime/porting/CLK-03/native-build-03/native-driver-build.json",
+            "sha256": "cdc90a5e5806c03e98355e7cd1593a0638ea1a5c7f801aa52ac7aad73c1a2700"
+          },
+          "build_review": {
+            "path": ".runtime/porting/CLK-03/independent-native-build-review-03/review.json",
+            "sha256": "771f09567e5d1b3c91fcbd54f9519f0cb415a63db8560818576f62277162b01a"
+          },
+          "original": {
+            "path": ".runtime/porting/CLK-03/original-helper-first-03/helper-reference.json",
+            "sha256": "0513bc94d02703d299cb0a63bc66fa11a0b405e0d0873d3e61a0916a4e123cdc"
+          },
+          "data_review": {
+            "path": ".runtime/porting/CLK-03/independent-original-data-review-02/review.json",
+            "sha256": "b8874a962db7c71f6395a5b3ccd811e780fffacc048a76d67bc215634f756166"
+          },
+          "validated_derivative": {
+            "path": ".runtime/porting/CLK-03/native-build-03/derivation/receipt.json",
+            "sha256": "6c11f918535058d01b4846ac549f56351decb7f847a1e42dc31ec6485e407e96"
+          }
+        },
+        "unstripped_original": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk03_reference_helper.exe",
+          "sha256": "7844273b5f9d28c2de8c91f8029a4949130701ccefadd896f5518f5b3450fcfc",
+          "size_bytes": 1296364990,
+          "disposition": "removed-with-actual-absence-receipt",
+          "full_debug_archive_created": false,
+          "hash_or_map_recovers_discarded_debug_bytes": false,
+          "deterministic_relink_recovery_claimed": false,
+          "full_debug_bytes_available": false
+        },
+        "removal_receipt": {
+          "path": ".runtime/porting/CLK-03/retirement-01/clk03_reference_helper-removal-receipt.json",
+          "sha256": "aed7c0d6f967bb707a0fd9f603072992f167186bb27781b79f0c179e5901fabb"
+        },
+        "actual_removal_observed": true
+      },
+      {
+        "schema": "native-new-target-retention-entry.v1",
+        "card": "CLK-03",
+        "target": "clk03_production_reference_helper",
+        "retention_class": "new-validated-derivative",
+        "status": "retained-derivative-original-retired",
+        "original_link": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk03_production_reference_helper.exe",
+          "sha256": "b22b4c8e3abd7fb7b55e8a8ad29480b82fcfbb4565fedf82cf453381c16e0085",
+          "size_bytes": 1296885338
+        },
+        "retained_derivative": {
+          "path": ".runtime/porting/CLK-03/matched-native-build-01/derivation/derived-helper.exe",
+          "sha256": "3100aba0fce1e09438d61e8647ef6c2ad90dec2196e051094087ab2576da03f6",
+          "size_bytes": 150396414
+        },
+        "evidence": {
+          "build": {
+            "path": ".runtime/porting/CLK-03/matched-native-build-01/native-driver-build.json",
+            "sha256": "a0fbe3ff2a6c807c33a0db14a39f518dce0514d6f1b8086ffbc3e974763d64ea"
+          },
+          "build_review": {
+            "path": ".runtime/porting/CLK-03/independent-matched-production-native-build-review-01/review.json",
+            "sha256": "33792e1dc9c3a5fa1b7374a405d1904f97d235d6f6ce463dd96af34aef278b92"
+          },
+          "original": {
+            "path": ".runtime/porting/CLK-03/matched-original-first-01/helper-reference.json",
+            "sha256": "172d704acb24b84bc120b9f6ecb173426b7b247a1f24cbe2a543c893c1a35974"
+          },
+          "data_review": {
+            "path": ".runtime/porting/CLK-03/independent-matched-original-data-review-02/review.json",
+            "sha256": "997980c8f10ece57ce67b6ae3023726737953620802cea7179ee31e824928ce6"
+          },
+          "validated_derivative": {
+            "path": ".runtime/porting/CLK-03/matched-native-build-01/derivation/receipt.json",
+            "sha256": "bc649298936d336592fe555c5af8a44ae77114498c56b8a06c7150adb5e0de77"
+          }
+        },
+        "unstripped_original": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk03_production_reference_helper.exe",
+          "sha256": "b22b4c8e3abd7fb7b55e8a8ad29480b82fcfbb4565fedf82cf453381c16e0085",
+          "size_bytes": 1296885338,
+          "disposition": "removed-with-actual-absence-receipt",
+          "full_debug_archive_created": false,
+          "hash_or_map_recovers_discarded_debug_bytes": false,
+          "deterministic_relink_recovery_claimed": false,
+          "full_debug_bytes_available": false
+        },
+        "removal_receipt": {
+          "path": ".runtime/porting/CLK-03/retirement-01/clk03_production_reference_helper-removal-receipt.json",
+          "sha256": "0e004acf676cc077ab769f3e0fe097e4257bf677960e3aaef640ac1801f712ef"
+        },
+        "actual_removal_observed": true
+      },
+      {
+        "schema": "native-new-target-retention-entry.v1",
+        "card": "CLK-04",
+        "target": "clk04_reference_helper",
+        "retention_class": "new-validated-derivative",
+        "status": "retained-derivative-original-retired",
+        "original_link": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk04_reference_helper.exe",
+          "sha256": "a36a1cccc6e1ddf26f15c4ba79c84fd60936d0039af6c711ec8f233875df376f",
+          "size_bytes": 1297205477
+        },
+        "retained_derivative": {
+          "path": ".runtime/porting/CLK-04/native-build-02/derivation/derived-helper.exe",
+          "sha256": "ee4d5e41080664e68ccfb17e4bf2457b62e40a2780ed5843b43fa971e57669cb",
+          "size_bytes": 150539944
+        },
+        "evidence": {
+          "unit-comparison": {
+            "path": ".runtime/porting/CLK-04/candidate-unit-comparison-03/unit-comparison.json",
+            "sha256": "ad547d36ac37d5e69a6ef5317f6409c09e0875de91c951e5c9532af31c1d3ac6"
+          },
+          "unit-execution": {
+            "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-03/receipt.json",
+            "sha256": "c9cedf230525b380d699d04b710b6044ac7b6f49e56d610d0039d0434cf78182"
+          },
+          "unit-result-review": {
+            "path": ".runtime/porting/CLK-04/independent-unit-result-review-01/review.json",
+            "sha256": "d7425d39aadbb5de36496ce98ec3b5c506888454fad10bbad6bb24dd2f763c9e"
+          },
+          "unit-review-execution": {
+            "path": ".runtime/porting/CLK-04/independent-unit-result-review-command-01/receipt.json",
+            "sha256": "468245444e6d7a7e7067d7aa4ae870bff29170fe2cba82d6e361960d3cd44bac"
+          },
+          "production-comparison": {
+            "path": ".runtime/porting/CLK-04/production-comparison-02/production-comparison.json",
+            "sha256": "4a29c5e1bb90caf1a89e81af99c697f4d80f7ed9b92079cfcbac6e18555649a6"
+          },
+          "production-execution": {
+            "path": ".runtime/porting/CLK-04/production-comparison-command-02/receipt.json",
+            "sha256": "d52899a59912422f4d7cab04d21ded20d4b851f2fb29b43736ac3be7669e08d5"
+          },
+          "production-result-review": {
+            "path": ".runtime/porting/CLK-04/independent-production-result-review-01/review.json",
+            "sha256": "c20b44ed08809176a727d4bfa9798af31f7b9b01d23fd832dc9358a2802cf41a"
+          },
+          "production-review-execution": {
+            "path": ".runtime/porting/CLK-04/independent-production-result-review-command-01/receipt.json",
+            "sha256": "695d6f496cfc3b0be404f540008733f181c89dbaba46a20d180fc9c8ae1daf0b"
+          },
+          "original-data-review": {
+            "path": ".runtime/porting/CLK-04/independent-original-data-review-01/review.json",
+            "sha256": "164d2d65dbc6d26f0f5ea02c258e8bf30ba868a6c5492e4360eb8c7fdb2536c1"
+          },
+          "original-data-review-execution": {
+            "path": ".runtime/porting/CLK-04/independent-original-data-review-command-01/receipt.json",
+            "sha256": "1c918fc62e6a32351dc52dca42516a30df868eff32ce83ea573d35fef9dff0b0"
+          },
+          "native-build": {
+            "path": ".runtime/porting/CLK-04/native-build-02/native-driver-build.json",
+            "sha256": "1888d15247b92f57a73806a8e197114407d18805946b65d2e5e7e0efd9e438fc"
+          },
+          "native-build-review": {
+            "path": ".runtime/porting/CLK-04/independent-native-build-review-01/review.json",
+            "sha256": "95b786ddce451f154054585e67e00106785246fd691c28ceca8d9c987e4b1400"
+          },
+          "native-build-review-execution": {
+            "path": ".runtime/porting/CLK-04/independent-native-build-review-command-01/receipt.json",
+            "sha256": "803ff81f35a9210fd71ed7c1a83da7b69bc038cdf1c368087aa3ebc64ebc6fc5"
+          },
+          "quality-lineage": {
+            "path": ".runtime/porting/CLK-04/quality-source-lineage-01/lineage.json",
+            "sha256": "657abda88a12c6fa68ad993958df31da79bd43c828bdeda31d751c2c7cb4b68f"
+          },
+          "quality-lineage-execution": {
+            "path": ".runtime/porting/CLK-04/quality-source-lineage-command-01/receipt.json",
+            "sha256": "e303237b8e5eb5b9dee290d12589d11f939cbecaffb484f3ba56f8e402d5acc3"
+          },
+          "preserved-failed-unit-comparison": {
+            "path": ".runtime/porting/CLK-04/candidate-unit-comparison-02/unit-comparison.json",
+            "sha256": "efce900319ad89ebcb7566e9777dd0ee9f9f329185eb77d055c7f00e108b6575"
+          },
+          "preserved-failed-unit-execution": {
+            "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-02/receipt.json",
+            "sha256": "15a830d384dc97bfe04f759aa3f091b335929a3d33af61c61657e8a6aecf6ad9"
+          },
+          "preserved-failed-production-comparison": {
+            "path": ".runtime/porting/CLK-04/production-comparison-01/production-comparison.json",
+            "sha256": "703d3bc076e433b114244a199c8a009b83237f26b4f1832836363436ab90395f"
+          },
+          "preserved-failed-production-execution": {
+            "path": ".runtime/porting/CLK-04/production-comparison-command-01/receipt.json",
+            "sha256": "bd22959bec7cd1ec106f9b9b35a0e030f44d6e067f47883da2ac113dbf69ee67"
+          },
+          "preserved-unit-metadata-failure-execution": {
+            "path": ".runtime/porting/CLK-04/candidate-unit-comparison-command-01/receipt.json",
+            "sha256": "332cf43edf500e9bc7aaaad06e6e182fee779cef4b0d7b683de6475cc39e1e9e"
+          },
+          "preserved-historical-clippy-execution": {
+            "path": ".runtime/porting/CLK-04/candidate-clippy-command-01/receipt.json",
+            "sha256": "8475edf40de512527ebc0a0a1937e0eb431c9ec47db845eee8951bdb68920cff"
+          },
+          "preserved-failed-supplemental-source-review-execution": {
+            "path": ".runtime/porting/CLK-04/independent-production-reader-amendment-source-review-command-01/receipt.json",
+            "sha256": "6db68010249538d4de04253f98273f5c7e067a1e76af0c62a73079af53247bf6"
+          },
+          "native-execution": {
+            "path": ".runtime/porting/CLK-04/original-first-02/helper-command.json",
+            "sha256": "50493a818d2c2c79f08dc6deffa0cc78a327434e3a5013452588b0f71a347a93"
+          },
+          "failed-original-parent": {
+            "path": ".runtime/porting/CLK-04/original-first-command-02/receipt.json",
+            "sha256": "b28ddaa77873187959beb732915200d332dd75ff368e51eaadc0b85d0d93ec9e"
+          },
+          "original-recovery": {
+            "path": ".runtime/porting/CLK-04/original-recovery-01/recovery.json",
+            "sha256": "9bfd727c3ac94cadc2b27e99afd5c844396b3218a1aed5eb45d89ffa358113e6"
+          },
+          "original-recovery-execution": {
+            "path": ".runtime/porting/CLK-04/original-recovery-command-01/receipt.json",
+            "sha256": "31c79c8bf24c1769cd071d1bd0848ebdf5461f46f31d8a111a969e9d5a3a7130"
+          }
+        },
+        "historical_native_exit_code": 0,
+        "historical_wrapper_exit_code": 1,
+        "metadata_recovery_exit_code": 0,
+        "unstripped_original": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk04_reference_helper.exe",
+          "sha256": "a36a1cccc6e1ddf26f15c4ba79c84fd60936d0039af6c711ec8f233875df376f",
+          "size_bytes": 1297205477,
+          "disposition": "removed-with-actual-absence-receipt",
+          "full_debug_archive_created": false,
+          "hash_or_map_recovers_discarded_debug_bytes": false,
+          "deterministic_relink_recovery_claimed": false,
+          "full_debug_bytes_available": false
+        },
+        "removal_receipt": {
+          "path": ".runtime/porting/CLK-04/retirement-01/clk04_reference_helper-removal-receipt.json",
+          "sha256": "75a2876684e9f18e5af85162d74e72f38a01116c250b305777d266392c6b08e5"
+        },
+        "actual_removal_observed": true
+      },
+      {
+        "schema": "native-new-target-retention-entry.v1",
+        "card": "CLK-05",
+        "target": "clk05_reference_helper",
+        "retention_class": "new-validated-derivative",
+        "status": "retained-derivative-original-retired",
+        "original_link": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe",
+          "sha256": "b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc",
+          "size_bytes": 1296986812
+        },
+        "retained_derivative": {
+          "path": ".runtime/porting/CLK-05/native-build-01/derivation/derived-helper.exe",
+          "sha256": "132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217",
+          "size_bytes": 150455372
+        },
+        "evidence": {
+          "native-build": {
+            "path": ".runtime/porting/CLK-05/native-build-01/native-driver-build.json",
+            "sha256": "df8dbf64a983c06b01964916d0fd6e1fadf88325078ae229a7a7b4027df457b0"
+          },
+          "native-build-execution": {
+            "path": ".runtime/porting/CLK-05/native-build-command-01/receipt.json",
+            "sha256": "c7c5093484cb702dac70913ca0070b79fc00d448d13b9f063f1e0ac385f246fb"
+          },
+          "native-build-review": {
+            "path": ".runtime/porting/CLK-05/independent-native-build-review-01/review.json",
+            "sha256": "39b689c90c67dd13de1084e0f8078f2acaee26f15060ba900586ca0ab0d5f0b2"
+          },
+          "native-build-review-execution": {
+            "path": ".runtime/porting/CLK-05/independent-native-build-review-command-01/receipt.json",
+            "sha256": "e33c0b7bc72a8bd08f7b3c21274a1e40270a014d2941c3b75093027f16e11189"
+          },
+          "original-data-review": {
+            "path": ".runtime/porting/CLK-05/independent-original-data-review-01/review.json",
+            "sha256": "5d2a5e2809c6ad92846988beb241795b7a9eaf65a0af01f65569ae103ec964fd"
+          },
+          "original-data-review-execution": {
+            "path": ".runtime/porting/CLK-05/independent-original-data-review-command-01/receipt.json",
+            "sha256": "76652b179c640eb765c14674a8ad85377efd7736f18419636b2bdabe6a4f4562"
+          },
+          "legacy-gap": {
+            "path": ".runtime/porting/CLK-05/existing-baseline-gap-01/gap.json",
+            "sha256": "dae13dac1e3f655ed2c30ff989cea902208430a351dd7508c24da18b02c52814"
+          },
+          "legacy-gap-execution": {
+            "path": ".runtime/porting/CLK-05/existing-baseline-gap-command-01/receipt.json",
+            "sha256": "6aabd238f94901ecd37985ed044ead6ac669e604212c79966b710075a0153da5"
+          },
+          "unit-comparison": {
+            "path": ".runtime/porting/CLK-05/candidate-unit-comparison-03/unit-comparison.json",
+            "sha256": "10e9df569ad262729b87bb55d1da062ec4c1feccc29a88d52a672f58c3d94e90"
+          },
+          "unit-execution": {
+            "path": ".runtime/porting/CLK-05/candidate-unit-comparison-command-03/receipt.json",
+            "sha256": "f516f4f3b4dde490737992bca92012a3bd7d1ff473bcfb6eab6780f0f48b66b6"
+          },
+          "unit-result-review": {
+            "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-02/review.json",
+            "sha256": "808c7159ebfcd196aa1f395d5e1b0887e60a9d93e98bcc83956abf7d1b094518"
+          },
+          "unit-review-execution": {
+            "path": ".runtime/porting/CLK-05/independent-candidate-unit-result-review-command-02/receipt.json",
+            "sha256": "63c22ff3e735be316886d8facbdf5f4a48837938fcae5e4814ba114375aa44b1"
+          },
+          "production-comparison": {
+            "path": ".runtime/porting/CLK-05/production-comparison-02/production-comparison.json",
+            "sha256": "882ecb56871a64841ae17c41cb15c3f72a42c8fc2c1ab3a18e05d2a0488fd24a"
+          },
+          "production-execution": {
+            "path": ".runtime/porting/CLK-05/production-comparison-command-02/receipt.json",
+            "sha256": "9573d0eb1d3965fbe2fbbace0bf20fe49a70f99e2782d0e6356b6a98e53f9734"
+          },
+          "production-result-review": {
+            "path": ".runtime/porting/CLK-05/independent-production-result-review-02/review.json",
+            "sha256": "a4e4b1457080cc9220199c02e8f7c74a284da099104bf0cc9e73e4742f30925a"
+          },
+          "production-review-execution": {
+            "path": ".runtime/porting/CLK-05/independent-production-result-review-command-02/receipt.json",
+            "sha256": "24e6d7ef3e2facff84f2f10c41152c2fcf5d8ac61f69d3a23536e3dc9b1fc170"
+          },
+          "quality-lineage": {
+            "path": ".runtime/porting/CLK-05/final-quality-lineage-01/lineage.json",
+            "sha256": "25df5b49695ac752290ef3636ab00d0adf60356825e79f9e00b64da6fb552e7f"
+          },
+          "quality-lineage-execution": {
+            "path": ".runtime/porting/CLK-05/final-quality-lineage-command-01/receipt.json",
+            "sha256": "9c437117c64548f54aeb2d6cf982150179ca858d7b741a3d439f9f971835c706"
+          },
+          "preserved-history/unit-counter-owner-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/candidate-unit-comparison-01/unit-comparison.json",
+            "sha256": "0f8184435f249a2725f2b6b625735e5efa6c539f552401789d96e9748b42885b"
+          },
+          "preserved-history/unit-counter-owner-failure/execution": {
+            "path": ".runtime/porting/CLK-05/candidate-unit-comparison-command-01/receipt.json",
+            "sha256": "5886218de1259d226c469b92dfb86695021539236501d77b055a9ad0e9ca021c"
+          },
+          "preserved-history/production-schedule-owner-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/production-comparison-01/production-comparison.json",
+            "sha256": "c36ae50d49b6022c438ee43d3864a8a65be96104bc3374b56013808fb68b644e"
+          },
+          "preserved-history/production-schedule-owner-failure/execution": {
+            "path": ".runtime/porting/CLK-05/production-comparison-command-01/receipt.json",
+            "sha256": "9e2e3f8726a8aa0b2db543488383860e12ece19a994599468ae53166e9c2442f"
+          },
+          "preserved-history/historical-clippy-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/final-clippy-command-01/receipt.json",
+            "sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee"
+          },
+          "preserved-history/historical-clippy-failure/execution": {
+            "path": ".runtime/porting/CLK-05/final-clippy-command-01/receipt.json",
+            "sha256": "e9f4fec72a3972afc88a01391a3dad470869c33a02e647b246581fcbc83864ee"
+          },
+          "preserved-history/historical-passive-observer-clippy-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/final-clippy-command-02/receipt.json",
+            "sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e"
+          },
+          "preserved-history/historical-passive-observer-clippy-failure/execution": {
+            "path": ".runtime/porting/CLK-05/final-clippy-command-02/receipt.json",
+            "sha256": "8cf06bcbfeb994f549c1cf4e7068da504de5f1cad645083539c2eb6a1e98e09e"
+          },
+          "preserved-history/historical-workspace-fixture-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/workspace-test-command-01/receipt.json",
+            "sha256": "e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1"
+          },
+          "preserved-history/historical-workspace-fixture-failure/execution": {
+            "path": ".runtime/porting/CLK-05/workspace-test-command-01/receipt.json",
+            "sha256": "e29294a4e8c41c4ca14f7843ef2fb3719df02726acbc6572ccdce51144569db1"
+          },
+          "preserved-history/historical-missing-build-plan-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/production-plan-command-01/receipt.json",
+            "sha256": "75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6"
+          },
+          "preserved-history/historical-missing-build-plan-failure/execution": {
+            "path": ".runtime/porting/CLK-05/production-plan-command-01/receipt.json",
+            "sha256": "75c557bb7cf766ecc933a6609f0f4e6c969a5ec0f9854c92fa24874e5d5501f6"
+          },
+          "preserved-history/historical-wrong-package-freeze-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/production-CLI-build-freeze-command-01/receipt.json",
+            "sha256": "e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8"
+          },
+          "preserved-history/historical-wrong-package-freeze-failure/execution": {
+            "path": ".runtime/porting/CLK-05/production-CLI-build-freeze-command-01/receipt.json",
+            "sha256": "e2d8a3dc6994603a572fa254145c6525f628487ef80744709d26ac740b24dab8"
+          },
+          "preserved-history/historical-production-result-review-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/independent-production-result-review-command-01/receipt.json",
+            "sha256": "cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9"
+          },
+          "preserved-history/historical-production-result-review-failure/execution": {
+            "path": ".runtime/porting/CLK-05/independent-production-result-review-command-01/receipt.json",
+            "sha256": "cd693a5fb0f2dd06f4d0e873852b8c8934fe27fd7639f6944dc45d839f9142b9"
+          },
+          "preserved-history/historical-native-build-stdout-protocol-plan-failure/artifact": {
+            "path": ".runtime/porting/CLK-05/retirement-plan-command-01/receipt.json",
+            "sha256": "e465692d4d6598a1e6ba2ba8fa2a5c26698ffdfd822465980f7978e3b909d904"
+          },
+          "preserved-history/historical-native-build-stdout-protocol-plan-failure/execution": {
+            "path": ".runtime/porting/CLK-05/retirement-plan-command-01/receipt.json",
+            "sha256": "e465692d4d6598a1e6ba2ba8fa2a5c26698ffdfd822465980f7978e3b909d904"
+          },
+          "native-execution": {
+            "path": ".runtime/porting/CLK-05/original-execution-01/helper-command.json",
+            "sha256": "770e5e1e793fb48bbb28574ec888e902aefc0e1d978ce3557854e56f7f1f4319"
+          },
+          "original-reference": {
+            "path": ".runtime/porting/CLK-05/original-execution-01/helper-reference.json",
+            "sha256": "e5cb6fee58abb978abd8c1fa92c4ef1bafcd80d2df1efe505a1c156cd512d820"
+          },
+          "original-execution": {
+            "path": ".runtime/porting/CLK-05/original-execution-command-01/receipt.json",
+            "sha256": "ab9fcdb9d2de3de9aa32f421d3135f77c6ef3f02678d8ee9a80c45aeb4847e24"
+          }
+        },
+        "historical_native_exit_code": 0,
+        "historical_wrapper_exit_code": 0,
+        "metadata_recovery_performed": false,
+        "unstripped_original": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe",
+          "sha256": "b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc",
+          "size_bytes": 1296986812,
+          "disposition": "removed-with-actual-absence-receipt",
+          "full_debug_archive_created": false,
+          "hash_or_map_recovers_discarded_debug_bytes": false,
+          "deterministic_relink_recovery_claimed": false,
+          "full_debug_bytes_available": false
+        },
+        "removal_receipt": {
+          "path": ".runtime/porting/CLK-05/retirement-01/clk05_reference_helper-removal-receipt.json",
+          "sha256": "e073b1d0c09eb6646636eeae37de073646661ab81ae7ac78637e7dc1bf1dcee0"
+        },
+        "actual_removal_observed": true
+      },
+      {
+        "schema": "native-new-target-retention-entry.proposed.v1",
+        "card": "CLK-06",
+        "target": "clk06_reference_helper",
+        "retention_class": "new-validated-derivative",
+        "status": "proposed-live-original-not-admitted",
+        "original_link": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk06_reference_helper.exe",
+          "sha256": "672dfd6b708833bbcc0f1869c5933a595423be86404b06142b5a179392545fb4",
+          "size_bytes": 1297365278
+        },
+        "retained_derivative": {
+          "path": ".runtime/porting/CLK-06/native-build-01/derivation/derived-helper.exe",
+          "sha256": "7e60b98d56fa25e203eb42df6395bee598146091a9dcc0483aee0e04afdefc8d",
+          "size_bytes": 150595264
+        },
+        "evidence": {
+          "native-build": {
+            "path": ".runtime/porting/CLK-06/native-build-01/native-driver-build.json",
+            "sha256": "eafcb354a1eeab9d86d584394d08c5335e00e977505fd0de95dc0c36bed10994"
+          },
+          "native-build-execution": {
+            "path": ".runtime/porting/CLK-06/native-build-command-01/receipt.json",
+            "sha256": "d5918e1c10f82ab8e83a463170a0fdacaf5d6dfd46355ca4e9a525cf280a4b09"
+          },
+          "native-build-review": {
+            "path": ".runtime/porting/CLK-06/independent-native-build-review-01/review.json",
+            "sha256": "2a9377fe5330ba0bb28e7cbd94014fdb4d21b181a7ec27c40540f5219484fb1f"
+          },
+          "native-build-review-execution": {
+            "path": ".runtime/porting/CLK-06/independent-native-build-review-command-01/receipt.json",
+            "sha256": "dbe6e678585aec0a9547d0f320109cfda4365c595051d265060fc0d4af309668"
+          },
+          "original-data-review": {
+            "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+            "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+          },
+          "original-data-review-execution": {
+            "path": ".runtime/porting/CLK-06/independent-original-data-review-command-02/receipt.json",
+            "sha256": "29e648e600a070e80b19f08f9f1f39a1a72f72da818a3eb5674f8f01e8ce8884"
+          },
+          "legacy-gap": {
+            "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+            "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+          },
+          "legacy-gap-execution": {
+            "path": ".runtime/porting/CLK-06/existing-baseline-gap-command-01/receipt.json",
+            "sha256": "bb86b0233042f77444884e18594903cc37ccd1bb658cbb7536d28be0c12d2b98"
+          },
+          "unit-comparison": {
+            "path": ".runtime/porting/CLK-06/candidate-unit-comparison-01/unit-comparison.json",
+            "sha256": "50da815d739269907fde1cec18f775aa21018b0aa5b5fc3bc09bf258fb7404d3"
+          },
+          "unit-execution": {
+            "path": ".runtime/porting/CLK-06/candidate-unit-comparison-command-01/receipt.json",
+            "sha256": "d017f971d60cc9158b96da3b45f63d88bfe768b731a7a58dce76a257d4d81b74"
+          },
+          "unit-result-review": {
+            "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/review.json",
+            "sha256": "04da992e1a8e34bc64e6d1f8fdd736b19dd7196794ddd3df9198f39e3443ab85"
+          },
+          "unit-review-execution": {
+            "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-command-01/receipt.json",
+            "sha256": "3f2f5206265509e0538c5717eb5aff4851d430b6570ac194e2a63ae945290835"
+          },
+          "production-comparison": {
+            "path": ".runtime/porting/CLK-06/production-comparison-02/production-comparison.json",
+            "sha256": "4e5c1f7b21b2933eea27af25f03489c4077c3b2cc65980d25e4cc52780821625"
+          },
+          "production-execution": {
+            "path": ".runtime/porting/CLK-06/production-comparison-command-02/receipt.json",
+            "sha256": "127b4c3fc3a2f8e3b23640bbf5d8ea29a7fb3b04d8358f2799e4384ac2affb83"
+          },
+          "production-result-review": {
+            "path": ".runtime/porting/CLK-06/independent-production-result-review-03/review.json",
+            "sha256": "b693cd52c73cd0ac475da19a50458b15e7004cce22119e2c9c41479898125b3a"
+          },
+          "production-review-execution": {
+            "path": ".runtime/porting/CLK-06/independent-production-result-review-command-03/receipt.json",
+            "sha256": "528140cd8c207fca28ce10355619e9d4c0a0c7418280d29ef041887b1441b845"
+          },
+          "final-workspace-execution": {
+            "path": ".runtime/porting/CLK-06/workspace-test-command-03/receipt.json",
+            "sha256": "90d51a4b7f7a270eddd7a940cb375063f95e3329b06e7ba0d83a92a9565588fc"
+          },
+          "final-clippy-execution": {
+            "path": ".runtime/porting/CLK-06/clippy-command-02/receipt.json",
+            "sha256": "278443659d8629ca7210afaeb113d523666788895cbc13a89bfa6101013c6ddc"
+          },
+          "final-format-execution": {
+            "path": ".runtime/porting/CLK-06/final-format-check-command-03/receipt.json",
+            "sha256": "12eec5fa9e40598118cf8fb979aafea6fe59d134eaf726f497ea9685568af7f7"
+          },
+          "final-source-quality-execution": {
+            "path": ".runtime/porting/CLK-06/source-quality-command-05/receipt.json",
+            "sha256": "12329c4c876bb6a877e9521a9ccd3bc1bb5a0dc8c5a408af088a48ecfc1c485a"
+          },
+          "final-structure-execution": {
+            "path": ".runtime/porting/CLK-06/structure-quality-command-04/receipt.json",
+            "sha256": "5ba52c4f86dc821e87e0d4e0a1ef80d1d0d2addf0e73966b7a9e864c45989f42"
+          },
+          "archive": {
+            "path": "energyplus_porting_plan/evidence/CLK-06-archive/archive.json",
+            "sha256": "9e028c79e43397b372d076634be810a2ce2e04686574f5313a762f4ae1450f57"
+          },
+          "archive-execution": {
+            "path": ".runtime/porting/CLK-06/archive-command-01/receipt.json",
+            "sha256": "dcc54bc86cc361a4853926e8de55119dfb1230184dd38e1d3a95b66476ca8942"
+          },
+          "archive-verification-execution": {
+            "path": ".runtime/porting/CLK-06/archive-verification-command-01/receipt.json",
+            "sha256": "6ce655a2ed608544bec73b6bfde94df00148dbce54eb255d93bbdd1a881723d8"
+          }
+        },
+        "historical_native_exit_code": 0,
+        "historical_wrapper_exit_code": 0,
+        "metadata_recovery_performed": false,
+        "unstripped_original": {
+          "historical_path": ".runtime/ep261-gcc13-o0/Products/clk06_reference_helper.exe",
+          "sha256": "672dfd6b708833bbcc0f1869c5933a595423be86404b06142b5a179392545fb4",
+          "size_bytes": 1297365278,
+          "disposition": "live-original",
+          "full_debug_archive_created": false,
+          "hash_or_map_recovers_discarded_debug_bytes": false,
+          "deterministic_relink_recovery_claimed": false,
+          "full_debug_bytes_available": true
+        }
+      }
+    ],
+    "admitted_by_this_plan": false,
+    "required_future_guard": "Guard exact retained derivative bytes and immutable build/PE/review/original-first/removal chain. If removed is declared, require actual absence plus the accepted removal receipt.",
+    "admitted_by_Root_after_actual_card_closure": false
+  },
+  "executed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/retirement-plan-01/source/common.py",
+        "sha256": "d4602b9c103ee41528cb7f75f70776983997be3a735286ed2c18f2718de00466"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-03/registry.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/retirement-plan-01/source/registry.py",
+        "sha256": "133bb112416ef85dc4aded064ef8cf080bc87adef7b7ebdf396103f5928c7b9d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-03/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/retirement-plan-01/source/proofs.py",
+        "sha256": "f0a0ed06f65467097513f4ee1268a49239c5c5da4fa739ef23686002a5ec1480"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-03/write_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/retirement-plan-01/source/write_plan.py",
+        "sha256": "d283ac49a6b6560df1c8577edff2673a9e9e3132fd4939e6db55df758b1fcbc6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-03/retire.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/retirement-plan-01/source/retire.py",
+        "sha256": "ae90ce2cb53f9464a64d6d37fcabf9ed99507eb50a8e699344139b46125681a7"
+      }
+    }
+  ],
+  "authenticated_proof_bindings_archive": {
+    "path": ".runtime/porting/CLK-06/retirement-plan-01/source/proof-bindings.json",
+    "sha256": "2f3d49a05c6a7f2936fd6a0551b83df72a5f0c3af4523993e4c070e719570331"
+  },
+  "historical_native_exit_code": 0,
+  "historical_wrapper_exit_code": 0,
+  "metadata_recovery_performed": false,
+  "failed_historical_wrapper_relabelled_zero": false,
+  "native_engine_reexecuted_for_recovery": false,
+  "actual_final_quality": {
+    "final-workspace-execution": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-03/receipt.json",
+      "sha256": "90d51a4b7f7a270eddd7a940cb375063f95e3329b06e7ba0d83a92a9565588fc"
+    },
+    "final-clippy-execution": {
+      "path": ".runtime/porting/CLK-06/clippy-command-02/receipt.json",
+      "sha256": "278443659d8629ca7210afaeb113d523666788895cbc13a89bfa6101013c6ddc"
+    },
+    "final-format-execution": {
+      "path": ".runtime/porting/CLK-06/final-format-check-command-03/receipt.json",
+      "sha256": "12eec5fa9e40598118cf8fb979aafea6fe59d134eaf726f497ea9685568af7f7"
+    },
+    "final-source-quality-execution": {
+      "path": ".runtime/porting/CLK-06/source-quality-command-05/receipt.json",
+      "sha256": "12329c4c876bb6a877e9521a9ccd3bc1bb5a0dc8c5a408af088a48ecfc1c485a"
+    },
+    "final-structure-execution": {
+      "path": ".runtime/porting/CLK-06/structure-quality-command-04/receipt.json",
+      "sha256": "5ba52c4f86dc821e87e0d4e0a1ef80d1d0d2addf0e73966b7a9e864c45989f42"
+    }
+  },
+  "actual_archive": {
+    "path": "energyplus_porting_plan/evidence/CLK-06-archive/archive.json",
+    "sha256": "9e028c79e43397b372d076634be810a2ce2e04686574f5313a762f4ae1450f57"
+  },
+  "actual_archive_execution": {
+    "path": ".runtime/porting/CLK-06/archive-command-01/receipt.json",
+    "sha256": "dcc54bc86cc361a4853926e8de55119dfb1230184dd38e1d3a95b66476ca8942"
+  },
+  "actual_archive_verification_execution": {
+    "path": ".runtime/porting/CLK-06/archive-verification-command-01/receipt.json",
+    "sha256": "6ce655a2ed608544bec73b6bfde94df00148dbce54eb255d93bbdd1a881723d8"
+  },
+  "all_four_actual_canonical_gates_already_pass": true,
+  "removal_authorized_by_this_plan": false,
+  "registry_admission_performed": false,
+  "deletion_or_move_performed": false,
+  "full_debug_copy_created": false,
+  "actual_storage_savings_bytes": 0,
+  "potential_exact_original_removal_bytes": 1297365278,
+  "engines_Cargo_Git_compilers_strip_or_comparers_executed": false,
+  "retained_gap_report_including_mismatch_samples_parsed": true,
+  "full_native_results_or_original_wrapper_parsed": false,
+  "extra_quality_lineage_execution_stage_required": false,
+  "limits": [
+    "Only the one explicitly named successful CLK06 debug original is contemplated. No directories/wildcards or failed original are eligible.",
+    "Twenty-two protected files remain live: the exact prior21 plus the CLK06 accepted derivative.",
+    "Historical original-first launchers require live originals for a fresh run and remain byte unchanged; they will fail after retirement.",
+    "Future builders must authenticate explicit version6 registry tombstones, actual removal receipts and retained derivatives.",
+    "Hash/PE maps cannot recover discarded debug bytes; deterministic relink recovery is not claimed.",
+    "This ignored plan does not admit deletion. Root must separately invoke reviewed retire.py --apply after rechecking exact identities."
+  ]
+}

@@ -1,0 +1,27 @@
+// pow_2( x ) == x^2
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_2( T const x )
+{
+	return x * x;
+}
+
+// pow_3( x ) == x^3
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_3( T const x )
+{
+	return x * x * x;
+}
+
+// pow_4( x ) == x^4
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_4( T const x )
+{
+	T const t( x * x );
+	return t * t;
+}

@@ -1,0 +1,259 @@
+{
+  "schema": "clk06-independent-candidate-unit-result-review.v1",
+  "status": "pass-authenticated-selected-unit-result-and-honest-unavailable-scope",
+  "review_started_utc": "2026-10-09T07:53:20.928663+00:00",
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-06/candidate-unit-comparison-01/unit-comparison.json",
+    "sha256": "50da815d739269907fde1cec18f775aa21018b0aa5b5fc3bc09bf258fb7404d3"
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CLK-06/candidate-unit-comparison-command-01/receipt.json",
+    "sha256": "d017f971d60cc9158b96da3b45f63d88bfe768b731a7a58dce76a257d4d81b74"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CLK-06/candidate-observer-build-01/build-receipt.json",
+    "sha256": "8cd79bbe823386fad63bc92defccf47ee83442d1ea10abdfc2a305033e9260b1"
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/CLK-06/candidate-observer-execution-command-01/receipt.json",
+    "sha256": "15cc1914a6ee31a77a85e7b9176a9e3a806b8762ab0568b5478627bb77b72084"
+  },
+  "Native_reference": {
+    "path": ".runtime/porting/CLK-06/original-execution-01/helper-reference.json",
+    "sha256": "c3b82a378092aeaa56652b34d0d4f84cc0977368df8884b2a6f1c3c1c6cfc174"
+  },
+  "Native_results": {
+    "path": ".runtime/porting/CLK-06/original-execution-01/native-output/clk06-helper-results.json",
+    "sha256": "1111b5b69d1c2d164a30cfd4a123f90ed1d2ddd44141d15a2bbfff44ad600d00"
+  },
+  "Original_data_review": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+    "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+  },
+  "observer_source_review": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-observer-source-review-01/review.json",
+    "sha256": "37f9be08b625911e7343692a4dea2a908d124dcbdbbefc5010d301174c0b2f7e"
+  },
+  "observer_source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-observer-source-review-command-01/receipt.json",
+    "sha256": "05793dd55ce2c7b9739f816d774e207fa4c99455792f0d791eee2b03fe04c9d3"
+  },
+  "observer_request": {
+    "path": ".runtime/porting/CLK-06/candidate-observer-input-01/observer-request.json",
+    "sha256": "d07f97923122fd777178f671d51a1976db1443de91e88c4847dc33a865dbe394"
+  },
+  "observer_projection": {
+    "path": ".runtime/porting/CLK-06/candidate-observer-input-01/projection.json",
+    "sha256": "e4dc3f3ad965b57c39a4bd4317e3f4dabeb023eb7709acfa7ec4e959b45a619d"
+  },
+  "preserved_existing_baseline_gap": {
+    "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+    "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+  },
+  "comparison_projection": {
+    "path": ".runtime/porting/CLK-06/comparer-projection-01/projection.json",
+    "sha256": "17e1fe3fba8a659fd622bf365aa4c37575ec7647126ba4cf93c7ed5e02b8e92a"
+  },
+  "comparison_projection_execution": {
+    "path": ".runtime/porting/CLK-06/comparer-projection-freeze-command-01/receipt.json",
+    "sha256": "e5a215a292e4008c3690809906fefdbd6ae04f92ccf1f3f2f3c1f90617ca35a1"
+  },
+  "source_review": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/review.json",
+    "sha256": "49a36bbc3b85947f869b251b6da03f916da9cd4ed13fde25ae3cbe3c95f9836d"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-command-02/receipt.json",
+    "sha256": "ae9a2c89c63d9925613436eceee020a73698c0cbd14af0fc6bf3ab0c2d5ffad2"
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "actual_implementation_commit": "37f07f548d869cafb4c8a6e3df021b43e2c6598f",
+  "actual_crates_tree": "efe6204064f64dc27f6d85ae042356f18135089d",
+  "actual_available_source_inventory_count": 3755,
+  "current_canonical_equal_to_science_build_claimed": false,
+  "actual_reader_interpreter_observation": {
+    "reported_argv_zero": "python",
+    "recorded_parent_python_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "child_executable_path": null,
+    "child_executable_path_available": false,
+    "parent_executable_is_proof_of_child_alias_resolution": false,
+    "unavailable_child_path_counted_as_PASS": false
+  },
+  "actual_call_ledger": {
+    "requested_counts": {
+      "setup_cases": 3,
+      "total_operations": 1120,
+      "emissivity_cases": 17,
+      "CalcSkyEmissivity": 17,
+      "weather_sequences": 35,
+      "GetNextEnvironment": 35,
+      "weather_operations": 1100,
+      "InitializeWeather": 550,
+      "calcSky": 35,
+      "SetCurrentWeather": 480
+    },
+    "actual_invocations": {
+      "native": 1120,
+      "Rust": 1120
+    },
+    "actual_skips": {
+      "native": 0,
+      "Rust": 0
+    },
+    "actual_unavailable_direct_API_operations": {
+      "native": 0,
+      "Rust": 0
+    },
+    "actual_native_function_counts": {
+      "SetupInterpolationValues": 3,
+      "CalcSkyEmissivity": 17,
+      "GetNextEnvironment": 35,
+      "InitializeWeather": 550,
+      "calcSky": 35,
+      "SetCurrentWeather": 480
+    },
+    "actual_Rust_API_counts": {
+      "SetupInterpolationValues": 3,
+      "CalcSkyEmissivity": 17,
+      "GetNextEnvironment": 35,
+      "InitializeWeather": 550,
+      "calcSky": 35,
+      "SetCurrentWeather": 480
+    },
+    "actual_native_status_counts": {
+      "source_returned": 1120
+    },
+    "actual_Rust_status_counts": {
+      "source_returned": 1120
+    },
+    "exception_text_parity_claimed": false,
+    "private_hourly_or_transient_weight_operands_reconstructed": false
+  },
+  "comparison_counts": {
+    "numeric_comparison_count": 304653,
+    "literal_binary64_comparison_count": 230238,
+    "metadata_comparison_count": 1027684,
+    "comparison_count": 1562575,
+    "mismatch_count": 0
+  },
+  "field_error_metrics": {
+    "TotalSkyCover": {
+      "comparison_count": 74646,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "OpaqueSkyCover": {
+      "comparison_count": 74646,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "Interpolation": {
+      "comparison_count": 13434,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "SolarInterpolation": {
+      "comparison_count": 13434,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "ESky": {
+      "comparison_count": 17,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "SkyTemp": {
+      "comparison_count": 64238,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "HorizIRSky": {
+      "comparison_count": 64238,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    }
+  },
+  "categories": {
+    "typed_metadata": 1027684,
+    "TotalSkyCover": 74646,
+    "OpaqueSkyCover": 74646,
+    "Interpolation": 13434,
+    "SolarInterpolation": 13434,
+    "ESky": 17,
+    "SkyTemp": 64238,
+    "HorizIRSky": 64238,
+    "literal_binary64": 230238
+  },
+  "unavailable_entry_count": 22841,
+  "required_both_null_unavailable_count": 382,
+  "unavailable_reason_counts": {
+    "Native default model/current5 and existing Current13 are passive context, no new CLK06 physical certification": 10443,
+    "actual comparison operand unavailable": 7952,
+    "Different public constructor/preparation observation phase": 41,
+    "Whole Initialize does not expose post-first-read/pre-handoff operand": 68,
+    "Declared compact boundary leaves full contents unobserved": 4232,
+    "Whole native Factory/constant/eight-call preparation is not the public Rust constructor phase": 105
+  },
+  "unavailable_arrays_copied_into_this_report": false,
+  "relative_tolerance_metrics_recomputed": false,
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/executed-result-reviewer.py",
+    "sha256": "cbe16ff966d1d1d2eaed7f33828326e3900536a458be7afaa14148b1993460ba"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/executed-metadata.py",
+    "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d"
+  },
+  "reviewed_verifier_source": {
+    "path": ".runtime/porting/CLK-06/unit-result-review-prep-02/review_result.py",
+    "sha256": "cbe16ff966d1d1d2eaed7f33828326e3900536a458be7afaa14148b1993460ba"
+  },
+  "reviewed_metadata_utility": {
+    "path": "tools/porting/geo03_provenance.py",
+    "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+  },
+  "reviewed_root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "factual_result_only_no_new_numerical_certification": true,
+  "SkyTemp_and_HorizIRSky_zero_mismatch_profiles_authenticated_not_recomputed": true,
+  "scientific_execution_performed": false,
+  "numeric_operands_recomputed": false,
+  "engines_or_numerical_readers_imported": false,
+  "full_Native_and_Rust_results_payloads_parsed": false,
+  "large_Original_wrapper_with_scientific_snapshots_parsed": false,
+  "large_Native_results_or_binary_rehashed": false,
+  "actual_Original_data_QA_reused_for_large_source_artifacts": true,
+  "existing_baseline_gap_full_JSON_including_retained_mismatch_payloads_parsed": true,
+  "existing_baseline_gap_numeric_mismatches_recomputed": false,
+  "whole_formula_or_own_code_independently_certified": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false,
+  "authorship_limits": "Raw authored this factual verifier, earlier raw cursor/input drafts and prior comparers; those formulas are not independently certified here. Baseline authored the bound numerical comparer; genuine Root execution and archived result are authenticated without rerunning science.",
+  "review_completed_utc": "2026-10-09T07:53:39.091827+00:00"
+}

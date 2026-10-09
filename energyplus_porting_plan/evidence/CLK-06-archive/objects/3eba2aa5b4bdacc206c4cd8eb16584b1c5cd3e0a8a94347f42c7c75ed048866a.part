@@ -1,0 +1,117 @@
+--- pre-format/crates/ep_run/src/clk06_sky_trace.rs
++++ crates/ep_run/src/clk06_sky_trace.rs
+@@ -43,18 +43,34 @@
+         SkyTransportValues::Sampler { values, owned } => json!({
+             "actual_returned_locals":pair(values),"actual_owned_context_available":owned,
+             "fallback_values_numerically_paired":false}),
+-        SkyTransportValues::Accumulator { hour_index, substep, received, before, after } => json!({
++        SkyTransportValues::Accumulator {
++            hour_index,
++            substep,
++            received,
++            before,
++            after,
++        } => json!({
+             "hour_index":hour_index,"substep":substep,"received_locals":pair(received),
+             "actual_sum_before":pair(before),"actual_sum_after":pair(after),
+             "expected_sum_recomputed":false}),
+-        SkyTransportValues::Hourly { hour_index, divisor, pushed } => json!({
++        SkyTransportValues::Hourly {
++            hour_index,
++            divisor,
++            pushed,
++        } => json!({
+             "hour_index":hour_index,"actual_divisor":scalar(divisor),"actual_pushed":pair(pushed),
+             "hourly_mean_claimed_equal_to_individual_Today_slot":false}),
+-        SkyTransportValues::Series { hour_index, handle, series, value } => {
++        SkyTransportValues::Series {
++            hour_index,
++            handle,
++            series,
++            value,
++        } => {
+             let (name, units) = match series {
+                 SkyTransportSeries::SkyTemperature => ("Site Sky Temperature", "C"),
+-                SkyTransportSeries::HorizontalInfrared =>
+-                    ("Site Horizontal Infrared Radiation Rate per Area", "W/m2"),
++                SkyTransportSeries::HorizontalInfrared => {
++                    ("Site Horizontal Infrared Radiation Rate per Area", "W/m2")
++                }
+             };
+             json!({"hour_index":hour_index,"actual_output_handle":handle,"key":"Environment",
+                 "variable_name":name,"units":units,"actual_series_value":scalar(value)})
+@@ -64,7 +80,12 @@
+             "actual_sky_argument_available":sky.is_some(),"actual_sky_argument":sky.map(scalar),
+             "actual_horizontal_infrared_argument_w_per_m2":scalar(ir),
+             "recorded_before_physical_early_return":true}),
+-        SkyTransportValues::Resolved { origin, sky, ir, owned } => json!({
++        SkyTransportValues::Resolved {
++            origin,
++            sky,
++            ir,
++            owned,
++        } => json!({
+             "actual_caller_origin":origin.id(),"caller_origin_inferred_from_TLS":false,
+             "actual_resolved_sky_argument":scalar(sky),
+             "actual_horizontal_infrared_local_w_per_m2":scalar(ir),
+@@ -111,26 +132,47 @@
+         "input_build_source_and_six_run_configuration_authentication":"external recorded workflow required"});
+     let path = config.output_dir.join("clk06_sky_transport_trace.json");
+     let write = || -> Result<(), String> {
+-        let file = std::fs::File::create(&path).map_err(|error|error.to_string())?;
++        let file = std::fs::File::create(&path).map_err(|error| error.to_string())?;
+         let mut writer = BufWriter::new(file);
+-        writer.write_all(b"{\"metadata\":").map_err(|error|error.to_string())?;
+-        serde_json::to_writer(&mut writer, &metadata).map_err(|error|error.to_string())?;
+-        writer.write_all(b",\"events\":[").map_err(|error|error.to_string())?;
++        writer
++            .write_all(b"{\"metadata\":")
++            .map_err(|error| error.to_string())?;
++        serde_json::to_writer(&mut writer, &metadata).map_err(|error| error.to_string())?;
++        writer
++            .write_all(b",\"events\":[")
++            .map_err(|error| error.to_string())?;
+         // Merge only eight retained prefixes. No second full-size event array/Value.
+         let mut next = [0; EVENT_KIND_COUNT];
+         let mut first = true;
+         loop {
+-            let chosen = (0..EVENT_KIND_COUNT).filter_map(|index| {
+-                trace.retained_by_kind[index].get(next[index]).map(|row|(index,row.sequence))
+-            }).min_by_key(|(_,sequence)|*sequence);
+-            let Some((index,_)) = chosen else { break; };
+-            if !first { writer.write_all(b",").map_err(|error|error.to_string())?; }
++            let chosen = (0..EVENT_KIND_COUNT)
++                .filter_map(|index| {
++                    trace.retained_by_kind[index]
++                        .get(next[index])
++                        .map(|row| (index, row.sequence))
++                })
++                .min_by_key(|(_, sequence)| *sequence);
++            let Some((index, _)) = chosen else {
++                break;
++            };
++            if !first {
++                writer.write_all(b",").map_err(|error| error.to_string())?;
++            }
+             first = false;
+-            serde_json::to_writer(&mut writer, &event(&trace.retained_by_kind[index][next[index]]))
+-                .map_err(|error|error.to_string())?;
++            serde_json::to_writer(
++                &mut writer,
++                &event(&trace.retained_by_kind[index][next[index]]),
++            )
++            .map_err(|error| error.to_string())?;
+             next[index] += 1;
+         }
+-        writer.write_all(b"]}\n").and_then(|()|writer.flush()).map_err(|error|error.to_string())
++        writer
++            .write_all(b"]}\n")
++            .and_then(|()| writer.flush())
++            .map_err(|error| error.to_string())
+     };
+-    write().map_err(|message|RunError { exit_code:RunExitCode::OutputExport, message })
++    write().map_err(|message| RunError {
++        exit_code: RunExitCode::OutputExport,
++        message,
++    })
+ }

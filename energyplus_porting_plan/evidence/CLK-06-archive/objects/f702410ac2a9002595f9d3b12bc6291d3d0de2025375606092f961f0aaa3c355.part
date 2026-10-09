@@ -1,0 +1,13 @@
+--- .runtime/porting/CLK-06/closure-prep-02/bindings.template.json
++++ .runtime/porting/CLK-06/closure-prep-03/bindings.template.json
+@@ -174,6 +174,10 @@
+     "frozen-contract-review-execution": {
+       "path": ".runtime/porting/CLK-06/independent-frozen-contract-review-command-01/receipt.json",
+       "sha256": "adc9d5d6481ed868e3d8c8ccb81711a49495db82bd7f94df6a492f1dbe83cd3b"
++    },
++    "production-comparison-execution": {
++      "path": ".runtime/porting/CLK-06/production-comparison-command-01/receipt.json",
++      "sha256": "45c116869f0958b03648ba110c1b0b9c4f93d6ef8f1e224eea439f53ee0339f3"
+     }
+   },
+   "historical_unknowns": {

@@ -1,0 +1,30 @@
+            // Call and setup the Design Day environment
+            if (envCurr.KindOfEnvrn != Constant::KindOfSim::RunPeriodWeather) {
+                if (envCurr.DesignDayNum > 0) {
+                    SetUpDesignDay(state, envCurr.DesignDayNum);
+                    state.dataEnvrn->EnvironmentName = envCurr.Title;
+                }
+            }
+
+            // Only used in Weather file environments
+            // Start over missing values with each environment
+            state.dataWeather->wvarsMissing.OutBaroPress = state.dataEnvrn->StdBaroPress; // Initial "missing" value
+            state.dataWeather->wvarsMissing.OutDryBulbTemp = 6.0;                         // Initial "missing" value
+            state.dataWeather->wvarsMissing.OutDewPointTemp = 3.0;                        // Initial "missing" value
+            state.dataWeather->wvarsMissing.OutRelHum = 50.0;                             // Initial "missing" value
+            state.dataWeather->wvarsMissing.WindSpeed = 2.5;                              // Initial "missing" value
+            state.dataWeather->wvarsMissing.WindDir = 180;                                // Initial "missing" value
+            state.dataWeather->wvarsMissing.TotalSkyCover = 5;                            // Initial "missing" value
+            state.dataWeather->wvarsMissing.OpaqueSkyCover = 5;                           // Initial "missing" value
+            state.dataWeather->wvarsMissing.Visibility = 777.7;                           // Initial "missing" value
+            state.dataWeather->wvarsMissing.Ceiling = 77777;                              // Initial "missing" value
+            state.dataWeather->wvarsMissing.AerOptDepth = 0.0;                            // Initial "missing" value
+            state.dataWeather->wvarsMissing.SnowDepth = 0;                                // Initial "missing" value
+            state.dataWeather->wvarsMissing.DaysLastSnow = 88;                            // Initial "missing" value
+            state.dataWeather->wvarsMissing.Albedo = 0.0;                                 // Initial "missing" value
+            state.dataWeather->wvarsMissing.LiquidPrecip = 0.0;                           // Initial "missing" value
+            // Counts set to 0 for each environment
+            state.dataWeather->wvarsMissedCounts = Weather::WeatherVarCounts();
+
+            // Counts set to 0 for each environment
+            state.dataWeather->wvarsOutOfRangeCounts = Weather::WeatherVarCounts();

@@ -1,0 +1,11 @@
+    void ReadUserWeatherInput(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Liesen
+        //       DATE WRITTEN   September 1997
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is the main driver of the weather manager module.
+        // It controls the assignment of weather related global variables as
+        // well as the reads and writes for retrieving weather information.

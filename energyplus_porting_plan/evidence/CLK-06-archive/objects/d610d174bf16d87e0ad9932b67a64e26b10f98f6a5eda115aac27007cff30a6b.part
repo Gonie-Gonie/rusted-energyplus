@@ -1,0 +1,2 @@
+    Real64 SkyTemp = 0.0;                         // Current sky temperature {C}
+    Real64 SkyTempKelvin = 0.0;                   // Current sky temperature {K}

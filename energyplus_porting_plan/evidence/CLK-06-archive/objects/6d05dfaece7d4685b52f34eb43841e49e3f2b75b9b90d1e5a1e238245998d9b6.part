@@ -1,0 +1,112 @@
+"""Source-only authenticated one-way CLK06 input metadata; no native operations."""
+def packet(value,context):
+    require,ref,read,verify,reg,PIN,SOURCE=[context[key] for key in ['require','ref','read','verify','reg','PIN','SOURCE']]
+    native_ref=ref(value);native=read(verify(native_ref))
+    require(native['schema']=='clk06-native-admission-contract.v1' and native['energyplus_commit']==PIN
+            and native['frozen_before_numerical_execution'] is True, 'Frozen separate CLK06 admission required')
+    for key in ['expected_values_supplied','expected_exits_supplied','scientific_execution_performed','gates_updated']:
+        require(native[key] is False, 'Input-only native admission boundary differs: '+key)
+    require(set(native['contracts'])=={'source','cases','tolerances'}, 'Exact three contract bindings required')
+    contracts={name:read(verify(binding)) for name,binding in native['contracts'].items()}
+    for name,contract in contracts.items():
+        require(contract['schema']=='clk06-'+name+'-contract.v1' and contract['card']=='CLK-06'
+                and contract['frozen_before_numerical_execution'] is True, 'Wrong/unfrozen original contract')
+    request=read(verify(native['helper_request']));projection=read(verify(native['projection']))
+    decision_ref=request['root_preoutput_decision'];decision=read(verify(decision_ref))
+    require(decision_ref['sha256']=='b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'
+            and decision['schema']=='clk06-root-preoutput-scope-decisions.v1'
+            and decision['Rust_current_global_owner_extension_authorized_for_this_card'] is False
+            and decision['SkyTempKelvin_cross_engine_profile_admitted'] is False
+            and all(contract['root_preoutput_decision']==decision_ref for contract in contracts.values())
+            and native['root_preoutput_decision']==decision_ref and projection['root_preoutput_decision']==decision_ref
+            and reg.exact(contracts['tolerances']['numeric_profiles'],decision['numeric_profiles']), 'Actual Root decision/profiles differ')
+    require(request['schema']=='clk06-helper-cases.v1' and request['energyplus_commit']==PIN
+            and request['frozen_before_numerical_execution'] is True
+            and all(request[key] is False for key in ['expected_values_supplied','expected_exits_supplied','scientific_execution_performed','gates_updated']),
+            'Frozen literal input-only request required')
+    require(reg.exact(request['contracts'],{name:native['contracts'][name] for name in ['source','tolerances']})
+            and reg.exact(request['fixed_scope'],native['fixed_scope'])
+            and reg.exact(request['all_45_guard_refs'],native['all_45_guard_refs']), 'One-way request contract/scope differs')
+    cases=contracts['cases']
+    require(cases['helper_request']==native['helper_request'] and cases['source']==native['contracts']['source']
+            and cases['tolerances']==native['contracts']['tolerances']
+            and cases['fixed_CON_scope']==native['fixed_scope'] and reg.exact(cases['all_45_guard_refs'],native['all_45_guard_refs']),
+            'Cases one-way literal input identity differs')
+    require(projection['schema']=='clk06-observation-projection.v1' and projection['frozen_before_numerical_execution'] is True
+            and projection['helper_request']==native['helper_request'] and projection['contracts']==native['contracts']
+            and reg.exact(projection['native_observation_policy'],request['observation_policy'])
+            and projection['original_results_supplied_to_Rust'] is False and projection['unavailable_counted_as_PASS'] is False,
+            'Pre-execution projection identity/policy differs')
+    scope=read(verify(native['fixed_scope']))
+    literal_guard_rows=[row[name] for row in scope['cases'] for name in ['input','weather','metadata']]
+    require(len(native['all_45_guard_refs'])==45 and reg.exact(native['all_45_guard_refs'],literal_guard_rows),
+            'Exactly45 ordered literal CON references required, including repeated shared weather')
+    verify(native['fixed_scope'])
+    for binding in native['all_45_guard_refs']: verify(binding)
+    actual={'setup_cases':len(request['setup_cases']),'emissivity_cases':len(request['emissivity_cases']),
+            'weather_sequences':len(request['weather_sequences']),'CalcSkyEmissivity':len(request['emissivity_cases']),
+            'GetNextEnvironment':0,'InitializeWeather':0,'SetCurrentWeather':0,'calcSky':0,'weather_operations':0,
+            'total_operations':len(request['setup_cases'])+len(request['emissivity_cases'])}
+    for item in request['setup_cases']:
+        require(type(item['time_steps_per_hour']) is int and item['time_steps_per_hour'] in [1,3,4], 'Declared pure Setup clock domain differs')
+    for item in request['emissivity_cases']:
+        require(item['kind']=='CalcSkyEmissivity' and type(item['SkyTempModel']) is int and item['SkyTempModel']==0
+                and set(item['arguments'])=={'OpaqueSkyCover','DryBulb','DewPoint','RelHum'}, 'Direct ClarkAllen emissivity input domain differs')
+    for sequence in request['weather_sequences']:
+        require(type(sequence['time_steps_per_hour']) is int and sequence['time_steps_per_hour'] in [1,3,4]
+                and sequence['prepared_environment_lane'] is True, 'Selected ordinary hourly1/3/4-step lane required')
+        for name in ['input','weather','external_byte_map']:
+            if name in sequence: verify(sequence[name])
+        for operation in sequence['operations']:
+            require(operation['kind'] in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky']
+                    and type(operation['caller']) is dict, 'Unknown selected sky source operation/caller')
+            if operation['kind']=='calcSky':
+                require(set(operation['arguments'])=={'OpaqueSkyCover','DryBulb','DewPoint','RelHum','IRHoriz'}
+                        and set(operation['output_initial_values'])=={'HorizIRSky','SkyTemp'}, 'Direct formal-output input shape differs')
+            actual[operation['kind']]+=1;actual['weather_operations']+=1;actual['total_operations']+=1
+    require(all(type(x) is int and x>=0 for x in native['requested_counts'].values())
+            and reg.exact(actual,native['requested_counts']) and reg.exact(actual,request['requested_counts'])
+            and reg.exact(actual,cases['requested_counts']), 'Actual declared packet cardinality differs')
+    for binding in cases['input_artifacts']: verify(binding)
+    verify(request['production_input_only_caller_history'])
+    control_ref=request['production_control_inputs'];controls=read(verify(control_ref))
+    require(controls['schema'] in ['clk05-production-control-inputs.v1','clk06-production-control-inputs.v1']
+            and controls['effective_controls_inferred_from_outputs'] is False
+            and contracts['source']['production_control_inputs']==control_ref,'Actual literal production control inputs required')
+    control_card=controls['schema'].split('-')[0]
+    production=[row for row in request['weather_sequences'] if row['lane']=='production-CON']
+    require([row['case_id'] for row in controls['cases']]==[row['id'] for row in production]
+            ==['A-24H','A-72H','B-BOTH-24H'],'Exact three production input controls required')
+    for row,sequence in zip(controls['cases'],production,strict=True):
+        require(row['input']==sequence['input'] and reg.exact(row['solar_controls'],sequence['solar_controls'])
+                and sequence['production_control_inputs']==control_ref,'Declared caller/control identity differs')
+        for binding in row['registration_source_archives']: verify(binding)
+    control_review=native['production_control_review'];control_qa=read(verify(control_review['review']))
+    control_command=read(verify(control_review['execution']))
+    require(control_qa['schema']==control_card+'-independent-production-control-input-review.v1'
+            and control_qa['status']=='pass-input-registration-and-captured-environment-before-original'
+            and control_qa['reviewed_control_inputs']==control_ref and control_qa['scientific_execution_performed'] is False
+            and type(control_command['exit_code']) is int and control_command['exit_code']==0
+            and control_command['source_bytes_match_before_and_after'] is True
+            and reg.exact(read(verify(control_command['stdout'])),control_qa),'Actual independent captured input review0 required')
+    for row in contracts['source']['source_files']:
+        require(row['path']==row['original']['path'].removeprefix('.reference/energyplus-src/26.1.0/')
+                and row['sha256']==row['original']['sha256'] and (SOURCE/row['path']).resolve().is_relative_to(SOURCE),
+                'Pinned original source alias escapes')
+        verify(row['original']);verify(row['archive'])
+        require(verify(row['original']).read_bytes()==verify(row['archive']).read_bytes(), 'Original whole-source archive differs')
+    require(reg.exact(native['source_files'],contracts['source']['source_files']), 'Admission whole-source aliases differ')
+    require(native['required_retired_registry']['sha256']==reg.REGISTRY_SHA
+            and native['required_actual_retirement']==reg.RETIREMENT
+            and native['required_actual_retirement_execution']==reg.OUTER, 'Frozen actual version5 retirement differs')
+    require(native['actual_scope_amendment']==decision['scope_amendment']
+            and native['actual_scope_amendment_execution']==decision['scope_amendment_execution'], 'Actual published scope amendment pair differs')
+    verify(native['actual_scope_amendment']);verify(native['actual_scope_amendment_execution'])
+    return {'native_admission_contract':native_ref,'helper_request':native['helper_request'],'projection':native['projection'],
+            'contracts':native['contracts'],'fixed_scope':native['fixed_scope'],'requested_counts':actual,
+            'source_policy_review':native['source_review'],'actual_CLK05_prerequisite':native['actual_CLK05_prerequisite'],
+            'required_retired_registry':native['required_retired_registry'],'required_actual_retirement':native['required_actual_retirement'],
+            'required_actual_retirement_execution':native['required_actual_retirement_execution'],'production_control_review':control_review,
+            'actual_scope_amendment':native['actual_scope_amendment'],'actual_scope_amendment_execution':native['actual_scope_amendment_execution'],
+            'root_preoutput_decision':decision_ref}
+

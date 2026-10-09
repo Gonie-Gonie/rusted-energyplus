@@ -1,0 +1,82 @@
+// Authenticate the one-way input packet. No source functions or output values.
+#ifndef CLK05_REFERENCE_ADMISSION_HH
+#define CLK05_REFERENCE_ADMISSION_HH
+namespace Clk05Admission {
+struct Packet {
+    json request, admission, contracts, requested_counts;
+    fs::path projection_path;
+};
+inline Packet admit(fs::path const &root, fs::path const &request_path, fs::path const &admission_path)
+{
+    Packet packet; packet.request = read_json(request_path); packet.admission = read_json(admission_path);
+    auto const &request = packet.request; auto const &admission = packet.admission;
+    require(request.at("schema") == "clk05-helper-cases.v1" &&
+            admission.at("schema") == "clk05-native-admission-contract.v1" &&
+            request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" &&
+            admission.at("energyplus_commit") == request.at("energyplus_commit"), "Frozen original input schema/pin differs");
+    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_numerical_execution") == true &&
+        value->at("expected_values_supplied") == false && value->at("expected_exits_supplied") == false &&
+        value->at("scientific_execution_performed") == false, "Input-only pre-execution policy required");
+    require(bound_path(root, admission.at("helper_request")) == fs::weakly_canonical(request_path) &&
+            request.at("fixed_scope") == admission.at("fixed_scope") &&
+            request.at("all_45_guard_refs") == admission.at("all_45_guard_refs") &&
+            request.at("all_45_guard_refs").is_array() && request.at("all_45_guard_refs").size() == 45 &&
+            request.at("contracts").size() == 2 && admission.at("contracts").size() == 3 &&
+            request.at("contracts").at("source") == admission.at("contracts").at("source") &&
+            request.at("contracts").at("tolerances") == admission.at("contracts").at("tolerances"),
+            "One-way input/scope/contracts differ");
+    bound_path(root, request.at("fixed_scope"));
+    for (auto const &row : request.at("all_45_guard_refs")) bound_path(root, row);
+    packet.contracts = json::object();
+    for (char const *name : {"source", "cases", "tolerances"}) {
+        auto const path = bound_path(root, admission.at("contracts").at(name)); auto const value = read_json(path);
+        require(value.at("schema") == std::string("clk05-") + name + "-contract.v1" &&
+                value.at("frozen_before_numerical_execution") == true, "Frozen contract schema differs");
+        if (std::string(name) == "cases") require(value.at("helper_request") == admission.at("helper_request") &&
+            value.at("source") == admission.at("contracts").at("source") &&
+            value.at("tolerances") == admission.at("contracts").at("tolerances") &&
+            value.at("fixed_CON_scope") == request.at("fixed_scope") &&
+            value.at("all_45_guard_refs") == request.at("all_45_guard_refs"), "Frozen case DAG differs");
+        if (std::string(name) == "source") {
+            require(value.at("energyplus_commit") == request.at("energyplus_commit"), "Wrong original source pin");
+            auto const source_root = fs::weakly_canonical(root / ".reference/energyplus-src/26.1.0");
+            for (auto const &row : value.at("source_files")) {
+                fs::path const relative(row.at("path").get<std::string>());
+                require(relative.is_relative(), "Original source path must be relative");
+                auto const path = fs::weakly_canonical(source_root / relative); auto const inside = path.lexically_relative(source_root);
+                require(!inside.empty() && *inside.begin() != ".." && fs::is_regular_file(path) &&
+                        file_sha(path) == row.at("sha256").get<std::string>(), "Pinned original source bytes differ");
+            }
+        }
+        packet.contracts[name] = file_ref(path);
+    }
+    packet.projection_path = bound_path(root, admission.at("projection")); auto const projection = read_json(packet.projection_path);
+    require(projection.at("schema") == "clk05-observation-projection.v1" &&
+            projection.at("frozen_before_numerical_execution") == true &&
+            projection.at("helper_request") == admission.at("helper_request") &&
+            projection.at("contracts") == admission.at("contracts") &&
+            projection.at("native_observation_policy") == request.at("observation_policy"), "Frozen observation DAG differs");
+    bound_path(root, request.at("production_control_inputs"));
+    require(request.at("setup_cases").is_array() && request.at("weather_sequences").is_array(), "Typed sequence arrays required");
+    require(request.at("requested_counts").is_object(), "Typed requested counts required");
+    for (auto const &row : request.at("requested_counts").items()) require(row.value().is_number_integer() &&
+        !row.value().is_boolean() && row.value().get<std::int64_t>() >= 0, "Nonnegative integer requested count required");
+    packet.requested_counts = {{"setup_cases", request.at("setup_cases").size()},
+        {"weather_sequences", request.at("weather_sequences").size()}, {"GetNextEnvironment", 0},
+        {"InitializeWeather", 0}, {"weather_operations", 0}, {"total_operations", request.at("setup_cases").size()}};
+    for (auto const &sequence : request.at("weather_sequences")) {
+        require(sequence.at("operations").is_array(), "Ordered operations array required");
+        for (auto const &item : sequence.at("operations")) {
+            auto const kind = item.at("kind").get<std::string>();
+            require(kind == "GetNextEnvironment" || kind == "InitializeWeather", "Operation outside bounded daily source history");
+            for (auto const &key : {kind, std::string("weather_operations"), std::string("total_operations")})
+                packet.requested_counts[key] = packet.requested_counts.at(key).get<std::size_t>() + 1;
+        }
+    }
+    require(request.at("requested_counts").size() == packet.requested_counts.size() &&
+            packet.requested_counts == request.at("requested_counts") &&
+            packet.requested_counts == admission.at("requested_counts"), "Actual declared input counts differ");
+    return packet;
+}
+} // namespace Clk05Admission
+#endif

@@ -1,0 +1,23 @@
+                    if (DryBulb >= 99.9) {
+                        DryBulb = state.dataWeather->wvarsMissing.OutDryBulbTemp;
+                        ++state.dataWeather->wvarsMissedCounts.OutDryBulbTemp;
+                    }
+                    if (DryBulb < -90.0 || DryBulb > 70.0) {
+                        ++state.dataWeather->wvarsOutOfRangeCounts.OutDryBulbTemp;
+                    }
+
+                    if (DewPoint >= 99.9) {
+                        DewPoint = state.dataWeather->wvarsMissing.OutDewPointTemp;
+                        ++state.dataWeather->wvarsMissedCounts.OutDewPointTemp;
+                    }
+                    if (DewPoint < -90.0 || DewPoint > 70.0) {
+                        ++state.dataWeather->wvarsOutOfRangeCounts.OutDewPointTemp;
+                    }
+
+                    if (RelHum >= 999.0) {
+                        RelHum = state.dataWeather->wvarsMissing.OutRelHum;
+                        ++state.dataWeather->wvarsMissedCounts.OutRelHum;
+                    }
+                    if (RelHum < 0.0 || RelHum > 110.0) {
+                        ++state.dataWeather->wvarsOutOfRangeCounts.OutRelHum;
+                    }

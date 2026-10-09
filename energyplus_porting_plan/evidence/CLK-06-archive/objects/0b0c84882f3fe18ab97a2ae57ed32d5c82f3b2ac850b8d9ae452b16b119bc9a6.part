@@ -1,0 +1,44 @@
+
+        if (thisEnviron.WP_Type1 != 0) {
+            switch (state.dataWeather->WPSkyTemperature(thisEnviron.WP_Type1).skyTempModel) {
+            case SkyTempModel::ScheduleValue: {
+                std::vector<Real64> const &dayVals =
+                    state.dataWeather->WPSkyTemperature(thisEnviron.WP_Type1)
+                        .sched->getDayVals(state, state.dataWeather->TomorrowVariables.DayOfYear_Schedule, state.dataWeather->CurDayOfWeek);
+
+                for (int hr = 0; hr < Constant::iHoursInDay; ++hr) {
+                    for (int ts = 0; ts < state.dataGlobal->TimeStepsInHour; ++ts) {
+                        state.dataWeather->wvarsHrTsTomorrow(ts + 1, hr + 1).SkyTemp = dayVals[hr * state.dataGlobal->TimeStepsInHour + ts];
+                    }
+                }
+            } break;
+
+            case SkyTempModel::DryBulbDelta: {
+                std::vector<Real64> const &dayVals =
+                    state.dataWeather->WPSkyTemperature(thisEnviron.WP_Type1)
+                        .sched->getDayVals(state, state.dataWeather->TomorrowVariables.DayOfYear_Schedule, state.dataWeather->CurDayOfWeek);
+
+                for (int hr = 0; hr < Constant::iHoursInDay; ++hr) {
+                    for (int ts = 0; ts < state.dataGlobal->TimeStepsInHour; ++ts) {
+                        auto &tomorrowTs = state.dataWeather->wvarsHrTsTomorrow(ts + 1, hr + 1);
+                        tomorrowTs.SkyTemp = tomorrowTs.OutDryBulbTemp - dayVals[hr * state.dataGlobal->TimeStepsInHour + ts];
+                    }
+                }
+            } break;
+
+            case SkyTempModel::DewPointDelta: {
+                std::vector<Real64> const &dayVals =
+                    state.dataWeather->WPSkyTemperature(thisEnviron.WP_Type1)
+                        .sched->getDayVals(state, state.dataWeather->TomorrowVariables.DayOfYear_Schedule, state.dataWeather->CurDayOfWeek);
+
+                for (int hr = 0; hr < Constant::iHoursInDay; ++hr) {
+                    for (int ts = 0; ts < state.dataGlobal->TimeStepsInHour; ++ts) {
+                        auto &tomorrowTs = state.dataWeather->wvarsHrTsTomorrow(ts + 1, hr + 1);
+                        tomorrowTs.SkyTemp = tomorrowTs.OutDewPointTemp - dayVals[hr * state.dataGlobal->TimeStepsInHour + ts];
+                    }
+                }
+            } break;
+
+            default:
+                break;
+            }

@@ -1,0 +1,18 @@
+--- .runtime/porting/CLK-06/closure-prep-03/close_card.py
++++ .runtime/porting/CLK-06/closure-prep-04/close_card.py
+@@ -139,12 +139,13 @@
+     rows = bound['preserved_failures']
+     required = {'weather-filter-execution', 'structure-execution', 'workspace-execution-01', 'workspace-execution-02',
+         'original-data-review-execution', 'comparer-source-review-execution', 'frozen-contract-review-execution',
+-        'production-comparison-execution'}
++        'production-comparison-execution', 'production-result-review-execution'}
+     v.need(set(rows) == required,
+         'Only genuine recorded failure refs admitted; no absent report placeholders')
+     for role, binding in rows.items():
+         v.record(binding, checked, code=1 if role in ['structure-execution', 'original-data-review-execution',
+-            'comparer-source-review-execution', 'frozen-contract-review-execution', 'production-comparison-execution'] else 101)
++            'comparer-source-review-execution', 'frozen-contract-review-execution', 'production-comparison-execution',
++            'production-result-review-execution'] else 101)
+     unknown = bound['historical_unknowns']['source_quality_recorder_launch_race']
+     v.need(unknown == {'role': 'source-quality-command-02-before-child-race',
+         'absent_receipt_path': '.runtime/porting/CLK-06/source-quality-command-02/receipt.json',

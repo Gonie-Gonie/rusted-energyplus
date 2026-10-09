@@ -1,0 +1,8 @@
+report ownership module exceeds 900 LOC: crates\ep_runtime\src\heat_balance\reports.rs has 906 LOC
+At C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\scripts\quality\heat-balance-structure-audit.ps1:64 char:9
++         throw "$Description exceeds $Limit LOC: $Path has $lineCount  ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (report ownershi....rs has 906 LOC:String) [], RuntimeException
+    + FullyQualifiedErrorId : report ownership module exceeds 900 LOC: crates\ep_runtime\src\heat_balance\reports.rs h 
+   as 906 LOC
+ 

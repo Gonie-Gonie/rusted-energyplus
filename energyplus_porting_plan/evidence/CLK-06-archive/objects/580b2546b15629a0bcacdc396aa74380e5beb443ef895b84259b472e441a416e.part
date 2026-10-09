@@ -1,0 +1,4 @@
+        int CurrentCycle = 0;                                 // Current cycle through weather file in NumSimYears repeats
+        int WP_Type1 = 0;                                     // WeatherProperties SkyTemperature Pointer
+        SkyTempModel skyTempModel = SkyTempModel::ClarkAllen; // WeatherProperties SkyTemperature CalculationType
+        bool UseWeatherFileHorizontalIR = true;               // If false, horizontal IR and sky temperature are calculated with WP models

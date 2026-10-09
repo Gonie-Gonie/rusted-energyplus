@@ -1,0 +1,178 @@
+"""Input-only CLK06 catalogue draft; no sky equations or expected results."""
+import struct
+
+STEPS = [1, 3, 4]
+POLICIES = ['Hour1', 'Hour24']
+CONTROL_KEYS = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation',
+                'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+COUNT_FIELDS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutRelHum', 'OutBaroPress',
+    'WindDir', 'WindSpeed', 'BeamSolarRad', 'DifSolarRad', 'TotalSkyCover', 'OpaqueSkyCover',
+    'Visibility', 'Ceiling', 'LiquidPrecip', 'WaterPrecip', 'AerOptDepth', 'SnowDepth',
+    'DaysLastSnow', 'WeathCodes', 'Albedo']
+WEATHER_REALS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum',
+    'WindSpeed', 'WindDir', 'SkyTemp', 'HorizIRSky', 'BeamSolarRad', 'DifSolarRad',
+    'Albedo', 'WaterPrecip', 'LiquidPrecip', 'TotalSkyCover', 'OpaqueSkyCover']
+IR_ROWS = ['-1', '-0.0', '0.0', '1e-12', '300', '9998.999999999998',
+           '9999', '9999.000000000002', '10000']
+CLOUD_ROWS = [('2', '1'), ('-1', '-0.0'), ('99', '99'), ('4', '8'),
+              ('99', '99'), ('100', '-2'), ('10', '0'), ('0', '10')]
+DIRECT_ARGUMENT_CANARIES = [
+    ('DRY-POSZERO-DEW-NEGZERO', 0.0, -0.0, 0.5),
+    ('DRY-NEGZERO-DEW-POSZERO', -0.0, 0.0, 0.5),
+    ('BOTH-POSZERO', 0.0, 0.0, 0.5),
+    ('BOTH-NEGZERO', -0.0, -0.0, 0.5),
+    ('DRY-NEGZERO-MIN', -0.0, 10.0, 0.5),
+    ('DEW-NEGZERO-MIN', 10.0, -0.0, 0.5),
+    ('RH-FRACTION-INPUT', 20.0, 10.0, 0.5),
+    ('RH-PERCENT-INPUT', 20.0, 10.0, 50.0),
+]
+STORED_LINEAR_WEIGHTS = {
+    3: [['3fefffffffffffff', '3ff0000000000000', '3ff0000000000001'],
+        ['8000000000000000', '0000000000000000', '3fe0000000000000']],
+    4: [['3fefffffffffffff', '3ff0000000000000', '3ff0000000000001', '0000000000000000'],
+        ['8000000000000000', '3fe0000000000000', '3fefffffffffffff', '3ff0000000000000']],
+}
+
+
+def bits(value):
+    return {'bits': struct.pack('>d', value).hex()}
+
+
+def preparation(steps):
+    if type(steps) is not int or steps not in STEPS:
+        raise ValueError('Only source interval1 with zone steps1/3/4 is admitted')
+    return {'lane': 'selected-prepared-environment', 'time_steps_per_hour': steps,
+        'TimeStepZone': bits(1.0 / steps), 'TimeStepFraction': bits(1.0 / steps),
+        'TimeStepZoneSec': bits(3600.0 / steps), 'MinutesInTimeStep': 60 // steps,
+        'whole_simulation_registration_claimed': False,
+        'genuine_calls': ['InputProcessor::processInput', 'SetupInterpolationValues',
+            'OpenWeatherFile', 'CloseWeatherFile', 'ReadUserWeatherInput', 'AllocateWeatherData',
+            'ResolveLocationInformation', 'CheckLocationValidity'],
+        'TimeStepFraction_assignment': 'after genuine SetupInterpolationValues, before OpenWeatherFile',
+        'positive_seconds_assignment': 'explicit source caller clock before whole SetCurrentWeather',
+        'BeginSimFlag': False, 'DoWeathSim': True, 'DoDesDaySim': False,
+        'GetEnvironmentFirstCall': False, 'GetBranchInputOneTimeFlag': False,
+        'WaterMainsParameterReport': False}
+
+
+def families():
+    result = []
+    for pattern in ['CONSTANT', 'RAMP']:
+        for steps in STEPS:
+            for policy in POLICIES:
+                result.append({'id': f'{pattern}-{steps}-{policy.upper()}',
+                    'pattern': pattern, 'steps': steps, 'policy': policy, 'days': 1})
+    for pattern in ['TWO-DAY-CLOUD', 'TWO-DAY-MISSING-IR']:
+        for steps in [3, 4]:
+            for policy in POLICIES:
+                result.append({'id': f'{pattern}-{steps}-{policy.upper()}',
+                    'pattern': pattern, 'steps': steps, 'policy': policy, 'days': 2})
+    for pattern in ['IR-BOUNDARY', 'CLOUD-BOUNDARY']:
+        for steps in STEPS:
+            result.append({'id': f'{pattern}-{steps}', 'pattern': pattern,
+                           'steps': steps, 'policy': 'Hour24', 'days': 1})
+    for steps in [3, 4]:
+        for index, weights in enumerate(STORED_LINEAR_WEIGHTS[steps], 1):
+            result.append({'id': f'STORED-LINEAR-{steps}-{index}', 'pattern': 'RAMP',
+                'steps': steps, 'policy': 'Hour24', 'days': 1,
+                'stored_interpolation_override': [{'bits': value} for value in weights]})
+    result.append({'id': 'ONE-STEP-CACHE-CANARY', 'pattern': 'RAMP', 'steps': 1,
+                   'policy': 'Hour24', 'days': 1, 'explicit_last_hour_input_canary': True})
+    if len(result) != 31 or len({row['id'] for row in result}) != len(result):
+        raise ValueError('Source-held diagnostic catalogue IDs/cardinality differ')
+    return result
+
+
+def caller_owned_seed(family):
+    missed = {name: 100 + index for index, name in enumerate(COUNT_FIELDS)}
+    ranges = {name: 300 + index for index, name in enumerate(COUNT_FIELDS)}
+    next_hour = {name: bits(0.125 * (index + 1)) for index, name in enumerate(WEATHER_REALS)}
+    next_hour.update(IsRain=True, IsSnow=False)
+    next_hour['SkyTemp'] = {'bits': '8000000000000000'}
+    result = {'missed_counts': missed, 'out_of_range_counts': ranges, 'next_hour': next_hour}
+    if family.get('explicit_last_hour_input_canary', False):
+        last_hour = {name: bits(-0.25 * (index + 1)) for index, name in enumerate(WEATHER_REALS)}
+        last_hour.update(IsRain=False, IsSnow=True)
+        result['last_hour'] = last_hour
+    return result
+
+
+def operations(family):
+    result = [{'id': 'get-next-environment', 'kind': 'GetNextEnvironment',
+               'caller': {}, 'selected_observation': True}]
+    steps, days = family['steps'], family['days']
+    for day in range(1, days + 1):
+        caller = {'DayOfSim': day, 'DayOfSimChr': str(day), 'HourOfDay': 1,
+            'TimeStep': 1, 'BeginSimFlag': False, 'BeginEnvrnFlag': day == 1,
+            'BeginDayFlag': True, 'BeginHourFlag': True, 'BeginTimeStepFlag': True,
+            'EndDayFlag': False, 'EndHourFlag': steps == 1, 'EndEnvrnFlag': False, 'WarmupFlag': False}
+        if day != 1:
+            caller['PreviousHour'] = 24
+        result.append({'id': f'run-{day}-begin-day', 'kind': 'InitializeWeather',
+                       'caller': caller, 'selected_observation': True})
+    result.append({'id': 'end-environment', 'kind': 'InitializeWeather',
+        'caller': {'DayOfSim': days, 'DayOfSimChr': str(days), 'HourOfDay': 24,
+            'TimeStep': steps, 'PreviousHour': 23, 'BeginSimFlag': False,
+            'BeginEnvrnFlag': False, 'BeginDayFlag': False, 'BeginHourFlag': steps == 1,
+            'BeginTimeStepFlag': True, 'EndHourFlag': True, 'EndDayFlag': True,
+            'EndEnvrnFlag': True, 'WarmupFlag': False}, 'selected_observation': True})
+    return result
+
+
+def input_weather(family, month, day, hour):
+    """Only raw input patterns: dry/dew/RH, IR, total cover, opaque cover."""
+    if month == 6:
+        return ('31', '12', '45', '410', '9', '8')
+    if day > family['days']:
+        return ('23', '7', '61', str(600 + hour), '7', '3')
+    pattern = family['pattern']
+    if pattern == 'CONSTANT':
+        return ('20', '10', '50', '300', '5', '5')
+    if pattern == 'IR-BOUNDARY':
+        ir = IR_ROWS[hour - 1] if hour <= len(IR_ROWS) else '300'
+        return ('20', '10', '50', ir, '8', '5')
+    if pattern == 'CLOUD-BOUNDARY':
+        total, opaque = CLOUD_ROWS[hour - 1] if hour <= len(CLOUD_ROWS) else ('6', '4')
+        return ('20', '10', '50', '0', total, opaque)
+    if pattern == 'TWO-DAY-CLOUD':
+        total, opaque = ('99', '99') if day == 2 and hour <= 2 else (str(hour % 11), str((hour + 3) % 11))
+        return ('20', '10', '50', '0', total, opaque)
+    if pattern == 'TWO-DAY-MISSING-IR':
+        return ('20', '10', '50', '0' if day == 1 else '300', '8', '5')
+    return (str(10 + hour // 3 + 2 * (day - 1)), str(2 + hour // 4),
+            str(35 + hour), str(200 + 7 * hour + 31 * (day - 1)),
+            str(hour % 11), str((hour + 2) % 11))
+
+
+def emissivity_cases():
+    result = []
+    for opaque in [0.0, 5.0, 10.0]:
+        for name, dry, dew in [('DRY-LOWER', 10.0, 20.0), ('DEW-LOWER', 20.0, 10.0), ('EQUAL', 10.0, 10.0)]:
+            result.append({'id': f'EMISSIVITY-{int(opaque)}-{name}', 'kind': 'CalcSkyEmissivity',
+                'SkyTempModel': 0, 'arguments': {'OpaqueSkyCover': bits(opaque), 'DryBulb': bits(dry),
+                                               'DewPoint': bits(dew), 'RelHum': bits(0.5)}})
+    # Direct public ClarkAllen inputs preserve zero signs/min ties and RH units.
+    # RelHum is unused by this admitted model; no output equivalence is supplied.
+    for name, dry, dew, rh in DIRECT_ARGUMENT_CANARIES:
+        result.append({'id': 'EMISSIVITY-CANARY-' + name, 'kind': 'CalcSkyEmissivity',
+            'SkyTempModel': 0, 'arguments': {'OpaqueSkyCover': bits(5.0), 'DryBulb': bits(dry),
+                                           'DewPoint': bits(dew), 'RelHum': bits(rh)}})
+    return result
+
+
+def direct_sky_operations():
+    result = [{'id': 'get-next-environment', 'kind': 'GetNextEnvironment', 'caller': {}, 'selected_observation': True}]
+    for opaque in [0.0, 5.0, 10.0]:
+        for index, ir in enumerate(IR_ROWS, 1):
+            result.append({'id': f'CALCSKY-{int(opaque)}-IR-{index}', 'kind': 'calcSky', 'caller': {},
+                'arguments': {'OpaqueSkyCover': bits(opaque), 'DryBulb': bits(20.0),
+                    'DewPoint': bits(10.0), 'RelHum': bits(0.5), 'IRHoriz': bits(float(ir))},
+                'output_initial_values': {'HorizIRSky': {'bits': '8000000000000000'}, 'SkyTemp': bits(-111.25)},
+                'selected_observation': True})
+    for name, dry, dew, rh in DIRECT_ARGUMENT_CANARIES:
+        result.append({'id': 'CALCSKY-CANARY-' + name, 'kind': 'calcSky', 'caller': {},
+            'arguments': {'OpaqueSkyCover': bits(5.0), 'DryBulb': bits(dry),
+                'DewPoint': bits(dew), 'RelHum': bits(rh), 'IRHoriz': bits(0.0)},
+            'output_initial_values': {'HorizIRSky': {'bits': '8000000000000000'}, 'SkyTemp': bits(-111.25)},
+            'selected_observation': True})
+    return result

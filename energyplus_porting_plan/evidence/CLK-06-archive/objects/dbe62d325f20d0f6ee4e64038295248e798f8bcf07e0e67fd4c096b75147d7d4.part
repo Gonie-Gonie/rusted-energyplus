@@ -1,0 +1,147 @@
+"""Factual receipt/ledger checks; reviewed science modules are never imported."""
+from collections import Counter
+import hashlib
+import importlib.util
+import math
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OWNED = ROOT / '.runtime/porting/CLK-05/gate-review-prep-01/metadata.py'
+GEO = ROOT / 'tools/porting/geo03_provenance.py'
+
+
+def module(name, source, digest):
+    if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+        raise ValueError('Metadata-only dependency differs before import')
+    spec = importlib.util.spec_from_file_location(name, source)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    return value
+
+
+m = module('clk06_result_owned_metadata', OWNED, '196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d')
+v = module('clk06_result_retained_metadata', GEO, '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5')
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+    'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+CASES = ['A-24H', 'A-72H', 'B-BOTH-24H']
+ENV = ['IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+FIELDS = {'SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover', 'Interpolation', 'SolarInterpolation'}
+EXACT_FIELDS = {'TotalSkyCover', 'OpaqueSkyCover', 'Interpolation', 'SolarInterpolation'}
+KINDS = ['owned_context_receipt', 'run_period_weather_sampler_return', 'run_period_report_accumulator',
+    'run_period_report_hourly_output', 'run_period_report_series_handoff', 'physical_exterior_balance_ingress',
+    'physical_resolved_longwave_argument', 'report_recomputed_longwave_argument']
+ORIGINS = ['surface_solve', 'report_outside_face_recomputation']
+
+
+def identity(actual, expected):
+    m.check(actual); m.check(expected)
+    m.need(v.same_binding(actual, expected), 'Actual contained path/hash identity differs')
+
+
+def fact_binding(actual, expected):
+    # Large Original operands are only reused by their actual DataQA-reviewed identities.
+    m.need(type(actual) is dict and type(expected) is dict and type(actual.get('sha256')) is str
+        and len(actual['sha256']) == 64 and all(c in '0123456789abcdef' for c in actual['sha256'])
+        and v.same_binding(actual, expected), 'Previously reviewed literal artifact identity differs')
+
+
+def script(record, archive, reported=None):
+    command = record['command']; admitted = {'python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'}
+    m.need(type(command) is list and len(command) >= 2 and all(type(x) is str for x in command)
+        and Path(command[0]).name.lower() in admitted, 'Typed admitted Python interpreter required')
+    index, seen = 1, set()
+    while index < len(command) and command[index] in ['-X', '-B']:
+        option = command[index]; m.need(option not in seen, 'Repeated Python option'); seen.add(option); index += 1
+        if option == '-X': m.need(index < len(command) and command[index] == 'utf8', 'Only UTF8 mode admitted'); index += 1
+    m.need(index < len(command) and command[index].endswith('.py') and not command[index].startswith('-')
+        and m.path(command[index]).read_bytes() == m.check(archive).read_bytes(), 'Actual executed script/archive differs')
+    if reported is None: return None
+    m.need(type(reported) is list and len(reported) >= 2 and all(type(x) is str for x in reported)
+        and Path(reported[0]).name.lower() in admitted and m.exact(command[1:], reported[1:]), 'Reported interpreter/argv tail differs')
+    parent = record['python']['executable']; absolute = Path(reported[0]).is_absolute()
+    m.need(type(parent) is str and Path(parent).is_absolute(), 'Recorded parent interpreter path required')
+    if absolute: m.need(Path(reported[0]).resolve() == Path(parent).resolve(), 'Absolute reported interpreter differs')
+    else: m.need(reported[0] == command[0] == Path(reported[0]).name, 'Reported alias must equal exact recorded alias')
+    return {'reported_argv_zero': reported[0], 'recorded_parent_python_executable': parent,
+        'child_executable_path': reported[0] if absolute else None, 'child_executable_path_available': absolute,
+        'parent_executable_is_proof_of_child_alias_resolution': False, 'unavailable_child_path_counted_as_PASS': False}
+
+
+def argument(record, name, binding):
+    command = record['command']; m.need(command.count(name) == 1, 'Unique actual argument required: ' + name)
+    index = command.index(name); m.need(index + 1 < len(command), 'Argument value absent')
+    m.need(m.path(command[index + 1]) == m.check(binding), 'Actual argument identity differs: ' + name)
+
+
+def source_rows(rows, count=None):
+    m.need(type(rows) is list and len(rows) == len({row['historical_path'] for row in rows})
+        and (count is None or len(rows) == count), 'Exact unique source archive inventory required')
+    result = {row['historical_path']: row['archive'] for row in rows}
+    for row in result.values(): m.check(row)
+    return result
+
+
+def execution(reference, not_after):
+    record = m.read(reference); checked = v.Bindings(); v.execution_interval(record, checked)
+    m.need(record['schema'] == 'recorded-porting-command.v1' and record['launch_error'] is None
+        and record['source_bytes_match_before_and_after'] is True and record['recorder_updates_gates'] is False
+        and record['recorder_supplies_reference_answers'] is False and Path(record['cwd']).resolve() == ROOT
+        and m.instant(record['finished_utc']) <= m.instant(not_after), 'Actual guarded recorded command0 required')
+    for row in checked.report(): m.check(row)
+    m.need(m.check(record['stderr']).stat().st_size == 0, 'Actual successful stderr must be empty')
+    return record
+
+
+def review(reference, outer, schema, status, started):
+    value = m.actual_review(reference, outer, schema, status, started)
+    record = m.read(outer); script(record, value['executed_reader_source_archive'])
+    m.need(m.check(record['stderr']).stat().st_size == 0, 'Actual metadata review stderr must be empty')
+    return value, record
+
+
+def metric_rows(rows, categories, fields):
+    m.need(type(rows) is dict and set(rows) == fields and type(categories) is dict
+        and set(categories) == fields | {'typed_metadata', 'literal_binary64'}
+        and all(type(x) is int and x >= 0 for x in categories.values()), 'Actual metric/category field set differs')
+    for field, row in rows.items():
+        m.need(set(row) == {'comparison_count', 'mismatch_count', 'maximum_absolute_error', 'RMSE'}
+            and type(row['comparison_count']) is int and row['comparison_count'] > 0
+            and type(row['mismatch_count']) is int and row['mismatch_count'] == 0
+            and all(type(row[key]) is float and math.isfinite(row[key]) and row[key] >= 0.0
+                for key in ['maximum_absolute_error', 'RMSE'])
+            and row['RMSE'] <= row['maximum_absolute_error'] and categories[field] == row['comparison_count'],
+            'Finite positive factual field metric differs: ' + field)
+        if field in EXACT_FIELDS: m.need(row['maximum_absolute_error'] == row['RMSE'] == 0.0, 'Frozen exact metric differs')
+        if field == 'ESky': m.need(row['maximum_absolute_error'] <= 2e-15, 'Frozen emissivity zero-relative bound differs')
+
+
+def metrics(report):
+    comparison = report['comparison']; integers = ['numeric_comparison_count', 'literal_binary64_comparison_count',
+        'metadata_comparison_count', 'comparison_count', 'mismatch_count']
+    m.need(all(type(comparison[key]) is int and comparison[key] >= 0 for key in integers)
+        and all(comparison[key] > 0 for key in integers[:4]) and comparison['mismatch_count'] == 0
+        and comparison['comparison_count'] == sum(comparison[key] for key in integers[:3])
+        and comparison['mismatches'] == [] and comparison['mismatch_payloads_truncated'] is False
+        and comparison['mismatch_payload_limit'] == 1000
+        and all(type(comparison[key]) is int and comparison[key] == 0 for key in
+            ['availability_failures', 'numeric_mismatches', 'literal_binary64_mismatches', 'metadata_mismatches']),
+        'Actual positive comparison ledger and zero failures required')
+    rows, categories = comparison['field_error_metrics'], comparison['categories']; metric_rows(rows, categories, FIELDS)
+    m.need(sum(row['comparison_count'] for row in rows.values()) == comparison['numeric_comparison_count']
+        and categories['typed_metadata'] == comparison['metadata_comparison_count']
+        and categories['literal_binary64'] == comparison['literal_binary64_comparison_count']
+        and sum(categories.values()) == comparison['comparison_count'], 'Actual category sums differ')
+    unavailable = comparison['unavailable_paths']; reasons = Counter(); required_both_null = 0
+    m.need(type(unavailable) is list and comparison['unavailable_counted_as_PASS'] is False, 'Unavailable is never PASS')
+    for row in unavailable:
+        m.need(type(row) is dict and type(row['location']) is str and type(row['reason']) is str
+            and all(type(row[key]) is bool for key in ['actual_available', 'original_available', 'required'])
+            and row['counted_as_PASS'] is False, 'Typed honest unavailable scope required')
+        if row['required']:
+            m.need(row['actual_available'] is row['original_available'] is False, 'One-sided required absence cannot PASS')
+            required_both_null += 1
+        reasons[row['reason']] += 1
+    return {'comparison_counts': {key: comparison[key] for key in integers}, 'field_error_metrics': rows,
+        'categories': categories, 'unavailable_entry_count': len(unavailable), 'unavailable_reason_counts': dict(reasons),
+        'required_both_null_unavailable_count': required_both_null, 'unavailable_arrays_copied_into_this_report': False,
+        'comparison_report_full_JSON_including_retained_mismatch_samples_parsed': True,
+        'parsed_retained_mismatch_sample_count': len(comparison['mismatches']), 'relative_tolerance_metrics_recomputed': False}

@@ -1,0 +1,40 @@
+    void UpdateWeatherData(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   June 1997
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine updates all of the daily weather data in the local
+        // module level variables and the global variables.
+        // This subroutine will temporarily transfer the weather data for the
+        // current day to the old data structure contained in envdat.inc until
+        // enough reengineering has taken place to eliminate the need for this
+        // include.
+
+        state.dataWeather->TodayVariables = state.dataWeather->TomorrowVariables; // Transfer Tomorrow's Daily Weather Variables to Today
+
+        if (state.dataGlobal->BeginEnvrnFlag) {
+            state.dataGlobal->PreviousHour = 24;
+        }
+
+        state.dataWeather->wvarsHrTsToday = state.dataWeather->wvarsHrTsTomorrow; // What a waste
+
+        // Update Global Data
+
+        state.dataEnvrn->DayOfYear = state.dataWeather->TodayVariables.DayOfYear;
+        state.dataEnvrn->Year = state.dataWeather->TodayVariables.Year;
+        state.dataEnvrn->Month = state.dataWeather->TodayVariables.Month;
+        state.dataEnvrn->DayOfMonth = state.dataWeather->TodayVariables.DayOfMonth;
+        state.dataEnvrn->DayOfWeek = state.dataWeather->TodayVariables.DayOfWeek;
+        state.dataEnvrn->HolidayIndex = state.dataWeather->TodayVariables.HolidayIndex;
+        if (state.dataEnvrn->HolidayIndex > 0) {
+            state.dataWeather->RptDayType = state.dataEnvrn->HolidayIndex;
+        } else {
+            state.dataWeather->RptDayType = state.dataEnvrn->DayOfWeek;
+        }
+        state.dataEnvrn->DSTIndicator = state.dataWeather->TodayVariables.DaylightSavingIndex;
+        state.dataEnvrn->EquationOfTime = state.dataWeather->TodayVariables.EquationOfTime;
+        state.dataEnvrn->CosSolarDeclinAngle = state.dataWeather->TodayVariables.CosSolarDeclinAngle;
+        state.dataEnvrn->SinSolarDeclinAngle = state.dataWeather->TodayVariables.SinSolarDeclinAngle;

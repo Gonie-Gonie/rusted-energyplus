@@ -1,0 +1,223 @@
+"""SOURCE-ONLY draft. Never imported/run during preparation; emits no answers.
+
+Future Root-authorized use emits an UNFROZEN proposal; a separate reviewed
+freezer must construct the final six one-way packet before native execution.
+"""
+from pathlib import Path
+import argparse
+import copy
+import hashlib
+import json
+from catalog import CONTROL_KEYS, families, controls, caller_owned_seed, preparation, operations, input_solar
+
+ROOT = Path(__file__).resolve().parents[4]
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+OLD_REQUEST = {'path': '.runtime/porting/CLK-04/frozen-packet-01/helper-request.json',
+               'sha256': 'db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054'}
+PRODUCTION_CALLERS = {'path': '.runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json',
+                      'sha256': 'e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1'}
+GOLDEN = {'path': '.runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw',
+          'sha256': 'c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f'}
+
+
+def check(binding):
+    if set(binding) != {'path', 'sha256'} or not isinstance(binding['path'], str):
+        raise ValueError('Exact two-field input reference required')
+    path = (ROOT / binding['path']).resolve()
+    if path == ROOT or not path.is_relative_to(ROOT) or not path.is_file():
+        raise ValueError('Input path escapes bounded repository')
+    if hashlib.sha256(path.read_bytes()).hexdigest() != binding['sha256']:
+        raise ValueError('Input bytes differ: ' + binding['path'])
+    return path
+
+
+def read(binding):
+    return json.loads(check(binding).read_text(encoding='utf-8'))
+
+
+def json_bytes(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8')
+
+
+def put(out, name, payload):
+    path = out / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(payload)
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(payload).hexdigest()}
+
+
+def diagnostic_idf(family):
+    text = ('Version,26.1;\n' + f"Timestep,{family['steps']};\n"
+            'Building,CLK05 Unit,0,Suburbs,0.04,0.4,FullExterior,25,6;\n'
+            'GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;\n'
+            'Site:Location,CLK05 Golden Context,39.74,-105.18,-7.0,1829.0;\n'
+            f"RunPeriod,CLK05 Unit,7,1,2013,7,{family['days']},2013,Monday,No,No,No,Yes,Yes,No,{family['policy']};\n")
+    return text.encode('utf-8')
+
+
+def diagnostic_epw(family, golden):
+    lines = golden.decode('utf-8-sig').splitlines()
+    if len(lines) != 8768:
+        raise ValueError('Hashed Golden must contain8 headers and8760 rows')
+    header = list(lines[:8])
+    header[5] = 'COMMENTS 1,input-only CLK05 solar patterns; derived from hashed Golden template'
+    header[6] = 'COMMENTS 2,no expected values or exits; distinct next-day solar inputs'
+    header[7] = 'DATA PERIODS,1,1,Data,Sunday,6/30,7/3'
+    rows = []
+    for text in lines[8:]:
+        row = text.split(',')
+        month, day, hour = map(int, (row[1], row[2], row[3]))
+        if (month, day) not in [(6, 30), (7, 1), (7, 2), (7, 3)]:
+            continue
+        if len(row) != 35:
+            raise ValueError('Full35-column Golden input required')
+        row[0] = '2013'
+        # Valid non-solar raw inputs, not computed/weather outputs.
+        for index, value in {6: '20', 7: '10', 8: '50', 9: '90000', 12: '300',
+                             20: '180', 21: '1', 22: '5', 23: '5', 24: '20',
+                             25: '10000', 26: '9', 27: '999999999', 28: '10',
+                             29: '0.1', 30: '0', 31: '1', 32: '0.2', 33: '0', 34: '1'}.items():
+            row[index] = value
+        row[14], row[15] = input_solar(family, month, day, hour)
+        rows.append(','.join(row))
+    if len(rows) != 96:
+        raise ValueError('Exactly four complete input days are required')
+    return ('\r\n'.join(header + rows) + '\r\n').encode('utf-8')
+
+
+def byte_map(payload, weather):
+    records, position = [], 0
+    for index, line in enumerate(payload.splitlines(keepends=True)):
+        end = position + len(line)
+        if index >= 8:
+            records.append({'source_record_ordinal': index - 8, 'byte_start': position,
+                            'byte_end': end, 'input_row_sha256': hashlib.sha256(line).hexdigest()})
+        position = end
+    return {'schema': 'clk05-input-byte-map.v1', 'weather': weather,
+            'source_bytes_include_line_endings': True, 'native_private_record_index_observed': False,
+            'records': records, 'input_only': True, 'scientific_values_computed': False}
+
+
+def production_context(control_ref, production, guards):
+    """Proposed registration input protocol; actual registration remains Root-owned."""
+    metadata = read(control_ref)
+    if metadata.get('schema') != 'clk05-production-control-inputs.v1':
+        raise ValueError('Reviewed actual input control registration metadata required')
+    if metadata.get('effective_controls_inferred_from_outputs') is not False:
+        raise ValueError('Production controls must derive from actual declared input registration')
+    rows = metadata.get('cases', [])
+    if [row['case_id'] for row in rows] != [row['id'] for row in production]:
+        raise ValueError('Exact three production controls in native request order required')
+    result = {}
+    for row, sequence in zip(rows, production, strict=True):
+        if row['input'] != sequence['input']:
+            raise ValueError('Production controls must bind the actual raw CON input')
+        values = row['solar_controls']
+        if set(values) != set(CONTROL_KEYS) or any(type(x) is not bool for x in values.values()):
+            raise ValueError('Exactly four effective typed production controls required')
+        for binding in row['registration_source_archives']:
+            check(binding); guards.append(binding)
+        # Actual captured external strings must exist even when absent/empty;
+        # applying source env_var_on/diagnostics belongs to reviewed registration.
+        environment = row['captured_environment_inputs']
+        if set(environment) != set(CONTROL_KEYS[1:]):
+            raise ValueError('All three actual external solar input presences must be captured')
+        for capture in environment.values():
+            if type(capture['present']) is not bool or not isinstance(capture['raw_value'], str):
+                raise ValueError('Typed external-input presence/string required')
+            if capture['present'] is False and capture['raw_value'] != '':
+                raise ValueError('Absent external input cannot carry a fabricated string')
+        result[sequence['id']] = copy.deepcopy(values)
+    return result
+
+
+def build_request(out, source_ref, tolerance_ref, control_ref):
+    old = read(OLD_REQUEST)
+    guards = [OLD_REQUEST, PRODUCTION_CALLERS, GOLDEN, source_ref, tolerance_ref, control_ref, old['fixed_scope']]
+    guards += old['all_45_guard_refs']
+    if len(old['all_45_guard_refs']) != 45:
+        raise ValueError('All45 ordered CON guard bindings required; never deduplicate')
+    for binding in guards:
+        check(binding)
+    production = copy.deepcopy(read(PRODUCTION_CALLERS)['cases'])
+    if [row['id'] for row in production] != ['A-24H', 'A-72H', 'B-BOTH-24H']:
+        raise ValueError('Exact unchanged three CON input/caller histories required')
+    prod_controls = production_context(control_ref, production, guards)
+    golden = check(GOLDEN).read_bytes()
+    sequences = []
+    for family in families():
+        prefix = 'inputs/' + family['id']
+        input_ref = put(out, prefix + '.idf', diagnostic_idf(family))
+        payload = diagnostic_epw(family, golden)
+        weather = put(out, prefix + '.epw', payload)
+        sequence = {'id': family['id'], 'lane': 'diagnostic', 'input': input_ref, 'weather': weather,
+                    'external_byte_map': put(out, prefix + '-byte-map.json', json_bytes(byte_map(payload, weather))),
+                    'time_steps_per_hour': family['steps'], 'prepared_environment_lane': True,
+                    'native_preparation': preparation(family['steps']), 'solar_controls': controls(family),
+                    'caller_owned_seed': caller_owned_seed(family), 'operations': operations(family),
+                    'run_period': {'begin_month': 7, 'begin_day': 1, 'begin_year': 2013,
+                                   'end_month': 7, 'end_day': family['days'], 'end_year': 2013,
+                                   'start_weekday': 'Monday', 'first_hour_policy': family['policy']},
+                    'literal_family': copy.deepcopy(family)}
+        if 'stored_solar_interpolation_override' in family:
+            sequence['stored_solar_interpolation_override'] = family['stored_solar_interpolation_override']
+        sequences.append(sequence)
+    for sequence in production:
+        context = next(row for row in old['weather_sequences'] if row['id'] == sequence['id'])
+        if (sequence['input'], sequence['weather'], sequence['run_period']) != (
+                context['input'], context['weather'], context['run_period']):
+            raise ValueError('Production scalar input identity differs between authentic packets')
+        sequence['lane'] = 'production-CON'
+        sequence['native_preparation'] = copy.deepcopy(context['native_preparation'])
+        for operation in sequence['operations']:
+            operation['selected_observation'] = True
+        sequence['solar_controls'] = prod_controls[sequence['id']]
+        sequence['production_control_inputs'] = control_ref
+        sequences.append(sequence)
+    counts = {'setup_cases': 3, 'weather_sequences': len(sequences), 'GetNextEnvironment': 0,
+              'InitializeWeather': 0, 'weather_operations': 0, 'total_operations': 3}
+    for sequence in sequences:
+        for operation in sequence['operations']:
+            counts[operation['kind']] += 1
+            counts['weather_operations'] += 1
+            counts['total_operations'] += 1
+    request = {'schema': 'clk05-helper-cases.draft.v1', 'energyplus_commit': PIN,
+               'status': 'input-only-proposal-not-frozen', 'frozen_before_numerical_execution': False,
+               'contracts': {'source': source_ref, 'tolerances': tolerance_ref},
+               'fixed_scope': old['fixed_scope'], 'all_45_guard_refs': old['all_45_guard_refs'],
+               'setup_cases': [{'id': f'SETUP-{steps}', **preparation(steps)} for steps in [1, 3, 4]],
+               'weather_sequences': sequences, 'requested_counts': counts,
+               'production_control_inputs': control_ref, 'historical_input_only_request': OLD_REQUEST,
+               'production_input_only_caller_history': PRODUCTION_CALLERS,
+               'expected_values_supplied': False, 'expected_exits_supplied': False,
+               'original_results_supplied_to_Rust': False, 'scientific_execution_performed': False,
+               'numerical_PASS_claimed': False, 'gates_updated': False}
+    # Rehash every consumed byte input after all emission, including repeated45.
+    for binding in guards:
+        check(binding)
+    return request
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output-dir', type=Path, required=True)
+    for name in ['source-contract', 'tolerances', 'production-control-inputs']:
+        parser.add_argument('--' + name, required=True)
+        parser.add_argument('--' + name + '-sha256', required=True)
+    args = parser.parse_args()
+    out = args.output_dir.resolve()
+    allowed = ROOT / '.runtime/porting/CLK-05'
+    if out == allowed or not out.is_relative_to(allowed) or out.exists():
+        raise ValueError('Fresh contained ignored CLK05 output directory required')
+    bindings = [{'path': getattr(args, key), 'sha256': getattr(args, key + '_sha256')}
+                for key in ['source_contract', 'tolerances', 'production_control_inputs']]
+    out.mkdir(parents=True)
+    request = build_request(out, *bindings)
+    binding = put(out, 'helper-request-draft.json', json_bytes(request))
+    print(json.dumps({'request': binding, 'requested_counts': request['requested_counts'],
+                      'input_only': True, 'contracts_frozen': False, 'scientific_execution_performed': False}))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,85 @@
+# CLK-06 document closure source preparation
+
+This source-only writer adapts the accepted C5 closure. The 135-line metadata
+utility is byte-identical. Raw exclusively owns the C6 archive writer/verifier;
+this writer consumes their genuine ignored archive0, independent verify0 and
+byte-exact canonical copy. No tool is executed and no document gate is changed
+by preparing these sources. Root must approve exact writer and bindings hashes
+and provide actual completed evidence at execution.
+
+## Source-review interface
+
+`clk06-independent-closure-source-review.v1` with status
+`pass-metadata-closure-source-and-proof-interface-before-document-write`.
+An actual recorded metadata0 review prints its full report and supplies aware
+UTC `review_started_utc`/`review_completed_utc`, `scientific_execution_performed:false`,
+`executed_reader_source_archive`, and exact2 `reviewed_sources` rows containing
+`historical_path`/`archive` for this `close_card.py` and `common.py`. This is a
+source/provenance review, not a numerical or final-lineage execution stage.
+Baseline authored the comparer, observer and earlier hourly/producer code;
+other-author peer and Root's actual execution remain separate.
+
+## Root-only future command
+
+`python -X utf8 -B close_card.py --bindings APPROVED_JSON --bindings-sha256 ACTUAL_SHA --source-mapping APPROVED_MAPPING --card-notes APPROVED_UTF8_MD --archive ABSOLUTE_CANONICAL_ARCHIVE_JSON --archive-execution ARCHIVE_RECORDER --archive-verification-execution VERIFY_RECORDER --approved-source-sha256 HELD_WRITER_SHA --output-dir FRESH_IGNORED_OUTPUT`
+
+The canonical archive must reside at
+`energyplus_porting_plan/evidence/CLK-06-archive/archive.json`. The recorded
+ignored archive and canonical copy have different paths and exact equal bytes.
+Gzip/chunk objects are hashed in place and each tracked object is at most4MB.
+Native results/binaries and duplicate huge stdout are not copied here.
+
+`bindings.template.json` is deliberately pending, unauthorized and unexecutable.
+It lists every consumed role without guessing future hashes or PASS. Root fills
+actual refs after science/QA and final quality have completed. Source mapping
+and UTF8 notes are Root-approved inputs; the mapping example names actual
+pinned function definitions and explicitly limits selected hourly/subhour
+blocks instead of claiming whole-function physical parity.
+
+The writer authenticates actual candidate unit0 and unitQA0, production six CLI
+result0 and factualQA0, Original1120 dataQA0, genuine scope0, frozen six/45 inputs,
+preserved legacy differences, and five genuine quality0 recorders. Unit and CLI
+build receipts are distinct. Their respective identities and the existing Root
+applied transport inventory are authenticated through the genuine result QA.
+No candidate/CLI whole-tree equality is invented. No extra quality-lineage stage
+is introduced: all five final checks must name the clean actual CLI source
+snapshot/head, with actual parsed complete workspace counts and0 failures/ignored.
+
+## Preserved history
+
+Nine genuine failed command refs remain failure1/101: the original frozen
+contract review, comparer source review, Original data review, weather namespace
+filter, structure audit, workspace01 four output failures and workspace02 old A
+equality failure, and the first production comparer caller-attribution metadata
+failure1 with empty stdout and no report, and the production result-review02
+metadata failure1 caused by its mixed parent/nested stdout protocol assumption.
+The result-review failure also has empty stdout and no review report. The
+successful scientific production02 report remains unchanged. No absent report
+placeholder is admitted. The source-quality
+recorder02 FileExists incident has no receipt and no proven child exit; its
+literal unknown/no-receipt object is retained, matching Raw's archive history.
+The legacy gap is genuine factual completion0 with real mismatches/unavailable
+APIs, not a failed recorder or numerical PASS.
+
+## Canonical outputs and retirement successor
+
+Only `plan.json`, `cards/CLK-06.md` and new `evidence/CLK-06.json` are written.
+The plan is not wholly reserialized: only the CLK-06 task's raw JSON span is
+replaced. All other63 raw task-object bytes and parsed semantics are checked
+unchanged. The card's four checkboxes close and Root's approved notes append.
+Korean status strings use Unicode escapes; notes/card bytes are decoded UTF8.
+No generic Rust500-line rule or fabricated line count is imposed.
+
+Completion evidence schema is `clk06-card-completion-evidence.v1`, with direct
+`unit.report`/`production.report`, their real execution/review refs and actual
+comparison counts, `actual_final_quality`, `applied_core_inventory`, contracts,
+archive/verification refs, preserved failures and explicit unpaired scope.
+
+Actual stdout/result schema is `clk06-metadata-card-closure.v1`: `before`2,
+`after`3, `previously_absent_evidence`, `only_CLK06_gates_updated:true`,
+`other_63_tasks_unchanged:true`, `other_63_raw_task_object_bytes_unchanged:true`,
+actual quality/archive refs and source copies. `archived_deltas` holds exact
+`{path,before,after}` byte archives of plan/card so later retirement can prove
+scope.after -> closure.before -> closure.after without requiring the old pending
+plan to remain live. HTML/view synchronization, Git publication and retirement
+are separate Root actions; this writer performs none of them.

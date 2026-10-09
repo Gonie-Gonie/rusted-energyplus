@@ -1,0 +1,31 @@
+{
+  "schema": "clk06-root-applied-math-source-inventory.v1",
+  "sources": [
+    {
+      "path": "crates/ep_runtime/src/weather_day/sky.rs",
+      "sha256": "5ce0edde536590435097087561f2c9a25beb1b7cef3b98d8220279a288f127bc",
+      "format_only_from_held": true
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/mod.rs",
+      "sha256": "d733ff335205e7cffe60ad4a43f06bf7b6cfd63508f31ff011b03c92abf786b9",
+      "format_only_from_held": true
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+      "sha256": "e54bbe6d2fc73ef36679e184a086370f288fec0ab2723a4d32d34934308a9bc0",
+      "format_only_from_held": true
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/solar.rs",
+      "sha256": "4ffe393e5670883f37648d1ef02bb0e82389e968f965337fe146529569962525",
+      "format_only_from_held": true
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/producer.rs",
+      "sha256": "9b01da47c728dbf92ba7f68ed35e400fe74a5653c14fba6924a356f668841617",
+      "format_only_from_held": true
+    }
+  ],
+  "scientific_execution_performed": false
+}

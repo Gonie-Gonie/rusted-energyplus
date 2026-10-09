@@ -1,0 +1,218 @@
+"""Input-only observer wrapper. Root's genuine OriginalDataQA0 gates Rust execution.
+
+No native result or numerical answer is read or supplied to Rust. This emitter's
+source-review guard does not claim to implement the external promotion/build gate.
+"""
+from pathlib import Path
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = '.runtime/porting/CLK-06/legacy-observer-prep-02'
+SHARED = 'crates/ep_runtime/examples'
+SOURCES = [f'{PREP}/clk06_existing_observer.rs', f'{PREP}/write_observer_inputs.py',
+    *[f'{PREP}/{name}.rs' for name in ['inputs', 'fields', 'observe', 'seeds']],
+    f'{SHARED}/clk02_probe_support/digest.rs', f'{SHARED}/clk02_probe_support/dto.rs',
+    f'{SHARED}/clk03_candidate_support/fields.rs', f'{SHARED}/clk03_candidate_support/inputs.rs',
+    f'{SHARED}/clk04_candidate_support/fields.rs']
+API = ['crates/ep_runtime/src/weather.rs',
+    *[f'crates/ep_runtime/src/weather_day/{name}.rs' for name in
+      ['configuration', 'lifecycle', 'state', 'context', 'current', 'producer', 'hourly', 'handoff']],
+    'crates/ep_runtime/src/weather_raw/cursor.rs', 'crates/ep_runtime/src/weather_raw/day_read.rs',
+    'crates/ep_runtime/src/weather_raw/input.rs']
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+    'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+AUTHORITIES = {
+    'catalogue': '.runtime/porting/CLK-06/input-design-prep-02/manifest.json',
+    'native_source': '.runtime/porting/CLK-06/native-prep-01/manifest.json',
+    'transport_source': '.runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json'}
+CONTROLS = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation',
+            'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+SKY = ['SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover']
+KINDS = ['GetNextEnvironment', 'InitializeWeather', 'SetCurrentWeather', 'calcSky']
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def ref(path):
+    raw = Path(path)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse input required')
+    path = raw.resolve()
+    require(path != ROOT and path.is_relative_to(ROOT), 'Contained actual file required')
+    return {'path': path.relative_to(ROOT).as_posix(),
+            'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def check(binding):
+    require(type(binding) is dict and set(binding) == {'path', 'sha256'}, 'Exact input ref required')
+    require(ref(binding['path']) == binding, 'Bound input bytes differ')
+    return (ROOT / binding['path']).resolve()
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
+def put(out, name, value):
+    payload = (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8')
+    path = out / name
+    with path.open('xb') as stream:
+        stream.write(payload)
+    return ref(path)
+
+
+def validate(native):
+    require(native['schema'] == 'clk06-helper-cases.v1'
+        and native['energyplus_commit'] == '6f2e40d10250a105b49966baa24d843711e61048'
+        and native['frozen_before_numerical_execution'] is True
+        and native['root_preoutput_decision'] == DECISION
+        and all(native[key] is False for key in ['expected_values_supplied', 'expected_exits_supplied',
+            'original_results_supplied_to_Rust', 'scientific_execution_performed']), 'Frozen input-only request required')
+    require(len(native['all_45_guard_refs']) == 45 and len(native['setup_cases']) == 3,
+            'Ordered45 guards and3 pure Setup inputs required')
+    require(sorted(row['time_steps_per_hour'] for row in native['setup_cases']) == [1, 3, 4],
+            'One/three/four-step Setup required')
+    direct = len(native['emissivity_cases'])
+    counts = {'setup_cases': 3, 'emissivity_cases': direct,
+        'weather_sequences': len(native['weather_sequences']), 'CalcSkyEmissivity': direct,
+        **{kind: 0 for kind in KINDS}, 'weather_operations': 0, 'total_operations': 3 + direct}
+    lanes, ids = {'diagnostic': 0, 'production-CON': 0}, set()
+    for row in native['emissivity_cases']:
+        require(row['id'] not in ids and row['kind'] == 'CalcSkyEmissivity'
+            and type(row['SkyTempModel']) is int and row['SkyTempModel'] == 0,
+            'Unique direct ClarkAllen input required')
+        ids.add(row['id'])
+    for sequence in native['weather_sequences']:
+        require(sequence['id'] not in ids and sequence['lane'] in lanes
+            and type(sequence['time_steps_per_hour']) is int and sequence['time_steps_per_hour'] in [1, 3, 4],
+            'Unique bounded sequence required')
+        ids.add(sequence['id']); lanes[sequence['lane']] += 1
+        controls = sequence['solar_controls']
+        require(set(controls) == set(CONTROLS) and all(type(x) is bool for x in controls.values()),
+                'Exactly four typed declared controls required')
+        op_ids = set()
+        for op in sequence['operations']:
+            require(op['id'] not in op_ids and op['kind'] in KINDS and type(op['selected_observation']) is bool,
+                    'Unique literal closed operation required')
+            op_ids.add(op['id'])
+            for key in [op['kind'], 'weather_operations', 'total_operations']:
+                counts[key] += 1
+    require(counts == native['requested_counts'] and lanes['production-CON'] == 3,
+            'Derived literal operation counts differ')
+
+
+def source_review(path, inventory, admission, native_ref):
+    value = read(path)
+    require(value['schema'] == 'clk06-independent-existing-observer-source-review.v1'
+        and value['status'] == 'pass-input-only-existing-observer-and-projection-before-execution'
+        and value['scientific_execution_performed'] is False, 'Independent source review required')
+    rows = value['reviewed_sources']
+    indexed = {row['historical_path']: row for row in rows}
+    require(len(rows) == len(indexed) == 23 and set(indexed) == {row['path'] for row in inventory},
+            'Exact unique23 source inventory required')
+    for source in inventory:
+        archive = indexed[source['path']]['archive']
+        require(check(archive).read_bytes() == check(source).read_bytes(), 'Reviewed source bytes changed')
+    require(value['reviewed_helper_request'] == native_ref
+        and value['reviewed_native_contract'] == ref(admission)
+        and value['root_preoutput_decision'] == DECISION, 'Reviewed native input authority differs')
+    completed = datetime.fromisoformat(value['review_completed_utc'])
+    require(completed.tzinfo is not None and completed.utcoffset().total_seconds() == 0
+        and completed <= datetime.now(timezone.utc),
+            'Actual source review must precede emission')
+    return ref(path)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    for key in ['native-request', 'native-contract', 'source-review', 'output-dir']:
+        parser.add_argument('--' + key, type=Path, required=True)
+    args = parser.parse_args()
+    out = args.output_dir.resolve()
+    allowed = ROOT / '.runtime/porting/CLK-06'
+    require(out != allowed and out.is_relative_to(allowed) and not out.exists(), 'Fresh ignored output required')
+    native_ref, admission_ref = ref(args.native_request), ref(args.native_contract)
+    native, admission = read(check(native_ref)), read(check(admission_ref))
+    validate(native)
+    require(admission['schema'] == 'clk06-native-admission-contract.v1'
+        and admission['helper_request'] == native_ref and admission['fixed_scope'] == native['fixed_scope']
+        and admission['all_45_guard_refs'] == native['all_45_guard_refs']
+        and admission['requested_counts'] == native['requested_counts']
+        and admission['root_preoutput_decision'] == DECISION
+        and admission['frozen_before_numerical_execution'] is True, 'One-way admission differs')
+    for key in ['source', 'tolerances']:
+        require(admission['contracts'][key] == native['contracts'][key], 'Input contracts differ')
+    projection = read(check(admission['projection']))
+    require(projection['schema'] == 'clk06-observation-projection.v1'
+        and projection['helper_request'] == native_ref and projection['contracts'] == admission['contracts']
+        and projection['native_observation_policy'] == native['observation_policy']
+        and projection['root_preoutput_decision'] == DECISION
+        and native['observation_policy']['full_weather_grid_fields'] == SKY, 'Frozen projection differs')
+    sources, api = [ref(path) for path in SOURCES], [ref(path) for path in API]
+    authorities = {key: ref(path) for key, path in AUTHORITIES.items()}
+    decision = read(check(DECISION))
+    tolerances = read(check(admission['contracts']['tolerances']))
+    require(tolerances['numeric_profiles'] == decision['numeric_profiles'], 'Root profiles changed')
+    guards = [native_ref, admission_ref, admission['projection'], native['fixed_scope'], DECISION,
+        native['production_control_inputs'], native['production_input_only_caller_history'],
+        *native['all_45_guard_refs'], *admission['contracts'].values(), *sources, *api, *authorities.values()]
+    for sequence in native['weather_sequences']:
+        guards += [sequence[key] for key in ['input', 'weather']]
+        if sequence.get('external_byte_map') is not None:
+            guards.append(sequence['external_byte_map'])
+    for binding in guards:
+        check(binding)
+    review = source_review(args.source_review, [*sources, *api], args.native_contract, native_ref)
+    guards.append(review)
+    common = {'created_utc': datetime.now(timezone.utc).isoformat(), 'native_request': native_ref,
+        'native_admission_contract': admission_ref, 'contracts': admission['contracts'],
+        'native_observation_projection': admission['projection'], 'native_observation_policy': native['observation_policy'],
+        'root_preoutput_decision': DECISION, 'production_transport_source_inventory': projection['production_transport_source_inventory'],
+        'fixed_scope': native['fixed_scope'], 'observer_sources': sources, 'actual_public_API_sources': api,
+        'source_authorities': authorities, 'independent_source_review': review, 'requested_counts': native['requested_counts'],
+        'frozen_before_existing_Rust_observer_numerical_execution': True, 'expected_values_supplied': False,
+        'native_results_supplied': False, 'Rust_outputs_supplied_as_inputs': False, 'scientific_execution_performed': False,
+        'gates_updated': False, 'native_request_bytes_changed': False}
+    out.mkdir(parents=True)
+    request_ref = put(out, 'observer-request.json', {'schema': 'clk06-existing-observer-request.v1', **common})
+    projection_ref = put(out, 'projection.json', {'schema': 'clk06-existing-observer-projection.v1', **common,
+        'observer_request': request_ref, 'complete_operation_order_retained': True, 'sky_grid_fields': SKY,
+        'actual_public_API': ['WeatherDayState::setup_interpolation_values', 'WeatherSession::new',
+            'WeatherSession::setup_interpolation_values', 'WeatherSession::get_next_environment',
+            'WeatherSession::initialize_weather', 'WeatherSession::set_current_weather'],
+        'unavailable_direct_API': ['CalcSkyEmissivity', 'calcSky'], 'direct_API_unavailability_stops_later_history': False,
+        'full_sky_grid_boundaries': native['observation_policy']['full_weather_grid_snapshots'],
+        'compact_operations': 'all scalar/calendar/header/cursor/count19/cache17 retained; sky4 grids shape retained, slots=null',
+        'stored_array_owner_path_mapping': {'native': 'snapshot ROOT', 'existing_Rust': 'snapshot ROOT',
+            'actual_Rust_owner': 'WeatherDayState.weather.interpolation/solar_interpolation', 'values_transformed': False},
+        'four_requested_controls': {'names': CONTROLS, 'owned_in_existing_baseline': True, 'applied': True,
+            'application_boundary': 'after actual preparation, before GetNextEnvironment'},
+        'linear_override': 'literal input assigned only to actual Setup-allocated weather.interpolation',
+        'whole_native_sky_model_Environment_owner_available': False,
+        'native_only_unpaired_globals': decision['native_only_unpaired_globals'],
+        'current13_is_passive_context_not_CLK06_physical_certification': True,
+        'existing_current_context_selected_full17_is_unpaired_generation_context': True,
+        'pure_Setup_TimeStepFraction': 'descriptor checked, weather owner unassigned, actual storage observed',
+        'weather_TimeStepFraction': 'literal declared input applied after actual Setup',
+        'whole_native_Factory_constant_initialization_preparation_available': False,
+        'OriginalDataQA0_before_Rust_promotion_build_run': 'external Root authorization gate; this emitter claims source admission only',
+        'unavailable_counted_as_PASS': False, 'private_hourly_ESky_or_branch_locals_observed': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None, 'numerical_PASS_claimed': False})
+    guards += [request_ref, projection_ref]
+    for binding in guards:
+        check(binding)
+    print(json.dumps({'observer_request': request_ref, 'projection': projection_ref, 'native_request_unchanged': True,
+        'all_bound_inputs_unchanged': True, 'input_only_emission': True, 'scientific_execution_performed': False, 'gates_updated': False}))
+
+
+if __name__ == '__main__':
+    main()

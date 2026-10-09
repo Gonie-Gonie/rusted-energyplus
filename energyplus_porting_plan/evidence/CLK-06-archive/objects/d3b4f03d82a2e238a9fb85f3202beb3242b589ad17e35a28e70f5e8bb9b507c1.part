@@ -1,0 +1,56 @@
+// Output-only selected solar storage. No interpolation or weather RHS.
+#ifndef CLK05_REFERENCE_FIELDS_HH
+#define CLK05_REFERENCE_FIELDS_HH
+#include "clk03_reference_fields.hh"
+
+namespace Clk05 {
+using Clk03::json;
+using Clk03::scalar;
+inline json solar(EnergyPlus::Weather::WeatherVars const &value)
+{
+    return {{"BeamSolarRad", scalar(value.BeamSolarRad)}, {"DifSolarRad", scalar(value.DifSolarRad)}};
+}
+inline json solar_grid(ObjexxFCL::Array2D<EnergyPlus::Weather::WeatherVars> const &value, bool full)
+{
+    int steps = 0, hours = 0;
+    if (value.allocated()) {
+        Clk03::require(value.size1() <= static_cast<std::size_t>(std::numeric_limits<int>::max()) &&
+                       value.size2() <= static_cast<std::size_t>(std::numeric_limits<int>::max()),
+                       "Actual grid exceeds native int indexing");
+        steps = static_cast<int>(value.size1()); hours = static_cast<int>(value.size2());
+    }
+    json slots = full ? json::array() : json(nullptr);
+    if (full && value.allocated()) for (int hour = 1; hour <= hours; ++hour) for (int step = 1; step <= steps; ++step)
+        slots.push_back({{"hour", hour}, {"time_step", step}, {"value", solar(value(step, hour))}});
+    json result = {{"allocated", value.allocated()}, {"time_steps", steps}, {"hours", hours},
+                   {"ordering", "hour-major,timestep-minor"}, {"slots", slots}, {"contents_available", full},
+                   {"observed_fields", {"BeamSolarRad", "DifSolarRad"}}};
+    if (!full) result["unavailability_reason"] = "pre-execution declared compact unselected solar grid";
+    return result;
+}
+inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool full = true)
+{
+    auto const &g = *state.dataGlobal; auto const &e = *state.dataEnvrn; auto const &w = *state.dataWeather;
+    auto result = Clk03::snapshot(state);
+    result["today_values"] = solar_grid(w.wvarsHrTsToday, full);
+    result["tomorrow_values"] = solar_grid(w.wvarsHrTsTomorrow, full);
+    json selected = nullptr;
+    if (w.wvarsHrTsToday.allocated() && g.TimeStep >= 1 && g.HourOfDay >= 1 &&
+        static_cast<std::size_t>(g.TimeStep) <= w.wvarsHrTsToday.size1() &&
+        static_cast<std::size_t>(g.HourOfDay) <= w.wvarsHrTsToday.size2()) {
+        selected = {{"hour", g.HourOfDay}, {"time_step", g.TimeStep},
+                    {"value", solar(w.wvarsHrTsToday(g.TimeStep, g.HourOfDay))}};
+    }
+    json controls = {{"DisplayWeatherMissingDataWarnings", e.DisplayWeatherMissingDataWarnings},
+                     {"IgnoreSolarRadiation", e.IgnoreSolarRadiation},
+                     {"IgnoreBeamRadiation", e.IgnoreBeamRadiation}, {"IgnoreDiffuseRadiation", e.IgnoreDiffuseRadiation}};
+    result["clk05_observation"] = {{"solar_controls", controls}, {"selected_today_solar_slot", selected},
+        {"clock", {{"TimeStepZoneSec", scalar(g.TimeStepZoneSec)}, {"MinutesInTimeStep", g.MinutesInTimeStep},
+                   {"CurrentTime", scalar(g.CurrentTime)}, {"SimTimeSteps", g.SimTimeSteps}}},
+        {"private_hourly_or_weight_locals_observed", false}, {"current_solar_night_physics_paired", false}};
+    result["full_solar_grid_contents_available"] = full;
+    result["full_17_field_grid_generation_parity_claimed"] = false;
+    return result;
+}
+} // namespace Clk05
+#endif

@@ -1,0 +1,8 @@
+// root_4( x ) == x^(1/4)
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+root_4( T const x )
+{
+	return T( std::sqrt( std::sqrt( x ) ) );
+}

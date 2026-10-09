@@ -1,0 +1,49 @@
+--- .runtime/porting/CLK-06/production-comparer-prep-01/observations.py
++++ .runtime/porting/CLK-06/production-comparer-prep-02/observations.py
+@@ -10,7 +10,7 @@
+     'run_period_report_accumulator', 'run_period_report_hourly_output', 'run_period_report_series_handoff',
+     'physical_exterior_balance_ingress', 'physical_resolved_longwave_argument', 'report_recomputed_longwave_argument']
+ ORIGINS = ['surface_solve', 'report_outside_face_recomputation']
+-CALLERS = {KINDS[0]: ('weather_day/production.rs', 'OwnedContextReceipt'),
++CALLERS = {KINDS[0]: ('heat_balance/weather_driver.rs', 'series.current_for('),
+     KINDS[1]: ('heat_balance/run_period/weather_sampling.rs', 'SamplerReturn'),
+     KINDS[2]: ('heat_balance/run_period.rs', 'ReportAccumulator'),
+     KINDS[3]: ('heat_balance/run_period.rs', 'record_hourly_output('),
+@@ -201,7 +201,7 @@
+         check.numeric(actual[field], original[field], label + '/' + field, field, 'same_owner_transport_copy')
+ 
+ 
+-def transport(check, trace, case, native, request, run, sources, compiled_surfaces):
++def transport(check, trace, case, native, request, run, sources, compiled_surfaces, origin_policy):
+     label = case['case_id'] + '/' + run['trace_level']; hours = 72 if case['duration'] == '72H' else 24
+     steps, completed = native_steps(native, request, hours); meta, events = trace['metadata'], trace['events']
+     require(meta['schema'] == 'clk06-sky-transport-trace.v1' and meta['trace_level'] == run['trace_level'].lower()
+@@ -324,7 +324,17 @@
+     check.discrete(context_identities, expected, label + '/all_actual_context_occurrences')
+     check.discrete([len(samplers), len(accumulators), len(hourly), len(handoffs)], [hours * 4, hours * 4, hours, hours * 2], label + '/required_transport_coverage')
+     require(all(counts[kind] > 0 for kind in KINDS[:6]), 'Actual owner/report-copy/ingress coverage is required')
+-    require(all(origins[KINDS[5] + '/' + origin] > 0 for origin in ORIGINS), 'Both explicit shared-kernel ingress origins required')
++    require(all(origins[KINDS[5] + '/' + origin] > 0 for origin in origin_policy['required_positive_ingress_origins']),
++        'Source-configured positive shared-kernel ingress origins required')
++    require(all(origins[key] == 0 for key in origin_policy['required_zero_origin_keys'])
++        and all(counts[kind] == 0 for kind in origin_policy['required_zero_event_kinds']),
++        'Source-verified quick outside/cached report branches must remain uninvoked')
++    uninvoked = []
++    for key in origin_policy['required_zero_origin_keys']:
++        uninvoked.append({'origin_key': key, 'actual_event_count': origins[key], 'available': False,
++            'required_when_invoked': True, 'counted_as_PASS': False,
++            'reason': 'source-verified quick outside/cached report return leaves this origin uninvoked'})
++        check.excluded(label + '/' + key, 'Source-verified branch has no invocation; no argument or PASS invented', False, False)
+     conditional = []
+     for kind in KINDS[6:]:
+         available = counts[kind] > 0
+@@ -334,7 +344,8 @@
+         if not available:
+             check.excluded(label + '/' + kind, 'No actual resolved/report-recompute invocation; no local or event invented', False, False)
+     return {'case_id': case['case_id'], 'trace_level': run['trace_level'], 'actual_event_counts': {kind: counts[kind] for kind in KINDS},
+-        'actual_origin_counts': dict(origins), 'total_completed_weather_operations': completed,
++        'actual_origin_counts': dict(origins), 'source_origin_policy': origin_policy,
++        'uninvoked_source_origin_availability': uninvoked, 'total_completed_weather_operations': completed,
+         'actual_event_kind_counts': meta['event_kind_counts'], 'total_event_count': meta['total_event_count'],
+         'retained_event_count': meta['retained_event_count'], 'truncated': meta['truncated'],
+         'actual_context_occurrences': len(context_identities), 'actual_hourly_aggregate_count': len(hourly),

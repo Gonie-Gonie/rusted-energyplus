@@ -1,0 +1,225 @@
+// Source-only driver: genuine cached original calls and passive selected storage.
+// This unique target never overwrites or executes a historical CLK03/04 target.
+#define main clk05_unused_preserved_clk03_main
+#include "clk03_reference_helper.cpp"
+#undef main
+#include "clk05_reference_fields.hh"
+#include "clk05_reference_admission.hh"
+
+namespace {
+int declared_steps(json const &value)
+{
+    int const steps = Clk03::integer(value);
+    require(steps == 1 || steps == 3 || steps == 4, "Bounded one/three/four step caller input required");
+    return steps;
+}
+void seed_clock(EnergyPlus::EnergyPlusData &state, json const &declared)
+{
+    int const steps = declared_steps(declared.at("time_steps_per_hour"));
+    // Literal caller clock inputs from SimulationManager:878-880, not weather answers.
+    char const *zone = steps == 1 ? "3ff0000000000000" : steps == 3 ? "3fd5555555555555" : "3fd0000000000000";
+    char const *seconds = steps == 1 ? "40ac200000000000" : steps == 3 ? "4092c00000000000" : "408c200000000000";
+    require(declared.at("TimeStepZone").at("bits") == zone && declared.at("TimeStepFraction") == declared.at("TimeStepZone") &&
+            declared.at("TimeStepZoneSec").at("bits") == seconds &&
+            Clk03::integer(declared.at("MinutesInTimeStep")) == (steps == 1 ? 60 : steps == 3 ? 20 : 15),
+            "Declared caller clock outside bounded source input timing");
+    auto &g = *state.dataGlobal; g.TimeStepsInHour = steps;
+    g.TimeStepZone = Clk03::input_real(declared.at("TimeStepZone"));
+    g.TimeStepZoneSec = Clk03::input_real(declared.at("TimeStepZoneSec"));
+    g.MinutesInTimeStep = Clk03::integer(declared.at("MinutesInTimeStep"));
+}
+template<class Function> void prepare5(Factory &factory, std::string const &name, Function &&function)
+{
+    if (factory.stopped) return;
+    auto before = Clk05::snapshot(*factory.state); auto outcome = invoke(std::forward<Function>(function));
+    factory.preparation.push_back({{"kind", name}, {"before", before},
+        {"after", Clk05::snapshot(*factory.state)}, {"call_outcome", outcome}});
+    if (outcome.at("source_fatal").template get<bool>()) {
+        factory.stopped = true; factory.stop_reason = "actual-source-fatal-during-preparation";
+    } else if (factory.errors) { factory.stopped = true; factory.stop_reason = "actual-errors-during-genuine-preparation"; }
+}
+void check_preparation5(json const &declared)
+{
+    json const calls = {"InputProcessor::processInput", "SetupInterpolationValues", "OpenWeatherFile", "CloseWeatherFile",
+                        "ReadUserWeatherInput", "AllocateWeatherData", "ResolveLocationInformation", "CheckLocationValidity"};
+    require(declared.at("lane") == "selected-prepared-environment" && declared.at("genuine_calls") == calls &&
+            declared.at("BeginSimFlag") == false && declared.at("DoWeathSim") == true && declared.at("DoDesDaySim") == false &&
+            declared.at("GetEnvironmentFirstCall") == false && declared.at("GetBranchInputOneTimeFlag") == false &&
+            declared.at("WaterMainsParameterReport") == false && declared.at("whole_simulation_registration_claimed") == false,
+            "Declared genuine prepared caller lane differs");
+}
+void seed_context(EnergyPlus::EnergyPlusData &state, json const &input, int steps)
+{
+    auto const &controls = input.at("solar_controls"); auto &e = *state.dataEnvrn; auto &w = *state.dataWeather;
+    require(controls.is_object() && controls.size() == 4, "Exactly four typed caller solar controls required");
+    e.DisplayWeatherMissingDataWarnings = Clk03::boolean(controls.at("DisplayWeatherMissingDataWarnings"));
+    e.IgnoreSolarRadiation = Clk03::boolean(controls.at("IgnoreSolarRadiation"));
+    e.IgnoreBeamRadiation = Clk03::boolean(controls.at("IgnoreBeamRadiation"));
+    e.IgnoreDiffuseRadiation = Clk03::boolean(controls.at("IgnoreDiffuseRadiation"));
+    if (input.contains("caller_owned_seed")) {
+        auto const &seed = input.at("caller_owned_seed"); require(seed.is_object(), "Caller storage seed must be object");
+        for (auto const &group : seed.items()) {
+            auto const key = group.key();
+            require(key == "missed_counts" || key == "out_of_range_counts" || key == "next_hour" || key == "last_hour" || key == "weather",
+                    "Seed group outside declared public solar/cache/count scope");
+            if (key == "missed_counts" || key == "out_of_range_counts") for (auto const &count : group.value().items()) {
+                int const value = Clk03::integer(count.value());
+                require(value >= 0 && value <= 1000000, "Count input outside bounded nonoverflow domain");
+            }
+            if (key == "weather") require(group.value().is_object() && group.value().size() == 1 &&
+                group.value().contains("LastHourSet"), "Only declared LastHourSet weather seed admitted");
+        }
+        Clk03::seed(state, seed);
+    }
+    if (input.contains("stored_solar_interpolation_override")) {
+        auto const &values = input.at("stored_solar_interpolation_override");
+        require(values.is_array() && values.size() == static_cast<std::size_t>(steps) &&
+                w.SolarInterpolation.allocated() && w.SolarInterpolation.size() == static_cast<std::size_t>(steps),
+                "Literal stored solar override requires actual genuine Setup allocation");
+        for (int step = 1; step <= steps; ++step) w.SolarInterpolation(step) = Clk03::input_real(values.at(step - 1));
+    }
+}
+json operation5(Factory &factory, json const &input, int steps)
+{
+    check_identifier(input); auto &state = *factory.state; auto const kind = input.at("kind").get<std::string>();
+    auto const &caller = input.at("caller"); require(caller.is_object(), "Literal caller object required");
+    bool const begin_day = caller.contains("BeginDayFlag") ? Clk03::boolean(caller.at("BeginDayFlag")) : state.dataGlobal->BeginDayFlag;
+    bool const begin_environment = caller.contains("BeginEnvrnFlag") ? Clk03::boolean(caller.at("BeginEnvrnFlag")) : state.dataGlobal->BeginEnvrnFlag;
+    bool const full = kind == "GetNextEnvironment" || (kind == "InitializeWeather" && (begin_day || begin_environment));
+    json result = {{"id", input.at("id")}, {"kind", kind}, {"requested_operation", input},
+        {"full_solar_grid_observation_declared", full}, {"before_caller", Clk05::snapshot(state, full)}};
+    if (factory.stopped) {
+        result["before"] = Clk05::snapshot(state, full); result["after"] = result["before"];
+        result["actual_source_invoked"] = false;
+        result["call_outcome"] = {{"status", "not-invoked-after-prior-source-outcome"},
+            {"source_fatal", nullptr}, {"skip_reason", factory.stop_reason}};
+        return result;
+    }
+    auto scalar_caller = caller;
+    if (scalar_caller.contains("DayOfSimChr")) {
+        int const day = Clk03::integer(scalar_caller.at("DayOfSim"));
+        require(day > 0 && scalar_caller.at("DayOfSimChr").is_string() &&
+                scalar_caller.at("DayOfSimChr").get<std::string>() == std::to_string(day), "Literal caller day text differs");
+        state.dataGlobal->DayOfSimChr = scalar_caller.at("DayOfSimChr").get<std::string>(); scalar_caller.erase("DayOfSimChr");
+    }
+    Clk03::seed(state, {{"global", scalar_caller}});
+    require(state.dataGlobal->TimeStepsInHour == steps, "Caller changed genuine allocated steps");
+    result["before"] = Clk05::snapshot(state, full); bool returned = false;
+    result["print_environment_stamp_before"] = factory.print_environment_stamp;
+    auto const outcome = invoke([&] {
+        if (kind == "GetNextEnvironment") returned = Weather::GetNextEnvironment(state, factory.available, factory.errors);
+        else if (kind == "InitializeWeather") {
+            require(factory.available && !factory.errors && state.dataWeather->Envrn > 0, "No genuine selected environment");
+            Weather::InitializeWeather(state, factory.print_environment_stamp);
+        } else throw std::runtime_error("Operation outside bounded whole-original solar read history");
+    });
+    result["call_outcome"] = outcome; result["after"] = Clk05::snapshot(state, full);
+    result["actual_source_invoked"] = true; result["Available"] = factory.available; result["ErrorsFound"] = factory.errors;
+    result["returned_bool"] = kind == "GetNextEnvironment" && !outcome.at("source_fatal").get<bool>() ? json(returned) : json(nullptr);
+    result["print_environment_stamp_after"] = factory.print_environment_stamp;
+    if (outcome.at("source_fatal").get<bool>()) { factory.stopped = true; factory.stop_reason = "actual-source-fatal"; }
+    else if (kind == "GetNextEnvironment" && !returned) {
+        factory.stopped = true; factory.stop_reason = "actual-selected-environment-unavailable-or-errors";
+    }
+    return result;
+}
+json sequence5(json const &input, fs::path const &root, fs::path const &output)
+{
+    check_identifier(input); int const steps = declared_steps(input.at("time_steps_per_hour"));
+    auto const &declared = input.at("native_preparation"); check_preparation5(declared);
+    require(input.at("prepared_environment_lane") == true && declared_steps(declared.at("time_steps_per_hour")) == steps,
+            "Actual declared prepared timestep domain differs");
+    auto const idf = bound_path(root, input.at("input")), epw = bound_path(root, input.at("weather"));
+    Factory factory; auto &state = *factory.state; auto &w = *state.dataWeather;
+    auto const before_preparation = Clk05::snapshot(state);
+    state.dataStrGlobals->inputFilePath = idf; state.files.inputWeatherFilePath.filePath = epw;
+    seed_clock(state, declared); state.dataGlobal->BeginSimFlag = false;
+    state.dataGlobal->DoWeathSim = true; state.dataGlobal->DoDesDaySim = false;
+    prepare5(factory, "InputProcessor::processInput", [&] { state.dataInputProcessing->inputProcessor->processInput(state); });
+    prepare5(factory, "SetupInterpolationValues", [&] { Weather::SetupInterpolationValues(state); });
+    if (!factory.stopped) w.TimeStepFraction = Clk03::input_real(declared.at("TimeStepFraction"));
+    prepare5(factory, "OpenWeatherFile", [&] { Weather::OpenWeatherFile(state, factory.errors); });
+    prepare5(factory, "CloseWeatherFile", [&] { Weather::CloseWeatherFile(state); });
+    prepare5(factory, "ReadUserWeatherInput", [&] { Weather::ReadUserWeatherInput(state); });
+    prepare5(factory, "AllocateWeatherData", [&] { Weather::AllocateWeatherData(state); });
+    auto const allocated_defaults = Clk05::snapshot(state);
+    prepare5(factory, "ResolveLocationInformation", [&] { Weather::ResolveLocationInformation(state, factory.errors); });
+    prepare5(factory, "CheckLocationValidity", [&] { Weather::CheckLocationValidity(state); });
+    if (!factory.stopped) {
+        require(w.TotRunPers == 1 && w.TotRunDesPers == 0 && w.NumIntervalsPerHour == 1 && state.dataGlobal->TimeStepsInHour == steps,
+                "Genuine input outside sole hourly ordinary RunPeriod domain");
+        int const environment_index = state.dataEnvrn->TotDesDays + 1;
+        require(w.Environment.allocated() && environment_index >= 1 &&
+                static_cast<std::size_t>(environment_index) <= w.Environment.size(), "Actual environment storage unavailable");
+        auto const &environment = w.Environment(environment_index);
+        require(environment.KindOfEnvrn == EnergyPlus::Constant::KindOfSim::RunPeriodWeather && !environment.ActualWeather &&
+                !environment.MatchYear && environment.StartYear == 2013 && environment.EndYear == 2013,
+                "Genuine resolved environment outside ordinary2013 scope");
+        w.GetEnvironmentFirstCall = false; w.GetBranchInputOneTimeFlag = false; w.WaterMainsParameterReport = false;
+        w.Envrn = state.dataEnvrn->TotDesDays;
+    }
+    auto const prepared = Clk05::snapshot(state);
+    auto const before_caller_context = Clk05::snapshot(state);
+    bool const context_applied = !factory.stopped;
+    if (context_applied) seed_context(state, input, steps);
+    auto const after_caller_context = Clk05::snapshot(state); json operations = json::array();
+    for (auto const &item : input.at("operations")) operations.push_back(operation5(factory, item, steps));
+    require(file_sha(idf) == input.at("input").at("sha256").get<std::string>() &&
+            file_sha(epw) == input.at("weather").at("sha256").get<std::string>(), "Literal source inputs changed");
+    return {{"id", input.at("id")}, {"lane", input.at("lane")}, {"input", file_ref(idf)}, {"weather_input", file_ref(epw)},
+        {"declared_run_period_input", input.at("run_period")}, {"declared_native_preparation", declared},
+        {"constructor", factory.constructor}, {"after_constant_initialization", factory.after_constant_initialization},
+        {"actual_clk05_before_preparation", before_preparation}, {"preparation_calls", factory.preparation},
+        {"allocated_defaults", allocated_defaults}, {"prepared", prepared}, {"before_caller_context", before_caller_context},
+        {"after_caller_context", after_caller_context}, {"declared_solar_controls", input.at("solar_controls")},
+        {"declared_caller_context_applied", context_applied},
+        {"operations", operations}, {"final_state", Clk05::snapshot(state)},
+        {"source_only_diagnostics", factory.diagnostics(output, input.at("id").get<std::string>())},
+        {"registered_whole_simulation_initialization_claimed", false}, {"private_hourly_or_weight_locals_observed", false},
+        {"current_solar_night_physics_paired", false}, {"native_internal_record_index_observed", false}};
+}
+} // namespace
+
+int main(int argc, char **argv)
+{
+    try {
+        require(argc == 5, "Usage: clk05_reference_helper <root> <frozen-request> <native-admission-contract> <fresh-output>");
+        auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+        auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CLK-05");
+        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained native output required");
+        auto const packet = Clk05Admission::admit(root, request_path, admission_path); auto const &request = packet.request;
+        fs::create_directories(output); json setup = json::array(), sequences = json::array();
+        for (auto const &row : request.at("setup_cases")) {
+            check_identifier(row); Factory factory; seed_clock(*factory.state, row); auto const before = Clk05::snapshot(*factory.state);
+            auto const outcome = invoke([&] { Weather::SetupInterpolationValues(*factory.state); });
+            setup.push_back({{"id", row.at("id")}, {"requested_operation", row}, {"kind", "SetupInterpolationValues"},
+                {"before", before}, {"after", Clk05::snapshot(*factory.state)}, {"call_outcome", outcome}, {"actual_source_invoked", true}});
+        }
+        for (auto const &row : request.at("weather_sequences")) sequences.push_back(sequence5(row, root, output));
+        int invoked = 0, skipped = 0; json calls = json::object(), outcomes = json::object();
+        auto observe = [&](json const &item, std::string const &kind) {
+            auto const status = item.at("call_outcome").at("status").get<std::string>();
+            outcomes[status] = (outcomes.contains(status) ? outcomes.at(status).get<int>() : 0) + 1;
+            if (item.at("actual_source_invoked").get<bool>()) {
+                ++invoked; calls[kind] = (calls.contains(kind) ? calls.at(kind).get<int>() : 0) + 1;
+            } else ++skipped;
+        };
+        for (auto const &item : setup) observe(item, "SetupInterpolationValues");
+        for (auto const &sequence : sequences) for (auto const &item : sequence.at("operations"))
+            observe(item, item.at("kind").get<std::string>());
+        auto const after = Clk05Admission::admit(root, request_path, admission_path);
+        require(after.request == request && after.contracts == packet.contracts &&
+                after.admission == packet.admission, "Input/source admission changed during genuine execution");
+        json const result = {{"schema", "clk05-helper-results.v1"}, {"energyplus_commit", request.at("energyplus_commit")},
+            {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+            {"observation_projection", file_ref(packet.projection_path)}, {"contracts", packet.contracts},
+            {"actual_binary", file_ref(fs::absolute(argv[0]))}, {"setup_cases", setup}, {"weather_sequences", sequences},
+            {"requested_counts", packet.requested_counts}, {"actual_operation_invocations", invoked},
+            {"actual_operations_skipped", skipped}, {"actual_source_function_counts", calls}, {"actual_source_status_counts", outcomes},
+            {"complete", true}, {"scientific_comparison_performed", false}, {"expected_values_supplied", false},
+            {"expected_exits_supplied", false}, {"full_simulation_or_selected_scope_PASS_claimed", false},
+            {"current_solar_night_physics_paired", false}, {"native_internal_record_index_observed", false}, {"gates_updated", false}};
+        write_text(output / "clk05-helper-results.json", result.dump(2) + "\n"); return 0;
+    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+}

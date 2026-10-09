@@ -1,0 +1,97 @@
+"""Pre-output solar scope, exact profiles and byte-preserved original ranges."""
+import copy
+from common import PIN, ROOT, exact, put, read, require, verify
+
+AUDIT = {'path': '.runtime/porting/CLK-05/source-audit-01/audit.json',
+         'sha256': '036e412833de482f7b3e931cd593f20e1cea715027dcaf0db02b4fe24bfeebc0'}
+POLICY = {'path': '.runtime/porting/CLK-05/policy-draft-01/policy.json',
+          'sha256': '2286e9354bc91a86e079bc22ac60ca15a54ce24bc5a048e4f883302832fe3772'}
+CONTROL_SOURCE = {'path': '.runtime/porting/CLK-05/production-control-proposal-01/proposal.json',
+                  'sha256': '6d6320aea3573cb7c981a005b2a727fda09c303d2f53fd8eb950ec542e5bb5d5'}
+PROPOSAL = {'path': '.runtime/porting/CLK-05/input-design-prep-02/projection-proposal.json',
+            'sha256': '7bfa5ab5350253e7319871011cb8bdabf1a48ade61789dbdf2b872d40ce6f750'}
+NATIVE_OBSERVATION_POLICY = {
+    'full_solar_grid_fields': ['BeamSolarRad', 'DifSolarRad'],
+    'full_solar_grid_snapshots': ['allocated_defaults', 'setup', 'prepared', 'before_context', 'after_context',
+                                 'GetNextEnvironment', 'InitializeWeather-effective-BeginEnvrn-or-BeginDay', 'final_state'],
+    'effective_boundary_flags': 'actual incoming flags overwritten only by declared partial caller writes',
+    'all_operations_executed_independently_of_observation_selection': True,
+    'compact_operation_grid_contents': None,
+    'compact_operation_grid_unavailability_reason': 'pre-execution declared compact unselected solar grid',
+    'selected_today_solar_slot': 'actual allocated in-range HourOfDay/TimeStep, otherwise unavailable',
+    'all19_counts_full17_LastHour_NextHour_retained': True,
+    'native_private_hourly_or_transient_weights_observed': False,
+    'passive_CurrentTime_SimTimeSteps_WeightNow_WeightPreviousHour_paired': False,
+}
+
+
+def source_contract(directory, started, current_card, prerequisite, controls, source_review):
+    audit, policy, control = [read(verify(row)) for row in [AUDIT, POLICY, CONTROL_SOURCE]]
+    require(audit['energyplus_commit'] == PIN and audit['future_contracts_frozen'] is False,
+            'Historical source-only audit required')
+    ranges = audit['ranges'] + policy['independent_source_identity_and_range_review']['supplemental_source_ranges'] + control['source_ranges']
+    originals, selected = {}, []
+    prefix = '.reference/energyplus-src/26.1.0/'
+    for row in ranges:
+        binding = row['source']
+        if not binding['path'].startswith(prefix):
+            continue  # Historical Rust findings are retained through the audit, not native source operands.
+        original = verify(binding)
+        lines = original.read_bytes().splitlines(keepends=True)
+        start, end = row['start_line'], row['end_line']
+        require(type(start) is int and type(end) is int and 1 <= start <= end <= len(lines), 'Pinned source range invalid')
+        payload = b''.join(lines[start - 1:end])
+        require(payload == verify(row['archive']).read_bytes(), 'Historical range differs from exact original bytes')
+        if binding['path'] not in originals:
+            saved = put(directory, f'original-source/{len(originals):02}-{original.name}', original.read_bytes())
+            originals[binding['path']] = {'path': binding['path'].removeprefix(prefix), 'sha256': binding['sha256'],
+                                         'original': binding, 'archive': saved}
+        saved = put(directory, f'original-ranges/{len(selected):03}-{original.name}-{start}-{end}.txt', payload)
+        selected.append({'path': binding['path'].removeprefix(prefix), 'start_line': start, 'end_line': end,
+                         'archive': saved, 'bytes_normalized': False})
+    require(originals and selected, 'Nonempty whole original source/range inventory required')
+    return {'schema': 'clk05-source-contract.v1', 'card': 'CLK-05', 'energyplus_commit': PIN,
+            'created_utc': started, 'frozen_before_numerical_execution': True, 'scientific_execution_performed': False,
+            'gates_updated': False, 'current_card': current_card, 'historical_scope_audit': AUDIT,
+            'historical_policy_proposal': POLICY, 'historical_control_registration_source': CONTROL_SOURCE,
+            'historical_audit_card_is_not_claimed_current': True, 'actual_CLK04_prerequisite': prerequisite,
+            'production_control_inputs': controls, 'source_review': source_review,
+            'source_files': list(originals.values()), 'source_ranges': selected,
+            'selected_functions': ['SetupInterpolationValues', 'ReadWeatherForDay-solar-preprocess-and-interpolation',
+                                   'InitializeWeather-public-Today-handoff', 'GetNextEnvironment-selected-prepared-admission'],
+            'selected_solar_fields': ['BeamSolarRad', 'DifSolarRad'],
+            'original_functions_copied_into_observer': False, 'private_source_record_index_claimed': False,
+            'CurrentTime_SimTimeSteps_currentSolar_night_and_SRC04_physics_paired': False}
+
+
+def tolerance_contract(started):
+    proposal = read(verify(PROPOSAL))
+    rows = copy.deepcopy(proposal['numeric_profile_proposals_not_frozen'])
+    require([row['field'] for row in rows] == ['Interpolation', 'SolarInterpolation', 'BeamSolarRad', 'DifSolarRad', 'NextHour.LiquidPrecip'],
+            'Exact pre-output five-profile domain required')
+    for row in rows[:4]:
+        require(type(row['atol']) is float and row['atol'] == 0.0 and type(row['rtol']) is float
+                and row['rtol'] == 0.0 and row['signed_zero_bits_exact'] is True, 'Solar profile relaxation forbidden')
+    inherited = read(verify(rows[-1]['inherited_contract']))
+    peer = [row for row in inherited['rows'] if row['profile'] == 'day_grid_and_raw_hour_cache' and row['field'] == 'LiquidPrecip']
+    require(len(peer) == 1 and exact({key: rows[-1][key] for key in ['unit', 'atol', 'rtol']},
+                                   {key: peer[0][key] for key in ['unit', 'atol', 'rtol']}), 'Inherited Liquid profile differs')
+    return {'schema': 'clk05-tolerances-contract.v1', 'card': 'CLK-05', 'created_utc': started,
+            'frozen_before_numerical_execution': True, 'scientific_execution_performed': False, 'gates_updated': False,
+            'rows': rows, 'criterion': proposal['proposed_numeric_criterion'],
+            'IEEE_classification_and_signed_zero_exact': True, 'missing_operand_counted_as_PASS': False,
+            'generic_profile_fallback': False, 'profile_proposal': PROPOSAL}
+
+
+def observation_projection(request, contracts, started):
+    proposal = read(verify(PROPOSAL))
+    keys = ['unit_input_domain', 'source_selection', 'observation_transport', 'production_selection',
+            'unpaired_or_unavailable_never_PASS', 'pure_Setup_invocation_boundary']
+    selected = {key: copy.deepcopy(proposal[key]) for key in keys}
+    selected['production_selection']['registration_protocol_pending_Root_approval'] = False
+    return {**selected, 'schema': 'clk05-observation-projection.v1', 'card': 'CLK-05', 'created_utc': started,
+            'frozen_before_numerical_execution': True, 'contracts': contracts, 'helper_request': request,
+            'native_observation_policy': copy.deepcopy(NATIVE_OBSERVATION_POLICY), 'profile_proposal': PROPOSAL,
+            'scientific_execution_performed': False, 'gates_updated': False,
+            'original_results_supplied_to_Rust': False, 'unavailable_counted_as_PASS': False,
+            'historical_CLK04_solar_observations_remain_unpaired': True}

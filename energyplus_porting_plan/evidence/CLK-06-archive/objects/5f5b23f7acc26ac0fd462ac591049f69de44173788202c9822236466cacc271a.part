@@ -1,0 +1,72 @@
+--- production-result-review-prep-02/review_result.py
++++ production-result-review-prep-03/review_result.py
+@@ -265,10 +265,8 @@
+             scope = m.read(artifacts[directory / 'porting_scope.json'])
+             m.need(scope['schema'] == 'porting-scope.v1' and scope['scope'] == case['scope'] and scope['admissible'] is True and scope['violations'] == [], 'Actual scope differs')
+             commands.append(item['command_receipt'])
+-            for key in ['stdout', 'stderr']:
+-                with m.check(child[key]).open('rb') as stream:
+-                    stream.seek(max(0, m.check(child[key]).stat().st_size - 8000)); lines += stream.read().decode('utf8', errors='replace')
+-            lines += json.dumps({'receipt': item['command_receipt'], 'exit_code': 0, 'source_bytes_match_before_and_after': True}) + '\n'
++            # The parent does not PIPE/capture/relay nested recorder console output (runner165-167).
++            m.check(child['stdout']); m.check(child['stderr'])
+             lines += case['case_id'] + ' ' + level + ' actual_exit=0\n'
+     lines += json.dumps({'matrix': report['Rust_matrix'], 'actual_command_count': 6, 'complete': True}) + '\n'
+     m.need(m.check(outer['stdout']).read_text(encoding='utf8').splitlines() == lines.splitlines(), 'Full mixed matrix stdout protocol differs')
+@@ -277,6 +275,38 @@
+         and outer['repository_before']['worktree_clean'] is True and outer['repository_after']['worktree_clean'] is True
+         and m.exact(outer['executed_launcher'], build['actual_executed_recorder']), 'Actual matrix build identity differs')
+     return matrix, plan, commands, outputs
++
++
++def structural_surface_id_unavailability(report, facts, executed, main_owner):
++    folder = Path(main_owner).parent.as_posix(); observation_ref = executed[folder + '/observations.py']
++    observation_source = m.check(observation_ref).read_text(encoding='utf8')
++    physical_guard = "if kind in KINDS[:5]:\n            require(surface is None, 'Non-surface event cannot invent surface identity')\n        else:\n            require(type(surface) is int and surface in surfaces and observed['caller_origin_inferred_from_TLS'] is False,\n                'Actual surface and explicit origin required')"
++    exact_events = "check.exact_value(sky_traces['Full']['events'], sky_traces['Summary']['events'], label + '/Full_Summary/all_actual_transport_occurrences')"
++    m.need(observation_source.count(physical_guard) == 1
++        and m.check(executed[main_owner]).read_text(encoding='utf8').count(exact_events) == 1,
++        'Actual archived comparer must require None only for non-surface kinds and real compiled surface IDs for physical kinds')
++    full = {row['case_id']: row for row in report['transport_observations'] if row['trace_level'] == 'Full'}
++    m.need(set(full) == set(CASES), 'Exact three Full kind ledgers required for structural unavailable IDs')
++    expected = {case: sum(full[case]['actual_event_counts'][kind] for kind in KINDS[:5]) for case in CASES}
++    indices = {case: set() for case in CASES}
++    for row in report['comparison']['unavailable_paths']:
++        if not row['required']: continue
++        parts = row['location'].split('/')
++        m.need(len(parts) == 5 and parts[0] in indices and parts[1:3] == ['Full_Summary', 'all_actual_transport_occurrences']
++            and parts[4] == 'surface_id' and parts[3].isascii() and parts[3].isdecimal()
++            and str(int(parts[3])) == parts[3] and row['actual_available'] is row['original_available'] is False
++            and row['counted_as_PASS'] is False, 'Any other required-unavailable operand must fail factual QA')
++        case, index = parts[0], int(parts[3])
++        m.need(index < full[case]['total_event_count'] and index not in indices[case],
++            'Structural unavailable surface ID must use a unique actual bounded event index')
++        indices[case].add(index)
++    actual = {case: len(indices[case]) for case in CASES}
++    m.need(m.exact(actual, expected) and sum(actual.values()) == facts['required_both_null_unavailable_count'],
++        'Structural unavailable surface-ID count must equal exactly the first-five non-surface kind ledgers')
++    return {'structural_non_surface_id_unavailable_counts': actual,
++        'structural_non_surface_id_source_guards': [observation_ref, executed[main_owner]],
++        'generic_required_flag_means_physical_surface_value_required': False,
++        'every_other_required_unavailable_rejected': True, 'structural_unavailable_counted_as_PASS': False}
+ 
+ 
+ def transport_facts(report, outputs):
+@@ -394,6 +424,7 @@
+         'Actual archived transport architecture disclosure differs')
+     m.need(m.instant(m.read(report['Rust_matrix_execution'])['finished_utc']) <= m.instant(outer['started_utc']), 'Comparison preceded completion of six actual CLI calls')
+     facts, transport = metrics(report), transport_facts(report, outputs)
++    facts.update(structural_surface_id_unavailability(report, facts, executed, main_owner))
+     checked.unchanged()
+     for binding in checked.report(): m.check(binding)
+     m.need(m.check(outer['stderr']).stat().st_size == 0, 'Successful comparison stderr must be empty')
+@@ -421,6 +452,9 @@
+         'actual_implementation_commit': build['implementation_commit'], 'actual_crates_tree': build['crates_tree'],
+         'historical_unit_implementation_commit': unit['actual_implementation_commit'], 'actual_available_source_inventory_count': len(available),
+         'actual_CLI_execution_refs': commands, 'actual_command_count': len(commands), 'actual_reported_mismatches': 0,
++        'matrix_stdout_protocol': {'parent_owned_progress_lines': 6, 'parent_owned_final_summary_lines': 1,
++            'full_parent_stdout_authenticated': True, 'six_child_streams_authenticated_separately': True,
++            'nested_recorder_console_forwarding_available': False, 'unavailable_nested_forwarding_counted_as_PASS': False},
+         'actual_unit_seven_field_error_metrics': unit['field_error_metrics'], 'production_ESky_metric_invented': False,
+         **facts, **transport, 'actual_reader_interpreter_observation': interpreter, 'reviewed_verifier_sources': sources,
+         'executed_reader_source_archive': sources[0]['archive'], 'executed_common_source_archive': sources[1]['archive'],

@@ -1,0 +1,16 @@
+--- .runtime/porting/CLK-06/closure-prep-02/README.md
++++ .runtime/porting/CLK-06/closure-prep-03/README.md
+@@ -47,10 +47,11 @@
+ 
+ ## Preserved history
+ 
+-Seven genuine failed command refs remain failure1/101: the original frozen
++Eight genuine failed command refs remain failure1/101: the original frozen
+ contract review, comparer source review, Original data review, weather namespace
+ filter, structure audit, workspace01 four output failures and workspace02 old A
+-equality failure. No absent QA report placeholder is admitted. The source-quality
++equality failure, and the first production comparer caller-attribution metadata
++failure1 with empty stdout and no report. No absent report placeholder is admitted. The source-quality
+ recorder02 FileExists incident has no receipt and no proven child exit; its
+ literal unknown/no-receipt object is retained, matching Raw's archive history.
+ The legacy gap is genuine factual completion0 with real mismatches/unavailable

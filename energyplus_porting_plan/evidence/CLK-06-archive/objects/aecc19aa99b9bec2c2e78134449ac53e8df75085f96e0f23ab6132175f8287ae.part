@@ -1,0 +1,190 @@
+"""Guard accepted retirement history and live retained files, without rewriting proofs."""
+from __future__ import annotations
+from datetime import datetime
+import hashlib
+import json
+from pathlib import Path
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+REGISTRY_SHA = 'bfcbcc4f3b466372c9258ee013cff19a352c2c899532f7e5a5d045ab28c38547'
+PREDECESSOR_SHA = '9fbc167c88860561601caa8ac6eec53caad6505fdf1b24e15ae9269def279564'
+OUTER = {'path': '.runtime/porting/CLK-03/retirement-command-01/receipt.json',
+         'sha256': '1f936434572004b29880591b5e5aa744b9388861d30ed091c785f3f1475d5969'}
+RETIREMENT = {'path': '.runtime/porting/CLK-03/retirement-01/retirement.json',
+              'sha256': 'e10aa20408a2ac7efeff0ad11a332f437a552a8deb32c9538409e0ad9b3babbc'}
+OLD_ORIGINALS = {
+    'clk02_reference_helper': ('.runtime/ep261-gcc13-o0/Products/clk02_reference_helper.exe',
+                               'c862da2948be4630f859bed0569e099ebe8e9738365ca146d9add7c790f85339', 1295668993),
+    'clk03_reference_helper': ('.runtime/ep261-gcc13-o0/Products/clk03_reference_helper.exe',
+                              '7844273b5f9d28c2de8c91f8029a4949130701ccefadd896f5518f5b3450fcfc', 1296364990),
+    'clk03_production_reference_helper': ('.runtime/ep261-gcc13-o0/Products/clk03_production_reference_helper.exe',
+                                         'b22b4c8e3abd7fb7b55e8a8ad29480b82fcfbb4565fedf82cf453381c16e0085', 1296885338),
+}
+FAILED = [
+    {'path': '.runtime/porting/CLK-03/native-build-02/retained-failed-original/clk03_reference_helper.exe',
+     'sha256': '1e10eb8c9294dc68562ef6a89fd4b41e29ec0c0de7270844ffe7eb31b07971b3', 'size_bytes': 1296271028},
+    {'path': '.runtime/porting/CLK-03/native-build-02/derivation/derived-helper.exe',
+     'sha256': '4ca6866f0e6558a2fcbaf425e95ff7907f8a6e9d7740f3e82f73d6aa54929854', 'size_bytes': 150101996},
+]
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def timestamp(value):
+    stamp = datetime.fromisoformat(value)
+    require(stamp.tzinfo is not None and stamp.utcoffset().total_seconds() == 0, 'Actual aware UTC required')
+    return stamp
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    if type(left) is float:
+        return left.hex() == right.hex()
+    return left == right
+
+
+def path(value):
+    item = Path(value)
+    item = item if item.is_absolute() else ROOT / item
+    resolved = item.resolve()
+    require(resolved.is_relative_to(ROOT) and resolved != ROOT, 'Artifact escapes repository')
+    return resolved
+
+
+def sha(value):
+    with Path(value).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def verify(binding):
+    raw = Path(binding['path'])
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse bound file required')
+    item = path(raw)
+    require(sha(item) == binding['sha256'], 'Actual retained bytes differ: ' + str(raw))
+    for key in ['size_bytes', 'bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and item.stat().st_size == binding[key], 'Actual retained size differs')
+    return item
+
+
+def ref(value):
+    item = path(value)
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': sha(item)}
+
+
+def read(value):
+    def pairs(rows):
+        out = {}
+        for key, item in rows:
+            require(key not in out, 'Duplicate JSON key')
+            out[key] = item
+        return out
+    def invalid(token):
+        raise ValueError('Nonstandard JSON token: ' + token)
+    return json.loads(Path(value).read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def actual_absence(value):
+    item = ROOT / value
+    require(item.parent.resolve() == ROOT / '.runtime/ep261-gcc13-o0/Products', 'Exact Products absence path required')
+    try:
+        item.lstat()
+    except FileNotFoundError:
+        return True
+    return False
+
+
+def guard(value):
+    registry_ref = ref(value)
+    require(registry_ref['sha256'] == REGISTRY_SHA, 'Explicit accepted current retired registry required')
+    registry = read(verify(registry_ref))
+    require(registry['schema'] == 'native-retained-artifact-registry.v3'
+            and registry['admitted_by_Root_after_actual_card_closure'] is True
+            and registry['admitted_by_this_plan'] is False, 'Actual admitted version3 required')
+    admitted_ref = registry['predecessor']
+    admitted = read(verify(admitted_ref))
+    require(admitted['schema'] == 'native-retained-artifact-registry.v3'
+            and admitted['admitted_by_Root_after_actual_card_closure'] is True, 'Actual pre-removal admission required')
+    previous_ref = admitted['predecessor']
+    require(previous_ref['sha256'] == PREDECESSOR_SHA, 'Accepted version2 predecessor differs')
+    previous = read(verify(previous_ref))
+    for key in ['legacy_products', 'legacy_product_count', 'protected_core_API_and_container']:
+        require(exact(registry[key], admitted[key]) and exact(registry[key], previous[key]), 'Legacy registry rows changed')
+    require(exact(registry['new_targets'][0], previous['new_targets'][0]), 'Existing CLK02 tombstone changed')
+    require(registry['legacy_product_count'] == 11 and len(registry['legacy_products']) == 11
+            and len(registry['protected_core_API_and_container']) == 3
+            and [row['target'] for row in registry['new_targets']] == list(OLD_ORIGINALS), 'Exact protected/tombstone cardinality required')
+    live = []
+    for row in registry['legacy_products']:
+        verify({**row['binary'], 'size_bytes': row['size_bytes']})
+        live.append(row['binary'])
+    for row in registry['protected_core_API_and_container']:
+        verify(row)
+        live.append({'path': row['path'], 'sha256': row['sha256']})
+    removals = []
+    for row in registry['new_targets']:
+        target = row['target']
+        name, digest, size = OLD_ORIGINALS[target]
+        require(exact(row['original_link'], {'historical_path': name, 'sha256': digest, 'size_bytes': size})
+                and row['status'] == 'retained-derivative-original-retired' and row['actual_removal_observed'] is True
+                and actual_absence(name), 'Genuine tombstone and actual original absence required')
+        removed = read(verify(row['removal_receipt']))
+        require(removed['schema'] == 'native-new-target-removal-receipt.v1'
+                and removed['target'] == target and type(removed['actual_command_exit_code']) is int
+                and removed['actual_command_exit_code'] == 0 and removed['actual_original_absence'] is True
+                and removed['prior_metadata_bytes_unchanged'] is True, 'Actual successful removal receipt required')
+        if target != 'clk02_reference_helper':
+            require(removed['actual_retirement_accepted'] is True and removed['preservation_guard_failure'] is None
+                    and removed['spawn_error'] is None and exact(removed['protected_before'], removed['protected_after']),
+                    'Real protected before/after accepted removal required')
+        for key in ['stdout', 'stderr', 'executed_script']:
+            verify(removed[key])
+        require(row['unstripped_original']['full_debug_bytes_available'] is False
+                and row['unstripped_original']['full_debug_archive_created'] is False
+                and row['unstripped_original']['hash_or_map_recovers_discarded_debug_bytes'] is False,
+                'Retired full debug bytes/recovery claims differ')
+        verify(row['retained_derivative'])
+        live.append({'path': row['retained_derivative']['path'], 'sha256': row['retained_derivative']['sha256']})
+        removals.append(row['removal_receipt'])
+    for row in FAILED:
+        verify(row)
+        live.append({'path': row['path'], 'sha256': row['sha256']})
+    require(len(live) == len({row['path'] for row in live}) == 19, 'Fourteen protected plus five retained files required')
+    retirement = read(verify(RETIREMENT))
+    outer = read(verify(OUTER))
+    require(retirement['schema'] == 'clk03-two-target-native-helper-retirement.v1'
+            and retirement['status'] == 'pass-precise-removal-and-retained-artifact-guards'
+            and retirement['retired_registry'] == registry_ref and retirement['admitted_registry'] == admitted_ref
+            and retirement['actual_removal_receipts'] == removals[1:]
+            and retirement['both_exact_new_originals_absent'] is True
+            and retirement['realized_removed_bytes'] == 2593250328
+            and retirement['historical_proofs_or_launchers_rewritten'] is False, 'Actual two-target retirement outcome differs')
+    require(outer['schema'] == 'recorded-porting-command.v1' and type(outer['exit_code']) is int and outer['exit_code'] == 0
+            and outer['source_bytes_match_before_and_after'] is True and outer['launch_error'] is None,
+            'Actual guarded retirement command0 required')
+    for key in ['stdout', 'stderr', 'source_snapshot']:
+        verify(outer[key])
+    require(exact(read(verify(outer['stdout'])), retirement)
+            and timestamp(outer['started_utc']) <= timestamp(retirement['started_utc'])
+            <= timestamp(retirement['completed_utc']) <= timestamp(outer['finished_utc']), 'Actual full retirement stdout/UTC differs')
+    verify(registry['actual_card_closure'])
+    verify(registry['admission_plan'])
+    verify(retirement['source_review']['review'])
+    verify(retirement['source_review']['execution'])
+    # Closure after-bindings are historical. Later cards may change plan.json;
+    # its retired proof remains bound here rather than requiring stale live bytes.
+    return registry_ref, registry, {'protected_and_retained_count': 19,
+                                  'actual_retirement': RETIREMENT, 'actual_retirement_execution': OUTER,
+                                  'live_retained_bindings': live, 'actual_removal_receipts': removals}

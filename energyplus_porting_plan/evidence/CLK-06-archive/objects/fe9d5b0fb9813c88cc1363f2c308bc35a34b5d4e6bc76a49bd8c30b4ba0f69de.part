@@ -1,0 +1,509 @@
+{
+  "schema": "clk06-independent-original-data-review.v1",
+  "status": "pass-preserved-original-data-before-Rust-baseline",
+  "review_started_utc": "2026-10-09T07:03:52.124653+00:00",
+  "reviewed_reference": {
+    "path": ".runtime/porting/CLK-06/original-execution-01/helper-reference.json",
+    "sha256": "c3b82a378092aeaa56652b34d0d4f84cc0977368df8884b2a6f1c3c1c6cfc174"
+  },
+  "reviewed_results": {
+    "path": ".runtime/porting/CLK-06/original-execution-01/native-output/clk06-helper-results.json",
+    "sha256": "1111b5b69d1c2d164a30cfd4a123f90ed1d2ddd44141d15a2bbfff44ad600d00"
+  },
+  "reviewed_execution": {
+    "path": ".runtime/porting/CLK-06/original-execution-command-01/receipt.json",
+    "sha256": "177a5a22f3265c69ade12957745e0b4f258abc6c0f0974470dc07399060ba526"
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CLK-06/original-execution-01/helper-command.json",
+    "sha256": "6015e83876ca829d7d36a742d4adfe47b3bddb2d351c9c7e64674c3aa63e2ab8"
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CLK-06/native-build-01/native-driver-build.json",
+    "sha256": "eafcb354a1eeab9d86d584394d08c5335e00e977505fd0de95dc0c36bed10994"
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CLK-06/native-build-command-01/receipt.json",
+    "sha256": "d5918e1c10f82ab8e83a463170a0fdacaf5d6dfd46355ca4e9a525cf280a4b09"
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CLK-06/independent-native-build-review-01/review.json",
+    "sha256": "2a9377fe5330ba0bb28e7cbd94014fdb4d21b181a7ec27c40540f5219484fb1f"
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-native-build-review-command-01/receipt.json",
+    "sha256": "dbe6e678585aec0a9547d0f320109cfda4365c595051d265060fc0d4af309668"
+  },
+  "reviewed_contract_review": {
+    "path": ".runtime/porting/CLK-06/independent-frozen-contract-review-02/review.json",
+    "sha256": "98759852ee80d0fdbfd79a0976a6bf7eb7aade242d463833eeb689e38d2932a2"
+  },
+  "reviewed_control_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-05/independent-control-input-review-01/review.json",
+      "sha256": "75a0975ed046dae492ca1b58ffba51c346f25038129ff37b88464ed7f673d45e"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/independent-control-input-review-command-01/receipt.json",
+      "sha256": "96c6b93e6c04aa9044720a8440e97a8fc5004f59877f4fff81758670bb74a2d2"
+    },
+    "reviewer_source_provenance": {
+      "historical_report_has_executed_reader_archive": false,
+      "current_pinned_historical_reader_source": {
+        "path": ".runtime/porting/CLK-05/control-input-review-prep-01/review_inputs.py",
+        "sha256": "07aef44be1fc507317ca0b3f10c19f94383934a2a032d51071945b2a0e29383e"
+      },
+      "current_source_is_a_retroactive_executed_archive": false,
+      "historical_report_or_receipt_rewritten": false
+    },
+    "historical_capture_is_not_current_child_environment_observation": true,
+    "recapture_and_equality_before_after_every_native_or_CLI_child_required": true
+  },
+  "reviewed_root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "reviewed_scope_amendment": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+    "sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184"
+  },
+  "reviewed_scope_amendment_execution": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-command-01/receipt.json",
+    "sha256": "e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "actual_operation_invocations": 1120,
+  "actual_operations_skipped": 0,
+  "actual_source_function_counts": {
+    "SetupInterpolationValues": 3,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "calcSky": 35,
+    "SetCurrentWeather": 480
+  },
+  "actual_source_status_counts": {
+    "source_returned": 1120
+  },
+  "intended_native_branch_coverage_complete": true,
+  "intended_native_branch_coverage": [
+    {
+      "sequence_id": "CONSTANT-1-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-1-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CONSTANT-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-1-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-1-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "RAMP-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CLOUD-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CLOUD-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CLOUD-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-CLOUD-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-MISSING-IR-3-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-MISSING-IR-3-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-MISSING-IR-4-HOUR1",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "TWO-DAY-MISSING-IR-4-HOUR24",
+      "lane": "diagnostic",
+      "requested_operations": 4,
+      "actual_returned_operations": 4,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "IR-BOUNDARY-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "IR-BOUNDARY-3",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "IR-BOUNDARY-4",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CLOUD-BOUNDARY-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CLOUD-BOUNDARY-3",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "CLOUD-BOUNDARY-4",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-LINEAR-3-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-LINEAR-3-2",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-LINEAR-4-1",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "STORED-LINEAR-4-2",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "ONE-STEP-CACHE-CANARY",
+      "lane": "diagnostic",
+      "requested_operations": 3,
+      "actual_returned_operations": 3,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "DIRECT-CALCSKY",
+      "lane": "diagnostic",
+      "requested_operations": 36,
+      "actual_returned_operations": 36,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "A-24H",
+      "lane": "production-CON",
+      "requested_operations": 193,
+      "actual_returned_operations": 193,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "A-72H",
+      "lane": "production-CON",
+      "requested_operations": 577,
+      "actual_returned_operations": 577,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    },
+    {
+      "sequence_id": "B-BOTH-24H",
+      "lane": "production-CON",
+      "requested_operations": 193,
+      "actual_returned_operations": 193,
+      "actual_preparation_returned": 8,
+      "caller_context_applied": true,
+      "intended_branch_covered": true
+    }
+  ],
+  "actual_typed_validation_visits": {
+    "full_grid": 2234,
+    "scalar": 1516856,
+    "snapshot": 4180,
+    "compact_grid": 6126
+  },
+  "actual_scalar_class_validation_visits": {
+    "positive_zero": 914504,
+    "finite": 601251,
+    "negative_zero": 1101
+  },
+  "actual_helper_exit_code": 0,
+  "actual_launcher_exit_code": 0,
+  "future_Rust_execution_or_comparison_performed": false,
+  "source_unavailable_counted_as_PASS": false,
+  "scientific_values_compared": false,
+  "scientific_execution_performed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "whole_original_inventory_or_engine_binary_rehashed_by_reader": false,
+  "recorded_original_preservation_before_after_verified": true,
+  "future_child_ENV_proved_by_prior_capture": false,
+  "actual_launch_external_ENV_recapture_verified": true,
+  "terminated_native_process_internal_ENV_observed": false,
+  "child_Python_executable_identity_inferred_from_alias": false,
+  "reviewed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/original-data-review-prep-02/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-original-data-review-02/00-review_data.py",
+        "sha256": "ab1aea1c15a39ac372f0c3bccc8447fb00dec6b54e4c1842ff6e27fc85cfa279"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/gate-review-prep-02/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-original-data-review-02/01-metadata.py",
+        "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/original-data-review-prep-02/shape.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-original-data-review-02/02-shape.py",
+        "sha256": "0be3f5ab9c56a87153b7b94b52de8d5bcf329563dfbf2932f4656e71534e7414"
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-02/00-review_data.py",
+    "sha256": "ab1aea1c15a39ac372f0c3bccc8447fb00dec6b54e4c1842ff6e27fc85cfa279"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-02/01-metadata.py",
+    "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+  },
+  "executed_shape_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-02/02-shape.py",
+    "sha256": "0be3f5ab9c56a87153b7b94b52de8d5bcf329563dfbf2932f4656e71534e7414"
+  },
+  "verifier_author": "/root/clk02_header_port",
+  "authorship_limits": "Header authored this factual metadata/storage reader and earlier builder/native/producer/scope/transport work. Raw authored new C6 helper and launcher. Own earlier scientific algorithms are not independently self-certified; Root and other-author source peers and actual recorder identify their separate review/execution roles.",
+  "scope_limits": "Real public ESky return/formal calcSky outputs/sky4 storage/full17 caches/all19 counts and complete declared source history are typed and authenticated, without numerical expected values. Current5/private hourly locals/alternative sky models/SRC08 physical formulas remain unpaired.",
+  "review_completed_utc": "2026-10-09T07:04:06.184449+00:00"
+}

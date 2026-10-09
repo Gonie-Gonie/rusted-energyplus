@@ -1,0 +1,1346 @@
+{
+  "schema": "clk06-independent-production-result-review.v1",
+  "status": "pass-authenticated-selected-production-result-and-honest-unavailable-scope",
+  "review_started_utc": "2026-10-09T09:46:49.370415+00:00",
+  "reviewed_report": {
+    "path": ".runtime/porting/CLK-06/production-comparison-02/production-comparison.json",
+    "sha256": "4e5c1f7b21b2933eea27af25f03489c4077c3b2cc65980d25e4cc52780821625"
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CLK-06/production-comparison-command-02/receipt.json",
+    "sha256": "127b4c3fc3a2f8e3b23640bbf5d8ea29a7fb3b04d8358f2799e4384ac2affb83"
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CLK-06/production-CLI-build-01/build-receipt.json",
+    "sha256": "11561b2882be8bb21c5aac0d07888d1c29987ca988168cf478956f3e938097d8"
+  },
+  "matrix": {
+    "path": ".runtime/porting/CLK-06/production-matrix-02/matrix.json",
+    "sha256": "bf2fb95b00196a2d1e2c541013ab8b55a818b42ec74e802432c33e6089fd32ba"
+  },
+  "matrix_execution": {
+    "path": ".runtime/porting/CLK-06/production-matrix-command-02/receipt.json",
+    "sha256": "852d2f5b627695f27f647d656a6e72a009f3e85c412a68f0650dd6423e8402c3"
+  },
+  "plan": {
+    "path": ".runtime/porting/CLK-06/production-plan-02/plan.json",
+    "sha256": "1ef96142e485dabb70ebfa5a05a9c8b7d7ce55f02caa346db118adb5d9c82c68"
+  },
+  "plan_execution": {
+    "path": ".runtime/porting/CLK-06/production-plan-command-02/receipt.json",
+    "sha256": "62fb4e59bbe31d38b90efd7bf0db0f3234976407db3d45df8709744a1483ab3e"
+  },
+  "comparison_projection": {
+    "path": ".runtime/porting/CLK-06/production-comparison-projection-02/projection.json",
+    "sha256": "f58dc57520bd2b90fee921500100b43b982fcb22526b3471b941a579e6595c2b"
+  },
+  "comparison_projection_execution": {
+    "path": ".runtime/porting/CLK-06/production-comparison-projection-command-02/receipt.json",
+    "sha256": "c5592be313b73f9e107fc78c7abd3c7fb6651148f28b5c7f0511a85f7394bdd9"
+  },
+  "reviewed_original_data_review": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+    "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+  },
+  "reviewed_original_data_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-command-02/receipt.json",
+    "sha256": "29e648e600a070e80b19f08f9f1f39a1a72f72da818a3eb5674f8f01e8ce8884"
+  },
+  "reviewed_unit_result": {
+    "path": ".runtime/porting/CLK-06/candidate-unit-comparison-01/unit-comparison.json",
+    "sha256": "50da815d739269907fde1cec18f775aa21018b0aa5b5fc3bc09bf258fb7404d3"
+  },
+  "reviewed_unit_result_QA": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/review.json",
+    "sha256": "04da992e1a8e34bc64e6d1f8fdd736b19dd7196794ddd3df9198f39e3443ab85"
+  },
+  "reviewed_unit_result_QA_execution": {
+    "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-command-01/receipt.json",
+    "sha256": "3f2f5206265509e0538c5717eb5aff4851d430b6570ac194e2a63ae945290835"
+  },
+  "reviewed_baseline_gap": {
+    "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+    "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+  },
+  "reviewed_production_source_review": {
+    "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-04/review.json",
+    "sha256": "636bdc68c40d381a284046a59cc7662784efe392afb6c9e5f2cf210310a40175"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-command-04/receipt.json",
+    "sha256": "7f3d076d4f2a437f717a006b9372be757133d8ff68647f921514ef3cc1877d51"
+  },
+  "reviewed_comparer_source_review": {
+    "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-02/review.json",
+    "sha256": "a43c74a80962ac32380aebee270e49fc9a02df738fc45bfbe346dda7576177b3"
+  },
+  "comparer_source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-command-02/receipt.json",
+    "sha256": "a31e16a8d53e0bf5019e6c099576ce337a2831b81f9e0612b2e490a06a9a7be7"
+  },
+  "reviewed_applied_core_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-applied-04/inventory.json",
+    "sha256": "452b74fb9f5b868a2abafe300751bd4ef469239060bb8f7ce8ffb723a298076e"
+  },
+  "reviewed_run_design": {
+    "path": ".runtime/porting/CLK-06/production-run-design-prep-01/plan.json",
+    "sha256": "cbcc3f9665bb32ca4cfe27a0bf61ecd8a6d7099a51ec5a378ac3380d4ad80752"
+  },
+  "actual_implementation_commit": "92018be6e8f3682520edc788ed226d24d6e6e0bf",
+  "actual_crates_tree": "d0b21c4001681d6edc510bbcbef7e516727dfd76",
+  "historical_unit_implementation_commit": "37f07f548d869cafb4c8a6e3df021b43e2c6598f",
+  "actual_available_source_inventory_count": 3757,
+  "actual_CLI_execution_refs": [
+    {
+      "path": ".runtime/porting/CLK-06/production-matrix-02/A-24H/full-command/receipt.json",
+      "sha256": "5a206d39382630a7847aa9be550f69c9dfd2fda2948141168d8c3c7e0143e6f8"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-matrix-02/A-24H/summary-command/receipt.json",
+      "sha256": "35a65bb804848217833e87ec4cb1729d0814620d2eeebe50936d9661244640bd"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-matrix-02/A-72H/full-command/receipt.json",
+      "sha256": "be4a310bc6e73bea8bd29e556e3b63febbb1698c7723560f4964bf81c606d785"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-matrix-02/A-72H/summary-command/receipt.json",
+      "sha256": "f8e71723984c2f7db04fa5998b1bef77e0e71299cbc5c7fa2feff3aae45518ea"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-matrix-02/B-BOTH-24H/full-command/receipt.json",
+      "sha256": "1b255858c9fb4bedccaee112fbcc30d1f2aea910cfbf5c91c5616a2f0ad128f8"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-matrix-02/B-BOTH-24H/summary-command/receipt.json",
+      "sha256": "69a19f2c67c03801c54d64e1b8df8826b5289391296fd968b5edef8617bf2369"
+    }
+  ],
+  "actual_command_count": 6,
+  "actual_reported_mismatches": 0,
+  "matrix_stdout_protocol": {
+    "parent_owned_progress_lines": 6,
+    "parent_owned_final_summary_lines": 1,
+    "full_parent_stdout_authenticated": true,
+    "six_child_streams_authenticated_separately": true,
+    "nested_recorder_console_forwarding_available": false,
+    "unavailable_nested_forwarding_counted_as_PASS": false
+  },
+  "actual_unit_seven_field_error_metrics": {
+    "TotalSkyCover": {
+      "comparison_count": 74646,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "OpaqueSkyCover": {
+      "comparison_count": 74646,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "Interpolation": {
+      "comparison_count": 13434,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "SolarInterpolation": {
+      "comparison_count": 13434,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "ESky": {
+      "comparison_count": 17,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "SkyTemp": {
+      "comparison_count": 64238,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "HorizIRSky": {
+      "comparison_count": 64238,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    }
+  },
+  "production_ESky_metric_invented": false,
+  "comparison_counts": {
+    "numeric_comparison_count": 99579,
+    "literal_binary64_comparison_count": 2853564,
+    "metadata_comparison_count": 1060634,
+    "comparison_count": 4013777,
+    "mismatch_count": 0
+  },
+  "field_error_metrics": {
+    "SkyTemp": {
+      "comparison_count": 30102,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "HorizIRSky": {
+      "comparison_count": 30585,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "TotalSkyCover": {
+      "comparison_count": 11742,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "OpaqueSkyCover": {
+      "comparison_count": 11742,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "Interpolation": {
+      "comparison_count": 7704,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    },
+    "SolarInterpolation": {
+      "comparison_count": 7704,
+      "mismatch_count": 0,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0
+    }
+  },
+  "categories": {
+    "typed_metadata": 1060634,
+    "SkyTemp": 30102,
+    "HorizIRSky": 30585,
+    "TotalSkyCover": 11742,
+    "OpaqueSkyCover": 11742,
+    "literal_binary64": 2853564,
+    "Interpolation": 7704,
+    "SolarInterpolation": 7704
+  },
+  "unavailable_entry_count": 14544,
+  "unavailable_reason_counts": {
+    "Observed += endpoints retained; native full heat-balance sum oracle is unavailable": 960,
+    "Actual hourly aggregate retained distinctly; no native report mean reconstructed": 240,
+    "actual comparison operand unavailable": 5632,
+    "CLI byte stream has no file_path member; authentic argv and input byte map bind identity": 1926,
+    "Native model/current5 and Current13 are context; no new physics certificate": 5778,
+    "Source-verified branch has no invocation; no argument or PASS invented": 6,
+    "No actual resolved/report-recompute invocation; no local or event invented": 2
+  },
+  "required_both_null_unavailable_count": 1803,
+  "unavailable_arrays_copied_into_this_report": false,
+  "comparison_report_full_JSON_including_retained_mismatch_samples_parsed": true,
+  "parsed_retained_mismatch_sample_count": 0,
+  "relative_tolerance_metrics_recomputed": false,
+  "structural_non_surface_id_unavailable_counts": {
+    "A-24H": 361,
+    "A-72H": 1081,
+    "B-BOTH-24H": 361
+  },
+  "structural_non_surface_id_source_guards": [
+    {
+      "path": ".runtime/porting/CLK-06/production-comparison-02/02-observations.py",
+      "sha256": "477c7a128d7549db09133a1ad93145f12466e02bb1ed1bd93ac9fe2c9049ee38"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-comparison-02/04-check_production.py",
+      "sha256": "1844387084ce37e30ee607c8410eb8909d4288a0df6f8d862575a11aa5add288"
+    }
+  ],
+  "generic_required_flag_means_physical_surface_value_required": false,
+  "every_other_required_unavailable_rejected": true,
+  "structural_unavailable_counted_as_PASS": false,
+  "actual_observation_ledgers": [
+    {
+      "case_id": "A-24H",
+      "native_calls_paired": 193,
+      "actual_Current_calls": 96,
+      "actual_nested_day_reads": 1,
+      "actual_consumer_receipts": 97,
+      "actual_initial_seed_duplicate": true,
+      "external_ordinals_are_native_internal_indices": false,
+      "actual_consumer_operation_prefix_available": true,
+      "native_thermal_callback_numerical_parity_claimed": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/A-24H/full/clk03-weather-day-production-trace.json",
+        "sha256": "b07b5403d96f94ca40685277ccd885a89285f3cb1fa7009203ad3f1b67789f43"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "native_calls_paired": 577,
+      "actual_Current_calls": 288,
+      "actual_nested_day_reads": 3,
+      "actual_consumer_receipts": 289,
+      "actual_initial_seed_duplicate": true,
+      "external_ordinals_are_native_internal_indices": false,
+      "actual_consumer_operation_prefix_available": true,
+      "native_thermal_callback_numerical_parity_claimed": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/A-72H/full/clk03-weather-day-production-trace.json",
+        "sha256": "4aa91fc8e08f0309ff4d35983c255b004dc601b4ac129cca9a55ccbc25b2fcf5"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "native_calls_paired": 193,
+      "actual_Current_calls": 96,
+      "actual_nested_day_reads": 1,
+      "actual_consumer_receipts": 97,
+      "actual_initial_seed_duplicate": true,
+      "external_ordinals_are_native_internal_indices": false,
+      "actual_consumer_operation_prefix_available": true,
+      "native_thermal_callback_numerical_parity_claimed": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/B-BOTH-24H/full/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56"
+      }
+    }
+  ],
+  "actual_transport_ledgers": [
+    {
+      "case_id": "A-24H",
+      "trace_level": "Full",
+      "actual_event_counts": {
+        "owned_context_receipt": 97,
+        "run_period_weather_sampler_return": 96,
+        "run_period_report_accumulator": 96,
+        "run_period_report_hourly_output": 24,
+        "run_period_report_series_handoff": 48,
+        "physical_exterior_balance_ingress": 1440,
+        "physical_resolved_longwave_argument": 81,
+        "report_recomputed_longwave_argument": 480
+      },
+      "actual_origin_counts": {
+        "physical_exterior_balance_ingress/surface_solve": 960,
+        "physical_exterior_balance_ingress/report_outside_face_recomputation": 480,
+        "report_recomputed_longwave_argument/report_terms_recomputation": 480,
+        "physical_resolved_longwave_argument/surface_solve": 54,
+        "physical_resolved_longwave_argument/report_outside_face_recomputation": 27
+      },
+      "source_origin_policy": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "uninvoked_source_origin_availability": [],
+      "total_completed_weather_operations": 194,
+      "actual_event_kind_counts": [
+        {
+          "kind": "owned_context_receipt",
+          "omitted": 0,
+          "retained": 97,
+          "total": 97,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_weather_sampler_return",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_accumulator",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_hourly_output",
+          "omitted": 0,
+          "retained": 24,
+          "total": 24,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_series_handoff",
+          "omitted": 0,
+          "retained": 48,
+          "total": 48,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_exterior_balance_ingress",
+          "omitted": 0,
+          "retained": 1440,
+          "total": 1440,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "omitted": 0,
+          "retained": 81,
+          "total": 81,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "omitted": 0,
+          "retained": 480,
+          "total": 480,
+          "truncated": false,
+          "truncation_reason": null
+        }
+      ],
+      "total_event_count": 2362,
+      "retained_event_count": 2362,
+      "truncated": false,
+      "actual_context_occurrences": 97,
+      "actual_hourly_aggregate_count": 24,
+      "actual_series_handoff_count": 48,
+      "conditional_role_availability": [
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "actual_invocations": 81,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "actual_invocations": 480,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        }
+      ],
+      "omitted_event_count": 0,
+      "deduplicated": false,
+      "hourly_means_compared_to_individual_Today_slots": false,
+      "weather_RHS_or_native_report_aggregate_recomputed": false,
+      "native_Current5_model_or_SRC08_physics_certified": false,
+      "unavailable_counted_as_PASS": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/A-24H/full/clk06_sky_transport_trace.json",
+        "sha256": "dd724844f3f04a8632aec57a67ee14ac339ced17c6fc80d3530636fbc301a1bf"
+      }
+    },
+    {
+      "case_id": "A-24H",
+      "trace_level": "Summary",
+      "actual_event_counts": {
+        "owned_context_receipt": 97,
+        "run_period_weather_sampler_return": 96,
+        "run_period_report_accumulator": 96,
+        "run_period_report_hourly_output": 24,
+        "run_period_report_series_handoff": 48,
+        "physical_exterior_balance_ingress": 1440,
+        "physical_resolved_longwave_argument": 81,
+        "report_recomputed_longwave_argument": 480
+      },
+      "actual_origin_counts": {
+        "physical_exterior_balance_ingress/surface_solve": 960,
+        "physical_exterior_balance_ingress/report_outside_face_recomputation": 480,
+        "report_recomputed_longwave_argument/report_terms_recomputation": 480,
+        "physical_resolved_longwave_argument/surface_solve": 54,
+        "physical_resolved_longwave_argument/report_outside_face_recomputation": 27
+      },
+      "source_origin_policy": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "uninvoked_source_origin_availability": [],
+      "total_completed_weather_operations": 194,
+      "actual_event_kind_counts": [
+        {
+          "kind": "owned_context_receipt",
+          "omitted": 0,
+          "retained": 97,
+          "total": 97,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_weather_sampler_return",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_accumulator",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_hourly_output",
+          "omitted": 0,
+          "retained": 24,
+          "total": 24,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_series_handoff",
+          "omitted": 0,
+          "retained": 48,
+          "total": 48,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_exterior_balance_ingress",
+          "omitted": 0,
+          "retained": 1440,
+          "total": 1440,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "omitted": 0,
+          "retained": 81,
+          "total": 81,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "omitted": 0,
+          "retained": 480,
+          "total": 480,
+          "truncated": false,
+          "truncation_reason": null
+        }
+      ],
+      "total_event_count": 2362,
+      "retained_event_count": 2362,
+      "truncated": false,
+      "actual_context_occurrences": 97,
+      "actual_hourly_aggregate_count": 24,
+      "actual_series_handoff_count": 48,
+      "conditional_role_availability": [
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "actual_invocations": 81,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "actual_invocations": 480,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        }
+      ],
+      "omitted_event_count": 0,
+      "deduplicated": false,
+      "hourly_means_compared_to_individual_Today_slots": false,
+      "weather_RHS_or_native_report_aggregate_recomputed": false,
+      "native_Current5_model_or_SRC08_physics_certified": false,
+      "unavailable_counted_as_PASS": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/A-24H/summary/clk06_sky_transport_trace.json",
+        "sha256": "d631aae2ef257507add5dcc96c9515646c92f616ec254882c94cb4afafc3b9f7"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "trace_level": "Full",
+      "actual_event_counts": {
+        "owned_context_receipt": 289,
+        "run_period_weather_sampler_return": 288,
+        "run_period_report_accumulator": 288,
+        "run_period_report_hourly_output": 72,
+        "run_period_report_series_handoff": 144,
+        "physical_exterior_balance_ingress": 4320,
+        "physical_resolved_longwave_argument": 945,
+        "report_recomputed_longwave_argument": 1440
+      },
+      "actual_origin_counts": {
+        "physical_exterior_balance_ingress/surface_solve": 2880,
+        "physical_exterior_balance_ingress/report_outside_face_recomputation": 1440,
+        "report_recomputed_longwave_argument/report_terms_recomputation": 1440,
+        "physical_resolved_longwave_argument/surface_solve": 630,
+        "physical_resolved_longwave_argument/report_outside_face_recomputation": 315
+      },
+      "source_origin_policy": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "uninvoked_source_origin_availability": [],
+      "total_completed_weather_operations": 580,
+      "actual_event_kind_counts": [
+        {
+          "kind": "owned_context_receipt",
+          "omitted": 0,
+          "retained": 289,
+          "total": 289,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_weather_sampler_return",
+          "omitted": 0,
+          "retained": 288,
+          "total": 288,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_accumulator",
+          "omitted": 0,
+          "retained": 288,
+          "total": 288,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_hourly_output",
+          "omitted": 0,
+          "retained": 72,
+          "total": 72,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_series_handoff",
+          "omitted": 0,
+          "retained": 144,
+          "total": 144,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_exterior_balance_ingress",
+          "omitted": 0,
+          "retained": 4320,
+          "total": 4320,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "omitted": 0,
+          "retained": 945,
+          "total": 945,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "omitted": 0,
+          "retained": 1440,
+          "total": 1440,
+          "truncated": false,
+          "truncation_reason": null
+        }
+      ],
+      "total_event_count": 7786,
+      "retained_event_count": 7786,
+      "truncated": false,
+      "actual_context_occurrences": 289,
+      "actual_hourly_aggregate_count": 72,
+      "actual_series_handoff_count": 144,
+      "conditional_role_availability": [
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "actual_invocations": 945,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "actual_invocations": 1440,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        }
+      ],
+      "omitted_event_count": 0,
+      "deduplicated": false,
+      "hourly_means_compared_to_individual_Today_slots": false,
+      "weather_RHS_or_native_report_aggregate_recomputed": false,
+      "native_Current5_model_or_SRC08_physics_certified": false,
+      "unavailable_counted_as_PASS": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/A-72H/full/clk06_sky_transport_trace.json",
+        "sha256": "6d4c1b37172e6feb83e0e83b4f3919b1b6d145c9e29880bddf6129fd7c079926"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "trace_level": "Summary",
+      "actual_event_counts": {
+        "owned_context_receipt": 289,
+        "run_period_weather_sampler_return": 288,
+        "run_period_report_accumulator": 288,
+        "run_period_report_hourly_output": 72,
+        "run_period_report_series_handoff": 144,
+        "physical_exterior_balance_ingress": 4320,
+        "physical_resolved_longwave_argument": 945,
+        "report_recomputed_longwave_argument": 1440
+      },
+      "actual_origin_counts": {
+        "physical_exterior_balance_ingress/surface_solve": 2880,
+        "physical_exterior_balance_ingress/report_outside_face_recomputation": 1440,
+        "report_recomputed_longwave_argument/report_terms_recomputation": 1440,
+        "physical_resolved_longwave_argument/surface_solve": 630,
+        "physical_resolved_longwave_argument/report_outside_face_recomputation": 315
+      },
+      "source_origin_policy": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "uninvoked_source_origin_availability": [],
+      "total_completed_weather_operations": 580,
+      "actual_event_kind_counts": [
+        {
+          "kind": "owned_context_receipt",
+          "omitted": 0,
+          "retained": 289,
+          "total": 289,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_weather_sampler_return",
+          "omitted": 0,
+          "retained": 288,
+          "total": 288,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_accumulator",
+          "omitted": 0,
+          "retained": 288,
+          "total": 288,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_hourly_output",
+          "omitted": 0,
+          "retained": 72,
+          "total": 72,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_series_handoff",
+          "omitted": 0,
+          "retained": 144,
+          "total": 144,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_exterior_balance_ingress",
+          "omitted": 0,
+          "retained": 4320,
+          "total": 4320,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "omitted": 0,
+          "retained": 945,
+          "total": 945,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "omitted": 0,
+          "retained": 1440,
+          "total": 1440,
+          "truncated": false,
+          "truncation_reason": null
+        }
+      ],
+      "total_event_count": 7786,
+      "retained_event_count": 7786,
+      "truncated": false,
+      "actual_context_occurrences": 289,
+      "actual_hourly_aggregate_count": 72,
+      "actual_series_handoff_count": 144,
+      "conditional_role_availability": [
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "actual_invocations": 945,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "actual_invocations": 1440,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        }
+      ],
+      "omitted_event_count": 0,
+      "deduplicated": false,
+      "hourly_means_compared_to_individual_Today_slots": false,
+      "weather_RHS_or_native_report_aggregate_recomputed": false,
+      "native_Current5_model_or_SRC08_physics_certified": false,
+      "unavailable_counted_as_PASS": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/A-72H/summary/clk06_sky_transport_trace.json",
+        "sha256": "6007f2d59d70115e9017a9a788bdb8a00654a46cf9358295ab626fecd62f9ffb"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Full",
+      "actual_event_counts": {
+        "owned_context_receipt": 97,
+        "run_period_weather_sampler_return": 96,
+        "run_period_report_accumulator": 96,
+        "run_period_report_hourly_output": 24,
+        "run_period_report_series_handoff": 48,
+        "physical_exterior_balance_ingress": 960,
+        "physical_resolved_longwave_argument": 480,
+        "report_recomputed_longwave_argument": 0
+      },
+      "actual_origin_counts": {
+        "physical_exterior_balance_ingress/surface_solve": 960,
+        "physical_resolved_longwave_argument/surface_solve": 480
+      },
+      "source_origin_policy": {
+        "runtime_route": "direct_zone_purchased_air_fixed_step",
+        "use_quick_outside_conduction": true,
+        "use_cached_exterior_report_terms": true,
+        "required_positive_ingress_origins": [
+          "surface_solve"
+        ],
+        "required_zero_origin_keys": [
+          "physical_exterior_balance_ingress/report_outside_face_recomputation",
+          "physical_resolved_longwave_argument/report_outside_face_recomputation",
+          "report_recomputed_longwave_argument/report_terms_recomputation"
+        ],
+        "required_zero_event_kinds": [
+          "report_recomputed_longwave_argument"
+        ],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "uninvoked_source_origin_availability": [
+        {
+          "origin_key": "physical_exterior_balance_ingress/report_outside_face_recomputation",
+          "actual_event_count": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "source-verified quick outside/cached report return leaves this origin uninvoked"
+        },
+        {
+          "origin_key": "physical_resolved_longwave_argument/report_outside_face_recomputation",
+          "actual_event_count": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "source-verified quick outside/cached report return leaves this origin uninvoked"
+        },
+        {
+          "origin_key": "report_recomputed_longwave_argument/report_terms_recomputation",
+          "actual_event_count": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "source-verified quick outside/cached report return leaves this origin uninvoked"
+        }
+      ],
+      "total_completed_weather_operations": 194,
+      "actual_event_kind_counts": [
+        {
+          "kind": "owned_context_receipt",
+          "omitted": 0,
+          "retained": 97,
+          "total": 97,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_weather_sampler_return",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_accumulator",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_hourly_output",
+          "omitted": 0,
+          "retained": 24,
+          "total": 24,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_series_handoff",
+          "omitted": 0,
+          "retained": 48,
+          "total": 48,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_exterior_balance_ingress",
+          "omitted": 0,
+          "retained": 960,
+          "total": 960,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "omitted": 0,
+          "retained": 480,
+          "total": 480,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "omitted": 0,
+          "retained": 0,
+          "total": 0,
+          "truncated": false,
+          "truncation_reason": null
+        }
+      ],
+      "total_event_count": 1801,
+      "retained_event_count": 1801,
+      "truncated": false,
+      "actual_context_occurrences": 97,
+      "actual_hourly_aggregate_count": 24,
+      "actual_series_handoff_count": 48,
+      "conditional_role_availability": [
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "actual_invocations": 480,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "actual_invocations": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "genuine early/cached source return can leave this role uninvoked"
+        }
+      ],
+      "omitted_event_count": 0,
+      "deduplicated": false,
+      "hourly_means_compared_to_individual_Today_slots": false,
+      "weather_RHS_or_native_report_aggregate_recomputed": false,
+      "native_Current5_model_or_SRC08_physics_certified": false,
+      "unavailable_counted_as_PASS": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/B-BOTH-24H/full/clk06_sky_transport_trace.json",
+        "sha256": "0820a5047b78c65663263e15239629e4893be4dc10e63d8586a03c3f26923182"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Summary",
+      "actual_event_counts": {
+        "owned_context_receipt": 97,
+        "run_period_weather_sampler_return": 96,
+        "run_period_report_accumulator": 96,
+        "run_period_report_hourly_output": 24,
+        "run_period_report_series_handoff": 48,
+        "physical_exterior_balance_ingress": 960,
+        "physical_resolved_longwave_argument": 480,
+        "report_recomputed_longwave_argument": 0
+      },
+      "actual_origin_counts": {
+        "physical_exterior_balance_ingress/surface_solve": 960,
+        "physical_resolved_longwave_argument/surface_solve": 480
+      },
+      "source_origin_policy": {
+        "runtime_route": "direct_zone_purchased_air_fixed_step",
+        "use_quick_outside_conduction": true,
+        "use_cached_exterior_report_terms": true,
+        "required_positive_ingress_origins": [
+          "surface_solve"
+        ],
+        "required_zero_origin_keys": [
+          "physical_exterior_balance_ingress/report_outside_face_recomputation",
+          "physical_resolved_longwave_argument/report_outside_face_recomputation",
+          "report_recomputed_longwave_argument/report_terms_recomputation"
+        ],
+        "required_zero_event_kinds": [
+          "report_recomputed_longwave_argument"
+        ],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "uninvoked_source_origin_availability": [
+        {
+          "origin_key": "physical_exterior_balance_ingress/report_outside_face_recomputation",
+          "actual_event_count": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "source-verified quick outside/cached report return leaves this origin uninvoked"
+        },
+        {
+          "origin_key": "physical_resolved_longwave_argument/report_outside_face_recomputation",
+          "actual_event_count": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "source-verified quick outside/cached report return leaves this origin uninvoked"
+        },
+        {
+          "origin_key": "report_recomputed_longwave_argument/report_terms_recomputation",
+          "actual_event_count": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "source-verified quick outside/cached report return leaves this origin uninvoked"
+        }
+      ],
+      "total_completed_weather_operations": 194,
+      "actual_event_kind_counts": [
+        {
+          "kind": "owned_context_receipt",
+          "omitted": 0,
+          "retained": 97,
+          "total": 97,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_weather_sampler_return",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_accumulator",
+          "omitted": 0,
+          "retained": 96,
+          "total": 96,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_hourly_output",
+          "omitted": 0,
+          "retained": 24,
+          "total": 24,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "run_period_report_series_handoff",
+          "omitted": 0,
+          "retained": 48,
+          "total": 48,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_exterior_balance_ingress",
+          "omitted": 0,
+          "retained": 960,
+          "total": 960,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "omitted": 0,
+          "retained": 480,
+          "total": 480,
+          "truncated": false,
+          "truncation_reason": null
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "omitted": 0,
+          "retained": 0,
+          "total": 0,
+          "truncated": false,
+          "truncation_reason": null
+        }
+      ],
+      "total_event_count": 1801,
+      "retained_event_count": 1801,
+      "truncated": false,
+      "actual_context_occurrences": 97,
+      "actual_hourly_aggregate_count": 24,
+      "actual_series_handoff_count": 48,
+      "conditional_role_availability": [
+        {
+          "kind": "physical_resolved_longwave_argument",
+          "actual_invocations": 480,
+          "available": true,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "actual executed argument copies paired"
+        },
+        {
+          "kind": "report_recomputed_longwave_argument",
+          "actual_invocations": 0,
+          "available": false,
+          "required_when_invoked": true,
+          "counted_as_PASS": false,
+          "reason": "genuine early/cached source return can leave this role uninvoked"
+        }
+      ],
+      "omitted_event_count": 0,
+      "deduplicated": false,
+      "hourly_means_compared_to_individual_Today_slots": false,
+      "weather_RHS_or_native_report_aggregate_recomputed": false,
+      "native_Current5_model_or_SRC08_physics_certified": false,
+      "unavailable_counted_as_PASS": false,
+      "actual_trace": {
+        "path": ".runtime/porting/CLK-06/production-matrix-02/B-BOTH-24H/summary/clk06_sky_transport_trace.json",
+        "sha256": "aa668ea06eefa1b8e184101c0145588317a51a060fe77ca4419d593ee0e6d7a7"
+      }
+    }
+  ],
+  "reviewed_source_origin_policy": {
+    "schema": "clk06-production-origin-source-policy.v1",
+    "source_bindings": [
+      {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "ef62fd34a1b50de86d7fcc76cd9b67ab381f71c8347b1c8ff755c8aabd92dadc"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "ce0fc15586ec35ef4709c24fba8133c2655bbfb8cd323bfbb41bff476c3497a1"
+      },
+      {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "ef72c30f27655ffc19bd42e2c4d251c3cf351da5431ba71fe933684f112237f6"
+      },
+      {
+        "path": "crates/ep_runtime/src/diagnostic_probes/heat_balance.rs",
+        "sha256": "2f6d91e55b65ed1ef375068ab101debd1d22b0a197a282f84446125768b0442a"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/algorithm.rs",
+        "sha256": "dc00aef90374ca111ad94ced8925813eb024215510a4ccafac3595677b27d34f"
+      },
+      {
+        "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+        "sha256": "f3ddcf038fb5c28102ebe6416367ba36be5c2622b81a123ed87c7513a9a3ad14"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+        "sha256": "159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/weather_driver.rs",
+        "sha256": "c3de8d274556aaaeb474aab9e36f1c4589226d9fe9f40740d07ec049f80c8a0b"
+      }
+    ],
+    "cases": {
+      "A-24H": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "A-72H": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "B-BOTH-24H": {
+        "runtime_route": "direct_zone_purchased_air_fixed_step",
+        "use_quick_outside_conduction": true,
+        "use_cached_exterior_report_terms": true,
+        "required_positive_ingress_origins": [
+          "surface_solve"
+        ],
+        "required_zero_origin_keys": [
+          "physical_exterior_balance_ingress/report_outside_face_recomputation",
+          "physical_resolved_longwave_argument/report_outside_face_recomputation",
+          "report_recomputed_longwave_argument/report_terms_recomputation"
+        ],
+        "required_zero_event_kinds": [
+          "report_recomputed_longwave_argument"
+        ],
+        "uninvoked_origins_counted_as_PASS": false
+      }
+    }
+  },
+  "uninvoked_source_origins_counted_as_PASS": false,
+  "conditional_zero_invocation_roles": [
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Full",
+      "kind": "report_recomputed_longwave_argument"
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "trace_level": "Summary",
+      "kind": "report_recomputed_longwave_argument"
+    }
+  ],
+  "conditional_zero_roles_counted_as_PASS": false,
+  "actual_original_calls_paired": 963,
+  "actual_Current_calls_observed": 480,
+  "transport_payloads_reparsed_or_recomputed": false,
+  "kernel_event_totals_claimed_as_timestep_solves": false,
+  "actual_reader_interpreter_observation": {
+    "reported_argv_zero": "python",
+    "recorded_parent_python_executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "child_executable_path": null,
+    "child_executable_path_available": false,
+    "parent_executable_is_proof_of_child_alias_resolution": false,
+    "unavailable_child_path_counted_as_PASS": false
+  },
+  "reviewed_verifier_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-result-review-prep-03/review_result.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-result-reviewer.py",
+        "sha256": "129d6a3b19bb95bd6e2905b06705af68006f2d8b0e39519588a8ed199d8e13bc"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-result-review-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-common.py",
+        "sha256": "dbe62d325f20d0f6ee4e64038295248e798f8bcf07e0e67fd4c096b75147d7d4"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/gate-review-prep-01/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-metadata.py",
+        "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-geo-metadata.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-result-reviewer.py",
+    "sha256": "129d6a3b19bb95bd6e2905b06705af68006f2d8b0e39519588a8ed199d8e13bc"
+  },
+  "executed_common_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-common.py",
+    "sha256": "dbe62d325f20d0f6ee4e64038295248e798f8bcf07e0e67fd4c096b75147d7d4"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-metadata.py",
+    "sha256": "196c681a9b14d71b7acb22dbd0894d47fe1c65cc9284c8bb077609653271ad7d"
+  },
+  "executed_geo_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-result-review-03/executed-geo-metadata.py",
+    "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+  },
+  "factual_result_only_no_new_numerical_certification": true,
+  "scientific_execution_performed": false,
+  "numeric_operands_recomputed": false,
+  "engines_or_numerical_readers_imported": false,
+  "large_Original_wrapper_with_scientific_snapshots_parsed": false,
+  "full_Native_results_payload_parsed": false,
+  "large_Native_results_or_binary_rehashed": false,
+  "existing_baseline_gap_mismatch_payloads_parsed": false,
+  "full_Rust_trace_event_or_day_payloads_parsed": false,
+  "ordinary_run_summary_JSON_parsed": true,
+  "actual_DataQA_and_unit_result_QA_proofs_reused": true,
+  "current_canonical_equal_to_science_build_claimed": false,
+  "extra_lineage_execution_stage_required": false,
+  "whole_formula_or_own_code_independently_certified": false,
+  "native_Current5_model_and_SRC08_physics_certified": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false,
+  "authorship_limits": "Raw authored this factual verifier, passive transport hooks and earlier raw/input/cursor/comparer work. These formulas are not independently certified here. Baseline authored the bound production numerical reader; Header authored the execution workflow. Root actual execution, separate source peers and archived results remain distinct.",
+  "review_completed_utc": "2026-10-09T09:47:11.137018+00:00"
+}

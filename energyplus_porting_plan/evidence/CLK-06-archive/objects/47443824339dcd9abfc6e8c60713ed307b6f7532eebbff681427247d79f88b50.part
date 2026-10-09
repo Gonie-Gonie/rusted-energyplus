@@ -1,0 +1,130 @@
+"""Authenticate independently read one-target retention sources without importing them."""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+HELPER = ROOT / '.runtime/porting/CLK-06/gate-review-prep-02/metadata.py'
+HELPER_SHA = '02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526'
+if hashlib.sha256(HELPER.read_bytes()).hexdigest() != HELPER_SHA:
+    raise ValueError('Metadata-only helper differs before import')
+spec = importlib.util.spec_from_file_location('clk06_retirement_source_metadata', HELPER)
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+MANIFEST = {'path': '.runtime/porting/CLK-06/retention-prep-03/manifest.json',
+    'sha256': '5eaf0e4475c411bdda1521e2c7a8bf8d4fc54523962e50676bd5fcf3971764d5'}
+PREFIX = '.runtime/porting/CLK-06/retention-prep-03/'
+SOURCES = [('common.py','d4602b9c103ee41528cb7f75f70776983997be3a735286ed2c18f2718de00466'),
+    ('registry.py','133bb112416ef85dc4aded064ef8cf080bc87adef7b7ebdf396103f5928c7b9d'),
+    ('proofs.py','f0a0ed06f65467097513f4ee1268a49239c5c5da4fa739ef23686002a5ec1480'),
+    ('write_plan.py','d283ac49a6b6560df1c8577edff2673a9e9e3132fd4939e6db55df758b1fcbc6'),
+    ('retire.py','ae90ce2cb53f9464a64d6d37fcabf9ed99507eb50a8e699344139b46125681a7')]
+SCHEMA = 'clk06-independent-retirement-writer-source-review.v1'
+STATUS = 'pass-source-before-one-target-retirement-metadata'
+TARGET = {'clk06_reference_helper': {
+    'historical_path': '.runtime/ep261-gcc13-o0/Products/clk06_reference_helper.exe',
+    'sha256': '672dfd6b708833bbcc0f1869c5933a595423be86404b06142b5a179392545fb4',
+    'size_bytes': 1297365278}}
+DERIVATIVE = {'path': '.runtime/porting/CLK-06/native-build-01/derivation/derived-helper.exe',
+    'sha256': '7e60b98d56fa25e203eb42df6395bee598146091a9dcc0483aee0e04afdefc8d', 'size_bytes': 150595264}
+
+
+def literal(tree, name):
+    rows = [node.value for node in tree.body if isinstance(node, ast.Assign)
+        and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name) and node.targets[0].id == name]
+    m.need(len(rows) == 1, 'Unique reviewed source constant required: ' + name)
+    return ast.literal_eval(rows[0])
+
+
+def inspect_sources(manifest):
+    m.need(manifest['schema'] == 'clk06-retention-source-draft.v1'
+        and manifest['status'] == 'SOURCE-READY-source-only-unexecuted'
+        and manifest['review_schema'] == SCHEMA and manifest['review_status'] == STATUS,
+        'Exact held retirement/source-review protocol required')
+    rows = manifest['sources']
+    m.need(type(rows) is list and len(rows) == 5 and [row['path'] for row in rows]
+        == [PREFIX + name for name, _ in SOURCES], 'Exact ordered five held source owners required')
+    texts = {}; trees = {}; originals = []
+    for row, (name, digest) in zip(rows, SOURCES, strict=True):
+        m.need(row['sha256'] == digest, 'Independently read held source identity differs')
+        path = m.verify(row); raw = path.read_bytes()
+        m.need(len(raw.splitlines()) == row['line_count'], 'Held source line metadata differs')
+        text = raw.decode('utf-8-sig'); trees[name] = ast.parse(text, filename=str(path))
+        texts[name] = text; originals.append(path)
+    m.need(literal(trees['common.py'], 'TARGETS') == TARGET
+        and literal(trees['proofs.py'], 'DERIVATIVE') == DERIVATIVE,
+        'Only independently verified original/retained derivative identities admitted')
+    for name in ['common.py','registry.py']:
+        m.need(literal(trees[name], 'REGISTRY_SHA') == 'db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6',
+            'Genuine retired v5 predecessor differs')
+    predicates = {
+        'common.py': ['def regular(', 'def unchanged(', 'source_bytes_match_before_and_after'],
+        'registry.py': ['def closed_scope_documents(', 'def scope_successor(', 'archived_deltas',
+            'actual_CLK06_card_closure', 'Historical closure/current annotation identity differs'],
+        'proofs.py': ["metric[k] >= 0", "Frozen bit-exact field errors must remain zero",
+            "exact(qa['field_error_metrics'],item['comparison']['field_error_metrics'])",
+            'Actual cached660/prior659/frozen643 command rows differ', '== 22', 'def actual_closure('],
+        'write_plan.py': [SCHEMA, STATUS, 'remember=False', 'removal_authorized_by_this_plan',
+            'retained_gap_report_including_mismatch_samples_parsed', 'full_native_results_or_original_wrapper_parsed'],
+        'retire.py': ['Remove-Item -LiteralPath $targetPath -Force', 'Get-FileHash -LiteralPath $targetPath',
+            'Resolve-Path -LiteralPath', 'actual_retirement_accepted', 'preservation_guard_failure',
+            'native-retained-artifact-registry.v6', 'registry-retired.json']}
+    for name, tokens in predicates.items():
+        for token in tokens: m.need(token in texts[name], 'Reviewed retention predicate absent: ' + token)
+    calls = [node for tree in trees.values() for node in ast.walk(tree) if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == 'subprocess']
+    m.need(len(calls) == 1 and calls[0].func.attr == 'run', 'Exactly the reviewed fixed PowerShell action call is admitted')
+    m.need(manifest['native_retention_protected_prior_count'] == 21
+        and manifest['with_new_derivative_protected_count'] == 22
+        and manifest['only_new_target'] == 'clk06_reference_helper'
+        and manifest['future_proof_refs_runtime_only'] is True
+        and manifest['no_current_closure_or_production_PASS_claimed'] is True
+        and manifest['canonical_changes'] is False, 'Source preparation cannot admit retirement or guess success')
+    return originals
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', required=True)
+    args = parser.parse_args(); m.need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    started = m.utc(); own = m.ref(__file__); helper = m.ref(HELPER, HELPER_SHA)
+    manifest = m.read(MANIFEST); originals = inspect_sources(manifest)
+    out = m.path(args.output_dir, exists=False)
+    m.need(out.is_relative_to(m.BASE) and out != m.BASE and not out.exists(), 'Fresh ignored review output required')
+    m.finish(); out.mkdir(parents=True); reviewed = []
+    for index, original in enumerate(originals):
+        destination = out / (f'{index:02d}-' + original.name)
+        with destination.open('xb') as stream: stream.write(original.read_bytes())
+        archive = m.ref(destination)
+        m.need(archive['sha256'] == m.ref(original)['sha256'], 'Reviewed source copy differs')
+        reviewed.append({'historical_path': original.relative_to(ROOT).as_posix(), 'archive': archive})
+    archives = []
+    for name, original, declared in [('executed-source-reviewer.py', Path(__file__), own),
+        ('executed-metadata.py', HELPER, helper)]:
+        destination = out / name
+        with destination.open('xb') as stream: stream.write(original.read_bytes())
+        archive = m.ref(destination)
+        m.need(archive['sha256'] == declared['sha256'], 'Actual reviewer dependency copy differs')
+        archives.append(archive)
+    report = {'schema': SCHEMA, 'status': STATUS, 'review_started_utc': started,
+        'reviewed_source_manifest': MANIFEST, 'reviewed_sources': reviewed,
+        'executed_reader_source_archive': archives[0], 'executed_metadata_source_archive': archives[1],
+        'reviewer_source_path': own, 'metadata_utility': helper,
+        'reviewed_target_metadata_only': TARGET, 'reviewed_retained_derivative_metadata_only': DERIVATIVE,
+        'source_only_static_read_and_AST': True, 'reviewed_modules_imported_or_executed': False,
+        'target_or_protected_binaries_hashed_by_reader': False, 'retirement_or_admission_performed': False,
+        'scientific_execution_performed': False, 'numerical_result_payloads_read': False,
+        'future_proof_outcomes_or_hashes_guessed': False, 'canonical_files_changed': False, 'gates_updated': False,
+        'extra_quality_lineage_execution_stage_required': False,
+        'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header independently read Raw one-target retention metadata/action sources, not its reused native algorithms. Header authored earlier sky/helper/workflow/source-review code; own physics is not independently self-certified. Root and other authors review this recorder and Root alone performs actual execution.'}
+    m.finish(); report['review_completed_utc'] = m.utc()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(report, stream, ensure_ascii=True, indent=2, allow_nan=False); stream.write('\n')
+    m.finish(); print(json.dumps(report, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__': main()

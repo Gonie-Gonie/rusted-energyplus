@@ -1,0 +1,10 @@
+    Weather::ExtWeatherVars wvarsMissing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa)
+                                          // | Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths)
+                                          // | Visibility (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth
+                                          // (cm) | Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
+    Weather::WeatherVarCounts wvarsMissedCounts;           // NOLINT(cert-err58-cpp)
+    Weather::WeatherVarCounts wvarsOutOfRangeCounts;       // NOLINT(cert-err58-cpp)
+    EPVector<Weather::DesignDayData> DesDayInput;          // Design day Input Data NOLINT(cert-err58-cpp)
+    Array1D<Weather::EnvironmentData> Environment;         // Environment data NOLINT(cert-err58-cpp)
+    Array1D<Weather::RunPeriodData> RunPeriodInput;        // NOLINT(cert-err58-cpp)
+    EPVector<Weather::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)

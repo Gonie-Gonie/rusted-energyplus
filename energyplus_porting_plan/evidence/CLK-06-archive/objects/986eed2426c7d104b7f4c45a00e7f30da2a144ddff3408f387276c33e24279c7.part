@@ -1,0 +1,274 @@
+"""Review held other-author sources as bytes/AST; never import reviewed code."""
+import argparse
+import ast
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-06'
+WORKFLOW = {'path': '.runtime/porting/CLK-06/workflow-prep-03/manifest.json',
+            'sha256': '150b0c19f1ea8777c28b1ba3eda258fc1a19b5ee7965f350d11c7273d31e2f0c'}
+CATALOGUE = {'path': '.runtime/porting/CLK-06/input-design-prep-02/manifest.json',
+             'sha256': '2e4f6fec8e3e863bc6294661c337daffd64cf83b0852661f0ff1da40d2cd3f73'}
+NATIVE = {'path': '.runtime/porting/CLK-06/native-prep-01/manifest.json',
+          'sha256': '0261e5932c81dbe4daa8760a53f5366f4436905c4f93678a296fdc88ad3bdce1'}
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+            'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+TRANSPORT = {'path': '.runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json',
+             'sha256': 'd05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c'}
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+FIELDS = ['SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover']
+CURRENT_UNPAIRED = ['weather.HorizIRSky', 'environment.SkyTemp', 'environment.SkyTempKelvin',
+                    'environment.TotalCloudCover', 'environment.OpaqueCloudCover']
+ROLES = ['owned_context_receipt', 'run_period_weather_sampler_return', 'run_period_report_accumulator',
+         'run_period_report_hourly_output', 'physical_exterior_balance_ingress',
+         'physical_resolved_longwave_argument', 'report_recomputed_longwave_argument']
+SEEN = {}
+
+
+def need(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def contained(value, exists=True):
+    raw = Path(value)
+    item = (raw if raw.is_absolute() else ROOT / raw).resolve(strict=exists)
+    need(item != ROOT and item.is_relative_to(ROOT), 'Contained source/input metadata required')
+    return item
+
+
+def reference(value, expected=None):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    item = contained(raw)
+    need(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+         'Regular non-reparse source/input required')
+    need(item.suffix.lower() in {'.py', '.json', '.md', '.idf', '.epw', '.rs', '.cpp', '.cc', '.hh', '.txt', '.log'}
+         and info.st_size <= 16_000_000, 'Only bounded sources and declared inputs; no binaries/results')
+    with item.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    need(expected is None or digest == expected, 'Held source/input SHA differs: ' + str(item))
+    need(SEEN.setdefault(item, digest) == digest, 'Previously consumed bytes changed')
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def verify(binding):
+    need(type(binding) is dict and type(binding.get('path')) is str and type(binding.get('sha256')) is str,
+         'Typed file binding required')
+    ref = reference(binding['path'], binding['sha256'])
+    item = contained(ref['path'])
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            need(type(binding[key]) is int and item.stat().st_size == binding[key], 'Bound size differs')
+    if 'line_count' in binding:
+        need(type(binding['line_count']) is int and len(item.read_bytes().splitlines()) == binding['line_count'],
+             'Bound physical line count differs')
+    return item
+
+
+def read(binding):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            need(key not in result, 'Duplicate JSON key')
+            result[key] = value
+        return result
+    return json.loads(verify(binding).read_bytes(), object_pairs_hook=pairs,
+                      parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Nonstandard JSON ' + value)))
+
+
+def exact(a, b):
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(exact(a[key], b[key]) for key in a)
+    if isinstance(a, (list, tuple)):
+        return len(a) == len(b) and all(exact(x, y) for x, y in zip(a, b))
+    return a.hex() == b.hex() if type(a) is float else a == b
+
+
+def literal(tree, name):
+    values = [node.value for node in tree.body if isinstance(node, ast.Assign)
+              and any(isinstance(target, ast.Name) and target.id == name for target in node.targets)]
+    need(len(values) == 1, 'Unique literal source declaration required: ' + name)
+    return ast.literal_eval(values[0])
+
+
+def range_bytes(source, first, last):
+    lines = source.read_bytes().splitlines(keepends=True)
+    need(type(first) is int and type(last) is int and 1 <= first <= last <= len(lines), 'Typed source range differs')
+    return b''.join(lines[first - 1:last])
+
+
+def unchanged():
+    for item, digest in list(SEEN.items()):
+        reference(item, digest)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', required=True)
+    args = parser.parse_args()
+    need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    started = now()
+    out = contained(args.output_dir, exists=False)
+    need(out.is_relative_to(BASE) and out != BASE and not out.exists(), 'Fresh ignored output required')
+    workflow, catalogue, native, decision, transport = [read(ref) for ref in [WORKFLOW, CATALOGUE, NATIVE, DECISION, TRANSPORT]]
+    need(workflow['schema'] == 'clk06-freeze-workflow-source-preparation.v1'
+         and catalogue['schema'] == 'clk06-input-catalogue-source-preparation.v1'
+         and native['schema'] == 'clk06-native-helper-source-preparation.v1', 'Held preparation schemas differ')
+    need(workflow['catalogue_manifest'] == CATALOGUE and workflow['native_source_manifest'] == NATIVE
+         and workflow['production_transport_source_inventory'] == TRANSPORT, 'Held manifest interface differs')
+    rows = [*workflow['own_sources'], *catalogue['own_sources'], *native['own_sources'], *native['included_sources']]
+    need(len(rows) == len({row['path'] for row in rows}) == 12
+         and exact(rows, workflow['required_reviewed_sources']), 'Exact12 own/dependency sources required')
+    texts, trees = {}, {}
+    for row in rows:
+        source = verify(row)
+        texts[source.name] = source.read_text(encoding='utf8')
+        if source.suffix == '.py':
+            trees[source.name] = ast.parse(texts[source.name], filename=row['path'])
+    need(set(trees) == {'common.py', 'packet_policy.py', 'freeze_packet.py', 'catalog.py', 'write_inputs.py'},
+         'Exact five Python sources parsed without execution')
+    for owner in [workflow, catalogue, native]:
+        need(owner['root_preoutput_decision'] == DECISION, 'Same Root decision must bind every source package')
+        for key in ['actual_scope_amendment', 'actual_scope_amendment_execution']:
+            verify(owner[key])
+    historical = {name: literal(trees['common.py'], 'HISTORICAL_CONTROL_' + suffix)
+                  for name, suffix in [('review', 'REVIEW'), ('execution', 'EXECUTION'), ('current_pinned_reader_source', 'READER')]}
+    for binding in historical.values():
+        verify(binding)
+    old_review, old_record = read(historical['review']), read(historical['execution'])
+    need(old_review['schema'] == 'clk05-independent-production-control-input-review.v1'
+         and 'executed_reader_source_archive' not in old_review
+         and old_review['scientific_values_compared'] is False
+         and old_review['numerical_comparison_count'] is None and old_review['numerical_mismatch_count'] is None
+         and old_review['numerical_PASS_claimed'] is False
+         and old_record['schema'] == 'recorded-porting-command.v1'
+         and type(old_record['exit_code']) is int and old_record['exit_code'] == 0
+         and old_record['source_bytes_match_before_and_after'] is True
+         and exact(read(old_record['stdout']), old_review), 'Genuine older control review protocol differs')
+    historical.update(historical_report_has_executed_reader_archive=False,
+                      current_source_is_a_retroactive_executed_archive=False,
+                      historical_report_or_receipt_rewritten=False)
+    profiles = literal(trees['packet_policy.py'], 'PROFILES')
+    need(decision['schema'] == 'clk06-root-preoutput-scope-decisions.v1'
+         and exact(decision['numeric_profiles'], profiles) and exact(decision['selected_day_carriers'], FIELDS)
+         and exact(decision['native_only_unpaired_globals'], CURRENT_UNPAIRED)
+         and decision['Rust_current_global_owner_extension_authorized_for_this_card'] is False
+         and decision['SkyTempKelvin_cross_engine_profile_admitted'] is False
+         and decision['scientific_execution_performed'] is False
+         and decision['packet_projection_or_precision_freeze_performed'] is False, 'Pre-output owner/profile boundary differs')
+    expected_profiles = {'ESky': {'unit': '1', 'atol': 2e-15, 'rtol': 0.0},
+        'SkyTemp': {'unit': 'degC', 'atol': 1e-12, 'rtol': 1e-15},
+        'HorizIRSky': {'unit': 'W_per_m2', 'atol': 1e-12, 'rtol': 1e-15}}
+    for key in ['cloud_drivers', 'stored_interpolation_weights', 'owned_value_copies']:
+        expected_profiles[key] = {'comparison': 'scalar_bits_and_class_exact', 'atol': 0.0, 'rtol': 0.0}
+    need(exact(profiles, expected_profiles), 'Exact separately named Root six profiles required')
+    canaries = [('DRY-POSZERO-DEW-NEGZERO', 0.0, -0.0, 0.5), ('DRY-NEGZERO-DEW-POSZERO', -0.0, 0.0, 0.5),
+        ('BOTH-POSZERO', 0.0, 0.0, 0.5), ('BOTH-NEGZERO', -0.0, -0.0, 0.5),
+        ('DRY-NEGZERO-MIN', -0.0, 10.0, 0.5), ('DEW-NEGZERO-MIN', 10.0, -0.0, 0.5),
+        ('RH-FRACTION-INPUT', 20.0, 10.0, 0.5), ('RH-PERCENT-INPUT', 20.0, 10.0, 50.0)]
+    need(exact(literal(trees['catalog.py'], 'DIRECT_ARGUMENT_CANARIES'), canaries)
+         and texts['catalog.py'].count('for name, dry, dew, rh in DIRECT_ARGUMENT_CANARIES:') == 2,
+         'Both direct APIs must preserve signed-zero/min-tie/RH literal inputs')
+    predicates = {
+        'freeze_packet.py': ['Exact declared12 helper/writer/dependency sources required', 'review_execution', "request['requested_counts']", 'finish_guards()',
+            "'source_files': source['source_files']", 'root_preoutput_decision', 'source_review'],
+        'packet_policy.py': ["'numeric_profiles':", "'paired_native_current_globals': []", "'default_model_must_be_actual_prepared_and_selected_not_forced': True",
+            "'native_private_hourly_or_calcSky_ESky_locals_observed': False", 'physical_resolved_longwave_argument',
+            'Full_and_Summary_actual_observation_paths_and_event_limits_authenticated_before_CLI'],
+        'write_inputs.py': ['production_input_only_caller_history', "'A-24H'", 'for binding in guards:', 'root_preoutput_decision'],
+        'clk06_reference_helper.cpp': ['Weather::CalcSkyEmissivity(', 'Weather::calcSky(', 'Weather::InitializeWeather(', 'Weather::SetCurrentWeather(',
+            'Weather::GetNextEnvironment(', 'admit_sky_environment', 'source_fatal', 'DayOfSimChr'],
+        'clk06_reference_fields.hh': ['"native_current_sky_globals_paired", false', '"private_hourly_ESky_or_branch_locals_observed", false',
+            'sky(w.wvarsHrTsToday(g.TimeStep, g.HourOfDay))', 'Clk03::snapshot(state)'],
+        'clk06_reference_admission.hh': ['root_preoutput_decision', 'emissivity_cases', 'SetCurrentWeather', 'calcSky', 'all_45_guard_refs']}
+    for name, tokens in predicates.items():
+        need(all(token in texts[name] for token in tokens), 'Full-read interface predicate differs: ' + name)
+    proposal = read(workflow['historical_scope_authority'])
+    need(proposal['energyplus_commit'] == PIN and len(proposal['source_ranges']) == 50, 'Primary source authority differs')
+    for row in proposal['source_ranges']:
+        data = range_bytes(verify(row['source']), row['start_line'], row['end_line'])
+        need(hashlib.sha256(data).hexdigest() == row['range_sha256'], 'Exact primary byte range differs')
+    scope = read(workflow['fixed_scope'])
+    guards = [case[key] for case in scope['cases'] for key in ['input', 'weather', 'metadata']]
+    need(len(scope['cases']) == 15 and len(guards) == 45 and exact(guards, proposal['literal_all_45_guard_refs']),
+         'Literal ordered15/45 CON input admission differs')
+    for binding in guards:
+        verify(binding)
+    for case in scope['cases']:
+        body = re.sub(r'![^\r\n]*', '', verify(case['input']).read_text(encoding='utf-8-sig'))
+        names = [item.split(',', 1)[0].strip().casefold() for item in body.split(';') if item.strip()]
+        need('weatherproperty:skytemperature' not in names, 'Declared default-model IDF admission changed')
+    verify(workflow['production_input_only_caller_history'])
+    need(transport['schema'] == 'clk06-production-transport-source-inventory.v1'
+         and transport['Root_preoutput_decision'] == DECISION and transport['required_role_names'] == ROLES
+         and transport['source_count'] == len(transport['source_rows']) == 9 and transport['range_count'] == 15,
+         'Required transport source inventory differs')
+    for binding in transport['files']:
+        verify(binding)
+    count = 0
+    for row in transport['source_rows']:
+        source, archive = verify(row['source']), verify(row['archive'])
+        need(row['historical_path'] == row['source']['path'] and source.read_bytes() == archive.read_bytes(),
+             'Current transport source differs from actual archived boundary')
+        for selected in row['selected_ranges']:
+            need(range_bytes(source, selected['first_line'], selected['last_line']) == verify(selected['archive']).read_bytes(),
+                 'Actual transport source range differs')
+            count += 1
+    need(count == 15, 'Exact15 transport ranges required')
+    unchanged()
+    out.mkdir(parents=True)
+    (out / 'source').mkdir()
+    copies = []
+    for index, row in enumerate(rows):
+        destination = out / 'source' / (f'{index:02}-' + Path(row['path']).name)
+        with destination.open('xb') as stream:
+            stream.write(verify(row).read_bytes())
+        copies.append({'historical_path': row['path'], 'archive': reference(destination, row['sha256'])})
+    own = out / 'executed-source-reviewer.py'
+    with own.open('xb') as stream:
+        stream.write(Path(__file__).read_bytes())
+    result = {'schema': 'clk06-independent-preexecution-source-review.v1', 'status': 'pass-source-input-policy-before-freeze',
+        'review_started_utc': started, 'review_completed_utc': now(), 'reviewed_sources': copies,
+        'executed_reader_source_archive': reference(own), 'catalogue_manifest': CATALOGUE, 'native_source_manifest': NATIVE,
+        'reviewed_workflow_manifest': WORKFLOW, 'reviewed_transport_source_inventory': TRANSPORT,
+        'reviewed_root_preoutput_decision': DECISION, 'reviewed_actual_scope_amendment': workflow['actual_scope_amendment'],
+        'reviewed_actual_scope_amendment_execution': workflow['actual_scope_amendment_execution'],
+        'reviewed_historical_control_protocol_repair': historical,
+        'actual_reviewed_source_count': 12, 'actual_primary_byte_range_count': 50,
+        'actual_transport_source_count': 9, 'actual_transport_range_count': 15,
+        'actual_admitted_IDF_count': 15, 'actual_ordered_CON_guard_count': 45,
+        'strict_preoutput_numeric_profiles': profiles, 'paired_day_fieldset': FIELDS, 'native_only_unpaired_current_globals': CURRENT_UNPAIRED,
+        'requested_cardinality_must_be_derived_by_later_input_freezer': True,
+        'reviewed_modules_imported_or_executed': False, 'scientific_execution_performed': False,
+        'numeric_operands_evaluated_or_compared': False, 'inputs_emitted_or_frozen': False,
+        'new_Original_or_Rust_outputs_read': False, 'Git_process_or_engine_called_by_reviewer': False,
+        'canonical_files_or_gates_written': False, 'numerical_PASS_claimed': False,
+        'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header independently read new Baseline catalogue/freezer/policy and Raw helper/fields/admission. Header authored prior producer/helper/serializer and the scope/transport designs; this source identity/protocol review does not independently certify those earlier algorithms, own designs, future physics or numerical outcomes.',
+        'limits': ['Held catalogue01/workflow01/02/reviewer01 are preserved; catalogue02 coverage and workflow03 metadata protocol repair precede any input freeze or numerical output.',
+            'Current sky/cloud5 and SRC08 physics remain unpaired; native prepared model/useIR must be observed, not assigned as expected answers.',
+            'Seven actual production transport roles and adequate Full/Summary collection still require future reviewed hooks before CLI execution.',
+            'Root alone executes the separately reviewed input generator/freezer after actual metadata review0.']}
+    unchanged()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False)
+        stream.write('\n')
+    unchanged()
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

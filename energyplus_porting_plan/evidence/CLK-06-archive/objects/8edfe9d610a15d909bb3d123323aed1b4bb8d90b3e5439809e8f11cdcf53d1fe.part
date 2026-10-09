@@ -1,0 +1,214 @@
+"""Root-invoked approved byte archival only; no canonical or scientific writes."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import gzip
+import hashlib
+import io
+import json
+import re
+import stat
+import zlib
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-06'
+CAP, PART, PLAIN = 4_000_000, 3_500_000, 512_000
+SHA = re.compile(r'[0-9a-f]{64}')
+REQUIRED = {
+    'unit-comparison', 'unit-execution', 'unit-result-review', 'unit-review-execution',
+    'production-comparison', 'production-execution', 'production-result-review', 'production-review-execution',
+    'legacy-gap', 'legacy-gap-execution', 'original-reference', 'original-execution',
+    'original-data-review', 'original-data-review-execution',
+    'frozen-source', 'frozen-cases', 'frozen-tolerances', 'frozen-helper-request',
+    'frozen-observation-projection', 'frozen-native-admission', 'input-freeze', 'input-freeze-execution',
+    'unit-projection', 'unit-projection-execution', 'unit-source-review', 'unit-source-review-execution',
+    'production-projection', 'production-projection-execution',
+    'production-comparer-source-review', 'production-comparer-source-review-execution',
+    'production-workflow-source-review', 'production-workflow-source-review-execution',
+    'production-plan', 'production-plan-execution', 'production-matrix', 'production-matrix-execution',
+    'final-workspace-execution', 'final-clippy-execution', 'final-format-execution',
+    'final-source-quality-execution', 'final-structure-execution',
+    'actual-transport-applied-inventory', 'production-run-design', 'root-preoutput-decision', 'math-release'}
+OPTIONAL = {'native-build', 'native-build-execution', 'native-build-review', 'native-build-review-execution',
+    'candidate-build', 'candidate-execution', 'production-CLI-build', 'production-CLI-build-execution',
+    'existing-build', 'existing-execution', 'observer-inputs', 'observer-input-projection',
+    'existing-observer-inputs', 'existing-observer-input-projection', 'scope-amendment', 'scope-amendment-execution',
+    'math-applied-inventory', 'source-format-or-cleanup-proof', 'canonical-closure', 'canonical-closure-execution'}
+KNOWN_FAILURES = {
+    'independent-comparer-source-review-command-01': (1, '1351b5a09dee612be04cda1f2582130b8d01ee0f29119f8921101a1554d23b6e'),
+    'independent-frozen-contract-review-command-01': (1, 'adc9d5d6481ed868e3d8c8ccb81711a49495db82bd7f94df6a492f1dbe83cd3b'),
+    'independent-original-data-review-command-01': (1, '9ed44731500044cd13d324435d96185fe3663e01050a6e56cf98430231e1b25a'),
+    'structure-quality-command-01': (1, '42a0588ec754056da24ac22e71a1f159bb3903eeb156a58cabf713a18b41a79d'),
+    'weather-day-tests-command-01': (101, '85486269127da4b682d2cc14b6b3b81196b9d0a5dcec2b3ba8e3d61359c27a34'),
+    'workspace-test-command-01': (101, '0763f4a058b4d0216e0f94790f60dde365acc44d53959094bca79647a713a068'),
+    'workspace-test-command-02': (101, '5ba60ce2478b28e9755c715b65a70c377957d778e3905e6945760f02d5189e78'),
+}
+LOCAL_PATH = '.runtime/porting/CLK-06/original-execution-01/native-output/clk06-helper-results.json'
+INCIDENT_PATH = '.runtime/porting/CLK-06/source-quality-command-02/receipt.json'
+
+
+
+def need(ok, message):
+    if not ok: raise ValueError(message)
+
+
+def sha(body):
+    return hashlib.sha256(body).hexdigest()
+
+
+def regular(value):
+    raw = Path(value); raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat(); path = raw.resolve(strict=True)
+    need(path != ROOT and path.is_relative_to(ROOT) and stat.S_ISREG(info.st_mode)
+        and not getattr(info, 'st_file_attributes', 0) & 0x400,
+        'Contained regular non-reparse file required')
+    return path
+
+
+def bound(row, limit=64_000_000):
+    need(type(row) is dict and set(row) == {'path', 'sha256'} and type(row['path']) is str
+        and type(row['sha256']) is str and SHA.fullmatch(row['sha256']), 'Approved normalized path/SHA reference required')
+    path = regular(row['path'])
+    need(path.stat().st_size <= limit, 'Approved byte-copy scope exceeded before read/hash')
+    body = path.read_bytes()
+    need(sha(body) == row['sha256'], 'Approved original byte hash differs')
+    return path, body
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--plan', required=True, type=Path)
+    parser.add_argument('--approved-source-sha256', required=True)
+    parser.add_argument('--output-dir', required=True, type=Path)
+    args = parser.parse_args(); own = Path(__file__).read_bytes()
+    need(Path.cwd().resolve() == ROOT and sha(own) == args.approved_source_sha256,
+        'Root-reviewed exact archival source and repository cwd required')
+    plan_path = regular(args.plan); plan_bytes = plan_path.read_bytes(); plan = json.loads(plan_bytes)
+    need(plan['schema'] == 'clk06-selected-evidence-archive-plan.v1' and plan['ready_to_archive'] is True
+        and plan['pending_refs'] == [] and plan['canonical_gate_or_doc_writes_authorized'] is False,
+        'Complete approved byte-only plan required; pending proofs cannot become archived success')
+    writer, writer_bytes = bound(plan['archive_writer'])
+    need(writer == regular(__file__) and writer_bytes == own, 'Plan must bind the actually executed writer')
+    rows = plan['artifacts']; roles = [row['role'] for row in rows]
+    need(type(rows) is list and all(type(row) is dict and set(row) == {'role', 'binding'} for row in rows)
+        and len(roles) == len(set(roles)) and REQUIRED <= set(roles) <= REQUIRED | OPTIONAL,
+        'Only explicitly approved complete unique artifact roles admitted')
+    out = args.output_dir.resolve()
+    need(out != BASE and out.is_relative_to(BASE) and not out.exists(), 'Fresh ignored archive output required')
+    prepared = []; monitored = {plan_path: sha(plan_bytes), writer: sha(own)}
+    for row in rows:
+        path, body = bound(row['binding'])
+        need(path.is_relative_to(BASE) and path.suffix == '.json' and len(body) <= 64_000_000,
+            'Scoped approved medium/small JSON only; no raw stdout/native/binary copies')
+        prepared.append((row, body)); monitored[path] = sha(body)
+    inherited = plan['inherited_archives']
+    need(type(inherited) is list and len(inherited) <= 4, 'Bounded existing canonical archive references required')
+    for row in inherited:
+        path, body = bound(row, CAP)
+        need(path.is_relative_to(ROOT / 'energyplus_porting_plan/evidence') and path.name == 'archive.json'
+            and len(body) <= CAP, 'Only compact existing canonical archive manifests are inherited')
+        monitored[path] = sha(body)
+    local = plan['local_only_large_proofs']
+    need(type(local) is list and len(local) == 1 and local[0]['role'] == 'genuine-CLK06-native-results',
+        'The genuine native result stays local-only; no C4/C5 solar/sky recertification')
+    data_row = next(row for row in rows if row['role'] == 'original-data-review')
+    data = json.loads(bound(data_row['binding'])[1])
+    binding = local[0]['binding']; native = regular(binding['path'])
+    need(native == (ROOT / LOCAL_PATH).resolve() and binding == data['reviewed_results']
+        and type(local[0]['size_bytes']) is int and native.stat().st_size == local[0]['size_bytes']
+        and local[0]['rehashed_by_archiver'] is False,
+        'Local result must match genuine DataQA-reviewed identity/size without a new large rehash')
+    incident = plan['unrecorded_incidents']
+    need(type(incident) is list and len(incident) == 1 and incident[0] == {
+        'role': 'source-quality-command-02-before-child-race', 'absent_receipt_path': INCIDENT_PATH,
+        'receipt_available': False, 'child_execution_or_exit_proven': False,
+        'reported_cause': 'FileExists before recorder child launch', 'outcome': 'unknown-no-receipt'},
+        'Unrecorded source-quality race must not manufacture an execution receipt or exit')
+    need(not (ROOT / INCIDENT_PATH).exists(), 'Recorded successor must not be mislabeled as missing')
+    failures = plan['preserved_failures']; need(type(failures) is list, 'Typed actual failed recorder inventory required')
+    failure_paths = set()
+    for row in failures:
+        need(type(row) is dict and set(row) == {'role', 'receipt', 'actual_exit_code'}, 'Exact failure receipt row required')
+        path, body = bound(row['receipt'], 8_000_000); value = json.loads(body)
+        need(path.parent.parent == BASE and path.name == 'receipt.json' and path not in failure_paths
+            and value['schema'] == 'recorded-porting-command.v1' and type(value['exit_code']) is int
+            and value['exit_code'] != 0 and type(row['actual_exit_code']) is int
+            and value['exit_code'] == row['actual_exit_code'], 'Genuine unique failed recorder outcome required')
+        failure_paths.add(path); monitored[path] = sha(body)
+        if path.parent.name in KNOWN_FAILURES:
+            expected_exit, expected_sha = KNOWN_FAILURES[path.parent.name]
+            need(value['exit_code'] == expected_exit and sha(body) == expected_sha, 'Known failure was rewritten')
+        prepared.append(({'failure_role': row['role'], 'binding': row['receipt']}, body))
+        for stream in ['stdout', 'stderr']:
+            log, log_bytes = bound(value[stream], 16_000_000)
+            need(log.parent == path.parent and log.suffix == '.log', 'Only this failed recorder own logs admitted')
+            monitored[log] = sha(log_bytes)
+            prepared.append(({'failure_role': row['role'] + '/' + stream, 'binding': value[stream]}, log_bytes))
+    need({BASE / name / 'receipt.json' for name in KNOWN_FAILURES} <= failure_paths,
+        'All seven already known failures must be preserved')
+    for receipt in BASE.glob('*/receipt.json'):
+        receipt = regular(receipt); need(receipt.stat().st_size <= 8_000_000, 'Bounded recorder metadata required before read')
+        _, body = bound({'path': receipt.relative_to(ROOT).as_posix(), 'sha256': sha(receipt.read_bytes())}, 8_000_000)
+        value = json.loads(body)
+        if value.get('schema') == 'recorded-porting-command.v1' and type(value.get('exit_code')) is int and value['exit_code'] != 0:
+            need(receipt.resolve() in failure_paths, 'Additional already recorded failure omitted from approved plan')
+        monitored[receipt.resolve()] = sha(body)
+    sources = plan['source_archives']; need(type(sources) is list and len(sources) <= 1000, 'Bounded reviewed source list required')
+    seen = set()
+    for row in sources:
+        need(type(row) is dict and set(row) == {'historical_path', 'archive'} and type(row['historical_path']) is str,
+            'Typed historical source identity required')
+        path, body = bound(row['archive'], 1_000_000); identity = row['historical_path'], sha(body)
+        need(identity not in seen and Path(row['historical_path']).suffix in {'.py', '.cpp', '.cc', '.hh', '.h', '.rs', '.cmake', '.txt', '.diff', '.md'}
+            and len(body) <= 1_000_000, 'Unique small reviewed/executed source required')
+        seen.add(identity); prepared.append(({'source_owner': row['historical_path'], 'binding': row['archive']}, body))
+        monitored[path] = sha(body)
+    out.mkdir(); (out / 'objects').mkdir(); saved = {}; archived = []
+
+    def save(body):
+        original_sha = sha(body)
+        if original_sha in saved: return saved[original_sha]
+        encoding, payload = 'identity', body
+        if len(body) > PLAIN:
+            buffer = io.BytesIO()
+            with gzip.GzipFile(fileobj=buffer, mode='wb', filename='', mtime=0, compresslevel=9) as stream: stream.write(body)
+            payload = buffer.getvalue(); encoding = 'gzip'
+            need(payload[3] == 0 and payload[4:8] == b'\0' * 4 and gzip.decompress(payload) == body,
+                'Deterministic gzip must restore exact full original bytes')
+        payload_sha = sha(payload); parts = []; size = CAP if len(payload) <= CAP else PART
+        for index, offset in enumerate(range(0, len(payload), size)):
+            chunk = payload[offset:offset + size]
+            suffix = '.gz' if encoding == 'gzip' and len(payload) <= CAP else '.part'
+            name = payload_sha + ('' if len(payload) <= CAP else f'.{index:03d}') + suffix
+            path = out / 'objects' / name
+            with path.open('xb') as stream: stream.write(chunk)
+            need(path.read_bytes() == chunk and len(chunk) <= CAP, 'Stored archive object differs or exceeds4MB')
+            parts.append({'index': index, 'offset': offset, 'relative_path': path.relative_to(out).as_posix(),
+                'sha256': sha(chunk), 'size_bytes': len(chunk)})
+        storage = {'encoding': encoding, 'original_sha256': original_sha, 'original_size_bytes': len(body),
+            'stored_payload_sha256': payload_sha, 'stored_payload_size_bytes': len(payload), 'parts': parts}
+        saved[original_sha] = storage; return storage
+
+    for row, body in prepared: archived.append({**row, 'storage': save(body)})
+    for path, digest in monitored.items(): need(sha(regular(path).read_bytes()) == digest, 'Consumed bytes changed during archival')
+    result = {'schema': 'clk06-selected-byte-evidence-archive.v1', 'completed_utc': datetime.now(timezone.utc).isoformat(),
+        'approved_plan': {'path': plan_path.relative_to(ROOT).as_posix(), 'sha256': sha(plan_bytes)}, 'rows': archived,
+        'inherited_archives': inherited, 'local_only_large_proofs': local, 'history_notes': plan['history_notes'],
+        'preserved_failures': failures, 'unrecorded_incidents': incident,
+        'failure_logs_copied_without_parsing': True, 'missing_receipt_exit_invented': False,
+        'exact_decompressed_bytes_verified': True, 'original_bytes_rewritten_or_JSON_reserialized': False,
+        'gzip': {'mtime': 0, 'filename': '', 'compresslevel': 9, 'zlib_version': zlib.ZLIB_VERSION},
+        'individual_stored_artifact_max_bytes': CAP, 'unique_original_documents_and_sources': len(saved),
+        'unique_stored_payload_bytes': sum(row['stored_payload_size_bytes'] for row in saved.values()),
+        'native_binary_or_full_native_trace_copied': False, 'duplicate_success_stdout_copied': False,
+        'scientific_comparer_or_engine_Cargo_Git_executed': False, 'gates_updated': False,
+        'canonical_plan_card_evidence_changed': False, 'writer_source_sha256': sha(own)}
+    payload = (json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf8')
+    need(len(payload) <= CAP, 'Compact manifest exceeds4MB')
+    with (out / 'archive.json').open('xb') as stream: stream.write(payload)
+    print(json.dumps({'archive': {'path': (out / 'archive.json').relative_to(ROOT).as_posix(), 'sha256': sha(payload)},
+        'unique_objects': len(saved), 'stored_bytes': result['unique_stored_payload_bytes'],
+        'canonical_files_changed': False, 'scientific_execution_performed': False}))
+
+
+if __name__ == '__main__': main()

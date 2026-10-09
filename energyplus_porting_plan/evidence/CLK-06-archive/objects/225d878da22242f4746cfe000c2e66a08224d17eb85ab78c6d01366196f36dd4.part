@@ -1,0 +1,87 @@
+--- .runtime/porting/CLK-06/production-comparer-prep-01/proofs.py
++++ .runtime/porting/CLK-06/production-comparer-prep-02/proofs.py
+@@ -8,7 +8,7 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ UNIT = ROOT / '.runtime/porting/CLK-06/comparer-prep-02'
+-WORKFLOW = ROOT / '.runtime/porting/CLK-06/production-workflow-prep-03'
++WORKFLOW = ROOT / '.runtime/porting/CLK-06/production-workflow-prep-04'
+ OWN_NAMES = ['proofs.py', 'adapter.py', 'observations.py', 'freeze_projection.py', 'check_production.py']
+ UNIT_NAMES = ['common.py', 'numeric.py', 'state.py', 'history.py', 'metadata.py', 'freeze_projection.py', 'check_clk06.py']
+ WORKFLOW_NAMES = ['common.py', 'evidence.py', 'prepare_plan.py', 'run_production.py']
+@@ -20,6 +20,59 @@
+     'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+ TRANSPORT = {'path': '.runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json',
+     'sha256': 'd05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c'}
++SOURCE_ORIGIN_POLICY = {'schema': 'clk06-production-origin-source-policy.v1',
++    'source_bindings': [
++        {'path': 'crates/ep_run/src/pipeline.rs', 'sha256': 'ef62fd34a1b50de86d7fcc76cd9b67ab381f71c8347b1c8ff755c8aabd92dadc'},
++        {'path': 'crates/ep_runtime/src/heat_balance/state.rs', 'sha256': 'ce0fc15586ec35ef4709c24fba8133c2655bbfb8cd323bfbb41bff476c3497a1'},
++        {'path': 'crates/ep_runtime/src/runtime.rs', 'sha256': 'ef72c30f27655ffc19bd42e2c4d251c3cf351da5431ba71fe933684f112237f6'},
++        {'path': 'crates/ep_runtime/src/diagnostic_probes/heat_balance.rs', 'sha256': '2f6d91e55b65ed1ef375068ab101debd1d22b0a197a282f84446125768b0442a'},
++        {'path': 'crates/ep_runtime/src/heat_balance/algorithm.rs', 'sha256': 'dc00aef90374ca111ad94ced8925813eb024215510a4ccafac3595677b27d34f'},
++        {'path': 'crates/ep_runtime/src/ideal_loads/coupled_runtime.rs', 'sha256': 'f3ddcf038fb5c28102ebe6416367ba36be5c2622b81a123ed87c7513a9a3ad14'},
++        {'path': 'crates/ep_runtime/src/heat_balance/surface_balance.rs', 'sha256': '159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434'},
++        {'path': 'crates/ep_runtime/src/heat_balance/weather_driver.rs', 'sha256': 'c3de8d274556aaaeb474aab9e36f1c4589226d9fe9f40740d07ec049f80c8a0b'}],
++    'cases': {
++        'A-24H': {'runtime_route': 'hourly_samples_simplified_analytical',
++            'use_quick_outside_conduction': False, 'use_cached_exterior_report_terms': False,
++            'required_positive_ingress_origins': ['surface_solve', 'report_outside_face_recomputation'],
++            'required_zero_origin_keys': [], 'required_zero_event_kinds': [], 'uninvoked_origins_counted_as_PASS': False},
++        'A-72H': {'runtime_route': 'hourly_samples_simplified_analytical',
++            'use_quick_outside_conduction': False, 'use_cached_exterior_report_terms': False,
++            'required_positive_ingress_origins': ['surface_solve', 'report_outside_face_recomputation'],
++            'required_zero_origin_keys': [], 'required_zero_event_kinds': [], 'uninvoked_origins_counted_as_PASS': False},
++        'B-BOTH-24H': {'runtime_route': 'direct_zone_purchased_air_fixed_step',
++            'use_quick_outside_conduction': True, 'use_cached_exterior_report_terms': True,
++            'required_positive_ingress_origins': ['surface_solve'],
++            'required_zero_origin_keys': ['physical_exterior_balance_ingress/report_outside_face_recomputation',
++                'physical_resolved_longwave_argument/report_outside_face_recomputation',
++                'report_recomputed_longwave_argument/report_terms_recomputation'],
++            'required_zero_event_kinds': ['report_recomputed_longwave_argument'], 'uninvoked_origins_counted_as_PASS': False}}}
++
++
++def compiled_origin_policy(available, checked):
++    text = {}
++    for row in SOURCE_ORIGIN_POLICY['source_bindings']:
++        owner = row['path']
++        require(owner in available and available[owner]['sha256'] == row['sha256'],
++            'Compiled source for exact origin/config policy differs: ' + owner)
++        text[owner] = checked.check(available[owner]).read_text(encoding='utf8')
++    markers = {
++        'crates/ep_run/src/pipeline.rs': ['HeatBalanceSimulationOptions::hourly_samples(sample_count)',
++            'DirectZonePurchasedAirCoupledOptions::hourly_samples(sample_count)'],
++        'crates/ep_runtime/src/heat_balance/state.rs': ['zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,'],
++        'crates/ep_runtime/src/runtime.rs': ['options.zone_air_algorithm.runtime_config()'],
++        'crates/ep_runtime/src/diagnostic_probes/heat_balance.rs': ['_ => diagnostic_runtime_config(self)',
++            '_ => selector,', 'use_cached_exterior_report_terms: uses_cached_exterior_report_terms(feature)',
++            'A::SimplifiedAnalytical\n            | A::EnergyPlusAnalyticalProbe', 'uses_quick_outside_conduction(selector)\n        && !matches!('],
++        'crates/ep_runtime/src/heat_balance/algorithm.rs': ['use_quick_outside_conduction: true,',
++            'use_cached_exterior_report_terms: true,', 'CompatibilityHeatBalanceAlgorithm::SourceOrder1ZoneOpaqueCompat.runtime_config();'],
++        'crates/ep_runtime/src/ideal_loads/coupled_runtime.rs': ['let runtime_config = direct_zone_purchased_air_fixed_step_runtime_config();'],
++        'crates/ep_runtime/src/heat_balance/surface_balance.rs': ['if runtime_config.timestep.use_quick_outside_conduction {\n        return surface_state.outside_face_temperature_c;',
++            'if heat_balance_uses_cached_exterior_report_terms(runtime_config) {\n        return surface_state.outside_report_terms;',
++            'runtime_config.use_cached_exterior_report_terms'],
++        'crates/ep_runtime/src/heat_balance/weather_driver.rs': ['owned: Some(series.current_for(record_index, zone_timestep)?)']}
++    require(all(token in text[owner] for owner, tokens in markers.items() for token in tokens),
++        'Authenticated compiled A/B routing, config inheritance, early returns or propagated caller differs')
++    return SOURCE_ORIGIN_POLICY['cases']
+ 
+ 
+ def load(name, path):
+@@ -48,6 +101,7 @@
+             'owned_value_copies': 'SkyTemp/HorizIRSky use frozen same_owner_transport_copy bit/class profile',
+             'cloud_copy': 'Both cloud drivers use frozen exact cloud profile',
+             'physical_origins': ['surface_solve', 'report_outside_face_recomputation'],
++            'source_origin_policy': SOURCE_ORIGIN_POLICY,
+             'separate_report_origin': 'report_terms_recomputation', 'explicit_direct_test_origin_admitted': False,
+             'kernel_event_totals_are_timestep_solve_totals': False,
+             'hourly_aggregation': 'Retain typed += endpoints, continuity, divisor and actual pushed values; pair pushed-to-series copies',
+@@ -80,6 +134,7 @@
+     binding(review['reviewed_root_preoutput_decision'], DECISION, checked)
+     for path in sources():
+         checked.check(ref(path))
++    compiled_origin_policy({row['path']: row for row in SOURCE_ORIGIN_POLICY['source_bindings']}, checked)
+     return review, indexed, finish
+ 
+ 

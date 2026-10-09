@@ -1,0 +1,209 @@
+"""Source-selected sky/cloud storage/metadata only; no interpolation RHS."""
+from numeric import require, scalar, unavailable
+from common import normalized_path
+
+SKY = ['SkyTemp','HorizIRSky','TotalSkyCover','OpaqueSkyCover']
+CLOUD = ['TotalSkyCover','OpaqueSkyCover']
+CONTROLS = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+ALL_COUNTS = 'OutDryBulbTemp OutDewPointTemp OutRelHum OutBaroPress WindDir WindSpeed BeamSolarRad DifSolarRad TotalSkyCover OpaqueSkyCover Visibility Ceiling LiquidPrecip WaterPrecip AerOptDepth SnowDepth DaysLastSnow WeathCodes Albedo'.split()
+ALL_WEATHER = 'IsRain IsSnow OutDryBulbTemp OutDewPointTemp OutBaroPress OutRelHum WindSpeed WindDir SkyTemp HorizIRSky BeamSolarRad DifSolarRad Albedo WaterPrecip LiquidPrecip TotalSkyCover OpaqueSkyCover'.split()
+GLOBAL_BOOL = 'BeginSimFlag BeginEnvrnFlag BeginDayFlag BeginHourFlag BeginTimeStepFlag EndDayFlag EndHourFlag EndEnvrnFlag EndDesignDayEnvrnsFlag WarmupFlag DoWeathSim DoDesDaySim DoOutputReporting'.split()
+GLOBAL_INT = 'DayOfSim CalendarYear PreviousHour HourOfDay NumOfDayInEnvrn TimeStepsInHour TimeStep KindOfSim'.split()
+ENV_INT = 'DayOfYear DayOfYear_Schedule Year Month DayOfMonth DayOfWeek HolidayIndex DSTIndicator YearTomorrow MonthTomorrow DayOfMonthTomorrow DayOfWeekTomorrow HolidayIndexTomorrow TotDesDays CurEnvirNum RunPeriodStartDayOfWeek'.split()
+WEATHER_INT = 'Envrn NumOfEnvrn TotRunPers TotRunDesPers NumDataPeriods NumIntervalsPerHour NumSpecialDays LeapYearAdd RptDayType CurDayOfWeek curSimDayForEndOfRunPeriod'.split()
+WEATHER_BOOL = 'GetBranchInputOneTimeFlag GetEnvironmentFirstCall FirstCall WaterMainsParameterReport LastHourSet WeatherFileExists DatesShouldBeReset StartDatesCycleShouldBeReset Jan1DatesShouldBeReset RPReadAllWeatherData UseDaylightSaving UseSpecialDays DaylightSavingIsActive'.split()
+DAY_INT = 'DayOfYear DayOfYear_Schedule Year Month DayOfMonth DayOfWeek DaylightSavingIndex HolidayIndex'.split()
+DAY_REAL = ['SinSolarDeclinAngle', 'CosSolarDeclinAngle', 'EquationOfTime']
+GRID = ['allocated', 'time_steps', 'hours', 'ordering']
+HEADER = 'EPWHeaderTitle WeatherFileLocationTitle WeatherFileLatitude WeatherFileLongitude WeatherFileTimeZone WeatherFileElevation WFAllowsLeapYears EPWDaylightSaving EPWDST DST NumSpecialDays SpecialDays NumDataPeriods NumIntervalsPerHour DataPeriods SpecialDays_allocated DataPeriods_allocated LeapYearAdd EndDayOfMonth wvarsMissedCounts.WeathCodes'.split()
+STREAM_BOOL = ['is_open', 'good', 'eof', 'fail', 'bad', 'position_available']
+COMPACT = 'pre-execution declared compact unselected sky/cloud grid'
+
+
+def typed(row, keys, kind, label):
+    require(type(row) is dict and set(keys) <= set(row), 'Complete actual owner group required: ' + label)
+    for key in keys:
+        require(type(row[key]) is kind, 'Exact actual type required: ' + label + '/' + key)
+        if kind is int:
+            require(-(2**31) <= row[key] < 2**31, 'Native i32 domain required')
+
+
+def weather(row, label):
+    require(type(row) is dict and set(row) == set(ALL_WEATHER), 'All17 actual cache fields retained: ' + label)
+    typed(row, ALL_WEATHER[:2], bool, label)
+    for field in ALL_WEATHER[2:]:
+        scalar(row[field], label + '/' + field)
+
+
+def sky(row, label):
+    require(type(row) is dict and set(row) == set(SKY), 'Exact selected sky4 fields required: ' + label)
+    for field in SKY:
+        scalar(row[field], label + '/' + field)
+
+
+def grid(row, full, label):
+    typed(row, ['allocated', 'contents_available'], bool, label)
+    typed(row, ['time_steps', 'hours'], int, label)
+    require(row['ordering'] == 'hour-major,timestep-minor' and row['observed_fields'] == SKY,
+        'Actual sky/cloud grid order/selection differs')
+    require((row['time_steps'] in [1, 3, 4] and row['hours'] == 24) if row['allocated'] else
+        (row['time_steps'] == row['hours'] == 0), 'Actual allocation/dimensions differ')
+    require(row['contents_available'] is full, 'Declared full/compact grid projection differs')
+    if not full:
+        require(row['slots'] is None and row['unavailability_reason'] == COMPACT, 'Compact array must remain explicitly unavailable')
+        return
+    require(type(row['slots']) is list and len(row['slots']) == row['time_steps'] * row['hours'], 'Full sky/cloud grid cardinality differs')
+    for index, slot in enumerate(row['slots']):
+        require(type(slot) is dict and set(slot) == {'hour', 'time_step', 'value'}, 'Actual indexed sky/cloud slot required')
+        typed(slot, ['hour', 'time_step'], int, label)
+        require(slot['hour'] == index // row['time_steps'] + 1 and slot['time_step'] == index % row['time_steps'] + 1,
+            'Actual hour-major source slot order differs')
+        sky(slot['value'], label + '/' + str(index))
+
+
+def shape(row, full, label, mode):
+    require(type(row) is dict and row['native_internal_record_index_observed'] is False
+        and row['native_source_local_variables_observed'] is False, 'No native private index/local claims')
+    typed(row['global'], GLOBAL_BOOL, bool, label)
+    typed(row['global'], GLOBAL_INT, int, label)
+    typed(row['global'], ['DayOfSimChr', 'CalendarYearChr'], str, label)
+    scalar(row['global']['TimeStepZone'], label + '/TimeStepZone')
+    typed(row['environment'], ENV_INT, int, label)
+    typed(row['environment'], ['EndMonthFlag', 'EndYearFlag'], bool, label)
+    typed(row['environment'], ['EnvironmentName'], str, label)
+    typed(row['weather'], WEATHER_INT, int, label)
+    typed(row['weather'], WEATHER_BOOL, bool, label)
+    for field in ['ReadEPlusWeatherCurTime', 'TimeStepFraction', 'IsRainThreshold']:
+        scalar(row['weather'][field], label + '/weather/' + field)
+    for owner in ['today_variables', 'tomorrow_variables']:
+        typed(row[owner], DAY_INT, int, label)
+        for field in DAY_REAL:
+            scalar(row[owner][field], label + '/' + owner + '/' + field)
+    for owner in ['today_values', 'tomorrow_values']:
+        grid(row[owner], full, label + '/' + owner)
+    require(row['full_sky_grid_contents_available'] is full and row['full_17_field_grid_generation_parity_claimed'] is False,
+        'Actual sky/cloud-only grid observation scope differs')
+    for owner in ['last_hour', 'next_hour']:
+        weather(row[owner], label + '/' + owner)
+    missing = row['missing_values']
+    weather({key: missing[key] for key in ALL_WEATHER}, label + '/missing_values')
+    for field in ['Visibility', 'Ceiling', 'AerOptDepth', 'SnowDepth']:
+        scalar(missing[field], label + '/missing_values/' + field)
+    typed(missing, ['DaysLastSnow'], int, label)
+    for owner in ['missed_counts', 'out_of_range_counts']:
+        require(set(row[owner]) == set(ALL_COUNTS), 'All19 actual counters required')
+        typed(row[owner], ALL_COUNTS, int, label)
+    for field in ['Interpolation', 'SolarInterpolation']:
+        typed(row, [field + '_allocated'], bool, label)
+        require(type(row[field]) is list and (row[field + '_allocated'] or not row[field]), 'Actual stored array shape differs')
+        if row[field + '_allocated']:
+            require(len(row[field]) == row['global']['TimeStepsInHour'], 'Actual Setup array cardinality differs')
+        for index, value in enumerate(row[field]):
+            scalar(value, label + '/' + field + '/' + str(index))
+    observation = row['clk06_observation']
+    require(observation['private_hourly_ESky_or_branch_locals_observed'] is False
+        and observation['whole_other_current_physics_paired'] is False, 'No fabricated private/Current/night pairing')
+    controls = observation['caller_controls']
+    require(set(controls) == set(CONTROLS), 'Exactly four retained effective control fields required')
+    typed(controls, CONTROLS, bool, label)
+    require(observation['native_current_sky_globals_paired'] is False, 'Native current-sky globals remain unpaired')
+    if mode != 'native':
+        require(unavailable(observation['actual_sky_environment']), 'Absent Rust sky Environment must remain unavailable')
+        globals_ = observation['native_current_sky_globals']
+        require(set(globals_) == {'weather.HorizIRSky','environment.SkyTemp','environment.SkyTempKelvin',
+            'environment.TotalCloudCover','environment.OpaqueCloudCover'} and all(unavailable(x) for x in globals_.values()),
+            'Absent Rust current-sky globals must remain unavailable')
+    clock = observation['existing_current_context']['clock']
+    typed(clock, ['MinutesInTimeStep', 'SimTimeSteps'], int, label)
+    for field in ['TimeStepZoneSec', 'CurrentTime']:
+        scalar(clock[field], label + '/clock/' + field)
+    selected = observation['selected_today_sky_slot']
+    today, g = row['today_values'], row['global']
+    valid = today['allocated'] and 1 <= g['HourOfDay'] <= today['hours'] and 1 <= g['TimeStep'] <= today['time_steps']
+    require((selected is not None) is bool(valid), 'Actual selected slot availability/index differs')
+    if valid:
+        require(type(selected) is dict and set(selected) == {'hour', 'time_step', 'value'}, 'Selected sky/cloud slot identity required')
+        typed(selected, ['hour', 'time_step'], int, label)
+        require(selected['hour'] == g['HourOfDay'] and selected['time_step'] == g['TimeStep'], 'Actual selected Today index differs')
+        sky(selected['value'], label + '/selected_today_sky_slot')
+
+
+def snapshot(check, actual, native, label, full, mode, metadata=True):
+    shape(actual, full, label + '/Rust', mode); shape(native, full, label + '/native', 'native')
+    for field in ['Interpolation', 'SolarInterpolation']:
+        check.discrete(actual[field + '_allocated'], native[field + '_allocated'], label + '/' + field + '_allocated')
+        check.discrete(len(actual[field]), len(native[field]), label + '/' + field + '/length')
+        for index, (a, b) in enumerate(zip(actual[field], native[field])):
+            check.numeric(a, b, label + '/' + field + '/' + str(index), field)
+    for owner in ['today_values', 'tomorrow_values']:
+        for field in GRID:
+            check.discrete(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+        if full:
+            check.discrete(len(actual[owner]['slots']), len(native[owner]['slots']), label + '/' + owner + '/length')
+            for index, (a, b) in enumerate(zip(actual[owner]['slots'], native[owner]['slots'])):
+                check.discrete([a['hour'], a['time_step']], [b['hour'], b['time_step']], label + '/' + owner + '/' + str(index) + '/index')
+                for field in SKY:
+                    check.numeric(a['value'][field], b['value'][field], label + '/' + owner + '/' + str(index) + '/' + field, field)
+        else:
+            check.availability(None, None, label + '/' + owner + '/contents', False)
+    for owner in ['last_hour','next_hour','missing_values']:
+        for field in CLOUD:
+            check.numeric(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field, field)
+    for owner in ['missed_counts','out_of_range_counts']:
+        for field in CLOUD:
+            check.discrete(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+    check.discrete(actual['missed_counts']['WeathCodes'], native['missed_counts']['WeathCodes'], label + '/shared_parser_counter')
+    check.discrete(actual['weather']['LastHourSet'], native['weather']['LastHourSet'], label + '/LastHourSet')
+    for field in CONTROLS:
+        a, b = actual['clk06_observation']['caller_controls'][field], native['clk06_observation']['caller_controls'][field]
+        check.discrete(a, b, label + '/caller_controls/' + field)
+    for field in ['actual_sky_environment','native_current_sky_globals','existing_current_context']:
+        check.excluded(label + '/clk06_observation/' + field,
+            'Native default model/current5 and existing Current13 are passive context, no new CLK06 physical certification')
+    a, b = actual['clk06_observation']['selected_today_sky_slot'], native['clk06_observation']['selected_today_sky_slot']
+    if check.availability(a, b, label + '/selected_today_sky_slot'):
+        check.discrete([a['hour'], a['time_step']], [b['hour'], b['time_step']], label + '/selected_today_sky_slot/index')
+        for field in SKY:
+            check.numeric(a['value'][field], b['value'][field], label + '/selected_today_sky_slot/' + field, field)
+    if not metadata:
+        check.excluded(label + '/whole_native_constructor_or_preparation', 'Different public constructor/preparation observation phase', True, True)
+        return
+    for owner, fields in [('global', GLOBAL_BOOL + GLOBAL_INT + ['DayOfSimChr', 'CalendarYearChr', 'TimeStepZone']),
+        ('environment', ENV_INT + ['EndMonthFlag', 'EndYearFlag', 'EnvironmentName']),
+        ('weather', WEATHER_INT + WEATHER_BOOL + ['ReadEPlusWeatherCurTime', 'TimeStepFraction', 'IsRainThreshold'])]:
+        for field in fields:
+            check.exact_value(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+    for owner in ['today_variables', 'tomorrow_variables']:
+        for field in DAY_INT:
+            check.discrete(actual[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+    for field in ['TimeStepZoneSec', 'MinutesInTimeStep']:
+        check.exact_value(actual['clk06_observation']['existing_current_context']['clock'][field], native['clk06_observation']['existing_current_context']['clock'][field], label + '/clock/' + field)
+    for field in HEADER:
+        check.exact_value(actual['header'][field], native['header'][field], label + '/header/' + field)
+    for row in [actual['stream'], native['stream']]:
+        typed(row, STREAM_BOOL, bool, label)
+        require(row['position_available'] is (row['position_byte'] is not None), 'Real byte-position availability differs')
+        if row['position_byte'] is not None:
+            require(type(row['position_byte']) is int and row['position_byte'] >= 0, 'Actual byte position required')
+    for field in STREAM_BOOL + ['position_byte']:
+        check.discrete(actual['stream'][field], native['stream'][field], label + '/stream/' + field, field != 'position_byte')
+    check.discrete(normalized_path(actual['stream']['file_path']), normalized_path(native['stream']['file_path']), label + '/stream/file_path')
+    rows = [row for row in native['environments'] if row['KindOfEnvrn'] == 3]
+    require(len(rows) == 1, 'Sole original ordinary RunPeriod context required')
+    context = {key: rows[0][key] for key in ['CurrentCycle', 'SetWeekDays']}
+    check.discrete(actual['selected_environment_context'], context, label + '/selected_environment_context')
+
+
+def continuity(check, left, right, label):
+    # Existing observed owner history, never reconstruct omitted array contents.
+    for owner in ['last_hour', 'next_hour', 'missed_counts', 'out_of_range_counts', 'global', 'weather']:
+        check.exact_value(left[owner], right[owner], label + '/' + owner)
+    for owner in ['today_values', 'tomorrow_values']:
+        for field in GRID:
+            check.discrete(left[owner][field], right[owner][field], label + '/' + owner + '/' + field)
+        if left[owner]['contents_available'] and right[owner]['contents_available']:
+            check.exact_value(left[owner]['slots'], right[owner]['slots'], label + '/' + owner + '/slots')
+        else:
+            check.excluded(label + '/' + owner + '/slots', 'Declared compact boundary leaves full contents unobserved', False, False)
+    a, b = [row['clk06_observation']['selected_today_sky_slot'] for row in [left, right]]
+    check.exact_value(a, b, label + '/selected_today_sky_slot', not (a is None and b is None))

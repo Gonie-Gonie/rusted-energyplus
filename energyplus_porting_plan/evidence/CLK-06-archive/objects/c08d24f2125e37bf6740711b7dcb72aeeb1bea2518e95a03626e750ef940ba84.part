@@ -1,0 +1,5 @@
+    Real64 HrAngle = 0.0;            // Current Hour Angle
+    Real64 SolarAltitudeAngle = 0.0; // Angle of Solar Altitude (degrees)
+    Real64 SolarAzimuthAngle = 0.0;  // Angle of Solar Azimuth (degrees)
+    Real64 HorizIRSky = 0.0;         // Horizontal Infrared Radiation Intensity (W/m2)
+    Real64 TimeStepFraction = 0.0;   // Fraction of hour each time step represents

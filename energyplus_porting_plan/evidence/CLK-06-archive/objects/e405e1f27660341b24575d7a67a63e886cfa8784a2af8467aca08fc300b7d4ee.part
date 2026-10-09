@@ -1,0 +1,272 @@
+{
+  "schema": "clk06-input-source-policy-freeze.v1",
+  "status": "frozen-before-original-execution",
+  "started_utc": "2026-10-09T06:21:57.621427+00:00",
+  "completed_utc": "2026-10-09T06:22:00.459702+00:00",
+  "actual_writer_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CLK-06/workflow-prep-03/freeze_packet.py",
+    "--source-review",
+    ".runtime/porting/CLK-06/independent-preexecution-source-review-01/review.json",
+    "--source-review-execution",
+    ".runtime/porting/CLK-06/independent-preexecution-source-review-command-01/receipt.json",
+    "--catalogue-directory",
+    ".runtime/porting/CLK-06/input-design-prep-02",
+    "--catalogue-manifest",
+    ".runtime/porting/CLK-06/input-design-prep-02/manifest.json",
+    "--native-directory",
+    ".runtime/porting/CLK-06/native-prep-01",
+    "--native-source-manifest",
+    ".runtime/porting/CLK-06/native-prep-01/manifest.json",
+    "--scope-amendment",
+    ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+    "--scope-amendment-execution",
+    ".runtime/porting/CLK-06/scope-amendment-command-01/receipt.json",
+    "--prerequisite-closure",
+    ".runtime/porting/CLK-05/closure-01/closure-result.json",
+    "--prerequisite-closure-execution",
+    ".runtime/porting/CLK-05/closure-command-01/receipt.json",
+    "--registry",
+    ".runtime/porting/CLK-05/retirement-01/registry-retired.json",
+    "--retirement",
+    ".runtime/porting/CLK-05/retirement-01/retirement.json",
+    "--retirement-execution",
+    ".runtime/porting/CLK-05/retirement-command-01/receipt.json",
+    "--production-control-inputs",
+    ".runtime/porting/CLK-05/production-control-capture-01/production-control-inputs.json",
+    "--control-review",
+    ".runtime/porting/CLK-05/independent-control-input-review-01/review.json",
+    "--control-review-execution",
+    ".runtime/porting/CLK-05/independent-control-input-review-command-01/receipt.json",
+    "--output-dir",
+    ".runtime/porting/CLK-06/frozen-packet-01"
+  ],
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "helper_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "source_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-06/independent-preexecution-source-review-01/review.json",
+      "sha256": "5539135d82b924285d8af10a9091ba5c591ee0eb6d3e78ea47ef68d7fea55de6"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-06/independent-preexecution-source-review-command-01/receipt.json",
+      "sha256": "03c940d37405737fefb70e1d2dd8f50202f6c9afa13af8f454dfdb2830240e2c"
+    }
+  },
+  "production_control_review": {
+    "review": {
+      "path": ".runtime/porting/CLK-05/independent-control-input-review-01/review.json",
+      "sha256": "75a0975ed046dae492ca1b58ffba51c346f25038129ff37b88464ed7f673d45e"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/independent-control-input-review-command-01/receipt.json",
+      "sha256": "96c6b93e6c04aa9044720a8440e97a8fc5004f59877f4fff81758670bb74a2d2"
+    },
+    "reviewer_source_provenance": {
+      "historical_report_has_executed_reader_archive": false,
+      "current_pinned_historical_reader_source": {
+        "path": ".runtime/porting/CLK-05/control-input-review-prep-01/review_inputs.py",
+        "sha256": "07aef44be1fc507317ca0b3f10c19f94383934a2a032d51071945b2a0e29383e"
+      },
+      "current_source_is_a_retroactive_executed_archive": false,
+      "historical_report_or_receipt_rewritten": false
+    },
+    "historical_capture_is_not_current_child_environment_observation": true,
+    "recapture_and_equality_before_after_every_native_or_CLI_child_required": true
+  },
+  "actual_CLK05_prerequisite": {
+    "closure": {
+      "path": ".runtime/porting/CLK-05/closure-01/closure-result.json",
+      "sha256": "1a87c229c2b427432401580f5ad35747d0acf93f3d78617aa91e11676bff70ce"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-05/closure-command-01/receipt.json",
+      "sha256": "1e2e4ffd6dc044a48cae2d3a3fd860775f3cfd87f7e84aa99984a1379c67e6e8"
+    },
+    "historical_canonical_after": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "80428e00633469e9aa8311845ef04c56423e09970ec5b832022f6b23cf239af6"
+      },
+      {
+        "path": "energyplus_porting_plan/cards/CLK-05.md",
+        "sha256": "8a805cfde4459e56dc2426f85e83d0bf025d5897bf4c04c86a0ba898e7bfa544"
+      },
+      {
+        "path": "energyplus_porting_plan/evidence/CLK-05.json",
+        "sha256": "faf2e50516145ebec3060c245fc217a6b5c181c48b9ec986f2d04cd68999c8ef"
+      }
+    ],
+    "registry": {
+      "path": ".runtime/porting/CLK-05/retirement-01/registry-retired.json",
+      "sha256": "db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6"
+    },
+    "retirement": {
+      "path": ".runtime/porting/CLK-05/retirement-01/retirement.json",
+      "sha256": "c3304ededb906298ff85adffebc6c86b78747bfa6bc004ffce00f6d5010a5a3b"
+    },
+    "retirement_execution": {
+      "path": ".runtime/porting/CLK-05/retirement-command-01/receipt.json",
+      "sha256": "f1eeb6c3458bdd6488cb1a0f61d581f91e8c8537a3a09408c422e372f8fba912"
+    },
+    "historical_plan_after_not_claimed_current": true,
+    "large_retained_artifact_guard_is_separate_native_builder_prerequisite": true
+  },
+  "actual_CLK06_scope_amendment": {
+    "report": {
+      "path": ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+      "sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-06/scope-amendment-command-01/receipt.json",
+      "sha256": "e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b"
+    },
+    "plan": {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042"
+    },
+    "card": {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1"
+    }
+  },
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "production_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "executed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/00-common.py",
+        "sha256": "3c96ab0f566058ec3f0abd8658131592ec654c73cfd1990d1ece3f5f8b2ce1dd"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/workflow-prep-03/packet_policy.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/01-packet_policy.py",
+        "sha256": "028ea0dbd302d5818ac5489d73dfc680d81d7219a2f1a7404acf83c90d639a37"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/workflow-prep-03/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/02-freeze_packet.py",
+        "sha256": "3e1fac60624b2a2dcba01a5053389ac1beaf254f9e611879b971baad0c0afb49"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/input-design-prep-02/catalog.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/03-catalog.py",
+        "sha256": "c1d117f67db523a03038b4667933d4b3a191ff4f93c3043c1e7b3453896f9bb2"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/input-design-prep-02/write_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/04-write_inputs.py",
+        "sha256": "021dbc63223875703587159860b91ecb80c48ed27adfc217177fa45156c37833"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/native-prep-01/clk06_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/05-clk06_reference_helper.cpp",
+        "sha256": "0047ac0a71e880cebf7442c5293049b140887f86f45f19bb63814e53aaf83b4d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/native-prep-01/clk06_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/06-clk06_reference_fields.hh",
+        "sha256": "60c6115291f340c693ea733e7b2e80ea27b2476ae7e265cd9cecd43d90948453"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/native-prep-01/clk06_reference_admission.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/07-clk06_reference_admission.hh",
+        "sha256": "63c19de5263ed815d52de12bf45f4389b8c201de3dca8746d7a9f3414e74a53c"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_reference_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/08-clk03_reference_helper.cpp",
+        "sha256": "2f4fb94a04f0638016b2f458ad9a567fa8e201b57323663b7fd18cf4e21b9877"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk03_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/09-clk03_reference_fields.hh",
+        "sha256": "6c9c43a45921c29155b81a7f5a110a1f3a75ddf21937ea06bd62a56bfb93ba66"
+      }
+    },
+    {
+      "historical_path": "tools/porting/clk02_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/10-clk02_reference_fields.hh",
+        "sha256": "b4e886101d97651f99aec06b6d41610fd59147fe88c831c143eb12bf8729fe41"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-04/native-prep-03/clk04_reference_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/sources/11-clk04_reference_fields.hh",
+        "sha256": "861d9438886e177dde5eb3b7923e6a3ded372928ab35ea51aca79ac0f1882cb3"
+      }
+    }
+  ],
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "actual_numerical_operation_count": 0,
+  "all_45_CON_inputs_preserved": true,
+  "canonical_files_or_gates_written": false,
+  "scientific_execution_performed": false,
+  "source_hash_cycle_present": false,
+  "expected_values_or_exits_supplied": false
+}

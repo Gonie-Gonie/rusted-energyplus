@@ -1,0 +1,141 @@
+"""Unexecuted input-only CLK05 catalog: no interpolation or solar answers."""
+import struct
+
+STEPS = [1, 3, 4]
+POLICIES = ['Hour1', 'Hour24']
+CONTROL_KEYS = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation',
+                'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+COUNT_FIELDS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutRelHum', 'OutBaroPress',
+                'WindDir', 'WindSpeed', 'BeamSolarRad', 'DifSolarRad', 'TotalSkyCover',
+                'OpaqueSkyCover', 'Visibility', 'Ceiling', 'LiquidPrecip', 'WaterPrecip',
+                'AerOptDepth', 'SnowDepth', 'DaysLastSnow', 'WeathCodes', 'Albedo']
+WEATHER_REALS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum',
+                 'WindSpeed', 'WindDir', 'SkyTemp', 'HorizIRSky', 'BeamSolarRad',
+                 'DifSolarRad', 'Albedo', 'WaterPrecip', 'LiquidPrecip',
+                 'TotalSkyCover', 'OpaqueSkyCover']
+SENTINEL_ROWS = [('0', '-0.0'), ('-4', '-2'), ('9999', '47'), ('13', '9999'),
+                 ('9998.5', '9998.5'), ('10000', '10000'), ('41', '7'), ('-0.0', '0')]
+STORED_WEIGHTS = {
+    3: [['3fefffffffffffff', '3ff0000000000000', '3ff0000000000001'],
+        ['8000000000000000', '3fefffffffffffff', '3ff0000000000001']],
+    4: [['3fefffffffffffff', '3ff0000000000000', '3ff0000000000001', '0000000000000000'],
+        ['8000000000000000', '3ff0000000000001', '3fefffffffffffff', '3ff0000000000000']],
+}
+
+
+def bits(value):
+    return {'bits': struct.pack('>d', value).hex()}
+
+
+def families():
+    result = []
+    for pattern in ['CONSTANT', 'RAMP']:
+        for steps in STEPS:
+            for policy in POLICIES:
+                result.append({'id': f'{pattern}-{steps}-{policy.upper()}',
+                               'pattern': pattern, 'steps': steps, 'policy': policy, 'days': 1})
+    for steps in [3, 4]:
+        for policy in POLICIES:
+            result.append({'id': f'TWO-DAY-CACHE-{steps}-{policy.upper()}',
+                           'pattern': 'RAMP', 'steps': steps, 'policy': policy, 'days': 2})
+    for steps in STEPS:
+        for warnings in [False, True]:
+            result.append({'id': f'SENTINEL-{steps}-WARN-{int(warnings)}',
+                           'pattern': 'SENTINEL', 'steps': steps, 'policy': 'Hour24',
+                           'days': 1, 'warnings': warnings})
+    for steps in [3, 4]:
+        for control in CONTROL_KEYS[1:]:
+            result.append({'id': f'CONTROL-{steps}-{control}', 'pattern': 'RAMP',
+                           'steps': steps, 'policy': 'Hour24', 'days': 1, 'ignore': control})
+    result.append({'id': 'CONTROL-1-IgnoreSolarRadiation', 'pattern': 'RAMP',
+                   'steps': 1, 'policy': 'Hour24', 'days': 1, 'ignore': 'IgnoreSolarRadiation',
+                   'explicit_last_hour_input_canary': True})
+    for steps in [3, 4]:
+        for index, weights in enumerate(STORED_WEIGHTS[steps], 1):
+            result.append({'id': f'STORED-WEIGHTS-{steps}-{index}', 'pattern': 'RAMP',
+                           'steps': steps, 'policy': 'Hour24', 'days': 1,
+                           'stored_solar_interpolation_override': [{'bits': x} for x in weights]})
+    if len(result) != 33 or len({x['id'] for x in result}) != 33:
+        raise ValueError('Declared input catalog cardinality/IDs differ')
+    return result
+
+
+def controls(family):
+    value = {key: False for key in CONTROL_KEYS}
+    value['DisplayWeatherMissingDataWarnings'] = family.get('warnings', False)
+    if 'ignore' in family:
+        value[family['ignore']] = True
+    return value
+
+
+def caller_owned_seed(family):
+    missed = {name: 100 + index for index, name in enumerate(COUNT_FIELDS)}
+    ranges = {name: 300 + index for index, name in enumerate(COUNT_FIELDS)}
+    missed.update(BeamSolarRad=5, DifSolarRad=91)
+    ranges.update(BeamSolarRad=7, DifSolarRad=23)
+    next_hour = {name: bits(0.125 * (index + 1)) for index, name in enumerate(WEATHER_REALS)}
+    next_hour.update(IsRain=True, IsSnow=False)
+    next_hour['SkyTemp'] = {'bits': '8000000000000000'}
+    result = {'missed_counts': missed, 'out_of_range_counts': ranges, 'next_hour': next_hour}
+    if family.get('explicit_last_hour_input_canary', False):
+        last_hour = {name: bits(-0.25 * (index + 1)) for index, name in enumerate(WEATHER_REALS)}
+        last_hour.update(IsRain=False, IsSnow=True)
+        result['last_hour'] = last_hour
+    return result
+
+
+def preparation(steps):
+    if steps not in STEPS:
+        raise ValueError('Only declared1/3/4 clock inputs are admitted')
+    return {'lane': 'selected-prepared-environment', 'time_steps_per_hour': steps,
+            'TimeStepZone': bits(1.0 / steps), 'TimeStepFraction': bits(1.0 / steps),
+            'TimeStepZoneSec': bits(3600.0 / steps), 'MinutesInTimeStep': 60 // steps,
+            'whole_simulation_registration_claimed': False,
+            'genuine_calls': ['InputProcessor::processInput', 'SetupInterpolationValues',
+                              'OpenWeatherFile', 'CloseWeatherFile', 'ReadUserWeatherInput',
+                              'AllocateWeatherData', 'ResolveLocationInformation', 'CheckLocationValidity'],
+            'TimeStepFraction_assignment': 'after genuine SetupInterpolationValues, before OpenWeatherFile',
+            'positive_seconds_assignment': 'explicit caller input before whole SetCurrentWeather',
+            'BeginSimFlag': False, 'DoWeathSim': True, 'DoDesDaySim': False,
+            'GetEnvironmentFirstCall': False, 'GetBranchInputOneTimeFlag': False,
+            'WaterMainsParameterReport': False}
+
+
+def operations(family):
+    """Whole source boundary calls, without unused hourly Current invocations."""
+    result = [{'id': 'get-next-environment', 'kind': 'GetNextEnvironment',
+               'caller': {}, 'selected_observation': True}]
+    steps, days = family['steps'], family['days']
+    for day in range(1, days + 1):
+        caller = {'DayOfSim': day, 'DayOfSimChr': str(day), 'HourOfDay': 1,
+                  'TimeStep': 1, 'BeginSimFlag': False, 'BeginEnvrnFlag': day == 1,
+                  'BeginDayFlag': True, 'BeginHourFlag': True, 'BeginTimeStepFlag': True,
+                  'EndDayFlag': False, 'EndHourFlag': steps == 1,
+                  'EndEnvrnFlag': False, 'WarmupFlag': False}
+        if day != 1:
+            caller['PreviousHour'] = 24
+        result.append({'id': f'run-{day}-begin-day', 'kind': 'InitializeWeather',
+                       'caller': caller, 'selected_observation': True})
+    result.append({'id': 'end-environment', 'kind': 'InitializeWeather',
+                   'caller': {'DayOfSim': days, 'DayOfSimChr': str(days), 'HourOfDay': 24,
+                              'TimeStep': steps, 'PreviousHour': 23, 'BeginSimFlag': False,
+                              'BeginEnvrnFlag': False, 'BeginDayFlag': False,
+                              'BeginHourFlag': steps == 1, 'BeginTimeStepFlag': True,
+                              'EndHourFlag': True, 'EndDayFlag': True,
+                              'EndEnvrnFlag': True, 'WarmupFlag': False},
+                   'selected_observation': True})
+    return result
+
+
+def input_solar(family, month, day, hour):
+    """Only literal EPW input patterns; never evaluate an interpolated answer."""
+    if month == 6:
+        return '1700', '1900'  # Decoy day, independently distinguishable.
+    if day > family['days']:
+        return str(7000 + hour), str(7200 + 2 * hour)  # Different next-day canary.
+    if family['pattern'] == 'CONSTANT':
+        return '37.5', '11.25'
+    if family['pattern'] == 'SENTINEL' and hour <= len(SENTINEL_ROWS):
+        return SENTINEL_ROWS[hour - 1]
+    # Both ramps are inputs with different slopes, bases and second-day offsets.
+    return str(17 + 3 * hour + 211 * (day - 1)), str(5 + 7 * hour + 97 * (day - 1))

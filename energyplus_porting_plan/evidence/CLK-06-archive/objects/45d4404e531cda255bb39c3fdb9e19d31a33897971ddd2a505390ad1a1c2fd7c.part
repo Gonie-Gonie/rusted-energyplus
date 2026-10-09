@@ -1,0 +1,164 @@
+"""Authenticate six actual input-only files before build; no reviewed imports."""
+import argparse
+import hashlib
+import importlib.util
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+META = HERE / 'metadata.py'
+need_hash = '30ce3e60b0a527adae9b4aa66366150724f13f0c7b76e977c2c158609fa50f69'
+if hashlib.sha256(META.read_bytes()).hexdigest() != need_hash:
+    raise ValueError('Own stdlib-only metadata utility changed before import')
+spec = importlib.util.spec_from_file_location('clk06_frozen_review_metadata', META)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+m.ref(META, need_hash)
+m.ref(__file__)
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+            'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+COUNTS = {'setup_cases', 'emissivity_cases', 'weather_sequences', 'CalcSkyEmissivity', 'GetNextEnvironment',
+          'InitializeWeather', 'SetCurrentWeather', 'calcSky', 'weather_operations', 'total_operations'}
+
+
+def requested(request):
+    result = {key: 0 for key in COUNTS}
+    result.update(setup_cases=len(request['setup_cases']), emissivity_cases=len(request['emissivity_cases']),
+                  weather_sequences=len(request['weather_sequences']), CalcSkyEmissivity=len(request['emissivity_cases']))
+    identifiers = [row['id'] for key in ['setup_cases', 'emissivity_cases', 'weather_sequences'] for row in request[key]]
+    m.need(len(identifiers) == len(set(identifiers)) and all(type(x) is str for x in identifiers), 'Unique literal case IDs required')
+    for sequence in request['weather_sequences']:
+        m.need(type(sequence['time_steps_per_hour']) is int and sequence['time_steps_per_hour'] in [1, 3, 4], 'Declared source clock domain differs')
+        operations = sequence['operations']
+        m.need(len(operations) == len({row['id'] for row in operations}), 'Unique literal operation IDs required')
+        for row in operations:
+            m.need(row['kind'] in ['GetNextEnvironment', 'InitializeWeather', 'SetCurrentWeather', 'calcSky']
+                   and type(row['caller']) is dict, 'Unknown literal direct operation/caller')
+            result[row['kind']] += 1
+            result['weather_operations'] += 1
+    result['total_operations'] = result['setup_cases'] + result['emissivity_cases'] + result['weather_operations']
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['native-contract', 'freeze-receipt', 'freeze-execution', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    m.need(Path.cwd().resolve() == m.ROOT, 'Repository cwd required')
+    started = m.utc()
+    native_ref, freeze_ref = m.ref(args.native_contract), m.ref(args.freeze_receipt)
+    native, freeze, decision = m.read(native_ref), m.read(freeze_ref), m.read(DECISION)
+    m.need(native['schema'] == 'clk06-native-admission-contract.v1'
+           and freeze['schema'] == 'clk06-input-source-policy-freeze.v1'
+           and freeze['status'] == 'frozen-before-original-execution'
+           and m.same(freeze['native_admission_contract'], native_ref), 'Actual frozen admission/receipt protocol differs')
+    outer, record = m.recorded(args.freeze_execution, freeze, started)
+    m.need(m.instant(record['started_utc']) <= m.instant(freeze['started_utc'])
+           <= m.instant(freeze['completed_utc']) <= m.instant(record['finished_utc']), 'Actual freezer interval differs')
+    for key in ['scientific_execution_performed', 'canonical_files_or_gates_written', 'source_hash_cycle_present', 'expected_values_or_exits_supplied']:
+        m.need(freeze[key] is False, 'Input-only freeze boundary differs: ' + key)
+    m.need(type(freeze['actual_numerical_operation_count']) is int and freeze['actual_numerical_operation_count'] == 0,
+           'Only actual input-only emission may precede build')
+    saved = m.archives(freeze['executed_source_archives'], 12)
+    tails = [value for value in record['command'] if type(value) is str and Path(value).name == 'freeze_packet.py']
+    m.need(len(tails) == 1 and m.path(tails[0]).relative_to(m.ROOT).as_posix() in saved, 'Actual frozen writer source owner absent')
+    m.script(record, saved[m.path(tails[0]).relative_to(m.ROOT).as_posix()])
+    source_pair = native['source_review']
+    review_ref, review_outer, review = m.review(source_pair['review']['path'], source_pair['execution']['path'],
+        'clk06-independent-preexecution-source-review.v1', 'pass-source-input-policy-before-freeze', record['started_utc'])
+    m.need(m.same(review_ref, source_pair['review']) and m.same(review_outer, source_pair['execution'])
+           and m.exact(freeze['source_review'], source_pair), 'Actual pre-freeze review pair differs')
+    reviewed = m.archives(review['reviewed_sources'], 12)
+    m.need(set(saved) == set(reviewed) and all(m.verify(saved[key]).read_bytes() == m.verify(reviewed[key]).read_bytes() for key in saved),
+           'Executed twelve freezer sources differ from independently reviewed archives')
+    m.need(set(native['contracts']) == {'source', 'cases', 'tolerances'} and m.exact(native['contracts'], freeze['contracts']),
+           'Exactly three actual one-way contracts required')
+    contracts = {name: m.read(binding) for name, binding in native['contracts'].items()}
+    request, projection = m.read(native['helper_request']), m.read(native['projection'])
+    six = [*contracts.values(), request, projection, native]
+    m.need(len({m.verify(binding) for binding in [*native['contracts'].values(), native['helper_request'], native['projection'], native_ref]}) == 6,
+           'Six distinct actual input-only files required')
+    for item in six:
+        m.need(item['frozen_before_numerical_execution'] is True and item['scientific_execution_performed'] is False
+               and item['gates_updated'] is False and m.same(item['root_preoutput_decision'], DECISION), 'Six-file pre-output boundary differs')
+    for name, contract in contracts.items():
+        m.need(contract['schema'] == 'clk06-' + name + '-contract.v1' and contract['card'] == 'CLK-06', 'Wrong card contract schema')
+    m.need(request['schema'] == 'clk06-helper-cases.v1' and projection['schema'] == 'clk06-observation-projection.v1'
+           and request['energyplus_commit'] == native['energyplus_commit'] == '6f2e40d10250a105b49966baa24d843711e61048',
+           'Pinned genuine source request/projection differs')
+    m.need(m.exact(request['contracts'], {name: native['contracts'][name] for name in ['source', 'tolerances']})
+           and m.same(contracts['cases']['helper_request'], native['helper_request'])
+           and m.same(contracts['cases']['source'], native['contracts']['source'])
+           and m.same(contracts['cases']['tolerances'], native['contracts']['tolerances'])
+           and m.same(projection['helper_request'], native['helper_request'])
+           and m.exact(projection['contracts'], native['contracts']), 'Actual six-file one-way DAG differs')
+    counts = requested(request)
+    m.need(all(type(value) is int and value >= 0 for value in counts.values())
+           and all(m.exact(counts, item['requested_counts']) for item in [native, freeze, request, contracts['cases'], projection]),
+           'Literal requested counts must derive from actual arrays, not future invocation guesses')
+    production = [row for row in request['weather_sequences'] if row['lane'] == 'production-CON']
+    m.need([row['id'] for row in production] == ['A-24H', 'A-72H', 'B-BOTH-24H']
+           and m.exact(requested({'setup_cases': [], 'emissivity_cases': [], 'weather_sequences': production}),
+               {'setup_cases': 0, 'emissivity_cases': 0, 'weather_sequences': 3, 'CalcSkyEmissivity': 0,
+                'GetNextEnvironment': 3, 'InitializeWeather': 480, 'SetCurrentWeather': 480, 'calcSky': 0,
+                'weather_operations': 963, 'total_operations': 963}), 'Exact three production caller histories required')
+    scope = m.read(native['fixed_scope'])
+    guards = [row[key] for row in scope['cases'] for key in ['input', 'weather', 'metadata']]
+    m.need(len(scope['cases']) == 15 and len(guards) == 45
+           and all(m.exact(guards, item['all_45_guard_refs']) for item in [native, request, contracts['cases']]),
+           'Ordered all45 CON refs including legitimate weather duplicates required')
+    for binding in [*guards, *contracts['cases']['input_artifacts']]:
+        m.verify(binding)
+    m.need(m.exact(contracts['tolerances']['numeric_profiles'], decision['numeric_profiles'])
+           and m.exact(projection['native_observation_policy'], request['observation_policy'])
+           and m.exact(request['observation_policy'], contracts['source']['native_observation_policy'])
+           and request['observation_policy']['paired_native_current_globals'] == []
+           and m.exact(request['observation_policy']['native_only_current_globals'], decision['native_only_unpaired_globals'])
+           and projection['unavailable_counted_as_PASS'] is False and projection['original_results_supplied_to_Rust'] is False,
+           'Fixed pre-output numeric profile/native-only owner boundaries differ')
+    originals = {}
+    for row in contracts['source']['source_files']:
+        original, archive = m.verify(row['original']), m.verify(row['archive'])
+        m.need(row['path'] == row['original']['path'].removeprefix('.reference/energyplus-src/26.1.0/')
+               and row['sha256'] == row['original']['sha256'] and original.read_bytes() == archive.read_bytes(), 'Original whole-source aliases differ')
+        originals[row['path']] = original
+    for row in contracts['source']['source_ranges']:
+        lines = originals[row['path']].read_bytes().splitlines(keepends=True)
+        first, last = row['start_line'], row['end_line']
+        m.need(type(first) is int and type(last) is int and 1 <= first <= last <= len(lines)
+               and row['bytes_normalized'] is False and b''.join(lines[first - 1:last]) == m.verify(row['archive']).read_bytes(),
+               'Original exact source range archive differs')
+    m.need(m.exact(native['source_files'], contracts['source']['source_files'])
+           and m.same(native['production_transport_source_inventory'], review['reviewed_transport_source_inventory']), 'Bound native source/transport inventory differs')
+    for pair in [native['production_control_review']]:
+        qa = m.read(pair['review']); m.recorded(pair['execution']['path'], qa, record['started_utc'])
+        m.need(qa['status'] == 'pass-input-registration-and-captured-environment-before-original'
+               and m.same(qa['reviewed_control_inputs'], request['production_control_inputs']), 'Actual captured control review differs')
+        if qa['schema'] == 'clk05-independent-production-control-input-review.v1':
+            provenance = pair['reviewer_source_provenance']
+            m.need('executed_reader_source_archive' not in qa
+                   and provenance['historical_report_has_executed_reader_archive'] is False
+                   and provenance['current_source_is_a_retroactive_executed_archive'] is False
+                   and provenance['historical_report_or_receipt_rewritten'] is False,
+                   'Genuine historical control reader archive limitation must remain explicit')
+            m.verify(provenance['current_pinned_historical_reader_source'])
+    m.emit(args.output_dir, {'schema': 'clk06-independent-frozen-contract-review.v1',
+        'status': 'pass-frozen-input-source-policy-before-native-build', 'review_started_utc': started,
+        'reviewed_native_admission_contract': native_ref, 'reviewed_helper_request': native['helper_request'],
+        'reviewed_projection': native['projection'], 'reviewed_contracts': native['contracts'],
+        'reviewed_freeze_receipt': freeze_ref, 'reviewed_freeze_execution': outer,
+        'reviewed_source_review': review_ref, 'reviewed_source_review_execution': review_outer,
+        'reviewed_source_archives': freeze['executed_source_archives'],
+        'reviewed_control_review': native['production_control_review'], 'reviewed_root_preoutput_decision': DECISION,
+        'reviewed_transport_source_inventory': native['production_transport_source_inventory'],
+        'actual_requested_counts': counts, 'actual_ordered_guard_ref_count': 45,
+        'scientific_execution_performed': False, 'reviewed_modules_imported_or_executed': False,
+        'numerical_values_compared': False, 'numerical_PASS_claimed': False, 'canonical_files_or_gates_written': False,
+        'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header reviews actual frozen metadata and other-author input/native routing. Header authored prior producer/helper/build utilities and source/transport designs; no independent own-physics or numerical certification is claimed.'}, __file__)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,475 @@
+"""Authenticate completed production ledgers, without rerunning selected physics."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+COMMON_SHA = 'dbe62d325f20d0f6ee4e64038295248e798f8bcf07e0e67fd4c096b75147d7d4'
+if hashlib.sha256((HERE / 'common.py').read_bytes()).hexdigest() != COMMON_SHA:
+    raise ValueError('Held metadata source differs before import')
+from common import (CASES, DECISION, ENV, EXACT_FIELDS, FIELDS, GEO, KINDS, ORIGINS, OWNED, ROOT,
+    argument, execution, fact_binding, identity, m, metric_rows, metrics, review, script, source_rows, v)
+
+
+def origin_policy(selection):
+    policy = selection['transport_mask']['source_origin_policy']
+    ordinary = {'runtime_route': 'hourly_samples_simplified_analytical',
+        'use_quick_outside_conduction': False, 'use_cached_exterior_report_terms': False,
+        'required_positive_ingress_origins': ORIGINS, 'required_zero_origin_keys': [],
+        'required_zero_event_kinds': [], 'uninvoked_origins_counted_as_PASS': False}
+    coupled = {'runtime_route': 'direct_zone_purchased_air_fixed_step',
+        'use_quick_outside_conduction': True, 'use_cached_exterior_report_terms': True,
+        'required_positive_ingress_origins': ['surface_solve'],
+        'required_zero_origin_keys': [KINDS[5] + '/' + ORIGINS[1], KINDS[6] + '/' + ORIGINS[1],
+            KINDS[7] + '/report_terms_recomputation'],
+        'required_zero_event_kinds': [KINDS[7]], 'uninvoked_origins_counted_as_PASS': False}
+    m.need(set(policy) == {'schema', 'source_bindings', 'cases'}
+        and policy['schema'] == 'clk06-production-origin-source-policy.v1'
+        and m.exact(policy['cases'], {CASES[0]: ordinary, CASES[1]: ordinary, CASES[2]: coupled}),
+        'Exact source-derived A ordinary/B quick-cached policy required; no generic missing-origin allowance')
+    return policy
+
+
+def selection(report, started):
+    projection = m.read(report['comparison_projection'])
+    qa, qa_record = review(projection['source_review'], projection['source_review_execution'],
+        'clk06-independent-production-comparer-source-review.v1',
+        'pass-held-production-reader-and-frozen-input-policy-before-six-cli', started)
+    rows = projection['reader_sources']; reviewed = source_rows(qa['reviewed_sources'], 17)
+    frozen = source_rows(projection['reader_source_archives'], 17)
+    prior = source_rows(projection['reviewed_source_archives'], 17)
+    executed = source_rows(report['executed_reader_source_archives'], 17)
+    m.need(len(rows) == len({row['path'] for row in rows}) == 17
+        and set(reviewed) == set(frozen) == set(prior) == set(executed) == {row['path'] for row in rows},
+        'Exact reviewed/frozen/executed seventeen source owners required')
+    for row in rows:
+        m.need(m.check(row).read_bytes() == m.check(reviewed[row['path']]).read_bytes()
+            == m.check(frozen[row['path']]).read_bytes() == m.check(prior[row['path']]).read_bytes()
+            == m.check(executed[row['path']]).read_bytes(), 'Actual comparer source differs from pre-six-CLI review')
+    mains = [owner for owner in executed if owner.endswith('/check_production.py')]
+    m.need(len(mains) == 1, 'Unique actual production comparer required'); folder = Path(mains[0]).parent.as_posix()
+    own = {folder + '/' + name for name in ['proofs.py', 'adapter.py', 'observations.py', 'freeze_projection.py', 'check_production.py']}
+    m.need(own <= set(executed) and 'tools/porting/geo03_provenance.py' in executed, 'Actual own-five plus dependency required')
+    freeze = m.recorded(report['comparison_projection_execution'], {'production_comparison_projection': report['comparison_projection'],
+        'input_only_source_selection_freeze': True, 'scientific_execution_performed': False, 'gates_updated': False}, started)
+    script(freeze, executed[folder + '/freeze_projection.py'])
+    for flag, key in [('native-admission-contract', 'native_admission_contract'), ('source-review', 'source_review'),
+        ('source-review-execution', 'source_review_execution')]: argument(freeze, '--' + flag, projection[key])
+    identity(qa['reviewed_native_admission_contract'], projection['native_admission_contract'])
+    for key, expected in [('reviewed_run_design', projection['production_run_design']),
+        ('reviewed_transport_source_inventory', projection['production_transport_source_inventory']),
+        ('reviewed_root_preoutput_decision', DECISION)]: identity(qa[key], expected)
+    identity(report['independent_comparer_source_review'], projection['source_review'])
+    identity(report['independent_comparer_source_review_execution'], projection['source_review_execution'])
+    admission = m.read(projection['native_admission_contract']); native = m.read(admission['projection'])
+    request = m.read(admission['helper_request']); tolerances = m.read(admission['contracts']['tolerances'])
+    selected = projection['selection']; mask = selected['transport_mask']; decision = m.read(DECISION)
+    m.need(admission['schema'] == 'clk06-native-admission-contract.v1' and admission['frozen_before_numerical_execution'] is True
+        and set(admission['contracts']) == {'source', 'cases', 'tolerances'} and request['schema'] == 'clk06-helper-cases.v1'
+        and native['schema'] == 'clk06-observation-projection.v1', 'Genuine frozen native packet required')
+    for value in [admission, request, native]: identity(value['root_preoutput_decision'], DECISION)
+    m.need(projection['schema'] == 'clk06-production-comparison-projection.v1'
+        and projection['frozen_before_all_six_Rust_production_calls'] is True
+        and all(projection[key] is False for key in ['native_results_read_by_freezer', 'scientific_execution_performed',
+            'numeric_policy_changed', 'unavailable_counted_as_PASS', 'gates_updated'])
+        and m.exact(selected, report['selection']) and m.exact(selected['numeric_profiles'], tolerances['numeric_profiles'])
+        and m.exact(selected['numeric_profiles'], decision['numeric_profiles']) and len(tolerances['rows']) == 9
+        and m.exact(selected['numeric_rows'], tolerances['rows']) and m.exact(selected['numeric_criterion'], tolerances['criterion'])
+        and m.exact(selected['source_selection'], native['source_selection'])
+        and m.exact(selected['native_observation_policy'], request['observation_policy']), 'Frozen six profiles/source selection differ')
+    m.need(mask['cases'] == CASES and mask['trace_levels'] == ['Full', 'Summary']
+        and m.exact(mask['native_direct_calls'], {'GetNextEnvironment': 3, 'InitializeWeather': 480, 'SetCurrentWeather': 480, 'total': 963})
+        and mask['physical_origins'] == ORIGINS and mask['separate_report_origin'] == 'report_terms_recomputation'
+        and all(mask[key] is True for key in ['all_eight_actual_kind_ledgers_required', 'both_Full_and_Summary_required',
+            'any_truncation_is_incomplete', 'required_one_sided_absence_fails'])
+        and all(mask[key] is False for key in ['explicit_direct_test_origin_admitted', 'kernel_event_totals_are_timestep_solve_totals',
+            'hourly_mean_equals_individual_slot_claimed', 'native_hourly_report_RHS_reconstructed',
+            'deduplicate_actual_occurrences', 'unavailable_counted_as_PASS', 'numeric_policy_changed'])
+        and type(mask['both_null_unavailable_comparisons']) is int and mask['both_null_unavailable_comparisons'] == 0,
+        'Frozen owned-copy/conditional availability/unpaired phase boundary differs')
+    origin_policy(selected)
+    m.need(m.exact(projection['contracts'], admission['contracts']) and m.exact(report['contracts'], admission['contracts'])
+        and len(admission['all_45_guard_refs']) == 45 and m.exact(projection['all_45_guard_refs'], admission['all_45_guard_refs']),
+        'Actual native six packet and ordered forty-five scope differ')
+    for actual, expected in [(projection['native_request'], admission['helper_request']),
+        (projection['native_observation_projection'], admission['projection']), (projection['fixed_scope'], admission['fixed_scope']),
+        (projection['root_preoutput_decision'], DECISION), (report['root_preoutput_decision'], DECISION),
+        (report['production_run_design'], projection['production_run_design']),
+        (report['production_transport_source_inventory'], admission['production_transport_source_inventory']),
+        (projection['production_transport_source_inventory'], admission['production_transport_source_inventory'])]: identity(actual, expected)
+    for row in [admission['fixed_scope'], *admission['contracts'].values(), *admission['all_45_guard_refs']]: m.check(row)
+    m.need(m.instant(qa_record['finished_utc']) <= m.instant(freeze['started_utc']) <= m.instant(projection['created_utc'])
+        <= m.instant(freeze['finished_utc']) and m.check(freeze['stderr']).stat().st_size == 0,
+        'Actual source review then projection freeze chronology differs')
+    return projection, admission, request, executed, mains[0], freeze
+
+
+def prerequisites(report, projection, admission, request, available, started):
+    refs = report['reviewed_evidence']
+    for key, expected in [('Native_admission_contract', projection['native_admission_contract']),
+        ('Native_request', admission['helper_request']), ('Native_projection', admission['projection']), ('Rust_build', report['Rust_build'])]:
+        identity(refs[key], expected)
+    qc, _ = review(refs['Original_data_review'], refs['Original_data_review_execution'],
+        'clk06-independent-original-data-review.v1', 'pass-preserved-original-data-before-Rust-baseline', started)
+    fact_binding(qc['reviewed_reference'], refs['Original_reference']); fact_binding(qc['reviewed_results'], refs['Native_results'])
+    identity(qc['reviewed_execution'], refs['Original_execution'])
+    for key, expected in [('reviewed_request', admission['helper_request']), ('reviewed_native_admission_contract', projection['native_admission_contract']),
+        ('reviewed_projection', admission['projection'])]: identity(qc[key], expected)
+    m.need(qc['intended_native_branch_coverage_complete'] is True and qc['actual_operation_invocations'] == request['requested_counts']['total_operations']
+        and qc['actual_operations_skipped'] == 0 and qc['numerical_PASS_claimed'] is False and qc['scientific_values_compared'] is False
+        and qc['source_unavailable_counted_as_PASS'] is False and m.exact(qc['reviewed_contracts'], admission['contracts'])
+        and m.exact(qc['reviewed_control_review'], admission['production_control_review']), 'Actual Original typed data proof differs')
+    m.recorded(refs['Original_execution'], {'reference': refs['Original_reference'],
+        'status': 'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review',
+        'actual_helper_exit_code': 0, 'actual_launcher_exit_code': 0}, started)
+    unit, unit_record = review(refs['candidate_unit_result_review'], refs['candidate_unit_result_review_execution'],
+        'clk06-independent-candidate-unit-result-review.v1', 'pass-authenticated-selected-unit-result-and-honest-unavailable-scope', started)
+    fact_binding(unit['reviewed_report'], refs['candidate_unit']); identity(unit['comparison_execution'], refs['candidate_unit_execution'])
+    identity(unit['Rust_build'], refs['candidate_build']); identity(unit['Rust_execution'], refs['candidate_execution'])
+    identity(unit['Original_data_review'], refs['Original_data_review']); fact_binding(unit['Native_reference'], refs['Original_reference'])
+    fact_binding(unit['Native_results'], refs['Native_results']); fact_binding(unit['preserved_existing_baseline_gap'], refs['baseline_gap'])
+    metric_rows(unit['field_error_metrics'], unit['categories'], FIELDS | {'ESky'})
+    m.need(unit['comparison_counts']['comparison_count'] > 0 and unit['comparison_counts']['mismatch_count'] == 0
+        and unit['unavailable_counted_as_PASS'] is False and unit['factual_result_only_no_new_numerical_certification'] is True
+        and m.exact(unit['actual_call_ledger']['requested_counts'], request['requested_counts'])
+        and m.exact(unit['actual_call_ledger']['actual_invocations'], {'native': request['requested_counts']['total_operations'], 'Rust': request['requested_counts']['total_operations']})
+        and m.exact(unit['actual_call_ledger']['actual_skips'], {'native': 0, 'Rust': 0}), 'Actual complete unit proof required')
+    gap_record = execution(refs['baseline_gap_execution'], started); compared = execution(refs['candidate_unit_execution'], started)
+    m.need(m.instant(qc['review_completed_utc']) <= m.instant(gap_record['started_utc']) <= m.instant(gap_record['finished_utc'])
+        <= m.instant(compared['started_utc']) <= m.instant(compared['finished_utc']) <= m.instant(unit['review_started_utc']),
+        'Original QC, preserved gap, unit and unit-result review chronology differs')
+    inventory = m.read(refs['applied_core_lineage']); identity(report['applied_core_inventory'], refs['applied_core_lineage'])
+    identity(inventory['unit_build'], refs['candidate_build'])
+    unit_build = m.read(refs['candidate_build']); snapshot = m.read(unit_build['source_snapshot'])
+    old = {row['historical_path']: row['archive'] for row in snapshot['files']}
+    m.need(len(old) == len(snapshot['files']) == unit_build['available_source_inventory_count']
+        and inventory['actual_unit_source_inventory_count'] == sum(owner.endswith('.rs') for owner in old), 'Rust/all-source inventory aliases differ')
+    hooks = m.read(inventory['reviewed_hooks_manifest']); test = m.read(inventory['reviewed_B_test_manifest'])
+    permitted = {row['path'] for row in hooks['changes']} | {row['target_path'] for row in hooks['new_sources']} | {test['canonical_path']}
+    applied = inventory['applied_sources']; indexed = {row['historical_path']: row for row in applied}
+    m.need(inventory['schema'] == 'clk06-root-applied-transport-source-inventory.v1' and len(applied) == len(indexed)
+        and set(indexed) == permitted and set(old) <= set(available)
+        and set(available) - set(old) == {row['target_path'] for row in hooks['new_sources']}
+        and inventory['all_other_unit_source_bytes_unchanged'] is True
+        and inventory['scientific_execution_performed'] is False and inventory['gates_updated'] is False,
+        'Actual Root application scope/source snapshot comparison differs')
+    for owner in set(old) - permitted: m.need(old[owner]['sha256'] == available[owner]['sha256'], 'Outside-scope source/config changed: ' + owner)
+    for owner, row in indexed.items():
+        m.need(row['before_unit_sha256'] == (old[owner]['sha256'] if owner in old else None)
+            and row['current_sha256'] == row['archive']['sha256'] == available[owner]['sha256'], 'Actual applied owner identity differs')
+        m.need(m.check(row['archive']).read_bytes() == m.check(available[owner]).read_bytes(), 'Actual applied byte copies differ')
+        m.check(row['format_diff'])
+    math_inventory = m.read(inventory['reviewed_math_inventory'])
+    for row in math_inventory['sources']:
+        owner = row['path']; m.need(old[owner]['sha256'] == row['sha256'], 'Unit core differs from reviewed math inventory')
+        if owner.endswith('/mod.rs'):
+            before, after = m.check(old[owner]).read_bytes(), m.check(available[owner]).read_bytes(); line = b'pub mod sky_transport_trace;\n'
+            m.need(after.count(line) == 1 and after.replace(line, b'', 1) == before, 'Module changed beyond passive declaration')
+        else: m.need(old[owner]['sha256'] == available[owner]['sha256'], 'Numerical core changed after actual unit proof')
+    return unit, unit_record
+
+
+def actual_matrix(report, admission, request, build, started, freeze, executed):
+    matrix = m.read(report['Rust_matrix']); plan = m.read(report['declared_plan']); refs = report['reviewed_evidence']
+    outer = execution(report['Rust_matrix_execution'], started)
+    m.need(matrix['schema'] == 'clk06-production-matrix.v1' and matrix['complete'] is True and matrix['all_bound_inputs_unchanged'] is True
+        and matrix['actual_command_count'] == 6 and m.exact(matrix['prerequisite_evidence'], refs)
+        and m.exact(plan['prerequisite_evidence'], refs) and m.exact(matrix['contracts'], admission['contracts'])
+        and m.exact(plan['contracts'], admission['contracts']), 'Actual complete matrix/frozen prerequisite identities differ')
+    for key in ['native_engine_executed', 'original_outputs_supplied_to_Rust', 'scientific_comparison_performed', 'numerical_PASS_claimed', 'gates_updated']:
+        m.need(matrix[key] is False, 'Ordinary actual CLI boundary differs')
+    for key, expected in [('declared_plan', report['declared_plan']), ('declared_plan_execution', report['declared_plan_execution']),
+        ('build', report['Rust_build']), ('native_admission_contract', refs['Native_admission_contract']),
+        ('production_comparison_projection', report['comparison_projection']), ('production_comparison_projection_execution', report['comparison_projection_execution']),
+        ('applied_core_inventory', report['applied_core_inventory'])]: identity(matrix[key], expected)
+    qa, qa_record = review(matrix['independent_sources_review'], matrix['independent_sources_review_execution'],
+        'clk06-independent-production-workflow-source-review.v1', 'pass-input-control-and-actual-CLI-provenance-before-production', started)
+    reviewed, archived = source_rows(qa['reviewed_sources'], 5), source_rows(plan['reader_source_archives'], 5)
+    m.need(set(reviewed) == set(archived) <= set(executed), 'Actual workflow reviewed/frozen scope differs')
+    for owner in reviewed: m.need(m.check(reviewed[owner]).read_bytes() == m.check(archived[owner]).read_bytes()
+        == m.check(executed[owner]).read_bytes(), 'Actually executed workflow source differs')
+    owners = {name: [owner for owner in reviewed if Path(owner).name == name] for name in ['run_production.py', 'prepare_plan.py']}
+    m.need(all(len(values) == 1 for values in owners.values()), 'Unique actual runner and plan writer required')
+    script(outer, reviewed[owners['run_production.py'][0]])
+    identity(report['independent_workflow_source_review'], matrix['independent_sources_review'])
+    identity(report['independent_workflow_source_review_execution'], matrix['independent_sources_review_execution'])
+    planned = m.recorded(report['declared_plan_execution'], {'plan': report['declared_plan'], 'input_only_freeze': True,
+        'physical_execution_performed': False, 'gates_updated': False}, started); script(planned, reviewed[owners['prepare_plan.py'][0]])
+    for record in [planned, outer]:
+        for flag, key in [('source-review', 'independent_sources_review'), ('source-review-execution', 'independent_sources_review_execution')]:
+            argument(record, '--' + flag, matrix[key])
+    for flag, key in [('plan', 'declared_plan'), ('plan-execution', 'declared_plan_execution')]: argument(outer, '--' + flag, matrix[key])
+    pairs = [('build', 'Rust_build'), ('original-data-review', 'Original_data_review'), ('original-data-review-execution', 'Original_data_review_execution'),
+        ('baseline-gap', 'baseline_gap'), ('baseline-gap-execution', 'baseline_gap_execution'), ('unit-comparison', 'candidate_unit'),
+        ('unit-comparison-execution', 'candidate_unit_execution'), ('unit-result-review', 'candidate_unit_result_review'),
+        ('unit-result-review-execution', 'candidate_unit_result_review_execution'), ('comparison-projection', 'production_comparison_projection'),
+        ('comparison-projection-execution', 'production_comparison_projection_execution'), ('applied-core-lineage', 'applied_core_lineage')]
+    for record in [planned, outer]:
+        for flag, key in pairs: argument(record, '--' + flag, refs[key])
+    m.need(plan['schema'] == 'clk06-production-plan.v1' and plan['frozen_before_Rust_production_numerical_execution'] is True
+        and m.instant(qa_record['finished_utc']) <= m.instant(planned['started_utc']) <= m.instant(plan['created_utc'])
+        <= m.instant(planned['finished_utc']) <= m.instant(outer['started_utc']) <= m.instant(matrix['started_utc'])
+        <= m.instant(matrix['finished_utc']) <= m.instant(outer['finished_utc'])
+        and m.instant(freeze['finished_utc']) <= m.instant(planned['started_utc']), 'Actual pre-six-CLI freeze/plan/runner chronology differs')
+    m.need([row['case_id'] for row in matrix['cases']] == [row['case_id'] for row in plan['cases']] == CASES, 'Exact three actual CON lanes required')
+    controls = {row['case_id']: row for row in m.read(request['production_control_inputs'])['cases']}
+    scope_cases = {row['id']: row for row in m.read(admission['fixed_scope'])['cases']}
+    lanes = {row['id']: row for row in request['weather_sequences'] if row['lane'] == 'production-CON'}
+    commands, outputs, lines = [], {}, ''
+    full_only = ['clk03-weather-day-production-trace.json', 'clk02-weather-production-trace.json', 'clock-calls.json', 'psy02-calls.json',
+        'psychrometrics-calls.json', 'zon01-initialization.json', 'compiled-geometry.json', 'geometry-consumers.json',
+        'geo02-geometry.json', 'geo02-geometry-operands.json', 'geo03-zone-volume.json']
+    for actual, case in zip(matrix['cases'], plan['cases'], strict=True):
+        label = case['case_id']; control = controls[label]
+        m.need(all(m.exact(case[key], scope_cases[label][key]) for key in ['scope', 'duration', 'input', 'weather', 'metadata'])
+            and m.exact(case['solar_controls'], lanes[label]['solar_controls']) and m.exact(case['solar_controls'], control['solar_controls'])
+            and m.exact(case['captured_environment_inputs'], control['captured_environment_inputs'])
+            and case['trace_levels'] == ['Full', 'Summary'], 'Actual plan must preserve native scope/control inputs')
+        m.need(all(m.exact(actual[key], case[key]) for key in ['case_id', 'scope', 'duration', 'input', 'weather', 'metadata']), 'Actual case differs')
+        for level in ['Full', 'Summary']:
+            item = actual[level]; directory = m.path(item['output_directory']); child = execution(item['command_receipt'], started)
+            m.need(directory not in outputs.values(), 'Distinct actual output directories required'); outputs[case['case_id'], level] = directory
+            expected = [str(m.check(build['binary'])), 'run', str(m.check(case['input'])), '--weather', str(m.check(case['weather'])),
+                '--output-dir', str(directory), '--mode', 'compatibility', '--partial', 'deny', '--trace-level', level.lower(), '--porting-scope', case['scope'].lower()]
+            m.need(m.exact(child['command'], expected) and m.exact(item['command'], expected) and item['spawn_error'] is None
+                and item['actual_recorder_exit_code'] == 0 and item['external_input_context_preserved'] is True
+                and item['terminated_CLI_process_internal_ENV_observed'] is False, 'Actual CLI argv/context differs')
+            for key in ['constructed_inherited_child_ENV', 'actual_parent_ENV_before_child', 'actual_parent_ENV_after_child', 'prospective_inherited_child_ENV_after_child']:
+                m.need(set(item[key]) == set(ENV) and m.exact(item[key], case['captured_environment_inputs']), 'Actual three ENV literals differ')
+            m.need(m.instant(matrix['started_utc']) <= m.instant(item['started_utc']) <= m.instant(child['started_utc'])
+                <= m.instant(child['finished_utc']) <= m.instant(item['finished_utc']) <= m.instant(matrix['finished_utc']), 'Actual child interval differs')
+            identity(child['source_snapshot'], build['source_snapshot'])
+            m.need(child['repository_before']['head'] == child['repository_after']['head'] == build['implementation_commit']
+                and child['repository_before']['worktree_clean'] is True and child['repository_after']['worktree_clean'] is True
+                and m.exact(child['executed_launcher'], build['actual_executed_recorder']), 'Actual child compiled identity differs')
+            artifacts = {m.check(row): row for row in item['artifacts']}
+            m.need(len(artifacts) == len(item['artifacts']) and set(artifacts) == {path.resolve() for path in directory.rglob('*') if path.is_file()}
+                and all(path.is_relative_to(directory) for path in artifacts), 'Complete unique actual output inventory required')
+            sky = directory / 'clk06_sky_transport_trace.json'; day = directory / full_only[0]
+            m.need(sky in artifacts and m.check(artifacts[sky]).stat().st_size > 0, 'Dedicated sky trace is required in both levels')
+            m.need(day in artifacts if level == 'Full' else not any(directory / name in artifacts for name in full_only), 'Old Full-only boundary differs')
+            summary = m.read(artifacts[directory / 'run-summary.json']); config = summary['config']
+            m.need(summary['status'] == 'success' and summary['exit_code'] == 0 and summary['source_order_gate']['matches'] is True
+                and summary['selected_algorithm_lane']['diagnostic_probe_used'] is False
+                and summary['support']['conformance_claim'] is False and config['mode'] == 'compatibility' and config['partial_policy'] == 'deny'
+                and config['trace_level'] == level.lower() and config['dry_run'] is False and config['hours'] is None
+                and config['oracle_baseline'] is False and config['compare_oracle'] is False and summary['oracle'] is None and summary['comparison'] is None
+                and summary['oracle_status'] == summary['compare_status'] == 'not-requested', 'Actual ordinary no-oracle run metadata differs')
+            m.need(summary['rust_runtime']['samples'] == (72 if case['duration'] == '72H' else 24), 'Actual duration differs')
+            if case['scope'] == 'B': m.need(summary['rust_runtime']['fixture_demand_injection_used'] is False
+                and type(summary['rust_runtime']['purchased_air_coupling_call_count']) is int and summary['rust_runtime']['purchased_air_coupling_call_count'] > 0, 'Real B coupling required')
+            else: m.need(summary['rust_runtime']['runtime_class'] == 'one-zone-heat-balance-compatibility'
+                and summary['rust_runtime']['fixture_demand_injection_used'] is None
+                and summary['rust_runtime']['purchased_air_coupling_call_count'] is None, 'A coupling must remain unavailable')
+            scope = m.read(artifacts[directory / 'porting_scope.json'])
+            m.need(scope['schema'] == 'porting-scope.v1' and scope['scope'] == case['scope'] and scope['admissible'] is True and scope['violations'] == [], 'Actual scope differs')
+            commands.append(item['command_receipt'])
+            # The parent does not PIPE/capture/relay nested recorder console output (runner165-167).
+            m.check(child['stdout']); m.check(child['stderr'])
+            lines += case['case_id'] + ' ' + level + ' actual_exit=0\n'
+    lines += json.dumps({'matrix': report['Rust_matrix'], 'actual_command_count': 6, 'complete': True}) + '\n'
+    m.need(m.check(outer['stdout']).read_text(encoding='utf8').splitlines() == lines.splitlines(), 'Full mixed matrix stdout protocol differs')
+    identity(outer['source_snapshot'], build['source_snapshot'])
+    m.need(outer['repository_before']['head'] == outer['repository_after']['head'] == build['implementation_commit']
+        and outer['repository_before']['worktree_clean'] is True and outer['repository_after']['worktree_clean'] is True
+        and m.exact(outer['executed_launcher'], build['actual_executed_recorder']), 'Actual matrix build identity differs')
+    return matrix, plan, commands, outputs
+
+
+def structural_surface_id_unavailability(report, facts, executed, main_owner):
+    folder = Path(main_owner).parent.as_posix(); observation_ref = executed[folder + '/observations.py']
+    observation_source = m.check(observation_ref).read_text(encoding='utf8')
+    physical_guard = "if kind in KINDS[:5]:\n            require(surface is None, 'Non-surface event cannot invent surface identity')\n        else:\n            require(type(surface) is int and surface in surfaces and observed['caller_origin_inferred_from_TLS'] is False,\n                'Actual surface and explicit origin required')"
+    exact_events = "check.exact_value(sky_traces['Full']['events'], sky_traces['Summary']['events'], label + '/Full_Summary/all_actual_transport_occurrences')"
+    m.need(observation_source.count(physical_guard) == 1
+        and m.check(executed[main_owner]).read_text(encoding='utf8').count(exact_events) == 1,
+        'Actual archived comparer must require None only for non-surface kinds and real compiled surface IDs for physical kinds')
+    full = {row['case_id']: row for row in report['transport_observations'] if row['trace_level'] == 'Full'}
+    m.need(set(full) == set(CASES), 'Exact three Full kind ledgers required for structural unavailable IDs')
+    expected = {case: sum(full[case]['actual_event_counts'][kind] for kind in KINDS[:5]) for case in CASES}
+    indices = {case: set() for case in CASES}
+    for row in report['comparison']['unavailable_paths']:
+        if not row['required']: continue
+        parts = row['location'].split('/')
+        m.need(len(parts) == 5 and parts[0] in indices and parts[1:3] == ['Full_Summary', 'all_actual_transport_occurrences']
+            and parts[4] == 'surface_id' and parts[3].isascii() and parts[3].isdecimal()
+            and str(int(parts[3])) == parts[3] and row['actual_available'] is row['original_available'] is False
+            and row['counted_as_PASS'] is False, 'Any other required-unavailable operand must fail factual QA')
+        case, index = parts[0], int(parts[3])
+        m.need(index < full[case]['total_event_count'] and index not in indices[case],
+            'Structural unavailable surface ID must use a unique actual bounded event index')
+        indices[case].add(index)
+    actual = {case: len(indices[case]) for case in CASES}
+    m.need(m.exact(actual, expected) and sum(actual.values()) == facts['required_both_null_unavailable_count'],
+        'Structural unavailable surface-ID count must equal exactly the first-five non-surface kind ledgers')
+    return {'structural_non_surface_id_unavailable_counts': actual,
+        'structural_non_surface_id_source_guards': [observation_ref, executed[main_owner]],
+        'generic_required_flag_means_physical_surface_value_required': False,
+        'every_other_required_unavailable_rejected': True, 'structural_unavailable_counted_as_PASS': False}
+
+
+def transport_facts(report, outputs):
+    days, transports = report['observations'], report['transport_observations']
+    m.need([row['case_id'] for row in days] == CASES and [(row['case_id'], row['trace_level']) for row in transports]
+        == [(case, level) for case in CASES for level in ['Full', 'Summary']], 'Actual three day/six transport ledgers required')
+    design = m.read(report['production_run_design']); runs = {(row['case_id'], row['trace_level']): row for row in design['cases']}
+    zero_roles = []; policies = origin_policy(report['selection'])
+    for day, hours in zip(days, [24, 72, 24], strict=True):
+        steps = hours * 4; m.need(day['native_calls_paired'] == 2 * steps + 1 and day['actual_Current_calls'] == steps
+            and day['actual_nested_day_reads'] == hours // 24 and type(day['actual_initial_seed_duplicate']) is bool
+            and day['actual_consumer_receipts'] == steps + int(day['actual_initial_seed_duplicate'])
+            and day['actual_consumer_operation_prefix_available'] is True and day['external_ordinals_are_native_internal_indices'] is False
+            and day['native_thermal_callback_numerical_parity_claimed'] is False, 'Actual whole-call/consumer ledger differs')
+        identity(day['actual_trace'], m.ref(outputs[day['case_id'], 'Full'] / 'clk03-weather-day-production-trace.json'))
+        pair = [row for row in transports if row['case_id'] == day['case_id']]
+        for row in pair:
+            counts, origins = row['actual_event_counts'], row['actual_origin_counts']; run = runs[row['case_id'], row['trace_level']]
+            m.need(set(counts) == set(KINDS) and all(type(value) is int and value >= 0 for value in counts.values())
+                and all(counts[kind] > 0 for kind in KINDS[:6]) and type(origins) is dict
+                and all(type(value) is int and value > 0 for value in origins.values()), 'Actual eight-kind/only-executed origin ledgers required')
+            for kind in KINDS:
+                m.need(counts[kind] <= run['conservative_collector_bounds'][kind] < 1_000_000, 'Conditional admitted source cap exceeded')
+            for kind in KINDS[5:]:
+                allowed = ORIGINS if kind in KINDS[5:7] else ['report_terms_recomputation']
+                m.need(sum(origins.get(kind + '/' + origin, 0) for origin in allowed) == counts[kind], 'Actual shared-kernel origin totals differ')
+            allowed_keys = {kind + '/' + origin for kind in KINDS[5:] for origin in (ORIGINS if kind in KINDS[5:7] else ['report_terms_recomputation'])}
+            policy = policies['cases'][row['case_id']]
+            m.need(m.exact(row['source_origin_policy'], policy) and set(origins) <= allowed_keys
+                and all(origins.get(KINDS[5] + '/' + origin, 0) > 0 for origin in policy['required_positive_ingress_origins'])
+                and all(origins.get(key, 0) == 0 for key in policy['required_zero_origin_keys'])
+                and all(counts[kind] == 0 for kind in policy['required_zero_event_kinds']),
+                'Actual origins must match exact ordinary/cached case-source branch policy')
+            unavailable_origins = [{'origin_key': key, 'actual_event_count': 0, 'available': False,
+                'required_when_invoked': True, 'counted_as_PASS': False,
+                'reason': 'source-verified quick outside/cached report return leaves this origin uninvoked'}
+                for key in policy['required_zero_origin_keys']]
+            m.need(m.exact(row['uninvoked_source_origin_availability'], unavailable_origins),
+                'Exactly source-defined uninvoked origins remain unavailable/noPASS; no actual call omitted')
+            ledger = row['actual_event_kind_counts']
+            m.need([item['kind'] for item in ledger] == KINDS and all(type(item[key]) is int for item in ledger for key in ['total', 'retained', 'omitted'])
+                and all(item['total'] == item['retained'] == counts[item['kind']] and item['omitted'] == 0
+                    and item['truncated'] is False and item['truncation_reason'] is None for item in ledger)
+                and row['total_event_count'] == row['retained_event_count'] == sum(counts.values())
+                and row['omitted_event_count'] == 0 and row['truncated'] is False and row['deduplicated'] is False,
+                'Actual complete retained/omitted/truncated ledger differs')
+            m.need(row['total_completed_weather_operations'] == day['native_calls_paired'] + day['actual_nested_day_reads']
+                and row['actual_context_occurrences'] == counts[KINDS[0]] == day['actual_consumer_receipts']
+                and counts[KINDS[1]] == counts[KINDS[2]] == steps and row['actual_hourly_aggregate_count'] == counts[KINDS[3]] == hours
+                and row['actual_series_handoff_count'] == counts[KINDS[4]] == 2 * hours,
+                'Actual completion/consumer/hourly/series occurrence counts differ')
+            conditional = row['conditional_role_availability']
+            m.need([item['kind'] for item in conditional] == KINDS[6:], 'Both conditional roles must remain explicit')
+            for item in conditional:
+                count = counts[item['kind']]
+                m.need(item['actual_invocations'] == count and type(item['available']) is bool and item['available'] is (count > 0)
+                    and item['required_when_invoked'] is True and item['counted_as_PASS'] is False and type(item['reason']) is str,
+                    'Uninvoked conditional role cannot become numeric PASS')
+                if count == 0: zero_roles.append({'case_id': row['case_id'], 'trace_level': row['trace_level'], 'kind': item['kind']})
+            m.need(all(row[key] is False for key in ['hourly_means_compared_to_individual_Today_slots',
+                'weather_RHS_or_native_report_aggregate_recomputed', 'native_Current5_model_or_SRC08_physics_certified', 'unavailable_counted_as_PASS']),
+                'Transport cannot claim unpaired physics or reconstructed hourly means')
+            identity(row['actual_trace'], m.ref(outputs[row['case_id'], row['trace_level']] / 'clk06_sky_transport_trace.json'))
+        m.need(m.exact({key: value for key, value in pair[0].items() if key not in ['trace_level', 'actual_trace']},
+            {key: value for key, value in pair[1].items() if key not in ['trace_level', 'actual_trace']}), 'Full/Summary factual transport ledgers differ')
+    m.need(sum(row['native_calls_paired'] for row in days) == 963 and sum(row['actual_Current_calls'] for row in days) == 480, 'Complete production history required')
+    return {'actual_observation_ledgers': days, 'actual_transport_ledgers': transports,
+        'reviewed_source_origin_policy': policies, 'uninvoked_source_origins_counted_as_PASS': False,
+        'conditional_zero_invocation_roles': zero_roles, 'conditional_zero_roles_counted_as_PASS': False,
+        'actual_original_calls_paired': 963, 'actual_Current_calls_observed': 480,
+        'transport_payloads_reparsed_or_recomputed': False, 'kernel_event_totals_claimed_as_timestep_solves': False}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    for key in ['report', 'comparison-execution', 'output-dir']: parser.add_argument('--' + key, type=Path, required=True)
+    args = parser.parse_args(); started = m.utc(); out = m.path(args.output_dir); base = ROOT / '.runtime/porting/CLK-06'
+    m.need(out.is_relative_to(base) and out != base and not out.exists(), 'Fresh ignored result-review output required')
+    report_ref, outer_ref = m.ref(args.report), m.ref(args.comparison_execution); report = m.read(report_ref)
+    outer = m.recorded(outer_ref, report, started)
+    m.need(report['schema'] == 'clk06-production-comparison.v1' and report['status'] == 'pass-selected-sky-and-owned-production-transport'
+        and report['numerical_PASS_claimed'] is True and report['actual_command_count'] == 6
+        and all(report[key] is False for key in ['engines_Cargo_Git_executed_by_reader', 'reference_outputs_supplied_to_Rust',
+            'scientific_RHS_recomputed', 'native_thermal_callback_numerical_parity_claimed', 'native_Current5_model_and_SRC08_physics_paired',
+            'hourly_mean_equals_individual_Today_slot_claimed', 'unavailable_counted_as_PASS', 'gates_updated']), 'Genuine selected production result0 required')
+    m.need(m.instant(outer['started_utc']) <= m.instant(report['started_utc']) <= m.instant(report['completed_utc'])
+        <= m.instant(outer['finished_utc']) <= m.instant(started) and Path(report['actual_reader_cwd']).resolve() == ROOT,
+        'Actual comparison/factual review interval or cwd differs')
+    projection, admission, request, executed, main_owner, freeze = selection(report, started)
+    interpreter = script(outer, executed[main_owner], report['actual_reader_argv'])
+    for flag, key in [('matrix', 'Rust_matrix'), ('matrix-execution', 'Rust_matrix_execution'), ('comparison-projection', 'comparison_projection'),
+        ('comparison-projection-execution', 'comparison_projection_execution')]: argument(outer, '--' + flag, report[key])
+    checked = v.Bindings(); build, available, compile_command = v.verify_rust_build(report['Rust_build'], checked, kind='cli', committed=True,
+        required_sources=['crates/ep_run/src/clk06_sky_trace.rs', 'crates/ep_runtime/src/weather_day/sky_transport_trace.rs',
+            'crates/ep_runtime/src/weather_day/sky.rs', 'crates/ep_runtime/src/weather_day/production.rs'])
+    m.need(report['implementation_commit'] == build['implementation_commit'] and report['crates_tree'] == build['crates_tree']
+        and outer['repository_before']['head'] == outer['repository_after']['head'] == build['implementation_commit']
+        and outer['repository_before']['worktree_clean'] is True and outer['repository_after']['worktree_clean'] is True
+        and m.exact(outer['executed_launcher'], build['actual_executed_recorder']), 'Actual clean CLI/comparer identity differs')
+    identity(outer['source_snapshot'], build['source_snapshot'])
+    policies = origin_policy(report['selection'])
+    origin_owners = ['crates/ep_run/src/pipeline.rs', 'crates/ep_runtime/src/heat_balance/state.rs',
+        'crates/ep_runtime/src/runtime.rs', 'crates/ep_runtime/src/diagnostic_probes/heat_balance.rs',
+        'crates/ep_runtime/src/heat_balance/algorithm.rs', 'crates/ep_runtime/src/ideal_loads/coupled_runtime.rs',
+        'crates/ep_runtime/src/heat_balance/surface_balance.rs', 'crates/ep_runtime/src/heat_balance/weather_driver.rs']
+    m.need(type(policies['source_bindings']) is list and [row['path'] for row in policies['source_bindings']] == origin_owners
+        and all(set(row) == {'path', 'sha256'} and row['sha256'] == available[row['path']]['sha256']
+            for row in policies['source_bindings']), 'Origin source refs must match exact actual compiled eight-owner inventory')
+    for row in policies['source_bindings']: m.check(available[row['path']])
+    unit, unit_record = prerequisites(report, projection, admission, request, available, started)
+    m.need(m.instant(unit_record['finished_utc']) <= m.instant(compile_command['started_utc']), 'Actual unit resultQA must precede CLI compilation')
+    matrix, plan, commands, outputs = actual_matrix(report, admission, request, build, started, freeze, executed)
+    m.need(m.exact(report['compiled_owned_transport_sources'], plan['source_architecture'])
+        and report['compiled_owned_transport_sources']['source_inventory_is_compiler_file_selection_proof'] is False,
+        'Actual archived transport architecture disclosure differs')
+    m.need(m.instant(m.read(report['Rust_matrix_execution'])['finished_utc']) <= m.instant(outer['started_utc']), 'Comparison preceded completion of six actual CLI calls')
+    facts, transport = metrics(report), transport_facts(report, outputs)
+    facts.update(structural_surface_id_unavailability(report, facts, executed, main_owner))
+    checked.unchanged()
+    for binding in checked.report(): m.check(binding)
+    m.need(m.check(outer['stderr']).stat().st_size == 0, 'Successful comparison stderr must be empty')
+    out.mkdir(parents=True); sources = []
+    for name, source in [('executed-result-reviewer.py', Path(__file__)), ('executed-common.py', HERE / 'common.py'),
+        ('executed-metadata.py', OWNED), ('executed-geo-metadata.py', GEO)]:
+        destination = out / name; destination.write_bytes(source.read_bytes())
+        m.need(m.ref(destination)['sha256'] == m.ref(source)['sha256'], 'Actual factual verifier source copy differs')
+        sources.append({'historical_path': source.relative_to(ROOT).as_posix(), 'archive': m.ref(destination)})
+    refs = report['reviewed_evidence']
+    m.finish(out, {'schema': 'clk06-independent-production-result-review.v1',
+        'status': 'pass-authenticated-selected-production-result-and-honest-unavailable-scope', 'review_started_utc': started,
+        'reviewed_report': report_ref, 'comparison_execution': outer_ref, 'Rust_build': report['Rust_build'],
+        'matrix': report['Rust_matrix'], 'matrix_execution': report['Rust_matrix_execution'], 'plan': report['declared_plan'],
+        'plan_execution': report['declared_plan_execution'], 'comparison_projection': report['comparison_projection'],
+        'comparison_projection_execution': report['comparison_projection_execution'],
+        'reviewed_original_data_review': refs['Original_data_review'], 'reviewed_original_data_review_execution': refs['Original_data_review_execution'],
+        'reviewed_unit_result': refs['candidate_unit'], 'reviewed_unit_result_QA': refs['candidate_unit_result_review'],
+        'reviewed_unit_result_QA_execution': refs['candidate_unit_result_review_execution'], 'reviewed_baseline_gap': refs['baseline_gap'],
+        'reviewed_production_source_review': report['independent_workflow_source_review'],
+        'source_review_execution': report['independent_workflow_source_review_execution'],
+        'reviewed_comparer_source_review': report['independent_comparer_source_review'],
+        'comparer_source_review_execution': report['independent_comparer_source_review_execution'],
+        'reviewed_applied_core_inventory': report['applied_core_inventory'], 'reviewed_run_design': report['production_run_design'],
+        'actual_implementation_commit': build['implementation_commit'], 'actual_crates_tree': build['crates_tree'],
+        'historical_unit_implementation_commit': unit['actual_implementation_commit'], 'actual_available_source_inventory_count': len(available),
+        'actual_CLI_execution_refs': commands, 'actual_command_count': len(commands), 'actual_reported_mismatches': 0,
+        'matrix_stdout_protocol': {'parent_owned_progress_lines': 6, 'parent_owned_final_summary_lines': 1,
+            'full_parent_stdout_authenticated': True, 'six_child_streams_authenticated_separately': True,
+            'nested_recorder_console_forwarding_available': False, 'unavailable_nested_forwarding_counted_as_PASS': False},
+        'actual_unit_seven_field_error_metrics': unit['field_error_metrics'], 'production_ESky_metric_invented': False,
+        **facts, **transport, 'actual_reader_interpreter_observation': interpreter, 'reviewed_verifier_sources': sources,
+        'executed_reader_source_archive': sources[0]['archive'], 'executed_common_source_archive': sources[1]['archive'],
+        'executed_metadata_source_archive': sources[2]['archive'], 'executed_geo_metadata_source_archive': sources[3]['archive'],
+        'factual_result_only_no_new_numerical_certification': True, 'scientific_execution_performed': False,
+        'numeric_operands_recomputed': False, 'engines_or_numerical_readers_imported': False,
+        'large_Original_wrapper_with_scientific_snapshots_parsed': False, 'full_Native_results_payload_parsed': False,
+        'large_Native_results_or_binary_rehashed': False, 'existing_baseline_gap_mismatch_payloads_parsed': False,
+        'full_Rust_trace_event_or_day_payloads_parsed': False, 'ordinary_run_summary_JSON_parsed': True,
+        'actual_DataQA_and_unit_result_QA_proofs_reused': True, 'current_canonical_equal_to_science_build_claimed': False,
+        'extra_lineage_execution_stage_required': False, 'whole_formula_or_own_code_independently_certified': False,
+        'native_Current5_model_and_SRC08_physics_certified': False, 'unavailable_counted_as_PASS': False, 'gates_updated': False,
+        'authorship_limits': 'Raw authored this factual verifier, passive transport hooks and earlier raw/input/cursor/comparer work. '
+            'These formulas are not independently certified here. Baseline authored the bound production numerical reader; '
+            'Header authored the execution workflow. Root actual execution, separate source peers and archived results remain distinct.'})
+
+
+if __name__ == '__main__': main()

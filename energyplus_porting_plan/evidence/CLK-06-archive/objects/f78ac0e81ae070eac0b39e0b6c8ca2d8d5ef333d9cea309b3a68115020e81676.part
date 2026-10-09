@@ -1,0 +1,90 @@
+--- pre-format/crates/ep_runtime/src/heat_balance/surface_balance.rs
++++ crates/ep_runtime/src/heat_balance/surface_balance.rs
+@@ -28,11 +28,13 @@
+ use crate::heat_balance::surface_weather::{
+     energyplus_exterior_wet_context_fraction, energyplus_exterior_wet_reference_temperature_c,
+ };
++use crate::weather::day::sky_transport_trace::{
++    self as sky_trace, SkyTransportKind, SkyTransportOrigin, SkyTransportStamp, SkyTransportValues,
++};
+ use crate::weather::{
+     EpwRecord, HeatBalanceWeatherContext, energyplus_weather_horizontal_infrared_for_context,
+     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
+ };
+-use crate::weather::day::sky_transport_trace::{self as sky_trace, SkyTransportKind, SkyTransportOrigin, SkyTransportStamp, SkyTransportValues};
+ use ep_model::{
+     OutsideBoundaryCondition, SunExposure, Surface, SurfaceType, Terrain, TypedModel, ZoneId,
+ };
+@@ -189,7 +191,9 @@
+                 quick_outside_conduction
+                     .and_then(|context| context.exterior_coefficient_surface_temperature_c),
+                 context.owned.map(|current| current.weather.sky_temp),
+-                context.owned.and_then(|current| current.sky_transport_stamp),
++                context
++                    .owned
++                    .and_then(|current| current.sky_transport_stamp),
+                 sky_transport_origin,
+             );
+         };
+@@ -220,7 +224,9 @@
+         quick_outside_conduction
+             .and_then(|context| context.exterior_coefficient_surface_temperature_c),
+         context.owned.map(|current| current.weather.sky_temp),
+-        context.owned.and_then(|current| current.sky_transport_stamp),
++        context
++            .owned
++            .and_then(|current| current.sky_transport_stamp),
+         sky_transport_origin,
+     )
+ }
+@@ -347,8 +353,15 @@
+         });
+     sky_trace::record(
+         SkyTransportKind::ReportResolved,
+-        context.owned.and_then(|current| current.sky_transport_stamp),
+-        SkyTransportValues::Resolved { origin: SkyTransportOrigin::ReportTerms, sky: sky_temperature_c, ir: horizontal_infrared_radiation_w_per_m2, owned: context.owned.is_some() },
++        context
++            .owned
++            .and_then(|current| current.sky_transport_stamp),
++        SkyTransportValues::Resolved {
++            origin: SkyTransportOrigin::ReportTerms,
++            sky: sky_temperature_c,
++            ir: horizontal_infrared_radiation_w_per_m2,
++            owned: context.owned.is_some(),
++        },
+         Some((surface_state.surface_id, &surface_state.surface_name)),
+     );
+     let longwave_terms = energyplus_exterior_longwave_terms_with_sky_temperature_c(
+@@ -491,8 +504,13 @@
+     sky_transport_origin: SkyTransportOrigin,
+ ) -> SurfaceBoundaryBalanceResult {
+     sky_trace::record(
+-        SkyTransportKind::PhysicalIngress, sky_transport_stamp,
+-        SkyTransportValues::Ingress { origin: sky_transport_origin, sky: sky_temperature_c, ir: horizontal_infrared_radiation_w_per_m2 },
++        SkyTransportKind::PhysicalIngress,
++        sky_transport_stamp,
++        SkyTransportValues::Ingress {
++            origin: sky_transport_origin,
++            sky: sky_temperature_c,
++            ir: horizontal_infrared_radiation_w_per_m2,
++        },
+         Some((surface_state.surface_id, &surface_state.surface_name)),
+     );
+     if quick_outside_conduction.is_none() {
+@@ -537,8 +555,14 @@
+         )
+     });
+     sky_trace::record(
+-        SkyTransportKind::PhysicalResolved, sky_transport_stamp,
+-        SkyTransportValues::Resolved { origin: sky_transport_origin, sky: sky_temperature_c, ir: horizontal_infrared_radiation_w_per_m2, owned: sky_from_owned_context },
++        SkyTransportKind::PhysicalResolved,
++        sky_transport_stamp,
++        SkyTransportValues::Resolved {
++            origin: sky_transport_origin,
++            sky: sky_temperature_c,
++            ir: horizontal_infrared_radiation_w_per_m2,
++            owned: sky_from_owned_context,
++        },
+         Some((surface_state.surface_id, &surface_state.surface_name)),
+     );
+     let longwave_terms = energyplus_exterior_longwave_terms_with_sky_temperature_c(

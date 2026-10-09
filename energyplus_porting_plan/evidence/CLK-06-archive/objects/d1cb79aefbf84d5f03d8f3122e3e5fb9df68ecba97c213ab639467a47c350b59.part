@@ -1,0 +1,210 @@
+"""Other-author candidate observer source review; no target import or execution."""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+ROOT = Path(__file__).resolve().parents[4]
+META = ROOT / '.runtime/porting/CLK-06/gate-review-prep-02/metadata.py'
+META_SHA = '02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526'
+if hashlib.sha256(META.read_bytes()).hexdigest() != META_SHA:
+    raise ValueError('Reviewed stdlib metadata source differs before import')
+spec = importlib.util.spec_from_file_location('clk06_candidate_source_review_metadata', META)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+m.ref(META, META_SHA)
+m.ref(__file__)
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+    'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+RELEASE = {'path': '.runtime/porting/CLK-06/math-release-01/decision.json',
+    'sha256': '43895e26c1df4086069670bcbe8f667594d396280aaba13b0126709b852c8e15'}
+SHARED = 'crates/ep_runtime/examples'
+API = ['crates/ep_runtime/src/weather.rs',
+    *[f'crates/ep_runtime/src/weather_day/{name}.rs' for name in
+      ['configuration', 'lifecycle', 'state', 'context', 'current', 'producer', 'hourly', 'handoff', 'sky', 'solar', 'mod']],
+    *[f'crates/ep_runtime/src/weather_raw/{name}.rs' for name in ['cursor', 'day_read', 'input']]]
+SHARED_PATHS = [f'{SHARED}/clk02_probe_support/digest.rs', f'{SHARED}/clk02_probe_support/dto.rs',
+    f'{SHARED}/clk03_candidate_support/fields.rs', f'{SHARED}/clk03_candidate_support/inputs.rs',
+    f'{SHARED}/clk04_candidate_support/fields.rs']
+
+
+def check_sources(manifest, prep):
+    own = [f'{prep}/clk06_candidate_probe.rs', f'{prep}/write_observer_inputs.py',
+        *[f'{prep}/{name}.rs' for name in ['inputs', 'fields', 'observe', 'seeds']]]
+    promoted = [f'{SHARED}/clk06_candidate_probe.rs',
+        *[f'{SHARED}/clk06_candidate_support/{name}.rs' for name in ['inputs', 'fields', 'observe', 'seeds']]]
+    rows = manifest['sources']
+    expected = [*own, *SHARED_PATHS, *API, *promoted]
+    m.need(manifest['schema'] == 'clk06-candidate-observer-source-preparation.v1'
+        and manifest['actual_SourceQA_inventory_after_reviewed_promotion_count'] == 31
+        and [row['path'] for row in rows] == expected and len(set(expected)) == 31,
+        'Exact six own/five shared/fifteen actual API/five promoted sources required')
+    texts = {}
+    for row in rows:
+        source = m.verify(row)
+        data = source.read_bytes()
+        lines = row.get('lines', row.get('line_count'))
+        m.need(type(lines) is int and len(data.splitlines()) == lines, 'Source line count differs')
+        if row['path'] in own:
+            m.need(lines <= 500, 'Bounded observer module required')
+        texts[row['path']] = data.decode('utf8')
+        if source.suffix == '.py':
+            ast.parse(texts[row['path']], filename=row['path'])
+    m.need([row['path'] for row in manifest['own_sources']] == own
+        and [row['path'] for row in manifest['shared_sources']] == SHARED_PATHS,
+        'Declared own/shared source roles differ')
+    for held, actual in zip([own[0], *own[2:]], promoted):
+        m.need(texts[held].encode('utf8') == texts[actual].encode('utf8'),
+            'Actual formatted promoted observer differs from held five bytes')
+    return rows, texts, own, promoted
+
+
+def source_facts(texts, prep):
+    facts = {
+        f'{prep}/clk06_candidate_probe.rs': ['clk06-candidate-probe-results.v1',
+            'with_fresh_psychrometric_state', 'inputs::check_all(&root, &bindings)?;',
+            '"actual_rust_unavailable_direct_API_operations":unavailable', '"native_callbacks_invoked":false'],
+        f'{prep}/observe.rs': ['state.setup_interpolation_values()', 'session.setup_interpolation_values()',
+            'session.get_next_environment()', 'session.initialize_weather()', 'session.set_current_weather()',
+            'default_clark_allen_sky_emissivity(real(&args["OpaqueSkyCover"])?',
+            'default_weather_file_sky(real(&args["OpaqueSkyCover"])?',
+            'real(&args["IRHoriz"])?', '"actual_return":raw_dto::scalar(returned)',
+            '"actual_return_available":true', '"formal_output_before_is_literal_input_not_Rust_owner":true',
+            'session.cursor.set_weather_code_missed_count(session.state.missed_counts.weath_codes);',
+            'after its genuine Setup; whole native Factory/preparation unavailable',
+            'let before_caller = fields::session_snapshot', 'seed_caller(&mut session.state.global',
+            'kind == "GetNextEnvironment" || (kind == "InitializeWeather" && (day || env))'],
+        f'{prep}/fields.rs': ['existing_current_fields::state_snapshot', '"SkyTemp"', '"HorizIRSky"',
+            '"TotalSkyCover"', '"OpaqueSkyCover"', 'result[key]["slots"] = Value::Null',
+            '"actual_sky_environment":unavailable', '"native_current_sky_globals_paired":false',
+            '"existing_current_context":current', '"whole_other_current_physics_paired":false'],
+        f'{prep}/seeds.rs': ['"WeathCodes" => owner.weath_codes = value', '"last_hour" => weather',
+            '"next_hour" => weather', 'input.get("stored_interpolation_override")',
+            'state.weather.interpolation.as_mut()', 'state.environment.ignore_solar_radiation = flag'],
+        f'{prep}/inputs.rs': ['"CalcSkyEmissivity"', '"calcSky"', '"SetCurrentWeather"',
+            'argument_object(&op["output_initial_values"]', 'super::existing_inputs::configuration',
+            'metadata preparation owner; no parsed weather values', 'Some(DayOfWeek::Monday)'],
+        f'{prep}/write_observer_inputs.py': ["PREP = '" + prep + "'", 'len(inventory) == 31',
+            "'native': 'snapshot ROOT', 'candidate_Rust': 'snapshot ROOT'",
+            "'unavailable_direct_API': []", "'prerequisite_evidence': evidence",
+            "'prerequisite_evidence_supplied_to_Rust_request': False"],
+        'crates/ep_runtime/src/weather_day/current.rs': ['pub fn setup_interpolation_values', 'pub fn set_current_weather'],
+        'crates/ep_runtime/src/weather_day/lifecycle.rs': ['pub fn get_next_environment', 'pub fn initialize_weather',
+            'state.setup_interpolation_values()?;', 'self.cursor.set_weather_code_missed_count(0)'],
+        'crates/ep_runtime/src/weather_raw/cursor.rs': ['pub fn set_weather_code_missed_count',
+            'self.header.weather_code_missed_count = value;'],
+        'crates/ep_runtime/src/weather_day/sky.rs': ['pub struct WeatherSky', 'pub horiz_ir_sky: f64',
+            'pub sky_temp: f64', 'pub fn default_clark_allen_sky_emissivity', 'pub fn default_weather_file_sky'],
+        'crates/ep_runtime/src/weather_day/mod.rs': ['mod sky;',
+            'default_clark_allen_sky_emissivity', 'default_weather_file_sky', 'WeatherSky'],
+    }
+    compact = lambda value: ''.join(value.split())
+    for owner, tokens in facts.items():
+        m.need(all(compact(token) in compact(texts[owner]) for token in tokens),
+            'Full-read source route differs: ' + owner)
+    observe = texts[f'{prep}/observe.rs']
+    m.need('.is_finite()' not in observe and '"unavailable-public-Rust-API"' not in observe,
+        'Actual direct return availability must not depend on finiteness or legacy absence')
+    m.need(compact(observe).index(compact('seeds::context(&mut session.state, input)?;'))
+        < compact(observe).index(compact('session.cursor.set_weather_code_missed_count(session.state.missed_counts.weath_codes);'))
+        < compact(observe).index(compact('let after_context =')),
+        'Declared same-counter handoff must precede after-context observation')
+    writer_tree = ast.parse(texts[f'{prep}/write_observer_inputs.py'])
+    common = [node.value for node in ast.walk(writer_tree) if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == 'common' for target in node.targets)]
+    m.need(len(common) == 1 and isinstance(common[0], ast.Dict)
+        and 'prerequisite_evidence' not in [key.value for key in common[0].keys if isinstance(key, ast.Constant)]
+        and all(name not in texts[f'{prep}/clk06_candidate_probe.rs'] for name in
+            ['prerequisite_evidence', 'existing_baseline_gap', 'Native_results']),
+        'Proof artifacts must remain separate from Rust request and input reads')
+    return sum(map(len, facts.values()))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--observer-manifest', required=True)
+    parser.add_argument('--output-dir', required=True)
+    args = parser.parse_args()
+    m.need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    started = m.utc()
+    manifest_ref = m.ref(args.observer_manifest)
+    manifest = m.read(manifest_ref)
+    prep = m.path(args.observer_manifest).parent.relative_to(ROOT).as_posix()
+    m.need(prep.startswith('.runtime/porting/CLK-06/candidate-observer-prep-'), 'Actual candidate preparation required')
+    rows, texts, own, promoted = check_sources(manifest, prep)
+    fact_count = source_facts(texts, prep)
+    frozen = manifest['actual_frozen_inputs']
+    native = m.read(frozen['helper_request'])
+    admission = m.read(frozen['native_admission_contract'])
+    projection = m.read(frozen['projection'])
+    decision = m.read(DECISION)
+    release = m.read(RELEASE)
+    m.need(native['schema'] == 'clk06-helper-cases.v1' and admission['schema'] == 'clk06-native-admission-contract.v1'
+        and m.same(admission['helper_request'], frozen['helper_request'])
+        and m.same(admission['projection'], frozen['projection'])
+        and m.exact(admission['contracts'], frozen['contracts'])
+        and m.exact(native['requested_counts'], frozen['requested_counts'])
+        and m.exact(projection['native_observation_policy'], native['observation_policy'])
+        and m.same(native['root_preoutput_decision'], DECISION)
+        and projection['unavailable_counted_as_PASS'] is False, 'Actual frozen input authority differs')
+    for key in ['source', 'cases', 'tolerances']:
+        m.verify(frozen['contracts'][key])
+    m.need(m.exact(m.read(frozen['contracts']['tolerances'])['numeric_profiles'], decision['numeric_profiles'])
+        and native['observation_policy']['paired_native_current_globals'] == []
+        and m.exact(native['observation_policy']['native_only_current_globals'], decision['native_only_unpaired_globals'])
+        and release['unchanged_six_profiles_and_native_request_required'] is True,
+        'Root six-profile/native-only current-sky boundary differs')
+    for binding in [native['fixed_scope'], *native['all_45_guard_refs'], frozen['production_transport_source_inventory']]:
+        m.verify(binding)
+    out = m.path(args.output_dir, exists=False)
+    m.need(out.is_relative_to(m.BASE) and out != m.BASE and not out.exists(), 'Fresh ignored source-review output required')
+    m.finish()
+    (out / 'sources').mkdir(parents=True)
+    copied = []
+    for index, row in enumerate(rows):
+        dest = out / 'sources' / (f'{index:02}-' + Path(row['path']).name)
+        with dest.open('xb') as stream:
+            stream.write(m.verify(row).read_bytes())
+        copied.append({'historical_path': row['path'], 'archive': m.ref(dest, row['sha256'])})
+    result = {'schema': 'clk06-independent-candidate-observer-source-review.v1',
+        'status': 'pass-input-only-candidate-observer-and-projection-before-execution', 'review_started_utc': started,
+        'reviewed_sources': copied, 'reviewed_observer_manifest': manifest_ref,
+        'reviewed_helper_request': frozen['helper_request'], 'reviewed_native_contract': frozen['native_admission_contract'],
+        'reviewed_projection': frozen['projection'], 'reviewed_contracts': frozen['contracts'],
+        'reviewed_fixed_scope': native['fixed_scope'], 'root_preoutput_decision': DECISION,
+        'reviewed_metadata_utility': m.ref(META, META_SHA), 'actual_reviewed_source_count': 31,
+        'checked_source_fact_count': fact_count, 'reviewed_requested_counts': native['requested_counts'],
+        'reviewed_math_release': RELEASE, 'actual_promoted_observer_sources': [m.ref(path) for path in promoted],
+        'whole_public_Setup_GetNext_Initialize_Current_routes_observed_in_source': True,
+        'direct_CalcSkyEmissivity_and_calcSky_API_available': True,
+        'actual_direct_returns_available_independently_of_finiteness': True,
+        'declared_counter_input_handoff_is_actual_public_owner_write': True,
+        'allocation_boundary_is_actual_constructor_return_after_Setup': True,
+        'native_and_Rust_array_mapping': 'actual snapshot ROOT to snapshot ROOT; values unchanged',
+        'prerequisite_proof_artifacts_supplied_to_Rust_request': False,
+        'OriginalDataQA0_and_legacygap0_before_candidate': 'Root actual authorization and input writer prerequisite guards; no science execution by this reviewer',
+        'native_current_sky_globals_paired': False, 'unavailable_counted_as_PASS': False,
+        'scientific_execution_performed': False, 'reviewed_modules_imported_or_executed': False,
+        'Rust_compile_validity_certified': False, 'numerical_values_compared': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None, 'numerical_PASS_claimed': False,
+        'canonical_files_or_gates_written': False, 'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header authored C6 sky/hourly/solar/producer math and prior observer/infrastructure work. This review independently reads Base candidate observer and verifies exact genuine API/promotion metadata; it does not independently certify earlier own math, compile validity, numerical parity, or passive transport hooks. Root and Raw separately fully read the math proposal.'}
+    for name, source in [('executed-source-reviewer.py', Path(__file__)), ('executed-metadata.py', META)]:
+        with (out / name).open('xb') as stream:
+            stream.write(source.read_bytes())
+    result['executed_reader_source_archive'] = m.ref(out / 'executed-source-reviewer.py')
+    result['executed_metadata_source_archive'] = m.ref(out / 'executed-metadata.py', META_SHA)
+    result['review_completed_utc'] = m.utc()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False)
+        stream.write('\n')
+    m.finish()
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

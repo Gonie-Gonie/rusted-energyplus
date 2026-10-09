@@ -1,0 +1,12 @@
+--- pre-format/crates/ep_run/src/pipeline.rs
++++ crates/ep_run/src/pipeline.rs
+@@ -900,8 +900,7 @@
+ ) -> Result<RunOutcome, RunError> {
+     let (((outcome, weather_trace), day_trace), sky_trace) =
+         ep_runtime::weather::day::sky_transport_trace::capture(
+-            scope.is_some()
+-                && matches!(config.trace_level, TraceLevel::Full | TraceLevel::Summary),
++            scope.is_some() && matches!(config.trace_level, TraceLevel::Full | TraceLevel::Summary),
+             || {
+                 ep_runtime::weather::day::production_trace::capture(
+                     config.trace_level == TraceLevel::Full,

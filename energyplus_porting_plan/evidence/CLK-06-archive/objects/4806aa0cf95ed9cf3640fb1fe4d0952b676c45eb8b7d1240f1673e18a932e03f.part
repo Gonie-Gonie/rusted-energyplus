@@ -1,0 +1,29 @@
+--- .runtime/porting/CLK-06/production-comparer-prep-01/check_production.py
++++ .runtime/porting/CLK-06/production-comparer-prep-02/check_production.py
+@@ -13,7 +13,7 @@
+ HERE = Path(__file__).resolve().parent
+ UNIT = ROOT / '.runtime/porting/CLK-06/comparer-prep-02'
+ COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+-PROOFS_SHA = 'ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a'
++PROOFS_SHA = 'b5eeb450122fe34334a8278b5ddfd4c83b61e7fd09aa1c8b2813fb923ff08f87'
+ DAY_TRACE = 'clk03-weather-day-production-trace.json'
+ SKY_TRACE = 'clk06_sky_transport_trace.json'
+ 
+@@ -73,6 +73,7 @@
+     m.binding(evidence['completed']['refs']['production_comparison_projection_execution'], freeze_ref, b)
+     _, plan_start, _ = m.recorded(b, evidence['plan_execution'])
+     m.require(freeze_finish <= plan_start, 'Production selection must be frozen before actual plan and every child')
++    origin_policies = p.compiled_origin_policy(complete['available'], b)
+     meta = load('clk06_actual_native_metadata', UNIT / 'metadata.py')
+     refs = complete['refs']
+     native_args = SimpleNamespace(native_admission_contract=b.check(refs['Native_admission_contract']),
+@@ -110,7 +111,8 @@
+                     'Cap requires actual six compiled surfaces; no geometry physics certification')
+             sky_ref = artifacts[directory / SKY_TRACE]; sky_trace = m.read(b.check(sky_ref)); sky_traces[level] = sky_trace
+             run = runs[label, level]
+-            row = observations.transport(check, sky_trace, case, native[label], inputs[label], run, source_lines, compiled_surfaces)
++            row = observations.transport(check, sky_trace, case, native[label], inputs[label], run, source_lines,
++                compiled_surfaces, origin_policies[label])
+             row['actual_trace'] = sky_ref; sky_rows.append(row)
+             if level == 'Full':
+                 trace_ref = artifacts[directory / DAY_TRACE]; trace = m.read(b.check(trace_ref))

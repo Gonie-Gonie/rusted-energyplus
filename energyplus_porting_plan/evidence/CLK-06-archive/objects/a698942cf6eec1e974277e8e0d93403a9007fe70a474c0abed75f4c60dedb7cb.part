@@ -1,0 +1,11 @@
+--- .runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py
++++ .runtime/porting/CLK-06/production-comparer-prep-02/freeze_projection.py
+@@ -12,7 +12,7 @@
+ HERE = Path(__file__).resolve().parent
+ UNIT = ROOT / '.runtime/porting/CLK-06/comparer-prep-02'
+ COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+-PROOFS_SHA = 'ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a'
++PROOFS_SHA = 'b5eeb450122fe34334a8278b5ddfd4c83b61e7fd09aa1c8b2813fb923ff08f87'
+ 
+ 
+ def load(name, path):

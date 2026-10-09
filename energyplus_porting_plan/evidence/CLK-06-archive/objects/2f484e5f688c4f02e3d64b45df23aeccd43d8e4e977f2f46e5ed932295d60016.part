@@ -1,0 +1,262 @@
+// SOURCE-ONLY DRAFT. The old authenticated plumbing is included, never executed.
+// Future build must archive/authenticate both included CLK03 files and CLK02 fields.
+#define main clk04_unused_preserved_clk03_main
+#include "clk03_reference_helper.cpp"
+#undef main
+#include "clk04_reference_fields.hh"
+
+namespace {
+int declared_steps(json const &value)
+{
+    int const steps = Clk03::integer(value);
+    require(steps == 1 || steps == 4, "Bounded one/four step input required");
+    return steps;
+}
+void seed_clock(EnergyPlus::EnergyPlusData &state, json const &declared)
+{
+    auto &g = *state.dataGlobal;
+    int const steps = declared_steps(declared.at("time_steps_per_hour"));
+    require(declared.at("TimeStepZone").at("bits") == (steps == 1 ? "3ff0000000000000" : "3fd0000000000000") &&
+            declared.at("TimeStepFraction") == declared.at("TimeStepZone") &&
+            declared.at("TimeStepZoneSec").at("bits") == (steps == 1 ? "40ac200000000000" : "408c200000000000") &&
+            Clk03::integer(declared.at("MinutesInTimeStep")) == (steps == 1 ? 60 : 15),
+            "Declared bounded caller timing differs from genuine SimulationManager timing");
+    g.TimeStepsInHour = steps;
+    g.TimeStepZone = Clk03::input_real(declared.at("TimeStepZone"));
+    g.TimeStepZoneSec = Clk03::input_real(declared.at("TimeStepZoneSec"));
+    g.MinutesInTimeStep = Clk03::integer(declared.at("MinutesInTimeStep"));
+}
+void admit_current(EnergyPlus::EnergyPlusData const &state)
+{
+    auto const &g = *state.dataGlobal; auto const &w = *state.dataWeather; auto const &e = *state.dataEnvrn;
+    require(g.KindOfSim == EnergyPlus::Constant::KindOfSim::RunPeriodWeather && e.RunPeriodEnvironment,
+            "SetCurrent outside admitted weather environment");
+    require(g.TimeStepZoneSec > 0.0 && std::isfinite(g.TimeStepZoneSec) && g.TimeStep >= 1 &&
+            g.TimeStep <= g.TimeStepsInHour && g.HourOfDay >= 1 && g.HourOfDay <= 24 &&
+            e.Month >= 1 && e.Month <= 12 && w.wvarsHrTsToday.allocated() && w.Interpolation.allocated(),
+            "Missing genuine selected weather/positive seconds/index context");
+    require(w.siteBuildingSurfaceGroundTempsPtr != nullptr && w.siteFCFactorMethodGroundTempsPtr != nullptr &&
+            w.siteShallowGroundTempsPtr != nullptr && w.siteDeepGroundTempsPtr != nullptr &&
+            w.GroundReflectances.allocated() && (e.TotDesDays == 0 || w.spSiteSchedules.allocated()),
+            "Genuine ReadUser ground/design-day context unavailable");
+    require(state.dataWaterData->RainFall.ModeID != EnergyPlus::DataWater::RainfallMode::RainSchedDesign,
+            "Scheduled site precipitation excluded from bounded cases");
+    require(!e.EMSOutDryBulbOverrideOn && !e.EMSOutDewPointTempOverrideOn && !e.EMSOutRelHumOverrideOn &&
+            !e.EMSWindSpeedOverrideOn && !e.EMSWindDirOverrideOn && !e.EMSDifSolarRadOverrideOn &&
+            !e.EMSBeamSolarRadOverrideOn, "EMS overrides excluded from bounded cases");
+}
+json operation4(Factory &factory, json const &input, int steps)
+{
+    check_identifier(input); auto &state = *factory.state;
+    auto const kind = input.at("kind").get<std::string>();
+    auto const &caller = input.at("caller");
+    bool const begin_day = caller.contains("BeginDayFlag") ? Clk03::boolean(caller.at("BeginDayFlag")) : state.dataGlobal->BeginDayFlag;
+    bool const begin_environment = caller.contains("BeginEnvrnFlag") ? Clk03::boolean(caller.at("BeginEnvrnFlag")) : state.dataGlobal->BeginEnvrnFlag;
+    bool const boundary = kind == "InitializeWeather" &&
+        (begin_day || begin_environment);
+    bool const full = kind == "GetNextEnvironment" || boundary;
+    json result = {{"id", input.at("id")}, {"kind", kind}, {"requested_operation", input},
+                   {"full_grid_observation_declared", full}, {"before_caller", Clk04::operation_snapshot(state, full)}};
+    if (factory.stopped) {
+        result["before"] = Clk04::operation_snapshot(state, full); result["after"] = result["before"];
+        result["actual_source_invoked"] = false;
+        result["call_outcome"] = {{"status", "not-invoked-after-prior-source-outcome"},
+            {"source_fatal", nullptr}, {"skip_reason", factory.stop_reason}};
+        return result;
+    }
+    auto scalar_caller = caller;
+    if (scalar_caller.contains("DayOfSimChr")) {
+        require(scalar_caller.at("DayOfSimChr").is_string() && Clk03::integer(scalar_caller.at("DayOfSim")) > 0 &&
+                scalar_caller.at("DayOfSimChr").get<std::string>() == std::to_string(Clk03::integer(scalar_caller.at("DayOfSim"))),
+                "Declared input-only day text must match positive caller day");
+        state.dataGlobal->DayOfSimChr = scalar_caller.at("DayOfSimChr").get<std::string>();
+        scalar_caller.erase("DayOfSimChr");
+    }
+    Clk03::seed(state, {{"global", scalar_caller}});
+    require(state.dataGlobal->TimeStepsInHour == steps, "Caller changed allocated step count");
+    result["before"] = Clk04::operation_snapshot(state, full); bool returned = false;
+    result["print_environment_stamp_before"] = factory.print_environment_stamp;
+    auto const outcome = invoke([&] {
+        if (kind == "GetNextEnvironment") returned = Weather::GetNextEnvironment(state, factory.available, factory.errors);
+        else {
+            require(factory.available && !factory.errors && state.dataWeather->Envrn > 0, "No genuine selected environment");
+            if (kind == "InitializeWeather") Weather::InitializeWeather(state, factory.print_environment_stamp);
+            else if (kind == "ReadWeatherForDay") {
+                int const day = Clk03::integer(input.at("day_to_read")); require(day > 0, "Positive day-to-read required");
+                Weather::ReadWeatherForDay(state, day, state.dataWeather->Envrn, Clk03::boolean(input.at("backspace_after_read")));
+            } else if (kind == "UpdateWeatherData") Weather::UpdateWeatherData(state);
+            else if (kind == "SetCurrentWeather") { admit_current(state); Weather::SetCurrentWeather(state); }
+            else throw std::runtime_error("Unknown whole-original operation");
+        }
+    });
+    result["call_outcome"] = outcome; result["after"] = Clk04::operation_snapshot(state, full);
+    result["actual_source_invoked"] = true; result["Available"] = factory.available; result["ErrorsFound"] = factory.errors;
+    result["returned_bool"] = kind == "GetNextEnvironment" && !outcome.at("source_fatal").get<bool>() ? json(returned) : json(nullptr);
+    result["print_environment_stamp_after"] = factory.print_environment_stamp;
+    if (outcome.at("source_fatal").get<bool>()) { factory.stopped = true; factory.stop_reason = "actual-source-fatal"; }
+    else if (kind == "GetNextEnvironment" && !returned) {
+        factory.stopped = true; factory.stop_reason = "actual-selected-environment-unavailable-or-errors";
+    }
+    return result;
+}
+json sequence4(json const &input, fs::path const &root, fs::path const &output)
+{
+    check_identifier(input); int const steps = declared_steps(input.at("time_steps_per_hour"));
+    auto const idf = bound_path(root, input.at("input")), epw = bound_path(root, input.at("weather"));
+    Factory factory; auto &state = *factory.state; auto &w = *state.dataWeather;
+    state.dataStrGlobals->inputFilePath = idf; state.files.inputWeatherFilePath.filePath = epw;
+    seed_clock(state, input.at("native_preparation"));
+    state.dataGlobal->BeginSimFlag = false; state.dataGlobal->DoWeathSim = true; state.dataGlobal->DoDesDaySim = false;
+    factory.prepare("InputProcessor::processInput", [&] { state.dataInputProcessing->inputProcessor->processInput(state); });
+    factory.prepare("SetupInterpolationValues", [&] { Weather::SetupInterpolationValues(state); });
+    if (!factory.stopped) w.TimeStepFraction = Clk03::input_real(input.at("native_preparation").at("TimeStepFraction"));
+    factory.prepare("OpenWeatherFile", [&] { Weather::OpenWeatherFile(state, factory.errors); });
+    factory.prepare("CloseWeatherFile", [&] { Weather::CloseWeatherFile(state); });
+    factory.prepare("ReadUserWeatherInput", [&] { Weather::ReadUserWeatherInput(state); });
+    factory.prepare("AllocateWeatherData", [&] { Weather::AllocateWeatherData(state); });
+    auto const allocated_defaults = Clk04::snapshot(state);
+    factory.prepare("ResolveLocationInformation", [&] { Weather::ResolveLocationInformation(state, factory.errors); });
+    factory.prepare("CheckLocationValidity", [&] { Weather::CheckLocationValidity(state); });
+    if (!factory.stopped) {
+        require(w.TotRunPers == 1 && w.TotRunDesPers == 0 && w.NumIntervalsPerHour == 1 &&
+                state.dataGlobal->TimeStepsInHour == steps, "Original parsed input outside bounded hourly RunPeriod");
+        auto const &env = w.Environment(state.dataEnvrn->TotDesDays + 1);
+        require(env.KindOfEnvrn == EnergyPlus::Constant::KindOfSim::RunPeriodWeather && !env.ActualWeather && !env.MatchYear &&
+                env.StartYear == 2013 && env.EndYear == 2013, "Original environment outside ordinary2013 scope");
+        w.GetEnvironmentFirstCall = false; w.GetBranchInputOneTimeFlag = false; w.WaterMainsParameterReport = false;
+        w.Envrn = state.dataEnvrn->TotDesDays;
+    }
+    auto const prepared = Clk04::snapshot(state); json operations = json::array();
+    for (auto const &item : input.at("operations")) operations.push_back(operation4(factory, item, steps));
+    require(file_sha(idf) == input.at("input").at("sha256").get<std::string>() &&
+            file_sha(epw) == input.at("weather").at("sha256").get<std::string>(), "Inputs changed during genuine calls");
+    return {{"id", input.at("id")}, {"input", file_ref(idf)}, {"weather_input", file_ref(epw)},
+            {"constructor", factory.constructor}, {"after_constant_initialization", factory.after_constant_initialization},
+            {"preparation_calls", factory.preparation}, {"allocated_defaults", allocated_defaults},
+            {"allocated_defaults_observation_context", "actual AllocateWeatherData after genuine interpolation/input prep, before location resolution"},
+            {"prepared", prepared}, {"operations", operations},
+            {"final_state", Clk04::snapshot(state)}, {"source_only_diagnostics", factory.diagnostics(output, input.at("id").get<std::string>())},
+            {"registered_whole_simulation_initialization_claimed", false},
+            {"constructor_current_extension_available", false},
+            {"whole_ground_water_solar_daylight_math_paired", false}, {"native_internal_record_index_observed", false}};
+}
+} // namespace
+
+int main(int argc, char **argv)
+{
+    try {
+        require(argc == 5, "Usage: clk04_reference_helper <repo_root> <frozen-input-only-request> <native-admission-contract> <fresh-output-dir>");
+        auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+        auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+        require(!fs::exists(output), "Native output must be fresh"); auto const request = read_json(request_path);
+        auto const admission = read_json(admission_path);
+        require(admission.at("schema") == "clk04-native-admission-contract.v1" &&
+                admission.at("frozen_before_numerical_execution") == true && admission.at("expected_values_supplied") == false &&
+                admission.at("expected_exits_supplied") == false && admission.at("scientific_execution_performed") == false &&
+                bound_path(root, admission.at("helper_request")) == fs::weakly_canonical(request_path),
+                "Separate one-way frozen input admission required");
+        require(request.at("schema") == "clk04-helper-cases.v1" && request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" &&
+                request.at("expected_values_supplied") == false &&
+                request.at("expected_exits_supplied") == false && request.at("scientific_execution_performed") == false &&
+                request.at("frozen_before_numerical_execution") == true, "Frozen input-only request required");
+        bound_path(root, request.at("fixed_scope"));
+        require(request.at("fixed_scope") == admission.at("fixed_scope") &&
+                request.at("energyplus_commit") == admission.at("energyplus_commit") &&
+                request.at("all_45_guard_refs") == admission.at("all_45_guard_refs") &&
+                request.at("all_45_guard_refs").size() == 45 && request.at("contracts").size() == 2 &&
+                request.at("contracts").at("source") == admission.at("contracts").at("source") &&
+                request.at("contracts").at("tolerances") == admission.at("contracts").at("tolerances"),
+                "One-way request/source/tolerance/scope bindings differ");
+        for (auto const &item : request.at("all_45_guard_refs")) bound_path(root, item);
+        json contracts = json::object();
+        for (char const *name : {"source", "cases", "tolerances"}) {
+            auto const path = bound_path(root, admission.at("contracts").at(name)); auto const value = read_json(path);
+            require(value.at("frozen_before_numerical_execution") == true &&
+                    value.at("schema") == std::string("clk04-") + name + "-contract.v1", "Wrong or unfrozen contract schema");
+            if (std::string(name) == "cases") require(value.at("schema") == "clk04-cases-contract.v1" &&
+                value.at("helper_request") == admission.at("helper_request") &&
+                value.at("source") == admission.at("contracts").at("source") &&
+                value.at("tolerances") == admission.at("contracts").at("tolerances") &&
+                value.at("fixed_CON_scope") == request.at("fixed_scope") &&
+                value.at("all_45_guard_refs") == request.at("all_45_guard_refs") &&
+                bound_path(root, value.at("helper_request")) == fs::weakly_canonical(request_path), "Frozen request binding differs");
+            if (std::string(name) == "source") {
+                require(value.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048", "Wrong original pin");
+                for (auto const &source : value.at("source_files")) require(file_sha(root / ".reference/energyplus-src/26.1.0" /
+                    source.at("path").get<std::string>()) == source.at("sha256").get<std::string>(), "Original source changed");
+            }
+            contracts[name] = file_ref(path);
+        }
+        auto const projection_path = bound_path(root, admission.at("projection"));
+        auto const projection = read_json(projection_path);
+        require(projection.at("schema") == "clk04-observation-projection.v1" &&
+                projection.at("frozen_before_numerical_execution") == true &&
+                projection.at("helper_request") == admission.at("helper_request") &&
+                projection.at("contracts") == admission.at("contracts") &&
+                request.at("observation_policy") == projection.at("native_observation_policy"),
+                "Frozen pre-execution observation projection differs");
+        require(request.at("setup_cases").is_array() && request.at("setup_cases").size() == 2 &&
+                request.at("wind_cases").is_array() && request.at("wind_cases").size() == 56 &&
+                request.at("weather_sequences").is_array() && request.at("weather_sequences").size() == 13,
+                "Bounded frozen two setup,56 wind,ten diagnostic and three CON weather families required");
+        json requested = {{"setup_cases", 2}, {"wind_cases", 56}, {"weather_sequences", 13},
+            {"GetNextEnvironment", 0}, {"InitializeWeather", 0}, {"SetCurrentWeather", 0},
+            {"weather_operations", 0}, {"total_operations", 58}};
+        for (auto const &sequence : request.at("weather_sequences")) for (auto const &item : sequence.at("operations")) {
+            auto const kind = item.at("kind").get<std::string>();
+            require(kind == "GetNextEnvironment" || kind == "InitializeWeather" || kind == "SetCurrentWeather",
+                    "Unknown bounded caller schedule operation");
+            requested[kind] = requested.at(kind).get<int>() + 1;
+            requested["weather_operations"] = requested.at("weather_operations").get<int>() + 1;
+            requested["total_operations"] = requested.at("total_operations").get<int>() + 1;
+        }
+        require(requested == request.at("requested_counts") && requested == admission.at("requested_counts"),
+                "Actual declared request/admission cardinality differs");
+        fs::create_directories(output); json setup = json::array(), wind = json::array(), sequences = json::array();
+        for (auto const &row : request.at("setup_cases")) {
+            Factory factory; seed_clock(*factory.state, row); auto before = Clk04::snapshot(*factory.state);
+            auto outcome = invoke([&] { Weather::SetupInterpolationValues(*factory.state); });
+            setup.push_back({{"id", row.at("id")}, {"requested_operation", row}, {"before", before},
+                             {"after", Clk04::snapshot(*factory.state)}, {"call_outcome", outcome}, {"actual_source_invoked", true}});
+        }
+        for (auto const &row : request.at("wind_cases")) {
+            auto const previous = Clk03::input_real(row.at("previous")), current = Clk03::input_real(row.at("current"));
+            auto const weight = Clk03::input_real(row.at("current_weight"));
+            require(previous >= 0.0 && previous <= 360.0 && current >= 0.0 && current <= 360.0 && weight >= 0.0 && weight <= 1.0,
+                    "Pure wind input outside bounded domain");
+            wind.push_back({{"id", row.at("id")}, {"inputs", row},
+                            {"actual_return", Clk03::scalar(Weather::interpolateWindDirection(previous, current, weight))},
+                            {"actual_source_invoked", true},
+                            {"call_outcome", {{"status", "source_returned"}, {"source_fatal", false}}}});
+        }
+        for (auto const &row : request.at("weather_sequences")) sequences.push_back(sequence4(row, root, output));
+        int invoked = 0, skipped = 0; json actual_calls = json::object(), actual_outcomes = json::object();
+        auto observe = [&](json const &item, std::string const &kind) {
+            auto const status = item.at("call_outcome").at("status").get<std::string>();
+            int count = actual_outcomes.contains(status) ? actual_outcomes.at(status).get<int>() : 0;
+            actual_outcomes[status] = count + 1;
+            if (item.at("actual_source_invoked").get<bool>()) {
+                ++invoked; count = actual_calls.contains(kind) ? actual_calls.at(kind).get<int>() : 0;
+                actual_calls[kind] = count + 1;
+            } else ++skipped;
+        };
+        for (auto const &item : setup) observe(item, "SetupInterpolationValues");
+        for (auto const &item : wind) observe(item, "interpolateWindDirection");
+        for (auto const &sequence : sequences) for (auto const &item : sequence.at("operations"))
+            observe(item, item.at("kind").get<std::string>());
+        for (auto const &item : request.at("all_45_guard_refs")) bound_path(root, item);
+        for (auto const &item : admission.at("contracts").items()) bound_path(root, item.value());
+        bound_path(root, admission.at("helper_request")); bound_path(root, admission.at("projection"));
+        json const result = {{"schema", "clk04-helper-results.v1"}, {"energyplus_commit", "6f2e40d10250a105b49966baa24d843711e61048"},
+            {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+            {"observation_projection", file_ref(projection_path)}, {"complete", true},
+            {"actual_binary", file_ref(fs::absolute(argv[0]))}, {"contracts", contracts}, {"setup_cases", setup},
+            {"wind_cases", wind}, {"weather_sequences", sequences}, {"scientific_comparison_performed", false},
+            {"requested_counts", requested}, {"actual_operation_invocations", invoked}, {"actual_operations_skipped", skipped},
+            {"actual_source_function_counts", actual_calls}, {"actual_source_status_counts", actual_outcomes},
+            {"gates_updated", false}, {"native_internal_record_index_observed", false},
+            {"expected_values_supplied", false}, {"expected_exits_supplied", false},
+            {"full_simulation_or_selected_scope_PASS_claimed", false}};
+        write_text(output / "clk04-helper-results.json", result.dump(2) + "\n"); return 0;
+    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+}

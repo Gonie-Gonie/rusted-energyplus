@@ -1,0 +1,143 @@
+"""Other-author source/receipt metadata review; never import reviewed targets."""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+ROOT = Path(__file__).resolve().parents[4]
+META = ROOT / '.runtime/porting/CLK-06/gate-review-prep-02/metadata.py'
+META_SHA = '02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526'
+if hashlib.sha256(META.read_bytes()).hexdigest() != META_SHA:
+    raise ValueError('Own stdlib metadata utility changed before import')
+spec = importlib.util.spec_from_file_location('clk06_launcher_review_metadata', META)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+m.ref(META, META_SHA)
+m.ref(__file__)
+PREFIX = '.runtime/porting/CLK-06/original-launcher-prep-01/'
+MANIFEST = {'path': PREFIX + 'manifest.json',
+    'sha256': 'e186c25701d6a510746a90db37cd5ab3b902b9a29e78bd1b543e751da532f85b'}
+BUILDER = '.runtime/porting/CLK-06/builder-prep-01/build_native.py'
+BUILDER_SHA = '8c3e02d1a255159c668762db7374b387a8d2810c2cb191fe533cd487204dc517'
+HELD = {
+    PREFIX + 'run_original.py': 'fe63bb4630cf250f9f72087e5b65d8275fcab8e8ad7e66506098c156bd71fa98',
+    PREFIX + 'launcher_support/common.py': 'e482403dd77a0ec88b0ae1f2b3350658eda241098c21d748909f60c06c76a01d',
+    PREFIX + 'launcher_support/admission.py': '83f5a877f7c8271988e13411d24f95ec727ac0112b41b42852864c9d1a7bbee8',
+    PREFIX + 'launcher_support/outcomes.py': '50923bbbe8aeb3359ac823acee703972c7cf4e46f79bab6d17ab0bde05f448e6',
+    PREFIX + 'launcher_support/__init__.py': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['contract-review', 'contract-review-execution', 'builder-source-review',
+                 'builder-source-review-execution', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    m.need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    started = m.utc()
+    manifest = m.read(MANIFEST)
+    m.need(manifest['schema'] == 'clk06-original-launcher-source-preparation.v1'
+           and len(manifest['own_sources']) == 5
+           and {row['path']: row['sha256'] for row in manifest['own_sources']} == HELD,
+           'Exact held own5 source inventory required')
+    sources = {owner: m.verify(m.ref(owner, digest)).read_bytes() for owner, digest in HELD.items()}
+    trees = {owner: ast.parse(data, filename=owner) for owner, data in sources.items()}
+    text = {owner: data.decode('utf8') for owner, data in sources.items()}
+    entry = text[PREFIX + 'run_original.py']
+    admission = text[PREFIX + 'launcher_support/admission.py']
+    common = text[PREFIX + 'launcher_support/common.py']
+    outcomes = text[PREFIX + 'launcher_support/outcomes.py']
+    bootstrap = next(ast.literal_eval(node.value) for node in trees[PREFIX + 'run_original.py'].body
+        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == '_BOOTSTRAP' for t in node.targets))
+    m.need(bootstrap == {owner[len(PREFIX):]: digest for owner, digest in HELD.items()
+                         if owner.startswith(PREFIX + 'launcher_support/')}, 'Exact before-import support pins required')
+    m.need(admission.index("unchanged(build['executed_source_archives'])")
+           < admission.index('spec.loader.exec_module(module)'), 'Imported metadata bytes must authenticate before import')
+    required = {
+        'admission': ["identity(peer['actual_build_command'], build_execution_ref)",
+            "exact(peer['reviewed_source_archives'], build['executed_source_archives'])",
+            "identity(launch['reviewed_metadata_utility'], ref(BUILDER))",
+            "len(current_rows) == 660", "len(core_rows) == 643", "== 659",
+            "module.preservation(", "bound)", "module.reviews(review_args, bound, launcher_started)"],
+        'entry': ["command = [str(verify(build['helper_binary'])), str(ROOT), str(verify(build['helper_request'])),",
+            "str(verify(build['native_admission_contract'])), str(native_dir)]",
+            "before_execution'] = guard", "after_execution'] = guard", "failure_final'] = guard",
+            'parent_before = child_environment_inputs(dict(os.environ))',
+            'parent_after = child_environment_inputs(dict(os.environ))',
+            'prospective_environment_after = child_environment_inputs(module.util.environment())',
+            'key.casefold() == name.casefold()', "'terminated_native_process_internal_environment_observed': False",
+            "'numerical_PASS_claimed': False", "'native_current_sky_globals_paired': False"],
+        'common': ["Path(record['cwd']).is_absolute()", 'executed_reader_source_archive',
+            "'Duplicate JSON key'", "'Regular non-reparse bound artifact required'"],
+        'outcomes': ["grid['slots'] is None", "['SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover']",
+            "counts['total_operations']", 'not-invoked-after-prior-source-outcome',
+            "'independent_initial_data_review_required_before_Rust': True",
+            "'numerical_comparison_count': None", "'numerical_PASS_claimed': False"]}
+    for name, body in [('admission', admission), ('entry', entry), ('common', common), ('outcomes', outcomes)]:
+        m.need(all(token in body for token in required[name]), 'Full-read launcher protocol predicate differs: ' + name)
+    m.need(entry.count('subprocess.run(') == 1
+           and entry.index("write(directory / 'helper-command.json', execution)") < entry.index('require(context_preserved,'),
+           'Sole genuine child and durable outcome-before-ENV-rejection required')
+    contract_ref, contract_execution, contract = m.review(args.contract_review, args.contract_review_execution,
+        'clk06-independent-frozen-contract-review.v1', 'pass-frozen-input-source-policy-before-native-build', started)
+    builder_ref, builder_execution, builder = m.review(args.builder_source_review, args.builder_source_review_execution,
+        'clk06-independent-native-builder-static-review.v1', 'pass-source-and-contract-before-native-build', started)
+    m.need(m.same(builder['reviewed_contract_review'], contract_ref)
+           and m.same(builder['reviewed_contract_review_execution'], contract_execution), 'Actual builder/contract review pair differs')
+    dependencies = m.archives(builder['reviewed_sources'])
+    m.need(BUILDER in dependencies and dependencies[BUILDER]['sha256'] == BUILDER_SHA,
+           'Actual independently reviewed builder metadata owner required')
+    native_ref = contract['reviewed_native_admission_contract']
+    native = m.read(native_ref)
+    packet = [*native['contracts'].values(), native['helper_request'], native['projection'], native_ref]
+    m.need(len(packet) == 6 and m.same(contract['reviewed_helper_request'], native['helper_request'])
+           and m.same(contract['reviewed_projection'], native['projection'])
+           and m.exact(contract['reviewed_contracts'], native['contracts']), 'Actual reviewed six-packet differs')
+    for binding in packet:
+        m.verify(binding)
+    all_sources = {**dependencies, **{owner: m.ref(owner, digest) for owner, digest in HELD.items()}}
+    out = m.path(args.output_dir, exists=False)
+    m.need(out.is_relative_to(m.BASE) and out != m.BASE and not out.exists(), 'Fresh ignored review output required')
+    m.finish()
+    out.mkdir(parents=True)
+    rows = []
+    for index, (owner, binding) in enumerate(sorted(all_sources.items())):
+        archive = out / (f'{index:02d}-' + Path(owner).name)
+        with archive.open('xb') as stream:
+            stream.write(m.verify(binding).read_bytes())
+        rows.append({'historical_path': owner, 'archive': m.ref(archive, binding['sha256'])})
+    result = {'schema': 'clk06-independent-original-launcher-static-review.v1',
+        'status': 'pass-source-and-input-contract-before-original-execution', 'review_started_utc': started,
+        'reviewed_sources': rows, 'reviewed_launcher_manifest': MANIFEST,
+        'reviewed_metadata_utility': m.ref(BUILDER, BUILDER_SHA),
+        'reviewed_contract_review': contract_ref, 'reviewed_contract_review_execution': contract_execution,
+        'reviewed_builder_source_review': builder_ref, 'reviewed_builder_source_review_execution': builder_execution,
+        'reviewed_native_admission_contract': native_ref, 'reviewed_frozen_packet': packet,
+        'reviewed_freeze_receipt': contract['reviewed_freeze_receipt'],
+        'reviewed_freeze_execution': contract['reviewed_freeze_execution'],
+        'actual_reviewed_source_count': len(rows), 'target_modules_imported_or_executed': False,
+        'native_binaries_or_numerical_results_hashed': False, 'scientific_execution_performed': False,
+        'numerical_values_compared': False, 'numerical_comparison_count': None, 'numerical_mismatch_count': None,
+        'numerical_PASS_claimed': False, 'canonical_files_or_gates_written': False,
+        'reviewer': '/root/clk02_header_port',
+        'authorship_disclosure': 'Header independently reviews Raw new launcher metadata. Header authored older builder, native glue, producer, scope and transport infrastructure; earlier own algorithms and future Original numerical correctness are not independently self-certified. Root full reads and other-author source reviews cover those limits.'}
+    for name, source in [('executed-source-reviewer.py', Path(__file__)), ('executed-metadata.py', META)]:
+        with (out / name).open('xb') as stream:
+            stream.write(source.read_bytes())
+    result['executed_reader_source_archive'] = m.ref(out / 'executed-source-reviewer.py')
+    result['executed_metadata_source_archive'] = m.ref(out / 'executed-metadata.py')
+    result['review_completed_utc'] = m.utc()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False)
+        stream.write('\n')
+    m.finish()
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,11 @@
+--- .runtime/porting/CLK-06/closure-prep-01/close_card.py
++++ .runtime/porting/CLK-06/closure-prep-02/close_card.py
+@@ -271,7 +271,7 @@
+         and v.same(admission['helper_request'], pins['frozen-helper-request'])
+         and len(admission['all_45_guard_refs']) == 45 and v.exact(cases['all_45_guard_refs'], admission['all_45_guard_refs']),
+         'Actual Original1120/unchanged frozen six/ordered45 required')
+-    v.need(v.exact(unit['contracts'], admission['contracts']) and v.exact(prod['contracts'], admission['contracts'])
++    v.need(v.exact(unit_qa['contracts'], admission['contracts']) and v.exact(prod['contracts'], admission['contracts'])
+         and v.exact(data['reviewed_contracts'], admission['contracts'])
+         and v.same(unit_qa['native_admission_contract'], pins['frozen-native-admission'])
+         and v.same(unit_qa['Original_data_review'], pins['original-data-review'])

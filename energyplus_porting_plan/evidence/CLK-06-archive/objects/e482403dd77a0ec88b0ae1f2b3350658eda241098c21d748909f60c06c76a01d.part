@@ -1,0 +1,176 @@
+"""Bounded metadata transport only; no engines, equations, or output operands."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import stat
+
+ROOT = Path(__file__).resolve().parents[5]
+BASE = ROOT / '.runtime/porting/CLK-06'
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+SEEN = {}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def instant(value):
+    item = datetime.fromisoformat(value)
+    require(item.tzinfo is not None and item.utcoffset().total_seconds() == 0, 'Aware UTC required')
+    return item
+
+
+def path(value):
+    item = Path(value)
+    item = item if item.is_absolute() else ROOT / item
+    item = item.resolve()
+    require(item.is_relative_to(ROOT) and item != ROOT, 'Artifact escapes repository')
+    return item
+
+
+def sha(value):
+    with Path(value).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def ref(value):
+    item = path(value)
+    info = item.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse bound artifact required')
+    digest = sha(item)
+    require(item not in SEEN or SEEN[item] == digest, 'Bound artifact changed')
+    SEEN[item] = digest
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def verify(binding):
+    require(type(binding) is dict and type(binding.get('path')) is str
+            and type(binding.get('sha256')) is str and len(binding['sha256']) == 64, 'Typed path/hash required')
+    item = path(binding['path'])
+    require(ref(item)['sha256'] == binding['sha256'], 'Bound bytes differ: ' + binding['path'])
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and item.stat().st_size == binding[key], 'Bound size differs')
+    return item
+
+
+def identity(actual, declared):
+    # Native file_ref emits absolute path/hash/bytes; declaration is relative path/hash.
+    require(verify(actual) == verify(declared), 'Contained actual/declared path identity differs')
+    require(actual['sha256'] == declared['sha256'], 'Actual/declared hash identity differs')
+
+
+def exact(a, b):
+    if type(a) is not type(b):
+        return False
+    if type(a) is dict:
+        return set(a) == set(b) and all(exact(a[key], b[key]) for key in a)
+    if type(a) is list:
+        return len(a) == len(b) and all(exact(x, y) for x, y in zip(a, b))
+    if type(a) is float:
+        return a.hex() == b.hex()
+    return a == b
+
+
+def read(value):
+    def pairs(rows):
+        result = {}
+        for key, item in rows:
+            require(key not in result, 'Duplicate JSON key')
+            result[key] = item
+        return result
+    return json.loads(Path(value).read_text(encoding='utf8'), object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonstandard JSON ' + token)))
+
+
+def put(directory, name, payload):
+    destination = path(directory / name)
+    require(destination.is_relative_to(directory), 'Fresh output filename escapes directory')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open('xb') as stream:
+        stream.write(payload)
+    return ref(destination)
+
+
+def put_json(directory, name, value):
+    return put(directory, name, (json.dumps(value, indent=2, ensure_ascii=True, allow_nan=False) + '\n').encode('utf8'))
+
+
+def unchanged(rows):
+    require(type(rows) is list and rows and len({row['historical_path'] for row in rows}) == len(rows),
+            'Unique reviewed source inventory required')
+    for row in rows:
+        require(path(row['historical_path']).read_bytes() == verify(row['archive']).read_bytes(), 'Reviewed source changed')
+
+
+def recorded(value, expected, not_after):
+    binding = ref(value)
+    record = read(verify(binding))
+    require(record['schema'] == 'recorded-porting-command.v1' and type(record['exit_code']) is int
+            and record['exit_code'] == 0 and record['launch_error'] is None
+            and record['source_bytes_match_before_and_after'] is True
+            and record['recorder_updates_gates'] is False and record['recorder_supplies_reference_answers'] is False,
+            'Actual recorded unchanged metadata0 required')
+    require(Path(record['cwd']).is_absolute() and Path(record['cwd']).resolve() == ROOT
+            and exact(read(verify(record['stdout'])), expected), 'Actual stdout/cwd differs')
+    for key in ['stderr', 'source_snapshot']:
+        verify(record[key])
+    require(verify(record['stderr']).stat().st_size == 0, 'Successful metadata stderr must be empty')
+    launcher = record['executed_launcher']
+    require(path(launcher['historical_path']) == ROOT / 'tools/porting/record_command.py', 'Actual generic recorder required')
+    verify(launcher['archive'])
+    require(instant(record['started_utc']) <= instant(record['finished_utc']) <= instant(not_after), 'Actual UTC chronology differs')
+    return binding, record
+
+
+def review_execution(value, review, not_after):
+    binding, record = recorded(value, review, not_after)
+    require(instant(record['started_utc']) <= instant(review['review_started_utc'])
+            <= instant(review['review_completed_utc']) <= instant(record['finished_utc']), 'Actual peer interval differs')
+    archive = verify(review['executed_reader_source_archive'])
+    require(sha(python_script(record['command'])) == sha(archive), 'Actual new C6 reader/script archive differs')
+    return binding
+
+
+def finish_guards():
+    for item, digest in SEEN.items():
+        require(sha(item) == digest, 'Bound bytes changed during metadata/native stage: ' + str(item))
+
+RAW = BASE
+TARGET = 'clk06_reference_helper'
+
+def write(destination, value):
+    with Path(destination).open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(value, stream, ensure_ascii=True, indent=2, allow_nan=False)
+        stream.write('\n')
+
+def argv_binding(command, flag, binding):
+    require(command.count(flag) == 1, 'Unique recorded argument required: ' + flag)
+    index = command.index(flag)
+    require(index + 1 < len(command) and path(command[index + 1]) == verify(binding), 'Recorded argument identity differs: ' + flag)
+
+
+def python_script(command, source=None):
+    require(type(command) is list and len(command) >= 2 and all(type(item) is str for item in command), 'Typed command array required')
+    require(Path(command[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe'], 'Admitted Python interpreter required')
+    index = 1
+    seen = set()
+    while index < len(command) and command[index].startswith('-'):
+        flag = command[index]
+        require(flag in ['-B', '-X'] and flag not in seen, 'Inline modules/code or unknown Python switches rejected')
+        seen.add(flag)
+        index += 1
+        if flag == '-X':
+            require(index < len(command) and command[index] == 'utf8', 'Exact Python UTF8 switch required')
+            index += 1
+    require(index < len(command) and command[index].endswith('.py'), 'Actual immediate Python script required')
+    actual = path(command[index])
+    require(source is None or actual == source, 'Actual immediate script must be the reviewed owner')
+    return actual

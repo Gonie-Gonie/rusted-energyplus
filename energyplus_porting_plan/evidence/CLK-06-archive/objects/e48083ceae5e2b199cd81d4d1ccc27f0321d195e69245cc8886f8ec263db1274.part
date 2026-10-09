@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-result-review-prep-02\review_result.py", line 441, in <module>
+    if __name__ == '__main__': main()
+                               ^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-result-review-prep-02\review_result.py", line 391, in main
+    matrix, plan, commands, outputs = actual_matrix(report, admission, request, build, started, freeze, executed)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-result-review-prep-02\review_result.py", line 274, in actual_matrix
+    m.need(m.check(outer['stdout']).read_text(encoding='utf8').splitlines() == lines.splitlines(), 'Full mixed matrix stdout protocol differs')
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-05\gate-review-prep-01\metadata.py", line 12, in need
+    raise ValueError(message)
+ValueError: Full mixed matrix stdout protocol differs

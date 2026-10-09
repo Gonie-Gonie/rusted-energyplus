@@ -1,0 +1,8 @@
+                    if (TotalSkyCover < 0.0) {
+                        TotalSkyCover = 99.0;
+                    }
+                    if (RelHum < 0.0) {
+                        RelHum = 999.0;
+                    }
+                    if (OpaqueSkyCover < 0.0) {
+                        OpaqueSkyCover = 99.0;

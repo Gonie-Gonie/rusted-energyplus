@@ -1,0 +1,2 @@
+    // Calculate sky temperature from weather data
+    Real64 CalcSkyEmissivity(EnergyPlusData &state, SkyTempModel skyTempModel, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);

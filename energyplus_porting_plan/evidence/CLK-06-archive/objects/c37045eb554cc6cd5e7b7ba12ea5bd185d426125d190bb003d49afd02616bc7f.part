@@ -1,0 +1,19 @@
+                    auto &tomorrowTs = state.dataWeather->wvarsHrTsTomorrow(ts, hour);
+                    auto const &wvarsH = wvarsHr(hour);
+                    tomorrowTs.OutDryBulbTemp = state.dataWeather->wvarsLastHr.OutDryBulbTemp * wgtPrevHr + wvarsH.OutDryBulbTemp * wgtCurrHr;
+                    tomorrowTs.OutBaroPress = state.dataWeather->wvarsLastHr.OutBaroPress * wgtPrevHr + wvarsH.OutBaroPress * wgtCurrHr;
+                    tomorrowTs.OutDewPointTemp = state.dataWeather->wvarsLastHr.OutDewPointTemp * wgtPrevHr + wvarsH.OutDewPointTemp * wgtCurrHr;
+                    tomorrowTs.OutRelHum = state.dataWeather->wvarsLastHr.OutRelHum * wgtPrevHr + wvarsH.OutRelHum * wgtCurrHr;
+                    tomorrowTs.WindSpeed = state.dataWeather->wvarsLastHr.WindSpeed * wgtPrevHr + wvarsH.WindSpeed * wgtCurrHr;
+                    tomorrowTs.WindDir = interpolateWindDirection(state.dataWeather->wvarsLastHr.WindDir, wvarsH.WindDir, wgtCurrHr);
+                    tomorrowTs.TotalSkyCover = state.dataWeather->wvarsLastHr.TotalSkyCover * wgtPrevHr + wvarsH.TotalSkyCover * wgtCurrHr;
+                    tomorrowTs.OpaqueSkyCover = state.dataWeather->wvarsLastHr.OpaqueSkyCover * wgtPrevHr + wvarsH.OpaqueSkyCover * wgtCurrHr;
+                    // Sky emissivity now takes interpolated timestep inputs rather than interpolated calculation esky results
+                    calcSky(state,
+                            tomorrowTs.HorizIRSky,
+                            tomorrowTs.SkyTemp,
+                            tomorrowTs.OpaqueSkyCover,
+                            tomorrowTs.OutDryBulbTemp,
+                            tomorrowTs.OutDewPointTemp,
+                            tomorrowTs.OutRelHum * 0.01,
+                            state.dataWeather->wvarsLastHr.HorizIRSky * wgtPrevHr + wvarsH.HorizIRSky * wgtCurrHr);

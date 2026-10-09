@@ -1,0 +1,7 @@
+    int Envrn = 0;                       // Counter for environments
+    int NumOfEnvrn = 0;                  // Number of environments to be simulated
+    int NumEPWTypExtSets = 0;            // Number of Typical/Extreme on weather file.
+    int NumWPSkyTemperatures = 0;        // Number of WeatherProperty:SkyTemperature items in input file
+
+    Array2D<Weather::WeatherVars> wvarsHrTsToday;
+    Array2D<Weather::WeatherVars> wvarsHrTsTomorrow;

@@ -1,0 +1,6 @@
+        ipsc->cCurrentModuleObject = "WeatherProperty:SkyTemperature";
+        state.dataWeather->NumWPSkyTemperatures = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+
+        state.dataWeather->WPSkyTemperature.allocate(state.dataWeather->NumWPSkyTemperatures); // by default, not used.
+
+        for (int i = 1; i <= state.dataWeather->NumWPSkyTemperatures; ++i) {

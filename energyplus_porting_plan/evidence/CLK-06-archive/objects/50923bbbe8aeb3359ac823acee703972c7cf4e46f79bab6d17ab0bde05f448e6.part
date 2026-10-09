@@ -1,0 +1,133 @@
+"""Transcribe genuine call availability/counts; never certify numerical values."""
+from collections import Counter
+from .common import exact, identity, require, verify
+
+
+def outcome(item):
+    invoked = item['actual_source_invoked']
+    value = item['call_outcome']
+    require(type(invoked) is bool and value['status'] in
+            ['source_returned', 'source_fatal', 'not-invoked-after-prior-source-outcome'], 'Actual source outcome shape differs')
+    require(invoked is (value['status'] != 'not-invoked-after-prior-source-outcome')
+            and value['source_fatal'] is (True if value['status'] == 'source_fatal' else False if invoked else None),
+            'Actual invocation/fatal availability differs')
+    return invoked, value['status']
+
+
+def grid_shape(snapshot, full):
+    require(snapshot['full_sky_grid_contents_available'] is full, 'Declared compact/full availability differs')
+    fields = ['SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover']
+    for key in ['today_values', 'tomorrow_values']:
+        grid = snapshot[key]
+        require(type(grid['allocated']) is bool and type(grid['time_steps']) is int and type(grid['hours']) is int
+                and grid['ordering'] == 'hour-major,timestep-minor'
+                and grid['observed_fields'] == fields, 'Actual sky/cloud grid shape differs')
+        require((grid['allocated'] is True and grid['time_steps'] in [1, 3, 4] and grid['hours'] == 24)
+                or (grid['allocated'] is False and grid['time_steps'] == grid['hours'] == 0), 'Actual allocated shape differs')
+        if full:
+            require(type(grid['slots']) is list and grid['contents_available'] is True
+                    and len(grid['slots']) == grid['time_steps'] * grid['hours'], 'Observed full sky storage required')
+            for slot, position in zip(grid['slots'], [(hour, step) for hour in range(1, grid['hours'] + 1)
+                    for step in range(1, grid['time_steps'] + 1)], strict=True):
+                require(type(slot['hour']) is type(slot['time_step']) is int
+                        and (slot['hour'], slot['time_step']) == position and set(slot['value']) == set(fields),
+                        'Actual full-grid source ordering/fieldset differs')
+        else:
+            require(grid['slots'] is None and grid['contents_available'] is False
+                    and grid['unavailability_reason'] == 'pre-execution declared compact unselected sky/cloud grid',
+                    'Declared unavailable contents cannot become fabricated values')
+    observation = snapshot['clk06_observation']
+    require(observation['native_current_sky_globals_paired'] is False
+            and observation['private_hourly_ESky_or_branch_locals_observed'] is False
+            and observation['whole_other_current_physics_paired'] is False,
+            'Predeclared native-only/private/other-physics boundary differs')
+
+
+def source_outcomes(result, request, build):
+    require(result['schema'] == 'clk06-helper-results.v1' and result['energyplus_commit'] == build['source_commit'], 'Actual native schema/pin differs')
+    for actual_key, build_key in [('actual_request', 'helper_request'), ('native_admission_contract', 'native_admission_contract'),
+                                 ('observation_projection', 'projection'), ('actual_binary', 'helper_binary')]:
+        identity(result[actual_key], build[build_key])
+    require(type(result['contracts']) is dict and set(result['contracts']) == set(build['contracts']), 'Exact native contract key inventory required')
+    for name, binding in result['contracts'].items():
+        identity(binding, build['contracts'][name])
+    counts = request['requested_counts']
+    require(result['complete'] is True and exact(result['requested_counts'], counts)
+            and exact(build['requested_counts'], counts), 'Actual result/frozen declared counts differ')
+    for key in ['scientific_comparison_performed', 'gates_updated', 'full_simulation_or_selected_scope_PASS_claimed',
+                'expected_values_supplied', 'expected_exits_supplied', 'native_internal_record_index_observed',
+                'native_current_sky_globals_paired', 'SkyTempKelvin_cross_engine_profile_admitted']:
+        require(result[key] is False, 'Actual result scope differs: ' + key)
+    require(exact(result['root_preoutput_decision'], request['root_preoutput_decision']), 'Actual Root owner/profile decision differs')
+    statuses, calls, observed = Counter(), Counter(), []
+
+    def add(item, kind, sequence_id):
+        invoked, status = outcome(item)
+        statuses[status] += 1
+        if invoked:
+            calls[kind] += 1
+        observed.append({'sequence_id': sequence_id, 'operation_id': item['id'], 'kind': kind,
+                         'actual_source_invoked': invoked, 'call_outcome': item['call_outcome']})
+
+    require(len(result['setup_cases']) == len(request['setup_cases']) == counts['setup_cases'], 'Actual Setup roots differ')
+    for item, supplied in zip(result['setup_cases'], request['setup_cases'], strict=True):
+        require(item['id'] == supplied['id'] and exact(item['requested_operation'], supplied), 'Actual Setup inputs differ')
+        require(item['kind'] == 'SetupInterpolationValues' and item['TimeStepFraction_descriptor_applied_to_weather_owner'] is False,
+                'Pure Setup clock phase must not invent a TimeStepFraction assignment')
+        add(item, 'SetupInterpolationValues', None)
+    require(len(result['emissivity_cases']) == len(request['emissivity_cases']) == counts['emissivity_cases'], 'Actual emissivity roots differ')
+    for item, supplied in zip(result['emissivity_cases'], request['emissivity_cases'], strict=True):
+        require(item['id'] == supplied['id'] and item['kind'] == 'CalcSkyEmissivity'
+                and exact(item['requested_operation'], supplied) and item['private_hourly_ESky_observed'] is False
+                and item['actual_whole_public_return_invoked'] is True, 'Actual genuine public return inputs/scope differ')
+        invoked, status = outcome(item)
+        require(type(item['actual_return_available']) is bool and item['actual_return_available'] is (status == 'source_returned')
+                and (type(item['actual_return']) is dict if item['actual_return_available'] else item['actual_return'] is None),
+                'Actual public return availability differs')
+        add(item, 'CalcSkyEmissivity', None)
+    require(len(result['weather_sequences']) == len(request['weather_sequences']) == counts['weather_sequences'], 'Actual weather roots differ')
+    for sequence, declared in zip(result['weather_sequences'], request['weather_sequences'], strict=True):
+        require(sequence['id'] == declared['id'] and sequence['lane'] == declared['lane']
+                and len(sequence['operations']) == len(declared['operations']), 'Actual source identity/order/cardinality differs')
+        identity(sequence['input'], declared['input']); identity(sequence['weather_input'], declared['weather'])
+        require(exact(sequence['declared_run_period_input'], declared['run_period'])
+                and exact(sequence['declared_native_preparation'], declared['native_preparation'])
+                and exact(sequence['declared_solar_controls'], declared['solar_controls']), 'Actual input declaration differs')
+        preparation = sequence['preparation_calls']
+        expected = declared['native_preparation']['genuine_calls']
+        require(type(preparation) is list and preparation and len(preparation) <= len(expected)
+                and [row['kind'] for row in preparation] == expected[:len(preparation)], 'Actual preparation prefix differs')
+        for position, prepared in enumerate(preparation):
+            status = prepared['call_outcome']['status']
+            require(status in ['source_returned', 'source_fatal']
+                    and prepared['call_outcome']['source_fatal'] is (status == 'source_fatal')
+                    and (status != 'source_fatal' or position == len(preparation) - 1), 'Actual preparation outcome prefix differs')
+        for item, supplied in zip(sequence['operations'], declared['operations'], strict=True):
+            require(item['id'] == supplied['id'] and item['kind'] == supplied['kind']
+                    and exact(item['requested_operation'], supplied), 'Actual requested operation identity/order differs')
+            incoming = item['before_caller']['global']
+            day = supplied['caller'].get('BeginDayFlag', incoming['BeginDayFlag'])
+            environment = supplied['caller'].get('BeginEnvrnFlag', incoming['BeginEnvrnFlag'])
+            require(type(day) is bool and type(environment) is bool, 'Typed effective boundary flags required')
+            full = supplied['kind'] == 'GetNextEnvironment' or (supplied['kind'] == 'InitializeWeather' and (day or environment))
+            require(item['full_sky_grid_observation_declared'] is full, 'Actual frozen observation mask differs')
+            for key in ['before_caller', 'before', 'after']:
+                grid_shape(item[key], full)
+            if supplied['kind'] == 'calcSky' and item['actual_source_invoked'] is True:
+                require(set(item['formal_outputs_before']) == set(item['formal_outputs_after']) == {'HorizIRSky', 'SkyTemp'},
+                        'Actual formal calcSky reference outputs must remain retained')
+            add(item, supplied['kind'], sequence['id'])
+    require(len(observed) == counts['total_operations'], 'Every actual requested operation row must be retained')
+    actual = {'actual_operation_invocations': sum(calls.values()),
+              'actual_operations_skipped': statuses['not-invoked-after-prior-source-outcome'],
+              'actual_source_function_counts': dict(calls), 'actual_source_status_counts': dict(statuses)}
+    for key, value in actual.items():
+        require(exact(result[key], value), 'Actual count transcription differs: ' + key)
+    return {**actual, 'requested_counts': counts, 'observed_operations': observed,
+            'actual_requested_operation_rows': len(observed), 'request_root_coverage_complete': True,
+            'all_requested_operations_source_returned': statuses['source_returned'] == counts['total_operations'],
+            'actual_preparation_calls': [{'sequence_id': row['id'], 'calls': row['preparation_calls']} for row in result['weather_sequences']],
+            'source_outputs_numerically_compared': False, 'numerical_comparison_count': None,
+            'numerical_mismatch_count': None, 'numerical_PASS_claimed': False,
+            'independent_initial_data_review_required_before_Rust': True,
+            'source_error_text_parity_claimed': False, 'native_internal_record_index_observed': False}

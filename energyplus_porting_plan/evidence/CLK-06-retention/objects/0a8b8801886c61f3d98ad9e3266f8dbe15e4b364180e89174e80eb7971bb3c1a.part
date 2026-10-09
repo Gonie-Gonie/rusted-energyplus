@@ -1,0 +1,154 @@
+{
+  "schema": "clk06-metadata-card-closure.v1",
+  "completed_utc": "2026-10-09T10:03:48.893673+00:00",
+  "before": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1"
+    }
+  ],
+  "after": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "34268f7ee2b75265879388a8837f65927adffffa89a8249d14fe05de4aea3eb1"
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "533094776492a66810adbb3a92180fd035199b4a4fa0a9a5a80524b603ad50fd"
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CLK-06.json",
+      "sha256": "798a9b075eedc343fa28fae9840dccc560a8d862b76baf5b69a7c19983d28d33"
+    }
+  ],
+  "archived_deltas": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "before": {
+        "path": ".runtime/porting/CLK-06/closure-01/before-plan.json",
+        "sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042"
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/closure-01/after-plan.json",
+        "sha256": "34268f7ee2b75265879388a8837f65927adffffa89a8249d14fe05de4aea3eb1"
+      }
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "before": {
+        "path": ".runtime/porting/CLK-06/closure-01/before-CLK-06.md",
+        "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1"
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/closure-01/after-CLK-06.md",
+        "sha256": "533094776492a66810adbb3a92180fd035199b4a4fa0a9a5a80524b603ad50fd"
+      }
+    }
+  ],
+  "previously_absent_evidence": "energyplus_porting_plan/evidence/CLK-06.json",
+  "only_CLK06_gates_updated": true,
+  "other_63_tasks_unchanged": true,
+  "other_63_raw_task_object_bytes_unchanged": true,
+  "all_four_actual_gates": "통과",
+  "executed_writer_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/closure-prep-04/close_card.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/closure-01/close_card.py",
+        "sha256": "f0995b2536c57d8c37a2aee45c8c96a26a0568cf4c15f0b73c55c1d891d8eb8a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/closure-prep-04/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/closure-01/common.py",
+        "sha256": "ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/root-approved-completion-01/bindings.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/closure-01/bindings.json",
+        "sha256": "4977bc0d17b1745dba7462d0b12975263c68c8fb95a04c1876de79f7f0ef44a4"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/root-approved-completion-01/source-mapping.json",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/closure-01/source-mapping.json",
+        "sha256": "ae6027b3594f07852b4f896b2c886078ed61aabe32f8249f96fe8e8f71d44033"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/root-approved-completion-01/card-notes.md",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/closure-01/card-notes.md",
+        "sha256": "1a3439a428fbb6a1002110f0989e6656854715beb68d0ceccab1f6d66d4075ac"
+      }
+    }
+  ],
+  "actual_archive": {
+    "path": "energyplus_porting_plan/evidence/CLK-06-archive/archive.json",
+    "sha256": "9e028c79e43397b372d076634be810a2ce2e04686574f5313a762f4ae1450f57"
+  },
+  "actual_final_quality": {
+    "workspace_tests": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/workspace-test-command-03/receipt.json",
+        "sha256": "90d51a4b7f7a270eddd7a940cb375063f95e3329b06e7ba0d83a92a9565588fc"
+      },
+      "started_utc": "2026-10-09T08:47:52.021970+00:00",
+      "finished_utc": "2026-10-09T08:50:57.845123+00:00",
+      "exit_code": 0,
+      "actual_test_counts": {
+        "groups": 21,
+        "passed": 4612,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/clippy-command-02/receipt.json",
+        "sha256": "278443659d8629ca7210afaeb113d523666788895cbc13a89bfa6101013c6ddc"
+      },
+      "started_utc": "2026-10-09T08:51:34.805081+00:00",
+      "finished_utc": "2026-10-09T08:52:42.689809+00:00",
+      "exit_code": 0
+    },
+    "format_check": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/final-format-check-command-03/receipt.json",
+        "sha256": "12eec5fa9e40598118cf8fb979aafea6fe59d134eaf726f497ea9685568af7f7"
+      },
+      "started_utc": "2026-10-09T08:50:26.551780+00:00",
+      "finished_utc": "2026-10-09T08:50:27.659727+00:00",
+      "exit_code": 0
+    },
+    "source_quality": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/source-quality-command-05/receipt.json",
+        "sha256": "12329c4c876bb6a877e9521a9ccd3bc1bb5a0dc8c5a408af088a48ecfc1c485a"
+      },
+      "started_utc": "2026-10-09T08:48:51.829570+00:00",
+      "finished_utc": "2026-10-09T08:49:14.780946+00:00",
+      "exit_code": 0
+    },
+    "structure_quality": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/structure-quality-command-04/receipt.json",
+        "sha256": "5ba52c4f86dc821e87e0d4e0a1ef80d1d0d2addf0e73966b7a9e864c45989f42"
+      },
+      "started_utc": "2026-10-09T08:49:31.939397+00:00",
+      "finished_utc": "2026-10-09T08:50:04.064242+00:00",
+      "exit_code": 0
+    }
+  },
+  "scientific_comparer_or_engine_Cargo_Git_executed": false,
+  "HTML_or_other_views_synchronized": false,
+  "native_retirement_admitted_or_performed": false
+}

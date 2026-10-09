@@ -1,0 +1,27 @@
+    Real64 CalcSkyEmissivity(
+        EnergyPlusData &state, SkyTempModel const ESkyCalcType, Real64 const OSky, Real64 const DryBulb, Real64 const DewPoint, Real64 const RelHum)
+    {
+        // Calculate Sky Emissivity
+        // References:
+        // M. Li, Y. Jiang and C. F. M. Coimbra,
+        // "On the determination of atmospheric longwave irradiance under all-sky conditions,"
+        // Solar Energy 144, 2017, pp. 40–48,
+        // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
+        // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
+
+        Real64 ESky;
+
+        if (ESkyCalcType == SkyTempModel::Brunt) {
+            double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
+            ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
+        } else if (ESkyCalcType == SkyTempModel::Idso) {
+            double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + Constant::Kelvin));
+        } else if (ESkyCalcType == SkyTempModel::BerdahlMartin) {
+            double const TDewC = min(DryBulb, DewPoint);
+            ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
+        } else {
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + Constant::Kelvin) / Constant::Kelvin);
+        }
+        return ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+    }

@@ -1,0 +1,116 @@
+--- .runtime/porting/CLK-05/comparer-prep-01/numeric.py
++++ .runtime/porting/CLK-06/comparer-prep-02/numeric.py
+@@ -1,4 +1,4 @@
+-"""Compare actual binary64 operands with exactly five frozen field profiles."""
++"""Compare actual operands with Root's unchanged six profiles/nine explicit rows."""
+ from collections import Counter
+ import math
+ import re
+@@ -41,17 +41,40 @@
+ 
+ class Comparison:
+     def __init__(self, tolerances):
+-        require(tolerances['schema'] == 'clk05-tolerances-contract.v1'
++        require(tolerances['schema'] == 'clk06-tolerances-contract.v1'
+             and tolerances['missing_operand_counted_as_PASS'] is False and tolerances['generic_profile_fallback'] is False,
+             'Frozen field-specific tolerance/availability policy required')
+-        self.rows = {row['field']: row for row in tolerances['rows']}
+-        require(len(self.rows) == len(tolerances['rows']) == 5 and set(self.rows) ==
+-            {'Interpolation', 'SolarInterpolation', 'BeamSolarRad', 'DifSolarRad', 'NextHour.LiquidPrecip'}, 'Exact five profiles required')
+-        for name, row in self.rows.items():
+-            require(type(row['atol']) is float and type(row['rtol']) is float and row['rtol'] == 0.0
+-                and row['atol'] == (1e-12 if name == 'NextHour.LiquidPrecip' else 0.0)
+-                and row['signed_zero_bits_exact'] is True, 'Frozen pre-output numeric profile differs')
++        canonical = {
++            'ESky': {'unit':'1','atol':2e-15,'rtol':0.0},
++            'SkyTemp': {'unit':'degC','atol':1e-12,'rtol':1e-15},
++            'HorizIRSky': {'unit':'W_per_m2','atol':1e-12,'rtol':1e-15},
++            'cloud_drivers': {'comparison':'scalar_bits_and_class_exact','atol':0.0,'rtol':0.0},
++            'stored_interpolation_weights': {'comparison':'scalar_bits_and_class_exact','atol':0.0,'rtol':0.0},
++            'owned_value_copies': {'comparison':'scalar_bits_and_class_exact','atol':0.0,'rtol':0.0}}
++        require(exact(tolerances['numeric_profiles'], canonical), 'Root canonical precision profiles differ')
++        declared = {
++            ('direct_emissivity','ESky'): ('ESky','1'),
++            ('direct_calcSky_and_day_grid','SkyTemp'): ('SkyTemp','degC'),
++            ('direct_calcSky_and_day_grid','HorizIRSky'): ('HorizIRSky','W_per_m2'),
++            ('cloud_driver_and_history','TotalSkyCover'): ('cloud_drivers','tenths'),
++            ('cloud_driver_and_history','OpaqueSkyCover'): ('cloud_drivers','tenths'),
++            ('actual_stored_weights','Interpolation'): ('stored_interpolation_weights','1'),
++            ('actual_stored_weights','SolarInterpolation'): ('stored_interpolation_weights','1'),
++            ('same_owner_transport_copy','SkyTemp'): ('owned_value_copies','degC'),
++            ('same_owner_transport_copy','HorizIRSky'): ('owned_value_copies','W_per_m2')}
++        self.rows = {(row['profile'],row['field']):row for row in tolerances['rows']}
++        require(len(self.rows) == len(tolerances['rows']) == 9 and set(self.rows) == set(declared),
++                'Exactly nine explicit field/profile rows required; no fallback')
++        for key, row in self.rows.items():
++            profile, unit = declared[key]
++            require(row['unit'] == unit and type(row['atol']) is float and type(row['rtol']) is float
++                and row['atol'] == canonical[profile]['atol'] and row['rtol'] == canonical[profile]['rtol']
++                and row['signed_zero_bits_exact'] is True and row['IEEE_classification_exact'] is True,
++                'Frozen pre-output numeric row differs')
++            if 'comparison' in canonical[profile]:
++                require(row['comparison'] == canonical[profile]['comparison'], 'Explicit bit-exact profile differs')
+         self.numeric_count = self.metadata_count = self.literal_count = self.mismatch_count = 0
++        self.availability_failures = self.numeric_mismatches = self.metadata_mismatches = self.literal_mismatches = 0
+         self.categories, self.metrics = Counter(), {}
+         self.mismatches, self.unavailable_paths = [], []
+ 
+@@ -70,7 +93,8 @@
+             return True
+         self.excluded(label, 'actual comparison operand unavailable', not left, not right)
+         self.unavailable_paths[-1]['required'] = required
+-        if left != right or required:
++        if left != right:
++            self.availability_failures += 1
+             self.mismatch(label + '/availability', not left, not right, 'required operand unavailable' if required else 'availability differs')
+         return False
+ 
+@@ -79,6 +103,7 @@
+             return
+         self.metadata_count += 1; self.categories['typed_metadata'] += 1
+         if not exact(actual, original):
++            self.metadata_mismatches += 1
+             self.mismatch(label, actual, original, 'typed exact metadata differs')
+ 
+     def literal(self, actual, original, label, required=True):
+@@ -87,12 +112,18 @@
+         a, b = scalar(actual, label + '/actual'), scalar(original, label + '/original')
+         self.literal_count += 1; self.categories['literal_binary64'] += 1
+         if a[1:] != b[1:]:
++            self.literal_mismatches += 1
+             self.mismatch(label, actual, original, 'binary64 bits/class differ')
+ 
+-    def numeric(self, actual, original, label, field):
++    def numeric(self, actual, original, label, field, profile=None):
+         if not self.availability(actual, original, label):
+             return
+-        row = self.rows[field]
++        if profile is None:
++            profile = ('direct_emissivity' if field == 'ESky' else 'direct_calcSky_and_day_grid'
++                if field in ['SkyTemp','HorizIRSky'] else 'cloud_driver_and_history'
++                if field in ['TotalSkyCover','OpaqueSkyCover'] else 'actual_stored_weights')
++        require((profile,field) in self.rows, 'Unadmitted field/profile has no fallback')
++        row = self.rows[profile,field]
+         a, b = scalar(actual, label + '/actual'), scalar(original, label + '/original')
+         self.numeric_count += 1; self.categories[field] += 1
+         error = abs(a[0] - b[0])
+@@ -102,7 +133,9 @@
+         metric['maximum_absolute_error'] = max(metric['maximum_absolute_error'], error)
+         metric['sum_squared_error'] += error * error
+         zero_exact = a[1] == b[1] if a[0] == b[0] == 0.0 else True
+-        if not (a[2] == b[2] and zero_exact and error <= row['atol'] + row['rtol'] * abs(b[0])):
++        bit_exact = a[1:] == b[1:] if row.get('comparison') == 'scalar_bits_and_class_exact' else True
++        if not (a[2] == b[2] and zero_exact and bit_exact and error <= row['atol'] + row['rtol'] * abs(b[0])):
++            self.numeric_mismatches += 1
+             metric['mismatch_count'] += 1
+             self.mismatch(label, actual, original, 'frozen tolerance/classification/signed-zero differs')
+ 
+@@ -131,6 +164,8 @@
+         return {'numeric_comparison_count': self.numeric_count, 'literal_binary64_comparison_count': self.literal_count,
+             'metadata_comparison_count': self.metadata_count, 'comparison_count': self.numeric_count + self.literal_count + self.metadata_count,
+             'mismatch_count': self.mismatch_count, 'field_error_metrics': metrics, 'categories': dict(self.categories),
++            'availability_failures':self.availability_failures,'numeric_mismatches':self.numeric_mismatches,
++            'literal_binary64_mismatches':self.literal_mismatches,'metadata_mismatches':self.metadata_mismatches,
+             'mismatches': self.mismatches, 'mismatch_payload_limit': 1000,
+             'mismatch_payloads_truncated': self.mismatch_count > len(self.mismatches),
+             'unavailable_paths': self.unavailable_paths, 'unavailable_counted_as_PASS': False}

@@ -1,0 +1,81 @@
+{
+  "schema": "clk06-root-preoutput-scope-decisions.v1",
+  "recorded_utc": "2026-10-09T05:38:43.437136+00:00",
+  "author": "/root",
+  "status": "source-only-before-new-Original-and-Rust-outputs",
+  "scope_amendment": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+    "sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184"
+  },
+  "scope_amendment_execution": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-command-01/receipt.json",
+    "sha256": "e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b"
+  },
+  "read_and_accepted_source_designs": [
+    {
+      "path": ".runtime/porting/CLK-06/original-helper-design-prep-01/design.json",
+      "sha256": "bcbcf593f3f81ae24819c404801931358f2c335486101b62d607182977c414d8"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/source-packet-plan-prep-01/plan.md",
+      "sha256": "681b649973224dc49b5e9529ed17987c0e85a35bafc00be5a4f41d26fc42898c"
+    }
+  ],
+  "numeric_profiles": {
+    "ESky": {
+      "unit": "1",
+      "atol": 2e-15,
+      "rtol": 0.0
+    },
+    "SkyTemp": {
+      "unit": "degC",
+      "atol": 1e-12,
+      "rtol": 1e-15
+    },
+    "HorizIRSky": {
+      "unit": "W_per_m2",
+      "atol": 1e-12,
+      "rtol": 1e-15
+    },
+    "cloud_drivers": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "stored_interpolation_weights": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "owned_value_copies": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    }
+  },
+  "selected_day_carriers": [
+    "SkyTemp",
+    "HorizIRSky",
+    "TotalSkyCover",
+    "OpaqueSkyCover"
+  ],
+  "paired_transport": "actual Today sky2/cloud2; same owned Today-to-context/sample IR/report IR/thermal sky arguments; actual completed Current prefix and duplicate seed reuse",
+  "native_only_unpaired_globals": [
+    "weather.HorizIRSky",
+    "environment.SkyTemp",
+    "environment.SkyTempKelvin",
+    "environment.TotalCloudCover",
+    "environment.OpaqueCloudCover"
+  ],
+  "Rust_current_global_owner_extension_authorized_for_this_card": false,
+  "native_current_call_required": "whole genuine SetCurrentWeather at each production timestep for actual literal clock/Schedule and same-phase Today transport; existing current13 is context, not new C6 physical certification",
+  "SkyTempKelvin_cross_engine_profile_admitted": false,
+  "unavailable_policy": "Both-null is unavailable/no comparison/noPASS; one-sided required availability is failure; absent Rust global owners remain explicitly unpaired",
+  "source_review_is_not_numeric_data_QA": true,
+  "packet_projection_or_precision_freeze_performed": false,
+  "new_native_or_Rust_observations_read": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "canonical_gates_changed": false,
+  "Rust_math_release_pending_Original_data_QA_and_legacy_gap": true
+}

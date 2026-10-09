@@ -1,0 +1,160 @@
+"""Bounded stdlib metadata primitives; no reviewed target import or process API."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-06'
+SEEN = {}
+
+
+def need(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def instant(value):
+    item = datetime.fromisoformat(value)
+    need(item.tzinfo is not None and item.utcoffset().total_seconds() == 0, 'Aware UTC required')
+    return item
+
+
+def path(value, exists=True):
+    raw = Path(value)
+    item = (raw if raw.is_absolute() else ROOT / raw).resolve(strict=exists)
+    need(item != ROOT and item.is_relative_to(ROOT), 'Contained metadata/source path required')
+    return item
+
+
+def ref(value, expected=None):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    item = path(raw)
+    need(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+         'Regular non-reparse metadata/source required')
+    need(item.suffix.lower() in {'.py', '.json', '.md', '.txt', '.log', '.idf', '.epw', '.rs', '.cpp', '.cc', '.hh', '.cmake'}
+         and info.st_size <= 16_000_000, 'Bounded input/source metadata only; no engine binaries or numerical results')
+    with item.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    need(expected is None or digest == expected, 'Bound bytes differ: ' + str(item))
+    need(SEEN.setdefault(item, digest) == digest, 'Previously consumed metadata/source changed')
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def verify(binding):
+    need(type(binding) is dict and type(binding.get('path')) is str and type(binding.get('sha256')) is str,
+         'Typed file reference required')
+    item = path(ref(binding['path'], binding['sha256'])['path'])
+    for key in ['size_bytes', 'bytes']:
+        if key in binding:
+            need(type(binding[key]) is int and item.stat().st_size == binding[key], 'Bound optional size differs')
+    return item
+
+
+def read(binding):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            need(key not in result, 'Duplicate JSON key')
+            result[key] = value
+        return result
+    return json.loads(verify(binding).read_bytes(), object_pairs_hook=pairs,
+                      parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Nonstandard JSON ' + value)))
+
+
+def exact(a, b):
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(exact(a[key], b[key]) for key in a)
+    if isinstance(a, list):
+        return len(a) == len(b) and all(exact(x, y) for x, y in zip(a, b))
+    return a.hex() == b.hex() if type(a) is float else a == b
+
+
+def same(a, b):
+    return verify(a) == verify(b) and a['sha256'] == b['sha256']
+
+
+def archives(rows, count=None):
+    need(type(rows) is list and rows and len(rows) == len({row['historical_path'] for row in rows})
+         and (count is None or len(rows) == count), 'Unique actual source/archive inventory required')
+    for row in rows:
+        archive = verify(row['archive'])
+        need(path(row['historical_path']).read_bytes() == archive.read_bytes(), 'Current source differs from actual archived bytes')
+        ref(row['historical_path'], row['archive']['sha256'])
+    return {row['historical_path']: row['archive'] for row in rows}
+
+
+def recorded(value, expected, not_after):
+    binding = ref(value)
+    record = read(binding)
+    need(record['schema'] == 'recorded-porting-command.v1' and type(record['exit_code']) is int
+         and record['exit_code'] == 0 and record['launch_error'] is None
+         and record['source_bytes_match_before_and_after'] is True
+         and record['recorder_updates_gates'] is False and record['recorder_supplies_reference_answers'] is False,
+         'Actual guarded metadata recorder0 required')
+    need(Path(record['cwd']).is_absolute() and Path(record['cwd']).resolve() == ROOT
+         and exact(read(record['stdout']), expected) and verify(record['stderr']).stat().st_size == 0,
+         'Actual full typed stdout/empty stderr/repository cwd differs')
+    verify(record['source_snapshot']); verify(record['executed_launcher']['archive'])
+    need(path(record['executed_launcher']['historical_path']) == ROOT / 'tools/porting/record_command.py'
+         and instant(record['started_utc']) <= instant(record['finished_utc']) <= instant(not_after),
+         'Actual recorder identity/UTC differs')
+    return binding, record
+
+
+def script(record, archive):
+    command = record['command']
+    need(type(command) is list and command and all(type(x) is str for x in command)
+         and Path(command[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe'], 'Typed admitted Python argv required')
+    index = 1
+    if command[index:index + 2] == ['-X', 'utf8']:
+        index += 2
+    if command[index:index + 1] == ['-B']:
+        index += 1
+    need(index < len(command) and Path(command[index]).suffix == '.py'
+         and ref(command[index])['sha256'] == ref(verify(archive))['sha256'], 'Actual executed script/archive differs')
+    return command[index:]
+
+
+def review(value, execution, schema, status, not_after):
+    binding = ref(value)
+    report = read(binding)
+    need(report['schema'] == schema and report['status'] == status and report['scientific_execution_performed'] is False,
+         'Actual admitted metadata review protocol required')
+    outer, record = recorded(execution, report, not_after)
+    need(instant(record['started_utc']) <= instant(report['review_started_utc'])
+         <= instant(report['review_completed_utc']) <= instant(record['finished_utc']), 'Actual review interval differs')
+    script(record, report['executed_reader_source_archive'])
+    return binding, outer, report
+
+
+def finish():
+    for item, digest in list(SEEN.items()):
+        ref(item, digest)
+
+
+def emit(out, result, main):
+    directory = path(out, exists=False)
+    need(directory.is_relative_to(BASE) and directory != BASE and not directory.exists(), 'Fresh ignored metadata review output required')
+    finish()
+    directory.mkdir(parents=True)
+    for name, source in [('executed-source-reviewer.py', Path(main)), ('executed-metadata.py', Path(__file__))]:
+        with (directory / name).open('xb') as stream:
+            stream.write(source.read_bytes())
+    result['executed_reader_source_archive'] = ref(directory / 'executed-source-reviewer.py')
+    result['executed_metadata_source_archive'] = ref(directory / 'executed-metadata.py')
+    result['review_completed_utc'] = utc()
+    with (directory / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False)
+        stream.write('\n')
+    finish()
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False))

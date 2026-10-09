@@ -1,0 +1,141 @@
+{
+  "schema": "clk06-tolerances-contract.v1",
+  "card": "CLK-06",
+  "created_utc": "2026-10-09T06:21:57.621427+00:00",
+  "frozen_before_numerical_execution": true,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "rows": [
+    {
+      "profile": "direct_emissivity",
+      "field": "ESky",
+      "unit": "1",
+      "atol": 2e-15,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "direct_calcSky_and_day_grid",
+      "field": "SkyTemp",
+      "unit": "degC",
+      "atol": 1e-12,
+      "rtol": 1e-15,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "direct_calcSky_and_day_grid",
+      "field": "HorizIRSky",
+      "unit": "W_per_m2",
+      "atol": 1e-12,
+      "rtol": 1e-15,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "cloud_driver_and_history",
+      "field": "TotalSkyCover",
+      "unit": "tenths",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "cloud_driver_and_history",
+      "field": "OpaqueSkyCover",
+      "unit": "tenths",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "actual_stored_weights",
+      "field": "Interpolation",
+      "unit": "1",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "actual_stored_weights",
+      "field": "SolarInterpolation",
+      "unit": "1",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "same_owner_transport_copy",
+      "field": "SkyTemp",
+      "unit": "degC",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    },
+    {
+      "profile": "same_owner_transport_copy",
+      "field": "HorizIRSky",
+      "unit": "W_per_m2",
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "signed_zero_bits_exact": true,
+      "IEEE_classification_exact": true
+    }
+  ],
+  "numeric_profiles": {
+    "ESky": {
+      "unit": "1",
+      "atol": 2e-15,
+      "rtol": 0.0
+    },
+    "SkyTemp": {
+      "unit": "degC",
+      "atol": 1e-12,
+      "rtol": 1e-15
+    },
+    "HorizIRSky": {
+      "unit": "W_per_m2",
+      "atol": 1e-12,
+      "rtol": 1e-15
+    },
+    "cloud_drivers": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "stored_interpolation_weights": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    },
+    "owned_value_copies": {
+      "comparison": "scalar_bits_and_class_exact",
+      "atol": 0.0,
+      "rtol": 0.0
+    }
+  },
+  "criterion": "abs(actual-reference) <= atol + rtol*abs(reference)",
+  "missing_operand_counted_as_PASS": false,
+  "generic_profile_fallback": false,
+  "Root_pre_output_profile_patch": {
+    "path": ".runtime/porting/CLK-06/scope-amendment-prep-02/task-updates.json",
+    "sha256": "c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d"
+  },
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "unselected_native_current_SkyTempKelvin_profile_inferred": false
+}

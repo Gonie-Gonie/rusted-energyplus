@@ -1,0 +1,11 @@
+--- .runtime/porting/CLK-06/production-source-review-prep-04/review_sources.py
++++ .runtime/porting/CLK-06/production-source-review-prep-05/review_sources.py
+@@ -17,7 +17,7 @@
+     raise ValueError('Pinned stdlib metadata dependency differs before import')
+ spec = importlib.util.spec_from_file_location('clk06_source_metadata', HELPER)
+ m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+-MANIFEST = {'path': '.runtime/porting/CLK-06/production-workflow-prep-03/manifest.json', 'sha256': '0f8b9a73aaaf39a2e43e353b4ea3eee38bee01de377f6310ec17ddb73ca1458a'}
++MANIFEST = {'path': '.runtime/porting/CLK-06/production-workflow-prep-04/manifest.json', 'sha256': '433356e591e4b504df506b4d7f7ede8ba7eec374dd4b16cca4bd507ae9bfbd24'}
+ NAMES = ['common.py', 'evidence.py', 'prepare_plan.py', 'run_production.py']
+ 
+ 

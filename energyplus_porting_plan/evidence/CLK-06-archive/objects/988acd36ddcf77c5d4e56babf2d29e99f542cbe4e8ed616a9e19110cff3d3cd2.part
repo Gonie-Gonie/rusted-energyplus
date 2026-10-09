@@ -1,0 +1,11 @@
+--- .runtime/porting/CLK-06/production-workflow-prep-03/evidence.py
++++ .runtime/porting/CLK-06/production-workflow-prep-04/evidence.py
+@@ -150,7 +150,7 @@
+     freeze, freeze_start, freeze_finish = recorded(checked, execution, {'production_comparison_projection': reference,
+         'input_only_source_selection_freeze': True, 'scientific_execution_performed': False, 'gates_updated': False})
+     freezers = [value for owner, value in reviewed.items()
+-        if owner == '.runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py']
++        if owner == '.runtime/porting/CLK-06/production-comparer-prep-02/freeze_projection.py']
+     need(len(freezers) == 1, 'Unique actual production projection freezer required'); script(freeze, freezers[0], checked)
+     for flag, expected in [('--native-admission-contract', ADMISSION), ('--source-review', selected['source_review']),
+         ('--source-review-execution', selected['source_review_execution'])]:

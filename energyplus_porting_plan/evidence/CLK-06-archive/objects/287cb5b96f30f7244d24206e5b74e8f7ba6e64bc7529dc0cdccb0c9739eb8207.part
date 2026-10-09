@@ -1,0 +1,53 @@
+--- pre-format/crates/ep_runtime/src/weather_day/production.rs
++++ crates/ep_runtime/src/weather_day/production.rs
+@@ -1,5 +1,8 @@
+ //! Fallible production weather access without borrowed cursor guards.
+ 
++use super::sky_transport_trace::{
++    self as sky_trace, SkyTransportKind, SkyTransportStamp, SkyTransportValues,
++};
+ use super::{
+     CurrentWeatherState, WeatherDayError, WeatherEnvironmentConfiguration, WeatherSession,
+     WeatherVars,
+@@ -7,7 +10,6 @@
+ use crate::weather::{EpwRecord, WeatherTimestepSample};
+ use ep_model::FirstHourInterpolationStartingValues;
+ use std::cell::RefCell;
+-use super::sky_transport_trace::{self as sky_trace, SkyTransportKind, SkyTransportStamp, SkyTransportValues};
+ 
+ /// Explicit caller phase; repeated warmup days retain independent call identities.
+ #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+@@ -205,7 +207,10 @@
+             }
+             session.set_current_weather()?;
+             *self.current_step_stamp.borrow_mut() = sky_trace::completed_stamp(
+-                phase, record_index, session.state.global.hour_of_day, session.state.global.time_step,
++                phase,
++                record_index,
++                session.state.global.hour_of_day,
++                session.state.global.time_step,
+             );
+             // The initial humidity seed and first thermal consumer share one
+             // zone step. Both consumer calls remain observable; the accepted
+@@ -270,11 +275,18 @@
+                 + f64::from(timestep) / f64::from(steps),
+         };
+         sky_trace::record(
+-            SkyTransportKind::OwnedContextReceipt, context.sky_transport_stamp,
++            SkyTransportKind::OwnedContextReceipt,
++            context.sky_transport_stamp,
+             SkyTransportValues::OwnedContext {
+-                today: [weather.sky_temp, weather.horiz_ir_sky, weather.total_sky_cover, weather.opaque_sky_cover],
++                today: [
++                    weather.sky_temp,
++                    weather.horiz_ir_sky,
++                    weather.total_sky_cover,
++                    weather.opaque_sky_cover,
++                ],
+                 sample_ir: context.sample.horizontal_infrared_radiation_w_per_m2,
+-            }, None,
++            },
++            None,
+         );
+         super::production_trace::record_consumer(record_index, timestep, phase, context, &session);
+         *self.last_consumed.borrow_mut() = Some((record_index, timestep));

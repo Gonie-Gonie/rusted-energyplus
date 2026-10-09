@@ -1,0 +1,286 @@
+{
+  "schema": "clk06-root-applied-transport-source-inventory.v1",
+  "unit_build": {
+    "path": ".runtime/porting/CLK-06/candidate-observer-build-01/build-receipt.json",
+    "sha256": "8cd79bbe823386fad63bc92defccf47ee83442d1ea10abdfc2a305033e9260b1"
+  },
+  "reviewed_math_inventory": {
+    "path": ".runtime/porting/CLK-06/math-applied-01/inventory.json",
+    "sha256": "200b7204a7ca130aa195a4dc2dcf6ea654e8b0f6f281b33066a72b8bb481c29c"
+  },
+  "reviewed_hooks_manifest": {
+    "path": ".runtime/porting/CLK-06/transport-hooks-prep-02/manifest.json",
+    "sha256": "00f33bcc3b322e4c935277331a96c7f097d45dafc387f4b9b1ae56131ad98467"
+  },
+  "reviewed_B_test_manifest": {
+    "path": ".runtime/porting/CLK-06/b-live-test-prep-01/manifest.json",
+    "sha256": "4522be28bd666d65a954d88211f8bfc51724d31245f02d8c0588f0bbef9ddce4"
+  },
+  "applied_sources": [
+    {
+      "historical_path": "crates/ep_run/src/lib.rs",
+      "before_unit_sha256": "cc579202821f4fe2d9fd848b22e6930dedaef2b2ff10d5bbbb5330e5383e2cf6",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_run/src/lib.rs",
+        "sha256": "a83ba6712c68dd63a78f9da2855f2c40a7493f113cc0f8a605e396b5e23c4ea9"
+      },
+      "current_sha256": "a83ba6712c68dd63a78f9da2855f2c40a7493f113cc0f8a605e396b5e23c4ea9",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_run/src/lib.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_run/src/pipeline.rs",
+      "before_unit_sha256": "175d47d00af937a8d8098da096b986139ac1eb0182d761752fbd323d043bf7c7",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_run/src/pipeline.rs",
+        "sha256": "ef62fd34a1b50de86d7fcc76cd9b67ab381f71c8347b1c8ff755c8aabd92dadc"
+      },
+      "current_sha256": "ef62fd34a1b50de86d7fcc76cd9b67ab381f71c8347b1c8ff755c8aabd92dadc",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_run/src/pipeline.rs.diff",
+        "sha256": "ce957a3d49abdd714a95d31d594b0a9159b26a63ad8559e8d07980a348c03de5"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/reports.rs",
+      "before_unit_sha256": "774854428daf15379b1b89add81b16ba1ec99ec42493f77bfc2cb93959520295",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/heat_balance/reports.rs",
+        "sha256": "a3ea6e5ba816b625a97785625df58150b8e012c8604db0ad0d321394805dcedc"
+      },
+      "current_sha256": "a3ea6e5ba816b625a97785625df58150b8e012c8604db0ad0d321394805dcedc",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/heat_balance/reports.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+      "before_unit_sha256": "80746f3388f8d54e9f5f4a16648eda66de07ce0eb9603a7381631693a47d624b",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+        "sha256": "f0fbdb7d985120e0554fed44d47c41fa0efd5ba83229608fd97b9b9f52fd4c8c"
+      },
+      "current_sha256": "f0fbdb7d985120e0554fed44d47c41fa0efd5ba83229608fd97b9b9f52fd4c8c",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs.diff",
+        "sha256": "a68b0dd19a75280c557c2ca0ea1609ff351d1fc045a21df261cffc8f4c362a41"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "before_unit_sha256": "e625a6e3c0e7b84c7a3a17a728517369fa1017c260c055bd2229c2ca5e575f60",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/heat_balance/run_period.rs",
+        "sha256": "f43d0aa74109034f77797da695d8a89d0b677993f028397d2a19d9446bc58ad8"
+      },
+      "current_sha256": "f43d0aa74109034f77797da695d8a89d0b677993f028397d2a19d9446bc58ad8",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/heat_balance/run_period.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+      "before_unit_sha256": "45472043602e3432d86cfcdad7fbecdfed559759002477b860ef7c436940faa6",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/heat_balance/surface_balance.rs",
+        "sha256": "159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434"
+      },
+      "current_sha256": "159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/heat_balance/surface_balance.rs.diff",
+        "sha256": "f78ac0e81ae070eac0b39e0b6c8ca2d8d5ef333d9cea309b3a68115020e81676"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/trace.rs",
+      "before_unit_sha256": "fe887a440d1ff8f2b9003cef5c9603aabbd1b1403ab922249e339efc1f6905d3",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/heat_balance/trace.rs",
+        "sha256": "8a5a190a29a365fdd06e7e5d55700c0bad491712a5c503c2aeb1f86ab73de695"
+      },
+      "current_sha256": "8a5a190a29a365fdd06e7e5d55700c0bad491712a5c503c2aeb1f86ab73de695",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/heat_balance/trace.rs.diff",
+        "sha256": "fc38898e817efbf6ba39ea2e6dcd7deb89fe969942be110ff447acf463f94114"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "before_unit_sha256": "fc771de72d205a3ce9ac17be1d2054ae94bda90863fa4d1d381a0dcdac6d47e4",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+        "sha256": "f3ddcf038fb5c28102ebe6416367ba36be5c2622b81a123ed87c7513a9a3ad14"
+      },
+      "current_sha256": "f3ddcf038fb5c28102ebe6416367ba36be5c2622b81a123ed87c7513a9a3ad14",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/runtime/tests/part06.rs",
+      "before_unit_sha256": "7916b3c09909db0926cbbe39ea6c889a897389c99a1b70a366919c2c12670ca7",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/runtime/tests/part06.rs",
+        "sha256": "47a57633bfa7867fc7976c8ad8ee7bc9f396113c2ac33c0246d297bb46d9a295"
+      },
+      "current_sha256": "47a57633bfa7867fc7976c8ad8ee7bc9f396113c2ac33c0246d297bb46d9a295",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/runtime/tests/part06.rs.diff",
+        "sha256": "6b39b3b0ad9cd9b22132fe6c314e13c05636178c6618bd40c1e61cb77dc832ed"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/runtime/tests/production_weather.rs",
+      "before_unit_sha256": "e6e253fe8379f90b41b9ca615d22682b074cc15e92af4f3c0a2585a4a461d568",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/runtime/tests/production_weather.rs",
+        "sha256": "bb061201bb29ed6c44f77c6fb7205b069dc0cda6f9d1982cf4da85bf4dbef0fe"
+      },
+      "current_sha256": "bb061201bb29ed6c44f77c6fb7205b069dc0cda6f9d1982cf4da85bf4dbef0fe",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/runtime/tests/production_weather.rs.diff",
+        "sha256": "aeba0487f0f66ef8112fd67bc8b1ccf8418fb93a0de58b689f4358928869aa2e"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/runtime.rs",
+      "before_unit_sha256": "5a09b31fb1ae937d817cd45d1568ad9d7179948709fdd83f0b46d814a57fe7bd",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/runtime.rs",
+        "sha256": "ef72c30f27655ffc19bd42e2c4d251c3cf351da5431ba71fe933684f112237f6"
+      },
+      "current_sha256": "ef72c30f27655ffc19bd42e2c4d251c3cf351da5431ba71fe933684f112237f6",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/runtime.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/mod.rs",
+      "before_unit_sha256": "d733ff335205e7cffe60ad4a43f06bf7b6cfd63508f31ff011b03c92abf786b9",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/weather_day/mod.rs",
+        "sha256": "0a4f3156c3a4625a2149dcb9fd178ae61bf7ae548a1c802632509c06d58ed325"
+      },
+      "current_sha256": "0a4f3156c3a4625a2149dcb9fd178ae61bf7ae548a1c802632509c06d58ed325",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/weather_day/mod.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/production.rs",
+      "before_unit_sha256": "8ca76c193f9c4fc8fedb85f4e42b175c92b683c9d03aa90fa3130b3a59c2d0b3",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "8cb2c4e6c1088b6fadfa37125179d1c71713cfe27c37870bab6cb2adab7609f2"
+      },
+      "current_sha256": "8cb2c4e6c1088b6fadfa37125179d1c71713cfe27c37870bab6cb2adab7609f2",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/weather_day/production.rs.diff",
+        "sha256": "287cb5b96f30f7244d24206e5b74e8f7ba6e64bc7529dc0cdccb0c9739eb8207"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/production_trace.rs",
+      "before_unit_sha256": "2d9d231483c3ee7ffec293515a989a852e50a46bc543bec421458d2dcc91e957",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/weather_day/production_trace.rs",
+        "sha256": "479734d9f839df09b07458340bef0b3c2c3e67122c203cfb3615daf772a9766f"
+      },
+      "current_sha256": "479734d9f839df09b07458340bef0b3c2c3e67122c203cfb3615daf772a9766f",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/weather_day/production_trace.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/weather_day/sky_transport_trace.rs",
+      "before_unit_sha256": null,
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/weather_day/sky_transport_trace.rs",
+        "sha256": "ff99ba18b310c3f37850b0b108879bbc87ee58b13fa519775fd83e5447af2ebf"
+      },
+      "current_sha256": "ff99ba18b310c3f37850b0b108879bbc87ee58b13fa519775fd83e5447af2ebf",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/weather_day/sky_transport_trace.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "historical_path": "crates/ep_run/src/clk06_sky_trace.rs",
+      "before_unit_sha256": null,
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_run/src/clk06_sky_trace.rs",
+        "sha256": "e7f914c1e18e7728c12a45397f291a9782434b901154b9e692bdd6d02252ee47"
+      },
+      "current_sha256": "e7f914c1e18e7728c12a45397f291a9782434b901154b9e692bdd6d02252ee47",
+      "role": "passive transport/source identity except actual Today IR sample assignment",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_run/src/clk06_sky_trace.rs.diff",
+        "sha256": "3eba2aa5b4bdacc206c4cd8eb16584b1c5cd3e0a8a94347f42c7c75ed048866a"
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/ideal_loads/coupled_runtime_tests_weather_day.rs",
+      "before_unit_sha256": "f959865e6a29336afe03c31787c42ee346cb42de346fab81b30f1f2cba404560",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/sources/crates/ep_runtime/src/ideal_loads/coupled_runtime_tests_weather_day.rs",
+        "sha256": "35ebf13db78942991c5a68fbd83a6cc23a338a68e6d5e654d8e2b2fb5420f9e3"
+      },
+      "current_sha256": "35ebf13db78942991c5a68fbd83a6cc23a338a68e6d5e654d8e2b2fb5420f9e3",
+      "role": "selected production transport and trace; B live-route regression",
+      "format_diff": {
+        "path": ".runtime/porting/CLK-06/transport-applied-04/format-diffs/crates/ep_runtime/src/ideal_loads/coupled_runtime_tests_weather_day.rs.diff",
+        "sha256": "d9c6b5ba47341a8e288df78197190132e97b4e09ed287e25694fe8b1753e4699"
+      }
+    }
+  ],
+  "Root_quality_adjustments": [
+    "Remove now-unused pure exterior_surface_boundary_temperature_c forwarding wrapper.",
+    "Narrow clippy::too_many_arguments allowance retains existing seven inputs plus passive origin.",
+    "Extract borrowed actual hourly/series observation helpers into existing collector; existing structure limits and arithmetic unchanged.",
+    "Capture dedicated sky receipts only for explicit porting scope in Full/Summary; export only real nonempty traces. Existing unscoped output layout preserved.",
+    "Replace obsolete A whole-legacy ResultStore equality with actual owned sky/report copy regression; raw initial CTF and zone seeds retained."
+  ],
+  "all_other_unit_source_bytes_unchanged": true,
+  "actual_unit_source_inventory_count": 3742,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "preserved_previous_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-applied-03/inventory.json",
+    "sha256": "924e6cff5d8e386327d4e6962b82f899f6e843cecaa6510fd765c3812dd592ef"
+  },
+  "reviewed_helper_manifest": {
+    "path": ".runtime/porting/CLK-06/report-handoff-helper-prep-02/manifest.json",
+    "sha256": "93043d79e1fd86133f194b714b8552c5e5c17e3a661dd08d690bb28aecd1ee63"
+  },
+  "reviewed_output_guard_manifest": {
+    "path": ".runtime/porting/CLK-06/scoped-sky-export-guard-prep-01/manifest.json",
+    "sha256": "5d2394bb684dc5f06f365f708a91293b57d8e0742e9309690d6748c5a983f83d"
+  },
+  "reviewed_A_test_manifest": {
+    "path": ".runtime/porting/CLK-06/a-live-test-prep-01/manifest.json",
+    "sha256": "c5e4be4bd4f2e45d39efae05fe2299fd4eeec1b6c2892c1cdcd741f5f67c9eea"
+  }
+}

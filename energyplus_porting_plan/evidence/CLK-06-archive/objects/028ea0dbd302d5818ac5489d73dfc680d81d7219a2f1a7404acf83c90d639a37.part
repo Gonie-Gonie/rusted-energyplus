@@ -1,0 +1,212 @@
+"""Source-only sky policy draft; Root-approved profiles, no calculated answers."""
+import copy
+import hashlib
+from common import PIN, exact, put, read, require, verify
+
+AUTHORITY = {'path': '.runtime/porting/CLK-06/scope-amendment-prep-01/scope-proposal.json',
+             'sha256': '4ce884811c9c9a140dbe32963b46bbdc19646ca1b2019d87cfd20f5b8c5b6e84'}
+PATCH = {'path': '.runtime/porting/CLK-06/scope-amendment-prep-02/task-updates.json',
+         'sha256': 'c88d136278f4859bbf477e31f511ae20c5f91c84f9f6017eea67843e257daa0d'}
+AUDIT = {'path': '.runtime/porting/CLK-06/readiness-audit-01/manifest.json',
+         'sha256': '1b30852a984c0bc45e00c2070fa54221b912f13ff73fdca6dbd480a4f1fdc53f'}
+DESIGN = {'path': '.runtime/porting/CLK-06/original-helper-design-prep-01/design.json',
+          'sha256': 'bcbcf593f3f81ae24819c404801931358f2c335486101b62d607182977c414d8'}
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+            'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+TRANSPORT = {'path': '.runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json',
+             'sha256': 'd05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c'}
+TRANSPORT_ROLES = ['owned_context_receipt', 'run_period_weather_sampler_return',
+    'run_period_report_accumulator', 'run_period_report_hourly_output',
+    'physical_exterior_balance_ingress', 'physical_resolved_longwave_argument',
+    'report_recomputed_longwave_argument']
+SKY = ['SkyTemp', 'HorizIRSky']
+CLOUD = ['TotalSkyCover', 'OpaqueSkyCover']
+PROFILES = {
+    'ESky': {'unit': '1', 'atol': 2e-15, 'rtol': 0.0},
+    'SkyTemp': {'unit': 'degC', 'atol': 1e-12, 'rtol': 1e-15},
+    'HorizIRSky': {'unit': 'W_per_m2', 'atol': 1e-12, 'rtol': 1e-15},
+    'cloud_drivers': {'comparison': 'scalar_bits_and_class_exact', 'atol': 0.0, 'rtol': 0.0},
+    'stored_interpolation_weights': {'comparison': 'scalar_bits_and_class_exact', 'atol': 0.0, 'rtol': 0.0},
+    'owned_value_copies': {'comparison': 'scalar_bits_and_class_exact', 'atol': 0.0, 'rtol': 0.0},
+}
+NATIVE_OBSERVATION_POLICY = {
+    'full_weather_grid_fields': SKY + CLOUD,
+    'full_weather_grid_snapshots': ['allocated_defaults', 'setup', 'prepared', 'before_caller_context',
+        'after_caller_context', 'GetNextEnvironment', 'InitializeWeather-effective-BeginEnvrn-or-BeginDay', 'final_state'],
+    'effective_boundary_flags': 'incoming flags overwritten only by declared partial caller writes',
+    'all_operations_executed_independently_of_observation_selection': True,
+    'compact_operation_grid_contents': None,
+    'compact_operation_grid_unavailability_reason': 'pre-execution declared compact unselected sky/cloud grid',
+    'selected_today_slot_fields': SKY + CLOUD,
+    'selected_today_slot_index': 'actual allocated in-range HourOfDay/TimeStep, otherwise explicitly unavailable',
+    'all19_counts_full17_LastHour_NextHour_Missing_retained': True,
+    'selected_cloud_history_fields': CLOUD,
+    'selected_cloud_missed_and_out_of_range_count_fields': CLOUD,
+    'native_private_hourly_or_calcSky_ESky_locals_observed': False,
+    'default_model_metadata': ['WP_Type1', 'skyTempModel', 'UseWeatherFileHorizontalIR'],
+    'default_model_must_be_actual_prepared_and_selected_not_forced': True,
+    'paired_native_current_globals': [],
+    'native_only_current_globals': ['weather.HorizIRSky', 'environment.SkyTemp',
+        'environment.SkyTempKelvin', 'environment.TotalCloudCover', 'environment.OpaqueCloudCover'],
+    'current13_solar_night_SRC08_physics_paired': False,
+}
+
+
+def authority():
+    proposal, patch, design = [read(verify(row)) for row in [AUTHORITY, PATCH, DESIGN]]
+    decision = read(verify(DECISION))
+    require(len(proposal['source_ranges']) == 50 and len(proposal['literal_all_45_guard_refs']) == 45,
+            'Exactly50 primary ranges and45 ordered CON references required')
+    require(exact(patch['updates']['numeric_profiles'], PROFILES), 'Root pre-output strict profiles differ')
+    require(exact(design['Root_pre_output_profiles_for_future_packet'], PROFILES), 'Helper design profiles differ')
+    require(decision['schema'] == 'clk06-root-preoutput-scope-decisions.v1'
+            and exact(decision['numeric_profiles'], PROFILES)
+            and exact(decision['selected_day_carriers'], SKY + CLOUD)
+            and exact(decision['native_only_unpaired_globals'], NATIVE_OBSERVATION_POLICY['native_only_current_globals'])
+            and decision['Rust_current_global_owner_extension_authorized_for_this_card'] is False
+            and decision['SkyTempKelvin_cross_engine_profile_admitted'] is False
+            and decision['scientific_execution_performed'] is False
+            and decision['packet_projection_or_precision_freeze_performed'] is False,
+            'Exact Root pre-output scope/profile decision required')
+    transport_inventory()
+    return proposal, design
+
+
+def transport_inventory():
+    inventory = read(verify(TRANSPORT))
+    require(inventory['schema'] == 'clk06-production-transport-source-inventory.v1'
+            and exact(inventory['Root_preoutput_decision'], DECISION)
+            and exact(inventory['required_role_names'], TRANSPORT_ROLES)
+            and inventory['source_count'] == len(inventory['source_rows']) == 9
+            and inventory['range_count'] == 15, 'Exact reviewed transport source inventory required')
+    require(len(inventory['files']) == 2, 'Exactly two held transport design files required')
+    for row in inventory['files']:
+        verify(row)
+    design = read(verify(inventory['files'][0]))
+    require(design['schema'] == 'clk06-source-only-production-transport-observation-design.v1'
+            and exact([row['role'] for row in design['required_observation_roles']], TRANSPORT_ROLES)
+            and exact(design['Root_preoutput_decision'], DECISION)
+            and design['staging']['hooks_currently_implemented_or_executed_claimed'] is False
+            and exact(design['staging']['required_trace_levels'], ['Full', 'Summary'])
+            and design['collection_integrity']['passive_hooks_recompute_weather_or_supply_inputs'] is False
+            and design['paired_scope_limits']['SRC08_coefficients_terms_or_heat_flux_certification_claimed'] is False,
+            'Required actual transport roles and scope differ')
+    count = 0
+    require(len({row['historical_path'] for row in inventory['source_rows']}) == 9, 'Unique transport sources required')
+    for row in inventory['source_rows']:
+        payload = verify(row['source']).read_bytes()
+        require(payload == verify(row['archive']).read_bytes(), 'Held current transport source/archive differs')
+        lines = payload.splitlines(keepends=True)
+        for selected in row['selected_ranges']:
+            first, last = selected['first_line'], selected['last_line']
+            require(type(first) is int and type(last) is int and 1 <= first <= last <= len(lines)
+                    and b''.join(lines[first - 1:last]) == verify(selected['archive']).read_bytes(),
+                    'Actual bounded transport source range differs')
+            count += 1
+    require(count == 15, 'Exactly fifteen transport ranges required')
+    return design
+
+
+def source_contract(directory, started, scope, prerequisite, controls, source_review, native_manifest):
+    proposal, design = authority()
+    require(scope['card']['sha256'] == '395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1',
+            'Actual approved CLK06 card differs')
+    originals, selected = {}, []
+    prefix = '.reference/energyplus-src/26.1.0/'
+    ranges = list(proposal['source_ranges'])
+    # Helper design contains extra declaration/owner ranges, not another numerical policy.
+    for row in design['source_ranges']:
+        if not any(exact(row['source'], old['source']) and row['start_line'] == old['start_line']
+                   and row['end_line'] == old['end_line'] for old in ranges):
+            ranges.append(row)
+    for row in ranges:
+        original = verify(row['source'])
+        lines = original.read_bytes().splitlines(keepends=True)
+        start, end = row['start_line'], row['end_line']
+        require(type(start) is int and type(end) is int and 1 <= start <= end <= len(lines), 'Exact bounded source range required')
+        payload = b''.join(lines[start - 1:end])
+        require(hashlib.sha256(payload).hexdigest() == row['range_sha256'], 'Original range bytes differ')
+        if not row['source']['path'].startswith(prefix):
+            continue  # Existing Rust findings are authority/provenance, never native operands.
+        if row['source']['path'] not in originals:
+            saved = put(directory, f'original-source/{len(originals):02}-{original.name}', original.read_bytes())
+            originals[row['source']['path']] = {'path': row['source']['path'].removeprefix(prefix),
+                'sha256': row['source']['sha256'], 'original': row['source'], 'archive': saved}
+        saved = put(directory, f'original-ranges/{len(selected):03}-{original.name}-{start}-{end}.txt', payload)
+        selected.append({'path': row['source']['path'].removeprefix(prefix), 'start_line': start,
+                         'end_line': end, 'archive': saved, 'bytes_normalized': False})
+    require(originals and selected, 'Nonempty actual original whole-source/range inventory required')
+    return {'schema': 'clk06-source-contract.v1', 'card': 'CLK-06', 'energyplus_commit': PIN,
+        'created_utc': started, 'frozen_before_numerical_execution': True, 'scientific_execution_performed': False,
+        'gates_updated': False, 'actual_scope_amendment': scope, 'actual_CLK05_prerequisite': prerequisite,
+        'current_card': scope['card'], 'historical_scope_authority': AUTHORITY, 'historical_readiness_audit': AUDIT,
+        'Root_pre_output_profile_patch': PATCH, 'root_preoutput_decision': DECISION,
+        'production_transport_source_inventory': TRANSPORT,
+        'helper_design': DESIGN, 'native_source_manifest': native_manifest,
+        'production_control_inputs': controls, 'source_review': source_review,
+        'source_files': list(originals.values()), 'source_ranges': selected,
+        'selected_functions': ['CalcSkyEmissivity-ClarkAllen', 'calcSky-default-useIR-true',
+            'ReadEPlusWeatherForDay-cloud-preprocess-hourly-and-subhour-sky', 'SetupInterpolationValues',
+            'GetNextEnvironment-actual-default-admission', 'InitializeWeather-Today-handoff',
+            'SetCurrentWeather-matching-phase-context-only'],
+        'selected_sky_fields': SKY, 'selected_cloud_fields': CLOUD,
+        'observed_fields': SKY + CLOUD, 'full_sky_grid_contents_available': True,
+        'native_observation_policy': copy.deepcopy(NATIVE_OBSERVATION_POLICY),
+        'admitted_sky_model': 'ClarkAllen', 'admitted_use_weather_file_horizontal_IR': True,
+        'actual_prepared_default_metadata_required': True,
+        'original_functions_copied_into_observer': False,
+        'private_native_hourly_ESky_or_record_index_claimed': False,
+        'current_globals_alternative_models_and_SRC08_physics_paired': False}
+
+
+def tolerance_contract(started):
+    authority()
+    rows = [{'profile': 'direct_emissivity', 'field': 'ESky', **copy.deepcopy(PROFILES['ESky'])}]
+    rows += [{'profile': 'direct_calcSky_and_day_grid', 'field': field, **copy.deepcopy(PROFILES[field])} for field in SKY]
+    rows += [{'profile': 'cloud_driver_and_history', 'field': field, 'unit': 'tenths',
+              **copy.deepcopy(PROFILES['cloud_drivers'])} for field in CLOUD]
+    rows += [{'profile': 'actual_stored_weights', 'field': field, 'unit': '1',
+              **copy.deepcopy(PROFILES['stored_interpolation_weights'])} for field in ['Interpolation', 'SolarInterpolation']]
+    rows += [{'profile': 'same_owner_transport_copy', 'field': field, 'unit': PROFILES[field]['unit'],
+              **copy.deepcopy(PROFILES['owned_value_copies'])} for field in SKY]
+    for row in rows:
+        row['signed_zero_bits_exact'] = True
+        row['IEEE_classification_exact'] = True
+    return {'schema': 'clk06-tolerances-contract.v1', 'card': 'CLK-06', 'created_utc': started,
+        'frozen_before_numerical_execution': True, 'scientific_execution_performed': False, 'gates_updated': False,
+        'rows': rows, 'numeric_profiles': copy.deepcopy(PROFILES),
+        'criterion': 'abs(actual-reference) <= atol + rtol*abs(reference)',
+        'missing_operand_counted_as_PASS': False, 'generic_profile_fallback': False,
+        'Root_pre_output_profile_patch': PATCH, 'root_preoutput_decision': DECISION,
+        'unselected_native_current_SkyTempKelvin_profile_inferred': False}
+
+
+def observation_projection(request_ref, request, contracts, started, catalogue_manifest):
+    authority()
+    require(exact(request['observation_policy'], NATIVE_OBSERVATION_POLICY), 'Reviewed input mask differs')
+    return {'schema': 'clk06-observation-projection.v1', 'card': 'CLK-06', 'created_utc': started,
+        'frozen_before_numerical_execution': True, 'helper_request': request_ref, 'contracts': contracts,
+        'native_observation_policy': copy.deepcopy(NATIVE_OBSERVATION_POLICY),
+        'catalogue_manifest': catalogue_manifest, 'root_preoutput_decision': DECISION,
+        'production_transport_source_inventory': TRANSPORT,
+        'requested_counts': request['requested_counts'],
+        'source_selection': {'direct_emissivity': ['ESky'], 'direct_calcSky': SKY,
+            'day_grids_and_selected_Today': SKY + CLOUD, 'cloud_history_and_counts': CLOUD,
+            'stored_arrays_at_DTO_ROOT': ['Interpolation', 'SolarInterpolation'],
+            'private_ESky_hourly_locals_and_native_current_globals': 'unavailable_or_unpaired_never_PASS'},
+        'production_selection': {'cases': ['A-24H', 'A-72H', 'B-BOTH-24H'], 'trace_levels': ['Full', 'Summary'],
+            'source_history': 'actual GetNext; Initialize then distinct Current at every zone step',
+            'required_observation_roles': copy.deepcopy(transport_inventory()['required_observation_roles']),
+            'joint_identity': copy.deepcopy(transport_inventory()['joint_identity']),
+            'collection_integrity': copy.deepcopy(transport_inventory()['collection_integrity']),
+            'Full_and_Summary_actual_observation_paths_and_event_limits_authenticated_before_CLI': True,
+            'initial_seed_repeated_context_is_not_weather_sampler_or_physical_invocation': True,
+            'physical_ingress_and_conditionally_executed_resolved_local_are_separate': True,
+            'report_recomputation_is_not_physical_longwave_invocation': True,
+            'hourly_report_expected_arithmetic_reconstructed_from_Today': False,
+            'SRC08_coefficients_heat_flux_and_native_global_owner_parity_paired': False},
+        'both_null_policy': 'unavailable; zero comparisons and no PASS',
+        'one_sided_required_availability_difference_is_failure': True,
+        'scientific_execution_performed': False, 'gates_updated': False,
+        'original_results_supplied_to_Rust': False, 'unavailable_counted_as_PASS': False,
+        'historical_CLK05_solar_only_observations_relabelled_sky': False}

@@ -1,0 +1,305 @@
+"""Authenticate existing proofs, two real build snapshots and frozen production inputs.
+
+No numerical readers are imported. Original scientific snapshots and result operands
+are not parsed; the actual DataQA and unit-result QA authenticate those artifacts.
+"""
+from pathlib import Path
+from common import (ADMISSION, BTEST, CONTROL, DECISION, DESIGN, HOOKS, MATH, ROOT,
+    binding, exact, need, read, recorded, ref, script, source_map, timestamp, v)
+
+REQUIRED = ['crates/ep_run/src/pipeline.rs', 'crates/ep_run/src/clk03_trace.rs',
+    'crates/ep_run/src/clk06_sky_trace.rs', 'crates/ep_run/src/weather_solar_controls.rs',
+    'crates/ep_runtime/src/weather_day/production.rs', 'crates/ep_runtime/src/weather_day/producer.rs',
+    'crates/ep_runtime/src/weather_day/hourly.rs', 'crates/ep_runtime/src/weather_day/sky.rs',
+    'crates/ep_runtime/src/weather_day/solar.rs', 'crates/ep_runtime/src/weather_day/mod.rs',
+    'crates/ep_runtime/src/weather_day/configuration.rs', 'crates/ep_runtime/src/weather_day/lifecycle.rs',
+    'crates/ep_runtime/src/weather_day/production_trace.rs', 'crates/ep_runtime/src/weather_day/sky_transport_trace.rs',
+    'crates/ep_runtime/src/heat_balance/weather_driver.rs', 'crates/ep_runtime/src/heat_balance/state.rs',
+    'crates/ep_runtime/src/heat_balance/surface_balance.rs']
+
+
+def fact_binding(actual, expected):
+    """Reuse exact DataQA/unitQA-reviewed large artifact identity without rehashing it."""
+    need(type(actual) is dict and type(expected) is dict
+        and type(actual.get('sha256')) is str and len(actual['sha256']) == 64
+        and all(c in '0123456789abcdef' for c in actual['sha256'])
+        and v.path_of(actual['path']).is_relative_to(ROOT) and v.same_binding(actual, expected),
+        'Previously reviewed literal artifact identity differs')
+
+
+def actual_review(reference, execution, schema, status, checked):
+    value = read(checked.check(reference)); record, start, finish = recorded(checked, execution, value)
+    need(value['schema'] == schema and value['status'] == status
+        and value['scientific_execution_performed'] is False
+        and start <= timestamp(value['review_started_utc']) <= timestamp(value['review_completed_utc']) <= finish,
+        'Actual metadata review schema/status/interval differs')
+    script(record, value['executed_reader_source_archive'], checked)
+    return value, record, finish
+
+
+def original(args, checked, admission):
+    qa_ref, execution_ref = ref(args.original_data_review), ref(args.original_data_review_execution)
+    qa, _, qc_finish = actual_review(qa_ref, execution_ref,
+        'clk06-independent-original-data-review.v1', 'pass-preserved-original-data-before-Rust-baseline', checked)
+    need(qa['intended_native_branch_coverage_complete'] is True
+        and qa['actual_operation_invocations'] == admission['requested_counts']['total_operations']
+        and qa['actual_operations_skipped'] == 0 and qa['numerical_PASS_claimed'] is False
+        and qa['scientific_values_compared'] is False and qa['source_unavailable_counted_as_PASS'] is False
+        and qa['numerical_comparison_count'] is None and qa['numerical_mismatch_count'] is None,
+        'Actual independent Original data QC coverage required')
+    source_map(qa['reviewed_reader_sources'], checked)
+    _, _, outer_finish = recorded(checked, qa['reviewed_execution'], {'reference': qa['reviewed_reference'],
+        'status': 'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review',
+        'actual_helper_exit_code': 0, 'actual_launcher_exit_code': 0})
+    need(outer_finish <= timestamp(qa['review_started_utc']), 'Original then DataQA chronology differs')
+    for key, expected in [('reviewed_request', admission['helper_request']),
+        ('reviewed_native_admission_contract', ADMISSION), ('reviewed_projection', admission['projection'])]:
+        binding(qa[key], expected, checked)
+    need(exact(qa['reviewed_contracts'], admission['contracts']), 'Original/QC frozen contracts differ')
+    control = qa['reviewed_control_review']
+    need(type(control) is dict and {'review', 'execution'} <= set(control), 'Actual control-review bundle required')
+    for key in ['review', 'execution']:
+        binding(control[key], admission['production_control_review'][key], checked)
+    return {'Original_reference': qa['reviewed_reference'], 'Original_execution': qa['reviewed_execution'],
+        'Original_data_review': qa_ref, 'Original_data_review_execution': execution_ref,
+        'Native_results': qa['reviewed_results'], 'Native_request': admission['helper_request'],
+        'Native_admission_contract': ADMISSION, 'Native_projection': admission['projection']}, qc_finish
+
+
+def interpreter(record, reported):
+    command = record['command']; admitted = {'python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'}
+    need(type(reported) is list and all(type(value) is str for value in reported) and len(reported) >= 2
+        and Path(command[0]).name.lower() in admitted and Path(reported[0]).name.lower() in admitted
+        and exact(command[1:], reported[1:]), 'Unit reader Python name/tail argv differs')
+    absolute = Path(reported[0]).is_absolute(); parent = record['python']['executable']
+    need(type(parent) is str and Path(parent).is_absolute(), 'Actual recorder parent Python path required')
+    if absolute:
+        need(Path(reported[0]).resolve() == Path(parent).resolve(), 'Absolute reported interpreter differs from recorder Python')
+    else:
+        need(reported[0] == command[0] == Path(reported[0]).name, 'Reported interpreter alias must equal exact recorded alias')
+    return {'reported_argv_zero': reported[0], 'recorded_command_zero': command[0],
+        'recorded_parent_python_executable': parent, 'reported_interpreter_is_absolute': absolute,
+        'child_python_executable_path': reported[0] if absolute else None,
+        'child_python_executable_path_available': absolute,
+        'parent_executable_is_proof_of_child_alias_resolution': False, 'unavailable_child_path_counted_as_PASS': False}
+
+
+def applied_core(args, probe_ref, unit_available, cli_available, checked):
+    inventory_ref = ref(args.applied_core_lineage); inventory = read(checked.check(inventory_ref))
+    need(inventory['schema'] == 'clk06-root-applied-transport-source-inventory.v1'
+        and inventory['scientific_execution_performed'] is False and inventory['gates_updated'] is False,
+        'Actual Root applied source inventory required; this is not another execution gate')
+    for key, expected in [('unit_build', probe_ref), ('reviewed_math_inventory', MATH),
+        ('reviewed_hooks_manifest', HOOKS), ('reviewed_B_test_manifest', BTEST)]: binding(inventory[key], expected, checked)
+    hooks, test, math = [read(checked.check(item)) for item in [HOOKS, BTEST, MATH]]
+    permitted = {row['path'] for row in hooks['changes']} | {row['target_path'] for row in hooks['new_sources']} | {test['canonical_path']}
+    rows = inventory['applied_sources']; indexed = {row['historical_path']: row for row in rows}
+    need(len(rows) == len(indexed) and set(indexed) == permitted, 'Exact reviewed hook and B-test source scope differs')
+    need(set(unit_available) <= set(cli_available) and set(cli_available) - set(unit_available)
+        == {row['target_path'] for row in hooks['new_sources']}, 'Only two declared new collector/serializer owners admitted')
+    for owner, row in indexed.items():
+        need(row['before_unit_sha256'] == (unit_available[owner]['sha256'] if owner in unit_available else None)
+            and row['current_sha256'] == row['archive']['sha256'] == cli_available[owner]['sha256']
+            and checked.check(row['archive']).read_bytes() == checked.check(cli_available[owner]).read_bytes(),
+            'Actual unit before and CLI applied archive differ: ' + owner)
+        checked.check(row['format_diff'])
+    for owner in set(unit_available) - permitted:
+        need(checked.check(unit_available[owner]).read_bytes() == checked.check(cli_available[owner]).read_bytes(),
+            'Source outside reviewed transport scope changed: ' + owner)
+    for row in math['sources']:
+        owner = row['path']; need(unit_available[owner]['sha256'] == row['sha256'], 'Unit math differs from reviewed applied inventory')
+        before, after = [checked.check(items[owner]).read_bytes() for items in [unit_available, cli_available]]
+        if owner.endswith('/mod.rs'):
+            line = b'pub mod sky_transport_trace;\n'
+            need(after.count(line) == 1 and after.replace(line, b'', 1) == before,
+                'Weather module changed beyond new passive collector declaration')
+        else: need(before == after, 'Actual unit numerical math bytes changed before CLI')
+    need(inventory['all_other_unit_source_bytes_unchanged'] is True
+        and inventory['actual_unit_source_inventory_count'] == sum(owner.endswith('.rs') for owner in unit_available), 'Root inventory source count differs')
+    return inventory_ref
+
+
+def production_projection(args, checked, admission, request, native, tolerances):
+    reference, execution = ref(args.comparison_projection), ref(args.comparison_projection_execution)
+    selected = read(checked.check(reference))
+    need(selected['schema'] == 'clk06-production-comparison-projection.v1'
+        and selected['frozen_before_all_six_Rust_production_calls'] is True
+        and all(selected[key] is False for key in ['native_results_read_by_freezer', 'scientific_execution_performed',
+            'numeric_policy_changed', 'unavailable_counted_as_PASS', 'gates_updated']), 'Input-only pre-six-CLI production selection required')
+    for key, expected in [('native_admission_contract', ADMISSION), ('native_request', admission['helper_request']),
+        ('native_observation_projection', admission['projection']), ('fixed_scope', admission['fixed_scope']),
+        ('root_preoutput_decision', DECISION), ('production_run_design', DESIGN),
+        ('production_transport_source_inventory', admission['production_transport_source_inventory'])]: binding(selected[key], expected, checked)
+    need(exact(selected['contracts'], admission['contracts']) and exact(selected['all_45_guard_refs'], admission['all_45_guard_refs']),
+        'Frozen production six packet/45 scope changed')
+    selection = selected['selection']
+    for key, expected in [('numeric_profiles', tolerances['numeric_profiles']), ('numeric_rows', tolerances['rows']),
+        ('numeric_criterion', tolerances['criterion']), ('source_selection', native['source_selection']),
+        ('native_observation_policy', request['observation_policy'])]: need(exact(selection[key], expected), 'Production selection changed: ' + key)
+    qa, _, qa_finish = actual_review(selected['source_review'], selected['source_review_execution'],
+        'clk06-independent-production-comparer-source-review.v1', 'pass-held-production-reader-and-frozen-input-policy-before-six-cli', checked)
+    reviewed = source_map(qa['reviewed_sources'], checked)
+    archived = source_map(selected['reader_source_archives'], checked)
+    prior = source_map(selected['reviewed_source_archives'], checked)
+    frozen = selected['reader_sources']
+    need(len(frozen) == len(reviewed) == len(archived) == len(prior)
+        and set(reviewed) == set(archived) == set(prior) == {row['path'] for row in frozen}, 'Production reviewed/frozen source scope differs')
+    for row in frozen:
+        need(row['sha256'] == reviewed[row['path']]['sha256'] == archived[row['path']]['sha256'] == prior[row['path']]['sha256'],
+            'Actual frozen production reader differs from reviewed source')
+    freeze, freeze_start, freeze_finish = recorded(checked, execution, {'production_comparison_projection': reference,
+        'input_only_source_selection_freeze': True, 'scientific_execution_performed': False, 'gates_updated': False})
+    freezers = [value for owner, value in reviewed.items()
+        if owner == '.runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py']
+    need(len(freezers) == 1, 'Unique actual production projection freezer required'); script(freeze, freezers[0], checked)
+    for flag, expected in [('--native-admission-contract', ADMISSION), ('--source-review', selected['source_review']),
+        ('--source-review-execution', selected['source_review_execution'])]:
+        need(freeze['command'].count(flag) == 1
+            and v.path_of(freeze['command'][freeze['command'].index(flag) + 1]) == checked.check(expected), 'Actual production freeze argument differs')
+    need(qa_finish <= freeze_start <= timestamp(selected['created_utc']) <= freeze_finish,
+        'Actual source review then input-only projection freeze chronology differs')
+    return reference, execution, freeze_finish
+
+
+def run_design(cases, request, admission, checked):
+    """Validate the six declared input routes and conditional cap, without results."""
+    design = read(checked.check(DESIGN))
+    need(design['schema'] == 'clk06-production-run-source-design.v1'
+        and design['scientific_execution_performed'] is False and design['actual_command_count'] == 6,
+        'Held six-run source design required')
+    for key, expected in [('native_admission_contract', ADMISSION), ('native_request', admission['helper_request']),
+        ('native_observation_projection', admission['projection']), ('root_preoutput_decision', DECISION),
+        ('production_transport_source_inventory', admission['production_transport_source_inventory'])]: binding(design[key], expected, checked)
+    need(exact(design['contracts'], admission['contracts']) and exact(design['all_45_guard_refs'], admission['all_45_guard_refs']),
+        'Design native packet or ordered45 scope differs')
+    lanes = {row['id']: row for row in request['weather_sequences'] if row['lane'] == 'production-CON'}
+    need([(row['case_id'], row['trace_level']) for row in design['cases']]
+        == [(row['case_id'], level) for row in cases for level in row['trace_levels']], 'Exact six case/trace routes required')
+    for row in design['cases']:
+        case = next(item for item in cases if item['case_id'] == row['case_id']); lane = lanes[row['case_id']]
+        for key in ['input', 'weather']: binding(row[key], case[key], checked)
+        need(exact(row['run_period'], lane['run_period']) and row['time_steps_per_hour'] == lane['time_steps_per_hour'] == 4
+            and exact(row['solar_controls'], case['solar_controls']), 'Design literal RunPeriod/steps/control transport differs')
+        text = checked.check(case['input']).read_text(encoding='utf8')
+        # Object cardinality only; no schema/converter or simulated geometry parity claim.
+        objects = [''.join(line.split('!', 1)[0] for line in text.splitlines()).split(';')][0]
+        kinds = [item.split(',', 1)[0].strip().casefold() for item in objects if ',' in item]
+        need(kinds.count('buildingsurface:detailed') == 6 and kinds.count('fenestrationsurface:detailed') == 0
+            and exact(row['input_geometry'], {'BuildingSurface:Detailed': 6, 'FenestrationSurface:Detailed': 0}),
+            'Conditional cap only admits six-surface/no-fenestration source inputs')
+        hours = 72 if case['duration'] == '72H' else 24; steps = hours * 4
+        bounds = {'owned_context_receipt': steps + 1, 'run_period_weather_sampler_return': steps,
+            'run_period_report_accumulator': steps, 'run_period_report_hourly_output': hours,
+            'run_period_report_series_handoff': hours * 2, 'physical_exterior_balance_ingress': 4 * 6 * steps,
+            'physical_resolved_longwave_argument': 4 * 6 * steps, 'report_recomputed_longwave_argument': 6 * steps,
+            'hourly_stamp_vector': hours}
+        need(row['hours'] == hours and row['zone_steps'] == steps and exact(row['conservative_collector_bounds'], bounds)
+            and row['selected_runtime_policy']['warmup_enabled'] is False
+            and row['selected_runtime_policy']['warmup_maximum_days'] == 0
+            and row['selected_runtime_policy']['surface_iteration_count'] == 1
+            and row['selected_runtime_policy']['hours_override'] is None, 'Frozen conditional six-run bounds differ')
+    policy = design['collector_policy']
+    need(policy['retained_prefix_per_kind'] == policy['hourly_stamp_vector_limit'] == 1_000_000
+        and policy['source_conditional_maximum_per_kind'] == 6912 and policy['any_truncation_is_incomplete_not_PASS'] is True
+        and policy['deduplicate_repeated_identity'] is False, 'Predeclared conditional cap/no-dedup policy differs')
+    return DESIGN
+
+
+def prerequisites(args, checked, admission, request, projection, contracts):
+    original_refs, qc_finish = original(args, checked, admission)
+    unit_ref, unit_execution = ref(args.unit_comparison), ref(args.unit_comparison_execution)
+    unit = read(checked.check(unit_ref)); unit_record, unit_start, unit_finish = recorded(checked, unit_execution, unit)
+    need(unit['schema'] == 'clk06-candidate-comparison.v1' and unit['mode'] == 'candidate'
+        and unit['status'] == 'pass-selected-sky-storage-and-source-history' and unit['numerical_PASS_claimed'] is True
+        and type(unit['comparison']['comparison_count']) is int and unit['comparison']['comparison_count'] > 0
+        and type(unit['comparison']['mismatch_count']) is int and unit['comparison']['mismatch_count'] == 0
+        and unit['unavailable_counted_as_PASS'] is False and unit['gates_updated'] is False, 'Actual candidate unit0 required')
+    result_ref, result_execution = ref(args.unit_result_review), ref(args.unit_result_review_execution)
+    result, _, result_finish = actual_review(result_ref, result_execution,
+        'clk06-independent-candidate-unit-result-review.v1', 'pass-authenticated-selected-unit-result-and-honest-unavailable-scope', checked)
+    binding(result['reviewed_report'], unit_ref, checked); binding(result['comparison_execution'], unit_execution, checked)
+    need(exact(result['actual_call_ledger'], unit['actual_call_ledger']) and exact(result['field_error_metrics'], unit['comparison']['field_error_metrics'])
+        and result['comparison_counts']['mismatch_count'] == 0, 'Actual unit QA ledger differs')
+    ledger = unit['actual_call_ledger']; total = request['requested_counts']['total_operations']
+    need(exact(ledger['requested_counts'], request['requested_counts']) and exact(ledger['actual_invocations'], {'native': total, 'Rust': total})
+        and exact(ledger['actual_skips'], {'native': 0, 'Rust': 0}), 'All declared unit source histories must actually return')
+    for key, expected in original_refs.items(): fact_binding(unit['reviewed_evidence'][key], expected)
+    gap_ref, gap_execution = ref(args.baseline_gap), ref(args.baseline_gap_execution)
+    fact_binding(unit['reviewed_evidence']['existing_baseline_gap'], gap_ref)
+    fact_binding(unit['reviewed_evidence']['existing_baseline_gap_execution'], gap_execution)
+    fact_binding(result['preserved_existing_baseline_gap'], gap_ref)
+    gap_record, gap_start, gap_finish = recorded(checked, gap_execution)
+    need(qc_finish <= gap_start <= gap_finish <= unit_start, 'Original QC/baseline/unit chronology differs')
+    selected = read(checked.check(unit['comparison_projection']))
+    need(selected['schema'] == 'clk06-comparer-projection.v1'
+        and exact(selected['numeric_profiles'], contracts['tolerances']['numeric_profiles'])
+        and exact(selected['numeric_rows'], contracts['tolerances']['rows'])
+        and exact(selected['numeric_criterion'], contracts['tolerances']['criterion'])
+        and exact(selected['source_selection'], projection['source_selection'])
+        and exact(selected['native_observation_policy'], request['observation_policy']), 'Candidate frozen unit selection differs')
+    qa, _, reviewed_finish = actual_review(selected['source_review'], selected['source_review_execution'],
+        'clk06-independent-comparer-source-review.v1', 'pass-source-selected-sky-and-authentication-before-comparison', checked)
+    reviewed, executed = source_map(qa['reviewed_sources'], checked), source_map(unit['executed_reader_source_archives'], checked)
+    frozen = selected['comparer_sources']
+    need(len(frozen) == len(reviewed) == len(executed) == 8 and set(reviewed) == set(executed) == {row['path'] for row in frozen},
+        'Exact frozen/reviewed/executed eight unit sources required')
+    for row in frozen: need(row['sha256'] == reviewed[row['path']]['sha256'] == executed[row['path']]['sha256'], 'Unit reader bytes differ')
+    mains = [value for owner, value in executed.items() if Path(owner).name == 'check_clk06.py']
+    need(len(mains) == 1, 'Unique actual unit reader required'); script(unit_record, mains[0], checked)
+    observed_interpreter = interpreter(unit_record, unit['actual_reader_argv'])
+    probe_ref = unit['reviewed_evidence']['Rust_build']
+    probe, unit_available, _ = v.verify_rust_build(probe_ref, checked, kind='example', example='clk06_candidate_probe', committed=True,
+        required_sources=['crates/ep_runtime/examples/clk06_candidate_probe.rs'])
+    binding(result['Rust_build'], probe_ref, checked)
+    build_ref = ref(args.build)
+    build, available, cli_compile = v.verify_rust_build(build_ref, checked, kind='cli', committed=True, required_sources=REQUIRED)
+    applied = applied_core(args, probe_ref, unit_available, available, checked)
+    need(exact(build['actual_executed_recorder'], probe['actual_executed_recorder']), 'Unit and CLI genuine recorder source differs')
+    selected_ref, selected_execution, selected_finish = production_projection(args, checked, admission, request, projection, contracts['tolerances'])
+    need(unit_finish <= timestamp(result['review_started_utc']) <= result_finish <= timestamp(cli_compile['started_utc']),
+        'Actual unit/result QA must precede production CLI compilation')
+    references = {**original_refs, 'baseline_gap': gap_ref, 'baseline_gap_execution': gap_execution,
+        'candidate_unit': unit_ref, 'candidate_unit_execution': unit_execution, 'Rust_build': build_ref,
+        'candidate_unit_result_review': result_ref, 'candidate_unit_result_review_execution': result_execution,
+        'candidate_build': probe_ref, 'candidate_execution': unit['reviewed_evidence']['Rust_execution'],
+        'candidate_comparison_projection': unit['comparison_projection'], 'applied_core_lineage': applied,
+        'production_comparison_projection': selected_ref, 'production_comparison_projection_execution': selected_execution,
+        'production_run_design': DESIGN, 'reviewed_hook_source_manifest': HOOKS}
+    return {'refs': references, 'build': build, 'available': available,
+        'unit_reader_interpreter_observation': observed_interpreter,
+        'prerequisites_finished_utc': max(result_finish, selected_finish, timestamp(cli_compile['finished_utc'])).isoformat()}
+
+
+def architecture(available, checked):
+    text = {owner: checked.check(available[owner]).read_text(encoding='utf8') for owner in REQUIRED}
+    compact = {owner: ''.join(value.split()) for owner, value in text.items()}
+    pipeline = compact['crates/ep_run/src/pipeline.rs']; current = compact['crates/ep_runtime/src/weather_day/production.rs']
+    need('capture_environment_inputs()?' in pipeline and 'resolve_controls(raw_model,&environment_inputs)?' in pipeline,
+        'Actual production boundary must capture ENV and raw-model controls')
+    start = current.index('pubfncurrent_for('); end = current.index('pubfninitial_hourly_dry_bulb_c('); body = current[start:end]
+    need(body.index('session.initialize_weather()?;') < body.index('session.set_current_weather()?;')
+        < body.index('super::production_trace::record_consumer('), 'Actual Initialize/Current/consumer order differs')
+    need('sample.horizontal_infrared_radiation_w_per_m2=weather.horiz_ir_sky;' in body,
+        'Actual Today IR must be copied into the owned sample before the consumer')
+    trace = compact['crates/ep_run/src/clk03_trace.rs']
+    need('"Interpolation_allocated":owner.interpolation.is_some()' in trace
+        and '"SolarInterpolation_allocated":owner.solar_interpolation.is_some()' in trace
+        and all(name in trace for name in ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation',
+            'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']), 'Actual ROOT arrays/four-control serialization required')
+    need('completed_operation_count:trace.total_operation_count' in compact['crates/ep_runtime/src/weather_day/production_trace.rs']
+        and '"completed_operation_count":row.completed_operation_count' in trace, 'Actual completion prefix required')
+    need('clk06_sky_trace::write_trace(' in pipeline, 'Dedicated sky transport trace must be emitted outside the old Full-only trace')
+    state = compact['crates/ep_runtime/src/heat_balance/state.rs']
+    need('pubconstfnhourly_samples(' in state and 'warmup:HeatBalanceWarmupOptions::disabled()' in state
+        and 'maximum_days:0' in state and 'surface_iteration_count:1' in state,
+        'Conditional six-run cap requires actual disabled-warmup/one-iteration route')
+    collector = compact['crates/ep_runtime/src/weather_day/sky_transport_trace.rs']
+    serializer = compact['crates/ep_run/src/clk06_sky_trace.rs']
+    need('EVENT_LIMIT_PER_KIND:usize=1_000_000' in collector and 'SkyTransportOrigin' in collector
+        and 'actual_caller_origin' in serializer and 'report_outside_face_recomputation' in serializer,
+        'Actual retained-prefix cap and explicit mixed shared-kernel origin required')
+    return {'actual_archived_registration_and_owner_routing_verified': True,
+        'unit_core_and_post_hook_CLI_builds_authenticated_separately': True,
+        'actual_Today_IR_copy_and_completion_stamp_transport_present': True,
+        'conditional_cap_design': DESIGN, 'source_inventory_is_compiler_file_selection_proof': False,
+        'native_current_sky_globals_model_and_SRC08_certified': False}

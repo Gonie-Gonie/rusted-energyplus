@@ -1,0 +1,375 @@
+"""Root-only document closure from genuine completed proofs; no numerical work."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+import shutil
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[3]
+COMMON_SHA = 'ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7'
+GATES = ['scope_review', 'unit_gate', 'integration_gate', 'production_gate']
+PASS, PENDING = '\uD1B5\uACFC', '\uBBF8\uD655\uC778'
+QUALITY = {'workspace_tests': 'final-workspace-execution', 'clippy': 'final-clippy-execution',
+    'format_check': 'final-format-execution', 'source_quality': 'final-source-quality-execution',
+    'structure_quality': 'final-structure-execution'}
+
+
+def load_common():
+    source = HERE / 'common.py'
+    if hashlib.sha256(source.read_bytes()).hexdigest() != COMMON_SHA:
+        raise ValueError('Authenticated metadata-only utility required before import')
+    spec = importlib.util.spec_from_file_location('clk06_closure_common', source)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+v = load_common()
+
+
+def dump(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False); stream.write('\n')
+
+
+def script_archive(record, archive, checked):
+    command = record['command']; index, seen = 1, set()
+    v.need(type(command) is list and len(command) >= 2 and all(type(x) is str for x in command)
+        and Path(command[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe', 'python3.12', 'python3.12.exe'],
+        'Actual admitted metadata Python interpreter required')
+    while index < len(command) and command[index] in ['-X', '-B']:
+        option = command[index]; v.need(option not in seen, 'Repeated Python option'); seen.add(option); index += 1
+        if option == '-X': v.need(command[index:index + 1] == ['utf8'], 'Only UTF8 mode admitted'); index += 1
+    v.need(index < len(command) and command[index].endswith('.py') and not command[index].startswith('-')
+        and checked.check(v.ref(v.path_of(command[index]))).read_bytes() == checked.check(archive).read_bytes(),
+        'Actually executed metadata reviewer and archived source differ')
+
+
+def source_review(pins, checked):
+    review, row, finish = v.review(pins['closure-source-review'], pins['closure-source-review-execution'],
+        'clk06-independent-closure-source-review.v1',
+        'pass-metadata-closure-source-and-proof-interface-before-document-write', checked)
+    v.need(review['scientific_execution_performed'] is False, 'Source review cannot claim scientific execution')
+    archived = v.source_rows(review['reviewed_sources'], checked, 2)
+    expected = {str(path.relative_to(ROOT).as_posix()): path for path in [HERE / 'close_card.py', HERE / 'common.py']}
+    v.need(set(archived) == set(expected), 'Exact closure writer and metadata utility source review required')
+    for name, path in expected.items():
+        v.need(checked.check(archived[name]).read_bytes() == path.read_bytes(), 'Reviewed closure source changed')
+    script_archive(row, review['executed_reader_source_archive'], checked)
+    return finish
+
+
+def scientific(role, status, checked, pins):
+    name = role.split('-')[0]; value = v.read(checked.check(pins[role]))
+    command, _, finish = v.record(pins[name + '-execution'], checked, payload=value)
+    comparison = value['comparison']
+    v.need(value['schema'] == 'clk06-' + ('candidate' if name == 'unit' else 'production') + '-comparison.v1'
+        and value['status'] == status and value['numerical_PASS_claimed'] is True
+        and type(comparison['comparison_count']) is int and comparison['comparison_count'] > 0
+        and type(comparison['mismatch_count']) is int and comparison['mismatch_count'] == 0
+        and comparison['mismatches'] == [] and comparison['mismatch_payloads_truncated'] is False
+        and all(comparison[key] == 0 for key in ['availability_failures', 'numeric_mismatches',
+            'literal_binary64_mismatches', 'metadata_mismatches'])
+        and value['unavailable_counted_as_PASS'] is False and value['gates_updated'] is False,
+        'Authentic selected result0 and complete zero-mismatch ledger required')
+    return value, command, finish
+
+
+def science_build(binding, kind, checked):
+    value = v.read(checked.check(binding)); row, _, _ = v.record(value['build_execution'], checked)
+    v.need(value['schema'] == 'porting-Rust-build.v1' and value['kind'] == kind
+        and value['committed_source_certification'] is True and value['source_worktree_clean'] is True
+        and value['repository_head'] == value['implementation_commit'] == row['repository_before']['head']
+        and row['repository_after']['head'] == value['repository_head']
+        and row['repository_before']['worktree_clean'] is True and row['repository_after']['worktree_clean'] is True
+        and v.same(value['source_snapshot'], row['source_snapshot']), 'Actual clean scientific build/source differs')
+    target, package = ('clk06_candidate_probe', 'ep_runtime') if kind == 'example' else ('eplus-rs', 'ep_cli')
+    v.need(value['example'] == (target if kind == 'example' else None)
+        and row['command'] == ['cargo', 'build', '-p', package, '--example' if kind == 'example' else '--bin',
+            target, '-j', '2', '--message-format=json-render-diagnostics'], 'Actual Cargo target/package differs')
+    captured, emitted = row['cargo_compiler_artifacts_capture'], value['actual_Cargo_executable']
+    v.need(captured['requested'] is True and captured['status'] == 'pass' and captured['error'] is None
+        and len(captured['rows']) == 1 and emitted['cargo_message'] == captured['rows'][0]['cargo_message']
+        and v.exact(emitted['executable'], captured['rows'][0]['executable'])
+        and emitted['cargo_message']['target']['name'] == target
+        and emitted['cargo_message']['target']['kind'] == ['example' if kind == 'example' else 'bin']
+        and emitted['executable']['sha256'] == value['binary']['sha256']
+        and v.same(emitted['matching_archive'], value['binary']), 'Compiler-emitted executable capture differs')
+    checked.check(value['source_snapshot'])
+    return value
+
+
+def final_quality(pins, cli, checked, format_paths):
+    quality = {}; tests = None
+    for name, role in QUALITY.items():
+        row, start, finish = v.record(pins[role], checked)
+        v.need(row['repository_before']['head'] == row['repository_after']['head'] == cli['implementation_commit']
+            and row['repository_before']['worktree_clean'] is True and row['repository_after']['worktree_clean'] is True
+            and v.same(row['source_snapshot'], cli['source_snapshot']), 'Five final checks must use authentic clean CLI source bytes')
+        command = row['command']
+        if name == 'workspace_tests':
+            v.need(command in [['cargo', 'test', '--workspace', '-j', '2'],
+                ['cargo', 'test', '--workspace', '--no-fail-fast', '-j', '2']], 'Complete workspace test command required')
+            lines = checked.check(row['stdout']).read_text(encoding='utf8')
+            groups = re.findall(r'test result: (\w+)\. (\d+) passed; (\d+) failed; (\d+) ignored;', lines)
+            v.need(groups and all(kind == 'ok' and int(failed) == int(ignored) == 0 for kind, _, failed, ignored in groups),
+                'Actual all-group workspace test0 without ignored tests required')
+            tests = {'groups': len(groups), 'passed': sum(int(passed) for _, passed, _, _ in groups), 'failed': 0, 'ignored': 0}
+            v.need(tests['passed'] > 0, 'Actual positive complete workspace test count required')
+        elif name == 'clippy':
+            v.need(command == ['cargo', 'clippy', '--workspace', '--all-targets', '-j', '2', '--', '-D', 'warnings'],
+                'Actual all-target workspace Clippy with denied warnings required')
+        elif name == 'format_check':
+            v.need(command[:6] == ['rustfmt', '--edition', '2024', '--check', '--config', 'skip_children=true']
+                and command[6:] == format_paths and len(command) > 6 and len(set(command[6:])) == len(command[6:])
+                and all(v.path_of(path).suffix == '.rs' for path in command[6:]), 'Actual scoped canonical Rust format check required')
+        else:
+            target = 'source-quality-gate.ps1' if name == 'source_quality' else 'heat-balance-structure-audit.ps1'
+            v.need(command == ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'scripts/quality/' + target],
+                'Actual source/structure quality command differs')
+        quality[name] = {'receipt': pins[role], 'started_utc': row['started_utc'], 'finished_utc': row['finished_utc'], 'exit_code': 0}
+    quality['workspace_tests']['actual_test_counts'] = tests
+    return quality
+
+
+def preserved_failures(bound, checked):
+    rows = bound['preserved_failures']
+    required = {'weather-filter-execution', 'structure-execution', 'workspace-execution-01', 'workspace-execution-02',
+        'original-data-review-execution', 'comparer-source-review-execution', 'frozen-contract-review-execution',
+        'production-comparison-execution'}
+    v.need(set(rows) == required,
+        'Only genuine recorded failure refs admitted; no absent report placeholders')
+    for role, binding in rows.items():
+        v.record(binding, checked, code=1 if role in ['structure-execution', 'original-data-review-execution',
+            'comparer-source-review-execution', 'frozen-contract-review-execution', 'production-comparison-execution'] else 101)
+    unknown = bound['historical_unknowns']['source_quality_recorder_launch_race']
+    v.need(unknown == {'role': 'source-quality-command-02-before-child-race',
+        'absent_receipt_path': '.runtime/porting/CLK-06/source-quality-command-02/receipt.json',
+        'receipt_available': False, 'child_execution_or_exit_proven': False,
+        'reported_cause': 'FileExists before recorder child launch', 'outcome': 'unknown-no-receipt'}
+        and not (ROOT / unknown['absent_receipt_path']).exists(),
+        'Pre-child recorder launch race has no child exit or invented receipt')
+    return rows
+
+
+def archive_guard(args, checked, pins, preserved):
+    path = args.archive.resolve(strict=True); directory = path.parent; reference = v.ref(path)
+    value = v.read(checked.check(reference))
+    v.need(directory == ROOT / 'energyplus_porting_plan/evidence/CLK-06-archive'
+        and value['schema'] == 'clk06-selected-byte-evidence-archive.v1'
+        and value['exact_decompressed_bytes_verified'] is True
+        and all(value[key] is False for key in ['original_bytes_rewritten_or_JSON_reserialized',
+            'native_binary_or_full_native_trace_copied', 'duplicate_success_stdout_copied', 'gates_updated']),
+        'Copied canonical bounded exact-byte archive required')
+    execution, verification = v.ref(args.archive_execution.resolve()), v.ref(args.archive_verification_execution.resolve())
+    row, _, finished = v.record(execution, checked); actual = v.read(checked.check(row['stdout']))
+    original = checked.check(actual['archive'])
+    script_archive(row, pins['archive-writer'], checked)
+    v.need(actual['archive']['sha256'] == reference['sha256'] and original.read_bytes() == path.read_bytes()
+        and actual['canonical_files_changed'] is False
+        and actual['scientific_execution_performed'] is False, 'Actual ignored archive0 differs')
+    verify, started, _ = v.record(verification, checked); result = v.read(checked.check(verify['stdout']))
+    script_archive(verify, pins['archive-verifier'], checked)
+    v.need(result['schema'] == 'clk06-byte-archive-verification.v1' and result['exact_original_bytes_restored'] is True
+        and result['files_written'] is False and result['scientific_operands_parsed_or_compared'] is False
+        and started >= finished and verify['command'][-2] == '--manifest'
+        and v.path_of(verify['command'][-1]) == original and v.same(result['manifest'], actual['archive']),
+        'Actual independent exact-byte verification0 required')
+    archived = {row['role']: row for row in value['rows'] if 'role' in row}
+    for role in ['unit-comparison', 'unit-result-review', 'production-comparison', 'production-result-review', 'legacy-gap']:
+        v.need(role in archived and v.same(archived[role]['binding'], pins[role]), 'Required full-byte proof archive differs')
+    failures = [row['receipt'] for row in value['preserved_failures']]
+    v.need(len(failures) == len(preserved) and all(any(v.same(actual, expected) for actual in failures)
+        for expected in preserved.values()), 'All exact genuine failed receipts must be included in the byte archive')
+    for row in value['rows']:
+        for part in row['storage']['parts']:
+            item = (directory / part['relative_path']).resolve(strict=True)
+            v.need(item.is_relative_to(directory) and item.stat().st_size == part['size_bytes'] <= 4_000_000,
+                'Copied archive part containment/size differs')
+            checked.check({'path': item.relative_to(ROOT).as_posix(), 'sha256': part['sha256']})
+    return reference, execution, verification
+
+
+def task_spans(text):
+    decoder = json.JSONDecoder(); position = 1
+    def skip(index):
+        while text[index].isspace(): index += 1
+        return index
+    while True:
+        position = skip(position); key, position = decoder.raw_decode(text, position)
+        position = skip(position); v.need(text[position] == ':', 'Root JSON member delimiter differs')
+        start = skip(position + 1); value, end = decoder.raw_decode(text, start)
+        if key == 'tasks':
+            v.need(type(value) is list and text[start] == '[', 'Task array required'); position = skip(start + 1); rows = []
+            while text[position] != ']':
+                first = position; task, position = decoder.raw_decode(text, position)
+                rows.append((task, first, position, text[first:position])); position = skip(position)
+                if text[position] == ',': position = skip(position + 1)
+                else: v.need(text[position] == ']', 'Task array delimiter differs')
+            return rows
+        position = skip(end); v.need(text[position] == ',', 'Root tasks member required'); position += 1
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['bindings', 'source-mapping', 'card-notes', 'archive', 'archive-execution', 'archive-verification-execution', 'output-dir']:
+        parser.add_argument('--' + name, required=True, type=Path)
+    for name in ['bindings-sha256', 'approved-source-sha256']: parser.add_argument('--' + name, required=True)
+    args = parser.parse_args(); own = Path(__file__).read_bytes(); started = datetime.now(timezone.utc).isoformat()
+    v.need(Path.cwd().resolve() == ROOT and hashlib.sha256(own).hexdigest() == args.approved_source_sha256,
+        'Root-reviewed exact writer and repository cwd required')
+    checked = v.Bindings(); checked.check(v.ref(Path(__file__).resolve())); checked.check(v.ref(HERE / 'common.py'))
+    bindings_ref = v.ref(args.bindings.resolve(strict=True)); v.need(bindings_ref['sha256'] == args.bindings_sha256, 'Approved bindings differ')
+    bound = v.read(checked.check(bindings_ref)); pins = bound['artifacts']; out = args.output_dir.resolve()
+    v.need(bound['schema'] == 'clk06-card-closure-bindings.v1' and bound['ready_to_close'] is True
+        and bound['pending_refs'] == [] and bound['canonical_gate_writes_authorized'] is True,
+        'Pending or unauthorized proofs cannot become canonical PASS')
+    v.need(out.is_relative_to(ROOT / '.runtime/porting/CLK-06') and out != ROOT / '.runtime/porting/CLK-06'
+        and not out.exists(), 'Fresh ignored closure output required')
+    v.need(source_review(pins, checked) <= v.utc(started), 'Actual source review must precede document closure')
+    for name, operand in [('source-mapping', args.source_mapping), ('card-notes', args.card_notes)]:
+        v.need(v.same(v.ref(operand.resolve(strict=True)), pins[name]), 'Approved mapping or UTF8 narrative differs')
+    mapping = v.read(checked.check(pins['source-mapping'])); notes = checked.check(pins['card-notes']).read_text(encoding='utf8')
+    v.need(mapping['schema'] == 'clk06-completion-source-mapping.v1' and mapping['source_ranges']
+        and notes.strip() and '???' not in notes, 'Root-approved source ranges and uncorrupted UTF8 narrative required')
+    unit, unit_cmd, _ = scientific('unit-comparison', 'pass-selected-sky-storage-and-source-history', checked, pins)
+    prod, prod_cmd, _ = scientific('production-comparison', 'pass-selected-sky-and-owned-production-transport', checked, pins)
+    v.need(unit['mode'] == 'candidate', 'Legacy factual completion0 is not candidate numerical PASS')
+    unit_qa, _, _ = v.review(pins['unit-result-review'], pins['unit-review-execution'],
+        'clk06-independent-candidate-unit-result-review.v1', 'pass-authenticated-selected-unit-result-and-honest-unavailable-scope', checked)
+    prod_qa, _, _ = v.review(pins['production-result-review'], pins['production-review-execution'],
+        'clk06-independent-production-result-review.v1', 'pass-authenticated-selected-production-result-and-honest-unavailable-scope', checked)
+    for qa, role in [(unit_qa, 'unit'), (prod_qa, 'production')]:
+        v.need(v.same(qa['reviewed_report'], pins[role + '-comparison']) and v.same(qa['comparison_execution'], pins[role + '-execution'])
+            and qa['scientific_execution_performed'] is False and qa['unavailable_counted_as_PASS'] is False,
+            'Actual other-author factual QA must bind each genuine result/recorder')
+        selected = unit if role == 'unit' else prod
+        v.need(v.exact(qa['comparison_counts'], {key: selected['comparison'][key] for key in qa['comparison_counts']})
+            and v.exact(qa['field_error_metrics'], selected['comparison']['field_error_metrics']),
+            'Factual QA counts and field metrics must be actual report copies')
+    candidate = science_build(unit_qa['Rust_build'], 'example', checked); cli = science_build(prod['Rust_build'], 'cli', checked)
+    v.need(v.same(prod_qa['Rust_build'], prod['Rust_build']) and unit_qa['actual_implementation_commit'] == candidate['implementation_commit']
+        and prod_qa['actual_implementation_commit'] == cli['implementation_commit'] == prod['implementation_commit']
+        and prod_qa['historical_unit_implementation_commit'] == candidate['implementation_commit']
+        and prod_qa['actual_original_calls_paired'] == 963 and prod_qa['actual_Current_calls_observed'] == 480
+        and prod_qa['actual_command_count'] == prod['actual_command_count'] == 6
+        and prod_qa['production_ESky_metric_invented'] is False, 'Actual separate unit and owned-transport proof identities differ')
+    inventory = v.read(checked.check(prod['applied_core_inventory']))
+    v.need(v.same(prod_qa['reviewed_applied_core_inventory'], prod['applied_core_inventory'])
+        and v.same(inventory['unit_build'], unit_qa['Rust_build']) and inventory['all_other_unit_source_bytes_unchanged'] is True
+        and inventory['scientific_execution_performed'] is False and inventory['gates_updated'] is False,
+        'Production QA-authenticated applied transport lineage required; whole candidate/CLI trees need not equal')
+    quality = final_quality(pins, cli, checked, bound['final_format_paths'])
+    data, _, _ = v.review(pins['original-data-review'], pins['original-data-review-execution'],
+        'clk06-independent-original-data-review.v1', 'pass-preserved-original-data-before-Rust-baseline', checked)
+    admission = v.read(checked.check(pins['frozen-native-admission'])); cases = v.read(checked.check(pins['frozen-cases']))
+    count = admission['requested_counts']['total_operations']
+    v.need(count == data['actual_operation_invocations'] == 1120 and data['actual_operations_skipped'] == 0
+        and data['intended_native_branch_coverage_complete'] is True and data['numerical_PASS_claimed'] is False
+        and v.same(admission['helper_request'], pins['frozen-helper-request'])
+        and len(admission['all_45_guard_refs']) == 45 and v.exact(cases['all_45_guard_refs'], admission['all_45_guard_refs']),
+        'Actual Original1120/unchanged frozen six/ordered45 required')
+    v.need(v.exact(unit_qa['contracts'], admission['contracts']) and v.exact(prod['contracts'], admission['contracts'])
+        and v.exact(data['reviewed_contracts'], admission['contracts'])
+        and v.same(unit_qa['native_admission_contract'], pins['frozen-native-admission'])
+        and v.same(unit_qa['Original_data_review'], pins['original-data-review'])
+        and v.same(prod_qa['reviewed_original_data_review'], pins['original-data-review'])
+        and v.same(unit_qa['preserved_existing_baseline_gap'], pins['legacy-gap'])
+        and v.same(prod_qa['reviewed_baseline_gap'], pins['legacy-gap'])
+        and v.same(data['reviewed_reference'], pins['original-reference']),
+        'The actual unit/production/QC/gap proofs must share the same frozen Original chain')
+    gap = v.read(checked.check(pins['legacy-gap'])); v.record(pins['legacy-gap-execution'], checked, payload=gap)
+    v.need(gap['schema'] == 'clk06-existing-baseline-gap.v1'
+        and gap['status'] == 'observed-authenticated-existing-sky-differences-and-unavailable-source-scope'
+        and gap['numerical_PASS_claimed'] is False
+        and gap['comparison']['mismatch_count'] > 0 and gap['unavailable_counted_as_PASS'] is False,
+        'Historical real legacy differences remain factual completion0, never science PASS')
+    preserved = preserved_failures(bound, checked); archive, archive_exec, archive_verify = archive_guard(args, checked, pins, preserved)
+    inputs = [pins['frozen-helper-request'], *admission['all_45_guard_refs']]
+    for row in inputs: checked.check(row)
+    snapshot = v.read(checked.check(cli['source_snapshot'])); indexed = {row['historical_path']: row['archive'] for row in snapshot['files']}
+    granularity = [{'path': owner, 'line_count': len(checked.check(indexed[owner]).read_bytes().splitlines()),
+        'source_archive': indexed[owner]} for owner in mapping['granularity_source_paths']]
+    plan_path = ROOT / 'energyplus_porting_plan/plan.json'; card_path = ROOT / 'energyplus_porting_plan/cards/CLK-06.md'
+    evidence_path = ROOT / 'energyplus_porting_plan/evidence/CLK-06.json'; before = [v.ref(plan_path), v.ref(card_path)]
+    v.need(v.same(before[0], bound['before']['plan']) and v.same(before[1], bound['before']['card']) and not evidence_path.exists(),
+        'Exact pending plan/card and absent completion evidence required')
+    scope = v.read(checked.check(pins['scope-amendment'])); v.record(pins['scope-amendment-execution'], checked, payload=scope)
+    v.need(scope['schema'] == 'clk06-metadata-scope-amendment.v1' and scope['scientific_execution_performed'] is False
+        and scope['all_four_CLK06_gates_remain_pending'] is True and scope['canonical_gates_updated'] is False
+        and type(scope['other_task_objects_unchanged']) is int and scope['other_task_objects_unchanged'] == 63
+        and scope['only_CLK06_semantic_entry_and_card_written'] is True
+        and len(scope['after']) == 2 and all(v.same(left, right) for left, right in zip(scope['after'], before, strict=True)),
+        'Genuine scope0 after-state must be the exact pending closure before-state')
+    text = plan_path.read_bytes().decode('utf8'); plan = v.read(plan_path); rows = task_spans(text)
+    target = [row for row in rows if row[0]['id'] == 'CLK-06']; task = target[0][0]
+    v.need(len(rows) == len(plan['tasks']) == 64 and len(target) == 1 and all(task[key] == PENDING for key in GATES),
+        'Exactly four pending CLK06 gates may close')
+    v.need(all(next(row for row in plan['tasks'] if row['id'] == 'CLK-05')[key] == PASS for key in GATES), 'Actual prior CLK05 completion required')
+    card = card_path.read_bytes().decode('utf8'); v.need(card.count('- [ ] ') == 4 and '???' not in card, 'Exactly four uncorrupted UTF8 card checks required')
+    scientific_commit, final_commit = candidate['implementation_commit'], cli['implementation_commit']
+    checks = {key: {'command': ' '.join((unit_cmd if key in ['scope_review', 'unit_gate'] else prod_cmd)['command']),
+        'commit': scientific_commit if key in ['scope_review', 'unit_gate'] else final_commit, 'exit_code': 0,
+        'artifacts': [pins['unit-comparison'], pins['unit-result-review']] if key in ['scope_review', 'unit_gate']
+        else [pins['production-comparison'], pins['production-result-review']]} for key in GATES}
+    plan_evidence = {'scopes': ['A', 'B'], 'implementation_commit': final_commit, 'source_ranges': mapping['source_ranges'],
+        'input_hashes': inputs, 'reference': {'kind': 'cpp-wrapper', 'artifacts': [pins['original-reference'], pins['original-data-review']]},
+        'checks': checks, 'production': {'rust_entrypoint': 'ep_cli -> live Today sky4 -> owned context/sample/report/thermal arguments',
+            'oracle_inputs_used': False, 'fixture_inputs_used': False},
+        'comparison': {'contract': pins['frozen-tolerances'], 'report': pins['unit-comparison']},
+        'byte_faithful_archive': archive, 'actual_final_quality': quality, 'helper_granularity': granularity}
+    evidence = {'schema': 'clk06-card-completion-evidence.v1', 'card': 'CLK-06', 'scopes': ['A', 'B'],
+        'scientific_implementation_commit': scientific_commit, 'production_implementation_commit': final_commit, 'final_quality_commit': final_commit,
+        'unit': {'report': pins['unit-comparison'], 'execution': pins['unit-execution'], 'review': pins['unit-result-review'],
+            'comparison_count': unit['comparison']['comparison_count'], 'mismatch_count': 0},
+        'production': {'report': pins['production-comparison'], 'execution': pins['production-execution'], 'review': pins['production-result-review'],
+            'comparison_count': prod['comparison']['comparison_count'], 'mismatch_count': 0, 'actual_CLI_commands': 6,
+            'actual_direct_original_calls': 963, 'actual_Current_calls': 480},
+        'native': {'data_review': pins['original-data-review'], 'actual_whole_calls': count, 'numerical_PASS_claimed_by_QC': False},
+        'contracts': admission['contracts'], 'selected_observation_projection': pins['frozen-observation-projection'],
+        'legacy_gap': pins['legacy-gap'], 'preserved_failures': preserved, 'historical_unknowns': bound['historical_unknowns'],
+        'compressed_full_byte_archive': archive, 'archive_execution': archive_exec, 'archive_verification_execution': archive_verify,
+        'actual_final_quality': quality, 'applied_core_inventory': prod['applied_core_inventory'], 'helper_granularity': granularity,
+        'unavailable_counted_as_PASS': False, 'whole_physical_system_certified': False,
+        'native_Current5_model_and_SRC08_paired': False, 'native_index_invented': False, 'scientific_values_recomputed_by_closure_writer': False,
+        'authorship_limits': 'Baseline authored comparer/observer and earlier hourly/producer work. Genuine Root execution, other-author source/results QA and this metadata transcription are distinct; no independent own-physics certification.'}
+    checked.unchanged(); out.mkdir(); copies = []
+    for path in [Path(__file__).resolve(), HERE / 'common.py', args.bindings.resolve(), args.source_mapping.resolve(), args.card_notes.resolve()]:
+        target_file = out / path.name; shutil.copyfile(path, target_file)
+        copies.append({'historical_path': path.relative_to(ROOT).as_posix(), 'archive': v.ref(target_file)})
+    deltas = []
+    for path in [plan_path, card_path]:
+        archived = out / ('before-' + path.name); shutil.copyfile(path, archived)
+        deltas.append({'path': path.relative_to(ROOT).as_posix(), 'before': v.ref(archived)})
+    for key in GATES: task[key] = PASS
+    task['evidence'] = plan_evidence
+    evidence_bytes = (json.dumps(evidence, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf8')
+    task['completion_evidence'] = {'path': evidence_path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(evidence_bytes).hexdigest()}
+    task['note'] = 'Default ClarkAllen/useIR sky/cloud history and live A/B owned transport passed; native Current5/model and SRC08 physics remain unpaired.'
+    _, first, end, _ = target[0]; indent = len(text[:first].rsplit('\n', 1)[-1])
+    replacement = json.dumps(task, ensure_ascii=False, indent=2, allow_nan=False).replace('\n', '\n' + ' ' * indent)
+    updated = text[:first] + replacement + text[end:]
+    after_rows = task_spans(updated)
+    v.need([(row[0]['id'], row[3]) for row in rows if row[0]['id'] != 'CLK-06']
+        == [(row[0]['id'], row[3]) for row in after_rows if row[0]['id'] != 'CLK-06'], 'Other63 raw task-object bytes changed')
+    v.need(v.exact([row for row in plan['tasks'] if row['id'] != 'CLK-06'],
+        [row[0] for row in after_rows if row[0]['id'] != 'CLK-06']), 'Other63 task semantics changed')
+    with evidence_path.open('xb') as stream: stream.write(evidence_bytes)
+    plan_path.write_text(updated, encoding='utf8', newline='\n')
+    card_path.write_text(card.replace('- [ ] ', '- [x] ') + '\n\n' + notes, encoding='utf8', newline='\n')
+    for item, path in zip(deltas, [plan_path, card_path], strict=True):
+        archived = out / ('after-' + path.name); shutil.copyfile(path, archived); item['after'] = v.ref(archived)
+    result = {'schema': 'clk06-metadata-card-closure.v1', 'completed_utc': datetime.now(timezone.utc).isoformat(),
+        'before': before, 'after': [v.ref(plan_path), v.ref(card_path), v.ref(evidence_path)], 'archived_deltas': deltas,
+        'previously_absent_evidence': evidence_path.relative_to(ROOT).as_posix(), 'only_CLK06_gates_updated': True,
+        'other_63_tasks_unchanged': True, 'other_63_raw_task_object_bytes_unchanged': True, 'all_four_actual_gates': PASS,
+        'executed_writer_sources': copies, 'actual_archive': archive, 'actual_final_quality': quality,
+        'scientific_comparer_or_engine_Cargo_Git_executed': False, 'HTML_or_other_views_synchronized': False,
+        'native_retirement_admitted_or_performed': False}
+    checked.unchanged(); dump(out / 'closure-result.json', result); print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__': main()

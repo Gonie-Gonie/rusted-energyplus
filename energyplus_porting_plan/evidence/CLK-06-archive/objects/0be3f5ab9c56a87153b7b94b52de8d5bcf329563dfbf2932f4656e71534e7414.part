@@ -1,0 +1,154 @@
+"""Typed source storage integrity only; no scientific expected values or formula."""
+from collections import Counter
+import math
+import struct
+
+SKY = ['SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover']
+REALS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutBaroPress', 'OutRelHum', 'WindSpeed', 'WindDir',
+         'SkyTemp', 'HorizIRSky', 'BeamSolarRad', 'DifSolarRad', 'Albedo', 'WaterPrecip', 'LiquidPrecip',
+         'TotalSkyCover', 'OpaqueSkyCover']
+COUNTS = ['OutDryBulbTemp', 'OutDewPointTemp', 'OutRelHum', 'OutBaroPress', 'WindDir', 'WindSpeed',
+          'BeamSolarRad', 'DifSolarRad', 'TotalSkyCover', 'OpaqueSkyCover', 'Visibility', 'Ceiling',
+          'LiquidPrecip', 'WaterPrecip', 'AerOptDepth', 'SnowDepth', 'DaysLastSnow', 'WeathCodes', 'Albedo']
+DAY = ['DayOfYear', 'DayOfYear_Schedule', 'Year', 'Month', 'DayOfMonth', 'DayOfWeek', 'DaylightSavingIndex', 'HolidayIndex']
+DAY_REALS = ['SinSolarDeclinAngle', 'CosSolarDeclinAngle', 'EquationOfTime']
+CONTROL = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+CURRENT = ['weather.HorizIRSky', 'environment.SkyTemp', 'environment.SkyTempKelvin',
+           'environment.TotalCloudCover', 'environment.OpaqueCloudCover']
+
+
+class Shapes:
+    def __init__(self, need, exact):
+        self.need, self.exact = need, exact
+        self.counts, self.classes = Counter(), Counter()
+
+    def scalar(self, value):
+        n = self.need
+        n(type(value) is dict and set(value) == {'value', 'value_bits', 'value_class'}, 'Exact scalar DTO required')
+        bits = value['value_bits']
+        n(type(bits) is str and len(bits) == 16 and all(c in '0123456789abcdef' for c in bits), 'Actual binary64 bits malformed')
+        number = struct.unpack('>d', bytes.fromhex(bits))[0]
+        kind = 'nan' if math.isnan(number) else ('positive_infinity' if number > 0 else 'negative_infinity') if math.isinf(number) else (
+            ('negative_zero' if bits[0] == '8' else 'positive_zero') if number == 0.0 else 'finite')
+        n(value['value_class'] == kind, 'Actual scalar class differs from its stored bits')
+        if math.isfinite(number):
+            n(type(value['value']) in [int, float] and float(value['value']).hex() == number.hex(), 'Scalar JSON differs from its own bits')
+        else:
+            n(value['value'] is None, 'Nonfinite scalar JSON value must be null')
+        self.classes[kind] += 1
+        self.counts['scalar'] += 1
+
+    def walk(self, value):
+        if type(value) is dict:
+            if 'value_bits' in value:
+                self.scalar(value)
+            else:
+                for child in value.values():
+                    self.walk(child)
+        elif type(value) is list:
+            for child in value:
+                self.walk(child)
+
+    def weather(self, value, missing=False):
+        fields = REALS + (['Visibility', 'Ceiling', 'AerOptDepth', 'SnowDepth'] if missing else [])
+        self.need(type(value) is dict and set(value) == set(fields + ['IsRain', 'IsSnow'] + (['DaysLastSnow'] if missing else [])),
+                  'Complete actual weather/cache DTO required')
+        for field in fields:
+            self.scalar(value[field])
+        for field in ['IsRain', 'IsSnow']:
+            self.need(type(value[field]) is bool, 'Actual weather flag typing differs')
+        if missing:
+            self.need(type(value['DaysLastSnow']) is int, 'Actual missing day count typing differs')
+
+    def sky(self, value):
+        self.need(type(value) is dict and set(value) == set(SKY), 'Exactly four actual sky/cloud fields required')
+        for scalar in value.values():
+            self.scalar(scalar)
+
+    def grid(self, value, steps, full, selected=True):
+        n = self.need
+        n(type(value) is dict and type(value['allocated']) is bool and type(value['time_steps']) is int
+          and type(value['hours']) is int and value['ordering'] == 'hour-major,timestep-minor', 'Actual grid dimensions/order typing differs')
+        if value['allocated']:
+            n(value['time_steps'] in [1, 3, 4] and (steps is None or value['time_steps'] == steps)
+              and value['hours'] == 24, 'Actual allocated steps-by24 storage differs')
+        else:
+            n(value['time_steps'] == value['hours'] == 0, 'Actual unallocated grid dimensions differ')
+        if selected:
+            n(value['observed_fields'] == SKY and value['contents_available'] is full, 'Frozen sky4/full availability differs')
+        if full:
+            rows = value['slots']
+            order = [(h, t) for h in range(1, value['hours'] + 1) for t in range(1, value['time_steps'] + 1)]
+            n(type(rows) is list and [(row['hour'], row['time_step']) for row in rows] == order, 'Actual slot cardinality/order differs')
+            for row in rows:
+                n(set(row) == {'hour', 'time_step', 'value'} and type(row['hour']) is type(row['time_step']) is int,
+                  'Typed actual slot position required')
+                self.sky(row['value']) if selected else self.weather(row['value'])
+        else:
+            n(value['slots'] is None and value['unavailability_reason'] == 'pre-execution declared compact unselected sky/cloud grid',
+              'Unavailable grid contents fabricated')
+        self.counts['full_grid' if full else 'compact_grid'] += 1
+
+    def snapshot(self, value, steps=None, full=True, legacy=False):
+        n = self.need
+        for key in ['global', 'environment', 'weather', 'header', 'stream']:
+            n(type(value[key]) is dict, 'Actual required snapshot group missing: ' + key)
+        for key in ['today_values', 'tomorrow_values']:
+            self.grid(value[key], steps, full, selected=not legacy)
+        for key in ['missed_counts', 'out_of_range_counts']:
+            n(type(value[key]) is dict and set(value[key]) == set(COUNTS)
+              and all(type(item) is int for item in value[key].values()), 'All19 typed actual counts required')
+        for key in ['last_hour', 'next_hour']:
+            self.weather(value[key])
+        self.weather(value['missing_values'], missing=True)
+        for key in ['today_variables', 'tomorrow_variables']:
+            day = value[key]
+            n(type(day) is dict and set(day) == set(DAY + DAY_REALS), 'Complete11 daily DTO required')
+            for field in DAY:
+                n(type(day[field]) is int, 'Actual daily integer typing differs')
+            for field in DAY_REALS:
+                self.scalar(day[field])
+        for key in ['Interpolation', 'SolarInterpolation']:
+            allocated, array = value[key + '_allocated'], value[key]
+            n(type(allocated) is bool and type(array) is list
+              and (len(array) in [1, 3, 4] and (steps is None or len(array) == steps) if allocated else len(array) == 0),
+              'Actual root interpolation allocation/shape differs')
+            for scalar in array:
+                self.scalar(scalar)
+        if not legacy:
+            n(value['full_sky_grid_contents_available'] is full and value['full_17_field_grid_generation_parity_claimed'] is False,
+              'Frozen selected/full-generation scope differs')
+            observed = value['clk06_observation']
+            n(set(observed['caller_controls']) == set(CONTROL)
+              and all(type(item) is bool for item in observed['caller_controls'].values()), 'Actual four typed caller controls required')
+            n(set(observed['native_current_sky_globals']) == set(CURRENT), 'Native-only Current5 fieldset differs')
+            for scalar in observed['native_current_sky_globals'].values():
+                self.scalar(scalar)
+            for flag in ['native_current_sky_globals_paired', 'private_hourly_ESky_or_branch_locals_observed', 'whole_other_current_physics_paired']:
+                n(observed[flag] is False, 'Actual unpaired/private boundary differs')
+            environment = observed['actual_sky_environment']
+            n(type(environment['Envrn']) is type(environment['NumWPSkyTemperatures']) is int
+              and environment['resolved_candidate_is_selected_Envrn_claimed'] is False, 'Actual selected/candidate environment scope differs')
+            for role in ['selected_environment', 'resolved_candidate_before_GetNext']:
+                row = environment[role]
+                if row is not None:
+                    n(type(row) is dict and set(row) == {'index', 'value'} and type(row['index']) is int
+                      and 1 <= row['index'] <= len(value['environments'])
+                      and self.exact(row['value'], value['environments'][row['index'] - 1]), 'Actual duplicate environment owner differs')
+            selected = observed['selected_today_sky_slot']
+            hour, step = value['global']['HourOfDay'], value['global']['TimeStep']
+            n(type(hour) is type(step) is int, 'Actual selected clock typing differs')
+            grid = value['today_values']
+            available = grid['allocated'] and 1 <= hour <= grid['hours'] and 1 <= step <= grid['time_steps']
+            if available:
+                n(type(selected) is dict and set(selected) == {'hour', 'time_step', 'value'}
+                  and type(selected['hour']) is type(selected['time_step']) is int
+                  and (selected['hour'], selected['time_step']) == (hour, step), 'Actual selected slot identity differs')
+                self.sky(selected['value'])
+                if full:
+                    n(self.exact(selected['value'], grid['slots'][(hour - 1) * grid['time_steps'] + step - 1]['value']),
+                      'Duplicate observation of actual selected owner differs')
+            else:
+                n(selected is None, 'Unavailable selected slot fabricated')
+        self.walk(value)
+        self.counts['snapshot'] += 1

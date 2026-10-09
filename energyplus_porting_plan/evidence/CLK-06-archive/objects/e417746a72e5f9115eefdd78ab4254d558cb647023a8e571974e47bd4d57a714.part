@@ -1,0 +1,324 @@
+"""SOURCE-ONLY PREPARATION: inspect actual completed build/PE metadata later.
+
+No compiler, strip tool, native helper, Rust, comparer, Cargo or Git is run.
+Only the previously authenticated PE reader may be imported after byte checks.
+"""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import stat
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+PE_SHA = 'afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56'
+DERIVER_SHA = '3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf'
+TARGET = 'clk06_reference_helper'
+REGISTRY_SOURCE = '.runtime/porting/CLK-06/builder-registry-prep-01/registry.py'
+REGISTRY_SHA = '2c53613f12e772c1be736e380a83204facfed635e81ecca5e09e0f5aa322082e'
+SEEN = {}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def path(value):
+    p = Path(value)
+    p = (p if p.is_absolute() else ROOT / p).resolve()
+    require(p.is_relative_to(ROOT) and p != ROOT, 'Contained repository artifact required')
+    return p
+
+
+def sha(p):
+    with p.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def ref(p):
+    p = path(p)
+    digest = sha(p)
+    require(p not in SEEN or SEEN[p] == digest, 'Previously bound file changed')
+    SEEN[p] = digest
+    return {'path': p.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def bound(binding):
+    p = path(binding.get('path', binding.get('historical_path')))
+    info = p.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400
+            and not p.is_symlink() and ref(p)['sha256'] == binding['sha256'], 'Actual regular artifact bytes differ')
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and p.stat().st_size == binding[key], 'Actual size differs')
+    return p
+
+
+def read(binding):
+    def pairs(rows):
+        result = {}
+        for key, value in rows:
+            require(key not in result, 'Duplicate JSON key'); result[key] = value
+        return result
+    return json.loads(bound(binding).read_text(encoding='utf-8'), object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonstandard JSON '+token)))
+
+
+def write(p, value):
+    with p.open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(value, stream, indent=2, allow_nan=False)
+        stream.write('\n')
+
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def timestamp(value):
+    actual=datetime.fromisoformat(value)
+    require(actual.tzinfo is not None and actual.utcoffset().total_seconds()==0, 'Actual UTC required')
+    return actual
+
+
+def exact(a, b):
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(exact(a[key], b[key]) for key in a)
+    if isinstance(a, list):
+        return len(a) == len(b) and all(exact(x, y) for x, y in zip(a, b))
+    return a.hex() == b.hex() if type(a) is float else a == b
+
+
+def command(binding):
+    record = read(binding)
+    require(timestamp(record['started_utc'])<=timestamp(record['finished_utc']), 'Actual command chronology differs')
+    require(type(record['exit_code']) is int and record['exit_code'] == 0, 'Actual recorded command0 required')
+    for key in ['stdout', 'stderr']:
+        bound(record[key])
+    return record
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--build-receipt', type=Path, required=True)
+    parser.add_argument('--build-command', type=Path, required=True)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    out = path(args.output_dir)
+    require(not out.exists() and out.is_relative_to(ROOT / '.runtime/porting/CLK-06'), 'Fresh ignored output required')
+    started = utc()
+    build_ref, outer_ref = ref(args.build_receipt), ref(args.build_command)
+    build, outer = read(build_ref), command(outer_ref)
+    require(build['schema'] == 'clk06-native-driver-build.v1' and build['checks_passed'] is True
+            and build['target'] == TARGET and build['source_commit'] == '6f2e40d10250a105b49966baa24d843711e61048',
+            'Actual completed genuine CLK06 native build required')
+    require(outer['source_bytes_match_before_and_after'] is True and outer['repository_before'] == outer['repository_after'],
+            'Actual build recorder preservation differs')
+    require('--build-driver' in outer['command'] and outer['started_utc'] <= build['started_utc']
+            <= build['finished_utc'] <= outer['finished_utc'] <= started, 'Actual build/command chronology differs')
+    stdout = read(outer['stdout'])
+    require(stdout['driver_build'] == build_ref and stdout['checks_passed'] is True and stdout['helper_binary'] == build['helper_binary'],
+            'Actual build stdout binding differs')
+    for flag in ['scientific_execution_performed', 'scientific_source_patches', 'Cargo_or_Git_executed', 'gates_updated',
+                 'original_removed', 'full_linked_original_copied', 'existing_unit_packet_or_actual_receipts_rewritten']:
+        require(build[flag] is False, 'Build boundary differs: ' + flag)
+    review_keys={'contract_review':'independent_contract_review','helper_static_review':'independent_helper_static_review',
+                 'builder_review':'independent_builder_static_review'}
+    reviews={name:read(build[key]) for name,key in review_keys.items()}
+    contract_review,helper_review,builder_review=[reviews[name] for name in review_keys]
+    require(contract_review['schema']=='clk06-independent-frozen-contract-review.v1'
+            and contract_review['status']=='pass-frozen-input-source-policy-before-native-build'
+            and helper_review['schema']=='clk06-independent-preexecution-source-review.v1'
+            and helper_review['status']=='pass-source-input-policy-before-freeze'
+            and builder_review['schema']=='clk06-independent-native-builder-static-review.v1'
+            and builder_review['status']=='pass-source-and-contract-before-native-build'
+            and all(row['scientific_execution_performed'] is False for row in reviews.values()),
+            'Actual distinct independent source/packet reviews required')
+    require(contract_review['reviewed_native_admission_contract']==build['native_admission_contract']
+            and contract_review['reviewed_helper_request']==build['helper_request']
+            and contract_review['reviewed_projection']==build['projection']
+            and contract_review['reviewed_contracts']==build['contracts']
+            and builder_review['reviewed_contract_review']==build['independent_contract_review'],
+            'Actual independent packet/source binding differs')
+    for name,item in reviews.items():
+        recorded=command(build['reviewed_source_executions'][name])
+        require(recorded['schema']=='recorded-porting-command.v1' and recorded['launch_error'] is None
+                and recorded['source_bytes_match_before_and_after'] is True and exact(read(recorded['stdout']), item)
+                and recorded['started_utc']<=item['review_started_utc']<=item['review_completed_utc']
+                <=recorded['finished_utc']<=build['started_utc'], 'Actual full source/packet review0 chronology differs')
+        bound(recorded['source_snapshot']);bound(recorded['executed_launcher']['archive'])
+    reviewed_sources={row['historical_path']:row['archive'] for row in builder_review['reviewed_sources']}
+    reviewed_sources.update({row['historical_path']:row['archive'] for row in helper_review['reviewed_sources']})
+    prior = read(build['prior_native_build'])
+    require(build['prior_native_build']['sha256'] == 'df8dbf64a983c06b01964916d0fd6e1fadf88325078ae229a7a7b4027df457b0'
+            and prior['schema'] == 'clk05-native-driver-build.v1' and prior['checks_passed'] is True,
+            'Actual authenticated CLK05 predecessor build required')
+    prior_peer = read(build['prior_actual_build_review'])
+    require(prior_peer['schema'] == 'clk05-independent-native-build-review.v1'
+            and prior_peer['status'] == 'pass-build-and-derivative-before-original-execution'
+            and prior_peer['reviewed_build'] == build['prior_native_build']
+            and prior_peer['scientific_execution_performed'] is False,
+            'Authentic independent predecessor build/PE metadata required')
+    bound(prior_peer['actual_independent_PE_validation'])
+    for row in prior['executed_source_archives']:
+        owner,archive=row['historical_path'],row['archive']
+        require(owner not in reviewed_sources or reviewed_sources[owner]['sha256']==archive['sha256'], 'Prior/new source pin disagreement')
+        reviewed_sources[owner]=archive
+    build_rows=build['executed_source_archives']
+    require(len(build_rows)==len({row['historical_path'] for row in build_rows})
+            and {row['historical_path'] for row in build_rows}==set(reviewed_sources),
+            'Actual prior plus newly reviewed source union must be dynamically exact')
+    for row in build_rows:
+        require(row['historical_path'] in reviewed_sources and row['archive']['sha256']==reviewed_sources[row['historical_path']]['sha256'],
+                'Build did not archive independently reviewed exact source')
+        require(path(row['historical_path']).read_bytes()==bound(row['archive']).read_bytes(), 'Current/executed build source differs')
+    before_rows = read(build['previous_compile_commands'])
+    rows = read(build['compile_commands'])
+    core_rows = read(build['frozen_original_build_commands'])
+    require(len(before_rows) == 659 and before_rows == read(prior['compile_commands']) and len(rows) == 660
+            and [row for row in rows if Path(row['file']).name != TARGET + '.cpp'] == before_rows
+            and len(core_rows) == 643 and all(row in rows for row in core_rows), 'Actual sole660/old659/core643 registrations differ')
+    actual_rows = read(build['actual_compile_commands'])
+    require(len(actual_rows) == 1 and actual_rows[0] in rows
+            and path(actual_rows[0]['file']) == ROOT/'.runtime/porting/CLK-06/native-prep-01'/ (TARGET+'.cpp'),
+            'Exact actual new helper compile row differs')
+    for flag in ['-DEP_psych_errors','-UNDEBUG','-Werror','-O0','-ffp-contract=off','-Wa,-mbig-obj','-std=c++20']:
+        require(flag in actual_rows[0]['command'].split(), 'Actual compiler mode missing: ' + flag)
+    for flag in ['_GLIBCXX_DEBUG','-ffast-math','EP_psych_stats']:
+        require(flag not in actual_rows[0]['command'], 'Unapproved ABI/math mode')
+    configure, link, derive_command = [command(build[key]) for key in ['configure','compile_link','derivation_command']]
+    require('--target' in link['command'] and link['command'][link['command'].index('--target')+1] == TARGET,
+            'Actual build was not restricted to new target')
+    require(configure['finished_utc'] <= link['started_utc'] <= link['finished_utc'] <= derive_command['started_utc'],
+            'Actual configure/link/derive chronology differs')
+    observations = build['preservation_observations']
+    require(set(observations) == {'before_configure','after_configure','after_compile_link','after_derivation','final'},
+            'Complete actual preservation stages required')
+    reference_guard = observations['before_configure']['source_guard']
+    for row in observations.values():
+        require(row['source_guard'] == reference_guard and row['protected_and_retained_count'] == 21
+                and row['historical_compile_rows_checked'] == 659 and row['frozen_core_rows_checked'] == 643,
+                'Actual source/compiler preservation stage differs')
+        for flag in ['retired_successful_originals_actual_absence_verified','retained_CLK02_both_CLK03_CLK04_and_CLK05_derivatives_unchanged',
+                     'failed_CLK03_original02_and_derivative02_unchanged','archived_build_sources_unchanged']:
+            require(row[flag] is True, 'Actual retained artifact preservation failed')
+    core = read(build['core_build'])
+    for key in ['binary','toolchain_publisher_receipt','object_cache_publisher_receipt']:
+        bound(core['compiler'][key])
+    require(actual_rows[0]['command'].startswith(str(bound(core['compiler']['binary']))), 'Actual compiler publisher binary differs')
+    # Authenticate the pure metadata retirement guard before importing it.
+    registry_source=path(REGISTRY_SOURCE)
+    require(ref(registry_source)['sha256']==REGISTRY_SHA and REGISTRY_SOURCE in reviewed_sources
+            and reviewed_sources[REGISTRY_SOURCE]['sha256']==REGISTRY_SHA, 'Authenticated v5 guard source differs')
+    sys.dont_write_bytecode=True
+    spec=importlib.util.spec_from_file_location('clk06_authenticated_retirement_metadata',registry_source)
+    require(spec is not None and spec.loader is not None, 'Authenticated metadata registry unavailable')
+    reg=importlib.util.module_from_spec(spec);spec.loader.exec_module(reg)
+    registry_ref,registry,guarded=reg.guard(bound(build['retained_registry']), bound(build['actual_retirement']), bound(build['actual_retirement_execution']), scope_amendment=build['actual_scope_amendment'], scope_amendment_execution=build['actual_scope_amendment_execution'])
+    require(registry_ref==build['retained_registry'] and guarded['protected_and_retained_count']==21,
+            'Actual v5 protected21/retained/tombstone guard differs')
+    for binding in guarded['live_retained_bindings']: bound(binding)
+    bound(guarded['actual_retirement']);bound(guarded['actual_retirement_execution'])
+    for binding in guarded['actual_removal_receipts']: bound(binding)
+    contract=read(build['native_admission_contract']);request=read(build['helper_request']);projection=read(build['projection'])
+    require(contract['schema']=='clk06-native-admission-contract.v1' and request['schema']=='clk06-helper-cases.v1'
+            and contract['contracts']==build['contracts'] and contract['helper_request']==build['helper_request']
+            and contract['projection']==build['projection'] and request['contracts']=={k:build['contracts'][k] for k in ['source','tolerances']}
+            and projection['contracts']==build['contracts'] and projection['helper_request']==build['helper_request']
+            and request['requested_counts']==contract['requested_counts']==build['requested_counts'], 'Frozen input graph changed')
+    source=read(build['contracts']['source']);cases=read(build['contracts']['cases']);read(build['contracts']['tolerances'])
+    for binding in contract['all_45_guard_refs']: bound(binding)
+    scope=read(contract['fixed_scope'])
+    require(contract['all_45_guard_refs']==[row[k] for row in scope['cases'] for k in ['input','weather','metadata']]
+            and len(contract['all_45_guard_refs'])==45, 'Whole ordered45 literal refs required')
+    for binding in cases['input_artifacts']: bound(binding)
+    for row in source['source_files']:
+        require(ref(ROOT/'.reference/energyplus-src/26.1.0'/row['path'])['sha256']==row['sha256'], 'Pinned selected original source changed')
+        bound(row['original']);bound(row['archive'])
+    for binding in build['source_policy_review'].values(): bound(binding)
+    require(contract['required_retired_registry']==build['retained_registry']
+            and contract['required_actual_retirement']==build['actual_retirement']
+            and contract['required_actual_retirement_execution']==build['actual_retirement_execution'], 'Frozen actual-v5 retirement differs')
+    derivation = read(build['validated_derivative'])
+    require(derivation['schema'] == 'validated-debug-derivative.v1'
+            and derivation['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+            and derivation['original_before'] == derivation['original_after']
+            and derivation['helper_binary'] == build['helper_binary'], 'Actual validated derivative binding differs')
+    for flag in ['original_removed','full_original_copied','scientific_execution_certified','gates_updated']:
+        require(derivation[flag] is False, 'Derivative scope differs')
+    for key, expected in [('executed_PE_reader',PE_SHA),('executed_driver',DERIVER_SHA)]:
+        require(derivation[key]['sha256'] == expected and ref(ROOT / derivation[key]['historical_path'])['sha256'] == expected
+                and derivation[key]['matching_archive']['sha256'] == expected, 'Authenticated PE utility source differs')
+        bound(derivation[key]['matching_archive'])
+    original_path, derived_path = bound(build['linked_original']), bound(build['helper_binary'])
+    require(original_path == ROOT/'.runtime/ep261-gcc13-o0/Products'/ (TARGET+'.exe'), 'Exact new original identity required')
+    require(derivation['original_before']['sha256'] == build['linked_original']['sha256']
+            and derivation['original_before']['size_bytes'] == build['linked_original']['size_bytes'], 'Actual linked source PE differs')
+    strip = command(derivation['strip_command_receipt'])
+    require(strip == derivation['strip_command'] and strip['command'][1:4] == ['--strip-debug','--preserve-dates','-o']
+            and path(strip['command'][4]) == derived_path and path(strip['command'][5]) == original_path, 'Actual bounded debug-only strip argv differs')
+    maps = {name: read(binding) for name,binding in derivation['maps'].items()}
+    pe_source = bound(derivation['executed_PE_reader']['matching_archive'])
+    sys.dont_write_bytecode = True
+    spec = importlib.util.spec_from_file_location('authenticated_metadata_PE_reader', pe_source)
+    require(spec is not None and spec.loader is not None, 'Authenticated metadata PE reader unavailable')
+    pe = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pe)
+    actual_original, actual_derived = pe.inspect(original_path), pe.inspect(derived_path)
+    require(actual_original == maps['original_before'] == maps['original_after']
+            and actual_derived == maps['derived'], 'Independent actual raw PE maps differ from derivation')
+    comparison = pe.compare(actual_original, actual_derived)
+    require(comparison == maps['comparison'] == derivation['comparison']
+            and comparison['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+            and comparison['code_or_data_masked'] is False, 'Independent retained PE comparison differs')
+    out.mkdir()
+    source_copy = out / 'review_build.py'
+    source_copy.write_bytes(Path(__file__).read_bytes())
+    original_map_path, derived_map_path = out / 'actual-original-pe.json', out / 'actual-derived-pe.json'
+    write(original_map_path, actual_original)
+    write(derived_map_path, actual_derived)
+    write(out / 'actual-pe-comparison.json', comparison)
+    pe_review = {'schema':'clk06-independent-PE-review.v1',
+        'status':'pass-exact-retained-runtime-sections-and-directories','review_completed_utc':utc(),
+        'reviewed_derivation':build['validated_derivative'],'actual_linked_original':build['linked_original'],
+        'reviewed_binary':build['helper_binary'],'actual_original_PE':ref(original_map_path),'actual_derived_PE':ref(derived_map_path),
+        'actual_PE_comparison':ref(out / 'actual-pe-comparison.json'),'authenticated_PE_reader':derivation['executed_PE_reader'],
+        'original_and_derivative_actual_whole_hashes_independently_verified':True,
+        'scientific_execution_performed':False,'debug_removal_is_scientific_certification':False,'gates_updated':False}
+    write(out / 'pe-review.json', pe_review)
+    require(reg.guard(bound(build['retained_registry']), bound(build['actual_retirement']), bound(build['actual_retirement_execution']), scope_amendment=build['actual_scope_amendment'], scope_amendment_execution=build['actual_scope_amendment_execution'])[0]==registry_ref, 'Accepted v5 retirement guards changed during PE review')
+    for p,digest in SEEN.items():
+        require(sha(p) == digest, 'Build/proof/input/binary bytes changed during independent metadata review')
+    review = {'schema':'clk06-independent-native-build-review.v1',
+        'status':'pass-build-and-derivative-before-original-execution','review_started_utc':started,'review_completed_utc':utc(),
+        'reviewed_build':build_ref,'actual_build_command':outer_ref,'reviewed_contract_review':build['independent_contract_review'],
+        'reviewed_helper_static_review':build['independent_helper_static_review'],'reviewed_builder_static_review':build['independent_builder_static_review'],
+        'reviewed_native_admission_contract':build['native_admission_contract'],'reviewed_helper_request':build['helper_request'],
+        'reviewed_projection':build['projection'],'reviewed_contracts':build['contracts'],
+        'reviewed_actual_retirement':build['actual_retirement'],'reviewed_actual_retirement_execution':build['actual_retirement_execution'],
+        'reviewed_binary':build['helper_binary'],'helper_binary':build['helper_binary'],
+        'actual_linked_original':{'path':build['linked_original']['historical_path'],'sha256':build['linked_original']['sha256'],
+                                 'size_bytes':build['linked_original']['size_bytes']},
+        'actual_independent_PE_validation':ref(out / 'pe-review.json'),'reviewed_source_archives':build['executed_source_archives'],
+        'actual_compile_rows':660,'historical_compile_rows':659,'frozen_core_rows':643,
+        'actual_configure_exit':configure['exit_code'],'actual_link_exit':link['exit_code'],'actual_derive_exit':derive_command['exit_code'],
+        'recorded_original_source_guard_exact_all_stages':True,'complete_original_inventory_reexecuted_by_this_reviewer':False,
+        'protected21_and_retained_pairs_independently_hashed':True,'all45_input_refs_unchanged':True,
+        'metadata_PE_reader_imported_after_authentication':True,'retirement_registry_guard_imported_after_authentication':True,
+        'actual_v5_retirement_and_successful_original_tombstones_verified':True,'reviewed_retired_registry':build['retained_registry'],'engine_compiler_strip_Cargo_Git_executed_by_reader':False,
+        'scientific_execution_performed':False,'source_original_scientific_answers_observed':False,'gates_updated':False,
+        'reviewed_bytes_unchanged_after':True,'executed_reader':ref(source_copy),'executed_reader_source_archive':ref(source_copy),'actual_reader_command':list(sys.orig_argv),
+        'authorship_disclosure':'Header authored this C6 factual build/PE metadata adaptation of Raw C5 reader and earlier Header C4 precedent. Raw authored new C6 builder/registry/helper; Header authored prior builder/producer/helper/scope/transport work. This does not independently certify earlier own algorithms or numerical physics. Root executes metadata only after actual native build0.',
+        'review_scope':'Actual build provenance and binary retained-byte/ABI metadata only; future original results/physics/numerical pairing not certified.'}
+    write(out / 'review.json', review)
+    print(json.dumps(review))
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

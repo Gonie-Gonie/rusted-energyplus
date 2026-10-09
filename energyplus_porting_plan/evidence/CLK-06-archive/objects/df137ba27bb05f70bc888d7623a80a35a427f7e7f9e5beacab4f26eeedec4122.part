@@ -1,0 +1,291 @@
+{
+  "schema": "clk06-independent-production-comparer-source-review.v1",
+  "status": "pass-held-production-reader-and-frozen-input-policy-before-six-cli",
+  "review_started_utc": "2026-10-09T08:31:11.388670+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/00-proofs.py",
+        "sha256": "ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/adapter.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/01-adapter.py",
+        "sha256": "b4961444eadcf456d2ff728fc6bc35c8ca44f8499cc9c0b7bafc8567792b5d68"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/observations.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/02-observations.py",
+        "sha256": "a095b6c98dbc6b94707190cc9cb690b7652c9686fddea9ebd8d8875734110c15"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/03-freeze_projection.py",
+        "sha256": "a1bcd4c6fd3336cb22e3f28a75f8810b48cf99c4b6e6a82ff08d2613ffb421c2"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/04-check_production.py",
+        "sha256": "b6ed71fe13c4ff017321857970f4024aa7a8bc324eb83945169988c48e2bbd19"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/05-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/06-numeric.py",
+        "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/07-state.py",
+        "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/08-history.py",
+        "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/09-metadata.py",
+        "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/10-freeze_projection.py",
+        "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/11-check_clk06.py",
+        "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/12-common.py",
+        "sha256": "e5a497f18f4f472dd535c1b058864b2f8399f07f44febe0a65e418a67aafd23e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/13-evidence.py",
+        "sha256": "790e454b0ac8bf0d743b7cde55221c450f663b39b54110d4206da4013a231252"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/14-prepare_plan.py",
+        "sha256": "d766e239c8261fdc920ca9c2f10e026f933a059c321ef6cfe7eed0e0ea70dcb3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/15-run_production.py",
+        "sha256": "a83da0f3aa8e17c79c6a08c1259125aef2a7d8a6d942c059f5f29851968cd4dd"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/16-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_source_manifest": {
+    "path": ".runtime/porting/CLK-06/production-comparer-prep-01/manifest.json",
+    "sha256": "81a1ab667abc0cc6f53a9df268e01732a1f5e9b75f85f46604a1550bff7a5554"
+  },
+  "reviewed_historical_source_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/CLK-05/production-comparer-prep-03/proofs.py",
+        "sha256": "6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424",
+        "bytes": 26185,
+        "line_count": 340
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/proofs.py",
+        "sha256": "ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a",
+        "bytes": 14160,
+        "line_count": 188
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/proofs.py.from-clk05.diff",
+        "sha256": "8f2b998199ba9ac7fea6f2c6dcaf683e21ed5039256f4031d9ddb526865c24d1",
+        "bytes": 36803,
+        "line_count": 460
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CLK-05/production-comparer-prep-03/adapter.py",
+        "sha256": "b280b74e8986f8c4a29635c1e8dd55944fdaaa1fbf96193b1af3c67dd05c5bbd",
+        "bytes": 10125,
+        "line_count": 138
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/adapter.py",
+        "sha256": "b4961444eadcf456d2ff728fc6bc35c8ca44f8499cc9c0b7bafc8567792b5d68",
+        "bytes": 8934,
+        "line_count": 120
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/adapter.py.from-clk05.diff",
+        "sha256": "878274d1b11364955f2568e338a5a158bac8cb7e1c5ab4f364983db33dd818a0",
+        "bytes": 13745,
+        "line_count": 181
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CLK-05/production-comparer-prep-03/observations.py",
+        "sha256": "ba386dd068473924ac12ec5213527d13a7588025ce2a6dadb87c226eab9896d9",
+        "bytes": 13990,
+        "line_count": 174
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/observations.py",
+        "sha256": "a095b6c98dbc6b94707190cc9cb690b7652c9686fddea9ebd8d8875734110c15",
+        "bytes": 27294,
+        "line_count": 344
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/observations.py.from-clk05.diff",
+        "sha256": "f9e1e086e702cc217516113540792a8bcfb4de983d2701ff1851536c354e9033",
+        "bytes": 38591,
+        "line_count": 468
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CLK-05/production-comparer-prep-03/freeze_projection.py",
+        "sha256": "632bff6cc0f9e244f9cf191978914a54da76a73cde47d4a51fe7c9b5196f681d",
+        "bytes": 5168,
+        "line_count": 79
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py",
+        "sha256": "a1bcd4c6fd3336cb22e3f28a75f8810b48cf99c4b6e6a82ff08d2613ffb421c2",
+        "bytes": 4905,
+        "line_count": 75
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py.from-clk05.diff",
+        "sha256": "611bc4505aa5fda111724e527fbeb0131ebe5146e60b8167a78f9537e693b37c",
+        "bytes": 8879,
+        "line_count": 115
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CLK-05/production-comparer-prep-03/check_production.py",
+        "sha256": "a27bf860bf9a35020b166cc5502e57bf5e145b2005a06f7b9db6156c498da3a9",
+        "bytes": 13874,
+        "line_count": 173
+      },
+      "after": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/check_production.py",
+        "sha256": "b6ed71fe13c4ff017321857970f4024aa7a8bc324eb83945169988c48e2bbd19",
+        "bytes": 14984,
+        "line_count": 182
+      },
+      "diff": {
+        "path": ".runtime/porting/CLK-06/production-comparer-prep-01/check_production.py.from-clk05.diff",
+        "sha256": "61e626cb357ddbc22e7a539756a63894099bcdad7d4319459f36bf22aa7cd877",
+        "bytes": 23915,
+        "line_count": 271
+      }
+    }
+  ],
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "reviewed_run_design": {
+    "path": ".runtime/porting/CLK-06/production-run-design-prep-01/plan.json",
+    "sha256": "cbcc3f9665bb32ca4cfe27a0bf61ecd8a6d7099a51ec5a378ac3380d4ad80752"
+  },
+  "reviewed_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "reviewed_root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/executed-source-reviewer.py",
+    "sha256": "ebc5637288139a2110d289cd03c45092c67d5d268cb62361987b3e5d7bd4e29b"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/executed-metadata.py",
+    "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+  },
+  "source_facts": {
+    "source_count": 17,
+    "native_production_calls": 963,
+    "actual_Current_steps_required": 480,
+    "actual_transport_kinds": [
+      "owned_context_receipt",
+      "run_period_weather_sampler_return",
+      "run_period_report_accumulator",
+      "run_period_report_hourly_output",
+      "run_period_report_series_handoff",
+      "physical_exterior_balance_ingress",
+      "physical_resolved_longwave_argument",
+      "report_recomputed_longwave_argument"
+    ],
+    "six_Full_Summary_children_required": true,
+    "source_review_then_input_only_projection_freeze_before_six_CLI": true,
+    "native_ROOT_to_CLI_ROOT_identity": true,
+    "conditional_uninvoked_roles_unavailable_no_PASS": true,
+    "native_Current5_model_and_SRC08_unpaired": true,
+    "compiled_geometry_and_source_conditional_caps_required": true,
+    "different_unit_and_CLI_builds_authenticated_by_actual_applied_inventory": true
+  },
+  "source_review_method": "Full other-author source read of Baseline production five; exact17 byte archives/AST/literal interfaces and frozen input authority; reviewed targets not imported.",
+  "authorship_limits": "Header authored earlier helper/observer/sky math and reviewed execution wrappers. Root and Raw independently read those dependencies. Baseline authored this production comparer and earlier producer algorithms. This factual source recorder does not independently certify own formulas or execute numerical comparisons.",
+  "reviewed_targets_imported_or_executed": false,
+  "scientific_execution_performed": false,
+  "native_or_Rust_numerical_result_payloads_read": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "historical_applied_inventory_in_manifest_is_future_CLI_identity_proof": false,
+  "numeric_policy_changed": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false,
+  "review_completed_utc": "2026-10-09T08:31:11.888559+00:00"
+}

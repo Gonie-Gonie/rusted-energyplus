@@ -1,0 +1,416 @@
+"""Source-only draft: authenticate actual v5 retirement and explicit CLK05 note successor.
+
+No admission, source write, deletion, subprocess, or scientific comparison is provided.
+The predecessor metadata guard is authenticated before its runtime-only import.
+"""
+from __future__ import annotations
+from datetime import datetime
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+C5 = '.runtime/porting/CLK-05/'
+REGISTRY_SHA = 'db48de3548d450a8402b0cf6412ffa0189fbe289f433e244b67d4b456d5798b6'
+PREVIOUS = {'path': '.runtime/porting/CLK-04/retirement-01/registry-retired.json',
+            'sha256': '27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378'}
+PREVIOUS_RETIREMENT = {'path': '.runtime/porting/CLK-04/retirement-01/retirement.json',
+                       'sha256': 'b9ca376626a2503ecf77ef21cc4394331563fc1d0628d32f1849abcb2f23038c'}
+PREVIOUS_EXECUTION = {'path': '.runtime/porting/CLK-04/retirement-command-01/receipt.json',
+                      'sha256': '4937e664fd7c509f77a8302c70b30bdd4d7aaf5d60d4894c406f643839ee1a38'}
+OLD_GUARD = {'path': C5 + 'builder-prep-02/registry.py',
+             'sha256': 'acb731bd97c71fa4518455598b93bc4e97b4b44811ce2e31b83c975e3c0e42b9'}
+RETIREMENT = {'path': C5 + 'retirement-01/retirement.json',
+              'sha256': 'c3304ededb906298ff85adffebc6c86b78747bfa6bc004ffce00f6d5010a5a3b'}
+OUTER = {'path': C5 + 'retirement-command-01/receipt.json',
+         'sha256': 'f1eeb6c3458bdd6488cb1a0f61d581f91e8c8537a3a09408c422e372f8fba912'}
+ADMITTED = {'path': C5 + 'retirement-01/registry-admitted.json',
+            'sha256': '966e361d657dc19022a825cf62394b610e7a7dd0e6d83bb3634973029814a8ec'}
+PLAN = {'path': C5 + 'retirement-plan-02/plan.json',
+        'sha256': '91bf44133da95735fe2b4a8f80942121331bb710be306d448cc0bb4ed1900efb'}
+PLAN_EXECUTION = {'path': C5 + 'retirement-plan-command-02/receipt.json',
+                  'sha256': '91f5b56550cb91a313c4b9972d9f569a3f8160ddcf5cc73313a5534c5ca19e98'}
+SOURCE_REVIEW = {'path': C5 + 'independent-retirement-writer-source-review-02/review.json',
+                 'sha256': 'a37fbe00ff7be21d2731ebe2b7447301c028b16860fd2fceeaa6abaf092ff8a3'}
+SOURCE_EXECUTION = {'path': C5 + 'independent-retirement-writer-source-review-command-02/receipt.json',
+                    'sha256': 'c5806291b53a61a4f3bba9b7d747d5b30b442d2e37c5fb90bef0ae5a5bc35bbc'}
+CLOSURE = {'path': C5 + 'closure-01/closure-result.json',
+           'sha256': '1a87c229c2b427432401580f5ad35747d0acf93f3d78617aa91e11676bff70ce'}
+CLOSURE_EXECUTION = {'path': C5 + 'closure-command-01/receipt.json',
+                     'sha256': '1e2e4ffd6dc044a48cae2d3a3fd860775f3cfd87f7e84aa99984a1379c67e6e8'}
+ANNOTATION = {'path': C5 + 'documentation-amendment-01/amendment.json',
+              'sha256': 'fd47cf4b961b1df890651b7f89388e84b192644cc7e9579990579dede22dfd4f'}
+ANNOTATION_EXECUTION = {'path': C5 + 'documentation-amendment-command-01/receipt.json',
+                        'sha256': '467badad017fd45e21d3e780f48de90ba7ac9865b18c0b4ef8d24490ca1cb87a'}
+ORIGINAL = {'historical_path': '.runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe',
+            'sha256': 'b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc',
+            'size_bytes': 1296986812}
+DERIVATIVE = {'path': C5 + 'native-build-01/derivation/derived-helper.exe',
+              'sha256': '132f76c4e0e4398de566cd14e9f2b0e9a0ba1ab7d16339c16d45d13967aee217',
+              'size_bytes': 150455372}
+SOURCES = {'common.py': 'f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038',
+           'proofs.py': 'c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302',
+           'write_plan.py': '666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a',
+           'retire.py': '33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea'}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    return left.hex() == right.hex() if type(left) is float else left == right
+
+
+def timestamp(value):
+    require(type(value) is str, 'Actual UTC text required')
+    result = datetime.fromisoformat(value)
+    require(result.tzinfo is not None and result.utcoffset().total_seconds() == 0, 'Aware UTC required')
+    return result
+
+
+def path(value):
+    raw = Path(value)
+    item = (raw if raw.is_absolute() else ROOT / raw).resolve()
+    require(item != ROOT and item.is_relative_to(ROOT), 'Artifact escapes repository')
+    return item
+
+
+def sha(value):
+    with Path(value).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def verify(binding):
+    raw = Path(binding['path'])
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse bound file required')
+    item = path(raw)
+    require(sha(item) == binding['sha256'], 'Bound actual bytes differ')
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and info.st_size == binding[key], 'Bound file size differs')
+    return item
+
+
+def ref(value):
+    item = path(value)
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': sha(item)}
+
+
+def read(binding):
+    def pairs(rows):
+        result = {}
+        for key, item in rows:
+            require(key not in result, 'Duplicate JSON key')
+            result[key] = item
+        return result
+    def invalid(value):
+        raise ValueError('Nonstandard JSON ' + value)
+    return json.loads(verify(binding).read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def command_tail(command):
+    require(type(command) is list and command and all(type(value) is str for value in command), 'Typed Python argv required')
+    require(Path(command[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe'], 'Admitted interpreter name required')
+    index = 1
+    if command[index:index + 2] == ['-X', 'utf8']:
+        index += 2
+    if command[index:index + 1] == ['-B']:
+        index += 1
+    require(index < len(command) and not command[index].startswith('-')
+            and Path(command[index]).suffix == '.py', 'Admitted actual script operand required')
+    return command[index:]
+
+
+def executed(record, archive, historical_path):
+    tail = command_tail(record['command'])
+    require(path(tail[0]) == path(historical_path), 'Executed Python script path differs')
+    require(ref(verify(archive))['sha256'] == ref(historical_path)['sha256'], 'Executed source/archive bytes differ')
+    # The literal interpreter alias is recorded; parent Python metadata does not prove its child executable resolution.
+    return tail
+
+
+def recorded(binding, expected=None):
+    record = read(binding)
+    require(record['schema'] == 'recorded-porting-command.v1' and type(record['exit_code']) is int
+            and record['exit_code'] == 0 and record['launch_error'] is None
+            and record['source_bytes_match_before_and_after'] is True
+            and Path(record['cwd']).resolve() == ROOT, 'Actual guarded metadata recorder0/cwd required')
+    for key in ['stdout', 'stderr', 'source_snapshot']:
+        verify(record[key])
+    require(verify(record['stderr']).stat().st_size == 0, 'Actual successful metadata stderr must be empty')
+    require(timestamp(record['started_utc']) <= timestamp(record['finished_utc']), 'Recorder interval reversed')
+    if expected is not None:
+        require(exact(read(record['stdout']), expected), 'Actual typed metadata stdout differs')
+    return record
+
+
+def predecessor():
+    source = verify(OLD_GUARD)
+    spec = importlib.util.spec_from_file_location('clk06_authenticated_v4_guard', source)
+    require(spec is not None and spec.loader is not None, 'Authenticated predecessor metadata guard unavailable')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.guard(verify(PREVIOUS), verify(PREVIOUS_RETIREMENT), verify(PREVIOUS_EXECUTION))
+
+
+def source_chain(plan, retirement):
+    review = read(SOURCE_REVIEW)
+    bundle = {'review': SOURCE_REVIEW, 'execution': SOURCE_EXECUTION}
+    require(exact(plan['source_review'], bundle) and exact(retirement['source_review'], bundle)
+            and review['schema'] == 'clk05-independent-retirement-writer-source-review.v1'
+            and review['status'] == 'pass-source-before-one-target-retirement-metadata'
+            and review['scientific_execution_performed'] is False, 'Actual sourceQA02 binding differs')
+    source_command = recorded(SOURCE_EXECUTION, review)
+    executed(source_command, review['executed_reader_source_archive'], C5 + 'retirement-source-review-prep-02/review_sources.py')
+    for rows in [review['reviewed_sources'], plan['executed_source_archives']]:
+        require(type(rows) is list and len(rows) == 4, 'Exactly four retirement03 source rows required')
+        keyed = {row['historical_path']: row['archive'] for row in rows}
+        require(len(keyed) == 4 and set(keyed) == {C5 + 'retention-prep-03/' + name for name in SOURCES}, 'Source03 inventory differs')
+        for name, digest in SOURCES.items():
+            owner = C5 + 'retention-prep-03/' + name
+            require(keyed[owner]['sha256'] == digest and ref(owner)['sha256'] == digest, 'Actual reviewed/executed source03 differs')
+            verify(keyed[owner])
+    archive = next(row['archive'] for row in plan['executed_source_archives'] if Path(row['historical_path']).name == 'write_plan.py')
+    plan_summary = {'plan': PLAN, 'status': plan['status'], 'targets': ['clk05_reference_helper'],
+                    'deletion_performed': False, 'registry_admission_performed': False}
+    plan_command = recorded(PLAN_EXECUTION, plan_summary)
+    require(command_tail(plan['actual_writer_command']) == executed(plan_command, archive, C5 + 'retention-prep-03/write_plan.py'), 'Plan actual writer argv differs')
+    require(timestamp(source_command['started_utc']) <= timestamp(review['review_started_utc'])
+            <= timestamp(review['review_completed_utc']) <= timestamp(source_command['finished_utc'])
+            <= timestamp(plan_command['started_utc']) <= timestamp(plan['started_utc'])
+            <= timestamp(plan['completed_utc']) <= timestamp(plan_command['finished_utc'])
+            <= timestamp(retirement['started_utc']), 'SourceQA02 must precede actual plan02 and action0')
+    return plan_command
+
+
+def documentation_successor(closure, outer):
+    amendment = read(ANNOTATION)
+    command = recorded(ANNOTATION_EXECUTION, amendment)
+    require(amendment['schema'] == 'clk05-documentation-encoding-amendment.v1'
+            and amendment['only_card_explanatory_notes_changed'] is True
+            and amendment['gates_or_science_changed'] is False
+            and amendment['historical_notes_and_archives_rewritten'] is False
+            and amendment['actual_prior_closure'] == CLOSURE
+            and amendment['actual_prior_retirement'] == RETIREMENT
+            and amendment['actual_prior_retirement_execution'] == OUTER, 'Explicit actual note-only successor required')
+    closed_card = next(row for row in closure['after'] if row['path'] == 'energyplus_porting_plan/cards/CLK-05.md')
+    require(amendment['before'] == closed_card and amendment['after']['path'] == closed_card['path'], 'Historical closure/current annotation identity differs')
+    require(amendment['before_archive']['sha256'] == closed_card['sha256']
+            and amendment['after_archive']['sha256'] == amendment['after']['sha256'], 'Actual card archive lineage differs')
+    before, after = verify(amendment['before_archive']).read_bytes(), verify(amendment['after_archive']).read_bytes()
+    require(verify(amendment['after']).read_bytes() == after, 'Current CLK05 card must equal explicit note successor')
+    sources = amendment['sources']
+    require(type(sources) is list and len(sources) == 2 and len({row['path'] for row in sources}) == 2, 'Exact two amendment source copies required')
+    keyed = {Path(row['path']).name: row for row in sources}
+    require(set(keyed) == {'amend_notes.py', 'additional-notes.md'}, 'Note writer/source inventory differs')
+    for row in sources:
+        verify(row)
+    tail = executed(command, keyed['amend_notes.py'], C5 + 'documentation-amendment-prep-01/amend_notes.py')
+    require(tail[1:] == ['--retirement', str(Path(RETIREMENT['path'])), '--retirement-execution',
+            str(Path(OUTER['path'])), '--output-dir', str(Path(C5 + 'documentation-amendment-01'))], 'Note amendment actual argv differs')
+    old = verify({'path': C5 + 'completion-approved-01/card-notes.md', 'sha256': '0849e42c6c6e89556ef0e4d235591407f62e30c5550f544742355a068b2c8c23'}).read_bytes()
+    draft = verify({'path': C5 + 'completion-draft/card-notes.md', 'sha256': '63f783f8747be10c341b890af0d743a370d7e21424d0807624b9effb66d21026'}).read_bytes()
+    addition = verify(keyed['additional-notes.md']).read_bytes()
+    require(before.endswith(old) and old.startswith(draft) and after == before[:-len(old)] + draft + addition,
+            'Only authenticated explanatory suffix replacement is admitted')
+    require(before.count(b'- [x]') == after.count(b'- [x]') == 4, 'CLK05 four closed gates must be preserved')
+    require(timestamp(outer['finished_utc']) <= timestamp(command['started_utc']), 'Actual retirement must precede note amendment')
+    # Plan after-binding remains historical: CLK06 may amend its own task. CLK05 evidence is unchanged.
+    verify(next(row for row in closure['after'] if row['path'] == 'energyplus_porting_plan/evidence/CLK-05.json'))
+    return {'reviewed_note_amendment': ANNOTATION, 'actual_note_amendment_execution': ANNOTATION_EXECUTION,
+            'historical_closed_card': closed_card, 'current_card_successor': amendment['after'],
+            'old_closure_card_claimed_current': False}
+
+
+def scope_successor(closure, notes, amendment_binding, execution_binding):
+    closed_plan = next(row for row in closure['after'] if row['path'] == 'energyplus_porting_plan/plan.json')
+    require((amendment_binding is None) == (execution_binding is None), 'Scope amendment requires both actual report/execution bindings')
+    if amendment_binding is None:
+        verify(closed_plan)
+        return {'actual_CLK06_scope_amendment': None, 'actual_CLK06_scope_amendment_execution': None,
+                'current_plan_successor': closed_plan, 'CLK06_scope_amendment_claimed': False}
+    amendment = read(amendment_binding)
+    command = recorded(execution_binding, amendment)
+    require(amendment['schema'] == 'clk06-metadata-scope-amendment.v1'
+            and amendment['status'] == 'scope-only-amended-four-gates-pending'
+            and amendment['other_task_objects_unchanged'] == 63
+            and amendment['only_CLK06_semantic_entry_and_card_written'] is True
+            and amendment['all_four_CLK06_gates_remain_pending'] is True
+            and all(amendment[key] is False for key in ['canonical_gates_updated',
+                'actual_new_packet_projection_or_precision_freeze_claimed', 'input_scope_expanded',
+                'future_alternative_models_or_SRC08_certification_claimed', 'scientific_execution_performed',
+                'numerical_PASS_claimed', 'Git_mutations_performed', 'engines_builds_tests_Cargo_executed']),
+            'Only explicit actual CLK06 scope metadata amendment is admitted')
+    rows = amendment['archived_deltas']
+    require(type(rows) is list and len(rows) == 2, 'Exactly plan/card scope archive rows required')
+    keyed = {row['historical_path']: row for row in rows}
+    require(len(keyed) == 2 and set(keyed) == {'energyplus_porting_plan/plan.json', 'energyplus_porting_plan/cards/CLK-06.md'}, 'Scope document inventory differs')
+    before_refs, after_refs = amendment['before'], amendment['after']
+    require(len(before_refs) == len(after_refs) == 2
+            and len({row['path'] for row in before_refs}) == len({row['path'] for row in after_refs}) == 2
+            and {row['path'] for row in before_refs} == set(keyed) == {row['path'] for row in after_refs}, 'Scope before/after bindings differ')
+    for name, row in keyed.items():
+        old = next(item for item in before_refs if item['path'] == name)
+        new = next(item for item in after_refs if item['path'] == name)
+        require(row['before']['sha256'] == old['sha256'] and row['proposed']['sha256'] == new['sha256'], 'Scope archive/source lineage differs')
+        verify(row['before']); verify(row['full_diff'])
+        require(verify(row['proposed']).read_bytes() == verify(new).read_bytes(), 'Actual scope successor bytes differ')
+    require(next(row for row in before_refs if row['path'] == closed_plan['path']) == closed_plan, 'Scope plan.before must match historical CLK05 closure plan')
+    before, after = read(keyed[closed_plan['path']]['before']), read(keyed[closed_plan['path']]['proposed'])
+    require(exact({key: value for key, value in before.items() if key != 'tasks'},
+                  {key: value for key, value in after.items() if key != 'tasks'}), 'Non-task plan metadata changed')
+    left, right = before['tasks'], after['tasks']
+    require(type(left) is list and type(right) is list and len(left) == len(right) == 64
+            and len({row['id'] for row in left}) == len({row['id'] for row in right}) == 64
+            and [row['id'] for row in left] == [row['id'] for row in right], 'Exact unique ordered64 task objects required')
+    indexes = [index for index, row in enumerate(left) if row['id'] == 'CLK-06']
+    require(len(indexes) == 1 and all(exact(a, b) for index, (a, b) in enumerate(zip(left, right)) if index != indexes[0]), 'All other63 tasks including CLK05 must remain typed-identical')
+    require(all(right[indexes[0]][key] == '\ubbf8\ud655\uc778' for key in ['scope_review', 'unit_gate', 'integration_gate', 'production_gate']), 'CLK06 gates must remain pending')
+    review = read(amendment['source_review'])
+    review_command = recorded(amendment['source_review_execution'], review)
+    require(review['schema'] == 'clk06-independent-scope-amendment-writer-source-review.v1'
+            and review['status'] == 'pass-scope-only-source-before-canonical-metadata-amendment'
+            and review['scientific_execution_performed'] is False, 'Actual pre-amendment source review required')
+    sources = review['reviewed_sources']
+    require(type(sources) is list and len(sources) == 3 and len({row['historical_path'] for row in sources}) == 3, 'Scope writer requires exact three reviewed sources')
+    writer = amendment['actual_applied_writer']
+    writer_archive = next(row['archive'] for row in sources if path(row['historical_path']) == path(writer['path']))
+    require({Path(row['historical_path']).name for row in sources} == {'write_amendment.py', 'task-updates.json', 'CLK-06.proposed.md'}, 'Scope source inventory differs')
+    for row in sources:
+        require(ref(row['historical_path'])['sha256'] == row['archive']['sha256'], 'Current scope writer/source archive differs')
+        verify(row['archive'])
+    executed(command, writer_archive, writer['path']); verify(writer)
+    executed(review_command, review['executed_reader_source_archive'], command_tail(review_command['command'])[0])
+    require(timestamp(review_command['started_utc']) <= timestamp(review['review_started_utc'])
+            <= timestamp(review['review_completed_utc']) <= timestamp(review_command['finished_utc'])
+            <= timestamp(command['started_utc']) <= timestamp(amendment['started_utc'])
+            <= timestamp(amendment['finished_utc']) <= timestamp(command['finished_utc'])
+            and timestamp(read(ANNOTATION_EXECUTION)['finished_utc']) <= timestamp(command['started_utc']), 'Source review/note/scope amendment chronology differs')
+    verify(notes['current_card_successor'])
+    return {'actual_CLK06_scope_amendment': dict(amendment_binding), 'actual_CLK06_scope_amendment_execution': dict(execution_binding),
+            'current_plan_successor': next(row for row in after_refs if row['path'] == closed_plan['path']),
+            'CLK06_scope_amendment_claimed': True, 'historical_closure_plan_claimed_current': False}
+
+
+def guard(registry_path, retirement_path, retirement_execution, scope_amendment=None, scope_amendment_execution=None):
+    registry_ref = ref(registry_path)
+    require(registry_ref == {'path': C5 + 'retirement-01/registry-retired.json', 'sha256': REGISTRY_SHA}
+            and ref(retirement_path) == RETIREMENT and ref(retirement_execution) == OUTER, 'Explicit actual v5/action0 bindings required')
+    registry, retirement, admitted, plan = read(registry_ref), read(RETIREMENT), read(ADMITTED), read(PLAN)
+    _, previous, inherited = predecessor()
+    require(registry['schema'] == admitted['schema'] == 'native-retained-artifact-registry.v5'
+            and registry['predecessor'] == ADMITTED and admitted['predecessor'] == PREVIOUS
+            and registry['admitted_by_Root_after_actual_card_closure'] is True
+            and admitted['admitted_by_Root_after_actual_card_closure'] is True
+            and registry['admitted_by_this_plan'] is False and admitted['admitted_by_this_plan'] is False, 'Exact actual v5 admission lineage required')
+    for key in ['legacy_products', 'legacy_product_count', 'protected_core_API_and_container']:
+        require(exact(registry[key], previous[key]) and exact(admitted[key], previous[key]), 'Original legacy/core bindings changed')
+    require(len(registry['new_targets']) == len(admitted['new_targets']) == 5
+            and exact(registry['new_targets'][:4], previous['new_targets'])
+            and exact(admitted['new_targets'][:4], previous['new_targets']), 'Exact four prior retired entries must remain unchanged')
+    require(plan['schema'] == 'clk05-single-target-retention-removal-plan.v1'
+            and plan['status'] == 'pass-actual-closure-and-prerequisites-removal-not-performed'
+            and plan['registry_admission_performed'] is False and plan['deletion_or_move_performed'] is False
+            and plan['predecessor_registry'] == PREVIOUS, 'Actual metadata-only plan02 required')
+    require(registry['admission_plan'] == admitted['admission_plan'] == PLAN
+            and registry['actual_card_closure'] == admitted['actual_card_closure'] == CLOSURE, 'Actual plan/closure admission differs')
+    entry = registry['new_targets'][-1]
+    require(entry['target'] == 'clk05_reference_helper' and entry['card'] == 'CLK-05'
+            and entry['schema'] == 'native-new-target-retention-entry.v1'
+            and entry['original_link'] == ORIGINAL and entry['retained_derivative'] == DERIVATIVE
+            and entry['status'] == 'retained-derivative-original-retired' and entry['actual_removal_observed'] is True,
+            'Sole CLK05 actual tombstone required')
+    require(entry['evidence'] == admitted['new_targets'][-1]['evidence'] == plan['evidence']
+            and entry['historical_native_exit_code'] == 0 and entry['historical_wrapper_exit_code'] == 0
+            and entry['metadata_recovery_performed'] is False, 'C5 actual Native0/wrapper0 must not be relabelled recovery')
+    for binding in plan['evidence'].values():
+        verify(binding)
+    verify(plan['authenticated_proof_bindings_archive'])
+    debug = entry['unstripped_original']
+    require(debug['disposition'] == 'removed-with-actual-absence-receipt'
+            and all(debug[key] is False for key in ['full_debug_bytes_available', 'full_debug_archive_created',
+                'hash_or_map_recovers_discarded_debug_bytes', 'deterministic_relink_recovery_claimed']), 'Discarded debug bytes are unavailable; no recovery/copy claim')
+    original = ROOT / ORIGINAL['historical_path']
+    parent_info = original.parent.lstat()
+    require(original.parent.resolve() == ROOT / '.runtime/ep261-gcc13-o0/Products'
+            and stat.S_ISDIR(parent_info.st_mode) and not getattr(parent_info, 'st_file_attributes', 0) & 0x400
+            and not original.exists() and not original.is_symlink(), 'Actual precise original absence/non-reparse Products required')
+    verify(DERIVATIVE)
+    removal = read(entry['removal_receipt'])
+    require(removal['schema'] == 'native-new-target-removal-receipt.v1' and removal['target'] == entry['target']
+            and type(removal['actual_command_exit_code']) is int and removal['actual_command_exit_code'] == 0
+            and removal['historical_original'] == ORIGINAL and removal['retained_derivative'] == DERIVATIVE
+            and removal['actual_original_absence'] is True and removal['actual_retirement_accepted'] is True
+            and removal['spawn_error'] is None and removal['preservation_guard_failure'] is None
+            and removal['prior_metadata_bytes_unchanged'] is True and removal['no_full_debug_copy_created'] is True
+            and removal['engines_or_scientific_comparers_executed'] is False
+            and removal['realized_removed_bytes'] == ORIGINAL['size_bytes'], 'Actual precise removal0 receipt required')
+    require(Path(removal['resolved_target']).resolve() == original and Path(removal['cwd']).resolve() == ROOT
+            and Path(removal['resolved_products_directory']).resolve() == original.parent, 'Actual one-file resolved removal paths differ')
+    for key in ['stdout', 'stderr', 'executed_script']:
+        verify(removal[key])
+    require(verify(removal['stderr']).stat().st_size == 0 and removal['actual_native_command'] ==
+            ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', str(verify(removal['executed_script']))], 'Actual native LiteralPath removal command differs')
+    require(exact(removal['protected_before'], removal['protected_after'])
+            and exact(removal['protected_after'], retirement['protected_and_retained_after'])
+            and exact(removal['protected_before'], plan['protected_and_retained_observations']), 'Protected21 observations must remain byte identical')
+    require(retirement['schema'] == 'clk05-single-target-native-helper-retirement.v1'
+            and retirement['status'] == 'pass-precise-removal-and-retained-artifact-guards'
+            and retirement['retired_registry'] == registry_ref and retirement['admitted_registry'] == ADMITTED
+            and retirement['actual_removal_receipts'] == [entry['removal_receipt']]
+            and retirement['retention_plan'] == PLAN and retirement['retention_plan_execution'] == PLAN_EXECUTION
+            and retirement['historical_native_exit_code'] == 0 and retirement['historical_wrapper_exit_code'] == 0
+            and retirement['metadata_recovery_performed'] is False and retirement['sole_exact_new_original_absent'] is True
+            and retirement['prior_metadata_bytes_unchanged'] is True and retirement['realized_removed_bytes'] == ORIGINAL['size_bytes'], 'Honest C5 retirement/action0 required')
+    require(all(retirement[key] is False for key in ['historical_failed_wrapper_relabelled_zero',
+            'historical_proofs_or_launchers_rewritten', 'full_debug_copy_created', 'canonical_files_or_gates_written',
+            'scientific_execution_repeated', 'discarded_debug_bytes_recoverable_from_hash_or_map',
+            'deterministic_relink_recovery_claimed']), 'No historical rewrite/science rerun/debug recovery claim admitted')
+    outer = recorded(OUTER, retirement)
+    archive = next(row['archive'] for row in plan['executed_source_archives'] if Path(row['historical_path']).name == 'retire.py')
+    require(command_tail(retirement['actual_writer_command']) == executed(outer, archive, C5 + 'retention-prep-03/retire.py'), 'Actual retirement source/argv differs')
+    source_chain(plan, retirement)
+    require(timestamp(outer['started_utc']) <= timestamp(retirement['started_utc'])
+            <= timestamp(registry['admission_utc']) <= timestamp(removal['action_started_utc'])
+            <= timestamp(removal['action_completed_utc']) <= timestamp(retirement['completed_utc'])
+            <= timestamp(outer['finished_utc']), 'Actual admission/action/retirement chronology differs')
+    closure = read(CLOSURE)
+    closure_command = recorded(CLOSURE_EXECUTION, closure)
+    require(closure['schema'] == 'clk05-metadata-card-closure.v1' and closure['all_four_actual_gates'] == '\uD1B5\uACFC'
+            and closure['only_CLK05_gates_updated'] is True and closure['other_63_tasks_unchanged'] is True
+            and retirement['actual_card_closure'] == plan['actual_card_closure']
+            and plan['actual_card_closure']['closure'] == CLOSURE
+            and plan['actual_card_closure']['closure_execution'] == CLOSURE_EXECUTION
+            and plan['actual_card_closure']['canonical_after'] == closure['after'], 'Actual four-gate historical closure required')
+    require(timestamp(closure_command['started_utc']) <= timestamp(closure['completed_utc'])
+            <= timestamp(closure_command['finished_utc']) <= timestamp(plan['started_utc']), 'Actual closure must precede retention plan')
+    live = inherited['live_retained_bindings'] + [{'path': DERIVATIVE['path'], 'sha256': DERIVATIVE['sha256']}]
+    protected = retirement['protected_and_retained_after']
+    require(len(live) == len({row['path'] for row in live}) == len(protected) == 21
+            and {row['binary']['path'] for row in protected} == {row['path'] for row in live}, 'Actual protected21 inventory differs')
+    indexed = {row['path']: row['sha256'] for row in live}
+    for row in protected:
+        require(row['binary']['sha256'] == indexed[row['binary']['path']], 'Protected retained SHA differs')
+        verify({**row['binary'], 'size_bytes': row['size_bytes']})
+    notes = documentation_successor(closure, outer)
+    scope = scope_successor(closure, notes, scope_amendment, scope_amendment_execution)
+    return registry_ref, registry, {'protected_and_retained_count': 21, 'live_retained_bindings': live,
+        'actual_retirement': RETIREMENT, 'actual_retirement_execution': OUTER,
+        'actual_removal_receipts': [entry['removal_receipt']], 'prior_retirement_registry': PREVIOUS,
+        'actual_retention_plan': PLAN, 'actual_retention_plan_execution': PLAN_EXECUTION,
+        'actual_retirement_source_review': SOURCE_REVIEW, 'actual_retirement_source_review_execution': SOURCE_EXECUTION,
+        'native_exit_code': 0, 'historical_wrapper_exit_code': 0, 'metadata_recovery_performed': False,
+        'new_registry_admission_or_removal_performed': False, **notes, **scope}

@@ -1,0 +1,276 @@
+"""Factual input-registration metadata review; never import/run the capturer.
+
+No native/Rust scientific payload is read or compared. Pre-capture approval was
+manual session authorization, not a formal SourceQA artifact. This actual review
+must precede future packet freeze/Original admission, whose launchers recapture
+the literal external strings rather than assuming this process's environment.
+"""
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+CAPTURE = {'path': '.runtime/porting/CLK-05/production-control-capture-prep-02/capture_inputs.py',
+           'sha256': 'c79e5186f56f66110e148c1d7d06748e6ec03ecd94b8b8ef74926c225739623e'}
+REGISTRATION = {'path': '.runtime/porting/CLK-05/control-registration-mirrors-01/proposal.json',
+                'sha256': 'f8f94f6c45e48f8be851e0bb34fd94c89b63013dbfc55939c3d7c1fc4181b550'}
+MATRIX = {'path': '.runtime/porting/CLK-04/production-execution-01/matrix.json',
+          'sha256': 'e0c0e83c151194a5e1dea689d7d21882254b7c38bd5f0e758e8863d098b275cc'}
+CALLERS = {'path': '.runtime/porting/CLK-03/production-matched-inputs-01/helper-request.json',
+           'sha256': 'e989b1d9aa052066040536a3320a91f9d512e06b6a33c14c46924aae526eb3d1'}
+CONTROLS = ['DisplayWeatherMissingDataWarnings', 'IgnoreSolarRadiation',
+            'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']
+CASE_IDS = ['A-24H', 'A-72H', 'B-BOTH-24H']
+SEEN = {}
+
+
+def require(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def instant(value):
+    parsed = datetime.fromisoformat(value)
+    require(parsed.tzinfo is not None and parsed.utcoffset().total_seconds() == 0, 'Aware UTC required')
+    return parsed
+
+
+def path(value):
+    item = Path(value)
+    item = (item if item.is_absolute() else ROOT / item).resolve()
+    require(item != ROOT and item.is_relative_to(ROOT) and item.is_file(), 'Contained actual file required')
+    return item
+
+
+def ref(value):
+    item = path(value)
+    with item.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    require(item not in SEEN or SEEN[item] == digest, 'Previously consumed bytes changed')
+    SEEN[item] = digest
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def check(binding):
+    require(type(binding) is dict and set(binding) <= {'path', 'sha256', 'bytes', 'size_bytes'}
+            and {'path', 'sha256'} <= set(binding), 'Typed path/hash reference required')
+    item = path(binding['path'])
+    require(type(binding['path']) is str and type(binding['sha256']) is str
+            and ref(item)['sha256'] == binding['sha256'], 'Bound file hash differs')
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and binding[key] == item.stat().st_size, 'Bound file size differs')
+    return item
+
+
+def read(binding):
+    def pairs(rows):
+        result = {}
+        for key, value in rows:
+            require(key not in result, 'Duplicate JSON key')
+            result[key] = value
+        return result
+    return json.loads(check(binding).read_text(encoding='utf-8'), object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonstandard JSON ' + token)))
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def literal_diagnostics(idf, epjson):
+    # Bounded actual CON domain, independently checked against retained conversion.
+    objects = re.sub(r'!.*', '', idf.decode('utf-8-sig')).split(';')
+    fields = [[token.strip() for token in item.split(',')] for item in objects if item.strip()]
+    literal = [row[1:] for row in fields if row[0].lower() == 'output:diagnostics']
+    require(len(literal) <= 1, 'Actual fixed CON has at most one diagnostics object')
+    instances = epjson.get('Output:Diagnostics', {})
+    require(type(instances) is dict and len(instances) == len(literal), 'IDF and epJSON object cardinalities differ')
+    names = sorted(instances)
+    require(all(type(key) is str and key.isascii() for key in names), 'Literal ASCII instance names required')
+    keys = []
+    if names:
+        selected = instances[names[0]]
+        require(type(selected) is dict and type(selected.get('diagnostics')) is list, 'Typed diagnostic array required')
+        for row in selected['diagnostics']:
+            require(type(row) is dict, 'Diagnostic entry object required')
+            if 'key' in row:
+                require(type(row['key']) is str and row['key'].isascii(), 'Typed literal diagnostic key required')
+                keys.append(row['key'])
+        require(keys == literal[0], 'Retained conversion differs from current literal IDF')
+    return {'object_type':'Output:Diagnostics', 'present':bool(names), 'literal_instance_names':names,
+            'selected_instance_name':names[0] if names else None, 'diagnostics':keys}
+
+
+def resolved_inputs(captured, diagnostics):
+    # Selected initializer/ENV/first-instance assignments only; no weather RHS.
+    require(type(captured) is dict and set(captured) == set(CONTROLS[1:]), 'Exactly three captured external inputs required')
+    result = {key: False for key in CONTROLS}
+    for key in CONTROLS[1:]:
+        item = captured[key]
+        require(type(item) is dict and set(item) == {'present', 'raw_value'}
+                and type(item['present']) is bool and type(item['raw_value']) is str, 'Typed input presence/string required')
+        item['raw_value'].encode('utf-8', errors='strict')
+        require(item['present'] or item['raw_value'] == '', 'Absent input cannot contain a fabricated string')
+        result[key] = item['present'] and item['raw_value'][:1] in {'Y', 'y', 'T', 't'}
+    for item in diagnostics['diagnostics']:
+        for key in CONTROLS:
+            if item.lower() == key.lower():
+                result[key] = True
+    return result
+
+
+def converter_input_receipt(receipt, key, binding):
+    require(receipt['algorithm'] == 'fnv-1a-64' and type(receipt['schema_version']) is int
+            and receipt['schema_version'] == 1, 'Authentic retained converter hash schema required')
+    item = receipt[key]
+    payload = check(binding).read_bytes()
+    require(path(item['path']) == check(binding) and type(item['bytes']) is int
+            and item['bytes'] == len(payload), 'Actual converter input path/byte count differs')
+    # Checksum of authenticated input bytes only; no numerical/weather operands.
+    digest = 0xcbf29ce484222325
+    for octet in payload:
+        digest = ((digest ^ octet) * 0x100000001b3) & 0xffffffffffffffff
+    require(type(item['hash']) is str and item['hash'] == format(digest, '016x'), 'Actual converter input FNV checksum differs')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['control-inputs', 'capture-execution', 'output-dir']:
+        parser.add_argument('--' + key, type=Path, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    started = now()
+    out = args.output_dir.resolve()
+    require(out.is_relative_to(ROOT / '.runtime/porting/CLK-05') and not out.exists(), 'Fresh ignored review output required')
+    capture_ref, execution_ref = ref(args.control_inputs), ref(args.capture_execution)
+    capture, execution = read(capture_ref), read(execution_ref)
+    require(execution['schema'] == 'recorded-porting-command.v1' and type(execution['exit_code']) is int
+            and execution['exit_code'] == 0 and execution['launch_error'] is None
+            and execution['source_bytes_match_before_and_after'] is True
+            and execution['recorder_updates_gates'] is False and execution['recorder_supplies_reference_answers'] is False,
+            'Actual unchanged capture metadata0 required')
+    require(Path(execution['cwd']).is_absolute() and Path(execution['cwd']).resolve() == ROOT, 'Recorded cwd differs')
+    require(execution['command'] == ['python', '-X', 'utf8', '-B', CAPTURE['path'], '--output-dir',
+            check(capture_ref).parent.relative_to(ROOT).as_posix()], 'Exact actual capture argv required')
+    require(exact(read(execution['stdout']), capture) and check(execution['stderr']).read_bytes() == b'', 'Full typed stdout or stderr differs')
+    check(execution['source_snapshot'])
+    launcher = execution['executed_launcher']
+    require(launcher['historical_path'] == 'tools/porting/record_command.py', 'Actual generic recorder required')
+    require(check(launcher['archive']).read_bytes() == path(launcher['historical_path']).read_bytes(), 'Recorder archive identity differs')
+    require(instant(execution['started_utc']) <= instant(capture['capture_started_utc'])
+            <= instant(capture['capture_completed_utc']) <= instant(execution['finished_utc']) <= instant(started), 'Actual capture/review chronology differs')
+    require(capture['schema'] == 'clk05-production-control-inputs.v1'
+            and capture['status'] == 'captured-literal-inputs-and-selected-registration-no-science', 'Actual capture schema/status differs')
+    for key in ['effective_controls_inferred_from_outputs', 'new_input_conversion_executed',
+                'weather_or_scientific_output_payloads_read', 'scientific_execution_performed',
+                'whole_InputProcessor_or_GetProjectData_certified', 'contracts_frozen', 'gates_updated']:
+        require(capture[key] is False, 'Input-only scope flag differs: ' + key)
+    require(exact(capture['reviewed_registration_source_proposal'], REGISTRATION)
+            and exact(capture['retained_input_conversion_matrix'], MATRIX), 'Exact retained authorities required')
+    registration, matrix, callers = read(REGISTRATION), read(MATRIX), read(CALLERS)
+    require(capture['source_registration_order'] == ['DataEnvironment selected false initialization',
+            'three captured environment first-character assignments',
+            'first literal name-ordered epJSON diagnostics instance true assignments'], 'Declared native registration order differs')
+    require(capture['captured_process_scope'] == 'Actual metadata-capture process only; not proof of any future native or CLI child inherited inputs.'
+            and capture['future_launcher_requirement'] == 'Recapture all three exact presence/raw strings immediately before and after each native/CLI child; reject mismatch against this frozen capture. Preserve effective four caller flags before first read.', 'Future-child input limitation differs')
+    source_rows = []
+    for row in registration['source_ranges']:
+        lines = check(row['source']).read_bytes().splitlines(keepends=True)
+        require(type(row['start_line']) is int and type(row['end_line']) is int
+                and 1 <= row['start_line'] <= row['end_line'] <= len(lines), 'Primary source range bounds invalid')
+        require(b''.join(lines[row['start_line']-1:row['end_line']]) == check(row['archive']).read_bytes(), 'Primary exact source range differs')
+        source_rows.append((row['archive'], row['archive']['path']))
+    for row in registration['proposed_sources']:
+        source_rows.append((row['proposed_source'], row['proposed_source']['path']))
+    require(len(source_rows) == 11 and len({item[1] for item in source_rows}) == 11, 'Exact eleven registration source identities required')
+    require([row['case_id'] for row in capture['cases']] == CASE_IDS
+            and [row['case_id'] for row in capture['retained_input_conversion_bindings']] == CASE_IDS
+            and [row['case_id'] for row in matrix['cases']] == CASE_IDS
+            and [row['id'] for row in callers['cases']] == CASE_IDS, 'Exact ordered three CON inputs required')
+    captured_environment = None
+    retained_rows, archived_sources = [], []
+    for actual, retained, historical, declared in zip(capture['cases'], capture['retained_input_conversion_bindings'], matrix['cases'], callers['cases'], strict=True):
+        require(exact(actual['input'], declared['input']) and exact(actual['input'], historical['input']), 'Current CON input identity differs')
+        artifacts = historical['Full']['artifacts']
+        for name, suffix in [('staged_original','original.idf'), ('converted_epJSON','converted.epJSON'), ('input_hash_receipt','input-hashes.json')]:
+            matching = [row for row in artifacts if row['path'].endswith('/input/' + suffix)]
+            require(len(matching) == 1 and exact(retained[name], matching[0]), 'Retained input artifact identity differs')
+            check(retained[name])
+        idf = check(actual['input']).read_bytes()
+        require(idf == check(retained['staged_original']).read_bytes(), 'Staged and current IDF bytes differ')
+        hashes = read(retained['input_hash_receipt'])
+        for key, binding in [('source',actual['input']),('converted_epjson',retained['converted_epJSON']),('staged_original',retained['staged_original'])]:
+            converter_input_receipt(hashes, key, binding)
+        require(exact(actual['retained_converted_input'], retained['converted_epJSON'])
+                and exact(actual['retained_input_hash_receipt'], retained['input_hash_receipt']), 'Captured input receipt alias differs')
+        diagnostics = literal_diagnostics(idf, read(retained['converted_epJSON']))
+        require(exact(diagnostics, actual['literal_OutputDiagnostics']), 'Literal first-instance diagnostics differ')
+        effective = resolved_inputs(actual['captured_environment_inputs'], diagnostics)
+        require(exact(effective, actual['solar_controls']), 'Source-defined four literal controls differ')
+        if captured_environment is None:
+            captured_environment = actual['captured_environment_inputs']
+        require(exact(captured_environment, actual['captured_environment_inputs']), 'One capture process must retain the same three external inputs')
+        archives = actual['registration_source_archives']
+        require(len(archives) == 11 and len({check(row) for row in archives}) == 11, 'Exactly eleven unique captured source archives required')
+        current_archives = []
+        for archive, (source, historical_path) in zip(archives, source_rows, strict=True):
+            require(check(archive).read_bytes() == check(source).read_bytes(), 'Captured registration source archive bytes differ')
+            current_archives.append({'historical_path':historical_path,'archive':archive})
+        if not archived_sources:
+            archived_sources = current_archives
+        require(exact(archived_sources, current_archives), 'Registration archives differ across captured cases')
+        retained_rows.append({'case_id':actual['case_id'],'input':actual['input'],
+            'retained_input_conversion':retained,'literal_OutputDiagnostics':diagnostics,'solar_controls':effective})
+    out.mkdir(parents=True)
+    archive = out / 'reviewed-capture-source.py'
+    with archive.open('xb') as stream:
+        stream.write(check(CAPTURE).read_bytes())
+    reviewed_sources = [{'historical_path':CAPTURE['path'],'archive':ref(archive)}, *archived_sources]
+    for item, digest in list(SEEN.items()):
+        require(ref(item)['sha256'] == digest, 'Consumed input/source bytes changed during review')
+    result = {'schema':'clk05-independent-production-control-input-review.v1',
+        'status':'pass-input-registration-and-captured-environment-before-original',
+        'review_started_utc':started,'review_completed_utc':now(),
+        'reviewed_control_inputs':capture_ref,'reviewed_capture_execution':execution_ref,
+        'reviewed_sources':reviewed_sources,'reviewed_registration_source_proposal':REGISTRATION,
+        'reviewed_primary_registration_ranges':registration['source_ranges'],
+        'reviewed_proposed_registration_owner_mirrors':registration['proposed_sources'],
+        'reviewed_retained_input_conversion_matrix':MATRIX,'reviewed_input_only_caller_request':CALLERS,
+        'captured_environment_inputs':captured_environment,'cases':retained_rows,
+        'actual_capture_exit_code':0,'full_typed_stdout_identity_verified':True,
+        'registration_source_archive_count':11,'retained_CON_input_count':3,
+        'pre_capture_formal_SourceQA_artifact_available':False,
+        'pre_capture_authorization':'Root manual full source read and peer source reads in this session; not a structured SourceQA0 receipt.',
+        'capturer_source_archive_created_at_this_review_not_before_capture':True,
+        'capture_process_external_inputs_are_future_child_environment_proof':False,
+        'future_launchers_must_recapture_exact_presence_and_raw_strings':True,
+        'future_Original_or_CLI_environment_absence_claimed':False,
+        'actual_child_python_executable_path':None,'child_alias_executable_counted_as_PASS':False,
+        'review_stage':'actual metadata capture0 followed by this factual review; future freeze/Original must bind this review and its real recorder0',
+        'scientific_execution_performed':False,'scientific_values_compared':False,
+        'whole_converter_InputProcessor_GetProjectData_or_scientific_certification_claimed':False,
+        'numerical_comparison_count':None,'numerical_mismatch_count':None,'numerical_PASS_claimed':False,
+        'unavailable_counted_as_PASS':False,'gates_updated':False,
+        'verifier_author':'/root/clk02_raw_port',
+        'author_limits':'Previously authored raw cursor and C5 input/observer drafts. This independently checks Header capture/input registration metadata, not own raw code or scientific outcomes.'}
+    with (out / 'review.json').open('xb') as stream:
+        stream.write((json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False) + '\n').encode('utf-8'))
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

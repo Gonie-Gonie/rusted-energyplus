@@ -1,0 +1,174 @@
+"""Selected native solar values and actual owned Rust consumer receipts only."""
+from collections import Counter
+import hashlib
+from numeric import exact, require, scalar
+import adapter
+import state as selected
+
+RAW_DATES = {'WYear': 'year', 'WMonth': 'month', 'WDay': 'day', 'WHour': 'hour', 'WMinute': 'minute'}
+RAW_COPIES = {'DryBulb': 'dry_bulb_c', 'DewPoint': 'dew_point_c', 'RelHum': 'relative_humidity_percent',
+    'AtmPress': 'atmospheric_pressure_pa', 'IRHoriz': 'horizontal_infrared_radiation_wh_per_m2',
+    'GLBHoriz': 'global_horizontal_radiation_wh_per_m2', 'DirectRad': 'direct_normal_radiation_wh_per_m2',
+    'DiffuseRad': 'diffuse_horizontal_radiation_wh_per_m2', 'WindDir': 'wind_direction_deg', 'WindSpeed': 'wind_speed_m_per_s'}
+
+
+def byte_map(mapped, actual_bytes):
+    require(mapped['schema'] == 'clk05-production-input-byte-map.v1' and mapped['header_line_count'] == 8
+        and mapped['input_byte_length'] == len(actual_bytes) and mapped['scientific_expected_values_supplied'] is False
+        and mapped['native_internal_source_index_claimed'] is False, 'Frozen input-only external byte map required')
+    result = {}
+    for index, row in enumerate(mapped['record_line_map']):
+        require(type(row['source_record_index']) is int and row['source_record_index'] == index
+            and type(row['start_byte']) is int and type(row['end_byte']) is int
+            and 0 <= row['start_byte'] < row['end_byte'] <= len(actual_bytes), 'Real external input byte range required')
+        pair = row['start_byte'], row['end_byte']
+        require(pair not in result and hashlib.sha256(actual_bytes[pair[0]:pair[1]]).hexdigest() == row['input_row_sha256'],
+            'Actual supplied full input row bytes differ')
+        result[pair] = index
+    return result
+
+
+def retained(check, before, after, owners, label):
+    for owner in owners:
+        check.exact_value(after[owner], before[owner], label + '/' + owner)
+
+
+def transport(check, incoming, after, label):
+    check.exact_value(after['today_variables'], incoming['tomorrow_variables'], label + '/actual_daily_full11_copy')
+    check.exact_value(after['today_values'], incoming['tomorrow_values'], label + '/actual_full17_grid_copy')
+
+
+def observe(check, trace, case, native, request, mapped, input_bytes, caller_lines, schedules):
+    label = case['case_id']; hours = 72 if case['duration'] == '72H' else 24; steps = 4; days = hours // 24
+    require(label == native['id'] == request['id'] == case['native_sequence_id']
+        and request['lane'] == 'production-CON', 'Only declared existing three-CON native lanes required')
+    require(trace['schema'] == 'clk03-weather-day-production-trace.v1'
+        and trace['capture_source'] == 'actual-live-Rust-weather-cursor-daily-owner-and-owned-thermal-operands'
+        and trace['observer_supplies_inputs'] is False and trace['observer_recomputes_weather'] is False
+        and trace['eager_preview_values_supply_production_weather'] is False
+        and trace['added_fields_supply_inputs_or_recompute_weather'] is False
+        and trace['consumer_repeated_identities_deduplicated'] is False
+        and trace['physical_producer_numerical_parity_claimed'] is False
+        and trace['thread_coverage'] == 'collecting-thread-only' and trace['complete_on_collecting_thread'] is True
+        and trace['truncation_reason'] is None and trace['observation_limit_per_series'] == 10000,
+        'Complete passive actual collecting-thread trace required')
+    ops, consumers = trace['operations_completion_order'], trace['consumers']
+    require(type(ops) is list and type(consumers) is list
+        and trace['total_operation_count'] == trace['retained_operation_count'] == len(ops)
+        and trace['total_consumer_count'] == trace['retained_consumer_count'] == len(consumers), 'Actual retained counts differ')
+    require(len(native['operations']) == len(request['operations']) == hours * steps + 1,
+        'Every original GetNext/Initialize production call must be retained')
+    matched = 0; reads = []; first_read = None; currents = {}; day_calls = Counter(); last_kind = None
+    for index, row in enumerate(ops):
+        loc = label + '/operations/' + str(index)
+        require(type(row['sequence']) is int and row['sequence'] == index + 1
+            and row['kind'] in ['GetNextEnvironment', 'ReadEPlusWeatherForDay', 'InitializeWeather', 'SetCurrentWeather']
+            and exact(row['outcome'], {'returned': True, 'source_fatal': False, 'error': None}),
+            'Actual contiguous returned operation completion order required')
+        before, after = row['before'], row['after']
+        for snapshot in [before, after]:
+            adapter.dto(snapshot, True)
+        if row['kind'] == 'ReadEPlusWeatherForDay':
+            reads.append(row)
+            if first_read is None:
+                first_read = after
+            continue
+        if row['kind'] == 'SetCurrentWeather':
+            require(last_kind == 'InitializeWeather', 'Initialize must complete before this actual Current')
+            retained(check, before, after, ['today_variables', 'tomorrow_variables', 'today_values', 'tomorrow_values',
+                'missing_values', 'missed_counts', 'out_of_range_counts', 'last_hour', 'next_hour'], loc + '/actual_Current_retention')
+            check.exact_value(after['clk05_observation'], before['clk05_observation'], loc + '/actual_controls_retained')
+            for field in ['Interpolation', 'SolarInterpolation', 'Interpolation_allocated', 'SolarInterpolation_allocated']:
+                check.exact_value(after[field], before[field], loc + '/actual_stored_array_retention/' + field)
+            key = tuple(after['global'][field] for field in ['DayOfSim', 'HourOfDay', 'TimeStep'])
+            require(key not in currents, 'No duplicated Current operation or manufactured consumption step')
+            currents[key] = {'before': before, 'after': after, 'sequence': row['sequence']}
+            check.excluded(loc + '/native_Current', 'Native CLK05 scope has no SetCurrent call; actual current/night/clocks retained unpaired', True, False)
+            last_kind = row['kind']; continue
+        require(matched < len(request['operations']), 'Actual production added an undeclared original function')
+        supplied = request['operations'][matched]; original = native['operations'][matched]; matched += 1
+        require(row['kind'] == supplied['kind'] == original['kind'] and original['id'] == supplied['id']
+            and exact(original['requested_operation'], supplied) and original['actual_source_invoked'] is True
+            and original['call_outcome']['status'] == 'source_returned' and original['call_outcome']['source_fatal'] is False,
+            'Actual original operation/caller/input transport differs')
+        for key, value in supplied['caller'].items():
+            check.exact_value(before['global'][key], value, loc + '/actual_literal_caller/' + key)
+        full = original['full_solar_grid_observation_declared']
+        require(type(full) is bool and full == (row['kind'] == 'GetNextEnvironment'
+            or (before['global']['BeginDayFlag'] or before['global']['BeginEnvrnFlag'])), 'Frozen native full/compact mask differs')
+        schedule = schedules[original['id']]
+        adapter.snapshot(check, before, original['before'], loc + '/before', full, schedule['before'])
+        adapter.snapshot(check, after, original['after'], loc + '/after', full, schedule['after'])
+        for actual_field, native_field in [('available', 'Available'), ('errors_found', 'ErrorsFound')]:
+            check.discrete(after[actual_field], original[native_field], loc + '/' + native_field)
+        check.discrete(before['print_environment_stamp'], original['print_environment_stamp_before'], loc + '/stamp_before')
+        check.discrete(after['print_environment_stamp'], original['print_environment_stamp_after'], loc + '/stamp_after')
+        if row['kind'] == 'InitializeWeather':
+            require(before['global']['WarmupFlag'] is False, 'Fixed-CON production lane cannot add undeclared warmup')
+            if before['global']['BeginDayFlag']:
+                day = before['global']['DayOfSim']; day_calls[day] += 1
+                incoming = first_read if before['global']['BeginEnvrnFlag'] else before
+                require(incoming is not None, 'Actual first read precedes owned first-day transport')
+                transport(check, incoming, after, loc + '/within_Rust_handoff')
+            else:
+                retained(check, before, after, ['today_variables', 'tomorrow_variables', 'today_values', 'tomorrow_values'], loc + '/actual_no_handoff')
+        last_kind = row['kind']
+    require(matched == len(native['operations']) and len(currents) == hours * steps and len(reads) == days,
+        'All483 declared original calls,480 actual Current calls and actual day reads required')
+    check.discrete(dict(day_calls), {day: 1 for day in range(1, days + 1)}, label + '/one_actual_day_transport')
+    lookup = byte_map(mapped, input_bytes); identities = []; ordinals = set()
+    for index, row in enumerate(consumers):
+        loc = label + '/consumer/' + str(index); record, step = row['record_index'], row['timestep']
+        require(type(record) is int and 0 <= record < hours and type(step) is int and 1 <= step <= steps
+            and type(row['sequence']) is int and row['sequence'] == index + 1
+            and row['phase'] == 'Run { day: ' + str(record // 24 + 1) + ' }', 'Actual ordered consumer civil identity required')
+        identities.append((record, step)); entry = currents[(record // 24 + 1, record % 24 + 1, step)]; owner = entry['after']
+        completed = row['completed_operation_count']
+        require(type(completed) is int and 1 <= completed <= len(ops), 'Actual passive completed-operation prefix required')
+        check.discrete(completed, entry['sequence'], loc + '/actual_Current_completion_receipt')
+        require(ops[completed - 1]['kind'] == 'SetCurrentWeather'
+            and (index == 0 or consumers[index - 1]['completed_operation_count'] <= completed), 'Current then monotonic consumer receipt required')
+        caller = row['caller']
+        require(set(caller) == {'file', 'line', 'column'}
+            and caller['file'].replace('\\', '/') == 'crates/ep_runtime/src/heat_balance/weather_driver.rs'
+            and type(caller['line']) is int and type(caller['column']) is int
+            and 1 <= caller['line'] <= len(caller_lines) and 1 <= caller['column'] <= len(caller_lines[caller['line'] - 1]) + 1
+            and 'series.current_for(' in caller_lines[caller['line'] - 1], 'Actual archived A/B owned caller attribution required')
+        check.exact_value(row['caller_state'], owner['global'], loc + '/actual_owned_clock')
+        slot = owner['today_values']['slots'][(record % 24) * steps + step - 1]
+        check.exact_value(row['received_Today_slot'], slot, loc + '/actual_full17_Today_receipt')
+        check.exact_value(row['received_current_weather'], owner['clk04_observation']['current_non_solar_weather'], loc + '/actual_owned_current_receipt')
+        sample = row['received_sample']
+        require(type(sample['record_index']) is int and type(sample['zone_timestep']) is int
+            and sample['record_index'] == record and sample['zone_timestep'] == step, 'Actual owned sample identity differs')
+        for field, operand in adapter.SAMPLE.items():
+            check.literal(sample[operand], slot[field], loc + '/Today_to_owned_sample/' + field)
+        for field, value in sample.items():
+            if field not in ['record_index', 'zone_timestep']:
+                scalar(value, loc + '/sample/' + field)
+        raw, projected = row['received_raw'], row['received_hourly_record']
+        for field, name in RAW_DATES.items():
+            check.discrete(projected['source_date_fields'][name], raw['date_fields'][field], loc + '/actual_raw_date/' + field)
+        for field, name in RAW_COPIES.items():
+            check.literal(projected['legacy_fields'][name], raw['mandatory_reals'][field], loc + '/raw_projection_copy/' + field)
+        provenance = row['actual_input_byte_range']; pair = provenance['start_byte'], provenance['end_byte']
+        require(pair in lookup and type(provenance['line_read_attempt']) is int and provenance['line_read_attempt'] > 0,
+            'Actual received raw provenance must bind supplied full input row bytes')
+        ordinals.add(lookup[pair]); scalar(row['local_hour'], loc + '/local_hour')
+        for field, value in row['shadowing_metadata'].items():
+            scalar(value, loc + '/retained_unpaired_shadow/' + field)
+    expected = [(hour, step) for hour in range(hours) for step in range(1, steps + 1)]
+    require(len(identities) in [len(expected), len(expected) + 1], 'Only genuine single initial seed duplicate admitted')
+    if len(identities) == len(expected) + 1:
+        expected = [(0, 1)] + expected
+    check.discrete(identities, expected, label + '/actual_ordered_consumer_receipts')
+    check.discrete(len(ordinals), hours, label + '/actual_external_input_hour_coverage')
+    require(consumers, 'Actual owned thermal consumer unavailable')
+    check.discrete(consumers[-1]['caller_state']['EndEnvrnFlag'], True, label + '/final_consumer_after_terminal_Initialize')
+    return {'case_id': label, 'native_calls_paired': matched, 'actual_Current_calls': len(currents),
+        'actual_nested_day_reads': len(reads), 'actual_consumer_receipts': len(consumers),
+        'actual_initial_seed_duplicate': len(consumers) == hours * steps + 1,
+        'actual_external_source_ordinals': sorted(ordinals), 'external_ordinals_are_native_internal_indices': False,
+        'actual_full17_Today_to_owned_sample_solar2_transport_verified': True,
+        'actual_consumer_operation_prefix_available': True, 'independent_event_wallclock_available': False,
+        'unavailable_wallclock_counted_as_PASS': False, 'native_thermal_callback_numerical_parity_claimed': False}

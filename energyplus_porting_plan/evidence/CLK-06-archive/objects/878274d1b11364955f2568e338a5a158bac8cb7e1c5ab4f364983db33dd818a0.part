@@ -1,0 +1,181 @@
+--- .runtime/porting/CLK-05/production-comparer-prep-03/adapter.py
++++ .runtime/porting/CLK-06/production-comparer-prep-01/adapter.py
+@@ -1,17 +1,16 @@
+-"""Project actual CLI JSON storage to the frozen solar2 DTO, without arithmetic."""
++"""Project actual full CLI storage to the predeclared sky4 observation DTO."""
+ from copy import deepcopy
+-from common import normalized_path
+-from numeric import exact, require, scalar
++from numeric import require
+ import state as selected
+ 
+-SOLAR = selected.SOLAR
+-SAMPLE = {'BeamSolarRad': 'direct_normal_radiation_w_per_m2',
+-    'DifSolarRad': 'diffuse_horizontal_radiation_w_per_m2'}
++
++def absent(reason):
++    return {'available': False, 'value': None, 'counted_as_PASS': False, 'reason': reason}
+ 
+ 
+ def dto(actual, full):
+     row = deepcopy(actual)
+-    require(row['native_internal_record_index_claimed'] is False, 'No fabricated native record index')
++    require(row['native_internal_record_index_claimed'] is False, 'No private native index claim')
+     row['native_internal_record_index_observed'] = False
+     row['native_source_local_variables_observed'] = False
+     for owner in ['today_values', 'tomorrow_values']:
+@@ -19,13 +18,12 @@
+         selected.typed(grid, ['allocated'], bool, owner)
+         selected.typed(grid, ['time_steps', 'hours'], int, owner)
+         require(type(slots) is list and len(slots) == steps * grid['hours'], 'Actual complete CLI grid required')
+-        for index, slot in enumerate(slots):
+-            selected.weather(slot, owner + '/' + str(index))
+-        grid['ordering'] = 'hour-major,timestep-minor'; grid['observed_fields'] = SOLAR
+-        grid['contents_available'] = full
++        for index, value in enumerate(slots):
++            selected.weather(value, owner + '/' + str(index))
++        grid.update(ordering='hour-major,timestep-minor', observed_fields=selected.SKY, contents_available=full)
+         if full:
+-            grid['slots'] = [{'hour': index // steps + 1, 'time_step': index % steps + 1,
+-                'value': {key: slot[key] for key in SOLAR}} for index, slot in enumerate(slots)] if steps else []
++            grid['slots'] = [{'hour': i // steps + 1, 'time_step': i % steps + 1,
++                'value': {key: value[key] for key in selected.SKY}} for i, value in enumerate(slots)] if steps else []
+         else:
+             grid['slots'] = None; grid['unavailability_reason'] = selected.COMPACT
+     missing = row['missing_values']; extra = missing['extra_reals']
+@@ -34,31 +32,36 @@
+         'DaysLastSnow': missing['DaysLastSnow']}
+     for owner in ['missed_counts', 'out_of_range_counts']:
+         values = row[owner]['declaration_order_integer_values']
+-        require(type(values) is list and len(values) == len(selected.ALL_COUNTS), 'All19 actual count values required')
++        require(type(values) is list and len(values) == len(selected.ALL_COUNTS), 'All19 actual counters retained')
+         row[owner] = dict(zip(selected.ALL_COUNTS, values, strict=True))
+     controls = row['clk05_observation']
+     require(controls['values_copied_from_actual_stored_owner'] is True
+-        and controls['current_solar_night_physics_paired'] is False, 'Passive actual stored controls required')
+-    current = row['clk04_observation']; slot = current['selected_today_slot']
+-    solar_slot = None
++        and controls['current_solar_night_physics_paired'] is False, 'Passive stored control serializer required')
++    current = row['clk04_observation']; slot = current['selected_today_slot']; sky_slot = None
+     if slot is not None:
+         require(set(slot) == {'hour', 'time_step', 'value'}, 'Actual selected full17 slot required')
+         selected.weather(slot['value'], 'actual selected CLI Today slot')
+-        solar_slot = {'hour': slot['hour'], 'time_step': slot['time_step'],
+-            'value': {key: slot['value'][key] for key in SOLAR}}
+-    row['clk05_observation'] = {'solar_controls': controls['solar_controls'],
+-        'selected_today_solar_slot': solar_slot, 'clock': current['clock'],
+-        'private_hourly_or_weight_locals_observed': False, 'current_solar_night_physics_paired': False}
++        sky_slot = {'hour': slot['hour'], 'time_step': slot['time_step'],
++            'value': {key: slot['value'][key] for key in selected.SKY}}
++    row['clk06_observation'] = {'selected_today_sky_slot': sky_slot,
++        'caller_controls': controls['solar_controls'], 'existing_current_context': current,
++        'actual_sky_environment': absent('Rust has no native sky Environment owner'),
++        'native_current_sky_globals': {key: absent('native-only current-sky owner') for key in
++            ['weather.HorizIRSky', 'environment.SkyTemp', 'environment.SkyTempKelvin',
++             'environment.TotalCloudCover', 'environment.OpaqueCloudCover']},
++        'native_current_sky_globals_paired': False, 'private_hourly_ESky_or_branch_locals_observed': False,
++        'whole_other_current_physics_paired': False}
+     row['selected_environment_context'] = {'CurrentCycle': row['current_cycle'], 'SetWeekDays': row['set_week_days']}
+-    row['full_solar_grid_contents_available'] = full; row['full_17_field_grid_generation_parity_claimed'] = False
+-    selected.shape(row, full, 'actual CLI projection', 'candidate')
++    row['full_sky_grid_contents_available'] = full
++    row['full_17_field_grid_generation_parity_claimed'] = False
++    selected.shape(row, full, 'actual CLI sky4 projection', 'candidate')
+     for field in ['Interpolation', 'SolarInterpolation']:
+         require(actual[field + '_length'] == (len(actual[field]) if actual[field + '_allocated'] else None),
+-            'Actual CLI stored-array length availability differs')
++            'Actual CLI array allocation/length differs')
+     return row
+ 
+ 
+-def snapshot(check, actual, native, label, full, schedule_value):
++def snapshot(check, actual, native, label, full):
+     a = dto(actual, full); selected.shape(native, full, label + '/native', 'native')
+     for field in ['Interpolation', 'SolarInterpolation']:
+         check.discrete(a[field + '_allocated'], native[field + '_allocated'], label + '/' + field + '/allocated')
+@@ -72,24 +75,22 @@
+             check.discrete(len(a[owner]['slots']), len(native[owner]['slots']), label + '/' + owner + '/length')
+             for index, (left, right) in enumerate(zip(a[owner]['slots'], native[owner]['slots'])):
+                 check.discrete([left['hour'], left['time_step']], [right['hour'], right['time_step']], label + '/' + owner + '/' + str(index) + '/index')
+-                for field in SOLAR:
++                for field in selected.SKY:
+                     check.numeric(left['value'][field], right['value'][field], label + '/' + owner + '/' + str(index) + '/' + field, field)
+         else:
+             check.availability(None, None, label + '/' + owner + '/compact_contents', False)
+-    for owner in ['last_hour', 'next_hour']:
+-        for field in SOLAR:
++    for owner in ['last_hour', 'next_hour', 'missing_values']:
++        for field in selected.CLOUD:
+             check.numeric(a[owner][field], native[owner][field], label + '/' + owner + '/' + field, field)
+-    check.numeric(a['next_hour']['LiquidPrecip'], native['next_hour']['LiquidPrecip'], label + '/next_hour/LiquidPrecip', 'NextHour.LiquidPrecip')
+     for owner in ['missed_counts', 'out_of_range_counts']:
+-        for field in SOLAR:
++        for field in selected.CLOUD:
+             check.discrete(a[owner][field], native[owner][field], label + '/' + owner + '/' + field)
+     check.discrete(a['missed_counts']['WeathCodes'], native['missed_counts']['WeathCodes'], label + '/actual_raw_counter')
+     for group, fields in [('global', selected.GLOBAL_BOOL + selected.GLOBAL_INT + ['DayOfSimChr', 'CalendarYearChr', 'TimeStepZone']),
+         ('environment', selected.ENV_INT + ['EndMonthFlag', 'EndYearFlag', 'EnvironmentName']),
+         ('weather', selected.WEATHER_INT + selected.WEATHER_BOOL + ['ReadEPlusWeatherCurTime', 'TimeStepFraction', 'IsRainThreshold'])]:
+         for key in fields:
+-            value = schedule_value if group == 'environment' and key == 'DayOfYear_Schedule' else native[group][key]
+-            check.exact_value(a[group][key], value, label + '/' + group + '/' + key)
++            check.exact_value(a[group][key], native[group][key], label + '/' + group + '/' + key)
+     for owner in ['today_variables', 'tomorrow_variables']:
+         for key in selected.DAY_INT:
+             check.discrete(a[owner][key], native[owner][key], label + '/' + owner + '/' + key)
+@@ -97,42 +98,23 @@
+         check.exact_value(a['header'][key], native['header'][key], label + '/header/' + key)
+     for row in [a['stream'], native['stream']]:
+         selected.typed(row, selected.STREAM_BOOL, bool, label)
+-        require(row['position_available'] is (row['position_byte'] is not None), 'Actual stream byte-position availability differs')
+-        if row['position_byte'] is not None:
+-            require(type(row['position_byte']) is int and row['position_byte'] >= 0, 'Actual typed byte position required')
++        require(row['position_available'] is (row['position_byte'] is not None), 'Actual stream availability differs')
++        require(row['position_byte'] is None or (type(row['position_byte']) is int and row['position_byte'] >= 0), 'Actual byte position required')
+     for key in selected.STREAM_BOOL + ['position_byte']:
+         check.discrete(a['stream'][key], native['stream'][key], label + '/stream/' + key, key != 'position_byte')
+-    require(type(native['stream']['file_path']) is str, 'Native actual stream file path retained')
+-    check.excluded(label + '/stream/file_path', 'CLI byte-stream has no file_path member; actual command/input byte map binds identity')
++    check.excluded(label + '/stream/file_path', 'CLI byte stream has no file_path member; authentic argv and input byte map bind identity')
+     environments = [row for row in native['environments'] if row['KindOfEnvrn'] == 3]
+-    require(len(environments) == 1, 'Sole genuine ordinary environment required')
++    require(len(environments) == 1, 'Sole actual ordinary environment required')
+     check.discrete(a['selected_environment_context'], {key: environments[0][key] for key in ['CurrentCycle', 'SetWeekDays']}, label + '/environment_context')
+     for key in selected.CONTROLS:
+-        check.discrete(a['clk05_observation']['solar_controls'][key], native['clk05_observation']['solar_controls'][key], label + '/solar_controls/' + key)
++        check.discrete(a['clk06_observation']['caller_controls'][key], native['clk06_observation']['caller_controls'][key], label + '/caller_controls/' + key)
+     for key in ['TimeStepZoneSec', 'MinutesInTimeStep']:
+-        check.exact_value(a['clk05_observation']['clock'][key], native['clk05_observation']['clock'][key], label + '/clock/' + key)
+-    left, right = a['clk05_observation']['selected_today_solar_slot'], native['clk05_observation']['selected_today_solar_slot']
+-    if check.availability(left, right, label + '/selected_today_solar_slot', False):
+-        check.discrete([left['hour'], left['time_step']], [right['hour'], right['time_step']], label + '/selected_today_solar_slot/index')
+-        for key in SOLAR:
+-            check.numeric(left['value'][key], right['value'][key], label + '/selected_today_solar_slot/' + key, key)
++        check.exact_value(a['clk06_observation']['existing_current_context']['clock'][key], native['clk06_observation']['existing_current_context']['clock'][key], label + '/clock/' + key)
++    left, right = a['clk06_observation']['selected_today_sky_slot'], native['clk06_observation']['selected_today_sky_slot']
++    if check.availability(left, right, label + '/selected_today_sky_slot'):
++        check.discrete([left['hour'], left['time_step']], [right['hour'], right['time_step']], label + '/selected_today_sky_slot/index')
++        for key in selected.SKY:
++            check.numeric(left['value'][key], right['value'][key], label + '/selected_today_sky_slot/' + key, key)
++    for key in ['actual_sky_environment', 'native_current_sky_globals', 'existing_current_context']:
++        check.excluded(label + '/clk06_observation/' + key, 'Native model/current5 and Current13 are context; no new physics certificate')
+     return a
+-
+-
+-def source_architecture(available, checked):
+-    owners = ['crates/ep_run/src/clk03_trace.rs', 'crates/ep_run/src/clk02_trace.rs',
+-        'crates/ep_runtime/src/weather_day/production.rs', 'crates/ep_runtime/src/heat_balance/solar.rs',
+-        'crates/ep_runtime/src/heat_balance/weather_driver.rs']
+-    texts = {owner: checked.check(available[owner]).read_text(encoding='utf8') for owner in owners}
+-    trace = texts[owners[0]]; source = texts[owners[2]]; thermal = texts[owners[3]]
+-    require('"clk05_observation"' in trace and '"values_copied_from_actual_stored_owner":true' in trace,
+-        'Accepted actual stored solar controls serializer required')
+-    require('sample.direct_normal_radiation_w_per_m2 = weather.beam_solar_rad;' in source
+-        and 'sample.diffuse_horizontal_radiation_w_per_m2 = weather.dif_solar_rad;' in source,
+-        'Actual Today-to-owned-sample direct copies required')
+-    require('direct_normal_radiation_w_per_m2: current.weather.beam_solar_rad,' in thermal
+-        and 'diffuse_horizontal_radiation_w_per_m2: current.weather.dif_solar_rad,' in thermal,
+-        'Actual owned weather-to-thermal solar operand direct copies required')
+-    require('owned: Some(series.current_for(record_index, zone_timestep)?),' in texts[owners[4]],
+-        'Shared A/B owned weather caller route required')
+-    return {owner: available[owner] for owner in owners}, texts[owners[4]].splitlines()

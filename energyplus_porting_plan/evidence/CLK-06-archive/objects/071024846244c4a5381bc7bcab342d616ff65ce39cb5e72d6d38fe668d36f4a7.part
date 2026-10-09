@@ -1,0 +1,13 @@
+            for (int hour = 1; hour <= Constant::iHoursInDay; ++hour) {
+
+                int NextHr = (hour == Constant::iHoursInDay) ? 1 : hour + 1;
+
+                state.dataWeather->wvarsNextHr.BeamSolarRad = wvarsHr(NextHr).BeamSolarRad;
+                state.dataWeather->wvarsNextHr.DifSolarRad = wvarsHr(NextHr).DifSolarRad;
+                state.dataWeather->wvarsNextHr.LiquidPrecip = wvarsHr(NextHr).LiquidPrecip;
+
+                for (int ts = 1; ts <= state.dataGlobal->TimeStepsInHour; ++ts) {
+
+                    Real64 wgtCurrHr = state.dataWeather->Interpolation(ts);
+                    Real64 wgtPrevHr = 1.0 - wgtCurrHr;
+

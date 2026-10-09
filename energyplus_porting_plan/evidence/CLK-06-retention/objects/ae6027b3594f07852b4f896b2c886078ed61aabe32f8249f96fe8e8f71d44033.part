@@ -1,0 +1,263 @@
+{
+  "schema": "clk06-completion-source-mapping.v1",
+  "Root_approval_pending": false,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_ranges": [
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "CalcSkyEmissivity",
+      "start_line": 3200,
+      "end_line": 3226,
+      "helpers": [
+        "ObjexxFCL::min",
+        "pow_2",
+        "pow_3"
+      ],
+      "projection_note": "Whole authority function; only the frozen default ClarkAllen branch is paired. Alternative models and PSY branches remain unverified."
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "calcSky",
+      "start_line": 8873,
+      "end_line": 8907,
+      "helpers": [
+        "CalcSkyEmissivity",
+        "pow_4",
+        "root_4"
+      ],
+      "projection_note": "Whole formal-output function with actual prepared default Environment. Native-only Current sky/cloud globals and thermal physics are not certified."
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "SetupInterpolationValues",
+      "start_line": 8328,
+      "end_line": 8386,
+      "helpers": [],
+      "projection_note": "Actual stored arrays and declared steps1/3/4 context; source sky calculations consume the selected stored linear weights. No new solar-physics parity claim."
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadWeatherForDay",
+      "start_line": 2275,
+      "end_line": 2292,
+      "helpers": [
+        "ReadEPlusWeatherForDay"
+      ],
+      "projection_note": "Complete dispatcher, separate from the following hourly reader definition."
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.cc",
+      "symbol": "ReadEPlusWeatherForDay",
+      "start_line": 2294,
+      "end_line": 3181,
+      "helpers": [
+        "calcSky"
+      ],
+      "projection_note": "Definition through the actual function closing brace. Paired scope is only frozen sky4/cloud missing/history/count and processed-hourly/subhour sky blocks. Scheduled sky and all other weather generation remain unpaired."
+    },
+    {
+      "path": "src/EnergyPlus/WeatherManager.hh",
+      "symbol": "UseWeatherFileHorizontalIR",
+      "start_line": 203,
+      "end_line": 209,
+      "helpers": [],
+      "projection_note": "Actual default member declarations (WP_Type1=0, ClarkAllen, useIR=true), authenticated by prepared Original observation rather than overwritten helper metadata."
+    }
+  ],
+  "granularity_source_paths": [
+    "crates/ep_runtime/src/weather_day/sky.rs",
+    "crates/ep_runtime/src/weather_day/hourly.rs",
+    "crates/ep_runtime/src/weather_day/solar.rs",
+    "crates/ep_runtime/src/weather_day/producer.rs",
+    "crates/ep_runtime/src/weather_day/production.rs",
+    "crates/ep_runtime/src/weather_day/sky_transport_trace.rs",
+    "crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+    "crates/ep_runtime/src/heat_balance/run_period.rs",
+    "crates/ep_runtime/src/heat_balance/reports.rs",
+    "crates/ep_runtime/src/heat_balance/surface_balance.rs"
+  ],
+  "line_count_policy": "Closure derives actual file line counts from the genuine final CLI source snapshot. No generic 500-line canonical Rust rule or whole-physical-system parity is introduced.",
+  "source_range_boundary_note": "The held closure example's 2294-3135 row covers selected hourly/subhour blocks, not the whole ReadEPlusWeatherForDay function. This separate Root-approval draft uses its actual closing brace at3181 and retains the same selected comparison scope.",
+  "scientific_execution_performed": false,
+  "canonical_writes_authorized": true,
+  "compiled_source_origin_policy": {
+    "schema": "clk06-production-origin-source-policy.v1",
+    "source_bindings": [
+      {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "ef62fd34a1b50de86d7fcc76cd9b67ab381f71c8347b1c8ff755c8aabd92dadc"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "ce0fc15586ec35ef4709c24fba8133c2655bbfb8cd323bfbb41bff476c3497a1"
+      },
+      {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "ef72c30f27655ffc19bd42e2c4d251c3cf351da5431ba71fe933684f112237f6"
+      },
+      {
+        "path": "crates/ep_runtime/src/diagnostic_probes/heat_balance.rs",
+        "sha256": "2f6d91e55b65ed1ef375068ab101debd1d22b0a197a282f84446125768b0442a"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/algorithm.rs",
+        "sha256": "dc00aef90374ca111ad94ced8925813eb024215510a4ccafac3595677b27d34f"
+      },
+      {
+        "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+        "sha256": "f3ddcf038fb5c28102ebe6416367ba36be5c2622b81a123ed87c7513a9a3ad14"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+        "sha256": "159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/weather_driver.rs",
+        "sha256": "c3de8d274556aaaeb474aab9e36f1c4589226d9fe9f40740d07ec049f80c8a0b"
+      }
+    ],
+    "cases": {
+      "A-24H": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "A-72H": {
+        "runtime_route": "hourly_samples_simplified_analytical",
+        "use_quick_outside_conduction": false,
+        "use_cached_exterior_report_terms": false,
+        "required_positive_ingress_origins": [
+          "surface_solve",
+          "report_outside_face_recomputation"
+        ],
+        "required_zero_origin_keys": [],
+        "required_zero_event_kinds": [],
+        "uninvoked_origins_counted_as_PASS": false
+      },
+      "B-BOTH-24H": {
+        "runtime_route": "direct_zone_purchased_air_fixed_step",
+        "use_quick_outside_conduction": true,
+        "use_cached_exterior_report_terms": true,
+        "required_positive_ingress_origins": [
+          "surface_solve"
+        ],
+        "required_zero_origin_keys": [
+          "physical_exterior_balance_ingress/report_outside_face_recomputation",
+          "physical_resolved_longwave_argument/report_outside_face_recomputation",
+          "report_recomputed_longwave_argument/report_terms_recomputation"
+        ],
+        "required_zero_event_kinds": [
+          "report_recomputed_longwave_argument"
+        ],
+        "uninvoked_origins_counted_as_PASS": false
+      }
+    }
+  },
+  "compiled_origin_ranges": [
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "ranges": [
+        [
+          3546,
+          3559
+        ],
+        [
+          3768,
+          3775
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "ranges": [
+        [
+          868,
+          886
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "ranges": [
+        [
+          320,
+          329
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/diagnostic_probes/heat_balance.rs",
+      "ranges": [
+        [
+          194,
+          203
+        ],
+        [
+          264,
+          292
+        ],
+        [
+          322,
+          339
+        ],
+        [
+          438,
+          460
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/algorithm.rs",
+      "ranges": [
+        [
+          21,
+          60
+        ],
+        [
+          63,
+          78
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "ranges": [
+        [
+          5978,
+          5996
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+      "ranges": [
+        [
+          234,
+          280
+        ],
+        [
+          418,
+          422
+        ]
+      ]
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/weather_driver.rs",
+      "ranges": [
+        [
+          64,
+          80
+        ]
+      ]
+    }
+  ],
+  "caller_metadata_scope": "The owned-context hook propagates track_caller to shared heat_balance/weather_driver.rs75 for A/B; no callee or physics inference.",
+  "Root_approved_source_mapping": true
+}

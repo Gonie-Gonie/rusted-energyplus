@@ -1,0 +1,157 @@
+"""Other-author source/archive review only; never import the reviewed comparer."""
+from pathlib import Path
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+METADATA = ROOT / '.runtime/porting/CLK-06/gate-review-prep-02/metadata.py'
+METADATA_SHA = '02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526'
+MANIFEST = {'path': '.runtime/porting/CLK-06/comparer-prep-02/manifest.json',
+    'sha256': '062da3b85b74c5958ee8004213f458c4a7323f50245c67b6732631907ed136ca'}
+ADMISSION = {'path': '.runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json',
+    'sha256': '8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4'}
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+    'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+
+
+def literal(tree, name):
+    values = [node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == name for target in node.targets)]
+    if len(values) != 1:
+        raise ValueError('Unique reviewed source declaration required: ' + name)
+    return ast.literal_eval(values[0])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    args = parser.parse_args()
+    if hashlib.sha256(METADATA.read_bytes()).hexdigest() != METADATA_SHA:
+        raise ValueError('Own bounded metadata helper changed before import')
+    spec = importlib.util.spec_from_file_location('clk06_source_metadata', METADATA)
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    started = m.utc(); m.need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    own_ref = m.ref(__file__); helper_ref = m.ref(METADATA, METADATA_SHA)
+    output = m.path(args.output_dir, exists=False)
+    m.need(output.is_relative_to(m.BASE) and output != m.BASE and not output.exists(), 'Fresh ignored output required')
+    manifest = m.read(MANIFEST)
+    m.need(manifest['schema'] == 'clk06-comparer-source-preparation.v1'
+        and manifest['status'] == 'SOURCE-READY-held-unexecuted-source-only'
+        and manifest['scientific_execution_performed'] is False, 'Held comparer02 source manifest required')
+    rows = manifest['sources']; prefix = '.runtime/porting/CLK-06/comparer-prep-02/'
+    names = ['common', 'numeric', 'state', 'history', 'metadata', 'freeze_projection', 'check_clk06']
+    expected = {prefix + name + '.py' for name in names} | {'tools/porting/geo03_provenance.py'}
+    m.need(type(rows) is list and len(rows) == len({row['path'] for row in rows}) == 8
+        and {row['path'] for row in rows} == expected, 'Exactly seven held modules and unchanged utility required')
+    texts, trees = {}, {}
+    for row in rows:
+        payload = m.verify(row).read_bytes()
+        m.need(len(payload) == row['size_bytes'] and len(payload.splitlines()) == row['line_count'], 'Source metadata differs')
+        name = Path(row['path']).stem; texts[name] = payload.decode('utf8'); trees[name] = ast.parse(payload)
+        m.need(row['line_count'] <= (635 if name == 'geo03_provenance' else 500), 'Bounded reviewed module required')
+    m.need(next(row for row in rows if row['path'] == 'tools/porting/geo03_provenance.py')['sha256'] ==
+        '5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5', 'Unchanged consumed metadata utility required')
+    for group in ['source_diffs', 'from_01_diffs']:
+        for row in manifest[group]:
+            m.verify(row)
+    m.verify(manifest['documentation']); m.verify(manifest['preserved_source_manifest'])
+    m.verify(manifest['original_data_review_source']); m.verify(manifest['legacy_observer_source'])
+    admission = m.read(ADMISSION); request = m.read(admission['helper_request'])
+    projection = m.read(admission['projection']); decision = m.read(DECISION)
+    contracts = {name: m.read(row) for name, row in admission['contracts'].items()}
+    m.need(admission['schema'] == 'clk06-native-admission-contract.v1'
+        and admission['frozen_before_numerical_execution'] is True and set(contracts) == {'source','cases','tolerances'},
+        'Actual frozen one-way native admission required')
+    m.same(manifest['native_admission_contract'], ADMISSION)
+    for obj in [manifest, admission, request, projection, *contracts.values()]:
+        m.same(obj['root_preoutput_decision'], DECISION)
+    m.need(m.exact(literal(trees['numeric'], 'canonical'), decision['numeric_profiles'])
+        and m.exact(contracts['tolerances']['numeric_profiles'], decision['numeric_profiles'])
+        and len(contracts['tolerances']['rows']) == len(literal(trees['numeric'], 'declared')) == 9,
+        'Root six profiles and nine explicit numeric rows must remain unchanged')
+    m.need(literal(trees['state'], 'SKY') == decision['selected_day_carriers'] ==
+        request['observation_policy']['full_weather_grid_fields']
+        and request['observation_policy']['paired_native_current_globals'] == [], 'Frozen day4/current5 scope differs')
+    m.need(projection['one_sided_required_availability_difference_is_failure'] is True
+        and projection['unavailable_counted_as_PASS'] is False
+        and m.exact(projection['native_observation_policy'], request['observation_policy']), 'Frozen availability policy differs')
+    counts = {'setup_cases': len(request['setup_cases']), 'emissivity_cases': len(request['emissivity_cases']),
+        'weather_sequences': len(request['weather_sequences']), 'CalcSkyEmissivity': len(request['emissivity_cases']),
+        'GetNextEnvironment': 0, 'InitializeWeather': 0, 'SetCurrentWeather': 0, 'calcSky': 0,
+        'weather_operations': 0, 'total_operations': len(request['setup_cases']) + len(request['emissivity_cases'])}
+    production = 0
+    for sequence in request['weather_sequences']:
+        for op in sequence['operations']:
+            m.need(op['kind'] in ['GetNextEnvironment','InitializeWeather','SetCurrentWeather','calcSky'], 'Closed call kind required')
+            for key in [op['kind'], 'weather_operations', 'total_operations']:
+                counts[key] += 1
+        if sequence['lane'] == 'production-CON':
+            production += len(sequence['operations'])
+    m.need(m.exact(counts, request['requested_counts']) and m.exact(counts, admission['requested_counts'])
+        and m.exact(counts, projection['requested_counts']) and counts['total_operations'] == 1120
+        and counts['CalcSkyEmissivity'] + counts['calcSky'] == 52 and production == 963, 'Literal-derived full history differs')
+    scope = m.read(admission['fixed_scope'])
+    guards = [case[key] for case in scope['cases'] for key in ['input','weather','metadata']]
+    m.need(len(guards) == 45 and m.exact(guards, admission['all_45_guard_refs'])
+        and m.exact(guards, request['all_45_guard_refs']), 'Ordered45 CON guard differs')
+    for row in guards:
+        m.verify(row)
+    facts = {
+        'numeric': ['if left != right:', 'self.availability_failures += 1', "'counted_as_PASS': False",
+            'if not (left or right):', 'return False', "require((profile,field) in self.rows", "'unavailable_counted_as_PASS': False"],
+        'state': ["if check.availability(a, b, label + '/selected_today_sky_slot'):",
+            "check.availability(None, None, label + '/' + owner + '/contents', False)",
+            "for field in CLOUD:", "check.excluded(label + '/clk06_observation/' + field,",
+            "'actual_sky_environment','native_current_sky_globals','existing_current_context'"],
+        'history': ["for phase in ['before_caller', 'before', 'after']:", "check.numeric(r['actual_return'],n['actual_return']",
+            "if check.availability(r,n,label + '/formal_outputs_' + phase):", "'unavailable-public-Rust-API'",
+            "strict=True", "native_counts = native['requested_counts']", "exact(native_counts, request['requested_counts'])"],
+        'metadata': ["'pass-preserved-original-data-before-Rust-baseline'", "len(command) == 5", "len(run['command']) == 2",
+            "'executed_reader_source_archive'", "Only five reviewed observation files may be added before legacy build",
+            "data_finish <= timestamp(compilation['started_utc'])", "gap_finish <= timestamp(compilation['started_utc'])"],
+        'common': ["def archives(rows, checked, current=True):", "path_of(owner).read_bytes() == checked.check(archive).read_bytes()",
+            "command[index].endswith('.py')", "Only Python UTF8 mode admitted"],
+        'freeze_projection': ["'array_path_mapping': {'native_snapshot': 'root', 'Rust_snapshot': 'root'",
+            "'required_roles_apply_identically_to_legacy_and_candidate': True", "'native_current_sky_globals_paired': False",
+            "'both_null': 'explicit unavailable, zero comparisons/noPASS'"],
+        'check_clk06': ["freeze_finish <= rust_start", "len(sources) == len(reviewed) == 8",
+            "args.mode == 'candidate' and compared['mismatch_count'] == 0", "return 0 if args.mode == 'legacy' or candidate_pass else 1"]}
+    for name, tokens in facts.items():
+        for token in tokens:
+            m.need(token in texts[name], 'Previously full-read source predicate changed: ' + name + '/' + token)
+    m.finish(); output.mkdir(); copied = []
+    for index, row in enumerate(rows):
+        copy = output / (str(index) + '-' + Path(row['path']).name)
+        with copy.open('xb') as stream:
+            stream.write(m.verify(row).read_bytes())
+        archive = m.ref(copy, row['sha256']); copied.append({'historical_path': row['path'], 'archive': archive})
+    for name, source in [('executed-source-reviewer.py', Path(__file__)), ('executed-metadata.py', METADATA)]:
+        with (output / name).open('xb') as stream:
+            stream.write(source.read_bytes())
+    result = {'schema': 'clk06-independent-comparer-source-review.v1',
+        'status': 'pass-source-selected-sky-and-authentication-before-comparison', 'review_started_utc': started,
+        'reviewed_sources': copied, 'reviewed_source_manifest': MANIFEST, 'reviewed_native_admission_contract': ADMISSION,
+        'reviewed_helper_request': admission['helper_request'], 'reviewed_projection': admission['projection'],
+        'reviewed_contracts': admission['contracts'], 'root_preoutput_decision': DECISION, 'requested_counts': counts,
+        'production_direct_history_count': production, 'required_direct_API_operation_count': 52,
+        'source_predicate_count': sum(map(len, facts.values())), 'required_roles_identical_legacy_and_candidate': True,
+        'both_null_unavailable_no_comparison_no_PASS': True, 'native_current5_and_default_Environment_paired': False,
+        'preserved_preexecution_required_label_correction': manifest['preserved_source_manifest'],
+        'executed_reader_source_archive': m.ref(output / 'executed-source-reviewer.py', own_ref['sha256']),
+        'executed_metadata_source_archive': m.ref(output / 'executed-metadata.py', helper_ref['sha256']),
+        'scientific_execution_performed': False, 'reviewed_target_modules_imported_or_executed': False,
+        'Original_or_Rust_numerical_output_payloads_read': False, 'numerical_comparison_count': None,
+        'numerical_mismatch_count': None, 'numerical_PASS_claimed': False, 'gates_updated': False,
+        'authorship_limits': 'Verifier author /root/clk02_raw_port authored earlier raw cursor/input, native helper, builder and Original launcher work. This is an other-author review of Baseline comparer source/provenance, not independent certification of those own algorithms. Baseline authored earlier hourly/producer, native packet/observer and this comparer. Root separately full-read all source and alone executes genuine comparisons.'}
+    result['review_completed_utc'] = m.utc()
+    with (output / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False); stream.write('\n')
+    m.finish(); print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,136 @@
+{
+  "schema": "clk06-independent-production-workflow-source-review.v1",
+  "status": "pass-input-control-and-actual-CLI-provenance-before-production",
+  "review_started_utc": "2026-10-09T08:50:40.337711+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/sources/00-common.py",
+        "sha256": "e5a497f18f4f472dd535c1b058864b2f8399f07f44febe0a65e418a67aafd23e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/sources/01-evidence.py",
+        "sha256": "790e454b0ac8bf0d743b7cde55221c450f663b39b54110d4206da4013a231252"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/sources/02-prepare_plan.py",
+        "sha256": "d766e239c8261fdc920ca9c2f10e026f933a059c321ef6cfe7eed0e0ea70dcb3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/sources/03-run_production.py",
+        "sha256": "a83da0f3aa8e17c79c6a08c1259125aef2a7d8a6d942c059f5f29851968cd4dd"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/sources/04-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_source_manifest": {
+    "path": ".runtime/porting/CLK-06/production-workflow-prep-03/manifest.json",
+    "sha256": "0f8b9a73aaaf39a2e43e353b4ea3eee38bee01de377f6310ec17ddb73ca1458a"
+  },
+  "reviewed_native_packet": {
+    "native_admission_contract": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+      "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+    },
+    "helper_request": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+      "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+    },
+    "projection": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+      "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+    },
+    "contracts": {
+      "source": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+        "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+      },
+      "cases": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+        "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+      },
+      "tolerances": {
+        "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+        "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+      }
+    },
+    "production_control_inputs": {
+      "path": ".runtime/porting/CLK-05/production-control-capture-01/production-control-inputs.json",
+      "sha256": "b30d5a9be74fd2d9e868715888f94be981e711f3aedb58d913023b2e8a73fdd2"
+    }
+  },
+  "reviewed_run_design": {
+    "path": ".runtime/porting/CLK-06/production-run-design-prep-01/plan.json",
+    "sha256": "cbcc3f9665bb32ca4cfe27a0bf61ecd8a6d7099a51ec5a378ac3380d4ad80752"
+  },
+  "reviewed_hook_source_manifest": {
+    "path": ".runtime/porting/CLK-06/transport-hooks-prep-02/manifest.json",
+    "sha256": "00f33bcc3b322e4c935277331a96c7f097d45dafc387f4b9b1ae56131ad98467"
+  },
+  "reviewed_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "reviewed_applied_core_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-applied-04/inventory.json",
+    "sha256": "452b74fb9f5b868a2abafe300751bd4ef469239060bb8f7ce8ffb723a298076e"
+  },
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/executed-source-reviewer.py",
+    "sha256": "9c9298c36fba66b6848e27e9f058d0878734dc2beb07cd3e5edb0b3c454f8b75"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-production-workflow-source-review-03/executed-metadata.py",
+    "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+  },
+  "source_review_method": "Exact byte inventory/AST/literal protocol checks after separate Root and Raw full source peer; reviewed targets are not imported.",
+  "source_facts": {
+    "workflow_and_dependency_sources": 5,
+    "ordinary_CLI_cases": 3,
+    "ordinary_CLI_commands": 6,
+    "native_production_history": {
+      "GetNextEnvironment": 3,
+      "InitializeWeather": 480,
+      "SetCurrentWeather": 480
+    },
+    "unit_and_post_hook_CLI_snapshot_comparison_required_before_child": true,
+    "extra_lineage_execution_stage_required": false,
+    "numeric_core_byte_equality_required_except_passive_module_declaration": true,
+    "production_projection_frozen_before_plan_and_all_six_cli": true,
+    "three_ENV_presence_raw_strings_before_after_every_attempt": true,
+    "old_clk03_trace_Full_only": true,
+    "dedicated_sky_transport_required_Full_and_Summary": true,
+    "conditional_cap_and_shared_kernel_origins_explicit": true,
+    "native_Current5_model_and_SRC08_unpaired": true,
+    "stored_array_mapping": "Native ROOT to CLI ROOT"
+  },
+  "reviewer_authored_reviewed_workflow": true,
+  "whole_formula_or_own_code_independently_certified": false,
+  "pre_Original_source_review_claimed": false,
+  "future_ENV_absence_or_prerequisite_completion_inferred": false,
+  "reviewed_targets_imported_or_executed": false,
+  "scientific_execution_performed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored this factual recorder, wrappers, prior helper/input/observer and sky math. Root and Raw separately read wrapper sources. This records inventory/protocol only and does not independently certify own formulas. Baseline owns the separate numerical production comparer.",
+  "review_completed_utc": "2026-10-09T08:50:40.688939+00:00"
+}

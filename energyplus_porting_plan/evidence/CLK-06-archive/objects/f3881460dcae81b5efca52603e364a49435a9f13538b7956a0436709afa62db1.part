@@ -1,0 +1,95 @@
+# CLK-06 production reader (source-only preparation)
+
+Five new reader modules reuse the unchanged C6 unit reader's seven modules,
+Header's held production workflow04 four modules, and the authenticated metadata
+utility. The manifest lists all 17 exact executable dependencies. No module has
+been imported or executed, and no numerical result payload has been read during
+authoring. Diffs against the historical C5 production reader are source lineage,
+not an assertion that the two cards select the same fields.
+
+## Required independent source review
+
+Schema: `clk06-independent-production-comparer-source-review.v1`.
+Status: `pass-held-production-reader-and-frozen-input-policy-before-six-cli`.
+The actual recorded full-JSON review must contain exact17 `reviewed_sources`
+rows (`historical_path`, `archive`), `executed_reader_source_archive`, actual
+aware UTC review interval, `scientific_execution_performed:false`, and these
+direct authenticated refs:
+
+- `reviewed_native_admission_contract`
+- `reviewed_run_design`
+- `reviewed_transport_source_inventory`
+- `reviewed_root_preoutput_decision`
+
+The source reviewer must read the actual source and frozen input policy; static
+authoring metadata is not a scientific certificate. Baseline authored these
+five modules, the candidate observer and earlier hourly/producer algorithms.
+Header's source review and Raw's factual result review disclose their own
+earlier helper, wrapper and numerical-source authorship separately.
+
+## Root-only future commands
+
+`python -X utf8 -B freeze_projection.py --native-admission-contract ADMISSION --source-review REVIEW --source-review-execution REVIEW_COMMAND --output-dir FRESH_FREEZE`
+
+This writes `projection.json` with schema
+`clk06-production-comparison-projection.v1`. SourceQA0 must precede freeze0,
+which must precede the actual input plan and all six CLI children. It reads no
+native numerical result. Its stdout is exactly the projection ref plus the
+three input-only/no-science/no-gates flags declared in the source.
+
+Header workflow04 prepares the input plan and executes exactly the existing
+A-24H/A-72H/B-BOTH-24H Full/Summary calls. Its actual matrix and recorder are
+runtime inputs; no future output identity or successful result is assumed.
+
+`python -X utf8 -B check_production.py --matrix MATRIX --matrix-execution MATRIX_COMMAND --comparison-projection PROJECTION --comparison-projection-execution FREEZE_COMMAND --output-dir FRESH_RESULT`
+
+This writes `production-comparison.json`, schema
+`clk06-production-comparison.v1`, and prints that complete JSON. Exit0 requires
+zero comparison mismatches; all real failure ledgers remain available. Pass
+status is `pass-selected-sky-and-owned-production-transport`; failure status is
+`fail-selected-sky-or-owned-production-transport`.
+
+## Frozen comparison boundary
+
+The Root six profiles and nine tolerance rows are copied unchanged. Production
+pairs Today sky4, cloud histories/counts, stored weights and actual owned sky/IR
+copies. Direct ESky17 remains a separate genuine unit-QA operand; no production
+ESky metric is invented. All three genuine Original production histories contain
+963 direct GetNext/Initialize/Current calls, including 480 Current calls. Actual
+nested reads derive from effective BeginEnvrn and BeginDay/prefetch flags; A72
+day-boundary read distribution is 2/1/0, with no invented completion ordinal.
+
+Each Full run pairs whole direct before/after history; both Full/Summary pair
+all eight actual transport kind ledgers and actual occurrence order, stamps,
+caller sites and explicit solve/report-outside-face origins. No deduplication,
+truncation or one-sided required absence can count as PASS. Conditional resolved
+and report-recompute kinds may genuinely have zero invocations; those remain
+unavailable/noPASS, and every executed argument is required. Hourly sums/means
+are observed distinctly; no native report aggregate or weather RHS is rebuilt.
+Actual pushed values are paired to the real OutputSeries handoff copies.
+
+Native Current sky5, prepared model owners, Current13 physics, cross-native
+CurrentTime/SimTimeSteps, fallback formulas and SRC08 coefficients/fluxes remain
+unpaired. No native answers are supplied to Rust. Exact six-run source/cap design
+and actual compiled surface identities bound the collector scope; generic user
+runtime settings are not certified. The source-held manifest is not an execution
+receipt, final card closure or gate update.
+
+## Preserved first execution and fresh source policy
+
+The actual first comparer failed before emitting a report because its owned
+context caller expected the immediate callee rather than the propagated
+`#[track_caller]` source `heat_balance/weather_driver.rs:75`. Its actual exit1
+receipt and empty stdout remain preserved. SourceQA01 did not catch that alias.
+Fresh02 uses exactly that compiled caller and `series.current_for(` marker.
+
+The projection freezes `selection.transport_mask.source_origin_policy` with
+eight exact compiled source identities and explicit per-case branches. A's
+hourly SimplifiedAnalytical route requires both positive ingress origins.
+B's fixed direct route inherits quick outside and cached report returns, so
+surface solve is positive and the three declared report-origin keys are exactly
+zero. Those uninvoked roles remain unavailable/noPASS; every executed argument
+retains the existing required comparison. Compiled source archives must match
+the policy SHA identities and source markers. No numeric profile, tolerance,
+weather operand or numerical selection changed. Fresh SourceQA0 and freeze0
+must precede a fresh six-run plan/matrix; matrix01 cannot satisfy that chronology.

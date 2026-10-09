@@ -1,0 +1,173 @@
+"""Compare actual selected solar storage and owned Rust production transport."""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import importlib.util
+import json
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+UNIT = ROOT / '.runtime/porting/CLK-05/comparer-prep-01'
+COMMON_SHA = '28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a'
+PROOFS_SHA = '6bed54508bf5fd1f3d30cf9d7b5a2dd37607c2f60aa87319cd14f94a573a2424'
+TRACE_NAME = 'clk03-weather-day-production-trace.json'
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module); return module
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for flag in ['matrix', 'matrix-execution', 'comparison-projection', 'comparison-projection-execution', 'output-dir']:
+        parser.add_argument('--' + flag, required=True, type=Path)
+    args = parser.parse_args(); started = datetime.now(timezone.utc).isoformat()
+    for path, digest in [(UNIT / 'common.py', COMMON_SHA), (HERE / 'proofs.py', PROOFS_SHA)]:
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            raise ValueError('Authenticated metadata source differs before import')
+    m = load('common', UNIT / 'common.py'); p = load('clk05_production_proofs', HERE / 'proofs.py')
+    checked = m.v.Bindings(); m.require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    projection_ref = m.ref(args.comparison_projection); frozen = m.read(checked.check(projection_ref))
+    m.require(frozen['schema'] == 'clk05-production-comparer-projection.v1'
+        and frozen['frozen_before_all_six_Rust_production_calls'] is True
+        and frozen['scientific_execution_performed'] is False and frozen['native_results_read_by_freezer'] is False
+        and frozen['numeric_policy_changed'] is False and frozen['unavailable_counted_as_PASS'] is False
+        and frozen['gates_updated'] is False, 'Actual pre-CLI reviewed reader selection freeze required')
+    review, reviewed, reviewed_finish = p.source_review(frozen['source_review'], frozen['source_review_execution'], checked)
+    declared = m.archives(frozen['reader_source_archives'], checked)
+    m.require(set(declared) == set(reviewed) == {row['path'] for row in frozen['reader_sources']}
+        and len(declared) == len(frozen['reader_sources']) == 17,
+        'Exact frozen reviewed source inventory required')
+    for row in frozen['reader_sources']:
+        m.require(row['path'] in declared and checked.check(row).read_bytes() == checked.check(declared[row['path']]).read_bytes()
+            == checked.check(reviewed[row['path']]).read_bytes(), 'Executed source differs from reviewed/frozen bytes')
+    freeze_execution_ref = m.ref(args.comparison_projection_execution)
+    freeze_record, freeze_start, freeze_finish = m.recorded(checked, freeze_execution_ref,
+        {'production_comparison_projection': projection_ref, 'input_only_source_selection_freeze': True,
+         'scientific_execution_performed': False, 'gates_updated': False})
+    m.script(freeze_record, declared[(HERE / 'freeze_projection.py').relative_to(ROOT).as_posix()], checked)
+    for flag, expected in [('--native-admission-contract', frozen['native_admission_contract']),
+        ('--source-review', frozen['source_review']), ('--source-review-execution', frozen['source_review_execution'])]:
+        m.argument(freeze_record, flag, expected, checked)
+    m.require(reviewed_finish <= freeze_start <= m.timestamp(frozen['created_utc']) <= freeze_finish,
+        'Actual source review then pre-CLI selection freeze chronology differs')
+    evidence = p.matrix_input(args, checked); b = evidence['checked']
+    h, runner, complete = evidence['helper'], evidence['runner'], evidence['completed']
+    m.binding(frozen['native_admission_contract'], h.ADMISSION, b)
+    for key, expected in [('native_request', evidence['admission']['helper_request']),
+        ('native_observation_projection', evidence['admission']['projection']), ('fixed_scope', evidence['admission']['fixed_scope'])]:
+        m.binding(frozen[key], expected, b)
+    m.require(m.exact(frozen['contracts'], evidence['admission']['contracts'])
+        and m.exact(frozen['all_45_guard_refs'], evidence['admission']['all_45_guard_refs'])
+        and m.exact(frozen['selection'], p.selection(evidence['native_policy'], evidence['contracts']['tolerances'])),
+        'Unchanged source/numeric/availability/production selection required')
+    supplemental = p.schedule_routing(evidence['admission'], b)
+    m.require(m.exact(frozen['supplemental_day_of_year_schedule'], supplemental),
+        'Pre-CLI frozen sole-field original-reference routing differs')
+    m.require(m.exact(frozen['preserved_production_failure'], p.PRESERVED_FAILURE),
+        'Historical scientific failure must be preserved distinctly')
+    schedules = p.schedule_observations(supplemental, b)
+    numeric = load('numeric', UNIT / 'numeric.py'); load('state', UNIT / 'state.py')
+    adapter = load('adapter', HERE / 'adapter.py'); observations = load('clk05_production_observations', HERE / 'observations.py')
+    architecture, caller_lines = adapter.source_architecture(complete['available'], b)
+    native_results = m.read(b.check(complete['refs']['Native_results']))
+    m.require(native_results['schema'] == 'clk05-helper-results.v1' and native_results['complete'] is True,
+        'Authentic complete original solar observations required')
+    native = {row['id']: row for row in native_results['weather_sequences']}
+    inputs = {row['id']: row for row in evidence['request']['weather_sequences']}
+    check = numeric.Comparison(evidence['contracts']['tolerances']); observed = []; commands = 0; directories = set()
+    m.require(len(evidence['matrix']['cases']) == len(evidence['plan']['cases']) == 3, 'Exactly three actual CON pairs required')
+    for actual, case in zip(evidence['matrix']['cases'], evidence['plan']['cases'], strict=True):
+        m.require(all(m.exact(actual[key], case[key]) for key in ['case_id', 'scope', 'duration', 'input', 'weather', 'metadata']),
+            'Actual fixed scope/input/weather/duration differs')
+        summaries, outputs = {}, {}
+        for level in ['Full', 'Summary']:
+            item = actual[level]; directory = m.v.path_of(item['output_directory'])
+            m.require(directory not in directories, 'Distinct actual outputs required'); directories.add(directory)
+            receipt = m.read(b.check(item['command_receipt'])); start, finish = m.v.execution_interval(receipt, b)
+            m.require(freeze_finish <= start, 'Numerical production preceded actual comparer selection freeze')
+            expected_command = [str(b.check(complete['build']['binary'])), 'run', str(b.check(case['input'])), '--weather',
+                str(b.check(case['weather'])), '--output-dir', str(directory), '--mode', 'compatibility', '--partial', 'deny',
+                '--trace-level', level.lower(), '--porting-scope', case['scope'].lower()]
+            m.require(m.exact(item['command'], expected_command) and m.exact(receipt['command'], expected_command)
+                and item['spawn_error'] is None and item['actual_recorder_exit_code'] == 0
+                and item['external_input_context_preserved'] is True and item['terminated_CLI_process_internal_ENV_observed'] is False,
+                'Actual ordinary CLI argv/context preservation required')
+            for key in ['constructed_inherited_child_ENV', 'actual_parent_ENV_before_child', 'actual_parent_ENV_after_child',
+                'prospective_inherited_child_ENV_after_child']:
+                h.require_environment(item[key], case['captured_environment_inputs'])
+            m.require(m.timestamp(item['started_utc']) <= start <= finish <= m.timestamp(item['finished_utc']),
+                'Actual child attempt interval differs')
+            runner.check_run(item, case, level, complete, evidence['plan_finish'], b)
+            artifacts = {b.check(row): row for row in item['artifacts']}; commands += 1
+            summaries[level] = m.read(b.check(artifacts[directory / 'run-summary.json'])); outputs[level] = directory
+            if level == 'Full':
+                trace_ref = artifacts[directory / TRACE_NAME]; trace = m.read(b.check(trace_ref))
+                mapped = m.read(b.check(case['external_byte_map']))
+                m.binding(mapped['input'], case['weather'], b)
+                row = observations.observe(check, trace, case, native[case['native_sequence_id']], inputs[case['native_sequence_id']],
+                    mapped, b.check(case['weather']).read_bytes(), caller_lines, schedules[case['native_sequence_id']])
+                row['actual_trace'] = trace_ref; observed.append(row)
+        left, right = summaries['Full'], summaries['Summary']; label = case['case_id']
+        check.discrete(sorted(left), sorted(right), label + '/ordinary_summary_keyset')
+        for key in set(left) - {'artifacts', 'timing', 'input', 'config'}:
+            if key in {'oracle', 'comparison'}:
+                m.require(left[key] is None and right[key] is None, 'No-oracle nullable metadata must be absent in both modes')
+                check.discrete(left[key], right[key], label + '/ordinary_summary/' + key, False)
+            else:
+                check.discrete(left[key], right[key], label + '/ordinary_summary/' + key)
+        check.discrete({key: value for key, value in left['config'].items() if key != 'trace_level'},
+            {key: value for key, value in right['config'].items() if key != 'trace_level'}, label + '/ordinary_config')
+        for name in ['results/selected-outputs.csv', 'results/meters.csv']:
+            check.discrete(b.check(m.ref(outputs['Full'] / name)).read_bytes() == b.check(m.ref(outputs['Summary'] / name)).read_bytes(),
+                True, label + '/' + name + '/exact_bytes')
+        for name in ['results/result-store.json', 'porting_scope.json']:
+            check.discrete(m.read(b.check(m.ref(outputs['Full'] / name))), m.read(b.check(m.ref(outputs['Summary'] / name))),
+                label + '/' + name + '/typed_exact')
+    m.require(commands == 6 and sum(row['native_calls_paired'] for row in observed) == 483
+        and sum(row['actual_Current_calls'] for row in observed) == 480, 'All six runs and483 source/480 Current observations required')
+    out = args.output_dir.resolve(); base = ROOT / '.runtime/porting/CLK-05'
+    m.require(out.is_relative_to(base) and out != base and not out.exists(), 'Fresh ignored comparison output required')
+    checked.unchanged(); b.unchanged(); out.mkdir(); archived = []
+    for index, path in enumerate(p.sources()):
+        copy = out / (str(index).zfill(2) + '-' + path.name); shutil.copyfile(path, copy)
+        m.require(copy.read_bytes() == path.read_bytes(), 'Executed reader source archive differs')
+        archived.append({'historical_path': path.relative_to(ROOT).as_posix(), 'archive': m.ref(copy)})
+    passed = check.mismatch_count == 0
+    report = {'schema': 'clk05-production-comparison.v1',
+        'status': 'pass-selected-solar-and-owned-production-transport' if passed else 'fail-selected-solar-or-owned-production-transport',
+        'numerical_PASS_claimed': passed, 'started_utc': started, 'completed_utc': datetime.now(timezone.utc).isoformat(),
+        'actual_reader_argv': list(sys.orig_argv), 'actual_reader_cwd': str(ROOT), 'Rust_matrix': evidence['matrix_ref'],
+        'Rust_matrix_execution': evidence['matrix_execution'], 'declared_plan': evidence['plan_ref'],
+        'declared_plan_execution': evidence['plan_execution'], 'Rust_build': complete['refs']['Rust_build'],
+        'implementation_commit': complete['build']['implementation_commit'], 'crates_tree': complete['build']['crates_tree'],
+        'reviewed_evidence': complete['refs'], 'contracts': frozen['contracts'],
+        'comparison_projection': projection_ref, 'comparison_projection_execution': freeze_execution_ref,
+        'independent_comparer_source_review': frozen['source_review'],
+        'independent_comparer_source_review_execution': frozen['source_review_execution'],
+        'independent_workflow_source_review': evidence['source_review'],
+        'independent_workflow_source_review_execution': evidence['source_review_execution'],
+        'actual_command_count': commands, 'comparison': check.report(), 'observations': observed,
+        'selection': frozen['selection'], 'compiled_owned_transport_sources': architecture,
+        'supplemental_day_of_year_schedule': supplemental,
+        'preserved_production_failure': p.PRESERVED_FAILURE,
+        'executed_reader_source_archives': archived, 'checked_artifact_bindings': [*checked.report(), *b.report()],
+        'engines_Cargo_Git_executed_by_reader': False, 'reference_outputs_supplied_to_Rust': False,
+        'scientific_RHS_recomputed': False, 'native_thermal_callback_numerical_parity_claimed': False,
+        'current_solar_night_SRC04_physics_paired': False, 'unavailable_counted_as_PASS': False, 'gates_updated': False,
+        'authorship_disclosure': 'Baseline authored this comparison reader and earlier carrier/hourly/producer implementations. '
+            'Independent other-author reader review and Root execution are required. This is not self-certification of physical kernels.'}
+    with (out / 'production-comparison.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(report, stream, ensure_ascii=False, indent=2, allow_nan=False); stream.write('\n')
+    checked.unchanged(); b.unchanged(); print(json.dumps(report, ensure_ascii=False, allow_nan=False))
+    if not passed:
+        raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()

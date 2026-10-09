@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-comparer-prep-01\check_production.py", line 182, in <module>
+    main()
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-comparer-prep-01\check_production.py", line 113, in main
+    row = observations.transport(check, sky_trace, case, native[label], inputs[label], run, source_lines, compiled_surfaces)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-comparer-prep-01\observations.py", line 232, in transport
+    suffix, marker = CALLERS[kind]; caller(event['caller'], suffix, marker, sources)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\production-comparer-prep-01\observations.py", line 186, in caller
+    require(name == 'crates/ep_runtime/src/' + suffix and name in sources, 'Compiled actual hook caller file differs')
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\comparer-prep-02\numeric.py", line 10, in require
+    raise ValueError(message)
+ValueError: Compiled actual hook caller file differs

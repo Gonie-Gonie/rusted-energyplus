@@ -1,0 +1,69 @@
+// Passive native storage only. No cloud/sky/interpolation scientific RHS.
+#ifndef CLK06_REFERENCE_FIELDS_HH
+#define CLK06_REFERENCE_FIELDS_HH
+#include "clk04_reference_fields.hh"
+
+namespace Clk06 {
+using Clk03::json;
+using Clk03::scalar;
+inline json sky(EnergyPlus::Weather::WeatherVars const &value)
+{
+    return {{"SkyTemp", scalar(value.SkyTemp)}, {"HorizIRSky", scalar(value.HorizIRSky)},
+            {"TotalSkyCover", scalar(value.TotalSkyCover)}, {"OpaqueSkyCover", scalar(value.OpaqueSkyCover)}};
+}
+inline json sky_grid(ObjexxFCL::Array2D<EnergyPlus::Weather::WeatherVars> const &value, bool full)
+{
+    int steps = 0, hours = 0;
+    if (value.allocated()) {
+        Clk03::require(value.size1() <= static_cast<std::size_t>(std::numeric_limits<int>::max()) &&
+                       value.size2() <= static_cast<std::size_t>(std::numeric_limits<int>::max()),
+                       "Actual grid exceeds native int indexing");
+        steps = static_cast<int>(value.size1()); hours = static_cast<int>(value.size2());
+    }
+    json slots = full ? json::array() : json(nullptr);
+    if (full && value.allocated()) for (int hour = 1; hour <= hours; ++hour) for (int step = 1; step <= steps; ++step)
+        slots.push_back({{"hour", hour}, {"time_step", step}, {"value", sky(value(step, hour))}});
+    json result = {{"allocated", value.allocated()}, {"time_steps", steps}, {"hours", hours},
+        {"ordering", "hour-major,timestep-minor"}, {"slots", slots}, {"contents_available", full},
+        {"observed_fields", {"SkyTemp", "HorizIRSky", "TotalSkyCover", "OpaqueSkyCover"}}};
+    if (!full) result["unavailability_reason"] = "pre-execution declared compact unselected sky/cloud grid";
+    return result;
+}
+inline json environment_at(EnergyPlus::EnergyPlusData const &state, int index)
+{
+    auto const &w = *state.dataWeather;
+    if (!w.Environment.allocated() || index < 1 || static_cast<std::size_t>(index) > w.Environment.size()) return nullptr;
+    return {{"index", index}, {"value", Clk03::source_environment(w.Environment(index))}};
+}
+inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool full = true)
+{
+    auto const &g = *state.dataGlobal; auto const &e = *state.dataEnvrn; auto const &w = *state.dataWeather;
+    auto result = Clk03::snapshot(state);
+    result["today_values"] = sky_grid(w.wvarsHrTsToday, full);
+    result["tomorrow_values"] = sky_grid(w.wvarsHrTsTomorrow, full);
+    json selected = nullptr;
+    if (w.wvarsHrTsToday.allocated() && g.TimeStep >= 1 && g.HourOfDay >= 1 &&
+        static_cast<std::size_t>(g.TimeStep) <= w.wvarsHrTsToday.size1() &&
+        static_cast<std::size_t>(g.HourOfDay) <= w.wvarsHrTsToday.size2())
+        selected = {{"hour", g.HourOfDay}, {"time_step", g.TimeStep},
+                    {"value", sky(w.wvarsHrTsToday(g.TimeStep, g.HourOfDay))}};
+    json controls = {{"DisplayWeatherMissingDataWarnings", e.DisplayWeatherMissingDataWarnings},
+        {"IgnoreSolarRadiation", e.IgnoreSolarRadiation}, {"IgnoreBeamRadiation", e.IgnoreBeamRadiation},
+        {"IgnoreDiffuseRadiation", e.IgnoreDiffuseRadiation}};
+    json globals = {{"weather.HorizIRSky", scalar(w.HorizIRSky)}, {"environment.SkyTemp", scalar(e.SkyTemp)},
+        {"environment.SkyTempKelvin", scalar(e.SkyTempKelvin)}, {"environment.TotalCloudCover", scalar(e.TotalCloudCover)},
+        {"environment.OpaqueCloudCover", scalar(e.OpaqueCloudCover)}};
+    result["clk06_observation"] = {{"selected_today_sky_slot", selected}, {"caller_controls", controls},
+        {"actual_sky_environment", {{"Envrn", w.Envrn}, {"NumWPSkyTemperatures", w.NumWPSkyTemperatures},
+            {"selected_environment", environment_at(state, w.Envrn)},
+            {"resolved_candidate_before_GetNext", environment_at(state, e.TotDesDays + 1)},
+            {"resolved_candidate_is_selected_Envrn_claimed", false}}},
+        {"native_current_sky_globals", globals}, {"native_current_sky_globals_paired", false},
+        {"existing_current_context", Clk04::current_observation(state)},
+        {"private_hourly_ESky_or_branch_locals_observed", false}, {"whole_other_current_physics_paired", false}};
+    result["full_sky_grid_contents_available"] = full;
+    result["full_17_field_grid_generation_parity_claimed"] = false;
+    return result;
+}
+} // namespace Clk06
+#endif

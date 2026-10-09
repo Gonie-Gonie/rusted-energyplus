@@ -1,0 +1,329 @@
+"""Authenticate actual closure/archive/quality and native retention facts; never recompute sky."""
+from common import *
+import importlib.util
+import math
+import zipfile
+
+DERIVATIVE = {'path': '.runtime/porting/CLK-06/native-build-01/derivation/derived-helper.exe',
+    'sha256': '7e60b98d56fa25e203eb42df6395bee598146091a9dcc0483aee0e04afdefc8d', 'size_bytes': 150595264}
+PRIOR_RETIREMENT = '.runtime/porting/CLK-05/retirement-01/retirement.json'
+PRIOR_RETIREMENT_EXECUTION = '.runtime/porting/CLK-05/retirement-command-01/receipt.json'
+QUALITY = ('final-workspace-execution', 'final-clippy-execution', 'final-format-execution',
+    'final-source-quality-execution', 'final-structure-execution')
+ROLES = ('native-build', 'native-build-execution', 'native-build-review', 'native-build-review-execution',
+    'original-data-review', 'original-data-review-execution', 'legacy-gap', 'legacy-gap-execution',
+    'unit-comparison', 'unit-execution', 'unit-result-review', 'unit-review-execution',
+    'production-comparison', 'production-execution', 'production-result-review', 'production-review-execution',
+    *QUALITY, 'archive', 'archive-execution', 'archive-verification-execution')
+ARCHIVE_SOURCES = {'archive_selected.py':'8edfe9d610a15d909bb3d123323aed1b4bb8d90b3e5439809e8f11cdcf53d1fe',
+    'verify_archive.py':'f9ce8b34d1243aa5a56275430cc165bef13fa5a5ec345f030b8016ea2a167528'}
+CONTEXT = None
+
+
+def same(value, expected):
+    require(type(value) is dict and value['sha256'] == expected['sha256']
+        and path_of(value['path']) == path_of(expected['path']), 'Actual contained path/SHA identity differs')
+    for key in ['bytes', 'size_bytes']:
+        if key in value: require(type(value[key]) is int and regular(value['path']).stat().st_size == value[key], 'Bound size differs')
+    return ref(value['path'], value['sha256'])
+
+
+def executed_script(command, archive):
+    argv = command['command']; require(type(argv) is list and len(argv) >= 2
+        and all(type(value) is str for value in argv)
+        and Path(argv[0]).name.lower() in {'python', 'python.exe', 'python3', 'python3.exe'}, 'Admitted Python invocation required')
+    index = 1
+    if argv[index:index+2] == ['-X', 'utf8']: index += 2
+    if argv[index:index+1] == ['-B']: index += 1
+    require(index < len(argv) and not argv[index].startswith('-') and Path(argv[index]).suffix == '.py',
+        'Actual executed script after admitted switches required; no -c/-m inference')
+    require(ref(argv[index])['sha256'] == bound(archive)['sha256'], 'Executed source/copy differs')
+    return argv[index]
+
+
+def actual_review(refs, role, schema, status, source_key='executed_reader_source_archive'):
+    item = read(bound(refs[role])['path']); execution = role.replace('result-review', 'review-execution')
+    if not role.endswith('result-review'): execution = role + '-execution'
+    command = recorded(bound(refs[execution])['path'])
+    require(exact(read(command['stdout']['path']), item) and item['schema'] == schema and item['status'] == status,
+        'Actual full factual review stdout/schema/status differs: ' + role)
+    require(regular(command['stderr']['path']).stat().st_size == 0 and time_of(command['started_utc'])
+        <= time_of(item['review_started_utc']) <= time_of(item['review_completed_utc']) <= time_of(command['finished_utc']),
+        'Actual successful factual review interval/stderr differs')
+    executed_script(command, item[source_key])
+    return item, command
+
+
+def registry_guard():
+    require(CONTEXT is not None, 'Actual scope/closure context required before v5 authentication')
+    source = Path(__file__).parent / 'registry.py'; ref(source)
+    spec = importlib.util.spec_from_file_location('clk06_retention_postclosure_v5_guard', source)
+    require(spec is not None and spec.loader is not None, 'Reviewed metadata-only v5 successor adapter unavailable')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    scope, scope_execution, closure, closure_execution = CONTEXT
+    return module.guard(path_of(REGISTRY), path_of(PRIOR_RETIREMENT), path_of(PRIOR_RETIREMENT_EXECUTION),
+        scope, scope_execution, closure, closure_execution)
+
+
+def protected(registry, retained):
+    old_ref, accepted, observations = registry_guard()
+    require(old_ref == ref(REGISTRY, REGISTRY_SHA) and exact(accepted, registry)
+        and registry['schema'] == 'native-retained-artifact-registry.v5' and len(registry['new_targets']) == 5,
+        'Real v5 predecessor and all five exact prior tombstones required')
+    require(exact(retained, DERIVATIVE), 'Only the existing validated C6 derivative is retained')
+    kept = []
+    for row in observations['live_retained_bindings']:
+        p = path_of(row['path']); kept.append({'role': 'previously-protected-live-file',
+            'binary': ref(p, row['sha256']), 'size_bytes': p.stat().st_size})
+    kept.append({'role': 'CLK06-accepted-retained-derivative',
+        'binary': ref(retained['path'], retained['sha256'], retained['size_bytes']), 'size_bytes': retained['size_bytes']})
+    require(len(kept) == len({row['binary']['path'] for row in kept}) == 22
+        and TARGETS['clk06_reference_helper']['historical_path'] not in {row['binary']['path'] for row in kept},
+        'All prior21 protected files plus C6 derivative, disjoint from sole original, required')
+    return kept
+
+
+def preservation(build):
+    rows = build['executed_source_archives']
+    require(len(rows) == len({row['historical_path'] for row in rows}) == 61, 'Actual sixty-one native source archives required')
+    for row in rows:
+        archive = bound(row['archive']); ref(row['historical_path'], archive['sha256'])
+    admission = read(bound(build['native_admission_contract'])['path'])
+    require(admission['schema'] == 'clk06-native-admission-contract.v1', 'Actual C6 packet required')
+    same(build['helper_request'], admission['helper_request']); same(build['projection'], admission['projection'])
+    require(exact(build['contracts'], admission['contracts']), 'Actual build/frozen contract identities differ')
+    source = read(bound(admission['contracts']['source'])['path'])
+    for row in source['source_files']:
+        bound(row['original']); bound(row['archive'])
+        require(row['sha256'] == row['original']['sha256'] == row['archive']['sha256'], 'Original source range archive differs')
+    for row in admission['all_45_guard_refs']: bound(row)
+    require(len(admission['all_45_guard_refs']) == 45, 'All forty-five ordered CON bindings required')
+    for row in [admission['fixed_scope'], admission['helper_request'], admission['projection'], *admission['contracts'].values()]: bound(row)
+    request = read(admission['helper_request']['path'])
+    require(exact(request['requested_counts'], admission['requested_counts']) and request['requested_counts']['total_operations'] == 1120,
+        'Frozen source-derived C6 requested call inventory differs')
+    for sequence in request['weather_sequences']:
+        bound(sequence['input']); bound(sequence['weather'])
+    controls = read(bound(request['production_control_inputs'])['path'])
+    require(controls['scientific_execution_performed'] is False, 'Preserved captured controls must remain input-only')
+    core = read(bound(build['core_build'])['path'])
+    preserved = read(ref(core['source_preservation']['path'], core['source_preservation']['sha256'])['path'])
+    table = read(ref(preserved['archive_snapshot']['path'], preserved['archive_snapshot']['sha256'])['path'])['files']
+    require(len(table) == len({row['path'] for row in table}) == 13537, 'Complete original source inventory required')
+    original_root = ROOT / '.reference/energyplus-src/26.1.0'
+    for row in table:
+        p = original_root / row['path']; require(p.resolve().is_relative_to(original_root.resolve()), 'Original tree entry escapes source root')
+        ref(p, row['sha256'], row['bytes'])
+    for key in ['binary', 'toolchain_publisher_receipt', 'object_cache_publisher_receipt']:
+        row = core['compiler'][key]; ref(row['path'], row['sha256'], row.get('bytes'))
+    publisher = read(core['compiler']['toolchain_publisher_receipt']['path'])
+    expected = publisher['publisher_checksums']['sha256']
+    require(publisher['checksums_match'] is True and expected == publisher['actual_checksums']['sha256'], 'Compiler publisher proof differs')
+    package_path = path_of(ref(publisher['archive'], expected, publisher['archive_size'])['path'])
+    with zipfile.ZipFile(package_path) as package:
+        for name in ['libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll']:
+            ref(path_of(core['compiler']['binary']['path']).parent/name, hashlib.sha256(package.read('mingw64/bin/'+name)).hexdigest())
+    cached = ROOT/'.runtime/ep261-gcc13-o0'
+    require(ref(cached/'CMakeCache.txt')['sha256'] == bound(build['cache'])['sha256'], 'Actual cached CMake state differs')
+    commands = read(bound(build['compile_commands'])['path']); previous = read(bound(build['previous_compile_commands'])['path'])
+    frozen = read(bound(build['frozen_original_build_commands'])['path'])
+    require(exact(read(cached/'compile_commands.json'), commands) and len(commands) == 660 and len(previous) == 659
+        and len(frozen) == 643 and all(row in commands for row in previous) and all(row in previous for row in frozen),
+        'Actual cached660/prior659/frozen643 command rows differ')
+    return admission
+
+
+def comparison(refs, kind):
+    item = read(bound(refs[kind+'-comparison'])['path']); command = recorded(bound(refs[kind+'-execution'])['path'])
+    require(exact(read(command['stdout']['path']), item) and item['schema'] ==
+        ('clk06-candidate-comparison.v1' if kind == 'unit' else 'clk06-production-comparison.v1')
+        and item['status'] == ('pass-selected-sky-storage-and-source-history' if kind == 'unit' else
+            'pass-selected-sky-and-owned-production-transport')
+        and item['numerical_PASS_claimed'] is True and item['unavailable_counted_as_PASS'] is False,
+        'Genuine completed selected science0 required')
+    ledger = item['comparison']; require(type(ledger['comparison_count']) is int and ledger['comparison_count'] > 0
+        and type(ledger['mismatch_count']) is int and ledger['mismatch_count'] == 0 and ledger['mismatches'] == []
+        and ledger['unavailable_counted_as_PASS'] is False, 'Positive actual comparison, no mismatch, unavailable never PASS')
+    fields = {'SkyTemp', 'HorizIRSky', 'TotalSkyCover', 'OpaqueSkyCover', 'Interpolation', 'SolarInterpolation'}
+    if kind == 'unit': fields.add('ESky')
+    require(set(ledger['field_error_metrics']) == fields, 'Actual unit7/production6 metric distinction required')
+    for field, metric in ledger['field_error_metrics'].items():
+        require(type(metric['comparison_count']) is int and metric['comparison_count'] > 0 and metric['mismatch_count'] == 0
+            and all(type(metric[k]) in {int,float} and math.isfinite(metric[k]) and metric[k] >= 0
+                for k in ['maximum_absolute_error','RMSE']), 'Actual selected field metrics must remain positive/finite/nonnegative')
+        if field in {'TotalSkyCover','OpaqueSkyCover','Interpolation','SolarInterpolation'}:
+            require(metric['maximum_absolute_error'] == metric['RMSE'] == 0, 'Frozen bit-exact field errors must remain zero')
+    for row in item['executed_reader_source_archives']: bound(row['archive'])
+    if kind == 'unit':
+        calls = item['actual_call_ledger']
+        require(exact(calls['actual_invocations'], {'native':1120,'Rust':1120})
+            and exact(calls['actual_skips'], {'native':0,'Rust':0}), 'All1120 real unit calls required')
+    else:
+        require(item['actual_command_count'] == 6 and len(item['observations']) == 3 and len(item['transport_observations']) == 6
+            and sum(row['native_calls_paired'] for row in item['observations']) == 963
+            and sum(row['actual_Current_calls'] for row in item['observations']) == 480,
+            'Six actual CLI runs/963 whole phase calls/480 Current required')
+    return item, command
+
+
+def actual_archive(refs):
+    archive = read(refs['archive']['path']); command = recorded(refs['archive-execution']['path'])
+    summary = read(command['stdout']['path']); verification = recorded(refs['archive-verification-execution']['path'])
+    checked = read(verification['stdout']['path'])
+    require(archive['schema'] == 'clk06-selected-byte-evidence-archive.v1' and archive['exact_decompressed_bytes_verified'] is True
+        and archive['original_bytes_rewritten_or_JSON_reserialized'] is False and archive['canonical_plan_card_evidence_changed'] is False,
+        'Actual lossless selected C6 byte archive required')
+    require(set(summary) == {'archive','unique_objects','stored_bytes','canonical_files_changed','scientific_execution_performed'}
+        and summary['archive']['sha256'] == refs['archive']['sha256']
+        and regular(summary['archive']['path']).read_bytes() == regular(refs['archive']['path']).read_bytes()
+        and summary['canonical_files_changed'] is False and summary['scientific_execution_performed'] is False,
+        'Actual writer compact stdout and ignored/canonical copy byte identity required')
+    require(checked['schema'] == 'clk06-byte-archive-verification.v1' and checked['manifest']['sha256'] == refs['archive']['sha256']
+        and checked['unique_objects_verified'] == archive['unique_original_documents_and_sources']
+        and checked['exact_original_bytes_restored'] is True and checked['files_written'] is False
+        and checked['scientific_operands_parsed_or_compared'] is False,
+        'Actual independent byte restoration verifier0 required')
+    require(time_of(command['finished_utc']) <= time_of(verification['started_utc']), 'Archive must precede actual byte verification')
+    for record, name in [(command,'archive_selected.py'),(verification,'verify_archive.py')]:
+        main = executed_script(record, ref(Path(__file__).parent.parent/'archive-prep-01'/name, ARCHIVE_SOURCES[name]))
+        require(Path(main).name == name, 'Actual reviewed archival script differs')
+    source_manifest = read(Path(__file__).parent.parent/'archive-prep-01/manifest.json')
+    require({row['path']:row['sha256'] for row in source_manifest['sources']} == {
+        str((Path(__file__).parent.parent/'archive-prep-01'/name).relative_to(ROOT).as_posix()): ARCHIVE_SOURCES[name]
+        for name in ['archive_selected.py','verify_archive.py']}, 'Held archive2 sources differ')
+    required_roles = set(refs)-{'archive','archive-execution','archive-verification-execution'}
+    selected = {row['role']:row['binding'] for row in archive['rows'] if 'role' in row}
+    aliases = {'final-workspace-execution':'final-workspace-execution','final-clippy-execution':'final-clippy-execution',
+        'final-format-execution':'final-format-execution','final-source-quality-execution':'final-source-quality-execution',
+        'final-structure-execution':'final-structure-execution'}
+    for role in required_roles: same(selected[aliases.get(role,role)], refs[role])
+    require(archive['missing_receipt_exit_invented'] is False and len(archive['preserved_failures']) >= 7
+        and archive['unrecorded_incidents'][0]['receipt_available'] is False, 'All failures and honest no-receipt incident required')
+    for record, flag, expected in [(command,'--plan',archive['approved_plan']), (verification,'--manifest',checked['manifest'])]:
+        argv = record['command']; require(argv.count(flag) == 1, 'Unique actual archival operand required')
+        require(path_of(argv[argv.index(flag)+1]) == path_of(expected['path']), 'Actual archival operand identity differs')
+    directory = path_of(refs['archive']['path']).parent; seen = set()
+    for row in archive['rows']:
+        for part in row['storage']['parts']:
+            path = directory/part['relative_path']
+            require(path.resolve().is_relative_to(directory) and type(part['size_bytes']) is int
+                and 0 <= part['size_bytes'] <= 4_000_000, 'Copied archive part escapes exact bounded archive')
+            if path not in seen: ref(path,part['sha256'],part['size_bytes']); seen.add(path)
+    # Actual verifier0 restored the same manifest-defined SHA parts; no second decompression or science here.
+    return archive
+
+
+def all_proofs(bindings_path, closure_path, closure_execution):
+    global CONTEXT
+    pins = read(bindings_path)
+    require(pins['schema'] == 'clk06-retirement-proof-bindings.v1' and pins['future_hashes_guessed'] is False
+        and set(pins['actual_artifact_refs']) == set(ROLES), 'Runtime complete actual proof inventory required')
+    refs = {role: bound(pins['actual_artifact_refs'][role]) for role in ROLES}; records = {}
+    build = read(refs['native-build']['path']); CONTEXT = (build['actual_scope_amendment'], build['actual_scope_amendment_execution'],
+        ref(closure_path), ref(closure_execution))
+    command = recorded(refs['native-build-execution']['path']); summary = read(command['stdout']['path'])
+    require(set(summary) == {'driver_build','checks_passed','helper_binary'} and summary['checks_passed'] is True,
+        'Actual native build bounded3-key stdout required')
+    same(summary['driver_build'],refs['native-build']); same(summary['helper_binary'],build['helper_binary'])
+    require(build['schema'] == 'clk06-native-driver-build.v1' and build['target'] == 'clk06_reference_helper'
+        and build['linked_original'] == TARGETS['clk06_reference_helper'] and build['checks_passed'] is True
+        and build['original_removed'] is False and build['full_linked_original_copied'] is False
+        and build['scientific_source_patches'] is False and build['assertions_enabled'] is True and build['fp_contract'] == 'off',
+        'Historical genuine C6 original/FP/assertion identity required')
+    admission = preservation(build); pe = read(bound(build['validated_derivative'])['path'])
+    require(pe['status'] == 'pass-exact-retained-runtime-sections-and-directories' and pe['failure'] is None
+        and pe['original_bytes_unchanged'] is True and pe['accepted_derivative_bytes_unchanged'] is True
+        and pe['full_original_copied'] is False and exact(pe['accepted_derivative'],DERIVATIVE), 'Actual existing derivative PE proof required')
+    same(build['helper_binary'],DERIVATIVE)
+    peer, peer_command = actual_review(refs,'native-build-review','clk06-independent-native-build-review.v1',
+        'pass-build-and-derivative-before-original-execution')
+    same(peer['reviewed_build'],refs['native-build']); same(peer['actual_build_command'],refs['native-build-execution'])
+    require(exact(peer['reviewed_source_archives'],build['executed_source_archives']) and peer['actual_compile_rows'] == 660
+        and peer['historical_compile_rows'] == 659 and peer['frozen_core_rows'] == 643, 'Actual660/659/643/source61 PE review required')
+    data, data_command = actual_review(refs,'original-data-review','clk06-independent-original-data-review.v1',
+        'pass-preserved-original-data-before-Rust-baseline')
+    require(data['actual_helper_exit_code'] == data['actual_launcher_exit_code'] == 0 and data['actual_operation_invocations'] == 1120
+        and data['actual_operations_skipped'] == 0 and data['intended_native_branch_coverage_complete'] is True
+        and data['numerical_PASS_claimed'] is False and data['scientific_values_compared'] is False,
+        'Native0/wrapper0/1120 actual calls and factual Original QA required')
+    same(data['reviewed_build'],refs['native-build']); same(data['reviewed_build_review'],refs['native-build-review'])
+    same(data['reviewed_request'],build['helper_request']); same(data['reviewed_native_admission_contract'],build['native_admission_contract'])
+    child = read(bound(data['reviewed_native_execution'])['path']); parent = recorded(bound(data['reviewed_execution'])['path'])
+    require(child['schema'] == 'clk06-original-native-command.v1' and child['exit_code'] == 0 and child['spawn_error'] is None
+        and len(child['command']) == 5 and path_of(child['command'][0]) == path_of(DERIVATIVE['path'])
+        and Path(child['command'][1]).resolve() == ROOT, 'Genuine actual native argc5/0 required')
+    for index,key in [(2,'helper_request'),(3,'native_admission_contract')]:
+        require(path_of(child['command'][index]) == path_of(build[key]['path']), 'Native argv frozen identity differs')
+    require(time_of(peer_command['finished_utc']) <= time_of(child['started_utc']) <= time_of(child['finished_utc'])
+        <= time_of(parent['finished_utc']) <= time_of(data['review_started_utc']), 'Genuine Original-first chronology required')
+    # Reuse actual Original DataQA for huge wrapper/results and exact child identity; do not load those snapshots.
+    gap_command = recorded(refs['legacy-gap-execution']['path'])
+    gap = read(refs['legacy-gap']['path'])
+    require(exact(read(gap_command['stdout']['path']),gap) and gap['schema'] == 'clk06-existing-baseline-gap.v1'
+        and gap['numerical_PASS_claimed'] is False and gap['unavailable_counted_as_PASS'] is False
+        and gap['comparison']['mismatch_count'] > 0, 'Actual retained factual gap must remain differences/unavailable, never PASS')
+    records.update({'native-build':build,'original-data-review':data})
+    for kind in ['unit','production']:
+        item, execution = comparison(refs,kind); records[kind+'-comparison'] = item
+        qa, qa_command = actual_review(refs,kind+'-result-review',
+            'clk06-independent-candidate-unit-result-review.v1' if kind == 'unit' else 'clk06-independent-production-result-review.v1',
+            'pass-authenticated-selected-'+kind+'-result-and-honest-unavailable-scope')
+        same(qa['reviewed_report'],refs[kind+'-comparison']); same(qa['comparison_execution'],refs[kind+'-execution'])
+        require(qa['scientific_execution_performed'] is False and qa['numeric_operands_recomputed'] is False
+            and qa['unavailable_counted_as_PASS'] is False and time_of(execution['finished_utc']) <= time_of(qa['review_started_utc']),
+            'Actual factual result QA0 after genuine science0 required')
+        require(exact(qa['field_error_metrics'],item['comparison']['field_error_metrics']),
+            'Actual factual QA metric copy must equal the authenticated genuine comparer ledger')
+        records[kind+'-result-review'] = qa
+    unit, production = records['unit-result-review'], records['production-result-review']
+    same(production['reviewed_unit_result_QA'],refs['unit-result-review']); same(production['reviewed_baseline_gap'],refs['legacy-gap'])
+    same(production['reviewed_original_data_review'],refs['original-data-review'])
+    cli = read(bound(production['Rust_build'])['path']); snapshot = cli['source_snapshot']
+    for role in QUALITY:
+        actual = recorded(refs[role]['path'])
+        require(actual['source_snapshot']['sha256'] == snapshot['sha256']
+            and actual['repository_before']['head'] == cli['implementation_commit']
+            and actual['repository_before']['worktree_clean'] is True and actual['repository_after']['worktree_clean'] is True,
+            'All final5 must run on actual clean CLI source identity; no fabricated final-commit execution')
+    records['archive'] = actual_archive(refs)
+    unchanged()
+    return records, refs, DERIVATIVE
+
+
+def actual_closure(value, execution, refs):
+    closure = read(value); command = recorded(execution)
+    require(closure['schema'] == 'clk06-metadata-card-closure.v1' and closure['only_CLK06_gates_updated'] is True
+        and closure['other_63_tasks_unchanged'] is True and exact(read(command['stdout']['path']),closure), 'Actual C6 closure0 required')
+    names = {'energyplus_porting_plan/plan.json','energyplus_porting_plan/cards/CLK-06.md','energyplus_porting_plan/evidence/CLK-06.json'}
+    require(len(closure['before']) == 2 and {row['path'] for row in closure['before']} == names-{'energyplus_porting_plan/evidence/CLK-06.json'}
+        and len(closure['after']) == 3 and {row['path'] for row in closure['after']} == names, 'Actual closure before2/after3 scope required')
+    for row in closure['after']: bound(row)
+    tasks = [row for row in read('energyplus_porting_plan/plan.json')['tasks'] if row['id'] == 'CLK-06']
+    require(len(tasks) == 1 and all(tasks[0][key] == '\uD1B5\uACFC' for key in GATES), 'All four actual current gates must pass')
+    evidence = read('energyplus_porting_plan/evidence/CLK-06.json')
+    require(evidence['schema'] == 'clk06-card-completion-evidence.v1', 'Actual C6 completion evidence required')
+    same(evidence['unit']['report'],refs['unit-comparison']); same(evidence['production']['report'],refs['production-comparison'])
+    for name, role in zip(['workspace_tests','clippy','format_check','source_quality','structure_quality'],QUALITY):
+        same(evidence['actual_final_quality'][name]['receipt'],refs[role])
+    require(evidence['compressed_full_byte_archive']['sha256'] == refs['archive']['sha256'], 'Canonical completion archive differs')
+    rows = closure['executed_writer_sources']; require(len(rows) == len({row['historical_path'] for row in rows}) == 5,
+        'Actual closure own2/bindings/mapping/notes source archives required')
+    for row in rows: bound(row['archive']); ref(row['historical_path'],row['archive']['sha256'])
+    argv = command['command']; indexes = [i for i,x in enumerate(argv) if x == '--bindings']
+    require(len(indexes) == 1 and indexes[0]+1 < len(argv), 'Exact closure approved bindings argument required')
+    pins = read(argv[indexes[0]+1])['artifacts']
+    review = read(bound(pins['closure-source-review'])['path']); source_command = recorded(bound(pins['closure-source-review-execution'])['path'])
+    require(exact(read(source_command['stdout']['path']),review) and review['schema'] == 'clk06-independent-closure-source-review.v1'
+        and review['status'] == 'pass-metadata-closure-source-and-proof-interface-before-document-write'
+        and review['scientific_execution_performed'] is False, 'Actual closure own2 source review required')
+    executed_script(source_command,review['executed_reader_source_archive'])
+    own = {row['historical_path']:row['archive'] for row in review['reviewed_sources']}
+    require(len(own) == 2 and {Path(key).name for key in own} == {'close_card.py','common.py'}, 'Closure own2 review inventory differs')
+    for key, archive in own.items(): require(ref(key)['sha256'] == bound(archive)['sha256'], 'Reviewed closure bytes changed')
+    main_index = next(i for i,x in enumerate(argv) if Path(x).name == 'close_card.py')
+    executed_script(command,own[path_of(argv[main_index]).relative_to(ROOT).as_posix()])
+    require(time_of(source_command['started_utc']) <= time_of(review['review_started_utc']) <= time_of(review['review_completed_utc'])
+        <= time_of(source_command['finished_utc']) <= time_of(command['started_utc']), 'Actual sourceQA must precede closure write')
+    require(time_of(read(refs['archive-verification-execution']['path'])['finished_utc']) <= time_of(command['started_utc']),
+        'Lossless archive verification0 must precede actual closure0')
+    return {'closure':ref(value),'closure_execution':ref(execution),'canonical_after':closure['after']}

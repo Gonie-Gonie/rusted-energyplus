@@ -1,0 +1,188 @@
+"""Production source, unchanged native inputs and genuine six-child provenance."""
+from pathlib import Path
+from types import SimpleNamespace
+import importlib.util
+import sys
+from common import (ROOT, v, require, exact, read, ref, binding, recorded, archives,
+    script, argument, timestamp, path_of)
+
+HERE = Path(__file__).resolve().parent
+UNIT = ROOT / '.runtime/porting/CLK-06/comparer-prep-02'
+WORKFLOW = ROOT / '.runtime/porting/CLK-06/production-workflow-prep-03'
+OWN_NAMES = ['proofs.py', 'adapter.py', 'observations.py', 'freeze_projection.py', 'check_production.py']
+UNIT_NAMES = ['common.py', 'numeric.py', 'state.py', 'history.py', 'metadata.py', 'freeze_projection.py', 'check_clk06.py']
+WORKFLOW_NAMES = ['common.py', 'evidence.py', 'prepare_plan.py', 'run_production.py']
+REVIEW_SCHEMA = 'clk06-independent-production-comparer-source-review.v1'
+REVIEW_STATUS = 'pass-held-production-reader-and-frozen-input-policy-before-six-cli'
+DESIGN = {'path': '.runtime/porting/CLK-06/production-run-design-prep-01/plan.json',
+    'sha256': 'cbcc3f9665bb32ca4cfe27a0bf61ecd8a6d7099a51ec5a378ac3380d4ad80752'}
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+    'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+TRANSPORT = {'path': '.runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json',
+    'sha256': 'd05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c'}
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    require(spec is not None and spec.loader is not None, 'Authenticated source loader unavailable')
+    module = importlib.util.module_from_spec(spec); sys.modules[name] = module
+    spec.loader.exec_module(module); return module
+
+
+def sources():
+    return [*[HERE / name for name in OWN_NAMES], *[UNIT / name for name in UNIT_NAMES],
+        *[WORKFLOW / name for name in WORKFLOW_NAMES], ROOT / 'tools/porting/geo03_provenance.py']
+
+
+def selection(native, tolerances):
+    return {'numeric_profiles': tolerances['numeric_profiles'], 'numeric_rows': tolerances['rows'],
+        'numeric_criterion': tolerances['criterion'], 'source_selection': native['source_selection'],
+        'native_observation_policy': native['native_observation_policy'],
+        'transport_mask': {'cases': ['A-24H', 'A-72H', 'B-BOTH-24H'], 'trace_levels': ['Full', 'Summary'],
+            'native_direct_calls': {'GetNextEnvironment': 3, 'InitializeWeather': 480, 'SetCurrentWeather': 480, 'total': 963},
+            'full_history': 'All direct before/after and nested day-read snapshots; full17 owned copy retained; sky4 generation paired',
+            'native_operand': 'Actual same-civil-day/hour/timestep native Current.after selected_today_sky_slot, sky4 only',
+            'array_DTO_path_mapping': 'native ROOT to CLI ROOT identity; storage owner state.weather',
+            'all_eight_actual_kind_ledgers_required': True, 'both_Full_and_Summary_required': True,
+            'source_stamp': 'Actual Current completion count carried with context; repeated seed/consumer retained',
+            'owned_value_copies': 'SkyTemp/HorizIRSky use frozen same_owner_transport_copy bit/class profile',
+            'cloud_copy': 'Both cloud drivers use frozen exact cloud profile',
+            'physical_origins': ['surface_solve', 'report_outside_face_recomputation'],
+            'separate_report_origin': 'report_terms_recomputation', 'explicit_direct_test_origin_admitted': False,
+            'kernel_event_totals_are_timestep_solve_totals': False,
+            'hourly_aggregation': 'Retain typed += endpoints, continuity, divisor and actual pushed values; pair pushed-to-series copies',
+            'hourly_mean_equals_individual_slot_claimed': False, 'native_hourly_report_RHS_reconstructed': False,
+            'physical_early_return': 'Ingress remains observed; no resolved event invented',
+            'conditional_resolved_roles': 'PhysicalResolved and ReportTerms may genuinely have zero calls after early/cached return; explicit unavailable/noPASS; every executed argument is required',
+            'cap': 'Exact six source-validated run-design configurations; per-kind actual counts below declared bound and1M',
+            'deduplicate_actual_occurrences': False, 'any_truncation_is_incomplete': True,
+            'required_one_sided_absence_fails': True, 'both_null_unavailable_comparisons': 0,
+            'unpaired': ['native Current sky3/cloud2', 'prepared sky model owner', 'Current13 physics',
+                'CurrentTime/SimTimeSteps cross-native', 'SRC08 coefficients/fluxes', 'fallback sky formulas',
+                'native full heat-balance callback', 'unselected full17 generation', 'CLI stream file_path absent'],
+            'unavailable_counted_as_PASS': False, 'numeric_policy_changed': False}}
+
+
+def source_review(review_ref, execution_ref, checked):
+    review = read(checked.check(review_ref))
+    require(review['schema'] == REVIEW_SCHEMA and review['status'] == REVIEW_STATUS
+        and review['scientific_execution_performed'] is False, 'Other-author pre-six-CLI production source review required')
+    indexed = archives(review['reviewed_sources'], checked)
+    names = {path.relative_to(ROOT).as_posix() for path in sources()}
+    require(len(indexed) == len(review['reviewed_sources']) == len(names) == 17 and set(indexed) == names,
+        'Exact own5/unit7/workflow4/utility source review required')
+    receipt, start, finish = recorded(checked, execution_ref, review)
+    script(receipt, review['executed_reader_source_archive'], checked)
+    require(start <= timestamp(review['review_started_utc']) <= timestamp(review['review_completed_utc']) <= finish,
+        'Actual source review interval differs')
+    binding(review['reviewed_run_design'], DESIGN, checked)
+    binding(review['reviewed_transport_source_inventory'], TRANSPORT, checked)
+    binding(review['reviewed_root_preoutput_decision'], DECISION, checked)
+    for path in sources():
+        checked.check(ref(path))
+    return review, indexed, finish
+
+
+def workflow(source_ref, execution_ref, checked):
+    previous = sys.modules['common']
+    try:
+        h = load('common', WORKFLOW / 'common.py')
+        bound, review_ref, review, review_execution, finish, evidence = h.boot(
+            checked.check(source_ref), checked.check(execution_ref))
+        runner = load('clk06_production_actual_runner', WORKFLOW / 'run_production.py')
+    finally:
+        sys.modules['common'] = previous
+    return h, runner, evidence, bound, review_ref, review, review_execution, finish
+
+
+def json_line(value):
+    def pairs(rows):
+        result = {}
+        for key, item in rows:
+            require(key not in result, 'Duplicate stdout JSON key'); result[key] = item
+        return result
+    return __import__('json').loads(value, object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonfinite stdout token: ' + token)))
+
+
+def matrix_input(args, checked):
+    matrix_ref = ref(args.matrix); matrix = read(checked.check(matrix_ref))
+    require(matrix['schema'] == 'clk06-production-matrix.v1' and matrix['complete'] is True
+        and type(matrix['actual_command_count']) is int and matrix['actual_command_count'] == 6
+        and matrix['all_bound_inputs_unchanged'] is True, 'Complete actual six CLI matrix required')
+    for key in ['native_engine_executed', 'original_outputs_supplied_to_Rust', 'scientific_comparison_performed',
+        'numerical_PASS_claimed', 'gates_updated']:
+        require(matrix[key] is False, 'Ordinary production execution boundary differs')
+    h, runner, evidence, bound, source_ref, review, source_exec, reviewed_finish = workflow(
+        matrix['independent_sources_review'], matrix['independent_sources_review_execution'], checked)
+    admission, request, native_policy, contracts, cases = h.packet(bound)
+    refs = matrix['prerequisite_evidence']
+    keys = [('build', 'Rust_build'), ('original_data_review', 'Original_data_review'),
+        ('original_data_review_execution', 'Original_data_review_execution'), ('baseline_gap', 'baseline_gap'),
+        ('baseline_gap_execution', 'baseline_gap_execution'), ('unit_comparison', 'candidate_unit'),
+        ('unit_comparison_execution', 'candidate_unit_execution'), ('unit_result_review', 'candidate_unit_result_review'),
+        ('unit_result_review_execution', 'candidate_unit_result_review_execution'),
+        ('comparison_projection', 'production_comparison_projection'),
+        ('comparison_projection_execution', 'production_comparison_projection_execution'), ('applied_core_lineage', 'applied_core_lineage')]
+    ns = SimpleNamespace(**{key: bound.check(refs[name]) for key, name in keys}, plan=bound.check(matrix['declared_plan']),
+        plan_execution=bound.check(matrix['declared_plan_execution']))
+    plan_ref, plan, plan_exec, plan_finish = runner.validate_plan(ns, bound, admission, request, native_policy,
+        contracts, cases, source_ref, source_exec, reviewed_finish)
+    completed = evidence.prerequisites(ns, bound, admission, request, native_policy, contracts)
+    require(exact(plan['prerequisite_evidence'], refs) and exact(refs, completed['refs']), 'Real frozen prerequisite identities differ')
+    require(exact(matrix['contracts'], admission['contracts']), 'Matrix native contracts differ')
+    for key, expected in [('native_admission_contract', h.ADMISSION), ('build', refs['Rust_build']),
+        ('production_control_inputs', h.CONTROL), ('production_comparison_projection', refs['production_comparison_projection']),
+        ('production_comparison_projection_execution', refs['production_comparison_projection_execution']),
+        ('production_run_design', DESIGN), ('applied_core_inventory', refs['applied_core_lineage'])]:
+        binding(matrix[key], expected, bound)
+    require(matrix['implementation_commit'] == completed['build']['implementation_commit']
+        and matrix['crates_tree'] == completed['build']['crates_tree'], 'Actual CLI source identity differs')
+    require(bound.check(matrix['executed_launcher']).read_bytes() == (WORKFLOW / 'run_production.py').read_bytes(),
+        'Actually executed matrix launcher archive differs')
+    execution_ref = ref(args.matrix_execution); receipt, start, finish = recorded(bound, execution_ref)
+    archived = archives(review['reviewed_sources'], bound)
+    script(receipt, archived[(WORKFLOW / 'run_production.py').relative_to(ROOT).as_posix()], bound)
+    for flag, expected in [('--plan', plan_ref), ('--plan-execution', plan_exec), ('--source-review', source_ref),
+        ('--source-review-execution', source_exec), *[('--' + key.replace('_', '-'), refs[name]) for key, name in keys]]:
+        argument(receipt, flag, expected, bound)
+    binding(receipt['source_snapshot'], completed['build']['source_snapshot'], bound)
+    require(exact(receipt['executed_launcher'], completed['build']['actual_executed_recorder'])
+        and receipt['repository_before']['head'] == receipt['repository_after']['head'] == completed['build']['implementation_commit']
+        and receipt['repository_before']['worktree_clean'] is True and receipt['repository_after']['worktree_clean'] is True,
+        'Actual matrix source snapshot/recorder/clean head differs')
+    lines = bound.check(receipt['stdout']).read_text(encoding='utf8').splitlines()
+    require(lines and exact(json_line(lines[-1]), {'matrix': matrix_ref, 'actual_command_count': 6, 'complete': True}),
+        'Actual final matrix stdout differs; six child stdout artifacts stay distinct')
+    require(plan_finish <= start <= timestamp(matrix['started_utc']) <= timestamp(matrix['finished_utc']) <= finish,
+        'Actual plan then guarded six-child chronology differs')
+    architecture = evidence.architecture(completed['available'], bound)
+    evidence.run_design(cases, request, admission, bound)
+    checked.recursive(bound.report())
+    return {'matrix_ref': matrix_ref, 'matrix': matrix, 'matrix_execution': execution_ref,
+        'plan_ref': plan_ref, 'plan': plan, 'plan_execution': plan_exec, 'plan_finish': plan_finish,
+        'helper': h, 'runner': runner, 'checked': bound, 'admission': admission, 'request': request,
+        'native_policy': native_policy, 'contracts': contracts, 'completed': completed,
+        'source_review': source_ref, 'source_review_execution': source_exec,
+        'matrix_start': start, 'matrix_finish': finish, 'architecture': architecture}
+
+
+def actual_run(item, case, level, evidence, freeze_finish):
+    bound, h = evidence['checked'], evidence['helper']; completed = evidence['completed']
+    finish = evidence['runner'].check_run(item, case, level, completed, evidence['plan_finish'], bound)
+    receipt = read(bound.check(item['command_receipt'])); start, _ = v.execution_interval(receipt, bound)
+    require(item['spawn_error'] is None and item['actual_recorder_exit_code'] == 0
+        and item['external_input_context_preserved'] is True and item['terminated_CLI_process_internal_ENV_observed'] is False,
+        'Actual successful child and honest external ENV context required')
+    for key in ['constructed_inherited_child_ENV', 'actual_parent_ENV_before_child', 'actual_parent_ENV_after_child',
+        'prospective_inherited_child_ENV_after_child']:
+        h.require_environment(item[key], case['captured_environment_inputs'])
+    require(evidence['matrix_start'] <= timestamp(item['started_utc']) <= start <= finish
+        <= timestamp(item['finished_utc']) <= evidence['matrix_finish'] and freeze_finish <= start,
+        'Actual child lies outside matrix or precedes frozen selection')
+    output = path_of(item['output_directory'])
+    command = [str(bound.check(completed['build']['binary'])), 'run', str(bound.check(case['input'])), '--weather',
+        str(bound.check(case['weather'])), '--output-dir', str(output), '--mode', 'compatibility', '--partial', 'deny',
+        '--trace-level', level.lower(), '--porting-scope', case['scope'].lower()]
+    require(exact(item['command'], command) and exact(receipt['command'], command), 'Actual exact six-run argv differs')
+    return output

@@ -1,0 +1,28 @@
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+   Compiling ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+   Compiling ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 35s
+     Running unittests src\main.rs (target\debug\deps\eplus_rs-dfdce69381af6960.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compare-3bf4640254bb210c.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compiler-4e22e7fd720cb275.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_conformance-231861d2db97950d.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_model-6c290119b93e77fd.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_oracle-f01e655ff43aca1e.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_raw_model-e915a6579ab39df4.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_run-019a2c94a2e9c96f.exe)
+     Running tests\arbitrary_run.rs (target\debug\deps\arbitrary_run-d9725998c35ae1cb.exe)
+     Running tests\arbitrary_run_direct_zone_coupled.rs (target\debug\deps\arbitrary_run_direct_zone_coupled-d357ef3edf47281b.exe)
+     Running tests\arbitrary_run_exit_codes.rs (target\debug\deps\arbitrary_run_exit_codes-d7e4c1741b1fd661.exe)
+     Running tests\arbitrary_run_ideal_loads.rs (target\debug\deps\arbitrary_run_ideal_loads-dd485b1133f18062.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-f5a9aea3364ab9b8.exe)
+error: test failed, to rerun pass `-p ep_runtime --lib`
+   Doc-tests ep_compare
+   Doc-tests ep_compiler
+   Doc-tests ep_conformance
+   Doc-tests ep_model
+   Doc-tests ep_oracle
+   Doc-tests ep_raw_model
+   Doc-tests ep_run
+   Doc-tests ep_runtime
+error: 1 target failed:
+    `-p ep_runtime --lib`

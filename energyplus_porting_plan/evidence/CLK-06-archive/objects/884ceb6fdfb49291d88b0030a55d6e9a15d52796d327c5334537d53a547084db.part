@@ -1,0 +1,811 @@
+{
+  "schema": "clk06-production-comparison-projection.v1",
+  "created_utc": "2026-10-09T08:32:40.283048+00:00",
+  "native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "native_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "native_observation_projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "production_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "production_run_design": {
+    "path": ".runtime/porting/CLK-06/production-run-design-prep-01/plan.json",
+    "sha256": "cbcc3f9665bb32ca4cfe27a0bf61ecd8a6d7099a51ec5a378ac3380d4ad80752"
+  },
+  "selection": {
+    "numeric_profiles": {
+      "ESky": {
+        "unit": "1",
+        "atol": 2e-15,
+        "rtol": 0.0
+      },
+      "SkyTemp": {
+        "unit": "degC",
+        "atol": 1e-12,
+        "rtol": 1e-15
+      },
+      "HorizIRSky": {
+        "unit": "W_per_m2",
+        "atol": 1e-12,
+        "rtol": 1e-15
+      },
+      "cloud_drivers": {
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0
+      },
+      "stored_interpolation_weights": {
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0
+      },
+      "owned_value_copies": {
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0
+      }
+    },
+    "numeric_rows": [
+      {
+        "profile": "direct_emissivity",
+        "field": "ESky",
+        "unit": "1",
+        "atol": 2e-15,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "direct_calcSky_and_day_grid",
+        "field": "SkyTemp",
+        "unit": "degC",
+        "atol": 1e-12,
+        "rtol": 1e-15,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "direct_calcSky_and_day_grid",
+        "field": "HorizIRSky",
+        "unit": "W_per_m2",
+        "atol": 1e-12,
+        "rtol": 1e-15,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "cloud_driver_and_history",
+        "field": "TotalSkyCover",
+        "unit": "tenths",
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "cloud_driver_and_history",
+        "field": "OpaqueSkyCover",
+        "unit": "tenths",
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "actual_stored_weights",
+        "field": "Interpolation",
+        "unit": "1",
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "actual_stored_weights",
+        "field": "SolarInterpolation",
+        "unit": "1",
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "same_owner_transport_copy",
+        "field": "SkyTemp",
+        "unit": "degC",
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      },
+      {
+        "profile": "same_owner_transport_copy",
+        "field": "HorizIRSky",
+        "unit": "W_per_m2",
+        "comparison": "scalar_bits_and_class_exact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "signed_zero_bits_exact": true,
+        "IEEE_classification_exact": true
+      }
+    ],
+    "numeric_criterion": "abs(actual-reference) <= atol + rtol*abs(reference)",
+    "source_selection": {
+      "direct_emissivity": [
+        "ESky"
+      ],
+      "direct_calcSky": [
+        "SkyTemp",
+        "HorizIRSky"
+      ],
+      "day_grids_and_selected_Today": [
+        "SkyTemp",
+        "HorizIRSky",
+        "TotalSkyCover",
+        "OpaqueSkyCover"
+      ],
+      "cloud_history_and_counts": [
+        "TotalSkyCover",
+        "OpaqueSkyCover"
+      ],
+      "stored_arrays_at_DTO_ROOT": [
+        "Interpolation",
+        "SolarInterpolation"
+      ],
+      "private_ESky_hourly_locals_and_native_current_globals": "unavailable_or_unpaired_never_PASS"
+    },
+    "native_observation_policy": {
+      "full_weather_grid_fields": [
+        "SkyTemp",
+        "HorizIRSky",
+        "TotalSkyCover",
+        "OpaqueSkyCover"
+      ],
+      "full_weather_grid_snapshots": [
+        "allocated_defaults",
+        "setup",
+        "prepared",
+        "before_caller_context",
+        "after_caller_context",
+        "GetNextEnvironment",
+        "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+        "final_state"
+      ],
+      "effective_boundary_flags": "incoming flags overwritten only by declared partial caller writes",
+      "all_operations_executed_independently_of_observation_selection": true,
+      "compact_operation_grid_contents": null,
+      "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected sky/cloud grid",
+      "selected_today_slot_fields": [
+        "SkyTemp",
+        "HorizIRSky",
+        "TotalSkyCover",
+        "OpaqueSkyCover"
+      ],
+      "selected_today_slot_index": "actual allocated in-range HourOfDay/TimeStep, otherwise explicitly unavailable",
+      "all19_counts_full17_LastHour_NextHour_Missing_retained": true,
+      "selected_cloud_history_fields": [
+        "TotalSkyCover",
+        "OpaqueSkyCover"
+      ],
+      "selected_cloud_missed_and_out_of_range_count_fields": [
+        "TotalSkyCover",
+        "OpaqueSkyCover"
+      ],
+      "native_private_hourly_or_calcSky_ESky_locals_observed": false,
+      "default_model_metadata": [
+        "WP_Type1",
+        "skyTempModel",
+        "UseWeatherFileHorizontalIR"
+      ],
+      "default_model_must_be_actual_prepared_and_selected_not_forced": true,
+      "paired_native_current_globals": [],
+      "native_only_current_globals": [
+        "weather.HorizIRSky",
+        "environment.SkyTemp",
+        "environment.SkyTempKelvin",
+        "environment.TotalCloudCover",
+        "environment.OpaqueCloudCover"
+      ],
+      "current13_solar_night_SRC08_physics_paired": false
+    },
+    "transport_mask": {
+      "cases": [
+        "A-24H",
+        "A-72H",
+        "B-BOTH-24H"
+      ],
+      "trace_levels": [
+        "Full",
+        "Summary"
+      ],
+      "native_direct_calls": {
+        "GetNextEnvironment": 3,
+        "InitializeWeather": 480,
+        "SetCurrentWeather": 480,
+        "total": 963
+      },
+      "full_history": "All direct before/after and nested day-read snapshots; full17 owned copy retained; sky4 generation paired",
+      "native_operand": "Actual same-civil-day/hour/timestep native Current.after selected_today_sky_slot, sky4 only",
+      "array_DTO_path_mapping": "native ROOT to CLI ROOT identity; storage owner state.weather",
+      "all_eight_actual_kind_ledgers_required": true,
+      "both_Full_and_Summary_required": true,
+      "source_stamp": "Actual Current completion count carried with context; repeated seed/consumer retained",
+      "owned_value_copies": "SkyTemp/HorizIRSky use frozen same_owner_transport_copy bit/class profile",
+      "cloud_copy": "Both cloud drivers use frozen exact cloud profile",
+      "physical_origins": [
+        "surface_solve",
+        "report_outside_face_recomputation"
+      ],
+      "separate_report_origin": "report_terms_recomputation",
+      "explicit_direct_test_origin_admitted": false,
+      "kernel_event_totals_are_timestep_solve_totals": false,
+      "hourly_aggregation": "Retain typed += endpoints, continuity, divisor and actual pushed values; pair pushed-to-series copies",
+      "hourly_mean_equals_individual_slot_claimed": false,
+      "native_hourly_report_RHS_reconstructed": false,
+      "physical_early_return": "Ingress remains observed; no resolved event invented",
+      "conditional_resolved_roles": "PhysicalResolved and ReportTerms may genuinely have zero calls after early/cached return; explicit unavailable/noPASS; every executed argument is required",
+      "cap": "Exact six source-validated run-design configurations; per-kind actual counts below declared bound and1M",
+      "deduplicate_actual_occurrences": false,
+      "any_truncation_is_incomplete": true,
+      "required_one_sided_absence_fails": true,
+      "both_null_unavailable_comparisons": 0,
+      "unpaired": [
+        "native Current sky3/cloud2",
+        "prepared sky model owner",
+        "Current13 physics",
+        "CurrentTime/SimTimeSteps cross-native",
+        "SRC08 coefficients/fluxes",
+        "fallback sky formulas",
+        "native full heat-balance callback",
+        "unselected full17 generation",
+        "CLI stream file_path absent"
+      ],
+      "unavailable_counted_as_PASS": false,
+      "numeric_policy_changed": false
+    }
+  },
+  "source_review": {
+    "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/review.json",
+    "sha256": "df137ba27bb05f70bc888d7623a80a35a427f7e7f9e5beacab4f26eeedec4122"
+  },
+  "source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-command-01/receipt.json",
+    "sha256": "c3ca6313963873ebd61f5c94adabc6607c5b9cdfe15bc474afe033f75db45d56"
+  },
+  "reader_sources": [
+    {
+      "path": ".runtime/porting/CLK-06/production-comparer-prep-01/proofs.py",
+      "sha256": "ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-comparer-prep-01/adapter.py",
+      "sha256": "b4961444eadcf456d2ff728fc6bc35c8ca44f8499cc9c0b7bafc8567792b5d68"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-comparer-prep-01/observations.py",
+      "sha256": "a095b6c98dbc6b94707190cc9cb690b7652c9686fddea9ebd8d8875734110c15"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py",
+      "sha256": "a1bcd4c6fd3336cb22e3f28a75f8810b48cf99c4b6e6a82ff08d2613ffb421c2"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-comparer-prep-01/check_production.py",
+      "sha256": "b6ed71fe13c4ff017321857970f4024aa7a8bc324eb83945169988c48e2bbd19"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-workflow-prep-03/common.py",
+      "sha256": "e5a497f18f4f472dd535c1b058864b2f8399f07f44febe0a65e418a67aafd23e"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-workflow-prep-03/evidence.py",
+      "sha256": "790e454b0ac8bf0d743b7cde55221c450f663b39b54110d4206da4013a231252"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-workflow-prep-03/prepare_plan.py",
+      "sha256": "d766e239c8261fdc920ca9c2f10e026f933a059c321ef6cfe7eed0e0ea70dcb3"
+    },
+    {
+      "path": ".runtime/porting/CLK-06/production-workflow-prep-03/run_production.py",
+      "sha256": "a83da0f3aa8e17c79c6a08c1259125aef2a7d8a6d942c059f5f29851968cd4dd"
+    },
+    {
+      "path": "tools/porting/geo03_provenance.py",
+      "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+    }
+  ],
+  "reader_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/00-proofs.py",
+        "sha256": "ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/adapter.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/01-adapter.py",
+        "sha256": "b4961444eadcf456d2ff728fc6bc35c8ca44f8499cc9c0b7bafc8567792b5d68"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/observations.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/02-observations.py",
+        "sha256": "a095b6c98dbc6b94707190cc9cb690b7652c9686fddea9ebd8d8875734110c15"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/03-freeze_projection.py",
+        "sha256": "a1bcd4c6fd3336cb22e3f28a75f8810b48cf99c4b6e6a82ff08d2613ffb421c2"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/04-check_production.py",
+        "sha256": "b6ed71fe13c4ff017321857970f4024aa7a8bc324eb83945169988c48e2bbd19"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/05-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/06-numeric.py",
+        "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/07-state.py",
+        "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/08-history.py",
+        "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/09-metadata.py",
+        "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/10-freeze_projection.py",
+        "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/11-check_clk06.py",
+        "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/12-common.py",
+        "sha256": "e5a497f18f4f472dd535c1b058864b2f8399f07f44febe0a65e418a67aafd23e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/13-evidence.py",
+        "sha256": "790e454b0ac8bf0d743b7cde55221c450f663b39b54110d4206da4013a231252"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/14-prepare_plan.py",
+        "sha256": "d766e239c8261fdc920ca9c2f10e026f933a059c321ef6cfe7eed0e0ea70dcb3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/15-run_production.py",
+        "sha256": "a83da0f3aa8e17c79c6a08c1259125aef2a7d8a6d942c059f5f29851968cd4dd"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/production-comparison-projection-01/16-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/00-proofs.py",
+        "sha256": "ed62e35ac2c636d3233848a854efde05980866b3f5cb8b6cbc39f04de6d43d9a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/adapter.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/01-adapter.py",
+        "sha256": "b4961444eadcf456d2ff728fc6bc35c8ca44f8499cc9c0b7bafc8567792b5d68"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/observations.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/02-observations.py",
+        "sha256": "a095b6c98dbc6b94707190cc9cb690b7652c9686fddea9ebd8d8875734110c15"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/03-freeze_projection.py",
+        "sha256": "a1bcd4c6fd3336cb22e3f28a75f8810b48cf99c4b6e6a82ff08d2613ffb421c2"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-comparer-prep-01/check_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/04-check_production.py",
+        "sha256": "b6ed71fe13c4ff017321857970f4024aa7a8bc324eb83945169988c48e2bbd19"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/05-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/06-numeric.py",
+        "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/07-state.py",
+        "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/08-history.py",
+        "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/09-metadata.py",
+        "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/10-freeze_projection.py",
+        "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/11-check_clk06.py",
+        "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/12-common.py",
+        "sha256": "e5a497f18f4f472dd535c1b058864b2f8399f07f44febe0a65e418a67aafd23e"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/evidence.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/13-evidence.py",
+        "sha256": "790e454b0ac8bf0d743b7cde55221c450f663b39b54110d4206da4013a231252"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/prepare_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/14-prepare_plan.py",
+        "sha256": "d766e239c8261fdc920ca9c2f10e026f933a059c321ef6cfe7eed0e0ea70dcb3"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/production-workflow-prep-03/run_production.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/15-run_production.py",
+        "sha256": "a83da0f3aa8e17c79c6a08c1259125aef2a7d8a6d942c059f5f29851968cd4dd"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-production-comparer-source-review-01/sources/16-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "frozen_before_all_six_Rust_production_calls": true,
+  "native_results_read_by_freezer": false,
+  "scientific_execution_performed": false,
+  "numeric_policy_changed": false,
+  "unavailable_counted_as_PASS": false,
+  "gates_updated": false
+}

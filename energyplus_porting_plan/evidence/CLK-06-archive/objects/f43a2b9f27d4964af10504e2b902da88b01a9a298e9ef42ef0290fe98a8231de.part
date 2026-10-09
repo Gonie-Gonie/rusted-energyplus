@@ -1,0 +1,202 @@
+"""Root-only six-packet input freeze; no original/Rust scientific execution."""
+from __future__ import annotations
+import argparse
+import importlib.util
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[3]
+COMMON_SHA = 'ff19bdeb01e1db79e00b0efc75346524cf83d53c7da75a8d26c648ae407a46d4'
+import hashlib
+if hashlib.sha256((HERE / 'common.py').read_bytes()).hexdigest() != COMMON_SHA:
+    raise ValueError('Held metadata utility changed before import')
+from common import BASE, PIN, exact, finish_guards, instant, path, put, put_json, read, recorded, ref, require, review_execution, unchanged, utc, verify
+
+RAW = ROOT / '.runtime/porting/CLK-05/input-design-prep-02'
+NATIVE = ROOT / '.runtime/porting/CLK-05/native-prep-01'
+DEPS = ['tools/porting/clk03_reference_helper.cpp', 'tools/porting/clk03_reference_fields.hh', 'tools/porting/clk02_reference_fields.hh']
+EXPECTED = [HERE / name for name in ['common.py', 'packet_policy.py', 'freeze_packet.py']] + [
+    RAW / name for name in ['catalog.py', 'write_inputs.py']] + [
+    NATIVE / name for name in ['clk05_reference_helper.cpp', 'clk05_reference_fields.hh', 'clk05_reference_admission.hh']] + [ROOT / name for name in DEPS]
+
+
+def source_review(args, started):
+    binding = ref(args.source_review)
+    review = read(verify(binding))
+    require(review['schema'] == 'clk05-independent-preexecution-source-review.v1'
+            and review['status'] == 'pass-source-input-policy-before-freeze'
+            and review['scientific_execution_performed'] is False, 'Separate independent source/input review required')
+    execution = review_execution(args.source_review_execution, review, started)
+    rows = review['reviewed_sources']
+    wanted = {item.relative_to(ROOT).as_posix() for item in EXPECTED}
+    require(len(rows) == len(wanted) and {row['historical_path'] for row in rows} == wanted, 'Exact11 source inventory required')
+    unchanged(rows)
+    return {'review': binding, 'execution': execution}, rows
+
+
+def prerequisites(args, started):
+    closure_ref = ref(args.prerequisite_closure)
+    closure = read(verify(closure_ref))
+    closure_execution, _ = recorded(args.prerequisite_closure_execution, closure, started)
+    require(closure['schema'] == 'clk04-metadata-card-closure.v1' and closure['only_CLK04_gates_updated'] is True,
+            'Actual completed CLK04 closure required')
+    after = closure['after']
+    wanted = {'energyplus_porting_plan/plan.json', 'energyplus_porting_plan/cards/CLK-04.md', 'energyplus_porting_plan/evidence/CLK-04.json'}
+    require(len(after) == 3 and {row['path'] for row in after} == wanted, 'Exact historical closure after-bindings required')
+    for row in after:
+        if row['path'] != 'energyplus_porting_plan/plan.json':
+            verify(row)
+    # Later approved card/plan scope edits are distinct from the historical closure bytes.
+    plan_ref = ref('energyplus_porting_plan/plan.json')
+    plan = read(verify(plan_ref))
+    tasks = {row['id']: row for row in plan['tasks']}
+    gates = ['scope_review', 'unit_gate', 'integration_gate', 'production_gate']
+    for card in ['CLK-04', 'PSY-01', 'PSY-02']:
+        require(all(tasks[card][gate] == '\uD1B5\uACFC' for gate in gates), 'Actual prerequisite gates incomplete')
+    require(all(tasks['CLK-05'][gate] == '\uBBF8\uD655\uC778' for gate in gates), 'CLK05 gates must remain unclaimed')
+    registry_ref = ref(args.registry)
+    registry = read(verify(registry_ref))
+    retirement_ref = ref(args.retirement)
+    retirement = read(verify(retirement_ref))
+    retirement_execution, _ = recorded(args.retirement_execution, retirement, started)
+    require(registry['schema'] == 'native-retained-artifact-registry.v4'
+            and registry['admitted_by_Root_after_actual_card_closure'] is True
+            and registry['actual_card_closure'] == closure_ref and retirement['retired_registry'] == registry_ref,
+            'Explicit actual-v4/closure identity required')
+    require(retirement['schema'] == 'clk04-single-target-native-helper-retirement.v1'
+            and retirement['status'] == 'pass-precise-removal-and-retained-artifact-guards'
+            and retirement['sole_exact_new_original_absent'] is True
+            and retirement['historical_native_exit_code'] == 0 and retirement['historical_wrapper_exit_code'] == 1
+            and retirement['metadata_recovery_exit_code'] == 0 and retirement['historical_failed_wrapper_relabelled_zero'] is False,
+            'Actual native0/wrapper1/recovery0 retirement chronology required')
+    admitted = read(verify(registry['predecessor']))
+    previous_ref = admitted['predecessor']
+    require(previous_ref['sha256'] == 'bfcbcc4f3b466372c9258ee013cff19a352c2c899532f7e5a5d045ab28c38547', 'Actual-v3 predecessor differs')
+    previous = read(verify(previous_ref))
+    for key in ['legacy_products', 'legacy_product_count', 'protected_core_API_and_container']:
+        require(exact(registry[key], previous[key]), 'Prior protected registry metadata changed')
+    require(len(registry['new_targets']) == 4 and exact(registry['new_targets'][:3], previous['new_targets'])
+            and registry['new_targets'][-1]['target'] == 'clk04_reference_helper'
+            and registry['new_targets'][-1]['actual_removal_observed'] is True, 'Exact previous3 plus genuine C4 tombstone required')
+    verify(retirement['source_review']['review']); verify(retirement['source_review']['execution'])
+    return {'closure': closure_ref, 'execution': closure_execution, 'historical_canonical_after': after,
+            'current_plan': plan_ref, 'registry': registry_ref, 'retirement': retirement_ref,
+            'retirement_execution': retirement_execution, 'historical_plan_after_not_claimed_current': True}
+
+
+def controls(args, started):
+    binding = ref(args.production_control_inputs)
+    value = read(verify(binding))
+    require(value['schema'] == 'clk05-production-control-inputs.v1'
+            and value['effective_controls_inferred_from_outputs'] is False, 'Actual input-derived controls required')
+    review_ref = ref(args.control_review)
+    review = read(verify(review_ref))
+    require(review['schema'] == 'clk05-independent-production-control-input-review.v1'
+            and review['status'] == 'pass-input-registration-and-captured-environment-before-original'
+            and review['scientific_execution_performed'] is False
+            and review['reviewed_control_inputs'] == binding, 'Independent captured-input registration review required')
+    execution = review_execution(args.control_review_execution, review, started)
+    unchanged(review['reviewed_sources'])
+    return binding, {'review': review_ref, 'execution': execution}
+
+
+def load(name, source):
+    spec = importlib.util.spec_from_file_location(name, source)
+    require(spec is not None and spec.loader is not None, 'Authenticated source module unavailable')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-review', 'source-review-execution', 'prerequisite-closure', 'prerequisite-closure-execution',
+                 'registry', 'retirement', 'retirement-execution', 'production-control-inputs', 'control-review',
+                 'control-review-execution', 'output-dir']:
+        parser.add_argument('--' + name, type=Path, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    output = path(args.output_dir)
+    require(output.is_relative_to(BASE) and output != BASE and not output.exists(), 'Fresh ignored freeze directory required')
+    started = utc()
+    reviewed, sources = source_review(args, started)
+    prior = prerequisites(args, started)
+    control_ref, control_review = controls(args, started)
+    current_card = ref('energyplus_porting_plan/cards/CLK-05.md')
+    policy = load('clk05_authenticated_policy', HERE / 'packet_policy.py')
+    # The writer's bare catalog import receives only the already-reviewed module.
+    require('catalog' not in sys.modules, 'Unexpected preloaded catalogue rejected')
+    catalogue = load('catalog', RAW / 'catalog.py')
+    sys.modules['catalog'] = catalogue
+    try:
+        inputs = load('clk05_authenticated_input_writer', RAW / 'write_inputs.py')
+    finally:
+        del sys.modules['catalog']
+    output.mkdir()
+    source = policy.source_contract(output, started, current_card, prior, control_ref, reviewed)
+    source['production_control_review'] = control_review
+    source_ref = put_json(output, 'source.json', source)
+    tolerance_ref = put_json(output, 'tolerances.json', policy.tolerance_contract(started))
+    request = inputs.build_request(output, source_ref, tolerance_ref, control_ref)
+    request.update({'schema': 'clk05-helper-cases.v1', 'status': 'frozen-input-only-before-numerical-execution',
+                    'created_utc': started, 'frozen_before_numerical_execution': True,
+                    'observation_policy': policy.NATIVE_OBSERVATION_POLICY})
+    counts = {'setup_cases': len(request['setup_cases']), 'weather_sequences': len(request['weather_sequences']),
+              'GetNextEnvironment': 0, 'InitializeWeather': 0, 'weather_operations': 0, 'total_operations': len(request['setup_cases'])}
+    artifacts = []
+    for sequence in request['weather_sequences']:
+        require(type(sequence['time_steps_per_hour']) is int and sequence['time_steps_per_hour'] in [1, 3, 4], 'Admitted step domain differs')
+        for key in ['input', 'weather', 'external_byte_map']:
+            if key in sequence:
+                verify(sequence[key]); artifacts.append(sequence[key])
+        for operation in sequence['operations']:
+            require(operation['kind'] in ['GetNextEnvironment', 'InitializeWeather'] and type(operation['caller']) is dict, 'Solar-only whole-call input required')
+            for key in [operation['kind'], 'weather_operations', 'total_operations']:
+                counts[key] += 1
+    require(exact(counts, request['requested_counts']), 'Literal auto-derived counts differ')
+    scope = read(verify(request['fixed_scope']))
+    ordered = [row[key] for row in scope['cases'] for key in ['input', 'weather', 'metadata']]
+    require(len(ordered) == 45 and exact(ordered, request['all_45_guard_refs']), 'Exactly45 ordered CON refs required')
+    for binding in ordered:
+        verify(binding)
+    request_ref = put_json(output, 'helper-request.json', request)
+    cases = {'schema': 'clk05-cases-contract.v1', 'card': 'CLK-05', 'created_utc': started,
+             'frozen_before_numerical_execution': True, 'scientific_execution_performed': False, 'gates_updated': False,
+             'helper_request': request_ref, 'source': source_ref, 'tolerances': tolerance_ref,
+             'fixed_CON_scope': request['fixed_scope'], 'all_45_guard_refs': ordered, 'input_artifacts': artifacts,
+             'requested_counts': counts, 'sequence_ids': [row['id'] for row in request['weather_sequences']],
+             'original_initial_data_QA_required_before_Rust_baseline': True}
+    contracts = {'source': source_ref, 'cases': put_json(output, 'cases.json', cases), 'tolerances': tolerance_ref}
+    projection_ref = put_json(output, 'projection.json', policy.observation_projection(request_ref, contracts, started))
+    native = {'schema': 'clk05-native-admission-contract.v1', 'energyplus_commit': PIN, 'created_utc': started,
+              'frozen_before_numerical_execution': True, 'contracts': contracts, 'helper_request': request_ref,
+              'projection': projection_ref, 'fixed_scope': request['fixed_scope'], 'all_45_guard_refs': ordered,
+              'requested_counts': counts, 'source_review': reviewed, 'actual_CLK04_prerequisite': prior,
+              'required_retired_registry': prior['registry'], 'required_actual_retirement': prior['retirement'],
+              'required_actual_retirement_execution': prior['retirement_execution'], 'production_control_review': control_review,
+              'expected_values_supplied': False, 'expected_exits_supplied': False,
+              'scientific_execution_performed': False, 'gates_updated': False}
+    native_ref = put_json(output, 'native-admission-contract.json', native)
+    saved = []
+    for index, row in enumerate(sources):
+        archive = put(output, f'sources/{index:02}-{Path(row["historical_path"]).name}', verify(row['archive']).read_bytes())
+        saved.append({'historical_path': row['historical_path'], 'archive': archive})
+    unchanged(sources); finish_guards()
+    receipt = {'schema': 'clk05-input-source-policy-freeze.v1', 'status': 'frozen-before-original-execution',
+               'started_utc': started, 'completed_utc': utc(), 'actual_writer_argv': list(sys.orig_argv),
+               'contracts': contracts, 'helper_request': request_ref, 'projection': projection_ref,
+               'native_admission_contract': native_ref, 'source_review': reviewed, 'production_control_review': control_review,
+               'actual_CLK04_prerequisite': prior, 'required_retired_registry': prior['registry'],
+               'executed_source_archives': saved, 'requested_counts': counts, 'actual_numerical_operation_count': 0,
+               'all_45_CON_inputs_preserved': True, 'canonical_files_or_gates_written': False,
+               'scientific_execution_performed': False, 'source_hash_cycle_present': False,
+               'expected_values_or_exits_supplied': False}
+    put_json(output, 'freeze-receipt.json', receipt)
+    import json
+    print(json.dumps(receipt, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

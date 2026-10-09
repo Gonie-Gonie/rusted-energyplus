@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\comparer-source-review-prep-01\review_sources.py", line 157, in <module>
+    main()
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\comparer-source-review-prep-01\review_sources.py", line 60, in main
+    m.verify(row)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-02\metadata.py", line 59, in verify
+    item = path(ref(binding['path'], binding['sha256'])['path'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-02\metadata.py", line 46, in ref
+    need((item.suffix.lower() in {'.py', '.json', '.md', '.txt', '.log', '.idf', '.epw', '.rs', '.cpp', '.cc', '.hh', '.cmake'}
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CLK-06\gate-review-prep-02\metadata.py", line 16, in need
+    raise ValueError(message)
+ValueError: Bounded input/source metadata only; no engine binaries or numerical results

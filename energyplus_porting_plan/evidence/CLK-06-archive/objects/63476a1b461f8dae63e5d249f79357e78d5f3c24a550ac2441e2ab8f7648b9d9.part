@@ -1,0 +1,15 @@
+        if (state.dataWeather->NumIntervalsPerHour == 1 && state.dataGlobal->TimeStepsInHour > 1) {
+            // Create interpolated weather for timestep orientation
+            // First copy ts=1 (hourly) from data arrays to Wthr structure
+            for (int hour = 1; hour <= Constant::iHoursInDay; ++hour) {
+                wvarsHr(hour) = state.dataWeather->wvarsHrTsTomorrow(1, hour);
+            }
+
+            if (!state.dataWeather->LastHourSet) {
+                // For first day of weather, all time steps of the first hour will be
+                // equal to the first hour's value.
+                // 2021-06: An additional input is added to here to allow the user to have chosen which hour to use
+                int HrUsedtoInterp = thisEnviron.firstHrInterpUseHr1 ? 1 : 24;
+                state.dataWeather->wvarsLastHr = wvarsHr(HrUsedtoInterp);
+                state.dataWeather->LastHourSet = true;
+            }

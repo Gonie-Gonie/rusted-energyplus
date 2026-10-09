@@ -1,0 +1,124 @@
+"""Static other-author builder review; no builder/registry import or native action."""
+import argparse
+import ast
+import hashlib
+import importlib.util
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+META = HERE / 'metadata.py'
+META_SHA = '30ce3e60b0a527adae9b4aa66366150724f13f0c7b76e977c2c158609fa50f69'
+if hashlib.sha256(META.read_bytes()).hexdigest() != META_SHA:
+    raise ValueError('Own stdlib-only metadata utility changed before import')
+spec = importlib.util.spec_from_file_location('clk06_builder_review_metadata', META)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+m.ref(META, META_SHA)
+m.ref(__file__)
+MANIFEST = {'path': '.runtime/porting/CLK-06/builder-prep-01/manifest.json',
+            'sha256': '90712a2c2d896d0e7ce6a4660d0fa6d4ef4a30cc1939c53fb00172d1f96fc83d'}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['native-contract', 'contract-review', 'contract-review-execution', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    m.need(Path.cwd().resolve() == m.ROOT, 'Repository cwd required')
+    started = m.utc()
+    manifest, native_ref = m.read(MANIFEST), m.ref(args.native_contract)
+    native = m.read(native_ref)
+    contract_ref, contract_execution, contract = m.review(args.contract_review, args.contract_review_execution,
+        'clk06-independent-frozen-contract-review.v1', 'pass-frozen-input-source-policy-before-native-build', started)
+    m.need(m.same(contract['reviewed_native_admission_contract'], native_ref)
+           and m.same(contract['reviewed_helper_request'], native['helper_request'])
+           and m.same(contract['reviewed_projection'], native['projection'])
+           and m.exact(contract['reviewed_contracts'], native['contracts']), 'Actual admitted frozen packet differs')
+    source_pair = native['source_review']
+    helper_ref, helper_execution, helper = m.review(source_pair['review']['path'], source_pair['execution']['path'],
+        'clk06-independent-preexecution-source-review.v1', 'pass-source-input-policy-before-freeze', started)
+    helper_rows = m.archives(helper['reviewed_sources'], 12)
+    m.need(manifest['schema'] == 'clk06-native-builder-source-preparation.v1'
+           and len(manifest['own_sources']) == 4 and len(manifest['included_native_sources']) == 7,
+           'Exact four builder and seven native dependencies required')
+    all_rows = [*manifest['own_sources'], *manifest['included_native_sources'], manifest['inherited_core_utility']]
+    by_owner = {}
+    for row in all_rows:
+        source = m.verify(row)
+        owner = source.relative_to(m.ROOT).as_posix()
+        m.need(owner not in by_owner or by_owner[owner]['sha256'] == row['sha256'], 'Conflicting duplicate source pin')
+        by_owner[owner] = row
+        if source.suffix == '.py':
+            ast.parse(source.read_text(encoding='utf8'), filename=owner)
+    for owner, archive in helper_rows.items():
+        m.need(owner not in by_owner or by_owner[owner]['sha256'] == archive['sha256'], 'Helper/build source pin disagreement')
+        by_owner[owner] = m.ref(owner, archive['sha256'])
+    texts = {Path(owner).name: m.verify(row).read_text(encoding='utf8') for owner, row in by_owner.items()}
+    predicates = {
+        'build_native.py': ["TARGET = 'clk06_reference_helper'", "prior['schema']=='clk05-native-driver-build.v1'",
+            'len(rows)==659 and len(clk04_rows)==658', 'len(older_rows)==657', 'len(legacy_rows)==656', 'len(oldest)==655',
+            'len(frozen)==643', 'scope_amendment=bound', 'scope_amendment_execution=bound',
+            'len(rows)==660 and len(own)==1', 'archive_sources', 'scientific_source_patches', 'before_configure', 'after_derivation'],
+        'packet.py': ["'clk06-native-admission-contract.v1'", "contract['card']=='CLK-06'", 'root_preoutput_decision',
+            "'CalcSkyEmissivity':len(request['emissivity_cases'])", "'SetCurrentWeather':0", "'calcSky':0",
+            "len(native['all_45_guard_refs'])==45", 'production_input_only_caller_history', 'actual_scope_amendment_execution'],
+        'registry.py': ['scope_amendment_execution', 'scope_amendment', 'scientific', 'retired', '21'],
+        'clk06_reference.cmake': ['CLK-05/builder-prep-02/clk05_reference.cmake', 'add_executable(clk06_reference_helper',
+            'target_link_libraries(clk06_reference_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)',
+            'target_compile_features(clk06_reference_helper PRIVATE cxx_std_20)']}
+    for name, tokens in predicates.items():
+        m.need(all(token in texts[name] for token in tokens), 'Full-read builder protocol predicate differs: ' + name)
+    prior = m.read(manifest['actual_prior_native_build'])
+    m.need(prior['schema'] == 'clk05-native-driver-build.v1' and prior['checks_passed'] is True
+           and prior['scientific_source_patches'] is False and len(prior['executed_source_archives']) == 49,
+           'Actual genuine prior CLK05 build metadata differs')
+    current_rows = m.read(prior['compile_commands'])
+    previous_rows = m.read(prior['previous_compile_commands'])
+    m.need(len(current_rows) == 659 and len(previous_rows) == 658
+           and [row for row in current_rows if Path(row['file']).name != 'clk05_reference_helper.cpp'] == previous_rows,
+           'Actual659 must retain predecessor658 registrations unchanged')
+    for binding in [manifest['native_source_manifest'], manifest['actual_scope_amendment'],
+                    manifest['actual_scope_amendment_execution'], manifest['root_preoutput_decision']]:
+        m.verify(binding)
+    out = m.path(args.output_dir, exists=False)
+    m.need(out.is_relative_to(m.BASE) and out != m.BASE and not out.exists(), 'Fresh ignored builder review output required')
+    m.finish()
+    out.mkdir(parents=True)
+    (out / 'source').mkdir()
+    copied = []
+    for index, (owner, row) in enumerate(sorted(by_owner.items())):
+        destination = out / 'source' / (f'{index:02}-' + Path(owner).name)
+        with destination.open('xb') as stream:
+            stream.write(m.verify(row).read_bytes())
+        copied.append({'historical_path': owner, 'archive': m.ref(destination, row['sha256'])})
+    result = {'schema': 'clk06-independent-native-builder-static-review.v1',
+        'status': 'pass-source-and-contract-before-native-build', 'review_started_utc': started,
+        'reviewed_contract_review': contract_ref, 'reviewed_contract_review_execution': contract_execution,
+        'reviewed_native_admission_contract': native_ref,
+        'reviewed_helper_static_review': helper_ref, 'reviewed_helper_static_review_execution': helper_execution,
+        'reviewed_builder_manifest': MANIFEST, 'reviewed_sources': copied,
+        'actual_reviewed_source_count': len(copied), 'reviewed_prior_build': manifest['actual_prior_native_build'],
+        'actual_prior_compile_row_count': 659, 'prospective_new_compile_row_count': 660,
+        'prospective_count_is_not_an_actual_build_claim': True,
+        'scientific_execution_performed': False, 'reviewed_modules_imported_or_executed': False,
+        'native_configure_compile_link_or_PE_validation_performed': False, 'large_binaries_or_numerical_results_hashed': False,
+        'canonical_files_or_gates_written': False, 'numerical_PASS_claimed': False,
+        'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header independently read Raw new builder/packet/registry changes; Header authored the earlier builder and producer/helper infrastructure. This source/archive review does not independently certify earlier own algorithms or a future actual build/PE result.'}
+    for name, source in [('executed-source-reviewer.py', Path(__file__)), ('executed-metadata.py', META)]:
+        with (out / name).open('xb') as stream:
+            stream.write(source.read_bytes())
+    result['executed_reader_source_archive'] = m.ref(out / 'executed-source-reviewer.py')
+    result['executed_metadata_source_archive'] = m.ref(out / 'executed-metadata.py')
+    result['review_completed_utc'] = m.utc()
+    import json
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(result, stream, indent=2, ensure_ascii=True, allow_nan=False); stream.write('\n')
+    m.finish()
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

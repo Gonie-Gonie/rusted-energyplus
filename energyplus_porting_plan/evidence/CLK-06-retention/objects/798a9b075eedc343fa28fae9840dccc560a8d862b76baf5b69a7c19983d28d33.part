@@ -1,0 +1,281 @@
+{
+  "schema": "clk06-card-completion-evidence.v1",
+  "card": "CLK-06",
+  "scopes": [
+    "A",
+    "B"
+  ],
+  "scientific_implementation_commit": "37f07f548d869cafb4c8a6e3df021b43e2c6598f",
+  "production_implementation_commit": "92018be6e8f3682520edc788ed226d24d6e6e0bf",
+  "final_quality_commit": "92018be6e8f3682520edc788ed226d24d6e6e0bf",
+  "unit": {
+    "report": {
+      "path": ".runtime/porting/CLK-06/candidate-unit-comparison-01/unit-comparison.json",
+      "sha256": "50da815d739269907fde1cec18f775aa21018b0aa5b5fc3bc09bf258fb7404d3"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-06/candidate-unit-comparison-command-01/receipt.json",
+      "sha256": "d017f971d60cc9158b96da3b45f63d88bfe768b731a7a58dce76a257d4d81b74"
+    },
+    "review": {
+      "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/review.json",
+      "sha256": "04da992e1a8e34bc64e6d1f8fdd736b19dd7196794ddd3df9198f39e3443ab85"
+    },
+    "comparison_count": 1562575,
+    "mismatch_count": 0
+  },
+  "production": {
+    "report": {
+      "path": ".runtime/porting/CLK-06/production-comparison-02/production-comparison.json",
+      "sha256": "4e5c1f7b21b2933eea27af25f03489c4077c3b2cc65980d25e4cc52780821625"
+    },
+    "execution": {
+      "path": ".runtime/porting/CLK-06/production-comparison-command-02/receipt.json",
+      "sha256": "127b4c3fc3a2f8e3b23640bbf5d8ea29a7fb3b04d8358f2799e4384ac2affb83"
+    },
+    "review": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-03/review.json",
+      "sha256": "b693cd52c73cd0ac475da19a50458b15e7004cce22119e2c9c41479898125b3a"
+    },
+    "comparison_count": 4013777,
+    "mismatch_count": 0,
+    "actual_CLI_commands": 6,
+    "actual_direct_original_calls": 963,
+    "actual_Current_calls": 480
+  },
+  "native": {
+    "data_review": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+      "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+    },
+    "actual_whole_calls": 1120,
+    "numerical_PASS_claimed_by_QC": false
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "selected_observation_projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "legacy_gap": {
+    "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+    "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+  },
+  "preserved_failures": {
+    "weather-filter-execution": {
+      "path": ".runtime/porting/CLK-06/weather-day-tests-command-01/receipt.json",
+      "sha256": "85486269127da4b682d2cc14b6b3b81196b9d0a5dcec2b3ba8e3d61359c27a34"
+    },
+    "structure-execution": {
+      "path": ".runtime/porting/CLK-06/structure-quality-command-01/receipt.json",
+      "sha256": "42a0588ec754056da24ac22e71a1f159bb3903eeb156a58cabf713a18b41a79d"
+    },
+    "workspace-execution-01": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-01/receipt.json",
+      "sha256": "0763f4a058b4d0216e0f94790f60dde365acc44d53959094bca79647a713a068"
+    },
+    "workspace-execution-02": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-02/receipt.json",
+      "sha256": "5ba60ce2478b28e9755c715b65a70c377957d778e3905e6945760f02d5189e78"
+    },
+    "original-data-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-command-01/receipt.json",
+      "sha256": "9ed44731500044cd13d324435d96185fe3663e01050a6e56cf98430231e1b25a"
+    },
+    "comparer-source-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-comparer-source-review-command-01/receipt.json",
+      "sha256": "1351b5a09dee612be04cda1f2582130b8d01ee0f29119f8921101a1554d23b6e"
+    },
+    "frozen-contract-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-frozen-contract-review-command-01/receipt.json",
+      "sha256": "adc9d5d6481ed868e3d8c8ccb81711a49495db82bd7f94df6a492f1dbe83cd3b"
+    },
+    "production-comparison-execution": {
+      "path": ".runtime/porting/CLK-06/production-comparison-command-01/receipt.json",
+      "sha256": "45c116869f0958b03648ba110c1b0b9c4f93d6ef8f1e224eea439f53ee0339f3"
+    },
+    "production-result-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-command-02/receipt.json",
+      "sha256": "46a8e752210e847f3f267fee810a6ad9532bc977da2ff5664eef82ef2d3c2e6d"
+    }
+  },
+  "historical_unknowns": {
+    "source_quality_recorder_launch_race": {
+      "role": "source-quality-command-02-before-child-race",
+      "absent_receipt_path": ".runtime/porting/CLK-06/source-quality-command-02/receipt.json",
+      "receipt_available": false,
+      "child_execution_or_exit_proven": false,
+      "reported_cause": "FileExists before recorder child launch",
+      "outcome": "unknown-no-receipt"
+    }
+  },
+  "compressed_full_byte_archive": {
+    "path": "energyplus_porting_plan/evidence/CLK-06-archive/archive.json",
+    "sha256": "9e028c79e43397b372d076634be810a2ce2e04686574f5313a762f4ae1450f57"
+  },
+  "archive_execution": {
+    "path": ".runtime/porting/CLK-06/archive-command-01/receipt.json",
+    "sha256": "dcc54bc86cc361a4853926e8de55119dfb1230184dd38e1d3a95b66476ca8942"
+  },
+  "archive_verification_execution": {
+    "path": ".runtime/porting/CLK-06/archive-verification-command-01/receipt.json",
+    "sha256": "6ce655a2ed608544bec73b6bfde94df00148dbce54eb255d93bbdd1a881723d8"
+  },
+  "actual_final_quality": {
+    "workspace_tests": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/workspace-test-command-03/receipt.json",
+        "sha256": "90d51a4b7f7a270eddd7a940cb375063f95e3329b06e7ba0d83a92a9565588fc"
+      },
+      "started_utc": "2026-10-09T08:47:52.021970+00:00",
+      "finished_utc": "2026-10-09T08:50:57.845123+00:00",
+      "exit_code": 0,
+      "actual_test_counts": {
+        "groups": 21,
+        "passed": 4612,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    "clippy": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/clippy-command-02/receipt.json",
+        "sha256": "278443659d8629ca7210afaeb113d523666788895cbc13a89bfa6101013c6ddc"
+      },
+      "started_utc": "2026-10-09T08:51:34.805081+00:00",
+      "finished_utc": "2026-10-09T08:52:42.689809+00:00",
+      "exit_code": 0
+    },
+    "format_check": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/final-format-check-command-03/receipt.json",
+        "sha256": "12eec5fa9e40598118cf8fb979aafea6fe59d134eaf726f497ea9685568af7f7"
+      },
+      "started_utc": "2026-10-09T08:50:26.551780+00:00",
+      "finished_utc": "2026-10-09T08:50:27.659727+00:00",
+      "exit_code": 0
+    },
+    "source_quality": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/source-quality-command-05/receipt.json",
+        "sha256": "12329c4c876bb6a877e9521a9ccd3bc1bb5a0dc8c5a408af088a48ecfc1c485a"
+      },
+      "started_utc": "2026-10-09T08:48:51.829570+00:00",
+      "finished_utc": "2026-10-09T08:49:14.780946+00:00",
+      "exit_code": 0
+    },
+    "structure_quality": {
+      "receipt": {
+        "path": ".runtime/porting/CLK-06/structure-quality-command-04/receipt.json",
+        "sha256": "5ba52c4f86dc821e87e0d4e0a1ef80d1d0d2addf0e73966b7a9e864c45989f42"
+      },
+      "started_utc": "2026-10-09T08:49:31.939397+00:00",
+      "finished_utc": "2026-10-09T08:50:04.064242+00:00",
+      "exit_code": 0
+    }
+  },
+  "applied_core_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-applied-04/inventory.json",
+    "sha256": "452b74fb9f5b868a2abafe300751bd4ef469239060bb8f7ce8ffb723a298076e"
+  },
+  "helper_granularity": [
+    {
+      "path": "crates/ep_runtime/src/weather_day/sky.rs",
+      "line_count": 140,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/5c/5ce0edde536590435097087561f2c9a25beb1b7cef3b98d8220279a288f127bc",
+        "sha256": "5ce0edde536590435097087561f2c9a25beb1b7cef3b98d8220279a288f127bc"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/hourly.rs",
+      "line_count": 426,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/e5/e54bbe6d2fc73ef36679e184a086370f288fec0ab2723a4d32d34934308a9bc0",
+        "sha256": "e54bbe6d2fc73ef36679e184a086370f288fec0ab2723a4d32d34934308a9bc0"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/solar.rs",
+      "line_count": 86,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/4f/4ffe393e5670883f37648d1ef02bb0e82389e968f965337fe146529569962525",
+        "sha256": "4ffe393e5670883f37648d1ef02bb0e82389e968f965337fe146529569962525"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/producer.rs",
+      "line_count": 324,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/9b/9b01da47c728dbf92ba7f68ed35e400fe74a5653c14fba6924a356f668841617",
+        "sha256": "9b01da47c728dbf92ba7f68ed35e400fe74a5653c14fba6924a356f668841617"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production.rs",
+      "line_count": 347,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/8c/8cb2c4e6c1088b6fadfa37125179d1c71713cfe27c37870bab6cb2adab7609f2",
+        "sha256": "8cb2c4e6c1088b6fadfa37125179d1c71713cfe27c37870bab6cb2adab7609f2"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/sky_transport_trace.rs",
+      "line_count": 353,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/ff/ff99ba18b310c3f37850b0b108879bbc87ee58b13fa519775fd83e5447af2ebf",
+        "sha256": "ff99ba18b310c3f37850b0b108879bbc87ee58b13fa519775fd83e5447af2ebf"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+      "line_count": 131,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/f0/f0fbdb7d985120e0554fed44d47c41fa0efd5ba83229608fd97b9b9f52fd4c8c",
+        "sha256": "f0fbdb7d985120e0554fed44d47c41fa0efd5ba83229608fd97b9b9f52fd4c8c"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "line_count": 932,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/f4/f43d0aa74109034f77797da695d8a89d0b677993f028397d2a19d9446bc58ad8",
+        "sha256": "f43d0aa74109034f77797da695d8a89d0b677993f028397d2a19d9446bc58ad8"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/reports.rs",
+      "line_count": 899,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/a3/a3ea6e5ba816b625a97785625df58150b8e012c8604db0ad0d321394805dcedc",
+        "sha256": "a3ea6e5ba816b625a97785625df58150b8e012c8604db0ad0d321394805dcedc"
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+      "line_count": 640,
+      "source_archive": {
+        "path": ".runtime/porting/source-objects/15/159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434",
+        "sha256": "159c153f333dbe06b7899139ff62d63a1294c251628fc77f69625ce56c628434"
+      }
+    }
+  ],
+  "unavailable_counted_as_PASS": false,
+  "whole_physical_system_certified": false,
+  "native_Current5_model_and_SRC08_paired": false,
+  "native_index_invented": false,
+  "scientific_values_recomputed_by_closure_writer": false,
+  "authorship_limits": "Baseline authored comparer/observer and earlier hourly/producer work. Genuine Root execution, other-author source/results QA and this metadata transcription are distinct; no independent own-physics certification."
+}

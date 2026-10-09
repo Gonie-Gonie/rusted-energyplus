@@ -1,0 +1,17 @@
+--- .runtime/porting/CLK-06/closure-source-review-prep-02/review_sources.py
++++ .runtime/porting/CLK-06/closure-source-review-prep-03/review_sources.py
+@@ -13,10 +13,10 @@
+     raise ValueError('Metadata-only helper differs before import')
+ spec = importlib.util.spec_from_file_location('clk06_closure_source_metadata', HELPER)
+ m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+-MANIFEST = {'path': '.runtime/porting/CLK-06/closure-prep-03/manifest.json',
+-    'sha256': '7e079df88e90da40d0bb17c88bc3dc96e7d55ef97d72ad7823946d392380f8d8'}
+-PREFIX = '.runtime/porting/CLK-06/closure-prep-03/'
+-SOURCES = [('close_card.py', '88b0cf0f25fa37ae83ed4d7c1d521429481736fbb0a4bcbfad34f6df1ffcb218'),
++MANIFEST = {'path': '.runtime/porting/CLK-06/closure-prep-04/manifest.json',
++    'sha256': 'd984b5b1435fba2c28e31484ba773c9ebe2f610a083949e7b1d03bddfa87af7c'}
++PREFIX = '.runtime/porting/CLK-06/closure-prep-04/'
++SOURCES = [('close_card.py', 'f0995b2536c57d8c37a2aee45c8c96a26a0568cf4c15f0b73c55c1d891d8eb8a'),
+     ('common.py', 'ab73475b464831fd93fff59e42b2244cba5ff1c7d0be5ba816cc06e90a4533c7')]
+ SCHEMA = 'clk06-independent-closure-source-review.v1'
+ STATUS = 'pass-metadata-closure-source-and-proof-interface-before-document-write'

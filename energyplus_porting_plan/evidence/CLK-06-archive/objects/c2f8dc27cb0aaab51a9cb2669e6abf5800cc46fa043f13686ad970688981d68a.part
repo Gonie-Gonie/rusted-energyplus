@@ -1,0 +1,263 @@
+"""Root-only input/source/policy freeze; ignored output only, no engines or answers.
+
+This source is held for independent review. It has not been imported/executed.
+"""
+from __future__ import annotations
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import stat
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-04'
+SOURCE_DIR = Path(__file__).parent
+NAMES = ['clk04_reference_helper.cpp', 'clk04_reference_fields.hh', 'write_inputs.py',
+         'packet_policy.py', 'freeze_packet.py']
+DEPS = [
+    ('tools/porting/clk03_reference_helper.cpp', '2f4fb94a04f0638016b2f458ad9a567fa8e201b57323663b7fd18cf4e21b9877'),
+    ('tools/porting/clk03_reference_fields.hh', '6c9c43a45921c29155b81a7f5a110a1f3a75ddf21937ea06bd62a56bfb93ba66'),
+    ('tools/porting/clk02_reference_fields.hh', 'b4e886101d97651f99aec06b6d41610fd59147fe88c831c143eb12bf8729fe41'),
+]
+SEEN = {}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def stamp(value):
+    actual = datetime.fromisoformat(value)
+    require(actual.tzinfo is not None and actual.utcoffset().total_seconds() == 0, 'Actual UTC required')
+    return actual
+
+
+def ref(value, expected=None):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse packet input required')
+    path = raw.resolve(strict=True)
+    require(path.is_relative_to(ROOT) and path != ROOT, 'Packet input escapes repository')
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    require(expected is None or expected == digest, 'Packet input hash differs: ' + str(value))
+    require(path not in SEEN or SEEN[path] == digest, 'Packet input changed while freezing')
+    SEEN[path] = digest
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def bound(value):
+    require(type(value) is dict and set(value) == {'path', 'sha256'} and type(value['sha256']) is str,
+            'Exact path/hash binding required')
+    require(ref(value['path'], value['sha256']) == value, 'Nonliteral packet binding')
+    return ROOT / value['path']
+
+
+def read(binding):
+    def pairs(items):
+        out = {}
+        for key, value in items:
+            require(key not in out, 'Duplicate JSON key')
+            out[key] = value
+        return out
+    def invalid(value):
+        raise ValueError('Nonstandard JSON number: ' + value)
+    return json.loads(bound(binding).read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[k], right[k]) for k in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    if type(left) is float:
+        return left.hex() == right.hex()
+    return left == right
+
+
+def recorded(value):
+    binding = ref(value)
+    item = read(binding)
+    require(item['schema'] == 'recorded-porting-command.v1' and type(item['exit_code']) is int
+            and item['exit_code'] == 0 and item['launch_error'] is None
+            and item['source_bytes_match_before_and_after'] is True
+            and item['repository_before']['head'] == item['repository_after']['head'],
+            'Actual metadata command0/source guard required')
+    for key in ['stdout', 'stderr', 'source_snapshot']:
+        bound(item[key])
+    bound(item['executed_launcher']['archive'])
+    require(stamp(item['started_utc']) <= stamp(item['finished_utc']), 'Actual command chronology differs')
+    return binding, item
+
+
+def source_review(args, started):
+    binding = ref(args.source_review)
+    review = read(binding)
+    execution, command = recorded(args.source_review_execution)
+    require(review['schema'] == 'clk04-independent-preexecution-source-review.v1'
+            and review['status'] == 'pass-source-input-policy-before-freeze'
+            and review['scientific_execution_performed'] is False
+            and exact(read(command['stdout']), review), 'Actual full independent source review required')
+    require(stamp(command['started_utc']) <= stamp(review['review_started_utc'])
+            <= stamp(review['review_completed_utc']) <= stamp(command['finished_utc']) <= stamp(started),
+            'Source policy review must precede input freeze')
+    rows = review['reviewed_sources']
+    require(type(rows) is list and len(rows) == 8, 'Five new and three preserved source dependencies required')
+    keyed = {row['historical_path']: row['archive'] for row in rows}
+    expected = [str((SOURCE_DIR / name).relative_to(ROOT).as_posix()) for name in NAMES] + [name for name, _ in DEPS]
+    require(len(keyed) == 8 and set(keyed) == set(expected), 'Exact unique source inventory required')
+    for historical in expected:
+        bound(keyed[historical])
+        require(ref(historical)['sha256'] == keyed[historical]['sha256'], 'Reviewed source changed')
+    for historical, digest in DEPS:
+        ref(historical, digest)
+    return {'review': binding, 'execution': execution}, keyed
+
+
+def load_owned(name):
+    path = SOURCE_DIR / (name + '.py')
+    spec = importlib.util.spec_from_file_location('clk04_frozen_' + name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def prerequisite(args, started):
+    closure_ref = ref(args.prerequisite_closure)
+    closure = read(closure_ref)
+    execution, command = recorded(args.prerequisite_closure_execution)
+    require(closure['schema'] == 'clk03-metadata-card-closure.v1'
+            and closure['only_CLK03_gates_updated'] is True and exact(read(command['stdout']), closure)
+            and stamp(command['finished_utc']) <= stamp(started), 'Actual completed CLK03 closure required')
+    expected = {'energyplus_porting_plan/evidence/CLK-03.json', 'energyplus_porting_plan/plan.json',
+                'energyplus_porting_plan/cards/CLK-03.md'}
+    rows = closure['after']
+    require(type(rows) is list and len(rows) == 3 and {row['path'] for row in rows} == expected,
+            'Actual exact CLK03 closure after-bindings required')
+    for row in rows:
+        bound(row)
+    plan = read(ref('energyplus_porting_plan/plan.json'))
+    keyed = {row['id']: row for row in plan['tasks']}
+    gates = ['scope_review', 'unit_gate', 'integration_gate', 'production_gate']
+    for card in ['CLK-03', 'PSY-01', 'PSY-02']:
+        require(all(keyed[card][gate] == '통과' for gate in gates), 'Actual dependency gates incomplete')
+    require(all(keyed['CLK-04'][gate] == '미확인' for gate in gates), 'CLK04 gates must remain unclaimed')
+    return {'closure': closure_ref, 'execution': execution, 'canonical_after': rows,
+            'current_plan': ref('energyplus_porting_plan/plan.json')}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-review', 'source-review-execution', 'prerequisite-closure',
+                 'prerequisite-closure-execution', 'output-dir']:
+        parser.add_argument('--' + name, type=Path, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    output = (ROOT / args.output_dir).resolve()
+    require(output.is_relative_to(BASE) and not output.exists(), 'Fresh ignored packet output required')
+    started = now()
+    reviewed, source_bindings = source_review(args, started)
+    previous = prerequisite(args, started)
+    # Authenticate all source bytes before these metadata-only module imports.
+    policy = load_owned('packet_policy')
+    inputs = load_owned('write_inputs')
+    registry = read(policy.REGISTRY)
+    require(registry['schema'] == 'native-retained-artifact-registry.v3'
+            and registry['admitted_by_Root_after_actual_card_closure'] is True
+            and len(registry['new_targets']) == 3
+            and all(row['actual_removal_observed'] is True for row in registry['new_targets']),
+            'Actual v3 retained derivatives/tombstones required before new target preparation')
+    for name, digest in policy.PREP_SHA.items():
+        ref('.runtime/porting/CLK-04/preparation-01/' + name, digest)
+    output.mkdir()
+    def put(name, payload):
+        path = output / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('xb') as stream:
+            stream.write(payload)
+        return ref(path)
+    def put_json(name, value):
+        return put(name, inputs.json_bytes(value))
+    source = policy.source_contract(read, bound, put, started, previous)
+    caller_source = inputs.PRODUCTION_CURRENT_CALLER_SOURCE
+    caller_archive = put('caller-source/production.rs', bound(caller_source).read_bytes())
+    source['production_current_for_caller_source'] = {'historical_path': caller_source['path'], 'archive': caller_archive,
+                                                    'selected_source_range': {'start_line': 208, 'end_line': 235}}
+    source['executed_source_policy_review'] = reviewed
+    source['source_helper_dependencies'] = policy.DEP_SOURCE
+    source_ref = put_json('source.json', source)
+    tolerances = policy.tolerance_contract(read, started)
+    tolerance_ref = put_json('tolerances.json', tolerances)
+    request = inputs.build_request(output / 'inputs')
+    require(request['requested_counts'] == policy.COUNT, 'Literal input cardinality differs')
+    for binding in request['all_45_guard_refs']:
+        bound(binding)
+    bound(request['fixed_scope']); bound(request['declared_CLK03_production_caller_source'])
+    request.update({'schema': 'clk04-helper-cases.v1', 'status': 'frozen-input-only-before-numerical-execution',
+                    'created_utc': started, 'frozen_before_numerical_execution': True,
+                    'contracts': {'source': source_ref, 'tolerances': tolerance_ref},
+                    'observation_policy': policy.NATIVE_OBSERVATION_POLICY,
+                    'production_current_for_caller_source': source['production_current_for_caller_source']})
+    artifact_rows = []
+    for sequence in request['weather_sequences']:
+        for key in ['input', 'weather', 'external_byte_map']:
+            if key in sequence:
+                bound(sequence[key]); artifact_rows.append(sequence[key])
+    request_ref = put_json('helper-request.json', request)
+    cases = {'schema': 'clk04-cases-contract.v1', 'card': 'CLK-04', 'created_utc': started,
+             'frozen_before_numerical_execution': True, 'scientific_execution_performed': False,
+             'expected_values_supplied': False, 'expected_exits_supplied': False, 'gates_updated': False,
+             'helper_request': request_ref, 'source': source_ref, 'tolerances': tolerance_ref,
+             'fixed_CON_scope': request['fixed_scope'], 'all_45_guard_refs': request['all_45_guard_refs'],
+             'input_artifacts': artifact_rows, 'requested_counts': policy.COUNT,
+             'weather_sequences': [{'id': row['id'], 'lane': row['lane'], 'time_steps_per_hour': row['time_steps_per_hour'],
+                                    'run_period': row['run_period'], 'input': row['input'], 'weather': row['weather'],
+                                    'declared_operation_count': len(row['operations'])} for row in request['weather_sequences']],
+             'selected_current_calls': {'diagnostic': 368, 'production': 480, 'total': 848},
+             'all_original_data_and_independent_QA_required_before_Rust_baseline': True}
+    cases_ref = put_json('cases.json', cases)
+    contracts = {'source': source_ref, 'cases': cases_ref, 'tolerances': tolerance_ref}
+    projection = policy.observation_projection(request_ref, contracts, started)
+    projection_ref = put_json('projection.json', projection)
+    native = {'schema': 'clk04-native-admission-contract.v1', 'energyplus_commit': inputs.PIN,
+              'created_utc': started, 'frozen_before_numerical_execution': True,
+              'contracts': contracts, 'helper_request': request_ref, 'projection': projection_ref,
+              'fixed_scope': request['fixed_scope'], 'all_45_guard_refs': request['all_45_guard_refs'],
+              'requested_counts': policy.COUNT, 'source_review': reviewed, 'actual_CLK03_prerequisite': previous,
+              'required_retired_registry': policy.REGISTRY, 'expected_values_supplied': False,
+              'expected_exits_supplied': False, 'scientific_execution_performed': False, 'gates_updated': False}
+    native_ref = put_json('native-admission-contract.json', native)
+    source_archives = []
+    for historical, archive in source_bindings.items():
+        destination = 'source/' + Path(historical).name
+        saved = put(destination, (ROOT / historical).read_bytes())
+        require(saved['sha256'] == archive['sha256'], 'Reviewed source/archive changed')
+        source_archives.append({'historical_path': historical, 'archive': saved})
+    for path, digest in SEEN.items():
+        require(hashlib.sha256(path.read_bytes()).hexdigest() == digest, 'Bound bytes changed during freeze')
+    receipt = {'schema': 'clk04-input-source-policy-freeze.v1', 'status': 'frozen-before-original-execution',
+               'started_utc': started, 'completed_utc': now(), 'actual_writer_argv': list(sys.orig_argv),
+               'contracts': contracts, 'helper_request': request_ref, 'projection': projection_ref,
+               'native_admission_contract': native_ref, 'source_review': reviewed,
+               'actual_CLK03_prerequisite': previous, 'required_retired_registry': policy.REGISTRY,
+               'executed_source_archives': source_archives, 'requested_counts': policy.COUNT,
+               'actual_numerical_operation_count': 0, 'all_45_CON_inputs_preserved': True,
+               'scientific_execution_performed': False, 'expected_values_or_exits_supplied': False,
+               'canonical_files_or_gates_written': False, 'source_hash_cycle_present': False}
+    put_json('freeze-receipt.json', receipt)
+    print(json.dumps(receipt, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

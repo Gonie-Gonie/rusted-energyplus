@@ -1,0 +1,87 @@
+{
+  "schema": "clk06-independent-retirement-writer-source-review.v1",
+  "status": "pass-source-before-one-target-retirement-metadata",
+  "review_started_utc": "2026-10-09T09:02:12.135064+00:00",
+  "reviewed_source_manifest": {
+    "path": ".runtime/porting/CLK-06/retention-prep-02/manifest.json",
+    "sha256": "9b13bde2ca0f86b0432fef27bce274558ed8d0e34bec4f86f69f6314b338a647"
+  },
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/00-common.py",
+        "sha256": "d4602b9c103ee41528cb7f75f70776983997be3a735286ed2c18f2718de00466"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-02/registry.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/01-registry.py",
+        "sha256": "133bb112416ef85dc4aded064ef8cf080bc87adef7b7ebdf396103f5928c7b9d"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-02/proofs.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/02-proofs.py",
+        "sha256": "2114a66351a4696775c4e7d6d6b54e292ec836d01e7306d7c85894ca5ffd6b97"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-02/write_plan.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/03-write_plan.py",
+        "sha256": "d283ac49a6b6560df1c8577edff2673a9e9e3132fd4939e6db55df758b1fcbc6"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/retention-prep-02/retire.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/04-retire.py",
+        "sha256": "ae90ce2cb53f9464a64d6d37fcabf9ed99507eb50a8e699344139b46125681a7"
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/executed-source-reviewer.py",
+    "sha256": "f5cd3f192fc130dfc0f8f503ac5e00abb954b8e2e8359b87aba78f96f22f90f3"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-retirement-writer-source-review-01/executed-metadata.py",
+    "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+  },
+  "reviewer_source_path": {
+    "path": ".runtime/porting/CLK-06/retirement-source-review-prep-01/review_sources.py",
+    "sha256": "f5cd3f192fc130dfc0f8f503ac5e00abb954b8e2e8359b87aba78f96f22f90f3"
+  },
+  "metadata_utility": {
+    "path": ".runtime/porting/CLK-06/gate-review-prep-02/metadata.py",
+    "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+  },
+  "reviewed_target_metadata_only": {
+    "clk06_reference_helper": {
+      "historical_path": ".runtime/ep261-gcc13-o0/Products/clk06_reference_helper.exe",
+      "sha256": "672dfd6b708833bbcc0f1869c5933a595423be86404b06142b5a179392545fb4",
+      "size_bytes": 1297365278
+    }
+  },
+  "reviewed_retained_derivative_metadata_only": {
+    "path": ".runtime/porting/CLK-06/native-build-01/derivation/derived-helper.exe",
+    "sha256": "7e60b98d56fa25e203eb42df6395bee598146091a9dcc0483aee0e04afdefc8d",
+    "size_bytes": 150595264
+  },
+  "source_only_static_read_and_AST": true,
+  "reviewed_modules_imported_or_executed": false,
+  "target_or_protected_binaries_hashed_by_reader": false,
+  "retirement_or_admission_performed": false,
+  "scientific_execution_performed": false,
+  "numerical_result_payloads_read": false,
+  "future_proof_outcomes_or_hashes_guessed": false,
+  "canonical_files_changed": false,
+  "gates_updated": false,
+  "extra_quality_lineage_execution_stage_required": false,
+  "verifier_author": "/root/clk02_header_port",
+  "authorship_limits": "Header independently read Raw one-target retention metadata/action sources, not its reused native algorithms. Header authored earlier sky/helper/workflow/source-review code; own physics is not independently self-certified. Root and other authors review this recorder and Root alone performs actual execution.",
+  "review_completed_utc": "2026-10-09T09:02:12.258828+00:00"
+}

@@ -1,0 +1,19 @@
+--- .runtime/porting/CLK-06/retirement-source-review-prep-01/review_sources.py
++++ .runtime/porting/CLK-06/retirement-source-review-prep-02/review_sources.py
+@@ -13,12 +13,12 @@
+     raise ValueError('Metadata-only helper differs before import')
+ spec = importlib.util.spec_from_file_location('clk06_retirement_source_metadata', HELPER)
+ m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+-MANIFEST = {'path': '.runtime/porting/CLK-06/retention-prep-02/manifest.json',
+-    'sha256': '9b13bde2ca0f86b0432fef27bce274558ed8d0e34bec4f86f69f6314b338a647'}
+-PREFIX = '.runtime/porting/CLK-06/retention-prep-02/'
++MANIFEST = {'path': '.runtime/porting/CLK-06/retention-prep-03/manifest.json',
++    'sha256': '5eaf0e4475c411bdda1521e2c7a8bf8d4fc54523962e50676bd5fcf3971764d5'}
++PREFIX = '.runtime/porting/CLK-06/retention-prep-03/'
+ SOURCES = [('common.py','d4602b9c103ee41528cb7f75f70776983997be3a735286ed2c18f2718de00466'),
+     ('registry.py','133bb112416ef85dc4aded064ef8cf080bc87adef7b7ebdf396103f5928c7b9d'),
+-    ('proofs.py','2114a66351a4696775c4e7d6d6b54e292ec836d01e7306d7c85894ca5ffd6b97'),
++    ('proofs.py','f0a0ed06f65467097513f4ee1268a49239c5c5da4fa739ef23686002a5ec1480'),
+     ('write_plan.py','d283ac49a6b6560df1c8577edff2673a9e9e3132fd4939e6db55df758b1fcbc6'),
+     ('retire.py','ae90ce2cb53f9464a64d6d37fcabf9ed99507eb50a8e699344139b46125681a7')]
+ SCHEMA = 'clk06-independent-retirement-writer-source-review.v1'

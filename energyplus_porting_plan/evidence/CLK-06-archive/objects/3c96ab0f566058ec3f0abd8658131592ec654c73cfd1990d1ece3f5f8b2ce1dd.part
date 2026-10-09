@@ -1,0 +1,187 @@
+"""Input/source metadata transport only; no equations or scientific operands."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-06'
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+SEEN = {}
+HISTORICAL_CONTROL_REVIEW = {'path': '.runtime/porting/CLK-05/independent-control-input-review-01/review.json',
+    'sha256': '75a0975ed046dae492ca1b58ffba51c346f25038129ff37b88464ed7f673d45e'}
+HISTORICAL_CONTROL_EXECUTION = {'path': '.runtime/porting/CLK-05/independent-control-input-review-command-01/receipt.json',
+    'sha256': '96c6b93e6c04aa9044720a8440e97a8fc5004f59877f4fff81758670bb74a2d2'}
+HISTORICAL_CONTROL_READER = {'path': '.runtime/porting/CLK-05/control-input-review-prep-01/review_inputs.py',
+    'sha256': '07aef44be1fc507317ca0b3f10c19f94383934a2a032d51071945b2a0e29383e'}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def instant(value):
+    require(type(value) is str, 'Typed actual UTC required')
+    item = datetime.fromisoformat(value)
+    require(item.tzinfo is not None and item.utcoffset().total_seconds() == 0, 'Aware actual UTC required')
+    return item
+
+
+def path(value):
+    item = Path(value)
+    item = item if item.is_absolute() else ROOT / item
+    item = item.resolve()
+    require(item.is_relative_to(ROOT) and item != ROOT, 'Artifact escapes repository')
+    return item
+
+
+def sha(value):
+    with Path(value).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def ref(value):
+    raw = Path(value)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+            'Regular non-reparse artifact required')
+    item = path(raw)
+    digest = sha(item)
+    require(item not in SEEN or SEEN[item] == digest, 'Bound artifact changed')
+    SEEN[item] = digest
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': digest}
+
+
+def verify(binding):
+    require(type(binding) is dict and type(binding.get('path')) is str
+            and type(binding.get('sha256')) is str and re.fullmatch('[0-9a-f]{64}', binding['sha256']),
+            'Typed contained path/SHA256 required')
+    item = path(binding['path'])
+    require(ref(binding['path'])['sha256'] == binding['sha256'], 'Bound bytes differ: ' + binding['path'])
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            require(type(binding[key]) is int and item.stat().st_size == binding[key], 'Bound size differs')
+    return item
+
+
+def identity(actual, declared):
+    # Native file_ref is absolute path/hash/bytes; frozen inputs are relative path/hash.
+    require(verify(actual) == verify(declared) and actual['sha256'] == declared['sha256'],
+            'Contained actual/declared identity differs')
+
+
+def exact(left, right):
+    if type(left) is not type(right):
+        return False
+    if type(left) is dict:
+        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+    if type(left) is list:
+        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+    return left.hex() == right.hex() if type(left) is float else left == right
+
+
+def read(value):
+    def pairs(rows):
+        result = {}
+        for key, item in rows:
+            require(key not in result, 'Duplicate JSON key')
+            result[key] = item
+        return result
+    def invalid(token):
+        raise ValueError('Nonstandard JSON ' + token)
+    return json.loads(Path(value).read_text(encoding='utf-8'), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def put(directory, name, payload):
+    destination = path(directory / name)
+    require(destination.is_relative_to(directory) and destination != directory, 'Output filename escapes fresh directory')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open('xb') as stream:
+        stream.write(payload)
+    return ref(destination)
+
+
+def put_json(directory, name, value):
+    return put(directory, name, (json.dumps(value, indent=2, ensure_ascii=True, allow_nan=False) + '\n').encode('utf-8'))
+
+
+def unchanged(rows):
+    require(type(rows) is list and rows and len({row['historical_path'] for row in rows}) == len(rows),
+            'Unique reviewed source inventory required')
+    for row in rows:
+        require(path(row['historical_path']).read_bytes() == verify(row['archive']).read_bytes(),
+                'Current source differs from independently reviewed archive')
+
+
+def script_tail(command):
+    require(type(command) is list and command and all(type(value) is str for value in command), 'Typed actual Python argv required')
+    require(Path(command[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe'], 'Admitted Python executable/alias required')
+    index = 1
+    if command[index:index + 2] == ['-X', 'utf8']:
+        index += 2
+    if command[index:index + 1] == ['-B']:
+        index += 1
+    require(index < len(command) and not command[index].startswith('-') and Path(command[index]).suffix == '.py',
+            'Immediate actual script required, not -c/-m or another switch')
+    return command[index:]
+
+
+def recorded(value, expected, not_after):
+    binding = ref(value)
+    record = read(verify(binding))
+    require(record['schema'] == 'recorded-porting-command.v1' and type(record['exit_code']) is int
+            and record['exit_code'] == 0 and record['launch_error'] is None
+            and record['source_bytes_match_before_and_after'] is True
+            and record['recorder_updates_gates'] is False and record['recorder_supplies_reference_answers'] is False,
+            'Actual guarded metadata recorder0 required')
+    require(Path(record['cwd']).is_absolute() and Path(record['cwd']).resolve() == ROOT
+            and exact(read(verify(record['stdout'])), expected), 'Actual full typed stdout/cwd differs')
+    require(verify(record['stderr']).stat().st_size == 0, 'Successful metadata stderr must be empty')
+    verify(record['source_snapshot'])
+    launcher = record['executed_launcher']
+    require(path(launcher['historical_path']) == ROOT / 'tools/porting/record_command.py', 'Actual generic recorder required')
+    verify(launcher['archive'])
+    require(instant(record['started_utc']) <= instant(record['finished_utc']) <= instant(not_after), 'Actual metadata chronology differs')
+    return binding, record
+
+
+def review_execution(value, review, not_after):
+    binding, record = recorded(value, review, not_after)
+    require(instant(record['started_utc']) <= instant(review['review_started_utc'])
+            <= instant(review['review_completed_utc']) <= instant(record['finished_utc']), 'Actual review interval differs')
+    tail = script_tail(record['command'])
+    if review['schema'] == 'clk05-independent-production-control-input-review.v1':
+        # This genuine older report never archived its own reader. Authenticate
+        # exact historical evidence and current held source, without adding a key
+        # or claiming a retroactive executed-reader archive.
+        require(exact(binding, HISTORICAL_CONTROL_EXECUTION)
+                and exact(review, read(verify(HISTORICAL_CONTROL_REVIEW)))
+                and 'executed_reader_source_archive' not in review,
+                'Only authentic historical control review/recorder pair admitted')
+        require(exact(tail, [HISTORICAL_CONTROL_READER['path'], '--control-inputs',
+                    review['reviewed_control_inputs']['path'], '--capture-execution',
+                    review['reviewed_capture_execution']['path'], '--output-dir',
+                    verify(HISTORICAL_CONTROL_REVIEW).parent.relative_to(ROOT).as_posix()])
+                and verify(HISTORICAL_CONTROL_READER) == path(tail[0]),
+                'Exact historical control reader/arguments/current pinned source required')
+        require(all(row['historical_path'] != HISTORICAL_CONTROL_READER['path'] for row in review['reviewed_sources'])
+                and review['scientific_values_compared'] is False
+                and review['numerical_comparison_count'] is None and review['numerical_mismatch_count'] is None
+                and review['numerical_PASS_claimed'] is False, 'Historical archive limitation and null counts differ')
+    else:
+        archive = review['executed_reader_source_archive']
+        require(ref(tail[0])['sha256'] == ref(verify(archive))['sha256'], 'Actual source-reviewer script/archive differs')
+    return binding
+
+
+def finish_guards():
+    for item, digest in SEEN.items():
+        require(sha(item) == digest, 'Consumed source/input bytes changed during input-only stage: ' + str(item))

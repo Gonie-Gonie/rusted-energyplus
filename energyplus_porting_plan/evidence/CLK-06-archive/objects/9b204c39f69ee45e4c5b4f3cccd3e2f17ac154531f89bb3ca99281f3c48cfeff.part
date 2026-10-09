@@ -1,0 +1,5 @@
+                } // End of TS Loop
+
+                state.dataWeather->wvarsLastHr = wvarsHr(hour);
+            } // End of Hour Loop
+        }

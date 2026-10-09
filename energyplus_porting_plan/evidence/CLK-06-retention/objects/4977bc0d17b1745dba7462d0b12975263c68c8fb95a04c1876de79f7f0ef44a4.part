@@ -1,0 +1,240 @@
+{
+  "schema": "clk06-card-closure-bindings.v1",
+  "ready_to_close": true,
+  "canonical_gate_writes_authorized": true,
+  "pending_refs": [],
+  "before": {
+    "plan": {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "fb62118110e5ab71b518b14d43ba6b14513a08932eccb979322f3cc33c0a5042"
+    },
+    "card": {
+      "path": "energyplus_porting_plan/cards/CLK-06.md",
+      "sha256": "395cff7b7f148e2140be868b4fb667fd4334a67187602a43bc76b3c340a333a1"
+    }
+  },
+  "artifacts": {
+    "closure-source-review": {
+      "path": ".runtime/porting/CLK-06/independent-closure-writer-source-review-03/review.json",
+      "sha256": "b5ad34f8d79872edc5440b401370d0ef5cee1f24cb42b2ca30e3b7565bc6c03d"
+    },
+    "closure-source-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-closure-writer-source-review-command-03/receipt.json",
+      "sha256": "64f0fdfebbb46b91b482d98e4a593f06efde919ed92f82dd6e588c4b1a9dda3d"
+    },
+    "source-mapping": {
+      "path": ".runtime/porting/CLK-06/root-approved-completion-01/source-mapping.json",
+      "sha256": "ae6027b3594f07852b4f896b2c886078ed61aabe32f8249f96fe8e8f71d44033"
+    },
+    "card-notes": {
+      "path": ".runtime/porting/CLK-06/root-approved-completion-01/card-notes.md",
+      "sha256": "1a3439a428fbb6a1002110f0989e6656854715beb68d0ceccab1f6d66d4075ac"
+    },
+    "unit-comparison": {
+      "path": ".runtime/porting/CLK-06/candidate-unit-comparison-01/unit-comparison.json",
+      "sha256": "50da815d739269907fde1cec18f775aa21018b0aa5b5fc3bc09bf258fb7404d3"
+    },
+    "unit-execution": {
+      "path": ".runtime/porting/CLK-06/candidate-unit-comparison-command-01/receipt.json",
+      "sha256": "d017f971d60cc9158b96da3b45f63d88bfe768b731a7a58dce76a257d4d81b74"
+    },
+    "unit-result-review": {
+      "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-01/review.json",
+      "sha256": "04da992e1a8e34bc64e6d1f8fdd736b19dd7196794ddd3df9198f39e3443ab85"
+    },
+    "unit-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-candidate-unit-result-review-command-01/receipt.json",
+      "sha256": "3f2f5206265509e0538c5717eb5aff4851d430b6570ac194e2a63ae945290835"
+    },
+    "production-comparison": {
+      "path": ".runtime/porting/CLK-06/production-comparison-02/production-comparison.json",
+      "sha256": "4e5c1f7b21b2933eea27af25f03489c4077c3b2cc65980d25e4cc52780821625"
+    },
+    "production-execution": {
+      "path": ".runtime/porting/CLK-06/production-comparison-command-02/receipt.json",
+      "sha256": "127b4c3fc3a2f8e3b23640bbf5d8ea29a7fb3b04d8358f2799e4384ac2affb83"
+    },
+    "production-result-review": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-03/review.json",
+      "sha256": "b693cd52c73cd0ac475da19a50458b15e7004cce22119e2c9c41479898125b3a"
+    },
+    "production-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-command-03/receipt.json",
+      "sha256": "528140cd8c207fca28ce10355619e9d4c0a0c7418280d29ef041887b1441b845"
+    },
+    "scope-amendment": {
+      "path": ".runtime/porting/CLK-06/scope-amendment-01/amendment.json",
+      "sha256": "6d5a2816a14c2441c38140bed4b7d0a28cd358c6b940e7505a240f78a39f6184"
+    },
+    "scope-amendment-execution": {
+      "path": ".runtime/porting/CLK-06/scope-amendment-command-01/receipt.json",
+      "sha256": "e0f6d14395694dc380de3852d716d6bae6f867e7b3104cb90785fe5310eea86b"
+    },
+    "original-data-review": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+      "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+    },
+    "original-data-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-command-02/receipt.json",
+      "sha256": "29e648e600a070e80b19f08f9f1f39a1a72f72da818a3eb5674f8f01e8ce8884"
+    },
+    "original-reference": {
+      "path": ".runtime/porting/CLK-06/original-execution-01/helper-reference.json",
+      "sha256": "c3b82a378092aeaa56652b34d0d4f84cc0977368df8884b2a6f1c3c1c6cfc174"
+    },
+    "original-execution": {
+      "path": ".runtime/porting/CLK-06/original-execution-command-01/receipt.json",
+      "sha256": "177a5a22f3265c69ade12957745e0b4f258abc6c0f0974470dc07399060ba526"
+    },
+    "legacy-gap": {
+      "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+      "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+    },
+    "legacy-gap-execution": {
+      "path": ".runtime/porting/CLK-06/existing-baseline-gap-command-01/receipt.json",
+      "sha256": "bb86b0233042f77444884e18594903cc37ccd1bb658cbb7536d28be0c12d2b98"
+    },
+    "frozen-source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "frozen-native-admission": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+      "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+    },
+    "frozen-cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "frozen-helper-request": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+      "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+    },
+    "frozen-tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    },
+    "frozen-observation-projection": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+      "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+    },
+    "archive-writer": {
+      "path": ".runtime/porting/CLK-06/archive-prep-02/archive_selected.py",
+      "sha256": "e2f2522db370394243c033df92d095aea49316a62d43be9ec3c5f13c267edfdf"
+    },
+    "archive-verifier": {
+      "path": ".runtime/porting/CLK-06/archive-prep-02/verify_archive.py",
+      "sha256": "f9ce8b34d1243aa5a56275430cc165bef13fa5a5ec345f030b8016ea2a167528"
+    },
+    "final-workspace-execution": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-03/receipt.json",
+      "sha256": "90d51a4b7f7a270eddd7a940cb375063f95e3329b06e7ba0d83a92a9565588fc"
+    },
+    "final-clippy-execution": {
+      "path": ".runtime/porting/CLK-06/clippy-command-02/receipt.json",
+      "sha256": "278443659d8629ca7210afaeb113d523666788895cbc13a89bfa6101013c6ddc"
+    },
+    "final-format-execution": {
+      "path": ".runtime/porting/CLK-06/final-format-check-command-03/receipt.json",
+      "sha256": "12eec5fa9e40598118cf8fb979aafea6fe59d134eaf726f497ea9685568af7f7"
+    },
+    "final-source-quality-execution": {
+      "path": ".runtime/porting/CLK-06/source-quality-command-05/receipt.json",
+      "sha256": "12329c4c876bb6a877e9521a9ccd3bc1bb5a0dc8c5a408af088a48ecfc1c485a"
+    },
+    "final-structure-execution": {
+      "path": ".runtime/porting/CLK-06/structure-quality-command-04/receipt.json",
+      "sha256": "5ba52c4f86dc821e87e0d4e0a1ef80d1d0d2addf0e73966b7a9e864c45989f42"
+    }
+  },
+  "final_format_paths": [
+    "crates/ep_run/src/clk06_sky_trace.rs",
+    "crates/ep_run/src/lib.rs",
+    "crates/ep_run/src/pipeline.rs",
+    "crates/ep_runtime/examples/clk06_candidate_probe.rs",
+    "crates/ep_runtime/examples/clk06_candidate_support/fields.rs",
+    "crates/ep_runtime/examples/clk06_candidate_support/inputs.rs",
+    "crates/ep_runtime/examples/clk06_candidate_support/observe.rs",
+    "crates/ep_runtime/examples/clk06_candidate_support/seeds.rs",
+    "crates/ep_runtime/examples/clk06_existing_observer.rs",
+    "crates/ep_runtime/examples/clk06_existing_support/fields.rs",
+    "crates/ep_runtime/examples/clk06_existing_support/inputs.rs",
+    "crates/ep_runtime/examples/clk06_existing_support/observe.rs",
+    "crates/ep_runtime/examples/clk06_existing_support/seeds.rs",
+    "crates/ep_runtime/src/heat_balance/reports.rs",
+    "crates/ep_runtime/src/heat_balance/run_period.rs",
+    "crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs",
+    "crates/ep_runtime/src/heat_balance/surface_balance.rs",
+    "crates/ep_runtime/src/heat_balance/trace.rs",
+    "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+    "crates/ep_runtime/src/ideal_loads/coupled_runtime_tests_weather_day.rs",
+    "crates/ep_runtime/src/runtime.rs",
+    "crates/ep_runtime/src/runtime/tests/part06.rs",
+    "crates/ep_runtime/src/runtime/tests/production_weather.rs",
+    "crates/ep_runtime/src/weather_day/hourly.rs",
+    "crates/ep_runtime/src/weather_day/mod.rs",
+    "crates/ep_runtime/src/weather_day/producer.rs",
+    "crates/ep_runtime/src/weather_day/production.rs",
+    "crates/ep_runtime/src/weather_day/production_trace.rs",
+    "crates/ep_runtime/src/weather_day/sky.rs",
+    "crates/ep_runtime/src/weather_day/sky_transport_trace.rs",
+    "crates/ep_runtime/src/weather_day/solar.rs"
+  ],
+  "preserved_failures": {
+    "weather-filter-execution": {
+      "path": ".runtime/porting/CLK-06/weather-day-tests-command-01/receipt.json",
+      "sha256": "85486269127da4b682d2cc14b6b3b81196b9d0a5dcec2b3ba8e3d61359c27a34"
+    },
+    "structure-execution": {
+      "path": ".runtime/porting/CLK-06/structure-quality-command-01/receipt.json",
+      "sha256": "42a0588ec754056da24ac22e71a1f159bb3903eeb156a58cabf713a18b41a79d"
+    },
+    "workspace-execution-01": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-01/receipt.json",
+      "sha256": "0763f4a058b4d0216e0f94790f60dde365acc44d53959094bca79647a713a068"
+    },
+    "workspace-execution-02": {
+      "path": ".runtime/porting/CLK-06/workspace-test-command-02/receipt.json",
+      "sha256": "5ba60ce2478b28e9755c715b65a70c377957d778e3905e6945760f02d5189e78"
+    },
+    "original-data-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-original-data-review-command-01/receipt.json",
+      "sha256": "9ed44731500044cd13d324435d96185fe3663e01050a6e56cf98430231e1b25a"
+    },
+    "comparer-source-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-comparer-source-review-command-01/receipt.json",
+      "sha256": "1351b5a09dee612be04cda1f2582130b8d01ee0f29119f8921101a1554d23b6e"
+    },
+    "frozen-contract-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-frozen-contract-review-command-01/receipt.json",
+      "sha256": "adc9d5d6481ed868e3d8c8ccb81711a49495db82bd7f94df6a492f1dbe83cd3b"
+    },
+    "production-comparison-execution": {
+      "path": ".runtime/porting/CLK-06/production-comparison-command-01/receipt.json",
+      "sha256": "45c116869f0958b03648ba110c1b0b9c4f93d6ef8f1e224eea439f53ee0339f3"
+    },
+    "production-result-review-execution": {
+      "path": ".runtime/porting/CLK-06/independent-production-result-review-command-02/receipt.json",
+      "sha256": "46a8e752210e847f3f267fee810a6ad9532bc977da2ff5664eef82ef2d3c2e6d"
+    }
+  },
+  "historical_unknowns": {
+    "source_quality_recorder_launch_race": {
+      "role": "source-quality-command-02-before-child-race",
+      "absent_receipt_path": ".runtime/porting/CLK-06/source-quality-command-02/receipt.json",
+      "receipt_available": false,
+      "child_execution_or_exit_proven": false,
+      "reported_cause": "FileExists before recorder child launch",
+      "outcome": "unknown-no-receipt"
+    }
+  },
+  "runtime_final_source_authority": "Use the genuine final CLI build/source snapshot and Root applied inventory supplied by the accepted production result QA. Applied04 is current source preparation metadata, not a future result or gate proof.",
+  "historical_source_preparation_applied_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-applied-04/inventory.json",
+    "sha256": "452b74fb9f5b868a2abafe300751bd4ef469239060bb8f7ce8ffb723a298076e"
+  },
+  "scientific_execution_performed": false,
+  "absent_failed_production_report_added": false,
+  "Root_approved_completed_scientific_and_quality_refs": true,
+  "Root_final_approved_after_actual_archive_and_verification": true
+}

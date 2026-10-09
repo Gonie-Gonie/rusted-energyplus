@@ -1,0 +1,429 @@
+"""Validate preserved Original provenance, intended calls and typed storage only."""
+import argparse
+from collections import Counter
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import stat
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[3]
+META = ROOT / '.runtime/porting/CLK-06/gate-review-prep-02/metadata.py'
+META_SHA = '02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526'
+SHAPE_SHA = '0be3f5ab9c56a87153b7b94b52de8d5bcf329563dfbf2932f4656e71534e7414'
+for source, digest in [(META, META_SHA), (HERE / 'shape.py', SHAPE_SHA)]:
+    if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+        raise ValueError('Own metadata/storage reader changed before import: ' + str(source))
+spec = importlib.util.spec_from_file_location('clk06_original_data_metadata', META)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+from shape import Shapes
+
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+LARGE_SEEN = {}
+HISTORICAL_CONTROL_REVIEW = {'path': '.runtime/porting/CLK-05/independent-control-input-review-01/review.json',
+    'sha256': '75a0975ed046dae492ca1b58ffba51c346f25038129ff37b88464ed7f673d45e'}
+HISTORICAL_CONTROL_EXECUTION = {'path': '.runtime/porting/CLK-05/independent-control-input-review-command-01/receipt.json',
+    'sha256': '96c6b93e6c04aa9044720a8440e97a8fc5004f59877f4fff81758670bb74a2d2'}
+HISTORICAL_CONTROL_READER = {'path': '.runtime/porting/CLK-05/control-input-review-prep-01/review_inputs.py',
+    'sha256': '07aef44be1fc507317ca0b3f10c19f94383934a2a032d51071945b2a0e29383e'}
+
+
+def identity(actual, declared, bytes_checked=True):
+    m.need(type(actual) is dict and type(declared) is dict and m.path(actual['path']) == m.path(declared['path'])
+           and actual['sha256'] == declared['sha256'], 'Contained path/hash binding differs')
+    for key in ['bytes', 'size_bytes']:
+        if key in actual:
+            m.need(type(actual[key]) is int, 'Actual optional size must be integer')
+        if key in declared:
+            m.need(type(declared[key]) is int, 'Declared optional size must be integer')
+    if bytes_checked:
+        m.verify(actual)
+        m.verify(declared)
+    else:
+        info = m.path(actual['path']).lstat()
+        m.need(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+               'Already PE-verified actual binary must remain a regular non-reparse file')
+        for owner in [actual, declared]:
+            for key in ['bytes', 'size_bytes']:
+                if key in owner:
+                    m.need(owner[key] == info.st_size, 'Already PE-verified actual binary size differs')
+
+
+def result_ref(value, expected, digest=None):
+    # Only the exact wrapper/result pair may exceed bounded metadata limits.
+    item = m.path(value)
+    info = item.lstat()
+    m.need(item == expected and stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+           'Exact regular preserved Original wrapper/result required')
+    with item.open('rb') as stream:
+        actual = hashlib.file_digest(stream, 'sha256').hexdigest()
+    m.need(digest is None or actual == digest, 'Preserved Original bytes differ')
+    m.need(item not in LARGE_SEEN or LARGE_SEEN[item] == actual, 'Previously consumed Original bytes changed')
+    LARGE_SEEN[item] = actual
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': actual}
+
+
+def result_read(binding, expected):
+    item = m.path(binding['path'])
+    info = item.lstat()
+    m.need(type(binding['sha256']) is str, 'Preserved result hash must be typed')
+    result_ref(item, expected, binding['sha256'])
+    for key in ['bytes', 'size_bytes']:
+        if key in binding:
+            m.need(type(binding[key]) is int and info.st_size == binding[key], 'Preserved result size differs')
+    def pairs(rows):
+        value = {}
+        for key, child in rows:
+            m.need(key not in value, 'Duplicate result JSON key')
+            value[key] = child
+        return value
+    with item.open(encoding='utf8') as stream:
+        return json.load(stream, object_pairs_hook=pairs,
+            parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonstandard result JSON ' + token)))
+
+
+def ledger(item, kind, calls, statuses):
+    invoked, outcome = item['actual_source_invoked'], item['call_outcome']
+    status = outcome['status']
+    m.need(type(invoked) is bool and status in ['source_returned', 'source_fatal', 'not-invoked-after-prior-source-outcome']
+           and invoked is (status != 'not-invoked-after-prior-source-outcome')
+           and outcome['source_fatal'] is (True if status == 'source_fatal' else False if invoked else None),
+           'Actual invocation/fatal/skipped outcome types differ')
+    statuses[status] += 1
+    if invoked:
+        calls[kind] += 1
+    m.need(invoked and status == 'source_returned', 'Intended Original source call unavailable/fatal/skipped; Rust admission held')
+
+
+def original(args, started):
+    reference_path = m.path(args.reference)
+    m.need(reference_path.is_relative_to(m.BASE) and reference_path.name == 'helper-reference.json', 'Contained genuine Original reference path required')
+    reference_ref = result_ref(reference_path, reference_path)
+    reference = result_read(reference_ref, reference_path)
+    m.need(reference['schema'] == 'clk06-original-reference.v1' and reference['energyplus_commit'] == PIN
+           and reference['status'] == 'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review'
+           and type(reference['actual_helper_exit_code']) is type(reference['actual_launcher_exit_code']) is int
+           and reference['actual_helper_exit_code'] == reference['actual_launcher_exit_code'] == 0
+           and reference['preservation_checks_passed'] is True, 'Actual successful preserved C6 wrapper required')
+    for flag in ['Rust_executed', 'Rust_compared', 'gates_updated', 'builds_or_Git_executed', 'source_expected_answers_supplied',
+                 'expected_values_supplied', 'expected_exits_supplied', 'deletion_performed', 'full_linked_original_copied',
+                 'whole_ground_water_current_solar_night_and_SRC04_physics_paired', 'native_current_sky_globals_paired',
+                 'SkyTempKelvin_cross_engine_profile_admitted', 'private_hourly_ESky_or_branch_locals_observed',
+                 'prior_actual_failure_relabelled_PASS', 'scientific_certification_passed', 'numerical_PASS_claimed']:
+        m.need(reference[flag] is False, 'Honest Original scope differs: ' + flag)
+    m.need(reference['numerical_comparison_count'] is None and reference['numerical_mismatch_count'] is None,
+           'Original wrapper is not a numerical comparison')
+    outer_ref, outer = m.recorded(args.execution, {'reference': reference_ref, 'status': reference['status'],
+        'actual_helper_exit_code': 0, 'actual_launcher_exit_code': 0}, started)
+    m.need(m.instant(outer['started_utc']) <= m.instant(reference['started_utc']) <= m.instant(reference['finished_utc'])
+           <= m.instant(outer['finished_utc']) and Path(reference['actual_launcher_cwd']).resolve() == ROOT,
+           'Actual preserved wrapper UTC/cwd differs')
+    m.archives(reference['executed_source_archives'])
+    m.archives(reference['input_archives'])
+    launcher = reference['executed_launcher']
+    identity(launcher['archive'], next(row['archive'] for row in reference['executed_source_archives']
+             if m.path(row['historical_path']) == m.path(launcher['historical_path'])))
+    m.script(outer, launcher['archive'])
+    actual_argv = reference['actual_launcher_argv']
+    m.need(type(actual_argv) is list and actual_argv[1:] == outer['command'][1:]
+           and Path(actual_argv[0]).name.lower() in ['python', 'python.exe', 'python3', 'python3.exe'],
+           'Actual wrapper immediate Python argument tail differs')
+    build_ref = reference['native_driver_build']
+    build = m.read(build_ref)
+    m.need(build['schema'] == 'clk06-native-driver-build.v1' and build['checks_passed'] is True
+           and build['source_commit'] == PIN and build['target'] == 'clk06_reference_helper', 'Actual genuine C6 build required')
+    m.recorded(reference['actual_build_execution'], {'driver_build': build_ref, 'checks_passed': True,
+        'helper_binary': build['helper_binary']}, reference['started_utc'])
+    _, _, peer = m.review(reference['independent_actual_build_review']['path'], reference['independent_actual_build_review_execution']['path'],
+        'clk06-independent-native-build-review.v1', 'pass-build-and-derivative-before-original-execution', reference['started_utc'])
+    identity(peer['reviewed_build'], build_ref)
+    identity(peer['actual_build_command'], reference['actual_build_execution'])
+    m.need(m.exact(peer['reviewed_source_archives'], build['executed_source_archives']), 'Actual independent build source inventory differs')
+    m.verify(peer['actual_independent_PE_validation'])
+    _, _, contract = m.review(build['independent_contract_review']['path'], build['reviewed_source_executions']['contract_review']['path'],
+        'clk06-independent-frozen-contract-review.v1', 'pass-frozen-input-source-policy-before-native-build', build['started_utc'])
+    for key, execution_key, schema, status in [
+        ('independent_helper_static_review', 'helper_static_review', 'clk06-independent-preexecution-source-review.v1', 'pass-source-input-policy-before-freeze'),
+        ('independent_builder_static_review', 'builder_review', 'clk06-independent-native-builder-static-review.v1', 'pass-source-and-contract-before-native-build')]:
+        m.review(build[key]['path'], build['reviewed_source_executions'][execution_key]['path'], schema, status, build['started_utc'])
+    _, _, launch = m.review(reference['independent_launcher_source_review']['path'], reference['independent_launcher_source_review_execution']['path'],
+        'clk06-independent-original-launcher-static-review.v1', 'pass-source-and-input-contract-before-original-execution', reference['started_utc'])
+    m.archives(launch['reviewed_sources'])
+    identity(launch['reviewed_contract_review'], build['independent_contract_review'])
+    for actual, expected in [('actual_request', 'helper_request'), ('native_admission_contract', 'native_admission_contract'),
+                             ('observation_projection', 'projection'), ('fixed_scope', 'fixed_scope'),
+                             ('root_preoutput_decision', 'root_preoutput_decision'), ('actual_scope_amendment', 'actual_scope_amendment'),
+                             ('actual_scope_amendment_execution', 'actual_scope_amendment_execution')]:
+        identity(reference[actual], build[expected])
+    identity(reference['executed_helper'], build['helper_binary'], bytes_checked=False)
+    m.need(m.exact(reference['contracts'], build['contracts']) and m.exact(contract['reviewed_contracts'], build['contracts']),
+           'Actual declared contract inventory differs')
+    child = m.read(reference['execution'])
+    m.need(child['schema'] == 'clk06-original-native-command.v1' and type(child['exit_code']) is int and child['exit_code'] == 0
+           and child['spawn_error'] is None and Path(child['cwd']).resolve() == ROOT, 'Actual genuine native child0 required')
+    for actual, expected in [('binary', 'executed_helper'), ('request', 'actual_request'), ('native_admission_contract', 'native_admission_contract'),
+                             ('observation_projection', 'observation_projection'), ('native_driver_build', 'native_driver_build')]:
+        identity(child[actual], reference[expected], bytes_checked=actual != 'binary')
+    m.verify(child['stdout'])
+    m.verify(child['stderr'])
+    result_path = m.path(reference['results']['path'])
+    m.need(result_path == m.path(reference_ref['path']).parent / 'native-output/clk06-helper-results.json', 'Actual fresh result path differs')
+    command = child['command']
+    wanted = [reference['executed_helper']['path'], str(ROOT), reference['actual_request']['path'],
+              reference['native_admission_contract']['path'], str(result_path.parent)]
+    m.need(type(command) is list and len(command) == 5 and all(type(value) is str for value in command), 'Actual native argc5 required')
+    for index, (actual, expected) in enumerate(zip(command, wanted, strict=True)):
+        m.need(Path(actual).resolve() == ROOT if index == 1 else m.path(actual) == m.path(expected), 'Actual native argument identity differs')
+    m.need(m.instant(reference['started_utc']) <= m.instant(child['started_utc']) <= m.instant(child['finished_utc'])
+           <= m.instant(reference['finished_utc']) and m.instant(build['finished_utc']) <= m.instant(peer['review_started_utc'])
+           <= m.instant(peer['review_completed_utc']) <= m.instant(child['started_utc']), 'Actual build/PE/wrapper/child chronology differs')
+    guards = reference['preservation_observations']
+    m.need(set(guards) == {'before_execution', 'after_execution'}, 'Actual successful before/after guards required')
+    before, after = guards['before_execution'], guards['after_execution']
+    m.need(m.exact({k: v for k, v in before.items() if k != 'observed_utc'},
+                   {k: v for k, v in after.items() if k != 'observed_utc'}), 'Preserved source/input/runtime guards differ')
+    for guard in [before, after]:
+        m.need(guard['protected_and_retained_count'] == 21 and guard['historical_compile_rows_checked'] == 659
+               and guard['frozen_core_rows_checked'] == 643 and guard['runtime_publisher_bytes_unchanged'] is True
+               and guard['archived_build_sources_unchanged'] is True and guard['retired_successful_originals_actual_absence_verified'] is True,
+               'Actual preservation scope differs')
+    return reference_ref, outer_ref, reference, build, child, result_path
+
+
+def actual_context(reference, request, build):
+    pair = build['production_control_review']
+    m.need(m.exact(pair, reference['production_control_review']), 'Actual captured-control bundle differs')
+    review = m.read(pair['review'])
+    m.need(review['schema'] in ['clk05-independent-production-control-input-review.v1', 'clk06-independent-production-control-input-review.v1']
+           and review['status'] == 'pass-input-registration-and-captured-environment-before-original'
+           and review['scientific_execution_performed'] is False, 'Actual control registration review required')
+    _, record = m.recorded(pair['execution']['path'], review, reference['started_utc'])
+    m.need(m.instant(record['started_utc']) <= m.instant(review['review_started_utc']) <= m.instant(review['review_completed_utc'])
+           <= m.instant(record['finished_utc']), 'Actual control review UTC differs')
+    if review['schema'].startswith('clk05-'):
+        identity(pair['review'], HISTORICAL_CONTROL_REVIEW)
+        identity(pair['execution'], HISTORICAL_CONTROL_EXECUTION)
+        m.need('executed_reader_source_archive' not in review and review['numerical_comparison_count'] is None
+               and review['numerical_mismatch_count'] is None and review['numerical_PASS_claimed'] is False,
+               'Genuine older control archive limitation/null counts differ')
+        tail = m.script(record, HISTORICAL_CONTROL_READER)
+        m.need(tail == [HISTORICAL_CONTROL_READER['path'], '--control-inputs', review['reviewed_control_inputs']['path'],
+            '--capture-execution', review['reviewed_capture_execution']['path'], '--output-dir',
+            m.path(HISTORICAL_CONTROL_REVIEW['path']).parent.relative_to(ROOT).as_posix()], 'Actual historical control arguments differ')
+        provenance = pair['reviewer_source_provenance']
+        m.need(provenance['historical_report_has_executed_reader_archive'] is False
+               and provenance['current_source_is_a_retroactive_executed_archive'] is False
+               and provenance['historical_report_or_receipt_rewritten'] is False, 'Historical evidence limitation differs')
+        identity(provenance['current_pinned_historical_reader_source'], HISTORICAL_CONTROL_READER)
+    else:
+        m.script(record, review['executed_reader_source_archive'])
+    identity(review['reviewed_control_inputs'], request['production_control_inputs'])
+    capture = m.read(request['production_control_inputs'])
+    env = reference['actual_child_environment_inputs']
+    m.need(set(env) == {'IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation'}, 'Exactly three ENV inputs required')
+    for item in env.values():
+        m.need(set(item) == {'present', 'raw_value'} and type(item['present']) is bool and type(item['raw_value']) is str
+               and (item['present'] or item['raw_value'] == ''), 'Typed actual ENV presence/raw strings differ')
+    for row in capture['cases']:
+        m.need(m.exact(row['captured_environment_inputs'], env), 'Actual ENV differs from frozen captured context')
+    for owner in [reference, m.read(reference['execution'])]:
+        for key in ['actual_parent_environment_before_child', 'actual_parent_environment_after_child',
+                    'actual_child_input_environment_recaptured_after_child', 'actual_child_environment_inputs']:
+            m.need(m.exact(owner[key], env), 'Actual before/after external input context differs')
+        m.need(owner['external_input_context_preserved_before_and_after_child'] is True
+               and owner['terminated_native_process_internal_environment_observed'] is False, 'External/internal ENV availability differs')
+    return pair
+
+
+def input_context(snapshot, supplied):
+    m.need(m.exact(snapshot['clk06_observation']['caller_controls'], supplied['solar_controls']), 'Four declared controls not stored before read')
+    for group, fields in supplied.get('caller_owned_seed', {}).items():
+        for name, value in fields.items():
+            stored = snapshot[group][name]
+            m.need(stored['value_bits'] == value['bits'] if type(value) is dict else m.exact(stored, value), 'Literal caller-owned seed transport differs')
+    if 'stored_interpolation_override' in supplied:
+        m.need([row['value_bits'] for row in snapshot['Interpolation']] == [row['bits'] for row in supplied['stored_interpolation_override']],
+               'Literal stored linear interpolation override transport differs')
+
+
+def default_environment(snapshot, selected):
+    observed = snapshot['clk06_observation']['actual_sky_environment']
+    role = observed['selected_environment' if selected else 'resolved_candidate_before_GetNext']
+    m.need(observed['NumWPSkyTemperatures'] == 0 and role is not None, 'Genuine admitted default environment unavailable')
+    value = role['value']
+    m.need(type(value['WP_Type1']) is type(value['skyTempModel']) is int and value['WP_Type1'] == value['skyTempModel'] == 0
+           and value['UseWeatherFileHorizontalIR'] is True, 'Actual prepared/selected model differs from admitted ClarkAllen/useIRtrue')
+    if selected:
+        m.need(role['index'] == observed['Envrn'] > 0, 'Actual selected environment identity differs')
+
+
+def data(reference, build, result_path):
+    request = m.read(reference['actual_request'])
+    native = m.read(reference['native_admission_contract'])
+    result = result_read(reference['results'], result_path)
+    m.need(result['schema'] == 'clk06-helper-results.v1' and result['energyplus_commit'] == PIN and result['complete'] is True,
+           'Complete genuine Original result required')
+    counts = {'setup_cases': len(request['setup_cases']), 'emissivity_cases': len(request['emissivity_cases']),
+        'weather_sequences': len(request['weather_sequences']), 'CalcSkyEmissivity': len(request['emissivity_cases']),
+        'GetNextEnvironment': 0, 'InitializeWeather': 0, 'SetCurrentWeather': 0, 'calcSky': 0, 'weather_operations': 0,
+        'total_operations': len(request['setup_cases']) + len(request['emissivity_cases'])}
+    for sequence in request['weather_sequences']:
+        for item in sequence['operations']:
+            m.need(item['kind'] in ['GetNextEnvironment', 'InitializeWeather', 'SetCurrentWeather', 'calcSky'], 'Declared kind outside frozen history')
+            for key in [item['kind'], 'weather_operations', 'total_operations']:
+                counts[key] += 1
+    for owner in [request, native, reference, result, build]:
+        m.need(m.exact(owner['requested_counts'], counts), 'Dynamically derived frozen counts differ')
+    for actual, expected in [('actual_request', 'actual_request'), ('native_admission_contract', 'native_admission_contract'),
+                             ('observation_projection', 'observation_projection'), ('actual_binary', 'executed_helper')]:
+        identity(result[actual], reference[expected], bytes_checked=actual != 'actual_binary')
+    m.need(set(result['contracts']) == set(reference['contracts']), 'Exact result contract key inventory required')
+    for name, binding in result['contracts'].items():
+        identity(binding, reference['contracts'][name])
+    for flag in ['scientific_comparison_performed', 'expected_values_supplied', 'expected_exits_supplied',
+                 'full_simulation_or_selected_scope_PASS_claimed', 'native_current_sky_globals_paired',
+                 'SkyTempKelvin_cross_engine_profile_admitted', 'native_internal_record_index_observed', 'gates_updated']:
+        m.need(result[flag] is False, 'Actual source result scope differs: ' + flag)
+    identity(result['root_preoutput_decision'], request['root_preoutput_decision'])
+    shapes = Shapes(m.need, m.exact)
+    calls, statuses, coverage = Counter(), Counter(), []
+    for group, kind in [('setup_cases', 'SetupInterpolationValues'), ('emissivity_cases', 'CalcSkyEmissivity')]:
+        m.need(len(result[group]) == len(request[group]), 'Actual direct case cardinality differs')
+        for actual, supplied in zip(result[group], request[group], strict=True):
+            m.need(actual['id'] == supplied['id'] and actual['kind'] == kind and m.exact(actual['requested_operation'], supplied),
+                   'Actual direct input/order differs')
+            ledger(actual, kind, calls, statuses)
+            steps = supplied['time_steps_per_hour'] if group == 'setup_cases' else None
+            for phase in ['before', 'after']:
+                shapes.snapshot(actual[phase], steps)
+            if group == 'setup_cases':
+                m.need(actual['TimeStepFraction_descriptor_applied_to_weather_owner'] is False, 'Pure Setup fraction write fabricated')
+                for name in ['Interpolation', 'SolarInterpolation']:
+                    m.need(actual['after'][name + '_allocated'] is True and len(actual['after'][name]) == steps, 'Pure Setup storage unavailable')
+                m.need(m.exact(actual['before']['weather']['TimeStepFraction'], actual['after']['weather']['TimeStepFraction']),
+                       'Pure Setup fraction owner changed unexpectedly')
+            else:
+                m.need(actual['actual_whole_public_return_invoked'] is True and actual['private_hourly_ESky_observed'] is False
+                       and actual['actual_return_available'] is True, 'Genuine public emissivity return unavailable')
+                shapes.scalar(actual['actual_return'])
+    m.need(len(result['weather_sequences']) == len(request['weather_sequences']), 'Actual sequence cardinality differs')
+    for actual, supplied in zip(result['weather_sequences'], request['weather_sequences'], strict=True):
+        m.need(actual['id'] == supplied['id'] and actual['lane'] == supplied['lane']
+               and len(actual['operations']) == len(supplied['operations']), 'Actual sequence/order/cardinality differs')
+        identity(actual['input'], supplied['input'])
+        identity(actual['weather_input'], supplied['weather'])
+        for a, b in [('declared_run_period_input', 'run_period'), ('declared_native_preparation', 'native_preparation'), ('declared_solar_controls', 'solar_controls')]:
+            m.need(m.exact(actual[a], supplied[b]), 'Actual literal sequence declaration differs')
+        steps = supplied['time_steps_per_hour']
+        for phase in ['constructor', 'after_constant_initialization']:
+            shapes.snapshot(actual[phase], legacy=True)
+        for phase in ['actual_clk06_before_preparation', 'allocated_defaults', 'prepared', 'before_caller_context', 'after_caller_context', 'final_state']:
+            shapes.snapshot(actual[phase], steps)
+        preparation = actual['preparation_calls']
+        m.need(len(preparation) == len(supplied['native_preparation']['genuine_calls']) == 8
+               and [row['kind'] for row in preparation] == supplied['native_preparation']['genuine_calls'], 'Genuine preparation8 order incomplete')
+        for row in preparation:
+            m.need(row['call_outcome']['status'] == 'source_returned' and row['call_outcome']['source_fatal'] is False, 'Intended genuine preparation did not return')
+            for phase in ['before', 'after']:
+                shapes.snapshot(row[phase], steps)
+        default_environment(actual['prepared'], selected=False)
+        m.need(actual['declared_caller_context_applied'] is True, 'Declared literal context was not applied')
+        input_context(actual['after_caller_context'], supplied)
+        for got, want in zip(actual['operations'], supplied['operations'], strict=True):
+            m.need(got['id'] == want['id'] and got['kind'] == want['kind'] and m.exact(got['requested_operation'], want), 'Actual direct operation input/order differs')
+            incoming, caller = got['before_caller']['global'], want['caller']
+            day, env = caller.get('BeginDayFlag', incoming['BeginDayFlag']), caller.get('BeginEnvrnFlag', incoming['BeginEnvrnFlag'])
+            m.need(type(day) is type(env) is bool, 'Typed effective caller flags required')
+            full = want['kind'] == 'GetNextEnvironment' or (want['kind'] == 'InitializeWeather' and (day or env))
+            m.need(got['full_sky_grid_observation_declared'] is full, 'Frozen full/compact observation mask differs')
+            for phase in ['before_caller', 'before', 'after']:
+                shapes.snapshot(got[phase], steps, full)
+            ledger(got, want['kind'], calls, statuses)
+            m.need(got['Available'] is True and got['ErrorsFound'] is False
+                   and all(m.exact(got['before']['global'][key], value) for key, value in caller.items()), 'Intended source availability/errors/caller transport differs')
+            m.need(got['returned_bool'] is True if want['kind'] == 'GetNextEnvironment' else got['returned_bool'] is None,
+                   'Actual genuine returned-bool availability differs')
+            default_environment(got['after'], selected=True)
+            if want['kind'] == 'calcSky':
+                for phase in ['formal_outputs_before', 'formal_outputs_after']:
+                    m.need(set(got[phase]) == {'HorizIRSky', 'SkyTemp'}, 'Two formal calcSky outputs required')
+                    for scalar in got[phase].values():
+                        shapes.scalar(scalar)
+                m.need(all(got['formal_outputs_before'][name]['value_bits'] == value['bits']
+                       for name, value in want['output_initial_values'].items()), 'Literal formal-output input canary transport differs')
+        coverage.append({'sequence_id': actual['id'], 'lane': actual['lane'], 'requested_operations': len(supplied['operations']),
+            'actual_returned_operations': len(actual['operations']), 'actual_preparation_returned': 8,
+            'caller_context_applied': True, 'intended_branch_covered': True})
+    fact = {'actual_operation_invocations': sum(calls.values()), 'actual_operations_skipped': statuses['not-invoked-after-prior-source-outcome'],
+        'actual_source_function_counts': dict(calls), 'actual_source_status_counts': dict(statuses)}
+    expected_calls = {'SetupInterpolationValues': counts['setup_cases'], 'CalcSkyEmissivity': counts['emissivity_cases'],
+        **{key: counts[key] for key in ['GetNextEnvironment', 'InitializeWeather', 'SetCurrentWeather', 'calcSky']}}
+    m.need(m.exact(dict(calls), expected_calls) and m.exact(dict(statuses), {'source_returned': counts['total_operations']}),
+           'Intended dynamically derived source history not fully returned; Rust admission held')
+    for key, value in fact.items():
+        m.need(m.exact(result[key], value) and m.exact(reference['actual_source_outcomes'][key], value), 'Actual source ledger transcription differs')
+    return request, counts, fact, coverage, shapes
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['reference', 'execution', 'output-dir']:
+        parser.add_argument('--' + key, required=True)
+    args = parser.parse_args()
+    m.need(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+    started = m.utc()
+    m.ref(__file__)
+    m.ref(META, META_SHA)
+    m.ref(HERE / 'shape.py', SHAPE_SHA)
+    out = m.path(args.output_dir, exists=False)
+    m.need(out.is_relative_to(m.BASE) and out != m.BASE and not out.exists(), 'Fresh ignored data review output required')
+    reference_ref, outer_ref, reference, build, child, result_path = original(args, started)
+    request, counts, fact, coverage, shapes = data(reference, build, result_path)
+    control = actual_context(reference, request, build)
+    m.finish()
+    for item, digest in LARGE_SEEN.items():
+        with item.open('rb') as stream:
+            m.need(hashlib.file_digest(stream, 'sha256').hexdigest() == digest, 'Preserved native result changed during review')
+    out.mkdir(parents=True)
+    rows = []
+    for index, source in enumerate([Path(__file__), META, HERE / 'shape.py']):
+        target = out / (f'{index:02d}-' + source.name)
+        with target.open('xb') as stream:
+            stream.write(source.read_bytes())
+        rows.append({'historical_path': source.relative_to(ROOT).as_posix(), 'archive': m.ref(target)})
+    report = {'schema': 'clk06-independent-original-data-review.v1', 'status': 'pass-preserved-original-data-before-Rust-baseline',
+        'review_started_utc': started, 'reviewed_reference': reference_ref, 'reviewed_results': reference['results'], 'reviewed_execution': outer_ref,
+        'reviewed_native_execution': reference['execution'], 'reviewed_request': reference['actual_request'],
+        'reviewed_native_admission_contract': reference['native_admission_contract'], 'reviewed_projection': reference['observation_projection'],
+        'reviewed_contracts': reference['contracts'], 'reviewed_build': reference['native_driver_build'], 'reviewed_build_execution': reference['actual_build_execution'],
+        'reviewed_build_review': reference['independent_actual_build_review'], 'reviewed_build_review_execution': reference['independent_actual_build_review_execution'],
+        'reviewed_contract_review': build['independent_contract_review'], 'reviewed_control_review': control,
+        'reviewed_root_preoutput_decision': reference['root_preoutput_decision'], 'reviewed_scope_amendment': reference['actual_scope_amendment'],
+        'reviewed_scope_amendment_execution': reference['actual_scope_amendment_execution'], 'requested_counts': counts, **fact,
+        'intended_native_branch_coverage_complete': True, 'intended_native_branch_coverage': coverage,
+        'actual_typed_validation_visits': dict(shapes.counts), 'actual_scalar_class_validation_visits': dict(shapes.classes),
+        'actual_helper_exit_code': 0, 'actual_launcher_exit_code': 0, 'future_Rust_execution_or_comparison_performed': False,
+        'source_unavailable_counted_as_PASS': False, 'scientific_values_compared': False, 'scientific_execution_performed': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None, 'numerical_PASS_claimed': False, 'gates_updated': False,
+        'whole_original_inventory_or_engine_binary_rehashed_by_reader': False, 'recorded_original_preservation_before_after_verified': True,
+        'future_child_ENV_proved_by_prior_capture': False, 'actual_launch_external_ENV_recapture_verified': True,
+        'terminated_native_process_internal_ENV_observed': False, 'child_Python_executable_identity_inferred_from_alias': False,
+        'reviewed_reader_sources': rows, 'executed_reader_source_archive': rows[0]['archive'],
+        'executed_metadata_source_archive': rows[1]['archive'], 'executed_shape_source_archive': rows[2]['archive'],
+        'verifier_author': '/root/clk02_header_port',
+        'authorship_limits': 'Header authored this factual metadata/storage reader and earlier builder/native/producer/scope/transport work. Raw authored new C6 helper and launcher. Own earlier scientific algorithms are not independently self-certified; Root and other-author source peers and actual recorder identify their separate review/execution roles.',
+        'scope_limits': 'Real public ESky return/formal calcSky outputs/sky4 storage/full17 caches/all19 counts and complete declared source history are typed and authenticated, without numerical expected values. Current5/private hourly locals/alternative sky models/SRC08 physical formulas remain unpaired.'}
+    report['review_completed_utc'] = m.utc()
+    with (out / 'review.json').open('x', encoding='utf8', newline='\n') as stream:
+        json.dump(report, stream, indent=2, ensure_ascii=True, allow_nan=False)
+        stream.write('\n')
+    m.finish()
+    print(json.dumps(report, ensure_ascii=True, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

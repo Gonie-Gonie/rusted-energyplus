@@ -1,0 +1,73 @@
+{
+  "schema": "clk06-root-implementation-release.v1",
+  "authored_utc": "2026-10-09T07:15:05.024226+00:00",
+  "author": "/root",
+  "status": "bounded-sky-math-and-passive-transport-source-preparation-released",
+  "Original_data_QA": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-02/review.json",
+    "sha256": "fe9d5b0fb9813c88cc1363f2c308bc35a34b5d4e6bc76a49bd8c30b4ba0f69de"
+  },
+  "Original_data_QA_execution": {
+    "path": ".runtime/porting/CLK-06/independent-original-data-review-command-02/receipt.json",
+    "sha256": "29e648e600a070e80b19f08f9f1f39a1a72f72da818a3eb5674f8f01e8ce8884"
+  },
+  "existing_baseline_gap": {
+    "path": ".runtime/porting/CLK-06/existing-baseline-gap-01/gap.json",
+    "sha256": "3e2d1020a9d76faac0537020b034eeb66c057370f8ab43630f8dc682bacd93d9"
+  },
+  "existing_baseline_gap_execution": {
+    "path": ".runtime/porting/CLK-06/existing-baseline-gap-command-01/receipt.json",
+    "sha256": "bb86b0233042f77444884e18594903cc37ccd1bb658cbb7536d28be0c12d2b98"
+  },
+  "baseline_implementation_commit": "715782ecf392d493e9a4e09d455bbaf9c27c4679",
+  "baseline_actual_comparison_count": 1562366,
+  "baseline_actual_mismatch_count": 19068,
+  "baseline_actual_unavailable_direct_API_operations": 52,
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "implementation_map": {
+    "path": ".runtime/porting/CLK-06/implementation-map-prep-01/manifest.json",
+    "sha256": "f599d1f918bcd93f2aac28f118ab2727c4f6fd9f31708c0799846d1b1246df40"
+  },
+  "comparison_projection": {
+    "path": ".runtime/porting/CLK-06/comparer-projection-01/projection.json",
+    "sha256": "17e1fe3fba8a659fd622bf365aa4c37575ec7647126ba4cf93c7ed5e02b8e92a"
+  },
+  "unchanged_six_profiles_and_native_request_required": true,
+  "native_current5_and_other_models_and_SRC08_remain_unpaired": true,
+  "public_default_interfaces": {
+    "default_clark_allen_sky_emissivity": [
+      "opaque_sky_cover",
+      "dry_bulb",
+      "dew_point",
+      "relative_humidity"
+    ],
+    "default_weather_file_sky": [
+      "opaque_sky_cover",
+      "dry_bulb",
+      "dew_point",
+      "relative_humidity",
+      "infrared"
+    ],
+    "WeatherSky": [
+      "horiz_ir_sky",
+      "sky_temp"
+    ]
+  },
+  "production_trace_policy_before_any_new_production_run": {
+    "levels": [
+      "Full",
+      "Summary"
+    ],
+    "artifact_name": "clk06_sky_transport_trace.json",
+    "maximum_retained_events_per_kind": 1000000,
+    "required_truncated_observation_is_failure": true,
+    "actual_early_return_no_resolved_event": true
+  },
+  "canonical_mutations_and_actual_executions_owner": "/root",
+  "numerical_candidate_PASS_claimed": false,
+  "gates_updated": false,
+  "this_document_is_a_root_authorization_record_not_an_execution_receipt": true
+}

@@ -1,0 +1,234 @@
+{
+  "schema": "clk06-independent-comparer-source-review.v1",
+  "status": "pass-source-selected-sky-and-authentication-before-comparison",
+  "review_started_utc": "2026-10-09T07:08:02.813784+00:00",
+  "reviewed_sources": [
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/common.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/0-common.py",
+        "sha256": "28ef6a283d3e69b1734e159130436d2caeeb8d7169a056cee84f3809c37fc07a"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/1-numeric.py",
+        "sha256": "758ba02cd24dc1018eddd366fad0d8247396ae90732b2b0779bb732df0d87ee7"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/state.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/2-state.py",
+        "sha256": "d50f1fe42f7a59359eb036e1b6e6e2e61a1c7e4b8386b1127408597cad3f0cd1"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/history.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/3-history.py",
+        "sha256": "d0a54a841184142119ee571e724ef64ee4f3845e7cd3cd1da5055147d8cb349b"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/4-metadata.py",
+        "sha256": "f93df98a87017dd66f462f62bfaba80d0164c47fa9a46e3567c4fbcdf94b5cfc"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/5-freeze_projection.py",
+        "sha256": "b9e274d4d4ce58b412df4d6559fd7b21689b2bf392ac86a76b20c0e07e70cdd9"
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/6-check_clk06.py",
+        "sha256": "d30538c67d0587bbfd90ac10fc636451281c0818e4970bdf481e3ca25c484f98"
+      }
+    },
+    {
+      "historical_path": "tools/porting/geo03_provenance.py",
+      "archive": {
+        "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/7-geo03_provenance.py",
+        "sha256": "5ca27645245ee9e7206a31c8906904394a5216625723cbfad12a5d5f49da9bf5"
+      }
+    }
+  ],
+  "reviewed_source_manifest": {
+    "path": ".runtime/porting/CLK-06/comparer-prep-02/manifest.json",
+    "sha256": "062da3b85b74c5958ee8004213f458c4a7323f50245c67b6732631907ed136ca"
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/native-admission-contract.json",
+    "sha256": "8bca3bddd78d49204685a496dc715061c4023cbf795e09aad6dc113b1cba0ca4"
+  },
+  "reviewed_helper_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/projection.json",
+    "sha256": "aa31e95728aedeb943bcc6f8a1212965094cd069280caf3a41245df2ac6a8734"
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "production_direct_history_count": 963,
+  "required_direct_API_operation_count": 52,
+  "source_predicate_count": 38,
+  "required_roles_identical_legacy_and_candidate": true,
+  "both_null_unavailable_no_comparison_no_PASS": true,
+  "native_current5_and_default_Environment_paired": false,
+  "preserved_preexecution_required_label_correction": {
+    "path": ".runtime/porting/CLK-06/comparer-prep-01/manifest.json",
+    "sha256": "f6d93e6a213c9f8fd2b365c5204a1dac9a4595ccda961970de22e6d95b8b1ee2",
+    "size_bytes": 4990,
+    "line_count": 132
+  },
+  "preserved_failed_source_review_execution": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-command-01/receipt.json",
+    "sha256": "1351b5a09dee612be04cda1f2582130b8d01ee0f29119f8921101a1554d23b6e"
+  },
+  "preserved_prior_reviewer_source": {
+    "path": ".runtime/porting/CLK-06/comparer-source-review-prep-01/review_sources.py",
+    "sha256": "a6a2d242d889f1c8c180a15056c2c8842682da2372e792755b2071418ee7f384"
+  },
+  "prior_source_peer_miss": "Reviewer01 passed declared .diff refs to a helper which intentionally rejects that suffix. Actual metadata1/no report is preserved. Reviewer02 admits only exact manifest-declared diff paths with bounded independent before/after byte checks; the helper policy is unchanged.",
+  "declared_source_diffs": [
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/common.py.from-clk05.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py.from-clk05.diff",
+      "sha256": "09247dc8d531dff5583d1ac3e30db48c3e587e787beba056edb9551265e72b58",
+      "size_bytes": 7737,
+      "line_count": 116
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/state.py.from-clk05.diff",
+      "sha256": "242d46e6f86e8994bada2e39c51b6e5f02366cbd2c1f2e7035b7be16f266a660",
+      "size_bytes": 13258,
+      "line_count": 183
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/history.py.from-clk05.diff",
+      "sha256": "000a9a3337ec32834fa0db8f31f791d2fd257fcc3b51483b2db6bdb862f134b2",
+      "size_bytes": 13919,
+      "line_count": 183
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py.from-clk05.diff",
+      "sha256": "5446565f30eee52da409272a8671a5f8e8a789dc1562704817540344eeefcbe3",
+      "size_bytes": 22349,
+      "line_count": 265
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py.from-clk05.diff",
+      "sha256": "ee33950fab8a43ea75b96a005c0e7330883fac95fb2563f8fbbc575a86ffa9c9",
+      "size_bytes": 7596,
+      "line_count": 89
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py.from-clk05.diff",
+      "sha256": "d5405363bf7a737566a239901c6df16a205299775a2b401022eeb922fee54581",
+      "size_bytes": 7241,
+      "line_count": 73
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/common.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/numeric.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/state.py.from-01.diff",
+      "sha256": "23a8dfd50f52831f97d8e7a36da97782adf8f406c4b50d8b9fc6bb0a7217ac00",
+      "size_bytes": 855,
+      "line_count": 11
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/history.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/metadata.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/freeze_projection.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CLK-06/comparer-prep-02/check_clk06.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    }
+  ],
+  "shared_metadata_suffix_or_size_policy_changed": false,
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/executed-source-reviewer.py",
+    "sha256": "ccd775b79867ece45a3a1dc70fa3be574e5bd7fb4c74c9b7e01123c6c630d7f3"
+  },
+  "executed_metadata_source_archive": {
+    "path": ".runtime/porting/CLK-06/independent-comparer-source-review-02/executed-metadata.py",
+    "sha256": "02ea0056cea6e6418579e2c71c23dac26f0dbd127cd49c5c90cc3952e355f526"
+  },
+  "scientific_execution_performed": false,
+  "reviewed_target_modules_imported_or_executed": false,
+  "Original_or_Rust_numerical_output_payloads_read": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "authorship_limits": "Verifier author /root/clk02_raw_port authored earlier raw cursor/input, native helper, builder and Original launcher work. This is an other-author review of Baseline comparer source/provenance, not independent certification of those own algorithms. Baseline authored earlier hourly/producer, native packet/observer and this comparer. Root separately full-read all source and alone executes genuine comparisons.",
+  "review_completed_utc": "2026-10-09T07:08:03.128693+00:00"
+}

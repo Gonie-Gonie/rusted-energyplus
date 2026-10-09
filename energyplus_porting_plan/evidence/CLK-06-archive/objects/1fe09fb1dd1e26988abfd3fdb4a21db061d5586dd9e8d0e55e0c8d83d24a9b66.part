@@ -1,0 +1,10 @@
+    struct WeatherProperties
+    {
+        // Members
+        std::string Name;       // Reference Name
+        bool IsSchedule = true; // Default is using Schedule
+        SkyTempModel skyTempModel = SkyTempModel::ClarkAllen;
+        Sched::DayOrYearSchedule *sched = nullptr; // schedule when used
+        bool UsedForEnvrn = false;
+        bool UseWeatherFileHorizontalIR = true; // If false, horizontal IR and sky temperature are calculated with WP models
+    };

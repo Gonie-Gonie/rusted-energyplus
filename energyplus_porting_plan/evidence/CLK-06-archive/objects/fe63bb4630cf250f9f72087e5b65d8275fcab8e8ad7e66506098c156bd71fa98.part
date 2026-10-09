@@ -1,0 +1,247 @@
+"""Execute only the authenticated genuine CLK06 helper, preserving actual outcomes.
+
+This wrapper authenticates metadata and source/ABI inputs before and after the
+native child. Scientific comparison and gate updates require later evidence.
+"""
+from __future__ import annotations
+import argparse
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+import traceback
+
+sys.dont_write_bytecode = True
+import hashlib
+_BOOTSTRAP = {'launcher_support/common.py': 'e482403dd77a0ec88b0ae1f2b3350658eda241098c21d748909f60c06c76a01d', 'launcher_support/admission.py': '83f5a877f7c8271988e13411d24f95ec727ac0112b41b42852864c9d1a7bbee8', 'launcher_support/outcomes.py': '50923bbbe8aeb3359ac823acee703972c7cf4e46f79bab6d17ab0bde05f448e6', 'launcher_support/__init__.py': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}
+for _name, _digest in _BOOTSTRAP.items():
+    if hashlib.sha256((Path(__file__).resolve().parent / _name).read_bytes()).hexdigest() != _digest:
+        raise ValueError('Held original metadata module changed before import: ' + _name)
+from launcher_support.common import ROOT, RAW, PIN, exact, identity, instant, path, read, ref, require, sha, unchanged, utc, verify, write, finish_guards
+from launcher_support.admission import RUNTIME_BIN, admit, guard, runtime_identity
+from launcher_support.outcomes import source_outcomes
+
+OWN = Path(__file__).resolve().parent
+OWN_NAMES = ['run_original.py', 'launcher_support/common.py', 'launcher_support/admission.py', 'launcher_support/outcomes.py', 'launcher_support/__init__.py']
+
+
+def metadata_bindings(value):
+    """Flatten only references in a metadata binding inventory, not scientific data."""
+    if type(value) is dict:
+        if 'path' in value and 'sha256' in value:
+            return [value]
+        return [item for child in value.values() for item in metadata_bindings(child)]
+    if type(value) is list:
+        return [item for child in value for item in metadata_bindings(child)]
+    return []
+
+
+def archive_inputs(directory, build, reviews, runtime):
+    destination = directory / 'source-and-inputs'
+    destination.mkdir()
+    admission = read(verify(build['native_admission_contract']))
+    cases = read(verify(build['contracts']['cases']))
+    request = read(verify(build['helper_request']))
+    bindings = [build[key] for key in ['native_admission_contract', 'helper_request', 'projection', 'fixed_scope',
+        'core_build', 'prior_native_build', 'prior_actual_build_review', 'retained_registry', 'validated_derivative',
+        'configure', 'compile_link', 'derivation_command', 'compile_commands', 'cache', 'actual_compile_commands',
+        'previous_compile_commands', 'frozen_original_build_commands']]
+    bindings += [*build['contracts'].values(), *admission['all_45_guard_refs'], *cases['input_artifacts'],
+        *metadata_bindings(reviews), *metadata_bindings(build['derivative_utility']),
+        *metadata_bindings(build['source_policy_review']), runtime['publisher_receipt'],
+        request['production_control_inputs'], request['production_input_only_caller_history'],
+        build['actual_CLK05_prerequisite']['closure'], build['actual_CLK05_prerequisite']['execution'],
+        build['actual_retirement'], build['actual_retirement_execution'], build['actual_scope_amendment'],
+        build['actual_scope_amendment_execution'], build['root_preoutput_decision'],
+        *metadata_bindings(build['production_control_review'])]
+    for sequence in request['weather_sequences']:
+        bindings += [sequence[key] for key in ['input', 'weather', 'external_byte_map'] if key in sequence]
+    source_files = [path(row['historical_path']) for row in build['executed_source_archives']]
+    source_files += [OWN / name for name in OWN_NAMES]
+    groups = {}
+    for key, originals in [('input_archives', [verify(item) for item in bindings]), ('executed_source_archives', source_files)]:
+        rows = []
+        for index, original in enumerate(dict.fromkeys(originals)):
+            require(original.suffix.lower() not in ['.exe', '.dll', '.zip', '.a', '.o', '.obj', '.lib', '.pdb'],
+                'Metadata/source archives must never copy native or publisher binaries')
+            target = destination / f'{key}-{index:03d}-{original.name}'
+            shutil.copyfile(original, target)
+            require(sha(original) == sha(target), 'Source/input changed while archiving')
+            rows.append({'historical_path': original.relative_to(ROOT).as_posix(), 'archive': ref(target)})
+        groups[key] = rows
+    require(len(admission['all_45_guard_refs']) == 45, 'All45 ordered guards required without removing shared weather bindings')
+    return groups
+
+
+def preserved_reviews(reviews, not_after):
+    for binding in metadata_bindings(reviews):
+        verify(binding)
+    for key in ['actual_build_review', 'launcher_source_review']:
+        require(instant(read(verify(reviews[key]))['review_completed_utc']) <= instant(not_after),
+            'Actual independent source/build reviews must precede execution')
+
+
+def inventory(directory):
+    return [ref(item) for item in sorted(directory.rglob('*')) if item.is_file()]
+
+
+def child_environment_inputs(environment):
+    require(os.name == 'nt' and all(type(key) is str and type(value) is str for key, value in environment.items()),
+        'Actual Windows string environment required')
+    captured = {}
+    for name in ['IgnoreSolarRadiation', 'IgnoreBeamRadiation', 'IgnoreDiffuseRadiation']:
+        # Windows environment names are case insensitive, including keys copied from os.environ.
+        matches = [value for key, value in environment.items() if key.casefold() == name.casefold()]
+        require(len(matches) <= 1, 'Conflicting case aliases in actual child environment')
+        captured[name] = {'present': bool(matches), 'raw_value': matches[0] if matches else ''}
+    return captured
+
+
+def run(args):
+    directory = path(args.output_dir)
+    require(directory.is_relative_to(RAW.resolve()) and directory != RAW.resolve() and not directory.exists(),
+        'Fresh contained ignored output required')
+    directory.mkdir(parents=True)
+    record = {'schema': 'clk06-original-reference.v1', 'status': 'preflight-in-progress', 'started_utc': utc(),
+        'actual_launcher_argv': list(sys.orig_argv), 'actual_launcher_cwd': str(Path.cwd().resolve()), 'energyplus_commit': PIN,
+        'Rust_executed': False, 'Rust_compared': False, 'gates_updated': False, 'builds_or_Git_executed': False,
+        'source_expected_answers_supplied': False, 'expected_values_supplied': False, 'expected_exits_supplied': False,
+        'deletion_performed': False, 'full_linked_original_copied': False, 'preservation_observations': {},
+        'whole_ground_water_current_solar_night_and_SRC04_physics_paired': False, 'original_data_review_required_before_Rust': True,
+        'native_current_sky_globals_paired': False, 'SkyTempKelvin_cross_engine_profile_admitted': False,
+        'private_hourly_ESky_or_branch_locals_observed': False,
+        'prior_actual_failure_relabelled_PASS': False, 'scientific_certification_passed': False,
+        'numerical_comparison_count': None, 'numerical_mismatch_count': None, 'numerical_PASS_claimed': False}
+    module = build = runtime = groups = reviews = None
+    return_code = 1
+    try:
+        require(Path.cwd().resolve() == ROOT, 'Repository cwd required')
+        module, build, reviews = admit(args, record['started_utc'])
+        preserved_reviews(reviews, record['started_utc'])
+        request = read(verify(build['helper_request']))
+        runtime = runtime_identity(read(verify(build['core_build'])))
+        groups = archive_inputs(directory, build, reviews, runtime)
+        record.update(groups)
+        own = next(row['archive'] for row in groups['executed_source_archives'] if path(row['historical_path']) == Path(__file__).resolve())
+        record.update(executed_launcher={'historical_path': Path(__file__).resolve().relative_to(ROOT).as_posix(), 'archive': own},
+            native_driver_build=reviews['actual_build'], actual_build_execution=reviews['actual_build_execution'],
+            independent_reviews=reviews, actual_request=build['helper_request'], native_admission_contract=build['native_admission_contract'],
+            observation_projection=build['projection'], fixed_scope=build['fixed_scope'], contracts=build['contracts'],
+            requested_counts=build['requested_counts'], executed_helper=build['helper_binary'],
+            independent_actual_build_review=reviews['actual_build_review'],
+            independent_actual_build_review_execution=reviews['actual_build_review_execution'],
+            independent_launcher_source_review=reviews['launcher_source_review'],
+            independent_launcher_source_review_execution=reviews['launcher_source_review_execution'], compiler_runtime=runtime,
+            actual_scope_amendment=build['actual_scope_amendment'],
+            actual_scope_amendment_execution=build['actual_scope_amendment_execution'],
+            root_preoutput_decision=build['root_preoutput_decision'], production_control_review=build['production_control_review'])
+        record['preservation_observations']['before_execution'] = guard(module, build, runtime)
+        preserved_reviews(reviews, record['started_utc'])
+        native_dir = directory / 'native-output'
+        require(not native_dir.exists(), 'Native output must be fresh before child')
+        command = [str(verify(build['helper_binary'])), str(ROOT), str(verify(build['helper_request'])),
+            str(verify(build['native_admission_contract'])), str(native_dir)]
+        started = utc()
+        require(instant(record['started_utc']) <= instant(started), 'Actual launcher/child chronology differs')
+        preserved_reviews(reviews, started)
+        begin = time.perf_counter()
+        env = module.util.environment()
+        require(env['PATH'].split(os.pathsep)[0] == str(RUNTIME_BIN), 'Wrong authenticated GNU runtime PATH prefix')
+        actual_external = child_environment_inputs(env)
+        parent_before = child_environment_inputs(dict(os.environ))
+        require(exact(parent_before, actual_external), 'Actual parent/child external input context differs before native child')
+        control_inputs = read(verify(request['production_control_inputs']))
+        require(all(exact(actual_external, row['captured_environment_inputs']) for row in control_inputs['cases']),
+            'Actual child environment differs from the pre-output captured input context')
+        record['actual_child_environment_inputs'] = actual_external
+        record['actual_parent_environment_before_child'] = parent_before
+        record['actual_child_environment_matches_frozen_input_capture'] = True
+        spawn_error = None
+        code = None
+        with (directory / 'helper-stdout.log').open('xb') as stdout, (directory / 'helper-stderr.log').open('xb') as stderr:
+            try:
+                code = subprocess.run(command, cwd=ROOT, env=env, stdout=stdout, stderr=stderr, check=False,
+                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0)).returncode
+            except Exception as error:
+                spawn_error = {'type': type(error).__name__, 'message': str(error)}
+        parent_after = child_environment_inputs(dict(os.environ))
+        prospective_environment_after = child_environment_inputs(module.util.environment())
+        context_preserved = exact(parent_after, parent_before) and exact(prospective_environment_after, actual_external)
+        context_preserved = context_preserved and all(exact(parent_after, row['captured_environment_inputs']) for row in control_inputs['cases'])
+        record['actual_parent_environment_after_child'] = parent_after
+        record['actual_child_input_environment_recaptured_after_child'] = prospective_environment_after
+        record['external_input_context_preserved_before_and_after_child'] = context_preserved
+        record['terminated_native_process_internal_environment_observed'] = False
+        execution = {'schema': 'clk06-original-native-command.v1', 'command': command, 'cwd': str(ROOT), 'exit_code': code,
+            'started_utc': started, 'finished_utc': utc(), 'elapsed_seconds': round(time.perf_counter() - begin, 6),
+            'runtime_path_prefix': str(RUNTIME_BIN), 'stdout': ref(directory / 'helper-stdout.log'),
+            'stderr': ref(directory / 'helper-stderr.log'), 'binary': build['helper_binary'], 'request': build['helper_request'],
+            'native_admission_contract': build['native_admission_contract'], 'observation_projection': build['projection'],
+            'native_driver_build': reviews['actual_build'], 'spawn_error': spawn_error,
+            'actual_child_environment_inputs': actual_external,
+            'actual_parent_environment_before_child': parent_before, 'actual_parent_environment_after_child': parent_after,
+            'actual_child_input_environment_recaptured_after_child': prospective_environment_after,
+            'external_input_context_preserved_before_and_after_child': context_preserved,
+            'terminated_native_process_internal_environment_observed': False}
+        write(directory / 'helper-command.json', execution)
+        record['execution'] = ref(directory / 'helper-command.json')
+        record['actual_helper_exit_code'] = code
+        require(context_preserved, 'Actual post-child external input capture differs; genuine child outcome preserved')
+        require(spawn_error is None, 'Actual helper could not launch; receipts/logs retained')
+        result_path = native_dir / 'clk06-helper-results.json'
+        record['results'] = ref(result_path) if result_path.is_file() else None
+        record['actual_source_outcomes'] = source_outcomes(read(result_path), request, build) if result_path.is_file() else None
+        record['preservation_observations']['after_execution'] = guard(module, build, runtime)
+        preserved_reviews(reviews, utc())
+        for rows in groups.values():
+            unchanged(rows)
+        require(exact(record['preservation_observations']['before_execution']['source_guard'],
+            record['preservation_observations']['after_execution']['source_guard']), 'Original source inventory changed')
+        finish_guards()
+        record['preservation_checks_passed'] = True
+        record['status'] = 'wrapper-complete-actual-source-outcomes-awaiting-independent-data-review' if code == 0 and record['results'] else 'actual-wrapper-failure-preserved'
+        return_code = code if code is not None and code != 0 else (0 if record['results'] else 1)
+    except Exception as error:
+        record['status'] = 'failed-preserved-stop-before-Rust-numerical-execution'
+        record['failure'] = {'type': type(error).__name__, 'message': str(error)}
+        (directory / 'failure.log').write_text(traceback.format_exc(), encoding='utf-8', newline='\n')
+        record['failure_log'] = ref(directory / 'failure.log')
+    finally:
+        if module is not None and build is not None and runtime is not None:
+            try:
+                if 'after_execution' not in record['preservation_observations']:
+                    record['preservation_observations']['failure_final'] = guard(module, build, runtime)
+                    preserved_reviews(reviews, utc())
+                else:
+                    record['final_guard_policy'] = 'actual-after-execution-observation-reused-no-third-full-inventory-hash'
+                if groups is not None:
+                    for rows in groups.values():
+                        unchanged(rows)
+            except Exception as error:
+                record['final_preservation_failure'] = {'type': type(error).__name__, 'message': str(error)}
+                record['preservation_checks_passed'] = False
+                record['status'] = 'failed-preserved-stop-before-Rust-numerical-execution'
+                return_code = 1
+        if (directory / 'native-output').exists():
+            record['native_artifact_inventory'] = inventory(directory / 'native-output')
+        record['finished_utc'] = utc()
+        record['actual_launcher_exit_code'] = return_code
+        write(directory / 'helper-reference.json', record)
+    print(json.dumps({'reference': ref(directory / 'helper-reference.json'), 'status': record['status'],
+        'actual_helper_exit_code': record.get('actual_helper_exit_code'), 'actual_launcher_exit_code': return_code}))
+    return return_code
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['build-receipt', 'build-execution', 'build-review', 'build-review-execution',
+                 'launcher-review', 'launcher-review-execution', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    return run(parser.parse_args())
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

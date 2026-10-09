@@ -1,0 +1,236 @@
+"""Source-only input writer draft; future use emits literals, never sky answers."""
+from pathlib import Path
+import argparse
+import copy
+import hashlib
+import json
+import stat
+from catalog import CONTROL_KEYS, emissivity_cases, families, caller_owned_seed, preparation, operations, input_weather, direct_sky_operations
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/CLK-06'
+PIN = '6f2e40d10250a105b49966baa24d843711e61048'
+OLD_REQUEST = {'path': '.runtime/porting/CLK-04/frozen-packet-01/helper-request.json',
+               'sha256': 'db463a9305801b6c0625f20fab9d4289c7f5251e19ef636e543d2319a8422054'}
+GOLDEN = {'path': '.runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw',
+          'sha256': 'c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f'}
+FIXED_SCOPE = {'path': 'energyplus_porting_plan/contracts/scope.json',
+               'sha256': 'b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879'}
+DECISION = {'path': '.runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json',
+            'sha256': 'b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54'}
+
+
+def check(binding):
+    if type(binding) is not dict or set(binding) != {'path', 'sha256'} or type(binding['path']) is not str:
+        raise ValueError('Exact input-only path/SHA reference required')
+    raw = Path(binding['path'])
+    raw = raw if raw.is_absolute() else ROOT / raw
+    info = raw.lstat()
+    if not stat.S_ISREG(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
+        raise ValueError('Regular non-reparse input required')
+    resolved = raw.resolve()
+    if resolved == ROOT or not resolved.is_relative_to(ROOT):
+        raise ValueError('Input path escapes repository')
+    if hashlib.sha256(resolved.read_bytes()).hexdigest() != binding['sha256']:
+        raise ValueError('Input bytes differ: ' + binding['path'])
+    return resolved
+
+
+def read(binding):
+    def pairs(rows):
+        result = {}
+        for key, value in rows:
+            if key in result:
+                raise ValueError('Duplicate input JSON key')
+            result[key] = value
+        return result
+    return json.loads(check(binding).read_text(encoding='utf-8'), object_pairs_hook=pairs,
+        parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Nonstandard JSON ' + token)))
+
+
+def json_bytes(value):
+    return (json.dumps(value, ensure_ascii=True, indent=2, allow_nan=False) + '\n').encode('utf-8')
+
+
+def put(out, name, payload):
+    item = (out / name).resolve()
+    if item == out or not item.is_relative_to(out):
+        raise ValueError('Input artifact filename escapes fresh output')
+    item.parent.mkdir(parents=True, exist_ok=True)
+    with item.open('xb') as stream:
+        stream.write(payload)
+    return {'path': item.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(payload).hexdigest()}
+
+
+def diagnostic_idf(family):
+    # Exactly the existing six-object diagnostic admission; no sky property override.
+    text = ('Version,26.1;\n' + f"Timestep,{family['steps']};\n"
+        'Building,CLK06 Unit,0,Suburbs,0.04,0.4,FullExterior,25,6;\n'
+        'GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;\n'
+        'Site:Location,CLK06 Golden Context,39.74,-105.18,-7.0,1829.0;\n'
+        f"RunPeriod,CLK06 Unit,7,1,2013,7,{family['days']},2013,Monday,No,No,No,Yes,Yes,No,{family['policy']};\n")
+    return text.encode('utf-8')
+
+
+def diagnostic_epw(family, golden):
+    lines = golden.decode('utf-8-sig').splitlines()
+    if len(lines) != 8768:
+        raise ValueError('Authenticated Golden must contain8 headers and8760 rows')
+    header = list(lines[:8])
+    header[5] = 'COMMENTS 1,input-only CLK06 sky/cloud patterns; hashed Golden template'
+    header[6] = 'COMMENTS 2,no expected values/exits; genuine source model not overridden'
+    header[7] = 'DATA PERIODS,1,1,Data,Sunday,6/30,7/3'
+    rows = []
+    for text in lines[8:]:
+        row = text.split(',')
+        if len(row) != 35:
+            raise ValueError('Full35-column Golden row required')
+        month, day, hour = map(int, (row[1], row[2], row[3]))
+        if (month, day) not in [(6, 30), (7, 1), (7, 2), (7, 3)]:
+            continue
+        row[0] = '2013'
+        for index, value in {9: '90000', 14: '37.5', 15: '11.25', 20: '180', 21: '1',
+            24: '20', 25: '10000', 26: '9', 27: '999999999', 28: '10', 29: '0.1',
+            30: '0', 31: '1', 32: '0.2', 33: '0', 34: '1'}.items():
+            row[index] = value
+        dry, dew, rh, ir, total, opaque = input_weather(family, month, day, hour)
+        row[6], row[7], row[8], row[12], row[22], row[23] = dry, dew, rh, ir, total, opaque
+        rows.append(','.join(row))
+    if len(rows) != 96:
+        raise ValueError('Exactly four literal input days required')
+    return ('\r\n'.join(header + rows) + '\r\n').encode('utf-8')
+
+
+def byte_map(payload, weather):
+    records, position = [], 0
+    for index, line in enumerate(payload.splitlines(keepends=True)):
+        end = position + len(line)
+        if index >= 8:
+            records.append({'source_record_ordinal': index - 8, 'byte_start': position,
+                'byte_end': end, 'input_row_sha256': hashlib.sha256(line).hexdigest()})
+        position = end
+    return {'schema': 'clk06-input-byte-map.v1', 'weather': weather, 'records': records,
+        'source_bytes_include_line_endings': True, 'native_private_record_index_observed': False,
+        'input_only': True, 'scientific_values_computed': False}
+
+
+def production_controls(control_ref, production, guards):
+    value = read(control_ref)
+    if value['schema'] not in ['clk05-production-control-inputs.v1', 'clk06-production-control-inputs.v1'] or value['effective_controls_inferred_from_outputs'] is not False:
+        raise ValueError('Authentic input-derived production registration required')
+    if [row['case_id'] for row in value['cases']] != [row['id'] for row in production]:
+        raise ValueError('Exactly three actual production control rows in native order required')
+    result = {}
+    for row, sequence in zip(value['cases'], production, strict=True):
+        if row['input'] != sequence['input'] or set(row['solar_controls']) != set(CONTROL_KEYS) or any(type(v) is not bool for v in row['solar_controls'].values()):
+            raise ValueError('Actual production input/four typed controls differ')
+        for binding in row['registration_source_archives']:
+            check(binding); guards.append(binding)
+        captures = row['captured_environment_inputs']
+        if set(captures) != set(CONTROL_KEYS[1:]):
+            raise ValueError('All three actual ENV presence/string inputs required')
+        for capture in captures.values():
+            if type(capture['present']) is not bool or type(capture['raw_value']) is not str or (capture['present'] is False and capture['raw_value'] != ''):
+                raise ValueError('Typed actual input presence/raw string required')
+        result[sequence['id']] = copy.deepcopy(row['solar_controls'])
+    return result
+
+
+def make_diagnostic(out, family, golden, direct=False):
+    prefix = 'inputs/' + family['id']
+    idf = put(out, prefix + '.idf', diagnostic_idf(family))
+    payload = diagnostic_epw(family, golden)
+    weather = put(out, prefix + '.epw', payload)
+    row = {'id': family['id'], 'lane': 'diagnostic', 'input': idf, 'weather': weather,
+        'external_byte_map': put(out, prefix + '-byte-map.json', json_bytes(byte_map(payload, weather))),
+        'time_steps_per_hour': family['steps'], 'prepared_environment_lane': True,
+        'native_preparation': preparation(family['steps']), 'solar_controls': {key: False for key in CONTROL_KEYS},
+        'caller_owned_seed': caller_owned_seed(family),
+        'operations': direct_sky_operations() if direct else operations(family),
+        'run_period': {'begin_month': 7, 'begin_day': 1, 'begin_year': 2013, 'end_month': 7,
+            'end_day': family['days'], 'end_year': 2013, 'start_weekday': 'Monday', 'first_hour_policy': family['policy']},
+        'literal_family': copy.deepcopy(family), 'admitted_model_metadata_not_forced': True}
+    if 'stored_interpolation_override' in family:
+        row['stored_interpolation_override'] = copy.deepcopy(family['stored_interpolation_override'])
+    return row
+
+
+def counts(sequences, setup, emissivity):
+    result = {'setup_cases': len(setup), 'emissivity_cases': len(emissivity), 'weather_sequences': len(sequences),
+        'CalcSkyEmissivity': len(emissivity), 'GetNextEnvironment': 0, 'InitializeWeather': 0,
+        'SetCurrentWeather': 0, 'calcSky': 0, 'weather_operations': 0, 'total_operations': len(setup) + len(emissivity)}
+    for row in sequences:
+        for operation in row['operations']:
+            if operation['kind'] not in ['GetNextEnvironment', 'InitializeWeather', 'SetCurrentWeather', 'calcSky']:
+                raise ValueError('Operation outside reviewed bounded source history')
+            for key in [operation['kind'], 'weather_operations', 'total_operations']:
+                result[key] += 1
+    return result
+
+
+def build_request(out, source_ref, tolerance_ref, control_ref):
+    old, source, decision = read(OLD_REQUEST), read(source_ref), read(DECISION)
+    guards = [OLD_REQUEST, GOLDEN, FIXED_SCOPE, DECISION, source_ref, tolerance_ref, control_ref]
+    scope = read(FIXED_SCOPE)
+    ordered = [row[key] for row in scope['cases'] for key in ['input', 'weather', 'metadata']]
+    if len(ordered) != 45 or old['fixed_scope'] != FIXED_SCOPE or old['all_45_guard_refs'] != ordered:
+        raise ValueError('Exactly existing45 ordered CON guards must remain unchanged')
+    guards += ordered
+    for binding in guards:
+        check(binding)
+    if source['schema'] != 'clk06-source-contract.v1' or source['root_preoutput_decision'] != DECISION or decision['Rust_current_global_owner_extension_authorized_for_this_card'] is not False:
+        raise ValueError('Actual source/Root pre-output authority required')
+    production = [copy.deepcopy(row) for row in old['weather_sequences'] if row['lane'] == 'production-CON']
+    if [row['id'] for row in production] != ['A-24H', 'A-72H', 'B-BOTH-24H']:
+        raise ValueError('Exactly three unchanged CON production histories required')
+    prod_controls = production_controls(control_ref, production, guards)
+    golden = check(GOLDEN).read_bytes()
+    sequences = [make_diagnostic(out, family, golden) for family in families()]
+    direct = {'id': 'DIRECT-CALCSKY', 'pattern': 'CONSTANT', 'steps': 4, 'policy': 'Hour24', 'days': 1}
+    sequences.append(make_diagnostic(out, direct, golden, direct=True))
+    for sequence in production:
+        # Whole C4 source-derived 963 history is an input artifact, not results or a reconstructed answer.
+        sequence['solar_controls'] = prod_controls[sequence['id']]
+        sequence['production_control_inputs'] = control_ref
+        sequence['admitted_model_metadata_not_forced'] = True
+        for operation in sequence['operations']:
+            operation['selected_observation'] = True
+        sequences.append(sequence)
+    setup = [{'id': f'SETUP-{step}', **preparation(step)} for step in [1, 3, 4]]
+    emissivity = emissivity_cases()
+    request = {'schema': 'clk06-helper-cases.draft.v1', 'energyplus_commit': PIN,
+        'status': 'input-only-proposal-not-frozen', 'frozen_before_numerical_execution': False,
+        'contracts': {'source': source_ref, 'tolerances': tolerance_ref}, 'fixed_scope': FIXED_SCOPE,
+        'all_45_guard_refs': ordered, 'setup_cases': setup, 'emissivity_cases': emissivity,
+        'weather_sequences': sequences, 'requested_counts': counts(sequences, setup, emissivity),
+        'observation_policy': copy.deepcopy(source['native_observation_policy']),
+        'production_control_inputs': control_ref, 'production_input_only_caller_history': OLD_REQUEST,
+        'root_preoutput_decision': DECISION, 'expected_values_supplied': False, 'expected_exits_supplied': False,
+        'original_results_supplied_to_Rust': False, 'scientific_execution_performed': False,
+        'numerical_PASS_claimed': False, 'gates_updated': False}
+    for binding in guards:
+        check(binding)
+    return request
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    for name in ['source-contract', 'tolerances', 'production-control-inputs']:
+        parser.add_argument('--' + name, required=True)
+        parser.add_argument('--' + name + '-sha256', required=True)
+    args = parser.parse_args()
+    out = args.output_dir.resolve()
+    if out == BASE or not out.is_relative_to(BASE) or out.exists():
+        raise ValueError('Fresh contained ignored CLK06 output directory required')
+    bindings = [{'path': getattr(args, key), 'sha256': getattr(args, key + '_sha256')}
+                for key in ['source_contract', 'tolerances', 'production_control_inputs']]
+    out.mkdir(parents=True)
+    request = build_request(out, *bindings)
+    binding = put(out, 'helper-request-draft.json', json_bytes(request))
+    print(json.dumps({'request': binding, 'requested_counts': request['requested_counts'],
+        'input_only': True, 'contracts_frozen': False, 'scientific_execution_performed': False}))
+
+
+if __name__ == '__main__':
+    main()

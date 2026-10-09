@@ -1,0 +1,17 @@
+            if (!wpSkyTemp.IsSchedule && !ipsc->lAlphaFieldBlanks(4)) {
+                if (BooleanSwitch b = getYesNoValue(ipsc->cAlphaArgs(4)); b != BooleanSwitch::Invalid) {
+                    wpSkyTemp.UseWeatherFileHorizontalIR = static_cast<bool>(b);
+                } else {
+                    ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
+                    ErrorsFound = true;
+                }
+            } else {
+                wpSkyTemp.UseWeatherFileHorizontalIR = true;
+            }
+        }
+        for (auto &envCurr : state.dataWeather->Environment) {
+            if (envCurr.WP_Type1 != 0 && state.dataWeather->NumWPSkyTemperatures >= envCurr.WP_Type1) {
+                envCurr.skyTempModel = state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).skyTempModel;
+                envCurr.UseWeatherFileHorizontalIR = state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).UseWeatherFileHorizontalIR;
+            }
+        }

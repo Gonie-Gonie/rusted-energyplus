@@ -1,0 +1,258 @@
+{
+  "schema": "clk06-observation-projection.v1",
+  "card": "CLK-06",
+  "created_utc": "2026-10-09T06:21:57.621427+00:00",
+  "frozen_before_numerical_execution": true,
+  "helper_request": {
+    "path": ".runtime/porting/CLK-06/frozen-packet-01/helper-request.json",
+    "sha256": "9848bcc817c9bc748e7c10cc37e79d30426049c78abff0c726ac4f1b9d5f400f"
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/source.json",
+      "sha256": "4f403804cc5b99e13e02bc8d08faea06dac1ff01127e7c34ddd68814a6ebf259"
+    },
+    "cases": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/cases.json",
+      "sha256": "293c16426db7fb2041e456bcb7aae3202a97d0daf6d3a49f26313aefed4971f2"
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CLK-06/frozen-packet-01/tolerances.json",
+      "sha256": "4b19467a579123aee1dde489ccac54e57a568f986e832838fe7b887b75b8c69c"
+    }
+  },
+  "native_observation_policy": {
+    "full_weather_grid_fields": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "full_weather_grid_snapshots": [
+      "allocated_defaults",
+      "setup",
+      "prepared",
+      "before_caller_context",
+      "after_caller_context",
+      "GetNextEnvironment",
+      "InitializeWeather-effective-BeginEnvrn-or-BeginDay",
+      "final_state"
+    ],
+    "effective_boundary_flags": "incoming flags overwritten only by declared partial caller writes",
+    "all_operations_executed_independently_of_observation_selection": true,
+    "compact_operation_grid_contents": null,
+    "compact_operation_grid_unavailability_reason": "pre-execution declared compact unselected sky/cloud grid",
+    "selected_today_slot_fields": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "selected_today_slot_index": "actual allocated in-range HourOfDay/TimeStep, otherwise explicitly unavailable",
+    "all19_counts_full17_LastHour_NextHour_Missing_retained": true,
+    "selected_cloud_history_fields": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "selected_cloud_missed_and_out_of_range_count_fields": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "native_private_hourly_or_calcSky_ESky_locals_observed": false,
+    "default_model_metadata": [
+      "WP_Type1",
+      "skyTempModel",
+      "UseWeatherFileHorizontalIR"
+    ],
+    "default_model_must_be_actual_prepared_and_selected_not_forced": true,
+    "paired_native_current_globals": [],
+    "native_only_current_globals": [
+      "weather.HorizIRSky",
+      "environment.SkyTemp",
+      "environment.SkyTempKelvin",
+      "environment.TotalCloudCover",
+      "environment.OpaqueCloudCover"
+    ],
+    "current13_solar_night_SRC08_physics_paired": false
+  },
+  "catalogue_manifest": {
+    "path": ".runtime/porting/CLK-06/input-design-prep-02/manifest.json",
+    "sha256": "2e4f6fec8e3e863bc6294661c337daffd64cf83b0852661f0ff1da40d2cd3f73"
+  },
+  "root_preoutput_decision": {
+    "path": ".runtime/porting/CLK-06/root-preoutput-decisions-01/decision.json",
+    "sha256": "b12d5d633cf50d669054ce4c37dc231f8ecf3192971f1b7e12ae61d40c2b0a54"
+  },
+  "production_transport_source_inventory": {
+    "path": ".runtime/porting/CLK-06/transport-observation-design-prep-01/manifest.json",
+    "sha256": "d05b4daf2d06fdf47e275632271d7deb0b0c7888c23900c80e3346c6aec3806c"
+  },
+  "requested_counts": {
+    "setup_cases": 3,
+    "emissivity_cases": 17,
+    "weather_sequences": 35,
+    "CalcSkyEmissivity": 17,
+    "GetNextEnvironment": 35,
+    "InitializeWeather": 550,
+    "SetCurrentWeather": 480,
+    "calcSky": 35,
+    "weather_operations": 1100,
+    "total_operations": 1120
+  },
+  "source_selection": {
+    "direct_emissivity": [
+      "ESky"
+    ],
+    "direct_calcSky": [
+      "SkyTemp",
+      "HorizIRSky"
+    ],
+    "day_grids_and_selected_Today": [
+      "SkyTemp",
+      "HorizIRSky",
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "cloud_history_and_counts": [
+      "TotalSkyCover",
+      "OpaqueSkyCover"
+    ],
+    "stored_arrays_at_DTO_ROOT": [
+      "Interpolation",
+      "SolarInterpolation"
+    ],
+    "private_ESky_hourly_locals_and_native_current_globals": "unavailable_or_unpaired_never_PASS"
+  },
+  "production_selection": {
+    "cases": [
+      "A-24H",
+      "A-72H",
+      "B-BOTH-24H"
+    ],
+    "trace_levels": [
+      "Full",
+      "Summary"
+    ],
+    "source_history": "actual GetNext; Initialize then distinct Current at every zone step",
+    "required_observation_roles": [
+      {
+        "role": "owned_context_receipt",
+        "actual_source": "weather_day/production.rs current_for context construction and record_consumer",
+        "existing_capture": "WeatherDayConsumerObservation.context and completed_operation_count",
+        "operands": [
+          "received_Today_slot.SkyTemp",
+          "received_Today_slot.HorizIRSky",
+          "received_Today_slot.TotalSkyCover",
+          "received_Today_slot.OpaqueSkyCover",
+          "received_sample.horizontal_infrared_radiation_w_per_m2"
+        ],
+        "required_correction_before_candidate": "Copy actual selected Today HorizIRSky into sample.horizontal_infrared_radiation_w_per_m2 and make the actual IR accessor use that owned sample. Current source only overwrites sample liquid and solar after current13.",
+        "comparison": "Within-owner copies exact scalar bits and class; Today sky2 cross-engine profiles remain Root-declared. Do not recompute IR or Sky from raw preview inside the observation."
+      },
+      {
+        "role": "run_period_weather_sampler_return",
+        "actual_source": "heat_balance/run_period/weather_sampling.rs sample_run_period_weather after actual local assignments and before return",
+        "required_actual_locals": [
+          "timestep_horizontal_infrared_radiation_w_per_m2",
+          "timestep_sky_temperature_c"
+        ],
+        "availability": "Record actual weather_context.owned availability and actual caller identity. An absent context is explicit unavailable; do not fabricate a selected Today value.",
+        "comparison": "Same owned context SkyTemp/HorizIRSky to actually computed sampler locals, exact copy transport. These locals are distinct from the earlier context receipt."
+      },
+      {
+        "role": "run_period_report_accumulator",
+        "actual_source": "heat_balance/run_period.rs actual sky_temperature_sum and horizontal_infrared_radiation_sum += locals",
+        "required_actual_values": [
+          "received_timestep_sky_temperature_c",
+          "received_timestep_horizontal_infrared_radiation_w_per_m2",
+          "actual_sum_before_sky",
+          "actual_sum_after_sky",
+          "actual_sum_before_IR",
+          "actual_sum_after_IR"
+        ],
+        "comparison": "Received values equal the corresponding actual sampler locals; retain actual accumulator writes as observations. Do not independently synthesize an expected sum from Today."
+      },
+      {
+        "role": "run_period_report_hourly_output",
+        "actual_source": "heat_balance/run_period.rs actual divisor and sky_temperatures/horizontal_infrared_radiation_rates vector push; reports.rs output series handoff",
+        "required_actual_values": [
+          "actual_divisor",
+          "actual_pushed_sky_temperature_c",
+          "actual_pushed_horizontal_infrared_radiation_w_per_m2",
+          "actual_hourly_sample_index"
+        ],
+        "output_series": [
+          "Environment / Site Sky Temperature / C",
+          "Environment / Site Horizontal Infrared Radiation Rate per Area / W/m2"
+        ],
+        "comparison": "Validate handoff of the actual pushed values to actual output series/exports. Hourly arithmetic is not a new Native heat-balance oracle. Never label hourly means bit-exact copies of individual Today timestep slots."
+      },
+      {
+        "role": "physical_exterior_balance_ingress",
+        "actual_source": "surface_balance.rs actual calls at context.owned.map(...weather.sky_temp) into exterior_surface_energy_balance; actual function entry",
+        "required_actual_arguments": [
+          "sky_temperature_c: Option<f64>",
+          "horizontal_infrared_radiation_w_per_m2: f64",
+          "surface_id",
+          "surface_name"
+        ],
+        "availability": "Preserve the actual Option argument. Record entry even when the physical function returns early before resolving the local SkyTemp. Do not fabricate a longwave invocation.",
+        "comparison": "The actual Some sky argument is an exact owned Today SkyTemp copy. The actual IR argument is the actual accessor result. No physical coefficient or flux comparison."
+      },
+      {
+        "role": "physical_resolved_longwave_argument",
+        "actual_source": "surface_balance.rs local sky_temperature_c resolution at 510-515 and actual longwave call at 516-523",
+        "required_actual_argument": "sky_temperature_c local passed to energyplus_exterior_longwave_terms_with_sky_temperature_c",
+        "availability": "Emit only when the local and call actually execute. Early return at 475-486 has no resolved local event. Native whole heat-balance is unavailable for this card.",
+        "comparison": "For actual owned Some path, exact transport from physical ingress to the actual resolved argument. Fallback calculations are explicitly unpaired; no night or SRC08 formula certification."
+      },
+      {
+        "role": "report_recomputed_longwave_argument",
+        "actual_source": "surface_balance.rs surface_exterior_report_terms local at 330-338 and call at 339-346",
+        "required_actual_argument": "actual sky_temperature_c local passed to the report recomputation's longwave helper",
+        "availability": "Separate from the physical event. Function explicitly labels report recomputation as not an actual physical geometry consumer; cached/default/absent-context returns produce no invented resolved local.",
+        "comparison": "Record actual selected owned sky argument, exact transport only; report recomputation is not counted as a physical longwave call."
+      }
+    ],
+    "joint_identity": {
+      "required_source_fields": [
+        "phase",
+        "record_index",
+        "hour_of_day",
+        "timestep",
+        "completed_operation_count",
+        "actual_caller_location",
+        "event_kind",
+        "one_based_event_sequence"
+      ],
+      "completed_operation_count": "Copy the live trace.total_operation_count at each actual hook. Match the retained completion prefix ending in the actual SetCurrentWeather for that phase/hour/timestep; do not invent a combined counter or timestamp.",
+      "initial_seed_reuse": "The initial current-context seed and first timestep context call share one SetCurrent completion prefix and the same actual Today owner. Preserve repeated context receipt events; the seed is not an executed weather-sampler or physical longwave event.",
+      "other_consumer_calls": "Preserve every actual hook occurrence. Report and physical recomputation calls have separate event kinds and counts.",
+      "surface_identity": "Copy actual surface id/name only for surface events, together with scalar phase/prefix identity; do not clone the complete weather owner for every surface call.",
+      "native_production_counts": "Derive from frozen input arrays. The admitted three CON lanes propose 3 GetNextEnvironment + 480 InitializeWeather + 480 SetCurrentWeather = 963 direct rows.",
+      "Rust_event_counts": "Derive total/retained counts from actual hooks; do not assume that thermal call multiplicity equals zone-timestep count."
+    },
+    "collection_integrity": {
+      "passive_hooks_recompute_weather_or_supply_inputs": false,
+      "scalar_DTO": "actual value/value_bits/value_class, exact bool/int/null/Option type and shape",
+      "bounded_storage": "Each event kind has actual total and retained counts plus explicit truncation reason; no repeated-identity deduplication.",
+      "physical_event_volume": "Actual surface/iteration events can exceed 10000. Before CLI execution freeze an adequate bounded policy or explicit incomplete-scope handling; do not silently assert complete coverage from the existing limit.",
+      "required_selected_operands": "Missing/truncated required events fail availability or remain explicitly unverified. Both-null carries unavailable/no comparison/noPASS; one-sided required availability is failure.",
+      "physical_noninvocation": "Preserve actual branch/noninvocation metadata; no heat-balance branch is forced to obtain observations.",
+      "runtime_source_identity": "All final hook and serializer sources, projection, actual build/source snapshot, input and captured ENV bindings must be authenticated before candidate and production execution."
+    },
+    "Full_and_Summary_actual_observation_paths_and_event_limits_authenticated_before_CLI": true,
+    "initial_seed_repeated_context_is_not_weather_sampler_or_physical_invocation": true,
+    "physical_ingress_and_conditionally_executed_resolved_local_are_separate": true,
+    "report_recomputation_is_not_physical_longwave_invocation": true,
+    "hourly_report_expected_arithmetic_reconstructed_from_Today": false,
+    "SRC08_coefficients_heat_flux_and_native_global_owner_parity_paired": false
+  },
+  "both_null_policy": "unavailable; zero comparisons and no PASS",
+  "one_sided_required_availability_difference_is_failure": true,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "original_results_supplied_to_Rust": false,
+  "unavailable_counted_as_PASS": false,
+  "historical_CLK05_solar_only_observations_relabelled_sky": false
+}

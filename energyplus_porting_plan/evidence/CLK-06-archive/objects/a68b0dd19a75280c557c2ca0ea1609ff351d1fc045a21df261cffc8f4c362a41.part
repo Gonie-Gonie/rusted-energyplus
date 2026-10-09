@@ -1,0 +1,39 @@
+--- pre-format/crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs
++++ crates/ep_runtime/src/heat_balance/run_period/weather_sampling.rs
+@@ -7,13 +7,15 @@
+     energyplus_weather_record_is_rain_at_timestep_with_starting_values,
+ };
+ use crate::heat_balance::weather_driver::HeatBalanceWeatherDriver;
++use crate::weather::day::sky_transport_trace::{
++    self as sky_trace, SkyTransportKind, SkyTransportValues,
++};
+ use crate::weather::{
+     EpwRecord, HeatBalanceWeatherContext,
+     energyplus_weather_dry_bulb_at_timestep_with_starting_values,
+     energyplus_weather_horizontal_infrared_for_context,
+ };
+ use ep_model::FirstHourInterpolationStartingValues;
+-use crate::weather::day::sky_transport_trace::{self as sky_trace, SkyTransportKind, SkyTransportValues};
+ 
+ pub(super) struct RunPeriodWeatherSample<'weather> {
+     pub weather_context: Option<HeatBalanceWeatherContext<'weather>>,
+@@ -107,11 +109,16 @@
+ 
+     sky_trace::record(
+         SkyTransportKind::SamplerReturn,
+-        weather_context.and_then(|context| context.owned.and_then(|owned| owned.sky_transport_stamp)),
++        weather_context
++            .and_then(|context| context.owned.and_then(|owned| owned.sky_transport_stamp)),
+         SkyTransportValues::Sampler {
+-            values: [timestep_sky_temperature_c, timestep_horizontal_infrared_radiation_w_per_m2],
++            values: [
++                timestep_sky_temperature_c,
++                timestep_horizontal_infrared_radiation_w_per_m2,
++            ],
+             owned: weather_context.is_some_and(|context| context.owned.is_some()),
+-        }, None,
++        },
++        None,
+     );
+     Ok(RunPeriodWeatherSample {
+         weather_context,

@@ -1,0 +1,8 @@
+                    state.dataWeather->wvarsMissing.OutDryBulbTemp = DryBulb;
+                    state.dataWeather->wvarsMissing.OutDewPointTemp = DewPoint;
+                    state.dataWeather->wvarsMissing.OutRelHum = static_cast<int>(std::round(RelHum * 100.0));
+                    state.dataWeather->wvarsMissing.OutBaroPress = AtmPress;
+                    state.dataWeather->wvarsMissing.WindDir = WindDir;
+                    state.dataWeather->wvarsMissing.WindSpeed = WindSpeed;
+                    state.dataWeather->wvarsMissing.TotalSkyCover = TotalSkyCover;
+                    state.dataWeather->wvarsMissing.OpaqueSkyCover = OpaqueSkyCover;

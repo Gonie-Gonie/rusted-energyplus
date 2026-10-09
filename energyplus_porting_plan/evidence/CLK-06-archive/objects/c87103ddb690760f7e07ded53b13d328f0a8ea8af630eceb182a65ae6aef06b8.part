@@ -1,0 +1,96 @@
+--- .runtime/porting/CLK-06/production-comparer-source-review-prep-01/review_sources.py
++++ .runtime/porting/CLK-06/production-comparer-source-review-prep-02/review_sources.py
+@@ -19,11 +19,11 @@
+     raise ValueError('Pinned stdlib metadata dependency differs before import')
+ spec = importlib.util.spec_from_file_location('clk06_production_source_metadata', HELPER)
+ m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+-MANIFEST = {'path': '.runtime/porting/CLK-06/production-comparer-prep-01/manifest.json',
+-    'sha256': '81a1ab667abc0cc6f53a9df268e01732a1f5e9b75f85f46604a1550bff7a5554'}
+-OWN = '.runtime/porting/CLK-06/production-comparer-prep-01/'
++MANIFEST = {'path': '.runtime/porting/CLK-06/production-comparer-prep-02/manifest.json',
++    'sha256': '2d73a5c5dec50ab7b2d821a89782ca19958cc0c7474ea6118b738edd8c9d578b'}
++OWN = '.runtime/porting/CLK-06/production-comparer-prep-02/'
+ UNIT = '.runtime/porting/CLK-06/comparer-prep-02/'
+-WORKFLOW = '.runtime/porting/CLK-06/production-workflow-prep-03/'
++WORKFLOW = '.runtime/porting/CLK-06/production-workflow-prep-04/'
+ OWN_NAMES = ['proofs.py', 'adapter.py', 'observations.py', 'freeze_projection.py', 'check_production.py']
+ UNIT_NAMES = ['common.py', 'numeric.py', 'state.py', 'history.py', 'metadata.py', 'freeze_projection.py', 'check_clk06.py']
+ WORKFLOW_NAMES = ['common.py', 'evidence.py', 'prepare_plan.py', 'run_production.py']
+@@ -97,6 +97,45 @@
+         'Same actual frozen963 production caller inputs required')
+     m.verify(request['production_control_inputs']); transport_ref = admission['production_transport_source_inventory']; m.verify(transport_ref)
+     return admission, request, decision_ref, transport_ref
++
++
++def origin_policy(proof_literals, manifest, proof_text):
++    policy = proof_literals['SOURCE_ORIGIN_POLICY']
++    ordinary = {'runtime_route': 'hourly_samples_simplified_analytical',
++        'use_quick_outside_conduction': False, 'use_cached_exterior_report_terms': False,
++        'required_positive_ingress_origins': ['surface_solve', 'report_outside_face_recomputation'],
++        'required_zero_origin_keys': [], 'required_zero_event_kinds': [], 'uninvoked_origins_counted_as_PASS': False}
++    coupled = {'runtime_route': 'direct_zone_purchased_air_fixed_step',
++        'use_quick_outside_conduction': True, 'use_cached_exterior_report_terms': True,
++        'required_positive_ingress_origins': ['surface_solve'],
++        'required_zero_origin_keys': [KINDS[5] + '/report_outside_face_recomputation',
++            KINDS[6] + '/report_outside_face_recomputation', KINDS[7] + '/report_terms_recomputation'],
++        'required_zero_event_kinds': [KINDS[7]], 'uninvoked_origins_counted_as_PASS': False}
++    owners = ['crates/ep_run/src/pipeline.rs', 'crates/ep_runtime/src/heat_balance/state.rs',
++        'crates/ep_runtime/src/runtime.rs', 'crates/ep_runtime/src/diagnostic_probes/heat_balance.rs',
++        'crates/ep_runtime/src/heat_balance/algorithm.rs', 'crates/ep_runtime/src/ideal_loads/coupled_runtime.rs',
++        'crates/ep_runtime/src/heat_balance/surface_balance.rs', 'crates/ep_runtime/src/heat_balance/weather_driver.rs']
++    m.need(m.exact(policy, manifest['source_origin_policy']) and set(policy) == {'schema','source_bindings','cases'}
++        and policy['schema'] == 'clk06-production-origin-source-policy.v1'
++        and m.exact(policy['cases'], {'A-24H': ordinary, 'A-72H': ordinary, 'B-BOTH-24H': coupled})
++        and [row['path'] for row in policy['source_bindings']] == owners
++        and all(set(row) == {'path','sha256'} for row in policy['source_bindings']),
++        'Only exact A ordinary/B quick-cached source-derived origin branches admitted')
++    text = {row['path']: m.verify(row).read_text(encoding='utf8') for row in policy['source_bindings']}
++    function = next(node for node in ast.parse(proof_text).body if isinstance(node, ast.FunctionDef)
++        and node.name == 'compiled_origin_policy')
++    markers = next(ast.literal_eval(node.value) for node in function.body if isinstance(node, ast.Assign)
++        and any(isinstance(target, ast.Name) and target.id == 'markers' for target in node.targets))
++    m.need(set(markers) == set(owners) and all(token in text[owner]
++        for owner, required in markers.items() for token in required), 'Exact eight source/config/caller guards differ')
++    failure = manifest['preserved_first_metadata_failure']; receipt = m.read(failure['execution'])
++    m.need(failure['actual_exit_code'] == receipt['exit_code'] == 1 and failure['report_emitted'] is False
++        and failure['numerical_mismatch_outcome_available'] is False
++        and failure['SourceQA01_missed_propagated_caller_alias'] is True
++        and receipt['source_bytes_match_before_and_after'] is True and m.verify(receipt['stdout']).stat().st_size == 0,
++        'Actual first metadata failure/no report must remain honestly preserved')
++    m.verify(receipt['stderr'])
++    return policy, failure['execution']
+ 
+ 
+ def main():
+@@ -137,7 +176,7 @@
+         constants = literals(own[name])
+         m.need(constants['PROOFS_SHA'] == proof_sha and constants['COMMON_SHA'] == common_sha,
+             'Actual authenticate-before-import bootstrap pin differs')
+-    tokens(own['proofs.py'], ["production-workflow-prep-03", 'def sources(', 'len(names) == 17',
++    tokens(own['proofs.py'], ["production-workflow-prep-04", 'def sources(', 'len(names) == 17',
+         "review['executed_reader_source_archive']", 'indexed = archives(', 'explicit_direct_test_origin_admitted',
+         'any_truncation_is_incomplete', 'native_hourly_report_RHS_reconstructed', 'both_null_unavailable_comparisons'])
+     tokens(own['freeze_projection.py'], ['p.source_review(', 'meta.packet(args, checked)', 'p.sources()',
+@@ -154,6 +193,11 @@
+         'compiled_surfaces)', "for level in ['Full', 'Summary']", "'actual_command_count': commands",
+         'native_calls_paired', 'actual_Current_calls', "'executed_reader_source_archives': copied",
+         "'scientific_RHS_recomputed': False", "'native_Current5_model_and_SRC08_physics_paired': False"])
++    tokens(own['observations.py'], ["('heat_balance/weather_driver.rs', 'series.current_for(')",
++        "origin_policy['required_positive_ingress_origins']", "origin_policy['required_zero_origin_keys']",
++        "'uninvoked_source_origin_availability': uninvoked"])
++    tokens(own['check_production.py'], ['p.compiled_origin_policy(complete[', 'origin_policies[label]'])
++    source_policy, failed_execution = origin_policy(proof_literals, manifest, own['proofs.py'])
+     admission_ref = m.ref(args.native_admission_contract)
+     admission, request, decision_ref, transport_ref = input_packet(admission_ref)
+     m.need(m.same(authorities['native_admission_contract'], admission_ref), 'Held manifest bound a different Native packet')
+@@ -181,6 +225,10 @@
+         'status': 'pass-held-production-reader-and-frozen-input-policy-before-six-cli',
+         'review_started_utc': started, 'reviewed_sources': archived, 'reviewed_source_manifest': MANIFEST,
+         'reviewed_historical_source_diffs': manifest['source_diffs'],
++        'reviewed_source_origin_policy': source_policy,
++        'reviewed_preserved_production_failure_execution': failed_execution,
++        'SourceQA01_propagated_caller_alias_miss_disclosed': True,
++        'policy_source_bindings_are_current_sources_not_self_claimed_compiler_selection': True,
+         'reviewed_native_admission_contract': admission_ref, 'reviewed_run_design': design_ref,
+         'reviewed_transport_source_inventory': transport_ref, 'reviewed_root_preoutput_decision': decision_ref,
+         'executed_reader_source_archive': m.ref(out / 'executed-source-reviewer.py'),

@@ -1,0 +1,6 @@
+        // the last environment(s) is designated the weather environment if an annual run
+        // is selected.  All of the design systems is done from the design day info
+        // which will have to be completed to run the annual run.
+        if (state.dataWeather->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
+            GetRunPeriodData(state, state.dataWeather->TotRunPers, ErrorsFound);
+        }
