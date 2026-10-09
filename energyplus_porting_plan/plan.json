@@ -7648,28 +7648,176 @@
       "title": "Constant/Compact 입력 정규화",
       "source": "ScheduleManager.cc",
       "symbols": "ProcessScheduleInput; ProcessForDayTypes; DecodeHHMMField",
-      "block": "선정 Schedule:Constant/Compact의 Through/For/Until·기본값만. 다른 스케줄 종류는 제외.",
+      "block": "Selected Schedule:Constant, Schedule:Compact and ScheduleTypeLimits initialization, normalization, actual registration/order, Through/For/Until/defaults and diagnostics. All other schedule families remain excluded.",
       "dependencies": [
         "CON-01"
       ],
-      "inputs": "원본 Constant/Compact, ScheduleTypeLimits",
-      "outputs": "기간·day type·시간구간·보간모드의 정규화 모델",
+      "inputs": "Unchanged CON-01 production IDFs; diagnostic literal IDFs for the same selected three families; authentic IDF conversion; declared consistent timestep initialization.",
+      "outputs": "Actual TypeLimits metadata, ID/name ledgers, Constant values, Compact period/day/time/interpolation semantics and actual initialized day/week owner links; genuine outcomes and partial-state availability.",
       "timing": "모델 초기화",
-      "unit_tests": "AllDays/선정 요일; AllOtherDays; 24:00; 누락/중복 구간",
-      "integration_test": "SCH-02가 소비하는 구간을 EP와 대조",
+      "unit_tests": "AllDays, selected weekdays, AllOtherDays, Through/leap-year boundaries, 24:00 and malformed/missing/duplicate interval fields; limits/defaults, registration order and collisions; exact cases frozen before outputs.",
+      "integration_test": "Actual public Rust compiler to existing schedule-cache handoff versus the actual initialized Native owner graph. This does not close SCH-02 evaluation arithmetic.",
       "rust_candidate": "crates/ep_compiler 스케줄 parser; crates/ep_runtime/src/schedules",
       "assessment": "기존 구현 재검증",
-      "companion": "ScheduleManager.hh",
-      "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
+      "companion": "ScheduleManager.hh; selected InputProcessor IDF/order caller; General date helpers; UtilityRoutines ProcessNumber; actual initialization and storage declarations.",
+      "excludes": "All schedule families outside selected Constant/Compact/TypeLimits and all CON-01 excluded production inputs. Diagnostic parser cases do not expand production admission. SCH-02 evaluation/time-update algorithms remain separate.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/ScheduleManager.cc",
       "scope_review": "미확인",
       "unit_gate": "미확인",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
+      "source_boundary_note": "Literal source ranges are authenticated in the scope amendment. Only listed selected branches and direct helpers are reviewed; no whole ProcessScheduleInput or full-library certification. Four gates remain pending until actual validation.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "source_ranges_input_only": [
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+          "line_ranges": [
+            [
+              171,
+              327
+            ],
+            [
+              329,
+              546
+            ],
+            [
+              724,
+              804
+            ],
+            [
+              1272,
+              1527
+            ],
+            [
+              1962,
+              2003
+            ],
+            [
+              2197,
+              2264
+            ],
+            [
+              2733,
+              2961
+            ],
+            [
+              2963,
+              3073
+            ],
+            [
+              3075,
+              3249
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.hh",
+          "line_ranges": [
+            [
+              70,
+              163
+            ],
+            [
+              165,
+              369
+            ],
+            [
+              493,
+              561
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+          "line_ranges": [
+            [
+              217,
+              237
+            ],
+            [
+              259,
+              330
+            ],
+            [
+              932,
+              1022
+            ],
+            [
+              1216,
+              1258
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+          "line_ranges": [
+            [
+              90,
+              150
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+          "line_ranges": [
+            [
+              395,
+              737
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+          "line_ranges": [
+            [
+              94,
+              173
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+          "line_ranges": [
+            [
+              469,
+              493
+            ],
+            [
+              585,
+              600
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+          "line_ranges": [
+            [
+              579,
+              594
+            ]
+          ]
+        }
+      ],
+      "scope_design": {
+        "fixed_scope": {
+          "path": "energyplus_porting_plan/contracts/scope.json",
+          "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"
+        },
+        "actual_call_order": [
+          "EnergyPlusData::init_constant_state",
+          "declared caller seed",
+          "InputProcessor::processInput",
+          "Sched::ProcessScheduleInput only after actual prior return"
+        ],
+        "source_exception_and_wrapper_failure_distinct": true,
+        "native_id_and_partial_storage_preserved": true,
+        "required_success_absence_both_sides_fails": true,
+        "stopped_uninvoked_partial_availability_never_PASS": true,
+        "SCH02_arithmetic_certification_claimed": false,
+        "packet_projection_precision_freeze_pending": true
+      }
     },
     {
       "id": "SCH-02",

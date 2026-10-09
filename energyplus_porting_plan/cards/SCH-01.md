@@ -68,3 +68,19 @@ SCH-02가 소비하는 구간을 EP와 대조
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## SCH-01 착수 시 원본 범위 보완
+
+EP 기준은 26.1.0 / `6f2e40d10250a105b49966baa24d843711e61048`이다. 생산 입력은 기존 CON-01 계약의 A/B IDF와 동일한 바이트를 사용한다. 진단용 잘못된 Constant/Compact/TypeLimits 입력은 선정 parser 분기를 확인하기 위한 것이며 생산 지원 범위를 늘리지 않는다.
+
+`ScheduleManager.cc`의 선정 범위는 초기화와 저장소 helper 171–327, 입력 함수의 선언·일회 처리 guard·종류 집계 329–546, TypeLimits 724–804, Compact 1272–1527, Constant 1962–2003, 최종 검증 2197–2264이다. 직접 호출 helper는 전체 `ProcessIntervalFields` 2733–2961, `DecodeHHMMField` 2963–3073, `ProcessForDayTypes` 3075–3249로 고정한다. 날짜 helper는 `General.cc` 395–737, 숫자 helper는 `UtilityRoutines.cc` 94–173이다. 입력 순서는 실제 InputProcessor의 IDF 순서 처리 경로를 따른다. 이 범위 표시는 `ProcessScheduleInput`의 다른 스케줄 종류까지 검증했다는 뜻이 아니다.
+
+관찰 대상은 TypeLimits의 실제 제한·숫자 종류·단위, 등록 순서와 실제 ID/name map, Constant 값, Compact 기간·요일·시간·보간모드, 실제 생성된 day/week 연결과 초기화 상태다. 원본이 사용하는 누락 요일의 실제 zero day owner와 윤일 복사도 포함한다. 수동 관찰에서는 사용 여부를 바꾸는 `GetSchedule`/`GetScheduleNum`을 호출하지 않는다. Native의 built-in ID, 사용자 ID, 보조 day/week ID를 보존하며 Rust와 다른 ID를 이름만으로 숨기지 않는다. 구체적인 대응 규칙은 실행 전 비교 계약에 고정한다.
+
+Compact의 TypeLimits 검사는 원본이 채운 실제 timestep 배열에 의존한다. 이 초기화 의존성과 SCH-02가 소비하는 상태 인계는 SCH-01에서 관찰하되, SCH-02 전체 평가·분 단위 보간·시간 전진 계산의 완료로 계산하지 않는다. Rust 구현은 기존 parser와 runtime을 재사용하며 compiler에서 runtime으로 순환 의존을 만들지 않는다. 실제 수정 방식은 원본 실행과 기존 Rust의 차이를 확인한 뒤 결정한다.
+
+호출 순서는 실제 constant 초기화, 선언된 timestep 문맥, 실제 IDF 입력 처리, 실제 `ProcessScheduleInput`이다. 입력 단계가 중단되면 스케줄 처리를 강제로 계속하지 않는다. 실제 반환, `EnergyPlus::FatalError`, 기타 원본 예외, 도구 자체의 오류를 구분하고 중단 시점의 부분 상태와 진단을 남긴다. 유효한 성공 출력의 필수 값은 양쪽 누락과 한쪽 누락 모두 실패로 처리한다. 사전에 선언한 중단·미호출·부분 상태의 미가용 값은 PASS에 포함하지 않으며 호출 결과 비교와 분리한다.
+
+Rust 입력 변환에는 기존 생산 경로의 실제 IDF→epJSON 변환기를 사용한다. 원본 IDF, 변환 도구, 실제 명령·종료·로그, 변환된 입력 해시와 선언 순서를 함께 기록한다. 변환 실패 시 시험용 정답 JSON을 만들지 않는다. EP 계산 결과는 비교 기준으로만 사용하며 Rust 생산 계산에 주입하지 않는다.
+
+이 변경은 착수 시 문서 범위를 보완한 것이다. 입력 묶음·관찰 필드·수치 정밀도·사례 수는 아직 최종 고정하지 않았고 새 수치 실행이나 PASS를 주장하지 않는다. 네 완료 항목은 모두 미확인으로 유지한다. 실제 명령과 결과를 확보한 뒤 각각 갱신한다.
