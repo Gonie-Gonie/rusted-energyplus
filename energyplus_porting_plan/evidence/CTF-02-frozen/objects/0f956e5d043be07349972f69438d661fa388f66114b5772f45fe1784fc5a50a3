@@ -1,0 +1,254 @@
+{
+  "schema": "ctf02-production-tolerances-contract.v1",
+  "frozen_before_this_CTF02_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "ctf02_public_observation_policy": {
+    "protocol": "ctf02-postreturn-regular-storage.v1",
+    "phase": "after_actual_whole_source_return",
+    "selection": "actual_used_no_source_1D_and_PostConversion_reached_and_not_layers_greater_than_num_res_layers",
+    "public_arrays": [
+      "CTFOutside",
+      "CTFCross",
+      "CTFInside",
+      "CTFFlux"
+    ],
+    "array_slots": 19,
+    "scalar_fields": [
+      "CTFTimeStep",
+      "UValue"
+    ],
+    "integer_fields": [
+      "NumHistories",
+      "NumCTFTerms"
+    ],
+    "all_19_slots_required_for_selected_return": true,
+    "unselected_massive_storage_paired": false,
+    "unreached_counted_as_PASS": false,
+    "private_s0_e_s_or_unassigned_locals_read": false
+  },
+  "arithmetic_profiles_by_variable": [
+    {
+      "variable": "CTFOutside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFCross",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFInside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFFlux",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "UValue",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "ctf01_preprocessing_profiles": [
+    {
+      "variable": "PostLoad.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dyn",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "scope": "actual one-dimensional assignment only"
+    },
+    {
+      "variable": "PostConversion.rs",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cnd",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    }
+  ],
+  "inherited_ctf01_tolerances": {
+    "path": ".runtime/porting/CTF-01/production-frozen-packet-01/tolerances.json",
+    "sha256": "b370c6b8f535cfe161fa553ca4045ef864dc9a1812b7f0c35420ca40545f1b84",
+    "size_bytes": 4310
+  },
+  "copied_input_and_owner_profile": {
+    "fields": [
+      "Thickness",
+      "Conductivity",
+      "Density",
+      "SpecHeat",
+      "Resistance",
+      "ThicknessPerpend",
+      "TimeStepZone",
+      "TimeStepZoneSec"
+    ],
+    "binary64_class_exact": true,
+    "binary64_bits_exact": true,
+    "source": "same declared bit operands copied into actual independent Native/Rust owners; actual loader lane must use observed loader-owned members",
+    "no_formula_or_recomputed_input_substitution": true
+  },
+  "discrete_exact": [
+    "case/order/input IDs and membership",
+    "available/selected/reached/type/shape",
+    "NumHistories/NumCTFTerms",
+    "binary64 class and signed-zero sign",
+    "all19 array slots including untouched tails"
+  ],
+  "nonfinite_policy": "retain actual DTO bits/class/availability; required nonfinite numerical operands unavailable/fail, never numeric PASS",
+  "tolerance_changes_after_output_inspection_permitted": false
+}

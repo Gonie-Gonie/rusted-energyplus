@@ -1,0 +1,71 @@
+--- /dev/null
++++ .runtime/porting/CTF-02/native-observer-prep-01/ctf02_public_fields.hh
+@@ -0,0 +1,68 @@
++// Pure public-owner copies after an unchanged whole calculateTransferFunction call.
++#ifndef CTF02_PUBLIC_FIELDS_HH
++#define CTF02_PUBLIC_FIELDS_HH
++#include "ctf01_reference_metadata.hh"
++#include "ctf01_observer.hh"
++#include <EnergyPlus/Data/EnergyPlusData.hh>
++#include <EnergyPlus/DataGlobals.hh>
++
++namespace Ctf01 {
++inline json ctf02_public_policy()
++{
++    return {{"protocol", "ctf02-postreturn-regular-storage.v1"},
++        {"phase", "after_actual_whole_source_return"},
++        {"selection", "actual_used_no_source_1D_and_PostConversion_reached_and_not_layers_greater_than_num_res_layers"},
++        {"public_arrays", {"CTFOutside", "CTFCross", "CTFInside", "CTFFlux"}},
++        {"array_slots", 19}, {"scalar_fields", {"CTFTimeStep", "UValue"}},
++        {"integer_fields", {"NumHistories", "NumCTFTerms"}},
++        {"all_19_slots_required_for_selected_return", true},
++        {"unselected_massive_storage_paired", false}, {"unreached_counted_as_PASS", false},
++        {"private_s0_e_s_or_unassigned_locals_read", false}};
++}
++inline json ctf02_unavailable(std::string const &reason)
++{
++    return {{"protocol", "ctf02-postreturn-regular-storage.v1"},
++        {"public_owner_available", false}, {"selected_all_resistive_operands", false},
++        {"unavailable_reason", reason}, {"snapshot", nullptr}, {"counted_as_PASS", false}};
++}
++inline json ctf02_public_after_return(EnergyPlus::EnergyPlusData const &state,
++    EnergyPlus::Construction::ConstructionProps const &construction,
++    EnergyPlus::CTF01Observation::Capture const &capture, int actual_index, bool source_returned)
++{
++    if (!source_returned) return ctf02_unavailable("whole_source_call_did_not_return");
++    auto const &converted = capture.phases[2];
++    bool const integrity = !(capture.binding_error || capture.identity_mismatch || capture.duplicate_phase ||
++        capture.phase_order_invalid || capture.active_prefix_invalid);
++    bool const converted_available = integrity && converted.reached && converted.active_prefix_available &&
++        capture.actual_phase_callback_counts[2] == 1;
++    bool const predicate = converted_available && !(converted.LayersInConstruct > converted.NumResLayers);
++    bool const selected = predicate && construction.IsUsedCTF && !construction.SourceSinkPresent &&
++        construction.SolutionDimensions == 1 && !converted.ErrorsFound;
++    std::string const reason = selected ? "selected_all_resistive_postreturn_storage" : !integrity ? "observer_integrity_failed" :
++        !construction.IsUsedCTF ? "source_unused_return" : !converted_available ? "PostConversion_unavailable" :
++        construction.SourceSinkPresent || construction.SolutionDimensions != 1 ? "outside_selected_no_source_1D_scope" :
++        converted.ErrorsFound ? "source_shared_preprocessing_error" : "unselected_massive_branch";
++    auto const array = [](auto const &values) {
++        json result = json::array();
++        for (auto const &value : values) result.push_back(scalar_bits(std::bit_cast<std::uint64_t>(value)));
++        return result;
++    };
++    return {{"protocol", "ctf02-postreturn-regular-storage.v1"}, {"public_owner_available", true},
++        {"selected_all_resistive_operands", selected}, {"selection_reason", reason},
++        {"selection_is_source_predicate_from_captured_operands_not_invented_branch_flag", true},
++        {"actual_construction_index", actual_index}, {"actual_construction_Name", construction.Name},
++        {"actual_IsUsedCTF", construction.IsUsedCTF}, {"actual_SourceSinkPresent", construction.SourceSinkPresent},
++        {"actual_SolutionDimensions", construction.SolutionDimensions},
++        {"PostConversion_available", converted_available},
++        {"actual_LayersInConstruct", converted_available ? json(converted.LayersInConstruct) : json(nullptr)},
++        {"actual_NumResLayers", converted_available ? json(converted.NumResLayers) : json(nullptr)},
++        {"snapshot", {{"CTFOutside", array(construction.CTFOutside)}, {"CTFCross", array(construction.CTFCross)},
++            {"CTFInside", array(construction.CTFInside)}, {"CTFFlux", array(construction.CTFFlux)},
++            {"CTFTimeStep", scalar(construction.CTFTimeStep)}, {"UValue", scalar(construction.UValue)},
++            {"NumHistories", construction.NumHistories}, {"NumCTFTerms", construction.NumCTFTerms},
++            {"actual_caller_TimeStepZone", scalar(state.dataGlobal->TimeStepZone)}}},
++        {"copied_after_actual_whole_return", true}, {"private_locals_or_solver_buffers_read", false},
++        {"unselected_storage_is_unpaired_context_only", !selected}, {"counted_as_PASS", false}};
++}
++} // namespace Ctf01
++#endif

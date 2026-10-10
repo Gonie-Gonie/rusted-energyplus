@@ -1,0 +1,80 @@
+{
+  "schema": "ctf02-fresh-pre-engine-evidence-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-frozen/manifest.json",
+    "sha256": "577fcea430f80e37769b97ad8d10ee0107dfeaa2a4d256f9986e534aa299da44",
+    "size_bytes": 65084
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-02/scope-amendment-01/amendment.json",
+    "sha256": "b213488af0206490a10e4090779fc9ba69c922e1044651f2361dd55e680bda4f",
+    "size_bytes": 2542
+  },
+  "actual_scope_validation": {
+    "path": ".runtime/porting/CTF-02/scope-amendment-command-01/receipt.json",
+    "sha256": "fb51286962387690f10e2e9556a41fbf29f76d33a8595d6db3c572a2a66220e6",
+    "size_bytes": 3014
+  },
+  "actual_unit_freeze": {
+    "path": ".runtime/porting/CTF-02/frozen-packet-01/freeze-receipt.json",
+    "sha256": "cb944917c7610e6ac6aa71133c9b3052b3a988073b7220cb89306c9e2dbc2df4",
+    "size_bytes": 22050
+  },
+  "actual_production_freeze": {
+    "path": ".runtime/porting/CTF-02/production-frozen-packet-01/freeze-receipt.json",
+    "sha256": "a861222d5362786603e4ccf3c0c3e8eae7e7d731d2d1032167dac83ffe9c0ff4",
+    "size_bytes": 27530
+  },
+  "actual_configure": {
+    "path": ".runtime/porting/CTF-02/native-configure-command-01/receipt.json",
+    "sha256": "55ecdf2250c7f0d359514638fac8af24387498ac9757b9626f7867618f796e21",
+    "size_bytes": 5719
+  },
+  "actual_compile_both_targets": {
+    "path": ".runtime/porting/CTF-02/native-compile-command-01/receipt.json",
+    "sha256": "6029e08ef706924d17786c17c0746562b5e14f5a2b58a53b24aff082bfd70d90",
+    "size_bytes": 3263
+  },
+  "actual_configure_rows": {
+    "previous": 667,
+    "current": 673,
+    "all_previous_unchanged": true
+  },
+  "source_review": "Root FULL Native6 bodies/6 exact diffs and Rust9 source proposals accepted, Base Native FULL peer and Raw Rust FULL peer accepted; Root FULL input writer217+IO99 and Raw FULL peer accepted. These are source reviews, not numerical certificates.",
+  "fresh_profiles": {
+    "variables": [
+      "CTFOutside",
+      "CTFCross",
+      "CTFInside",
+      "CTFFlux",
+      "CTFTimeStep",
+      "UValue"
+    ],
+    "atol": 0.0,
+    "rtol": 0.0,
+    "class_exact": true,
+    "shape_exact": true,
+    "signed_zero_exact": true,
+    "all_four_arrays_require_slots": 19,
+    "inherited18_preprocessor_profiles_separate_unchanged": true
+  },
+  "unit_inputs": {
+    "model_cases": 39,
+    "whole_calls": 42
+  },
+  "production_inputs": {
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "whole_construction_calls": "dynamic from actual source-produced Construct owners; no expected21"
+  },
+  "actual_CTF02_helper_execution_yet": false,
+  "Rust_candidate_applied": false,
+  "original_data_QA_complete": false,
+  "numerical_PASS_claimed": false,
+  "pending": [
+    "actual Native build preservation and PE inspection",
+    "genuine Native unit/production observation and Original data integrity",
+    "fresh unchanged existing-Rust baseline",
+    "candidate implementation and unit/integration/production gates"
+  ]
+}

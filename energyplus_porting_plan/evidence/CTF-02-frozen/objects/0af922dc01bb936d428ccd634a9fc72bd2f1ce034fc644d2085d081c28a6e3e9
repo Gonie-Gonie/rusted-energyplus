@@ -1,0 +1,65 @@
+# CTF02 input-only freezer source
+
+SOURCE ONLY; the writer has not been imported or executed by its author.
+This is a bounded adaptation of the accepted CTF01 freezer, not a new review
+or execution framework. Root approves the exact writer SHA and runs it after
+the actual CTF02 source amendment. Both inherited CTF01 packets stay immutable.
+
+One CLI serves `--lane unit` and `--lane production`. Unit copies the exact
+genuine 39 model / 42 operation member-input rows. Production copies the exact
+ordered 15 original-IDF/caller rows and 13 loader phases (195 declared records).
+Production whole CTF calls remain derived from actual Construct owners; no
+expected 21-call count is generated. Neither lane computes Resistance, CTF
+arrays, outcomes or replacement operands. All original 45 guards remain exact.
+
+The inherited Original source lists and selected ranges are preserved: unit
+7 full source identities / 21 ranges; production 21 identities / 45 ranges.
+The held CTF02 observer's 11 selected source contexts separately cover reset,
+literal branch dispatch, all-resistive assignments, public storage/lifetime,
+array declarations, constants, actual caller and ordered whole calls. Current
+Native source identities are the exact held eight rows for the selected lane.
+
+Fresh public profiles are the six ordered variables CTFOutside, CTFCross,
+CTFInside, CTFFlux, CTFTimeStep, UValue, with atol=rtol=0, exact class/shape and
+signed zero. All four arrays require 19 slots. The genuine CTF01 preprocessing
+18-profile list is copied unchanged to `ctf01_preprocessing_profiles`, with its
+exact historical tolerance ref; it does not become a new coefficient oracle.
+The shared public policy is exact in request/admission/projection/tolerances.
+Unreached/unselected states and required absence retain the held policy's
+explicit no-PASS rules. No source result payload is read by this writer.
+
+The actual amendment protocol is `ctf02-source-scope-amendment.v1`, card CTF-02,
+`native_observer` = held native manifest, `public_policy_source_inventory` =
+held projection proposal, `scope_review_passed:true`,
+`all_other_gates_pending:true`, `strict_profiles_settled_before_outputs:true`,
+`actual_CTF02_build_or_engine_execution_performed:false`. Its requested_counts
+is `{unit:{model_cases:39,calculateTransferFunction:42},production:{model_cases:15,
+loader_phase_records:195}}`. Before-document copies must include the historical
+held CTF02 card hash; after_documents must include the explicit current card.
+The genuine supplied recorder must be a source-preserving successful
+`python -X utf8 -B tools/porting/check_plan.py --check --card CTF-02` validation.
+The recorder validates Root-authored documents; it is not an amendment writer.
+
+Runtime CLI (all binding arguments use actual relative `path#SHA256`):
+`python -X utf8 -B <freeze_packet.py> --lane unit|production
+--approved-source-sha256 <actual approved writer SHA>
+--source-manifest <this actual manifest binding>
+--native-source-manifest <held b841 manifest binding>
+--current-card <actual current CTF-02 card binding>
+--actual-scope-amendment <actual amendment binding>
+--actual-scope-amendment-execution <actual recorder binding>
+--output-dir <fresh contained CTF-02 directory>`.
+No future amendment/freeze identity is guessed in source or this manifest.
+
+The six packet files and their receipt form source/tolerances -> request ->
+cases -> projection -> admission -> receipt. Admission has no receipt backref. Both lanes use the
+fresh flag `frozen_before_this_CTF02_helper_execution`; historical CTF01 freeze
+flags are not repurposed. Receipt records actual UTC, source archives, direct
+executed writer/helper identities and full typed stdout. The stdlib packet
+helper is byte-identical to accepted CTF01 IO99 except its CTF-02 output root;
+ordinary Root-supplied paths retain its existing containment/reparse guards.
+
+Authorship: Header authored the inherited Native observer/helpers and proposed
+Rust CTF02 branch. This input/source transport is not independent certification
+of those algorithms. Root and another author review these held bytes; only
+Root performs any actual freeze/build/engine/comparison/card action.

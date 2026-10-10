@@ -1,0 +1,142 @@
+{
+  "schema": "ctf02-public-storage-projection-source-proposal.v1",
+  "status": "SOURCE-PROPOSAL-not-yet-frozen",
+  "ctf02_public_observation_policy": {
+    "protocol": "ctf02-postreturn-regular-storage.v1",
+    "phase": "after_actual_whole_source_return",
+    "selection": "actual_used_no_source_1D_and_PostConversion_reached_and_not_layers_greater_than_num_res_layers",
+    "public_arrays": [
+      "CTFOutside",
+      "CTFCross",
+      "CTFInside",
+      "CTFFlux"
+    ],
+    "array_slots": 19,
+    "scalar_fields": [
+      "CTFTimeStep",
+      "UValue"
+    ],
+    "integer_fields": [
+      "NumHistories",
+      "NumCTFTerms"
+    ],
+    "all_19_slots_required_for_selected_return": true,
+    "unselected_massive_storage_paired": false,
+    "unreached_counted_as_PASS": false,
+    "private_s0_e_s_or_unassigned_locals_read": false
+  },
+  "selected_owner_identity": [
+    "same case ID/order and same original input or exact literal member DTOs",
+    "actual Native construction index/name versus actual Rust construction identity; preserve registration and membership order",
+    "actual whole invocation/outcome and CTF01 phase identity",
+    "actual IsUsedCTF / source context and literal !(LayersInConstruct>NumResLayers) from genuine PostConversion operands"
+  ],
+  "selected_fields": [
+    "CTFOutside",
+    "CTFCross",
+    "CTFInside",
+    "CTFFlux",
+    "CTFTimeStep",
+    "UValue",
+    "NumHistories",
+    "NumCTFTerms"
+  ],
+  "observed_context_only": [
+    "actual caller TimeStepZone",
+    "whole final ErrorsFound/DoCTFErrorReport and source/process outcomes",
+    "returned massive-branch public storage"
+  ],
+  "availability": {
+    "required_selected_one_or_both_missing": "FAIL, no numerical PASS",
+    "genuinely_unreached": "explicit unavailable/excluded with zero comparisons, never PASS",
+    "unused_loading_error_massive": "retain exact source/caller/outcome ledger; no substitution of zero coefficient results",
+    "observer_integrity_failure": "factual failure, never treated as an optional unselected branch",
+    "source_fatal_exception_OS_nonzero": "actual distinct outcomes; no invented whole-return snapshot or method status"
+  },
+  "arithmetic_profiles_by_variable": [
+    {
+      "variable": "CTFOutside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFCross",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFInside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFFlux",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ]
+    },
+    {
+      "variable": "CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "UValue",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "discrete_exact": [
+    "case/order/input IDs and membership",
+    "available/selected/reached/type/shape",
+    "NumHistories/NumCTFTerms",
+    "binary64 class and signed-zero sign",
+    "all19 array slots including untouched tails"
+  ],
+  "nonfinite_policy": "retain actual DTO bits/class/availability; required nonfinite numerical operands unavailable/fail, never numeric PASS",
+  "inherited_preprocessing_policy": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+    "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+    "size_bytes": 5520
+  },
+  "preprocessing_profiles_changed": false,
+  "independent_Rust_operands": "real preprocessing->generated selected public owner->actual surface copy, no Native observations as inputs",
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "not_observed_or_paired": [
+    "SourceSink/Temp/User coefficient arrays",
+    "private s0/e/s storage and unassigned locals",
+    "massive downstream coefficients as CTF02 selected results"
+  ]
+}

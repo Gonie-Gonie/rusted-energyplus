@@ -1,0 +1,69 @@
+{
+  "schema": "ctf02-source-scope-amendment.v1",
+  "card": "CTF-02",
+  "created_utc": "2026-10-10T13:12:14.612905+00:00",
+  "purpose": "Actual Root-authored source scope before any CTF02 Native build/helper or candidate implementation; earlier CTF01 outputs exist and are not backdated. Recorder validates these documents and does not author this amendment.",
+  "native_observer": {
+    "path": ".runtime/porting/CTF-02/native-observer-prep-01/manifest.json",
+    "sha256": "b841bb940fa475255677a2ec7c84a43856b53a0ec2d179dd276d18bd434bf24c",
+    "size_bytes": 28362
+  },
+  "public_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-02/native-observer-prep-01/projection-policy-proposal.json",
+    "sha256": "d610b96f8640b512a81112cabeed373dc0aa0c56e82569dea2049a7a71e200d5",
+    "size_bytes": 4510
+  },
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF02_build_or_engine_execution_performed": false,
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-02/scope-amendment-01/before-card.md",
+      "sha256": "c9b29a1deb1fc79b326599833489b02bfc70952a7ff68989f534ea69ea45c1c5",
+      "size_bytes": 2675
+    },
+    {
+      "path": ".runtime/porting/CTF-02/scope-amendment-01/before-plan.json",
+      "sha256": "bf6ddcd5f2a3fcf600e2f2e2383b6ec954a1e165cbbb4c617552901ec4f31a52",
+      "size_bytes": 616578
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-02.md",
+      "sha256": "3421da46c1db4d0128d71b18602ea9dacc223668b41097a36319cb26285d9094",
+      "size_bytes": 4614
+    },
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "9d7d3e180bad6476509068b560bb9b1131da9c0472d6ab8713e9a223b2689dd8",
+      "size_bytes": 622958
+    }
+  ],
+  "immutable_after_document_copies": [
+    {
+      "path": ".runtime/porting/CTF-02/scope-amendment-01/after-card.md",
+      "sha256": "3421da46c1db4d0128d71b18602ea9dacc223668b41097a36319cb26285d9094",
+      "size_bytes": 4614
+    },
+    {
+      "path": ".runtime/porting/CTF-02/scope-amendment-01/after-plan.json",
+      "sha256": "9d7d3e180bad6476509068b560bb9b1131da9c0472d6ab8713e9a223b2689dd8",
+      "size_bytes": 622958
+    }
+  ],
+  "private_arrays_observed": false,
+  "Rust_candidate_applied": false,
+  "numerical_PASS_claimed": false
+}

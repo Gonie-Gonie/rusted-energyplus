@@ -1,0 +1,72 @@
+# CTF02 public postreturn observation source proposal
+
+SOURCE ONLY. This directory is not a frozen engine packet or an actual build/run proof.
+The old CTF01 sources, packets and outputs remain immutable. No source formula is
+replaced: each helper still executes the unchanged whole public
+`ConstructionProps::calculateTransferFunction` method through the same three
+CTF01 passive callbacks, then copies actual public members after a real return.
+
+`ctf02_public_fields.hh` is shared by fresh forks of both accepted helpers. The
+unit lane preserves the genuine 39 model / 42 operation input rows, including
+single and multiple resistive layers; its members remain literal input seeds,
+not Material-loader observations. The production lane preserves all ordered 15
+original IDFs, 45 inherited guard refs, 13 public lifecycle phases and actual
+loader-owned Material/Construct/use/timestep fields. Whole-call counts are
+derived from the actual loaded Construct array. No prior observed count is an
+expected result.
+
+The public copier reads four complete 19-slot arrays (`CTFOutside`, `CTFCross`,
+`CTFInside`, `CTFFlux`), `CTFTimeStep`, `UValue`, `NumHistories`, `NumCTFTerms`,
+actual owner identity and caller `TimeStepZone`. It reads no private `s0`, `e`,
+`s` or unassigned local. Source selection uses an integrity-valid genuine
+PostConversion snapshot and the literal predicate
+`!(LayersInConstruct > NumResLayers)`, actual used/no-source/1D members and
+preprocessing error state. It is not a claimed Native branch flag.
+
+Every selected return requires all 19 slots, exact count/type/shape/class and
+signed-zero sign. The six separate numeric profiles (four arrays, timestep, U)
+propose `atol=rtol=0` before new CTF02 observations. Returned massive storage is
+retained only as unpaired context. Unused/error/unreached observations never
+become zero-valued selected results or PASS. Source exceptions/OS stops retain
+their real outcomes without fabricated return snapshots. Public-copy failures
+are observer failures, separate from the unchanged source-call outcome. The
+helper itself makes no numerical comparison or card/gate certification.
+
+The two JSON files are input/projection proposals, not runnable operand packets.
+Fresh CTF02 scope authority, source/request/cases/tolerances/projection/admission
+and freeze receipt must exist before either helper executes. Admission requires
+the exact shared policy in request/admission/projection/tolerances and the six
+zero profiles. Its fresh flag is `frozen_before_this_CTF02_helper_execution`;
+inherited CTF01 freezes are historical input authorities, not backdated CTF02
+freezes. Actual future refs remain null in this proposal.
+
+Each lane's `native_source_files` contains eight exact source identities: the
+new main, new admission, shared new copier, unchanged inherited metadata and
+lane fields, and unchanged derived Construction / observer header / observer
+implementation. The manifest records their exact paths and bytes. The four
+before copies and generated diffs expose all changes to inherited helper code.
+
+Both helpers retain argc5: `<root> <fresh-request> <fresh-admission> <fresh-output>`.
+Output is confined to a new directory below `.runtime/porting/CTF-02`.
+Unit schemas are `ctf02-helper-cases.v1`, `ctf02-native-admission-contract.v1`,
+`ctf02-{source,cases,tolerances}-contract.v1`,
+`ctf02-observation-projection.v1`, `ctf02-helper-results.v1`.
+Production schemas add `production-` after `ctf02-`.
+The result adds `CTF02_public_observation_policy`; each operation adds
+`CTF02_public_postreturn`. The exact original callback ledger remains present.
+
+The CMake recipe adds two targets, `ctf02_unit_helper` and
+`ctf02_production_helper`, with distinct main / inherited full Construction /
+callback object files. It includes the held CTF01 production recipe to retain
+existing targets. The genuine cache must retain its existing CTF01 helper and
+production source directory variables, and receive `CTF02_SOURCE_DIR` plus the
+unchanged `CTF01_OBSERVER_SOURCE_DIR`. Original archive objects are not replaced.
+Root must verify actual unchanged prior compile commands, actual added rows,
+compiler/ABI/FP flags, existing registered versus physically present objects,
+protected bytes, and each real link map (derived provider selected, archive
+Construction member absent), then derive/PE-review before an engine call.
+These are future actual build duties; no extra execution framework is added.
+
+Authorship: Header authored the inherited CTF01 helper/observer and proposed
+CTF02 Rust branch. This source proposal is not independent certification of
+those algorithms. Root and another author review the exact held source bytes.

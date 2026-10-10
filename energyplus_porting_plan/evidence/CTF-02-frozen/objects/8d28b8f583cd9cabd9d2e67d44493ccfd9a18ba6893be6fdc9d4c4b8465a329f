@@ -1,0 +1,88 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CTF-02/input-writer-prep-01/freeze_packet.py",
+    "--lane",
+    "unit",
+    "--approved-source-sha256",
+    "0bd6b7cc358ac2d8f81c3ba45af997f6f51f129dd96b13e8b9a1ea2eb2b13f8b",
+    "--source-manifest",
+    ".runtime/porting/CTF-02/input-writer-prep-01/manifest.json#620f4c1998d2f02ac8e5b8f2beb9bdd311eecfaa391fab77c5482a4873847142",
+    "--native-source-manifest",
+    ".runtime/porting/CTF-02/native-observer-prep-01/manifest.json#b841bb940fa475255677a2ec7c84a43856b53a0ec2d179dd276d18bd434bf24c",
+    "--current-card",
+    "energyplus_porting_plan/cards/CTF-02.md#3421da46c1db4d0128d71b18602ea9dacc223668b41097a36319cb26285d9094",
+    "--actual-scope-amendment",
+    ".runtime/porting/CTF-02/scope-amendment-01/amendment.json#b213488af0206490a10e4090779fc9ba69c922e1044651f2361dd55e680bda4f",
+    "--actual-scope-amendment-execution",
+    ".runtime/porting/CTF-02/scope-amendment-command-01/receipt.json#fb51286962387690f10e2e9556a41fbf29f76d33a8595d6db3c572a2a66220e6",
+    "--output-dir",
+    ".runtime/porting/CTF-02/frozen-packet-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T13:13:17.395168+00:00",
+  "finished_utc": "2026-10-10T13:13:18.104761+00:00",
+  "elapsed_seconds": 0.7089793999912217,
+  "repository_before": {
+    "head": "791a2addd14b9139c97c5366ad5fe5c936f39103",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CTF-02.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "repository_after": {
+    "head": "791a2addd14b9139c97c5366ad5fe5c936f39103",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CTF-02.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/9e/9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+    "sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-02/freeze-command-01/stdout.log",
+    "sha256": "2da8b82a1b4fa1bf728133245290b7be8a256afa56d17c3ef2c915b5a15af56b"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-02/freeze-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T13:13:18.104761+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

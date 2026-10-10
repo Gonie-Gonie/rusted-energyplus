@@ -1,0 +1,78 @@
+--- .runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp
++++ .runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_helper.cpp
+@@ -1,6 +1,7 @@
+ // Actual fixed-CON IDF loaders, actual use owners, and unchanged whole CTF calls.
+ #include "ctf01_production_fields.hh"
+-#include "ctf01_production_admission.hh"
++#include "ctf02_production_admission.hh"
++#include "ctf02_public_fields.hh"
+ #include <EnergyPlus/DataStringGlobals.hh>
+ #include <EnergyPlus/DataHVACGlobals.hh>
+ #include <EnergyPlus/OutputProcessor.hh>
+@@ -152,7 +153,7 @@
+     int const count = factory.state ? factory.state->dataConstruction->Construct.isize() : 0;
+     for (int index = 1; index <= count; ++index) {
+         bool const invoked = !factory.stopped; auto const before = factory.observed(input_errors, ctf_errors, report);
+-        auto const begin = factory.messages.size(); json outcome = not_invoked(factory.stop_reason), observed = nullptr;
++        auto const begin = factory.messages.size(); json outcome = not_invoked(factory.stop_reason), observed = nullptr, public_storage = ctf02_unavailable("actual_source_not_invoked");
+         if (invoked) {
+             Observation::Capture capture;
+             {
+@@ -160,6 +161,15 @@
+                 Observation::Binding binding(capture, *factory.state, construction);
+                 outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ctf_errors, report); });
+             }
++            try {
++                public_storage = ctf02_public_after_return(*factory.state,
++                    factory.state->dataConstruction->Construct(index), capture, index,
++                    outcome.at("status") == "source_returned");
++            } catch (std::exception const &error) {
++                factory.observer_integrity_failed = true;
++                public_storage = ctf02_unavailable("observer_public_storage_copy_failed");
++                public_storage["observer_exception_message"] = error.what();
++            }
+             observed = observations(capture); factory.observer_integrity_failed = factory.observer_integrity_failed || observer_failed(capture);
+             if (outcome.at("status") != "source_returned") {
+                 factory.stopped = true; factory.stop_reason = outcome.at("status").get<std::string>();
+@@ -168,7 +178,7 @@
+         operations.push_back({{"kind", "calculateTransferFunction"}, {"actual_construction_index", index},
+             {"actual_construction_Name", factory.state->dataConstruction->Construct(index).Name},
+             {"actual_source_invoked", invoked}, {"call_outcome", outcome}, {"before", before},
+-            {"after", factory.observed(input_errors, ctf_errors, report)}, {"observations", observed},
++            {"after", factory.observed(input_errors, ctf_errors, report)}, {"observations", observed}, {"CTF02_public_postreturn", public_storage},
+             {"diagnostic_message_begin", begin}, {"diagnostic_message_end", factory.messages.size()}});
+     }
+     return {{"id", row.at("id")}, {"lane", row.at("lane")}, {"actual_input", row.at("input")}, {"declared_caller", row.at("caller")},
+@@ -186,10 +196,10 @@
+ {
+     using namespace Ctf01;
+     try {
+-        require(argc == 5, "Usage: ctf01_production_helper <root> <frozen-production-request> <production-admission> <fresh-output>");
++        require(argc == 5, "Usage: ctf02_production_helper <root> <frozen-production-request> <production-admission> <fresh-output>");
+         auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+         auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+-        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-01");
++        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-02");
+         require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF production output required");
+         auto const packet = admit_production(root, request_path, admission_path); fs::create_directories(output);
+         json rows = json::array(), statuses = json::object(), loader_statuses = json::object(), functions = json::object(); std::size_t invoked = 0, skipped = 0, callbacks = 0, unavailable = 0;
+@@ -214,7 +224,7 @@
+         auto const after = admit_production(root, request_path, admission_path);
+         require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts, "Production packet changed during calls");
+         int const exit = observer_integrity_failed ? 2 : 0;
+-        json const result = {{"schema", "ctf01-production-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
++        json const result = {{"schema", "ctf02-production-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
+             {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+             {"observation_projection", file_ref(packet.projection_path)}, {"contracts", packet.contracts},
+             {"actual_scope_amendment", packet.request.at("actual_scope_amendment")}, {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
+@@ -224,8 +234,8 @@
+             {"loader_unavailable_model_cases", unavailable}, {"unknown_whole_call_obligations_for_unavailable_loaders", unavailable == 0 ? json(0) : json(nullptr)},
+             {"actual_CTF_status_counts", statuses}, {"actual_loader_status_counts", loader_statuses}, {"actual_source_function_counts", functions}, {"actual_phase_callback_count", callbacks}, {"observer_integrity_failed", observer_integrity_failed},
+             {"actual_helper_exit_code", exit}, {"complete_requested_model_ledger", true}, {"complete_all_phase_observations_claimed", false},
+-            {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
++            {"CTF02_public_observation_policy", ctf02_public_policy()}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
+             {"whole_building_or_CTF02_through_CTF10_certified", false}};
+-        write_text(output / "ctf01-production-helper-results.json", result.dump(2) + "\n"); return exit;
++        write_text(output / "ctf02-production-helper-results.json", result.dump(2) + "\n"); return exit;
+     } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+ }

@@ -1,0 +1,412 @@
+--- .runtime/porting/CTF-01/input-writer-prep-01/freeze_packet.py
++++ .runtime/porting/CTF-02/input-writer-prep-01/freeze_packet.py
+@@ -1,235 +1,213 @@
+-"""Freeze literal CTF member inputs and a one-way contract DAG; Root execution only."""
++"""Freeze inherited literal inputs plus fresh CTF02 public-storage policy; Root only."""
+ import argparse
+ import hashlib
+ import importlib.util
+ import json
+-import re
+ from datetime import datetime, timezone
+ from pathlib import Path
+ 
+-IO_SHA = "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74"
++IO_SHA = "c5e6943ef2c249e093be697520f82662d5b1dacf64942820b66358dbf0f859dd"
+ io_path = Path(__file__).resolve().with_name("packet_io.py")
+ if hashlib.sha256(io_path.read_bytes()).hexdigest() != IO_SHA:
+-    raise ValueError("Reviewed stdlib input/source helper differs")
+-spec = importlib.util.spec_from_file_location("ctf01_packet_io", io_path)
++    raise ValueError("Reviewed stdlib packet helper differs")
++spec = importlib.util.spec_from_file_location("ctf02_packet_io", io_path)
+ m = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(m)
+ 
+ COMMIT = "6f2e40d10250a105b49966baa24d843711e61048"
+-DESIGN = {"path": ".runtime/porting/CTF-01/input-design-prep-01/manifest.json",
+-          "sha256": "28016195bc72bff53ab5140abfb6dca43fb0f82c117f04f824acf07a1a53583f"}
+-OBSERVER = {"path": ".runtime/porting/CTF-01/native-observer-prep-01/manifest.json",
+-            "sha256": "da47576f07da2283ce28ac65452332221e80679c66992fb62e7ea9952701fe26"}
+-SCOPE = {"path": "energyplus_porting_plan/contracts/scope.json",
+-         "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"}
+-ORIGINAL_PREFIX = ".reference/energyplus-src/26.1.0/"
+-FLAGS = {"frozen_before_numerical_execution": True, "expected_values_supplied": False,
++ORIGINAL = ".reference/energyplus-src/26.1.0/"
++NATIVE = {"path": ".runtime/porting/CTF-02/native-observer-prep-01/manifest.json",
++          "sha256": "b841bb940fa475255677a2ec7c84a43856b53a0ec2d179dd276d18bd434bf24c"}
++FLAGS = {"frozen_before_this_CTF02_helper_execution": True, "expected_values_supplied": False,
+          "expected_exits_supplied": False, "scientific_execution_performed": False}
+-NATIVE_NAMES = {"Construction.ctf01.cc", "ctf01_observer.hh", "ctf01_observer.cc",
+-                "ctf01_reference_helper.cpp", "ctf01_reference_metadata.hh",
+-                "ctf01_reference_fields.hh", "ctf01_reference_admission.hh"}
+-
+-
+-def identifier(value):
+-    m.require(isinstance(value, str) and re.fullmatch("[A-Za-z0-9_-]{1,80}", value),
+-              "Bounded literal identifier required")
+-    return value
+-
+-
+-def expand(matrix):
+-    literals = {row["id"]: row["bits"] for row in matrix["scalar_literals"]}
+-    m.require(len(literals) == len(matrix["scalar_literals"]), "Duplicate scalar literal ID")
+-    for bits in literals.values():
+-        m.require(re.fullmatch("[0-9a-f]{16}", bits) and (int(bits, 16) >> 52) & 2047 != 2047,
+-                  "Literal finite binary64 input required")
+-
+-    def scalar(name):
+-        return {"bits": literals[name]}
+-
+-    seeds = matrix["material_member_seeds"]
+-    seed_ids = [identifier(row["id"]) for row in seeds]
+-    m.require(len(set(seed_ids)) == len(seed_ids), "Duplicate material seed ID")
+-    models = []
+-    for row in matrix["model_cases"]:
+-        used = {name for call in row["construction_calls"] for name in call["layer_material_ids"]}
+-        m.require(used <= set(seed_ids), "Unknown literal material membership")
+-        materials = []
+-        # Subset only; the original seed-registry order determines actual owner order.
+-        for seed in seeds:
+-            if seed["id"] not in used:
+-                continue
+-            m.require(seed["group_member"] == "Regular" and
+-                      seed["provenance"] == "explicit-member-input-not-loader-output", "Explicit member lane required")
+-            members = seed["members"]
+-            m.require(type(members["ROnly"]) is bool, "Typed ROnly input required")
+-            materials.append({"id": seed["id"], "Name": seed["id"],
+-                              **{key: scalar(members[key]) for key in
+-                                 ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]},
+-                              "ROnly": members["ROnly"]})
+-        common = matrix["common_construction_inputs"]
+-        constructions, operations = [], []
+-        for call in row["construction_calls"]:
+-            name = identifier(call["id"])
+-            m.require(type(call["IsUsedCTF"]) is bool and 1 <= len(call["layer_material_ids"]) <= 11,
+-                      "Literal selected construction members required")
+-            constructions.append({"id": name, "Name": name, "IsUsedCTF": call["IsUsedCTF"],
+-                                  **{key: common[key] for key in ["SourceSinkPresent", "SolutionDimensions",
+-                                                                "SourceAfterLayer", "TempAfterLayer"]},
+-                                  "ThicknessPerpend": scalar(common["ThicknessPerpend"]),
+-                                  "layer_material_ids": list(call["layer_material_ids"])})
+-            operations.append({"id": name, "kind": "calculateTransferFunction", "construction_id": name})
+-        m.require(row["lane"] == "explicit-member-unit" and materials and constructions,
+-                  "Nonempty explicit member model required")
+-        m.require(len({call["id"] for call in constructions}) == len(constructions), "Duplicate construction ID")
+-        for key in ["initial_ErrorsFound", "initial_DoCTFErrorReport"]:
+-            m.require(type(row[key]) is bool, "Typed shared initial flag required")
+-        caller = {key: scalar(matrix["common_caller_inputs"][key]) for key in ["TimeStepZone", "TimeStepZoneSec"]}
+-        caller.update(ErrorsFound=row["initial_ErrorsFound"], DoCTFErrorReport=row["initial_DoCTFErrorReport"])
+-        models.append({"id": identifier(row["id"]), "lane": row["lane"], "caller": caller,
+-                       "materials": materials, "constructions": constructions, "operations": operations})
+-    m.require(len({row["id"] for row in models}) == len(models), "Duplicate model ID")
+-    calls = sum(len(row["operations"]) for row in models)
+-    counts = {"model_cases": len(models), "calculateTransferFunction": calls, "total_operations": calls}
+-    m.require({"model_cases": len(models), "calculateTransferFunction_calls": calls} ==
+-              matrix["proposed_array_derived_counts"], "Literal matrix counts differ")
+-    return models, counts
++INHERITED = {
++    "unit": {"base": ".runtime/porting/CTF-01/frozen-packet-01/",
++             "request": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
++             "source": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
++             "tolerances": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b"},
++    "production": {"base": ".runtime/porting/CTF-01/production-frozen-packet-01/",
++                   "request": "400beabb42dceafc0db6e0a7f3ebaf14bb54bb9e037b8c8777043e74233e301d",
++                   "source": "89c2629f2789b82ffd4b6d92c552391843eb2d793702116dd73beaae5579e9d3",
++                   "tolerances": "b370c6b8f535cfe161fa553ca4045ef864dc9a1812b7f0c35420ca40545f1b84"},
++}
++COUNTS = {"unit": {"model_cases": 39, "calculateTransferFunction": 42},
++          "production": {"model_cases": 15, "loader_phase_records": 195}}
++
++
++def range_guard(source, row):
++    raw = m.contained(m.bind(source)["path"]).read_bytes().splitlines(keepends=True)
++    lo, hi = row["start_line"], row["end_line"]
++    m.require(type(lo) is int and type(hi) is int and 1 <= lo <= hi <= len(raw), "Bounded source range required")
++    selected = b"".join(raw[lo - 1:hi])
++    m.require(hashlib.sha256(selected).hexdigest() == row.get("range_sha256", row.get("sha256")) and
++              len(selected) == row.get("range_size_bytes", row.get("size_bytes")), "Selected source range differs")
++
++
++def scope_authority(args, native, native_ref, policy_ref):
++    card = m.argument(args.current_card)
++    m.require(card["path"] == "energyplus_porting_plan/cards/CTF-02.md", "Actual CTF02 card required")
++    amendment_ref = m.argument(args.actual_scope_amendment)
++    execution_ref = m.argument(args.actual_scope_amendment_execution)
++    amendment, execution = m.load(amendment_ref), m.load(execution_ref)
++    m.require(amendment["schema"] == "ctf02-source-scope-amendment.v1" and amendment["card"] == "CTF-02" and
++              amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
++              amendment["strict_profiles_settled_before_outputs"] is True and
++              amendment["actual_CTF02_build_or_engine_execution_performed"] is False,
++              "Actual pre-output CTF02 source scope authority required")
++    m.require(m.bind(amendment["native_observer"]) == native_ref and
++              m.bind(amendment["public_policy_source_inventory"]) == policy_ref and
++              amendment["requested_counts"] == COUNTS, "Actual scope source/policy/input count binding differs")
++    before = [m.bind(row) for row in amendment["before_documents"]]
++    after = [m.bind(row) for row in amendment["after_documents"]]
++    historical_card = next(row for row in native["historical_authorities"] if row["path"] == card["path"])
++    m.require(any(row["sha256"] == historical_card["sha256"] for row in before) and card in after,
++              "Historical source card archive/current amended card correspondence differs")
++    m.require(type(execution["exit_code"]) is int and execution["exit_code"] == 0 and
++              execution["launch_error"] is None and execution["source_bytes_match_before_and_after"] is True and
++              execution["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py",
++                                       "--check", "--card", "CTF-02"],
++              "Actual source-preserving scope-document validation recorder required")
++    for key in ["stdout", "stderr"]:
++        m.bind(execution[key])
++    m.require(m.contained(execution["stderr"]["path"]).read_bytes() == b"", "Scope validation stderr must be empty")
++    return {"current_card": card, "actual_scope_amendment": amendment_ref,
++            "actual_scope_amendment_execution": execution_ref, "historical_scope_documents": before,
++            "scope_recorder_role": "validated-Root-authored-documents; did-not-author-amendment"}
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--lane", choices=["unit", "production"], required=True)
+     for name in ["approved-source-sha256", "source-manifest", "native-source-manifest", "current-card",
+                  "actual-scope-amendment", "actual-scope-amendment-execution", "output-dir"]:
+         parser.add_argument("--" + name, required=True)
+     args = parser.parse_args()
+     started = datetime.now(timezone.utc).isoformat()
+     writer = m.identity(__file__)
+-    m.require(writer["sha256"] == args.approved_source_sha256, "Explicit reviewed writer SHA256 differs")
+-    own_manifest_ref = m.argument(args.source_manifest)
+-    own_manifest = m.load(own_manifest_ref)
+-    m.require(own_manifest["schema"] == "ctf01-input-writer-source-preparation.v1", "Reviewed writer manifest required")
+-    own_sources = [m.bind(row) for row in own_manifest["own_sources"]]
+-    m.require(own_sources == [writer, m.identity(io_path)], "Approved writer/source-helper inventory differs")
+-    design_ref, observer_ref = m.bind(DESIGN), m.bind(OBSERVER)
+-    design, observer = m.load(design_ref), m.load(observer_ref)
+-    m.require(design["schema"] == "ctf01-input-projection-source-proposal.v1" and
+-              design["status"] == "SOURCE-READY-held-unexecuted-proposal", "Held design identity required")
+-    documents = {Path(row["path"]).name: m.bind(row) for row in design["documents"]}
+-    matrix, proposed_projection, policy = [m.load(documents[name]) for name in
+-                                          ["case-matrix.json", "projection.json", "numeric-policy.json"]]
+-    models, counts = expand(matrix)
+-    profiles = policy["arithmetic_profiles_by_variable"]
+-    expected = [phase + "." + field for phase in ["PostLoad", "PostMerge", "PostConversion"]
+-                for field in ["dl", "rk", "rho", "cp", "lr"]] + ["PostConversion." + key for key in ["dyn", "rs", "cnd"]]
+-    m.require([row["variable"] for row in profiles] == expected, "Exact eighteen named profiles required")
+-    m.require(all(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and
+-                  row["rtol"] == 0.0 and row["class_exact"] is True and row["shape_exact"] is True
+-                  for row in profiles), "Root pre-output zero tolerances/class/shape must remain exact")
+-    copied = policy["copied_input_and_owner_profile"]
+-    m.require(copied["binary64_class_exact"] is True and copied["binary64_bits_exact"] is True,
+-              "Copied input member bits/class must remain exact")
+-    source_files, source_bindings = [], []
+-    for row in design["primary_source_identities"]:
+-        if row["path"].startswith(ORIGINAL_PREFIX):
+-            ref = m.bind(row)
+-            source_bindings.append(ref)
+-            source_files.append({**ref, "path": row["path"][len(ORIGINAL_PREFIX):]})
+-    for row in design["primary_source_ranges"]:
+-        raw = m.contained(m.bind(row["source"])["path"]).read_bytes().splitlines(keepends=True)
+-        selected = b"".join(raw[row["start_line"] - 1:row["end_line"]])
+-        m.require(hashlib.sha256(selected).hexdigest() == row["range_sha256"] and
+-                  len(selected) == row["range_size_bytes"], "Pinned primary source range differs")
+-    native_manifest_ref = m.argument(args.native_source_manifest)
+-    native_manifest = m.load(native_manifest_ref)
+-    m.require(native_manifest["schema"] == "ctf01-native-helper-source-preparation.v1" and
+-              native_manifest["energyplus_commit"] == COMMIT, "Reviewed Native helper source manifest required")
+-    native_sources = [m.bind(row) for row in native_manifest["runtime_protocol"]["native_source_files"]]
+-    m.require(len(native_sources) == 7 and {Path(row["path"]).name for row in native_sources} == NATIVE_NAMES,
+-              "Exact seven Native source files required")
+-    passive = [m.bind(row) for row in observer["sources"]]
+-    m.require(native_sources[:3] == passive, "Held passive observer identity/order differs")
+-    scope_ref = m.bind(SCOPE)
++    m.require(writer["sha256"] == args.approved_source_sha256, "Explicit approved writer SHA differs")
++    own_ref = m.argument(args.source_manifest)
++    own = m.load(own_ref)
++    own_sources = [m.bind(row) for row in own["own_sources"]]
++    m.require(own["schema"] == "ctf02-input-writer-source-preparation.v1" and
++              own_sources == [writer, m.identity(io_path)], "Exact approved writer/helper identities required")
++    native_ref = m.argument(args.native_source_manifest)
++    m.require(native_ref == m.bind(NATIVE), "Exact held Native source preparation required")
++    native = m.load(native_ref)
++    m.require(native["schema"] == "ctf02-native-public-postreturn-source-preparation.v1" and
++              native["energyplus_commit"] == COMMIT, "Pinned new public observer manifest required")
++    documents = {Path(row["path"]).name: m.bind(row) for row in native["source_proposals"]}
++    proposed = m.load(documents["input-policy-proposal.json"])
++    projection_policy_ref = documents["projection-policy-proposal.json"]
++    projection_policy = m.load(projection_policy_ref)
++    public_policy = projection_policy["ctf02_public_observation_policy"]
++    m.require(public_policy == proposed["ctf02_public_observation_policy"], "Typed public policy differs")
++    profiles = projection_policy["arithmetic_profiles_by_variable"]
++    variables = ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFTimeStep", "UValue"]
++    m.require([row["variable"] for row in profiles] == variables and all(
++        type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
++        row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
++        row["required_shape"] == ([19] if index < 4 else "scalar") for index, row in enumerate(profiles)),
++        "Six distinct zero/class/shape/signedzero profiles and all19 slots required")
++    inherited = INHERITED[args.lane]
++    old_refs = {key: m.bind({"path": inherited["base"] + name, "sha256": inherited[key]}) for key, name in
++                [("request", "helper-request.json"), ("source", "source.json"), ("tolerances", "tolerances.json")]}
++    old_request, old_source, old_tolerance = [m.load(old_refs[key]) for key in ["request", "source", "tolerances"]]
++    models = old_request["model_cases"]  # Exact literal/member or original IDF rows; no normalization or reconstruction.
++    counts = {"model_cases": len(models)}
++    if args.lane == "unit":
++        counts["calculateTransferFunction"] = sum(len(row["operations"]) for row in models)
++        m.require(counts == COUNTS["unit"], "Genuine inherited unit39/42 input rows required")
++        counts["total_operations"] = counts["calculateTransferFunction"]
++    else:
++        counts["loader_phase_records"] = len(models) * len(old_request["loader_phase_order"])
++        m.require(counts == COUNTS["production"], "Genuine inherited production15/195 input rows required")
++    m.require(counts == old_request["requested_counts"] and old_request["energyplus_commit"] == COMMIT and
++              old_source["energyplus_commit"] == COMMIT, "Inherited request source/count identity differs")
++    old_profiles = old_tolerance["arithmetic_profiles_by_variable"]
++    expected18 = [phase + "." + field for phase in ["PostLoad", "PostMerge", "PostConversion"]
++                  for field in ["dl", "rk", "rho", "cp", "lr"]] + ["PostConversion." + key for key in ["dyn", "rs", "cnd"]]
++    m.require([row["variable"] for row in old_profiles] == expected18 and all(
++        row["atol"] == row["rtol"] == 0.0 and row["class_exact"] is True and row["shape_exact"] is True
++        for row in old_profiles), "Inherited18 preprocessing profiles must remain unchanged separate context")
++    scope_ref = m.bind(proposed["fixed_scope"])
+     scope = m.load(scope_ref)
+-    guards = [ref for row in scope["cases"] for key in ["input", "weather", "metadata"] for ref in [row[key]]]
+-    m.require(len(scope["cases"]) == 15 and len(guards) == 45 and scope["energyplus"]["commit"] == COMMIT,
+-              "Fixed ordered CON15/45 source/input authority required")
++    guards = [row[key] for row in scope["cases"] for key in ["input", "weather", "metadata"]]
++    m.require(len(scope["cases"]) == 15 and len(guards) == 45 and guards == old_request["all_45_guard_refs"] ==
++              proposed["all_45_guard_refs"] and m.bind(old_request["fixed_scope"]) == scope_ref,
++              "Exact inherited fixed15 and ordered45 input guard refs required")
+     for row in guards:
+-        m.bind(row)  # Hash only: no IDF/weather/metadata numerical parsing.
+-    card_ref = m.argument(args.current_card)
+-    m.require(card_ref["path"] == "energyplus_porting_plan/cards/CTF-01.md", "Explicit actual current CTF card required")
+-    amendment_ref = m.argument(args.actual_scope_amendment)
+-    execution_ref = m.argument(args.actual_scope_amendment_execution)
+-    amendment = m.load(amendment_ref)
+-    m.require(amendment["schema"] == "ctf01-source-scope-amendment.v1" and
+-              amendment["strict_profiles_settled_before_outputs"] is True and amendment["all_four_gates_pending"] is True and
+-              amendment["actual_CTF_build_or_engine_execution_performed"] is False, "Actual pre-output scope amendment required")
+-    for key, expected_ref in [("input_design", design_ref), ("native_observer", observer_ref),
+-                              ("native_helper", native_manifest_ref)]:
+-        m.require(m.bind(amendment[key]) == expected_ref, "Scope authority source binding differs")
+-    before_documents = [m.bind(row) for row in amendment["before_documents"]]
+-    after_documents = [m.bind(row) for row in amendment["after_documents"]]
+-    historical_card = next(row for row in design["primary_source_identities"] if row["path"] == card_ref["path"])
+-    m.require(any(row["sha256"] == historical_card["sha256"] for row in before_documents) and
+-              card_ref in after_documents, "Historical design card archive/current scope card correspondence differs")
+-    m.require(amendment["requested_counts"] == {key: counts[key] for key in ["model_cases", "calculateTransferFunction"]},
+-              "Actual scope literal-array count differs")
+-    execution = m.load(execution_ref)
+-    m.require(type(execution["exit_code"]) is int and execution["exit_code"] == 0 and
+-              execution["launch_error"] is None and execution["source_bytes_match_before_and_after"] is True,
+-              "Actual successful source-preserving scope amendment recorder required")
+-    m.require(execution["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", "CTF-01"],
+-              "Actual recorded scope document validation command required; it did not author the amendment")
+-    for key in ["stdout", "stderr"]:
+-        m.bind(execution[key])
++        m.bind(row)  # Only byte identities, no scientific/weather parsing.
++    if args.lane == "production":
++        m.require(all(row["id"] == selected["id"] and row["input"] == selected["input"]
++                      for row, selected in zip(models, scope["cases"])), "Production scope order/input rows differ")
++    originals = []
++    for row in old_source["source_files"]:
++        source = m.bind({**row, "path": ORIGINAL + row["path"]})
++        m.require(m.contained(source["path"]).is_relative_to(m.ROOT / ORIGINAL), "Original source tree escape")
++        originals.append(source)
++        for selected in row.get("selected_ranges", []):
++            range_guard(source, selected)
++    m.require(len(originals) == (7 if args.lane == "unit" else 21), "Genuine inherited Original source inventory differs")
++    for row in old_source.get("primary_source_ranges", []):
++        range_guard(row["source"], row)
++    for row in native["selected_primary_ranges"]:
++        source = next(item for item in native["original_sources"] if item["path"] == row["source"])
++        range_guard(source, row)
++    native_sources = [m.bind(row) for row in native["native_source_files_by_lane"][args.lane]]
++    m.require(len(native_sources) == 8 and len({Path(row["path"]).name for row in native_sources}) == 8,
++              "Exact lane-specific Native8 identity inventory required")
++    authority = scope_authority(args, native, native_ref, projection_policy_ref)
++    authority.update(native_source_manifest=native_ref, public_policy_source_inventory=projection_policy_ref,
++                     inherited_input_only_packet=old_refs)
+     output = m.contained(args.output_dir, existing=False)
+-    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh contained output directory required")
++    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh CTF02 output required")
+     m.recheck()
+     output.mkdir(parents=True, exist_ok=False)
+     archive_dir = output / "source-archives"
+     archive_dir.mkdir()
+-    archived_sources = [m.archive(row, archive_dir, index) for index, row in enumerate(
+-        own_sources + list(documents.values()) + source_bindings + native_sources)]
+-    authority = {"design_manifest": design_ref, "native_observer_source_manifest": observer_ref,
+-                 "native_helper_source_manifest": native_manifest_ref, "current_card": card_ref,
+-                 "actual_scope_amendment": amendment_ref, "actual_scope_amendment_execution": execution_ref,
+-                 "historical_scope_documents": before_documents,
+-                 "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment"}
+-    source = m.emit(output / "source.json", {"schema": "ctf01-source-contract.v1", **FLAGS,
+-        "energyplus_commit": COMMIT, "source_files": source_files, "primary_source_ranges": design["primary_source_ranges"],
+-        "source_authorities": authority, "historical_design_source_identities": design["primary_source_identities"],
+-        "historical_design_card_and_Rust_rows_asserted_current": False})
+-    tolerances = m.emit(output / "tolerances.json", {**policy, "schema": "ctf01-tolerances-contract.v1", **FLAGS,
+-        "status": "Root-reviewed-zero-tolerances-frozen-before-first-numerical-execution", "source_proposal": documents["numeric-policy.json"]})
++    archives = [m.archive(row, archive_dir, index) for index, row in enumerate(
++        own_sources + [native_ref, *documents.values(), *old_refs.values()] + originals + native_sources)]
++    prefix = "ctf02-" + ("production-" if args.lane == "production" else "")
+     common = {**FLAGS, "energyplus_commit": COMMIT, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
+-              "actual_scope_amendment": amendment_ref, "actual_scope_amendment_execution": execution_ref}
+-    observation_policy = {key: proposed_projection[key] for key in
+-                          ["selected_source", "required_observed_fields_when_phase_reached", "pairing", "availability", "excluded"]}
+-    observation_policy["production_fixed15_real_loader_lane"] = "separate-required-pending; not certified by this explicit-member packet"
+-    request = m.emit(output / "helper-request.json", {"schema": "ctf01-helper-cases.v1", **common,
+-        "contracts": {"source": source, "tolerances": tolerances}, "observation_policy": observation_policy,
+-        "model_cases": models, "requested_counts": counts})
+-    cases = m.emit(output / "cases.json", {"schema": "ctf01-cases-contract.v1", **FLAGS, "helper_request": request,
+-        "source": source, "tolerances": tolerances, "fixed_CON_scope": scope_ref, "all_45_guard_refs": guards,
+-        "requested_counts": counts, "literal_case_matrix": documents["case-matrix.json"],
+-        "material_order": "referenced subset in original seed-registry order; no sorting",
+-        "construction_operation_and_layer_order": "literal declaration order unchanged"})
++              **{key: authority[key] for key in ["actual_scope_amendment", "actual_scope_amendment_execution"]}}
++    source = m.emit(output / "source.json", {"schema": prefix + "source-contract.v1", **FLAGS,
++        "energyplus_commit": COMMIT, "source_files": old_source["source_files"],
++        "inherited_primary_source_ranges": old_source.get("primary_source_ranges", []),
++        "ctf02_selected_primary_ranges": native["selected_primary_ranges"], "source_authorities": authority,
++        "selected_source_boundary": "unchanged whole calls; selected all-resistive public postreturn storage only"})
++    tolerances = m.emit(output / "tolerances.json", {"schema": prefix + "tolerances-contract.v1", **FLAGS,
++        "ctf02_public_observation_policy": public_policy, "arithmetic_profiles_by_variable": profiles,
++        "ctf01_preprocessing_profiles": old_profiles, "inherited_ctf01_tolerances": old_refs["tolerances"],
++        "copied_input_and_owner_profile": old_tolerance["copied_input_and_owner_profile"],
++        "discrete_exact": projection_policy["discrete_exact"], "nonfinite_policy": projection_policy["nonfinite_policy"],
++        "tolerance_changes_after_output_inspection_permitted": False})
++    request_extra = {"loader_phase_order": old_request["loader_phase_order"]} if args.lane == "production" else {}
++    request = m.emit(output / "helper-request.json", {"schema": prefix + "helper-cases.v1", **common,
++        "contracts": {"source": source, "tolerances": tolerances}, "observation_policy": old_request["observation_policy"],
++        "ctf02_public_observation_policy": public_policy, "model_cases": models, "requested_counts": counts, **request_extra})
++    cases = m.emit(output / "cases.json", {"schema": prefix + "cases-contract.v1", **FLAGS,
++        "helper_request": request, "source": source, "tolerances": tolerances, "fixed_CON_scope": scope_ref,
++        "all_45_guard_refs": guards, "requested_counts": counts, "inherited_input_only_request": old_refs["request"],
++        "model_member_caller_operation_order_and_bits_unchanged": True})
+     contracts = {"source": source, "cases": cases, "tolerances": tolerances}
+-    projection = m.emit(output / "projection.json", {"schema": "ctf01-observation-projection.v1", **common,
+-        "helper_request": request, "contracts": contracts, "native_observation_policy": observation_policy,
+-        "source_authorities": authority, "numeric_policy": tolerances, "scientific_values_compared_or_PASS_claimed": False})
+-    admission = m.emit(output / "native-admission-contract.json", {"schema": "ctf01-native-admission-contract.v1", **common,
+-        "helper_request": request, "projection": projection, "contracts": contracts,
+-        "native_source_files": native_sources, "requested_counts": counts})
++    projection = m.emit(output / "projection.json", {"schema": prefix + "observation-projection.v1", **common,
++        "helper_request": request, "contracts": contracts, "native_observation_policy": old_request["observation_policy"],
++        "ctf02_public_observation_policy": public_policy, "public_storage_pairing_and_availability": projection_policy,
++        "numeric_policy": tolerances, "source_authorities": authority, "scientific_values_compared_or_PASS_claimed": False})
++    admission = m.emit(output / "native-admission-contract.json", {"schema": prefix + "native-admission-contract.v1", **common,
++        "helper_request": request, "projection": projection, "contracts": contracts, "native_source_files": native_sources,
++        "ctf02_public_observation_policy": public_policy, "requested_counts": counts, **request_extra})
+     m.recheck()
+-    receipt = {"schema": "ctf01-frozen-packet.v1", "status": "frozen-literal-input-and-policy-before-numerical-execution",
+-        "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(), **FLAGS,
+-        "source_preparation_approval": {"approved_writer_sha256": writer["sha256"], "source_manifest": own_manifest_ref,
++    receipt = {"schema": prefix + "frozen-packet.v1", "status": "frozen-inherited-input-and-fresh-CTF02-policy-before-helper",
++        "lane": args.lane, **FLAGS, "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
++        "source_preparation_approval": {"approved_writer_sha256": writer["sha256"], "source_manifest": own_ref,
+                                         "reviewed_sources": own_sources}, "source_authorities": authority,
+-        "helper_request": request, "native_admission_contract": admission, "projection": projection, "contracts": contracts,
+-        "requested_counts": counts, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
+-        "executed_writer_sources": archived_sources[:2], "reviewed_source_archives": archived_sources,
+-        "scope_execution_exit_zero_source_guard_verified": True, "scientific_operands_evaluated": False,
++        "helper_request": request, "native_admission_contract": admission, "projection": projection,
++        "contracts": contracts, "requested_counts": counts, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
++        "executed_writer_sources": archives[:2], "reviewed_source_archives": archives,
++        "inherited_CTF01_freeze_claimed_as_fresh_CTF02_freeze": False, "scientific_operands_evaluated": False,
+         "expected_arrays_or_method_outcomes_generated": False, "numerical_PASS_claimed": False,
+-        "canonical_files_updated": False, "gates_updated": False, "production_fixed15_loader_lane_certified": False}
++        "canonical_files_updated": False, "gates_updated": False}
+     m.emit(output / "freeze-receipt.json", receipt)
+     m.recheck()
+     print(json.dumps(receipt, ensure_ascii=False, allow_nan=False, indent=2))

@@ -1,0 +1,6 @@
+PASS: 64 unique cards; EP 26.1.0 / 6f2e40d10250a105b49966baa24d843711e61048; gates and dependencies valid.
+Scope A: 13/54 completed; ready: SCH-01, CTF-01, SRC-03, SRC-05, SRC-06, RAD-01, ZON-05
+  CTF-02: blocked; scope_review=통과, unit_gate=미확인, integration_gate=미확인, production_gate=미확인; waiting: CTF-01
+Scope B: 13/64 completed; ready: SCH-01, CTF-01, SRC-03, SRC-05, SRC-06, RAD-01, ZON-05
+  CTF-02: blocked; scope_review=통과, unit_gate=미확인, integration_gate=미확인, production_gate=미확인; waiting: CTF-01
+Completion evidence metadata checked; numerical correctness requires the recorded scientific review and replay.
