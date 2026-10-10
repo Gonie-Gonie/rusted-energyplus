@@ -88,3 +88,7 @@ Same frozen inputs and strict zero profiles: unit numeric945014/discrete3840604,
 Actual Clippy/fmt checks0; focused162 and workspace4782 tests passed with0 failed. All candidate/quality/comparison recorders bind Sourcef280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced. The genuine first Clippy missing-docs and second macro recursion-limit failures are preserved. Corrections add eight field descriptions and a single unit-observer crate macro expansion limit; no math or input changes. Full actual scientific bytes, sources and commands are retained in evidence/CTF-09-unit/{manifest,summary}.json.
 
 Only the selected unit gate passes. Whole Native public SI19 stores, reports/final fatal backend, SUR/cache handoff and integration/production/full-card gates remain pending. Fixed6 CLI and precise Original retirement will be recorded separately.
+
+## Actual fixed six ordinary CLI executions
+
+A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final09 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-09-production-cli/{manifest,summary}.json.
