@@ -1,0 +1,13 @@
+{
+  "schema": "ctf10-Root-actual-map-parser-correction.v1",
+  "actual_configure_compile_and_both_derivations_already_succeeded": true,
+  "prior_Root_operational_script": {
+    "path": ".runtime/porting/CTF-10/derive-and-describe-native-build.py",
+    "sha256": "3e440752e82e4ace2cb11514f3a70bf60dd1be79d4808888a4b9bfdc217ac538",
+    "size_bytes": 8558
+  },
+  "prior_Root_metadata_assertion": "incorrect immediate-previous-line section assumption; HBM has many symbols in one actual .text object section",
+  "correction": "track latest actual .text section and prove actual symbol address lies within that object section; both core-provider exclusions and target LOAD ordering remain mandatory",
+  "scientific_Source_or_targets_modified": false,
+  "actual_executions_overwritten_or_retried": false
+}

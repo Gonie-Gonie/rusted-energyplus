@@ -1,0 +1,667 @@
+{
+  "schema": "ctf10-actual-Original-and-unchanged09-baseline-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-original-baseline/manifest.json",
+    "sha256": "152cf38070efd708a5cfee60ada8ff9b97884a58657e6f0c0b9cd8b66507b320",
+    "size_bytes": 437040
+  },
+  "actual_original_DataQA": {
+    "unit": {
+      "review": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/review.json",
+        "sha256": "700797737e0fe61230034f87f88206916db81d31c915388fda2c795c44ca22b5",
+        "size_bytes": 73499
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-10/original-data-review-command-01/receipt.json",
+        "sha256": "07a83031d8b0dbdcd40da4b3b9fe65f779f3d89b24aa1bc4a0b40835843d1892",
+        "size_bytes": 4278
+      },
+      "actual_observation_counts": {
+        "actual_public_storage_observation_counts": {
+          "actual_site_counts": [
+            42,
+            42,
+            0,
+            0,
+            42,
+            42
+          ],
+          "actual_whole_call_records": 42,
+          "failure_kind_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "numerical_PASS_claimed": false,
+          "public_copy_integrity_failed": false
+        },
+        "actual_public_copy_integrity_failed_records": 0,
+        "method_whole_call_records": 42,
+        "method_uninvoked_whole_call_records": 0,
+        "actual_exponential_observation_counts": {
+          "actual_invocation_count": 41,
+          "actual_retained_invocation_count": 41,
+          "actual_stage_callback_counts": [
+            41,
+            41,
+            41,
+            3154,
+            469,
+            41,
+            41
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "actual_retained_power_control_count": 3154,
+          "actual_retained_square_control_count": 469,
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "exponential_selected_first_invocation_count": 25,
+        "exponential_later_unpaired_invocation_count": 16,
+        "exponential_actual_return_marker_count": 41,
+        "actual_inverse_observation_counts": {
+          "actual_invocation_count": 41,
+          "actual_retained_invocation_count": 41,
+          "actual_stage_callback_counts": [
+            41,
+            41,
+            0,
+            0,
+            0,
+            41,
+            41
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "actual_retained_power_control_count": 0,
+          "actual_retained_square_control_count": 0,
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "inverse_selected_first_invocation_count": 25,
+        "inverse_later_unpaired_invocation_count": 16,
+        "inverse_actual_return_marker_count": 41,
+        "actual_gamma_observation_counts": {
+          "actual_invocation_count": 41,
+          "actual_retained_invocation_count": 41,
+          "actual_stage_callback_counts": [
+            41,
+            41,
+            41,
+            41,
+            41
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "gamma_whole_call_records": 42,
+        "gamma_uninvoked_whole_call_records": 0,
+        "gamma_selected_first_invocation_count": 25,
+        "gamma_later_unpaired_invocation_count": 16,
+        "gamma_actual_return_marker_count": 41,
+        "actual_final_coefficient_observation_counts": {
+          "actual_invocation_count": 41,
+          "actual_retained_invocation_count": 41,
+          "actual_stage_callback_counts": [
+            41,
+            41,
+            41
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "coefficient_whole_call_records": 42,
+        "coefficient_uninvoked_whole_call_records": 0,
+        "coefficient_selected_first_invocation_count": 25,
+        "coefficient_later_unpaired_invocation_count": 16,
+        "coefficient_actual_return_marker_count": 41,
+        "actual_retry_observation_counts": {
+          "actual_pre_assignment_count": 41,
+          "actual_retained_pre_assignment_count": 41,
+          "actual_caller_event_count": 151,
+          "actual_retained_caller_event_count": 151,
+          "actual_diagnostic_count": 40,
+          "actual_retained_diagnostic_count": 40,
+          "pre_assignment_records_omitted": 0,
+          "diagnostic_records_omitted": 0,
+          "actual_caller_event_counts": [
+            41,
+            15,
+            26,
+            1,
+            0,
+            2,
+            2,
+            39,
+            25
+          ],
+          "caller_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "retry_copy_integrity_failed": false,
+          "complete_retry_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "retry_whole_call_records": 42,
+        "retry_uninvoked_whole_call_records": 0,
+        "initial_record_count": 42,
+        "initial_reached_phase_records": 25,
+        "initial_unreached_phase_records": 17,
+        "initial_available_owner_count": 25,
+        "initial_unavailable_owner_count": 17,
+        "initial_selected_1D_owner_count": 25,
+        "initial_unselected_context_count": 0,
+        "actual_initial_callback_count": 25,
+        "matrix_whole_call_records": 42,
+        "matrix_uninvoked_whole_call_count": 0,
+        "matrix_unreached_whole_call_count": 17,
+        "actual_matrix_attempt_callback_count": 41,
+        "actual_retained_matrix_attempt_count": 41,
+        "matrix_attempt_records_omitted": 0,
+        "matrix_selected_first_attempt_count": 25,
+        "matrix_later_unpaired_attempt_count": 16,
+        "matrix_unselected_context_attempt_count": 0,
+        "matrix_unavailable_attempt_count": 0,
+        "matrix_failure_event_count": 0,
+        "matrix_failure_IdentityMismatch": 0,
+        "matrix_failure_OrderFailure": 0,
+        "matrix_failure_ActivePrefixShape": 0,
+        "matrix_failure_MatrixShape": 0,
+        "matrix_failure_CopyException": 0,
+        "matrix_failure_LedgerAppendException": 0,
+        "model_cases": 39,
+        "operation_records": 42,
+        "actual_operation_invocations": 42,
+        "actual_operations_skipped": 0,
+        "actual_phase_callback_count": 131,
+        "unreached_phase_records": 20,
+        "scalar_DTO_visits": 2468321,
+        "snapshot_visits": 318,
+        "actual_source_function_counts": {
+          "calculateTransferFunction": 42
+        },
+        "actual_source_status_counts": {
+          "source_returned": 42
+        },
+        "actual_constructor_status_counts": {
+          "source_returned": 39
+        },
+        "actual_initialization_status_counts": {
+          "source_returned": 39
+        },
+        "actual_phase_callback_counts": {
+          "PostLoad": 40,
+          "PostMerge": 33,
+          "PostConversion": 33,
+          "InitialDiscretization": 25
+        }
+      }
+    },
+    "production": {
+      "review": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/review.json",
+        "sha256": "51fa6c55da25fadf97fee0512263329edfc0996ac03a286fbd49df200e67af43",
+        "size_bytes": 116533
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-command-01/receipt.json",
+        "sha256": "b1137332725415b991ac0564702c006d2a463583aa122beade0027e2c7f909b2",
+        "size_bytes": 4379
+      },
+      "actual_observation_counts": {
+        "actual_public_storage_observation_counts": {
+          "actual_site_counts": [
+            21,
+            21,
+            0,
+            0,
+            21,
+            21
+          ],
+          "actual_whole_call_records": 21,
+          "failure_kind_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "numerical_PASS_claimed": false,
+          "public_copy_integrity_failed": false
+        },
+        "actual_public_copy_integrity_failed_records": 0,
+        "method_whole_call_records": 21,
+        "method_uninvoked_whole_call_records": 0,
+        "actual_exponential_observation_counts": {
+          "actual_invocation_count": 15,
+          "actual_retained_invocation_count": 15,
+          "actual_stage_callback_counts": [
+            15,
+            15,
+            15,
+            213,
+            60,
+            15,
+            15
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "actual_retained_power_control_count": 213,
+          "actual_retained_square_control_count": 60,
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "exponential_selected_first_invocation_count": 15,
+        "exponential_later_unpaired_invocation_count": 0,
+        "exponential_actual_return_marker_count": 15,
+        "actual_inverse_observation_counts": {
+          "actual_invocation_count": 15,
+          "actual_retained_invocation_count": 15,
+          "actual_stage_callback_counts": [
+            15,
+            15,
+            0,
+            0,
+            0,
+            15,
+            15
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "actual_retained_power_control_count": 0,
+          "actual_retained_square_control_count": 0,
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "inverse_selected_first_invocation_count": 15,
+        "inverse_later_unpaired_invocation_count": 0,
+        "inverse_actual_return_marker_count": 15,
+        "actual_gamma_observation_counts": {
+          "actual_invocation_count": 15,
+          "actual_retained_invocation_count": 15,
+          "actual_stage_callback_counts": [
+            15,
+            15,
+            15,
+            15,
+            15
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "gamma_whole_call_records": 21,
+        "gamma_uninvoked_whole_call_records": 0,
+        "gamma_selected_first_invocation_count": 15,
+        "gamma_later_unpaired_invocation_count": 0,
+        "gamma_actual_return_marker_count": 15,
+        "actual_final_coefficient_observation_counts": {
+          "actual_invocation_count": 15,
+          "actual_retained_invocation_count": 15,
+          "actual_stage_callback_counts": [
+            15,
+            15,
+            15
+          ],
+          "stage_records_omitted": [
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "method_copy_integrity_failed": false,
+          "complete_method_return_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "coefficient_whole_call_records": 21,
+        "coefficient_uninvoked_whole_call_records": 0,
+        "coefficient_selected_first_invocation_count": 15,
+        "coefficient_later_unpaired_invocation_count": 0,
+        "coefficient_actual_return_marker_count": 15,
+        "actual_retry_observation_counts": {
+          "actual_pre_assignment_count": 15,
+          "actual_retained_pre_assignment_count": 15,
+          "actual_caller_event_count": 60,
+          "actual_retained_caller_event_count": 60,
+          "actual_diagnostic_count": 0,
+          "actual_retained_diagnostic_count": 0,
+          "pre_assignment_records_omitted": 0,
+          "diagnostic_records_omitted": 0,
+          "actual_caller_event_counts": [
+            15,
+            0,
+            15,
+            0,
+            0,
+            0,
+            0,
+            15,
+            15
+          ],
+          "caller_records_omitted": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "failure_event_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "retry_copy_integrity_failed": false,
+          "complete_retry_parity_claimed": false,
+          "numerical_PASS_claimed": false
+        },
+        "retry_whole_call_records": 21,
+        "retry_uninvoked_whole_call_records": 0,
+        "initial_record_count": 21,
+        "initial_reached_phase_records": 15,
+        "initial_unreached_phase_records": 6,
+        "initial_available_owner_count": 15,
+        "initial_unavailable_owner_count": 6,
+        "initial_selected_1D_owner_count": 15,
+        "initial_unselected_context_count": 0,
+        "actual_initial_callback_count": 15,
+        "matrix_whole_call_records": 21,
+        "matrix_uninvoked_whole_call_count": 0,
+        "matrix_unreached_whole_call_count": 6,
+        "actual_matrix_attempt_callback_count": 15,
+        "actual_retained_matrix_attempt_count": 15,
+        "matrix_attempt_records_omitted": 0,
+        "matrix_selected_first_attempt_count": 15,
+        "matrix_later_unpaired_attempt_count": 0,
+        "matrix_unselected_context_attempt_count": 0,
+        "matrix_unavailable_attempt_count": 0,
+        "matrix_failure_event_count": 0,
+        "matrix_failure_IdentityMismatch": 0,
+        "matrix_failure_OrderFailure": 0,
+        "matrix_failure_ActivePrefixShape": 0,
+        "matrix_failure_MatrixShape": 0,
+        "matrix_failure_CopyException": 0,
+        "matrix_failure_LedgerAppendException": 0,
+        "model_cases": 15,
+        "loader_phase_records": 195,
+        "operation_records": 21,
+        "actual_CTF_invocations": 21,
+        "actual_retained_CTF_call_records": 21,
+        "actual_whole_Init_invocations": 15,
+        "actual_Init_event_count": 216,
+        "actual_Init_construction_call_count": 21,
+        "actual_retained_Init_call_records": 21,
+        "actual_Init_diagnostic_count": 0,
+        "Init_copy_integrity_failed_records": 0,
+        "unreturned_Init_call_records": 0,
+        "loader_unavailable_model_cases": 0,
+        "actual_phase_callback_count": 78,
+        "unreached_phase_records": 0,
+        "scalar_DTO_visits": 40710,
+        "snapshot_visits": 435,
+        "unavailable_snapshot_records": 0,
+        "actual_CTF_skipped_construct_rows": null,
+        "actual_whole_Init_status_counts": {
+          "source_returned": 15
+        },
+        "actual_source_function_counts": {
+          "InputProcessor::processInput": 15,
+          "SimulationManager::PostIPProcessing": 15,
+          "EnergyPlusData::init_constant_state": 15,
+          "EnergyPlusData::init_state": 15,
+          "OutputReportPredefined::SetPredefinedTables": 15,
+          "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+          "OutputProcessor::SetupTimePointers(Zone)": 15,
+          "OutputProcessor::SetupTimePointers(System)": 15,
+          "HeatBalanceManager::GetProjectControlData": 15,
+          "HeatBalanceManager::GetSiteAtmosphereData": 15,
+          "Material::GetMaterialData": 15,
+          "HeatBalanceManager::GetConstructData": 15,
+          "HeatBalanceManager::GetBuildingData": 15,
+          "calculateTransferFunction": 21,
+          "HeatBalanceManager::InitConductionTransferFunctions": 15
+        },
+        "actual_CTF_status_counts": {
+          "source_returned": 21
+        },
+        "actual_loader_status_counts": {
+          "source_returned": 195
+        },
+        "actual_constructor_status_counts": {
+          "source_returned": 15
+        },
+        "actual_phase_callback_counts": {
+          "PostLoad": 21,
+          "PostMerge": 21,
+          "PostConversion": 21,
+          "InitialDiscretization": 15
+        },
+        "unknown_whole_call_obligations_for_unavailable_loaders": 0
+      }
+    }
+  },
+  "actual_unit_Native_execution": {
+    "path": ".runtime/porting/CTF-10/native-unit-command-01/receipt.json",
+    "sha256": "b8e52f10c2008a0a57199c33be2d7061612cf29c039922d45b3460aff4a3d8b1",
+    "size_bytes": 3178
+  },
+  "actual_production_Native_execution": {
+    "path": ".runtime/porting/CTF-10/native-production-command-01/receipt.json",
+    "sha256": "2f02bb6a79662bc58417943d64058ada2164d0d6572badbfdfbcbea03c7c97ab",
+    "size_bytes": 3225
+  },
+  "actual_unchanged09_baseline_gap": {
+    "path": ".runtime/porting/CTF-10/existing-production-inputs-01/baseline-gap.json",
+    "sha256": "7a144d0e94f5ded032d1f2bc80a44a73d65e59b7c2effadd99ac79cbf5715e2a",
+    "size_bytes": 3967
+  },
+  "actual_unchanged09_build": {
+    "path": ".runtime/porting/CTF-10/existing-production-build-command-01/receipt.json",
+    "sha256": "7fa60e44288ca7b973172dd3d6d54e747b9741d1cf60c899c1fde752e0878cd9",
+    "size_bytes": 4461
+  },
+  "actual_unchanged09_execution": {
+    "path": ".runtime/porting/CTF-10/existing-production-command-01/receipt.json",
+    "sha256": "b27ebc885dfec860e6fe03fb51d8c02c73643a9c27778b9d33bee5b18434627f",
+    "size_bytes": 2928
+  },
+  "actual_unchanged09_Source_sha256": "f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced",
+  "actual_captured_source_files": 3854,
+  "Original_DataQA_completed_before_unchanged_Rust_build": true,
+  "legacy04_first_assembly_DTO_only_no10_public_owner_coverage_claim": true,
+  "source_review": {
+    "Root_and_other_author_FULL_before_execution": true,
+    "Nativehelper": {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json",
+      "sha256": "1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63",
+      "size_bytes": 37974
+    },
+    "passive": {
+      "path": ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json",
+      "sha256": "a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d",
+      "size_bytes": 22328
+    },
+    "PE": {
+      "path": ".runtime/porting/CTF-10/native-build-review-prep-01/manifest.json",
+      "sha256": "4ba85e024746836e861a7161215f791c2980fcb8603d5f04fbcc3606344c2eee",
+      "size_bytes": 3124
+    },
+    "OriginalDataQA": {
+      "path": ".runtime/porting/CTF-10/original-data-review-prep-01/manifest.json",
+      "sha256": "f5ab4cf6dd7d135326c3d5b2dfa16e746c7859dd18e6adcf4c41054bceedd012",
+      "size_bytes": 50395
+    }
+  },
+  "linked_originals_retained_now": true,
+  "actual_before_guard_discloses_prior09_final_inventory_reuse": true,
+  "fresh_after_build_all46_protected_and631core_hashes_and12absences_verified": true,
+  "preserved_failed_attempts": [],
+  "Root_operational_map_parser_correction": {
+    "path": ".runtime/porting/CTF-10/native-build-01/map-parser-correction.json",
+    "sha256": "2a2b4fcca6b85620575b024d0171362532ad8eb6ed056635dea768337b658e80",
+    "size_bytes": 799
+  },
+  "completed_prior06_trace_transparent_compression": {
+    "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/record.json",
+    "sha256": "65795b7f40ab3d21fcb4871421a3f700845853f9a5fb90ec85c5e3ed87148f7e",
+    "size_bytes": 7246
+  },
+  "Root_authored_summary_is_not_a_command_recorder": true,
+  "Rust_CTF10_candidate_applied": false,
+  "numerical_comparison_count": 0,
+  "numerical_PASS_claimed": false,
+  "unit_integration_production_gates_updated": false,
+  "current10_frozen_plan_and_card_kept_literal_until_comparisons": true,
+  "pending": [
+    "actual10 public source application and formatter correspondence",
+    "Cargo quality",
+    "same-input public19 and actual Init custody comparisons",
+    "fixed6 CLI regression",
+    "separate genuine Original retention decision",
+    "source/internal transfer functions, report equivalence, actual surface consumer handoff and complete CTF gates"
+  ]
+}

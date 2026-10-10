@@ -1,0 +1,453 @@
+"""Validate actual public/whole-Init copies and custody; no CTF or aggregate evaluator."""
+from collections import Counter
+
+ARRAYS = ["CTFCross", "CTFFlux", "CTFInside", "CTFOutside", "CTFSourceIn", "CTFSourceOut",
+          "CTFTSourceOut", "CTFTSourceIn", "CTFTSourceQ", "CTFTUserOut", "CTFTUserIn", "CTFTUserSource"]
+SITES = ["FunctionEntry", "Reset", "ReverseEntry", "ReverseCompleted", "ScopeExit", "CallerReturn"]
+FAILURES = ["IdentityMismatch", "ConstructionNotFound", "CopyException", "Duplicate", "Order", "CounterOverflow"]
+INIT_EVENTS = ["Entry", "ConstructionEntry", "ConstructionReturn", "PostConstructionAggregate", "AfterAllAggregates",
+               "ReportLayersEntry", "ReportLayersReturn", "ScanEntry", "ScanReturn", "ReportHeaders",
+               "ReportTransferEntry", "ReportTransferReturn", "FinalFatalBoundary", "FunctionEnd", "ScopeExit"]
+INIT_SITES = ["Event", "Construction", "Diagnostic"]
+INIT_FAILURES = ["IdentityMismatch", "ConstructionNotFound", "LedgerAppendException", "CopyException", "Order", "CounterOverflow"]
+POLICY = {'schema': 'ctf10-public-storage-prospective-policy.v1', 'status': 'SOURCE-PROPOSAL-not-a-runtime-freeze', 'selected_scope': 'actual_reached_no_source_1D_within_fixed_public_capacity', 'arithmetic_profiles_by_variable': [{'variable': 'CTFOutside', 'atol': 0.0, 'rtol': 0.0, 'class_exact': True, 'shape_exact': True, 'signed_zero_exact': True, 'required_shape': [19], 'unit': 'W/m2-K'}, {'variable': 'CTFCross', 'atol': 0.0, 'rtol': 0.0, 'class_exact': True, 'shape_exact': True, 'signed_zero_exact': True, 'required_shape': [19], 'unit': 'W/m2-K'}, {'variable': 'CTFInside', 'atol': 0.0, 'rtol': 0.0, 'class_exact': True, 'shape_exact': True, 'signed_zero_exact': True, 'required_shape': [19], 'unit': 'W/m2-K'}, {'variable': 'CTFFlux', 'atol': 0.0, 'rtol': 0.0, 'class_exact': True, 'shape_exact': True, 'signed_zero_exact': True, 'required_shape': [19], 'unit': 'dimensionless'}, {'variable': 'CTFTimeStep', 'atol': 0.0, 'rtol': 0.0, 'class_exact': True, 'shape_exact': True, 'signed_zero_exact': True, 'required_shape': 'scalar', 'unit': 'hours'}, {'variable': 'UValue', 'atol': 0.0, 'rtol': 0.0, 'class_exact': True, 'shape_exact': True, 'signed_zero_exact': True, 'required_shape': 'scalar', 'unit': 'W/m2-K'}], 'reset_source_arrays': {'names': ['CTFSourceIn', 'CTFSourceOut', 'CTFTSourceOut', 'CTFTSourceIn', 'CTFTSourceQ', 'CTFTUserOut', 'CTFTUserIn', 'CTFTUserSource'], 'required_shape': [19], 'required_value_bits': '0000000000000000', 'source_QTF_generation_certified': False}, 'exact_discrete': ['original_construction_ids', 'declared_Construct_order', 'original_LayerPoint_material_ids', 'actual_IsUsedCTF', 'actual_reverse_provider_identity_and_precedence', 'NumCTFTerms', 'NumHistories', 'array_lengths', 'source_route_and_return_availability', 'ErrorsFound', 'DoCTFErrorReport', 'actual_Init_call_order', 'postreturn_aggregate_update_order', 'SimpleCTFOnly', 'MaxCTFTerms', 'AnyInternalHeatSourceInInput', 'report_call_availability', 'diagnostic_event_identity_and_order'], 'custody_obligations': ['last_private_method_stamp_distinct_from_actual_caller_postcheck_stamp', 'current_converted_conductance_for_U_including_reverse', 'earlier_actual_public_owner_for_reverse_not_reconstructed_private_coefficients', 'all_fixed_19_slots_including_reset_tails', 'all_actual_declared_calls_retained_and_unreached_explicit'], 'public_capacity': {'slot_count': 19, 'last_valid_index': 18, 'inclusive_NumCTFTerms_store_required': True, 'out_of_capacity_Rust_interface_unrepresentable': True, 'Native_capacity_guard_or_safe_store_outcome_inferred': False, 'clamp_or_truncation': False}, 'source_outcomes': {'fatal_inside_construction_bypasses_stores_and_Init_aggregate': True, 'seven_hour_severe_break_does_not_bypass_stores': True, 'scope_stop_is_not_Native_fatal': True, 'unknown_unreached_or_unrepresentable_counted_as_PASS': False, 'nonfinite_required_numeric_PASS_claimed': False}, 'historical_profiles_modified': False, 'expected_values_or_exits_supplied': False, 'scientific_execution_performed': False, 'numerical_PASS_claimed': False, 'gates_updated': False}
+EXECUTION_POLICY = {'protocol': 'ctf10-declared-Native-execution-lanes.v1', 'unit': 'existing39_models42_direct_whole_Construction_calls_literal_incoming_flags', 'unit_whole_Init_and_reports_admitted': False, 'production': 'fixed15_genuine13_loader_phases_then_true_whole_Init_once_if_ready', 'production_manual_Construction_call_loop_performed': False, 'production_per_call_records': 'actual_original_Init_loop_checkpoint_and_retained_Capture_only', 'per_call_missing_return_is_unknown_not_inferred_exception': True, 'outer_actual_Init_invoke_owns_exception_outcome': True, 'manual_whole_model_per_call_before_after_snapshots_available': False, 'actual_Init_shared_flags_from_reached_event_and_public_snapshots_only': True, 'native_public_capacity_guard_or_store_safety_inferred': False, 'numerical_PASS_claimed': False}
+
+
+def packet(freeze, request, admission, projection, tolerances, need):
+    for owner in [freeze, request, admission, projection, tolerances]:
+        need(owner["frozen_before_this_CTF10_helper_execution"] is True and owner["expected_values_supplied"] is False and
+             owner["expected_exits_supplied"] is False and owner["scientific_execution_performed"] is False,
+             "Fresh input-only public-storage packet required")
+    for owner in [request, admission, projection, tolerances]:
+        need(owner["ctf10_public_storage_observation_policy"] == POLICY and owner["ctf10_execution_lane_policy"] == EXECUTION_POLICY and
+             owner["ctf10_public_profiles"] == POLICY["arithmetic_profiles_by_variable"], "Exact public policy/lane/six profiles required")
+    need(freeze["inherited_CTF01_through_CTF09_freeze_claimed_as_fresh_CTF10_freeze"] is False and
+         projection["method_state_pairing_and_availability"]["ctf10_public_storage_observation_policy"] == POLICY and
+         projection["method_state_pairing_and_availability"]["ctf10_execution_lane_policy"] == EXECUTION_POLICY,
+         "Inherited freezes cannot replace current public-storage authority")
+
+
+def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked public call cannot have observations")
+        return
+    row = operation["observations"]["PublicStorage"]
+    need(row["protocol"] == "ctf10-actual-public-storage-observation.v1" and row["declared_fixed_array_count"] == 12 and
+         row["slots_per_array"] == 19 and all(row[k] is False for k in
+         ["observer_indices_derived_from_NumCTFTerms", "whole_Init_or_safe_Source_store_inferred", "numerical_PASS_claimed"]),
+         "Actual fixed public ownership/scope protocol differs")
+
+    def integer(value, low=0, high=None):
+        need(type(value) is int and value >= low and (high is None or value <= high), "Typed actual public integer required")
+
+    for key in ["integrity_failed", "public_copy_integrity_failed", "scope_exited_during_unwind"]:
+        need(type(row[key]) is bool, "Typed public failure/unwind flag required")
+    sites, failures = {}, {}
+    for key, names, target in [("actual_site_counts", SITES, sites), ("failure_kind_counts", FAILURES, failures)]:
+        need(isinstance(row[key], list) and len(row[key]) == len(names), "Complete actual public counter inventory required")
+        for name, value in zip(names, row[key]):
+            need(set(value) == {"site" if key == "actual_site_counts" else "kind", "actual_count"} and
+                 value["site" if key == "actual_site_counts" else "kind"] == name, "Actual public counter order differs")
+            integer(value["actual_count"]); target[name] = value["actual_count"]
+    need(row["integrity_failed"] is bool(sum(failures.values())), "Public typed failure summary differs")
+    for key in ["first_failure", "last_failure"]:
+        failure = row[key]
+        if sum(failures.values()) == 0: need(failure is None, "No public failure can invent an endpoint")
+        else:
+            need(isinstance(failure, dict) and set(failure) == {"site", "actual_site_ordinal", "kind"} and
+                 failure["site"] in sites and failure["kind"] in failures and failures[failure["kind"]] > 0,
+                 "Actual public failure endpoint required")
+            integer(failure["actual_site_ordinal"], 0, sites[failure["site"]])
+    index = operation["actual_construction_index"]
+    need(isinstance(owner_snapshot, dict) and type(index) is int and 1 <= index <= len(owner_snapshot["constructions"]),
+         "Public call requires its genuine original owner")
+    owner = owner_snapshot["constructions"][index - 1]
+    copied = []
+
+    def snapshot(value, provider=False):
+        need(isinstance(value, dict) and set(value) == {"reached", "copy_available", "snapshot", "unavailable_reason"} and
+             type(value["reached"]) is bool and type(value["copy_available"]) is bool, "Actual public snapshot mask required")
+        if not value["copy_available"]:
+            need(value["snapshot"] is None and value["unavailable_reason"] ==
+                 ("actual_copy_failed" if value["reached"] else "source_checkpoint_not_reached"), "Unavailable public storage must stay null")
+            if value["reached"]: copied.append(False)
+            return None
+        need(value["reached"] is True and value["unavailable_reason"] is None and isinstance(value["snapshot"], dict),
+             "Available public owner requires actual reached copy")
+        state = value["snapshot"]
+        keys = set(ARRAYS + ["actual_construction_address", "actual_construction_index", "actual_Name", "ErrorsFound", "DoCTFErrorReport",
+            "IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "original_layer_prefix_available", "original_LayerPoint",
+            "CTFTimeStep", "UValue", "NumHistories", "NumCTFTerms"])
+        need(set(state) == keys, "All actual fixed public fields required")
+        integer(state["actual_construction_index"], 1, len(owner_snapshot["constructions"])); integer(state["actual_construction_address"], 1)
+        integer(state["TotLayers"]); integer(state["SolutionDimensions"]); integer(state["NumHistories"], -2147483648, 2147483647); integer(state["NumCTFTerms"], -2147483648, 2147483647)
+        need(isinstance(state["actual_Name"], str), "Actual public construction name required")
+        for key in ["ErrorsFound", "DoCTFErrorReport", "IsUsedCTF", "SourceSinkPresent", "original_layer_prefix_available"]:
+            need(type(state[key]) is bool, "Actual public member flag required")
+        actual_owner = owner_snapshot["constructions"][state["actual_construction_index"] - 1]
+        need(state["actual_Name"] == actual_owner["Name"] and all(state[k] == actual_owner[k] for k in
+             ["TotLayers", "IsUsedCTF", "SourceSinkPresent", "SolutionDimensions"]), "Actual public original owner association differs")
+        if not provider: need(state["actual_construction_index"] == index, "Current public owner index differs")
+        if state["original_layer_prefix_available"]:
+            need(state["original_LayerPoint"] == actual_owner["LayerPoint_active"], "Actual public LayerPoint custody differs")
+        else: need(state["original_LayerPoint"] is None, "Unavailable original membership must stay null")
+        copied.append(state["original_layer_prefix_available"])
+        for key in ARRAYS:
+            need(isinstance(state[key], list) and len(state[key]) == 19, "Every declared public array must retain all19 slots")
+            for item in state[key]: scalar(item)
+        for key in ["CTFTimeStep", "UValue"]: scalar(state[key])
+        return state
+
+    states = {key: snapshot(row[key]) for key in ["before_reset", "after_reset", "scope_exit", "actual_caller_return"]}
+    reverse = {}
+    for key in ["reverse_entry", "reverse_completed"]:
+        value = row[key]
+        need(set(value) == {"reached", "current", "actual_provider", "reverse_predicate_reconstructed"} and
+             type(value["reached"]) is bool and value["reverse_predicate_reconstructed"] is False, "Actual reverse-provider mask required")
+        current, provider = snapshot(value["current"]), snapshot(value["actual_provider"], True)
+        need(value["reached"] is value["current"]["reached"] is value["actual_provider"]["reached"], "Reverse endpoint reached flags differ")
+        if provider is not None: need(provider["actual_construction_index"] < index, "Actual reverse provider must precede current owner")
+        reverse[key] = (current, provider)
+    failed = row["integrity_failed"] or any(x is False for x in copied)
+    need(row["public_copy_integrity_failed"] is failed, "Actual public copy-integrity aggregate differs")
+    if failed: integrity.append(label + "/PublicStorage/required-copy-or-protocol-failed")
+    if not failed:
+        reached = [row["before_reset"]["reached"], row["after_reset"]["reached"], row["reverse_entry"]["reached"],
+                   row["reverse_completed"]["reached"], row["scope_exit"]["reached"], row["actual_caller_return"]["reached"]]
+        need([sites[k] for k in SITES] == [int(x) for x in reached] and reached[0] and reached[1] and reached[4],
+             "Every actual whole call requires its entry/reset/scope-exit records")
+        returned = operation["call_outcome"]["status"] == "source_returned"
+        need(reached[5] is returned and row["scope_exited_during_unwind"] is (not returned), "Actual public return/unwind custody differs")
+        need(not reached[3] or reached[2], "Reverse completion requires actual entry")
+        if returned: need(states["scope_exit"] == states["actual_caller_return"], "Public caller-return copy differs from actual normal scope exit")
+        if reached[3]: need(reverse["reverse_entry"][1] == reverse["reverse_completed"][1], "Actual reverse provider changed across a read-only transfer")
+    counts["public_whole_call_records"] += 1
+    for name in SITES: counts["public_site_" + name] += sites[name]
+    for name in FAILURES: counts["public_failure_" + name] += failures[name]
+    counts["public_copy_integrity_failed_records"] += int(failed)
+
+
+def summary(result, counts, need):
+    actual = result["actual_public_storage_observation_counts"]
+    expected = {"actual_whole_call_records": counts["public_whole_call_records"],
+        "actual_site_counts": [counts["public_site_" + k] for k in SITES],
+        "failure_kind_counts": [counts["public_failure_" + k] for k in FAILURES],
+        "public_copy_integrity_failed": counts["public_copy_integrity_failed_records"] > 0, "numerical_PASS_claimed": False}
+    need(actual == expected, "Actual public observation totals differ from all retained calls")
+    return {"actual_public_storage_observation_counts": actual,
+            "actual_public_copy_integrity_failed_records": counts["public_copy_integrity_failed_records"]}
+
+
+def whole_init(model, initialized, need, scalar, counts, integrity, label, stop):
+    whole, messages = model["whole_Init"], model["source_diagnostics"]["messages"]
+    need(whole["kind"] == "HeatBalanceManager::InitConductionTransferFunctions" and
+         type(whole["actual_source_invoked"]) is bool and whole["actual_source_invoked"] is (stop is None) and
+         whole["manual_Construction_loop_performed"] is False and model["manual_Construction_call_loop_performed"] is False and
+         model["declared_construct_owners"] == model["initialized_owners"] and whole["before"] == model["initialized_owners"],
+         "True whole Init must own the actual production loop and original-owner join")
+    counts["whole_Init_status_" + whole["call_outcome"]["status"]] += 1
+    if not whole["actual_source_invoked"]:
+        need(whole["observations"] is None and whole["after"] is None and model["operations"] == [] and
+             model["actual_CTF_call_checkpoint_count"] == 0 and
+             whole["call_outcome"]["status"] == "source_not_invoked_due_to_unavailable_prerequisite" and
+             whole["call_outcome"]["unavailable_reason"] == stop, "Unavailable Init cannot fabricate calls/events/after state")
+        return
+    counts["actual_whole_Init_invocations"] += 1
+    need(initialized is not None, "Invoked Init requires actual initialized owner context")
+    row = whole["observations"]
+    need(row["protocol"] == "ctf10-actual-whole-Init-observation.v1" and row["original_loop_owned_all_calls"] is True and
+         row["manual_whole_model_per_call_snapshots_available"] is False and row["outer_helper_Invoke_owns_exception_outcome"] is True and
+         row["whole_building_simulation_certified"] is False and row["numerical_PASS_claimed"] is False,
+         "Actual whole Init protocol/claim boundary differs")
+
+    def integer(v, low=0, high=None):
+        need(type(v) is int and v >= low and (high is None or v <= high), "Typed actual Init ordinal/count required")
+
+    for key in ["binding_error", "integrity_failed", "Init_copy_integrity_failed", "actual_entry_reached", "actual_function_end_reached",
+                "scope_exit_reached", "scope_exited_during_unwind", "actual_caller_return_reached", "actual_global_diagnostic_join_valid"]:
+        need(type(row[key]) is bool, "Actual Init boolean required")
+    sites = {}
+    for name, retained, omitted, field in [("actual_event_count", "actual_retained_event_count", "event_records_omitted", "events"),
+          ("actual_construction_call_count", "actual_retained_construction_call_count", "construction_records_omitted", "construction_records"),
+          ("actual_diagnostic_count", "actual_retained_diagnostic_count", "diagnostic_records_omitted", "diagnostics")]:
+        for key in [name, retained, omitted]: integer(row[key])
+        need(isinstance(row[field], list) and len(row[field]) == row[retained] and row[name] == row[retained] + row[omitted],
+             "Actual Init retained/omitted ledger accounting differs")
+        sites[{"events": "Event", "construction_records": "Construction", "diagnostics": "Diagnostic"}[field]] = row[name]
+    need(model["actual_CTF_call_checkpoint_count"] == row["actual_construction_call_count"] and
+         len(model["operations"]) == len(row["construction_records"]), "Actual Init call checkpoint/operation join differs")
+    failure_counts = {}
+    need(len(row["failure_kind_counts"]) == len(INIT_FAILURES), "Complete Init failure inventory required")
+    for name, item in zip(INIT_FAILURES, row["failure_kind_counts"]):
+        need(set(item) == {"kind", "actual_count"} and item["kind"] == name, "Actual Init failure ordering differs")
+        integer(item["actual_count"]); failure_counts[name] = item["actual_count"]
+    need(row["integrity_failed"] is bool(sum(failure_counts.values())), "Actual Init failure flag differs")
+    for key in ["first_failure", "last_failure"]:
+        item = row[key]
+        if not sum(failure_counts.values()): need(item is None, "Unexpected Init failure endpoint")
+        else:
+            need(set(item) == {"site", "actual_site_ordinal", "kind"} and item["site"] in sites and
+                 item["kind"] in failure_counts and failure_counts[item["kind"]] > 0, "Actual Init failure endpoint differs")
+            integer(item["actual_site_ordinal"], 0, sites[item["site"]])
+    events, event_counts, seen = {}, Counter(), set()
+    failed_copies = False
+    scan = None
+    for item in row["events"]:
+        need(set(item) == {"actual_event_ordinal", "event", "copy_available", "snapshot", "counted_as_PASS"} and
+             item["event"] in INIT_EVENTS and type(item["copy_available"]) is bool and item["counted_as_PASS"] is False,
+             "Actual Init event fields required")
+        integer(item["actual_event_ordinal"], 1, row["actual_event_count"])
+        need(item["actual_event_ordinal"] not in events and (not events or item["actual_event_ordinal"] > max(events)), "Ordered unique Init events required")
+        events[item["actual_event_ordinal"]] = item; event_counts[item["event"]] += 1
+        if not item["copy_available"]:
+            need(item["snapshot"] is None, "Unavailable Init event must stay null"); failed_copies = True; continue
+        state = item["snapshot"]
+        need(isinstance(state, dict) and set(state) == {"actual_construction_index", "actual_construction_address", "actual_cCounter",
+             "ErrorsFound", "DoCTFErrorReport", "InitCTFDoReport", "SimpleCTFOnly", "MaxCTFTerms", "AnyInternalHeatSourceInInput",
+             "actual_Construct_array_size", "GetReportInput", "Constructions", "actual_predefined_table_entry_count",
+             "actual_opaque_layer_column_count", "actual_TimeStepZone"}, "Actual reached Init event snapshot required")
+        for name in ["ErrorsFound", "DoCTFErrorReport", "SimpleCTFOnly", "AnyInternalHeatSourceInInput", "GetReportInput", "Constructions"]:
+            need(type(state[name]) is bool, "Actual Init flag owner required")
+        for name in ["actual_construction_index", "actual_construction_address", "actual_cCounter", "MaxCTFTerms",
+                     "actual_Construct_array_size", "actual_predefined_table_entry_count", "actual_opaque_layer_column_count"]: integer(state[name])
+        scalar(state["actual_TimeStepZone"])
+        need(state["actual_Construct_array_size"] == len(initialized["constructions"]) and
+             state["actual_TimeStepZone"]["value_bits"] == initialized["TimeStepZone"]["value_bits"], "Actual Init owner/caller custody differs")
+        if item["event"] in ["ConstructionEntry", "ConstructionReturn", "PostConstructionAggregate", "ReportLayersEntry", "ReportLayersReturn", "ReportTransferEntry", "ReportTransferReturn"]:
+            integer(state["actual_construction_index"], 1, len(initialized["constructions"])); integer(state["actual_construction_address"], 1)
+        else: need(state["actual_construction_index"] == state["actual_construction_address"] == 0, "Non-construction Init event has no construction address")
+        if item["event"] in ["ReportTransferEntry", "ReportTransferReturn"]:
+            need(state["actual_cCounter"] == state["actual_construction_index"], "Actual report counter/index differs")
+        else: need(state["actual_cCounter"] == 0, "Unassigned report counter must not be fabricated")
+        if item["event"] in ["ScanReturn", "ReportHeaders", "ReportTransferEntry", "ReportTransferReturn", "FinalFatalBoundary", "FunctionEnd"]:
+            need(type(state["InitCTFDoReport"]) is bool, "Assigned report flag required only at genuine observed sites")
+        else: need(state["InitCTFDoReport"] is None, "Unassigned/destroyed report flag must remain absent")
+        if item["event"] == "ScanReturn": scan = state
+        seen.add(item["event"])
+    need(isinstance(row["actual_event_kind_counts"], list) and len(row["actual_event_kind_counts"]) == len(INIT_EVENTS), "Complete Init event counters required")
+    for name, value in zip(INIT_EVENTS, row["actual_event_kind_counts"]):
+        integer(value); need(value >= event_counts[name], "Observed event count cannot exceed actual callbacks")
+    need(sum(row["actual_event_kind_counts"]) == row["actual_event_count"], "Actual Init event totals differ")
+    calls = {}
+    for item, operation in zip(row["construction_records"], model["operations"]):
+        need(set(item) == {"actual_call_ordinal", "actual_construction_index", "actual_construction_address", "actual_Name", "identity_available",
+             "actual_caller_return_reached", "postaggregate_reached", "scope_exit_reached", "scope_exited_during_unwind", "observation_owner",
+             "source_exception_type_or_outcome_inferred", "counted_as_PASS"}, "Complete actual Init construction record required")
+        integer(item["actual_call_ordinal"], 1, row["actual_construction_call_count"])
+        integer(item["actual_construction_index"], 1, len(initialized["constructions"])); integer(item["actual_construction_address"], 1)
+        need(item["actual_call_ordinal"] not in calls and (not calls or item["actual_call_ordinal"] > max(calls)), "Ordered actual Init call ordinals required")
+        calls[item["actual_call_ordinal"]] = item
+        for key in ["identity_available", "actual_caller_return_reached", "postaggregate_reached", "scope_exit_reached", "scope_exited_during_unwind"]:
+            need(type(item[key]) is bool, "Typed retained Init call state required")
+        if not item["identity_available"]:
+            need(item["actual_Name"] is None, "Unavailable Init identity copy cannot fabricate a name"); failed_copies = True
+        else: need(item["actual_Name"] == initialized["constructions"][item["actual_construction_index"] - 1]["Name"], "Actual Init construction name differs")
+        need(item["observation_owner"] == "model.operations_same_retained_order_and_actual_call_ordinal" and
+             item["source_exception_type_or_outcome_inferred"] is False and item["counted_as_PASS"] is False,
+             "Retained Init call must not invent source outcome")
+        for key in ["actual_construction_index", "actual_construction_address"]:
+            need(operation[key] == item[key], "Actual Init operation owner identity differs")
+        need(operation["actual_Init_call_ordinal"] == item["actual_call_ordinal"] and operation["actual_construction_Name"] == item["actual_Name"] and
+             operation["actual_Init_caller_return_reached"] is item["actual_caller_return_reached"] and
+             all(operation[k] is item[k] for k in ["postaggregate_reached", "scope_exit_reached", "scope_exited_during_unwind"]), "Actual Init call/operation state differs")
+        need(operation["before"] is None and operation["after"] is None and operation["manual_full_model_before_after_unavailable"] is True and
+             operation["actual_input_owner_join"] == "initialized_owners_and_public.before_reset_original_LayerPoint" and
+             operation["actual_caller_join"] == "whole_Init.events.actual_TimeStepZone_and_public_shared_flags" and
+             operation["unreturned_call_fatal_or_exception_inferred"] is False, "Per-call unavailable snapshots/custody protocol differs")
+        outcome = operation["call_outcome"]
+        need(set(outcome) == {"status", "source_fatal", "source_exception", "exception_type", "exception_message"} and
+             outcome["status"] == ("source_returned" if item["actual_caller_return_reached"] else "source_return_not_observed") and
+             outcome["source_fatal"] is (False if item["actual_caller_return_reached"] else None) and
+             outcome["source_exception"] is (False if item["actual_caller_return_reached"] else None) and
+             outcome["exception_type"] is None and outcome["exception_message"] is None, "Missing per-call return is unknown, never an inferred exception")
+        if not item["scope_exit_reached"] or not item["actual_caller_return_reached"]: counts["unreturned_Init_call_records"] += 1
+        if not row["Init_copy_integrity_failed"]:
+            need(item["actual_call_ordinal"] == item["actual_construction_index"] and item["scope_exit_reached"] and
+                 item["scope_exited_during_unwind"] is (not item["actual_caller_return_reached"]) and
+                 item["postaggregate_reached"] is item["actual_caller_return_reached"], "Actual original loop call order/lifetime differs")
+            public = operation["observations"]["PublicStorage"]
+            need(public["actual_caller_return"]["reached"] is item["actual_caller_return_reached"], "Actual public and Init return markers differ")
+            entry = next(e["snapshot"] for e in row["events"] if e["event"] == "ConstructionEntry" and e["snapshot"]["actual_construction_index"] == item["actual_construction_index"])
+            before = public["before_reset"]["snapshot"]
+            need(entry["actual_construction_address"] == item["actual_construction_address"] == before["actual_construction_address"] and
+                 all(entry[k] is before[k] for k in ["ErrorsFound", "DoCTFErrorReport"]), "True Init entry/public local flag join differs")
+    begin, end = whole["diagnostic_message_begin"], whole["diagnostic_message_end"]
+    integer(begin, 0, len(messages)); integer(end, begin, len(messages))
+    diagnostic_join = True
+    previous, previous_message = 0, begin - 1
+    for item in row["diagnostics"]:
+        integer(item["actual_diagnostic_ordinal"], previous + 1, row["actual_diagnostic_count"]); previous = item["actual_diagnostic_ordinal"]
+        need(set(item) == {"actual_diagnostic_ordinal", "actual_global_message_index", "preceding_retained_event_ordinal",
+             "active_retained_construction_call_ordinal", "actual_level", "actual_message", "copy_available", "temporal_association_only",
+             "causal_branch_inferred"}, "Complete actual Init diagnostic record required")
+        integer(item["actual_global_message_index"], previous_message + 1, end - 1)
+        previous_message = item["actual_global_message_index"]
+        need(type(item["copy_available"]) is bool and item["temporal_association_only"] is True and item["causal_branch_inferred"] is False, "Actual Init diagnostic scope differs")
+        integer(item["actual_level"], -1)
+        available = item["copy_available"] and item["actual_global_message_index"] < len(messages)
+        if item["copy_available"]: need(isinstance(item["actual_message"], str), "Actual diagnostic text required")
+        else: need(item["actual_message"] is None, "Unavailable diagnostic text must stay null")
+        if available:
+            actual = messages[item["actual_global_message_index"]]
+            available = actual["level"] == item["actual_level"] and actual["message"] == item["actual_message"]
+        for key, table in [("preceding_retained_event_ordinal", events), ("active_retained_construction_call_ordinal", calls)]:
+            if item[key] is not None:
+                integer(item[key], 1); available = available and item[key] in table
+        diagnostic_join = diagnostic_join and available
+    need(row["actual_global_diagnostic_join_valid"] is diagnostic_join, "Actual Init global diagnostic tuple/temporal join differs")
+    failed = row["binding_error"] or row["integrity_failed"] or failed_copies or not diagnostic_join or any(row[k] for k in
+             ["event_records_omitted", "construction_records_omitted", "diagnostic_records_omitted"]) or any(
+             op["observations"]["observer_failure"] for op in model["operations"])
+    need(row["Init_copy_integrity_failed"] is bool(failed), "Actual Init copy/omission/child integrity aggregate differs")
+    if failed: integrity.append(label + "/whole_Init/required-copy-or-ledger-failed")
+    returned = whole["call_outcome"]["status"] == "source_returned"
+    if not failed:
+        need(row["actual_entry_reached"] and row["scope_exit_reached"] and row["actual_caller_return_reached"] is returned and
+             row["actual_function_end_reached"] is returned and row["scope_exited_during_unwind"] is (not returned), "Actual whole Init scope/outer return custody differs")
+        expected = [("Entry", 0)]
+        for index in range(1, len(initialized["constructions"]) + 1):
+            expected += [("ConstructionEntry", index), ("ConstructionReturn", index), ("PostConstructionAggregate", index)]
+        expected += [("AfterAllAggregates", 0)]
+        used = [i for i, c in enumerate(initialized["constructions"], 1) if c["IsUsedCTF"]]
+        for index in used: expected += [("ReportLayersEntry", index), ("ReportLayersReturn", index)]
+        expected += [("ScanEntry", 0), ("ScanReturn", 0)]
+        if scan is not None:
+            if scan["InitCTFDoReport"] or scan["DoCTFErrorReport"]:
+                expected += [("ReportHeaders", 0)]
+                for index in used: expected += [("ReportTransferEntry", index), ("ReportTransferReturn", index)]
+            expected += [("FinalFatalBoundary" if scan["ErrorsFound"] else "FunctionEnd", 0)]
+        actual = [(item["event"], item["snapshot"]["actual_construction_index"]) for item in row["events"]]
+        need(actual[-1] == ("ScopeExit", 0) and actual[:-1] == expected[:len(actual) - 1], "Actual Init event sequence is not a genuine whole-function prefix")
+        for event in row["events"]:
+            state = event["snapshot"]; index = state["actual_construction_index"]
+            if index:
+                need(state["actual_construction_address"] == calls[index]["actual_construction_address"], "Actual Init construction address custody differs")
+                public = model["operations"][index - 1]["observations"]["PublicStorage"]
+                if event["event"] in ["ConstructionReturn", "PostConstructionAggregate"]:
+                    final = public["actual_caller_return"]["snapshot"]
+                    need(all(state[k] is final[k] for k in ["ErrorsFound", "DoCTFErrorReport"]), "Actual Init returned shared-flag custody differs")
+        if returned: need(actual == expected + [("ScopeExit", 0)] and len(calls) == len(initialized["constructions"]), "Returned Init requires actual complete ordered loop/report path")
+        if "FinalFatalBoundary" in seen: need(whole["call_outcome"]["status"] == "source_fatal", "Reached final fatal must retain actual outer FatalError outcome")
+        entry = row["events"][0]["snapshot"]
+        need(entry["ErrorsFound"] is False and entry["DoCTFErrorReport"] is False, "Actual Init local flags begin false/false")
+    counts["actual_Init_event_count"] += row["actual_event_count"]
+    counts["actual_Init_construction_call_count"] += row["actual_construction_call_count"]
+    counts["actual_retained_Init_call_records"] += len(calls)
+    counts["actual_Init_diagnostic_count"] += row["actual_diagnostic_count"]
+    counts["Init_copy_integrity_failed_records"] += int(failed)
+
+
+def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane, coefficients, retry):
+    from datetime import datetime
+    from pathlib import Path
+    authority, need = freeze["source_authorities"], m.require
+    counts = {"unit": {"model_cases": 39, "calculateTransferFunction": 42}, "production": {"model_cases": 15, "loader_phase_records": 195}}
+
+    def check(ref, name, before):
+        command = recorded(ref, before)
+        need(command["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", name] and
+             m.bind(command["stderr"])["size_bytes"] == 0, "Actual source-preserving card check0/empty stderr required")
+
+    need(set(authority["current_cards"]) == {"CTF-10"} and authority["actual_scope_amendment_execution_role"] == "real-CTF-10-check-only",
+         "Current public-storage scope role differs")
+    amendment = m.load(authority["actual_scope_amendment"])
+    need(amendment["schema"] == "ctf10-source-scope-amendment.v1" and amendment["cards"] == ["CTF-10"] and
+         amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
+         amendment["strict_profiles_settled_before_outputs"] is True and amendment["actual_CTF10_build_or_engine_execution_performed"] is False and
+         amendment["requested_counts"] == counts, "Actual pre-output public-storage scope authority required")
+    for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
+                        ("public_storage_policy_source_inventory", authority["public_storage_policy_source_inventory"])]:
+        same(amendment[key], target); m.bind(target)
+    before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
+    need(len(before) == len(after) == 2 and len({row["path"] for row in before}) == len({row["path"] for row in after}) == 2 and
+         before == authority["historical_scope_documents"] and after == authority["current_scope_documents"], "Actual10 raw document identities differ")
+    card = m.bind(authority["current_cards"]["CTF-10"])
+    historical = next(row["source"] for row in passive["source_inventory"] if row["source"]["path"] == card["path"])
+    need(card["path"] == "energyplus_porting_plan/cards/CTF-10.md" and card in after and m.identity("energyplus_porting_plan/plan.json") in after and
+         any(row["sha256"] == historical["sha256"] and row["size_bytes"] == historical["size_bytes"] for row in before),
+         "Current10 plan/card and authentic before copy differ")
+    check(authority["actual_scope_amendment_execution"], "CTF-10", frozen_started)
+    prior = authority["historical_prior_09_authority"]
+    prior_ref, execution_ref = prior["prior_09_freeze"], prior["prior_09_freeze_execution"]
+    old = m.load(prior_ref); command = recorded(execution_ref, frozen_started)
+    prefix = "ctf09-" + ("production-" if lane == "production" else "")
+    need(old["schema"] == prefix + "frozen-packet.v1" and old["lane"] == lane and
+         old["status"] == "frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper" and
+         old["frozen_before_this_CTF09_helper_execution"] is True and old["requested_counts"] == freeze["requested_counts"] and
+         old["scientific_operands_evaluated"] is False and old["numerical_PASS_claimed"] is False and
+         m.load(command["stdout"]) == old and m.bind(command["stderr"])["size_bytes"] == 0,
+         "Real same-lane historical09 input-only freeze/full stdout required")
+    finished = datetime.fromisoformat(old["finished_utc"])
+    need(finished.tzinfo is not None and finished <= datetime.fromisoformat(frozen_started), "Actual historical09 freeze must precede10")
+    writer_ref = prior["prior_09_writer_manifest"]
+    need(writer_ref["sha256"] == "4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd", "Exact prior09 writer source required")
+    same(old["source_preparation_approval"]["source_manifest"], writer_ref)
+    own = [m.bind(row) for row in m.load(writer_ref)["own_sources"]]
+    need(len(own) == len(old["executed_writer_sources"]) == 2 and old["source_preparation_approval"]["approved_writer_sha256"] == own[0]["sha256"] and
+         [m.bind(row) for row in old["source_preparation_approval"]["reviewed_sources"]] == own, "Historical09 approved own2 source differs")
+    for source, archive in zip(own, old["executed_writer_sources"]):
+        need(archive["historical_path"] == source["path"] and m.bind(archive["archive"])["sha256"] == source["sha256"], "Actual09 executed source/archive differs")
+    argv = command["command"]
+    need(len(argv) == 25 and Path(argv[0]).name.lower() in ["python", "python.exe"] and argv[1:4] == ["-X", "utf8", "-B"] and
+         m.contained(argv[4]) == m.contained(own[0]["path"]), "Actual historical09 freezer command/source differs")
+    flags = dict(zip(argv[5::2], argv[6::2]))
+    need(set(flags) == {"--lane", "--approved-source-sha256", "--source-manifest", "--native-source-manifest", "--current-card-09",
+         "--actual-scope-amendment", "--actual-scope-amendment-execution", "--prior-08-freeze", "--prior-08-freeze-execution", "--output-dir"} and
+         flags["--lane"] == lane and flags["--approved-source-sha256"] == own[0]["sha256"] and
+         m.contained(flags["--output-dir"], existing=False) == m.contained(prior_ref["path"]).parent, "Actual historical09 flags/output differ")
+    old_authority = old["source_authorities"]
+    nested = prior["historical_prior_08_authority"]
+    need(nested == old_authority["historical_prior_08_authority"] and old_authority["actual_scope_amendment_execution_role"] == "real-CTF-09-check-only",
+         "Historical09 and nested08 authority differs")
+    for key, ref in [("source-manifest", writer_ref), ("native-source-manifest", old_authority["native_source_manifest"]),
+                     ("actual-scope-amendment", prior["prior_09_scope_amendment"]), ("actual-scope-amendment-execution", prior["prior_09_scope_check_execution"]),
+                     ("prior-08-freeze", nested["prior_08_freeze"]), ("prior-08-freeze-execution", nested["prior_08_freeze_execution"])]:
+        same(m.argument(flags["--" + key]), ref)
+    same(old_authority["actual_scope_amendment"], prior["prior_09_scope_amendment"])
+    same(old_authority["actual_scope_amendment_execution"], prior["prior_09_scope_check_execution"])
+    historical09 = m.load(prior["prior_09_scope_amendment"])
+    need(historical09["schema"] == "ctf09-source-scope-amendment.v1" and historical09["cards"] == ["CTF-09"] and
+         historical09["scope_review_passed"] is True and historical09["all_other_gates_pending"] is True and
+         historical09["strict_profiles_settled_before_outputs"] is True and historical09["actual_CTF09_build_or_engine_execution_performed"] is False and
+         historical09["requested_counts"] == counts, "Authentic historical09 amendment required")
+    for key, target in [("native_observer", old_authority["native_source_manifest"]), ("passive_observer", old_authority["passive_observer"]),
+                        ("retry_policy_source_inventory", old_authority["retry_policy_source_inventory"])]:
+        same(historical09[key], target); m.bind(target)
+    need(old_authority["retry_policy_source_inventory"]["sha256"] == '233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef',
+         "Exact historical09 policy source required")
+    before09, after09 = [m.bind(row) for row in historical09["before_documents"]], historical09["after_documents"]
+    need(len(before09) == len(after09) == 2 and before09 == old_authority["historical_scope_documents"] == prior["historical_before_document_archives"] and
+         after09 == old_authority["current_scope_documents"] and {row["path"] for row in after09} ==
+         {"energyplus_porting_plan/plan.json", "energyplus_porting_plan/cards/CTF-09.md"} and prior["historical_after_document_identities"] ==
+         [{"historical_path": row["path"], "sha256": row["sha256"], "size_bytes": row["size_bytes"]} for row in after09], "Historical09 document identities differ")
+    historical_card = old_authority["current_cards"]["CTF-09"]
+    need(historical_card in after09 and flags["--current-card-09"] == historical_card["path"] + "#" + historical_card["sha256"], "Historical09 card argument differs")
+    check(prior["prior_09_scope_check_execution"], "CTF-09", command["started_utc"])
+    for archive in prior["available_prior_frozen_document_archives"]:
+        need(any(row["historical_path"] == archive["historical_path"] and row["archive"] == archive["archive"] for row in old["reviewed_source_archives"]),
+             "Historical09 document archive was not present in its actual freeze")
+        m.bind(archive["archive"])
+    need(all(any(row["historical_path"] == ref["path"] and row["archive"]["sha256"] == ref["sha256"]
+                 for row in prior["available_prior_frozen_document_archives"]) for ref in before09 + after09), "Historical09 document bytes require authentic archives")
+    old_request = m.load(old["helper_request"])
+    need(old_request["model_cases"] == request["model_cases"] and old_request["requested_counts"] == request["requested_counts"] and
+         old_request["all_45_guard_refs"] == request["all_45_guard_refs"] and old_request["historical_prior_08_authority"] == nested and
+         prior["prior09_numerical_PASS_inferred"] is False, "Historical09 literal same-input ancestry required; no PASS inferred")
+    old_tolerances, new_tolerances = m.load(old["contracts"]["tolerances"]), m.load(freeze["contracts"]["tolerances"])
+    for key in ["ctf03_initial_observation_policy", "ctf04_matrix_observation_policy", "ctf03_initial_profiles", "arithmetic_profiles_by_variable",
+                "ctf06_exponential_observation_policy", "ctf05_inverse_observation_policy", "ctf06_exponential_profiles", "ctf05_inverse_profiles",
+                "ctf07_gamma_observation_policy", "ctf07_gamma_profiles", "ctf08_final_coefficient_observation_policy", "ctf08_final_coefficient_profiles",
+                "ctf09_retry_observation_policy", "ctf09_attempt_selection", "ctf09_retry_profiles", "ctf09_all_visit_handoff_profile_groups"]:
+        need(old_tolerances[key] == new_tolerances[key], "Historical09 policies/profiles must remain literal")
+    same(old["contracts"]["source"], prior["prior_09_source_contract"])
+    old_source = m.load(prior["prior_09_source_contract"])
+    need(old_source["source_authorities"] == old_authority and old_source["ctf09_selected_primary_ranges"] == prior["prior_09_selected_primary_ranges"],
+         "Historical09 source/ranges/authority differ")
+    # Authenticate actual historical09 including its literal nested08/07/05/06 using archive-aware document custody.
+    old_native = m.load(old_authority["native_source_manifest"])
+    retry.scope(m, same, recorded, old, old_request, m.load(old["native_admission_contract"]), m.load(old["projection"]),
+                m.load(old_native["passive_observer_manifest"]), command["started_utc"], lane, coefficients, historical_prior_09=prior)
+    for owner in [request, admission, projection]:
+        for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "actual_scope_amendment_execution_role", "current_cards", "historical_prior_09_authority"]:
+            need(owner[key] == authority[key], "Current10 and historical09 packet custody differs")

@@ -1,0 +1,224 @@
+actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "coefficient_whole_call_records": 42,
+    "coefficient_uninvoked_whole_call_records": 0,
+    "coefficient_selected_first_invocation_count": 25,
+    "coefficient_later_unpaired_invocation_count": 16,
+    "coefficient_actual_return_marker_count": 41,
+    "actual_retry_observation_counts": {
+      "actual_pre_assignment_count": 41,
+      "actual_retained_pre_assignment_count": 41,
+      "actual_caller_event_count": 151,
+      "actual_retained_caller_event_count": 151,
+      "actual_diagnostic_count": 40,
+      "actual_retained_diagnostic_count": 40,
+      "pre_assignment_records_omitted": 0,
+      "diagnostic_records_omitted": 0,
+      "actual_caller_event_counts": [
+        41,
+        15,
+        26,
+        1,
+        0,
+        2,
+        2,
+        39,
+        25
+      ],
+      "caller_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "retry_copy_integrity_failed": false,
+      "complete_retry_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "retry_whole_call_records": 42,
+    "retry_uninvoked_whole_call_records": 0,
+    "initial_record_count": 42,
+    "initial_reached_phase_records": 25,
+    "initial_unreached_phase_records": 17,
+    "initial_available_owner_count": 25,
+    "initial_unavailable_owner_count": 17,
+    "initial_selected_1D_owner_count": 25,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 25,
+    "matrix_whole_call_records": 42,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 17,
+    "actual_matrix_attempt_callback_count": 41,
+    "actual_retained_matrix_attempt_count": 41,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 25,
+    "matrix_later_unpaired_attempt_count": 16,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 131,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 2468321,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33,
+      "InitialDiscretization": 25
+    }
+  },
+  "actual_method_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/review_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/000-review_unit.py",
+        "sha256": "383653dae7c2fbddc253db533ca59534722b93e49ccd68d9d5f7203bcf945dd5",
+        "size_bytes": 32258
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/unit_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/001-unit_shape.py",
+        "sha256": "7ad46d9f885f3f89d28c642071a9e3406f08a1a16117b823b22b9e49eafc0cab",
+        "size_bytes": 20938
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/002-initial_shape.py",
+        "sha256": "ab0fdc69412d939bd9bb3bd025a43719defde08e36400f9a6f199b82e6737de8",
+        "size_bytes": 26626
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/method_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/003-method_shape.py",
+        "sha256": "0990f10316263894bbf42cc53f25d18c5cf79947286d99b6279e55b37eae9801",
+        "size_bytes": 30929
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/gamma_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/004-gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/coefficient_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/005-coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/retry_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/006-retry_shape.py",
+        "sha256": "e8615423cdd570c98c97c07b5eb58b2f9a736154a9b0b6a5150d09551898b4a7",
+        "size_bytes": 45988
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/public_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/007-public_shape.py",
+        "sha256": "8a772dc521cb8f99a7d3f51c1bbc61a3b1f9e0019ee3d22cb9f28fc6132fc669",
+        "size_bytes": 45307
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-data-review-01/008-packet_io.py",
+        "sha256": "e8aa503a053a9a50afccc498bef770c8617d37894b85d7b96c9117c8df8c581b",
+        "size_bytes": 4665
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-10/original-data-review-01/000-review_unit.py",
+    "sha256": "383653dae7c2fbddc253db533ca59534722b93e49ccd68d9d5f7203bcf945dd5",
+    "size_bytes": 32258
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored public storage/initialization, passive06/09, helper09 and prior validators; Raw authored passive/helper10, Base independently peered. This is structural transport/provenance review, not independent own-formula scientific certification. Root and other-author FULL source reviews are required."
+}
+{"receipt": {"path": ".runtime/porting/CTF-10/original-data-review-command-01/receipt.json", "sha256": "07a83031d8b0dbdcd40da4b3b9fe65f779f3d89b24aa1bc4a0b40835843d1892"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

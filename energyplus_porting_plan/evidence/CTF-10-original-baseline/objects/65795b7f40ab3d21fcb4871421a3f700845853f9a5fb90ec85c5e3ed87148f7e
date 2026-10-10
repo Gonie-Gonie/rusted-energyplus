@@ -1,0 +1,158 @@
+{
+  "schema": "root-completed-cli-trace-transparent-compression.v1",
+  "created_utc": "2026-10-10T23:29:50.342046+00:00",
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact6 completed CLI trace files",
+  "files": [
+    {
+      "actual_completed_execution": {
+        "path": ".runtime/porting/CTF-06/production-cli-command-01/A-24H/receipt.json",
+        "sha256": "3ef60f31fb6111fc75e04843d7f5c1ff8fe958a95be45b274cfdd8b61972d5d6",
+        "size_bytes": 3249
+      },
+      "file_before": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/A-24H/clk03-weather-day-production-trace.json",
+        "sha256": "b07b5403d96f94ca40685277ccd885a89285f3cb1fa7009203ad3f1b67789f43",
+        "size_bytes": 105957615
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/A-24H/clk03-weather-day-production-trace.json",
+        "sha256": "b07b5403d96f94ca40685277ccd885a89285f3cb1fa7009203ad3f1b67789f43",
+        "size_bytes": 105957615
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/CTF-06-A-24H.log",
+        "sha256": "85012688193436a96989c187910a4cb46796015e42808446eab2ffafe1ba37dd",
+        "size_bytes": 288
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "actual_completed_execution": {
+        "path": ".runtime/porting/CTF-06/production-cli-command-01/A-72H/receipt.json",
+        "sha256": "9a6484a51decbf01c950741a3e3a4a3d077c8288350a8c2a54f557d43f06de07",
+        "size_bytes": 3249
+      },
+      "file_before": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/A-72H/clk03-weather-day-production-trace.json",
+        "sha256": "4aa91fc8e08f0309ff4d35983c255b004dc601b4ac129cca9a55ccbc25b2fcf5",
+        "size_bytes": 316599591
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/A-72H/clk03-weather-day-production-trace.json",
+        "sha256": "4aa91fc8e08f0309ff4d35983c255b004dc601b4ac129cca9a55ccbc25b2fcf5",
+        "size_bytes": 316599591
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/CTF-06-A-72H.log",
+        "sha256": "a18f19b179f82c9043c81ac0d25dbc8944261651e33662de54a5ac58f9822805",
+        "size_bytes": 289
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "actual_completed_execution": {
+        "path": ".runtime/porting/CTF-06/production-cli-command-01/B-NOLIMIT-24H/receipt.json",
+        "sha256": "36faddabb22ba83c403fa51d0e4f250ba788de9f0ea71be162061a26346b1905",
+        "size_bytes": 3281
+      },
+      "file_before": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-NOLIMIT-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-NOLIMIT-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/CTF-06-B-NOLIMIT-24H.log",
+        "sha256": "beb37d080ed6274fe785c0a757a966f50ede5d1d54133c183e6651783aa9204d",
+        "size_bytes": 296
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "actual_completed_execution": {
+        "path": ".runtime/porting/CTF-06/production-cli-command-01/B-FLOW-24H/receipt.json",
+        "sha256": "d5a3fd135c49739b0f3953c1fde167a002fbe85cdfa3bfa96fd331419d752bd2",
+        "size_bytes": 3269
+      },
+      "file_before": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-FLOW-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-FLOW-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/CTF-06-B-FLOW-24H.log",
+        "sha256": "ada89b0d1b1973454a1a1753011e1d454afe04dd2cbdd1f3e38b185762667257",
+        "size_bytes": 293
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "actual_completed_execution": {
+        "path": ".runtime/porting/CTF-06/production-cli-command-01/B-CAPACITY-24H/receipt.json",
+        "sha256": "8c8937a14a743d55c392d70bab05b0b72f11e31cd95b51cd8856d3c3f288a20b",
+        "size_bytes": 3285
+      },
+      "file_before": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-CAPACITY-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-CAPACITY-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/CTF-06-B-CAPACITY-24H.log",
+        "sha256": "ad73443a24078c7be2452de230293728bfec91865032745587888af187c3c832",
+        "size_bytes": 297
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "actual_completed_execution": {
+        "path": ".runtime/porting/CTF-06/production-cli-command-01/B-BOTH-24H/receipt.json",
+        "sha256": "947c070f465b4fe208ddf02f31a4b86034cb0382454d963ed5b7dfda09f8207a",
+        "size_bytes": 3269
+      },
+      "file_before": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-BOTH-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-BOTH-24H/clk03-weather-day-production-trace.json",
+        "sha256": "377a0cde5dd555389b8dda06205c9ca55d01c99c603bb55a34aa67c828ce9b56",
+        "size_bytes": 105957615
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/prior06-cli-trace-storage-compression-01/CTF-06-B-BOTH-24H.log",
+        "sha256": "8dc02e49fec9936f4e7ee55c8ac75db18ef2dbaac17d075c0c4488f91aa5bc97",
+        "size_bytes": 293
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 1264021504,
+  "observed_free_bytes_after": 2051985408,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all6_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "gates_updated": false
+}

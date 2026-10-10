@@ -1,0 +1,284 @@
+"""Structural validation of actual method copies and ledgers; no matrix/control evaluator."""
+
+POLICIES = {'ctf06_exponential_observation_policy': {'protocol': 'ctf06-exponential-method-observation.v1', 'actual_method': 'ConstructionProps::calculateExponentialMatrix', 'actual_caller_line': 884, 'actual_method_source_lines': [1105, 1373], 'actual_stage_names': ['Entry', 'InitializedInputs', 'ScalingControls', 'PowerControl', 'SquareControl', 'FinalWorkspace', 'SourceReturn'], 'input_matrices': ['AMat', 'IdenMatrix'], 'initialized_matrices': ['AMat1', 'AMato', 'AMatN', 'AExp'], 'scaled_matrices': ['AMat1'], 'final_matrices': ['AMat1', 'AMato', 'AMatN', 'AExp'], 'return_matrices': ['AMat', 'IdenMatrix', 'AExp'], 'scalar_controls': ['AMatRowNormMax', 'fact', 'CheckVal'], 'integer_controls': ['k', 'l', 'final_i'], 'actual_power_controls': ['i', 'SigFigLimit'], 'actual_square_controls': ['isq', 'Backup'], 'scalar_controls_available_only_at_scaling_and_final': True, 'final_i_distinct_from_observed_control_event_count': True, 'selected_invocation_ordinal': 1, 'selected_assembly_ordinal': 1, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'actual_source_produced_identity_required': True, 'storage_order': 'source_i1_outer_i2_inner_row_first', 'invocation_identity': 'one_based_actual_entry_visit_within_bound_whole_call', 'actual_assembly_association_required': True, 'actual_method_return_marker_required_for_return_claim': True, 'all_actual_visits_and_control_events_retained': True, 'later_Native_attempts_paired': False, 'later_Native_attempts_counted_as_PASS': False, 'Rust_retry_driver_available': False, 'uninvoked_counted_as_PASS': False, 'missing_selected_owner_on_one_or_both_sides_is_required_failure': True, 'observer_failure_or_omission_is_integrity_failure': True, 'method_values_or_identity_or_return_or_retry_state_reconstructed': False}, 'ctf05_inverse_observation_policy': {'protocol': 'ctf05-inverse-method-observation.v1', 'actual_method': 'ConstructionProps::calculateInverseMatrix', 'actual_caller_line': 887, 'actual_method_source_lines': [1375, 1494], 'actual_stage_names': ['Entry', 'InitializedInputs', 'ScalingControls', 'PowerControl', 'SquareControl', 'FinalWorkspace', 'SourceReturn'], 'input_matrices': ['AMat', 'IdenMatrix'], 'initialized_matrices': ['AMat1', 'AInv'], 'final_matrices': ['AMat1', 'AInv'], 'return_matrices': ['AMat', 'IdenMatrix', 'AInv'], 'actual_exponential_return_precedes_inverse_entry': True, 'inverse_inputs_are_original_AMat_and_IdenMatrix_not_AExp': True, 'selected_invocation_ordinal': 1, 'selected_assembly_ordinal': 1, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'actual_source_produced_identity_required': True, 'storage_order': 'source_i1_outer_i2_inner_row_first', 'invocation_identity': 'one_based_actual_entry_visit_within_bound_whole_call', 'actual_assembly_association_required': True, 'actual_method_return_marker_required_for_return_claim': True, 'all_actual_visits_and_control_events_retained': True, 'later_Native_attempts_paired': False, 'later_Native_attempts_counted_as_PASS': False, 'Rust_retry_driver_available': False, 'uninvoked_counted_as_PASS': False, 'missing_selected_owner_on_one_or_both_sides_is_required_failure': True, 'observer_failure_or_omission_is_integrity_failure': True, 'method_values_or_identity_or_return_or_retry_state_reconstructed': False}}
+SELECTION = {'actual_assembly_ordinal': 1, 'actual_exponential_invocation_ordinal': 1, 'actual_inverse_invocation_ordinal': 1, 'association': 'same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history', 'actual_order': ['assembly728', 'exponential884', 'inverse887'], 'later_actual_visits': 'all retained unpaired context/noPASS', 'no_initial_dt_equals_TimeStepZone_assertion': True, 'no_Rust_retry_driver_claim': True, 'stopped_or_uninvoked': 'unavailable/noPASS, real source or OS outcome retained separately'}
+RETENTION_INTENT = {'schema': 'ctf10-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF10-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+
+STAGES = ["Entry", "InitializedInputs", "ScalingControls", "PowerControl", "SquareControl", "FinalWorkspace", "SourceReturn"]
+FAILURES = ["IdentityMismatch", "AssociationFailure", "OrderFailure", "MatrixShape", "CopyException", "LedgerAppendException"]
+VALUE_STAGES = ["Entry", "InitializedInputs", "ScalingControls", "FinalWorkspace", "SourceReturn"]
+METHODS = ["Exponential", "Inverse"]
+COUNTS = ["method_whole_call_records", "method_uninvoked_whole_call_records"]
+
+
+def packet(freeze, request, admission, projection, tolerances, need):
+    for key, policy in POLICIES.items():
+        for owner in [request, admission, projection, tolerances]:
+            need(owner[key] == policy, "Exact frozen method policy required")
+        need(projection["method_state_pairing_and_availability"][key] == policy, "Method projection inventory differs")
+    for key, names, shapes in [
+        ("ctf06_exponential_profiles", ["AExp", "final_AMat1", "final_AMato", "final_AMatN", "AMatRowNormMax", "fact", "CheckVal"],
+         ["actual_rcmax_by_rcmax"] * 4 + ["scalar"] * 3),
+        ("ctf05_inverse_profiles", ["AInv", "final_AMat1"], ["actual_rcmax_by_rcmax"] * 2)]:
+        rows = tolerances[key]
+        need(isinstance(rows, list) and [row["variable"] for row in rows] == names, "Separate seven/two method profiles required")
+        for row, shape in zip(rows, shapes):
+            need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+                 row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+                 row["required_shape"] == shape, "Exact zero/class/shape/signedzero method profile differs")
+    selection = projection["method_state_pairing_and_availability"]["inherited_method_selection"]
+    need(selection == SELECTION, "Exact first assembly/exponential/inverse source selection required")
+    for owner in [freeze, request, admission, projection, tolerances]:
+        need(owner["linked_original_retention_intent"] == RETENTION_INTENT, "New07 prospective retention intent differs")
+
+
+def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    """Validate every actual method visit, with real stopped partial records retained."""
+    counts["method_whole_call_records"] += 1
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked whole call cannot fabricate method observations")
+        counts["method_uninvoked_whole_call_records"] += 1
+        return
+    observed = operation["observations"]
+    assemblies = {row["observed_attempt_ordinal"]: row for row in observed["MatrixAssembly"]["attempts"]}
+    methods = {}
+    for method in METHODS:
+        ledger = observed[method]; methods[method] = ledger
+        key = method.lower()
+        policy = POLICIES["ctf06_exponential_observation_policy" if method == "Exponential" else "ctf05_inverse_observation_policy"]
+        need(isinstance(ledger, dict) and set(ledger) == {"protocol", "method", "actual_invocation_count", "actual_retained_invocation_count",
+             "actual_stage_callback_counts", "stage_records_omitted", "stage_ledger", "observer_failure", "method_copy_integrity_failed",
+             "failure_event_counts", "first_failure", "last_failure", "invocations", "no_actual_entry_observed", "record_cap",
+             "deduplicated", "truncated", "unreached_counted_as_PASS", "later_attempts_counted_as_PASS",
+             "values_or_identity_or_return_reconstructed", "old_checkpoint_and_matrix_counters_include_method_callbacks"},
+             "Complete actual method ledger required")
+        need(ledger["protocol"] == policy["protocol"] and ledger["method"] == method and ledger["record_cap"] is None,
+             "Actual method protocol/cap differs")
+        for name in ["deduplicated", "truncated", "unreached_counted_as_PASS", "later_attempts_counted_as_PASS",
+                     "values_or_identity_or_return_reconstructed", "old_checkpoint_and_matrix_counters_include_method_callbacks"]:
+            need(ledger[name] is False, "Method values/visits cannot be dropped, inferred or counted as PASS")
+        for name in ["observer_failure", "method_copy_integrity_failed", "no_actual_entry_observed"]:
+            need(type(ledger[name]) is bool, "Typed actual method flag required")
+        for name in ["actual_invocation_count", "actual_retained_invocation_count"]:
+            need(type(ledger[name]) is int and ledger[name] >= 0, "Typed actual invocation count required")
+        callbacks, omitted = ledger["actual_stage_callback_counts"], ledger["stage_records_omitted"]
+        need(all(isinstance(v, list) and len(v) == 7 and all(type(n) is int and n >= 0 for n in v) for v in [callbacks, omitted]),
+             "Seven typed actual stage/omission counts required")
+        need(ledger["actual_invocation_count"] == callbacks[0] and ledger["no_actual_entry_observed"] is (callbacks[0] == 0) and
+             isinstance(ledger["invocations"], list) and ledger["actual_retained_invocation_count"] == len(ledger["invocations"]),
+             "Actual entry/invocation/retained ledger differs")
+        need(ledger["stage_ledger"] == [{"stage": stage, "actual_callback_count": callbacks[i], "records_omitted": omitted[i]}
+                                        for i, stage in enumerate(STAGES)], "Actual named stage ledger differs")
+        failures = ledger["failure_event_counts"]
+        need(isinstance(failures, list) and len(failures) == 6, "Six typed actual failure counters required")
+        event_counts = []
+        for kind, row in zip(FAILURES, failures):
+            need(isinstance(row, dict) and set(row) == {"kind", "actual_event_count"} and row["kind"] == kind and
+                 type(row["actual_event_count"]) is int and row["actual_event_count"] >= 0, "Actual method failure count differs")
+            event_counts.append(row["actual_event_count"])
+        need(ledger["observer_failure"] is bool(sum(event_counts)), "Method observer failure/count differs")
+        for name in ["first_failure", "last_failure"]:
+            event = ledger[name]
+            if not sum(event_counts): need(event is None, "No actual failure can be invented")
+            else:
+                need(isinstance(event, dict) and set(event) == {"method", "invocation_ordinal", "assembly_ordinal", "stage", "kind"} and
+                     event["method"] == method and event["stage"] in STAGES and event["kind"] in FAILURES and
+                     type(event["invocation_ordinal"]) is int and 0 <= event["invocation_ordinal"] <= callbacks[0] and
+                     type(event["assembly_ordinal"]) is int and 0 <= event["assembly_ordinal"] <= observed["MatrixAssembly"]["actual_matrix_attempt_callback_count"] and
+                     event_counts[FAILURES.index(event["kind"])] > 0, "Actual method failure event association differs")
+        if sum(event_counts):
+            need(ledger["first_failure"]["invocation_ordinal"] <= ledger["last_failure"]["invocation_ordinal"],
+                 "Actual first/last failure invocation order differs")
+        retained = [0] * 7; per_record_callbacks = [0] * 7; record_flags = [0] * 6
+        ordinals = []; local_failed = ledger["observer_failure"] or any(omitted) or callbacks[0] != len(ledger["invocations"])
+        for record in ledger["invocations"]:
+            need(isinstance(record, dict) and set(record) == {"observed_invocation_ordinal", "observed_assembly_ordinal", "association_available",
+                 "failure_kinds", "actual_stage_callback_counts", *STAGES, "actual_retained_power_control_count", "actual_retained_square_control_count", "counted_as_PASS"},
+                 "Exact actual invocation record required")
+            ordinal, assembly_ordinal = record["observed_invocation_ordinal"], record["observed_assembly_ordinal"]
+            need(type(ordinal) is int and 1 <= ordinal <= callbacks[0] and (not ordinals or ordinal > ordinals[-1]) and
+                 type(assembly_ordinal) is int and 0 <= assembly_ordinal <= observed["MatrixAssembly"]["actual_matrix_attempt_callback_count"] and
+                 type(record["association_available"]) is bool and record["counted_as_PASS"] is False, "Actual method ordinal/association differs")
+            ordinals.append(ordinal)
+            if ordinal != len(ordinals) or ordinal != assembly_ordinal or not record["association_available"]: local_failed = True
+            flags = record["failure_kinds"]
+            need(isinstance(flags, list) and len(flags) == 6, "Six per-invocation failure flags required")
+            for i, (kind, flag) in enumerate(zip(FAILURES, flags)):
+                need(isinstance(flag, dict) and set(flag) == {"kind", "failed"} and flag["kind"] == kind and type(flag["failed"]) is bool,
+                     "Actual method failure flag differs")
+                record_flags[i] += int(flag["failed"])
+                if flag["failed"]: local_failed = True
+            actual = record["actual_stage_callback_counts"]
+            need(isinstance(actual, list) and len(actual) == 7 and all(type(n) is int and n >= 0 for n in actual), "Actual per-invocation stage counts required")
+            actual_retained = []
+            assembly = assemblies.get(assembly_ordinal)
+            for stage in STAGES:
+                index = STAGES.index(stage)
+                if stage in ["PowerControl", "SquareControl"]:
+                    events = record[stage]
+                    need(isinstance(events, list), "All actual control events must remain retained")
+                    expected_keys = {"observed_event_ordinal", "i", "SigFigLimit"} if stage == "PowerControl" else {"observed_event_ordinal", "isq", "Backup"}
+                    for n, event in enumerate(events, 1):
+                        need(isinstance(event, dict) and set(event) == expected_keys and type(event["observed_event_ordinal"]) is int and
+                             1 <= event["observed_event_ordinal"] <= actual[index] and
+                             (n == 1 or event["observed_event_ordinal"] > events[n - 2]["observed_event_ordinal"]), "Actual control event order differs")
+                        need(type(event["i" if stage == "PowerControl" else "isq"]) is int and
+                             type(event["SigFigLimit" if stage == "PowerControl" else "Backup"]) is bool, "Actual control locals must retain types")
+                        if event["observed_event_ordinal"] != n: local_failed = True
+                    actual_retained.append(len(events))
+                    name = "actual_retained_power_control_count" if stage == "PowerControl" else "actual_retained_square_control_count"
+                    need(type(record[name]) is int and record[name] == len(events), "Actual retained control count differs")
+                    counts[key + "_" + name] += len(events)
+                    if method == "Inverse": need(not events and actual[index] == 0, "Inverse has no exponential control stages")
+                    continue
+                value = record[stage]
+                need(isinstance(value, dict) and set(value) == {"reached", "available", "snapshot", "unavailable_reason", "counted_as_PASS"} and
+                     type(value["reached"]) is bool and type(value["available"]) is bool and value["counted_as_PASS"] is False,
+                     "Exact actual method value-stage record required")
+                actual_retained.append(int(value["reached"]))
+                if not value["reached"]:
+                    need(value["available"] is False and value["snapshot"] is None and
+                         value["unavailable_reason"] == "actual_stage_callback_not_retained_or_not_reached", "Unreached method stage must remain absent")
+                    continue
+                snapshot = value["snapshot"]
+                need(isinstance(snapshot, dict) and set(snapshot) == {"context_available", "context", "matrices_available", "observed_matrix_count",
+                     "matrices", "exponential_controls", "caller_context_available", "actual_return_site_caller_context"}, "All actual method copy fields required")
+                for name in ["context_available", "matrices_available", "caller_context_available"]: need(type(snapshot[name]) is bool, "Typed method copy availability required")
+                need(type(snapshot["observed_matrix_count"]) is int and 0 <= snapshot["observed_matrix_count"] <= 4 and
+                     isinstance(snapshot["matrices"], list) and len(snapshot["matrices"]) == snapshot["observed_matrix_count"] and
+                     snapshot["context_available"] is (snapshot["observed_matrix_count"] != 0) and
+                     value["available"] is snapshot["matrices_available"] and
+                     value["unavailable_reason"] == (None if value["available"] else "required_method_matrix_copy_unavailable"), "Actual partial method copy availability differs")
+                if not snapshot["context_available"]:
+                    need(snapshot["context"] is None and not value["available"] and not snapshot["matrices"], "Identity-failed entry cannot fabricate context")
+                    local_failed = True; continue
+                context = snapshot["context"]
+                need(isinstance(context, dict) and set(context) == {"IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "rcmax",
+                     "NodeSource", "NodeUserTemp", "CTFTimeStep", "NumHistories", "assembly_context_available", "earlier_checked_assembly_context",
+                     "assembly_context_is_fresh_method_stack_context"}, "Exact real method/earlier assembly context required")
+                for name in ["IsUsedCTF", "SourceSinkPresent", "assembly_context_available"]: need(type(context[name]) is bool, "Typed method context flags required")
+                for name in ["SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]: need(type(context[name]) is int, "Actual method integer required")
+                scalar(context["CTFTimeStep"])
+                need(context["assembly_context_is_fresh_method_stack_context"] is False, "Earlier assembly context cannot be relabeled fresh method locals")
+                if context["assembly_context_available"]:
+                    earlier = context["earlier_checked_assembly_context"]
+                    need(isinstance(earlier, dict) and set(earlier) == {"ErrorsFound", "DoCTFErrorReport", "TimeStepZone"} and
+                         type(earlier["ErrorsFound"]) is bool and type(earlier["DoCTFErrorReport"]) is bool, "Actual checked earlier caller context required")
+                    scalar(earlier["TimeStepZone"])
+                    need(assembly is not None and assembly["available"], "Method association requires actual intact assembly visit")
+                    source = assembly["snapshot"]
+                    for name in ["IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+                        need(context[name] == source[name], "Actual assembly-to-method context handoff differs")
+                    need(context["CTFTimeStep"]["value_bits"] == source["CTFTimeStep"]["value_bits"] and
+                         earlier["TimeStepZone"]["value_bits"] == source["TimeStepZone"]["value_bits"] and
+                         earlier["ErrorsFound"] is source["ErrorsFound"] and earlier["DoCTFErrorReport"] is source["DoCTFErrorReport"],
+                         "Actual assembly-to-method scalar/flag handoff differs")
+                else:
+                    need(context["earlier_checked_assembly_context"] is None, "Unavailable checked context cannot fabricate values")
+                    local_failed = True
+                names = policy["input_matrices" if stage == "Entry" else "initialized_matrices" if stage == "InitializedInputs" else
+                               "scaled_matrices" if stage == "ScalingControls" and method == "Exponential" else "final_matrices" if stage == "FinalWorkspace" else "return_matrices"]
+                need([row["owner"] for row in snapshot["matrices"]] == names, "Only actual observed matrix owner slots may be emitted")
+                complete = True
+                for copy in snapshot["matrices"]:
+                    need(isinstance(copy, dict) and set(copy) == {"owner", "actual_bounds", "copy_available", "values"} and
+                         type(copy["copy_available"]) is bool, "Actual matrix copy availability required")
+                    bounds = copy["actual_bounds"]
+                    need(bounds is None or (isinstance(bounds, dict) and set(bounds) == {"lower1", "upper1", "lower2", "upper2", "size"} and
+                         all(type(n) is int for n in bounds.values())), "Actual Objexx bounds must retain exact integer fields")
+                    if not copy["copy_available"]:
+                        need(copy["values"] is None, "Failed matrix copy must remain null, preserving successful sibling copies")
+                        complete = False; local_failed = True; continue
+                    n = context["rcmax"]
+                    need(n >= 1 and bounds == {"lower1": 1, "upper1": n, "lower2": 1, "upper2": n, "size": n * n} and
+                         isinstance(copy["values"], list) and len(copy["values"]) == n * n, "Actual rcmax-square row-first shape differs")
+                    for field in copy["values"]: scalar(field)
+                    if stage in ["Entry", "SourceReturn"] and copy["owner"] in ["AMat", "IdenMatrix"] and context["assembly_context_available"]:
+                        need([x["value_bits"] for x in copy["values"]] == [x["value_bits"] for x in assembly["snapshot"]["matrices"][copy["owner"]]],
+                             "Original actual AMat/Iden handoff differs; no AExp substitution")
+                need(not value["available"] or complete, "Available method stage requires all actual matrix copies")
+                if not value["available"]: local_failed = True
+                controls = snapshot["exponential_controls"]
+                if method == "Exponential" and stage in ["ScalingControls", "FinalWorkspace"]:
+                    need(isinstance(controls, dict) and set(controls) == {"AMatRowNormMax", "k", "fact", "CheckVal", "l", "final_i"}, "Actual exponential control owners required")
+                    for name in ["AMatRowNormMax", "fact", "CheckVal"]: scalar(controls[name])
+                    for name in ["k", "l"]: need(type(controls[name]) is int, "Actual signed control integer required")
+                    need(type(controls["final_i"]) is int if stage == "FinalWorkspace" else controls["final_i"] is None,
+                         "Actual final_i is available only at final workspace; not an event count")
+                else: need(controls is None, "Unobserved method controls must remain null")
+                caller = snapshot["actual_return_site_caller_context"]
+                if stage == "SourceReturn":
+                    need(snapshot["caller_context_available"] is True and isinstance(caller, dict) and
+                         set(caller) == {"ErrorsFound", "DoCTFErrorReport", "TimeStepZone"} and
+                         type(caller["ErrorsFound"]) is bool and type(caller["DoCTFErrorReport"]) is bool, "Actual caller return marker/context required")
+                    scalar(caller["TimeStepZone"])
+                    if context["assembly_context_available"]: need(caller == context["earlier_checked_assembly_context"], "Actual returned caller differs from checked assembly context")
+                else: need(snapshot["caller_context_available"] is False and caller is None, "Method return cannot be inferred before caller site")
+            for i in range(7):
+                retained[i] += actual_retained[i]; per_record_callbacks[i] += actual[i]
+                need(actual[i] >= actual_retained[i], "Actual callback count cannot omit retained stage")
+            if actual != actual_retained: local_failed = True
+            reached = {name: record[name]["reached"] for name in VALUE_STAGES}
+            if method == "Inverse": need(not reached["ScalingControls"] and actual[2:5] == [0, 0, 0], "Inverse exponential-only stages must remain uninvoked")
+            need(not reached["InitializedInputs"] or reached["Entry"], "Actual initialized stage requires preceding entry")
+            need(not reached["ScalingControls"] or reached["InitializedInputs"], "Actual scaling stage requires initialized input")
+            need(not record["PowerControl"] and not record["SquareControl"] or reached["ScalingControls"], "Actual controls require scaling stage")
+            need(not reached["FinalWorkspace"] or reached["InitializedInputs"] and (method == "Inverse" or reached["ScalingControls"]), "Actual final workspace stage order differs")
+            need(not reached["SourceReturn"] or reached["FinalWorkspace"], "Actual caller return requires final workspace callback")
+            if operation["call_outcome"]["status"] == "source_returned":
+                need(reached["Entry"] and reached["FinalWorkspace"] and reached["SourceReturn"], "Returned whole call with method entry requires actual method return capture")
+            if ordinal > 1: counts[key + "_later_unpaired_invocation_count"] += 1
+            elif record["association_available"] and assembly_ordinal == 1 and assembly is not None and assembly["available"]:
+                source = assembly["snapshot"]
+                if source["SourceSinkPresent"] is False and source["SolutionDimensions"] == 1:
+                    counts[key + "_selected_first_invocation_count"] += 1
+            counts[key + "_actual_return_marker_count"] += int(reached["SourceReturn"])
+        need(all(callbacks[i] == retained[i] + omitted[i] and per_record_callbacks[i] <= callbacks[i] for i in range(7)),
+             "All actual stage visits must equal retained plus explicit omitted counts")
+        need(all(record_flags[i] <= event_counts[i] for i in range(6)), "Per-record failure flags require genuine event counts")
+        local_failed = local_failed or callbacks != retained
+        need(ledger["method_copy_integrity_failed"] is bool(local_failed), "Actual method integrity summary differs")
+        if local_failed: integrity.append(label + "/" + method + "/required-observation-integrity-failed")
+        for suffix, value in [("actual_invocation_count", callbacks[0]), ("actual_retained_invocation_count", len(ledger["invocations"]))]: counts[key + "_" + suffix] += value
+        for i, stage in enumerate(STAGES):
+            counts[key + "_stage_" + stage] += callbacks[i]; counts[key + "_omitted_" + stage] += omitted[i]
+        for i, kind in enumerate(FAILURES): counts[key + "_failure_" + kind] += event_counts[i]
+        counts[key + "_method_copy_integrity_failed"] = bool(counts[key + "_method_copy_integrity_failed"] or local_failed)
+    exp, inv = methods["Exponential"], methods["Inverse"]
+    if not (exp["method_copy_integrity_failed"] or inv["method_copy_integrity_failed"]):
+        need(inv["actual_invocation_count"] <= exp["actual_stage_callback_counts"][6] <= exp["actual_invocation_count"] and
+             exp["actual_invocation_count"] <= inv["actual_stage_callback_counts"][6] + 1, "Actual exp-before-inverse and prior-return order differs")
+        exp_rows = {r["observed_invocation_ordinal"]: r for r in exp["invocations"]}
+        for record in inv["invocations"]:
+            preceding = exp_rows.get(record["observed_invocation_ordinal"])
+            need(preceding is not None and preceding["SourceReturn"]["reached"] and
+                 preceding["observed_assembly_ordinal"] == record["observed_assembly_ordinal"], "Inverse requires actual same-attempt exponential return")
+
+
+def summary(result, counts, need):
+    answer = {name: counts[name] for name in COUNTS}
+    for method in METHODS:
+        key = method.lower(); total = result["actual_" + key + "_observation_counts"]
+        expected = {"actual_invocation_count": counts[key + "_actual_invocation_count"],
+                    "actual_retained_invocation_count": counts[key + "_actual_retained_invocation_count"],
+                    "actual_stage_callback_counts": [counts[key + "_stage_" + stage] for stage in STAGES],
+                    "stage_records_omitted": [counts[key + "_omitted_" + stage] for stage in STAGES],
+                    "failure_event_counts": [counts[key + "_failure_" + kind] for kind in FAILURES],
+                    "actual_retained_power_control_count": counts[key + "_actual_retained_power_control_count"],
+                    "actual_retained_square_control_count": counts[key + "_actual_retained_square_control_count"],
+                    "method_copy_integrity_failed": bool(counts[key + "_method_copy_integrity_failed"]),
+                    "complete_method_return_parity_claimed": False, "numerical_PASS_claimed": False}
+        need(isinstance(total, dict) and set(total) == set(expected) and total == expected,
+             "Global actual method totals differ from complete observed ledger")
+        for name in ["actual_invocation_count", "actual_retained_invocation_count", "actual_retained_power_control_count", "actual_retained_square_control_count"]:
+            need(type(total[name]) is int, "Typed actual global method counts required")
+        for name, size in [("actual_stage_callback_counts", 7), ("stage_records_omitted", 7), ("failure_event_counts", 6)]:
+            need(isinstance(total[name], list) and len(total[name]) == size and all(type(value) is int and value >= 0 for value in total[name]),
+                 "Typed actual global method count arrays required")
+        for name in ["method_copy_integrity_failed", "complete_method_return_parity_claimed", "numerical_PASS_claimed"]:
+            need(type(total[name]) is bool, "Typed actual global method flags required")
+        answer["actual_" + key + "_observation_counts"] = expected
+        answer[key + "_selected_first_invocation_count"] = counts[key + "_selected_first_invocation_count"]
+        answer[key + "_later_unpaired_invocation_count"] = counts[key + "_later_unpaired_invocation_count"]
+        answer[key + "_actual_return_marker_count"] = counts[key + "_actual_return_marker_count"]
+    return answer

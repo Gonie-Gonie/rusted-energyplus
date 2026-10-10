@@ -1,0 +1,181 @@
+
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-72H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-72H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/B-NOLIMIT-ANNUAL/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-production-output-01/ctf10-production-helper-results.json",
+      "sha256": "9e21e132896f65ad5cc378e176a8342f44a6bf3459c9e2aff0987cc0fcf6a122",
+      "size_bytes": 4616636
+    }
+  ],
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 15,
+    "loader_phase_records": 195
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/review_production.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/000-review_production.py",
+        "sha256": "5666cfa891a34adb97b7b042c5530e9000e3cdc8bbdde9f998cf289087837506",
+        "size_bytes": 34925
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/production_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/001-production_shape.py",
+        "sha256": "d54572e4f941d0648882c589b89bb9d2f535eb0971b05a4d6ec5320e988836d6",
+        "size_bytes": 23520
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/002-initial_shape.py",
+        "sha256": "ab0fdc69412d939bd9bb3bd025a43719defde08e36400f9a6f199b82e6737de8",
+        "size_bytes": 26626
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/method_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/003-method_shape.py",
+        "sha256": "0990f10316263894bbf42cc53f25d18c5cf79947286d99b6279e55b37eae9801",
+        "size_bytes": 30929
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/gamma_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/004-gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/coefficient_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/005-coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/retry_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/006-retry_shape.py",
+        "sha256": "e8615423cdd570c98c97c07b5eb58b2f9a736154a9b0b6a5150d09551898b4a7",
+        "size_bytes": 45988
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/public_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/007-public_shape.py",
+        "sha256": "8a772dc521cb8f99a7d3f51c1bbc61a3b1f9e0019ee3d22cb9f28fc6132fc669",
+        "size_bytes": 45307
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/original-production-data-review-01/008-packet_io.py",
+        "sha256": "e8aa503a053a9a50afccc498bef770c8617d37894b85d7b96c9117c8df8c581b",
+        "size_bytes": 4665
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-10/original-production-data-review-01/000-review_production.py",
+    "sha256": "5666cfa891a34adb97b7b042c5530e9000e3cdc8bbdde9f998cf289087837506",
+    "size_bytes": 34925
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored public storage/initialization, passive06/09, helper09 and prior validators; Raw authored passive/helper10, Base independently peered. This is structural transport/provenance review, not independent own-formula scientific certification. Root and other-author FULL source reviews are required."
+}
+{"receipt": {"path": ".runtime/porting/CTF-10/original-production-data-review-command-01/receipt.json", "sha256": "b1137332725415b991ac0564702c006d2a463583aa122beade0027e2c7f909b2"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

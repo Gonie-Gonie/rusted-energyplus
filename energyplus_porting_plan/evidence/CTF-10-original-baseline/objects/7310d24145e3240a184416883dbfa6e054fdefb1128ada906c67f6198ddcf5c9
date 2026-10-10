@@ -1,0 +1,38 @@
+--- accepted09/retry_shape.py
++++ proposed10/retry_shape.py
+@@ -293,7 +293,7 @@
+             "retry_uninvoked_whole_call_records": counts["retry_uninvoked_whole_call_records"]}
+ 
+ 
+-def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane, coefficients):
++def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane, coefficients, historical_prior_09=None):
+     from datetime import datetime
+     from pathlib import Path
+     authority, need = freeze["source_authorities"], m.require
+@@ -314,12 +314,23 @@
+     for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
+                         ("retry_policy_source_inventory", authority["retry_policy_source_inventory"])]:
+         same(amendment[key], target); m.bind(target)
+-    before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
++    before = [m.bind(row) for row in amendment["before_documents"]]
++    after = amendment["after_documents"]
++    if historical_prior_09 is None:
++        after = [m.bind(row) for row in after]
++    else:
++        need(before == historical_prior_09["historical_before_document_archives"] and
++             historical_prior_09["historical_after_document_identities"] == [{"historical_path": r["path"], "sha256": r["sha256"], "size_bytes": r["size_bytes"]} for r in after],
++             "Historical09 scope document identities differ")
++        for ref in before + after:
++            archived = next(r["archive"] for r in historical_prior_09["available_prior_frozen_document_archives"] if r["historical_path"] == ref["path"] and r["archive"]["sha256"] == ref["sha256"])
++            need(m.bind(archived)["size_bytes"] == ref["size_bytes"], "Historical09 document archive differs")
+     need(len(before) == len(after) == 2 and len({row["path"] for row in before}) == len({row["path"] for row in after}) == 2 and
+          before == authority["historical_scope_documents"] and after == authority["current_scope_documents"], "Actual09 raw document identities differ")
+-    card = m.bind(authority["current_cards"]["CTF-09"])
++    card = authority["current_cards"]["CTF-09"]
++    if historical_prior_09 is None: card = m.bind(card)
+     historical = next(row for row in passive["source_dependencies"] if row["path"] == card["path"])
+-    need(card["path"] == "energyplus_porting_plan/cards/CTF-09.md" and card in after and m.identity("energyplus_porting_plan/plan.json") in after and
++    need(card["path"] == "energyplus_porting_plan/cards/CTF-09.md" and card in after and (historical_prior_09 is not None or m.identity("energyplus_porting_plan/plan.json") in after) and
+          any(row["sha256"] == historical["sha256"] and row["size_bytes"] == historical["size_bytes"] for row in before),
+          "Current09 plan/card and authentic before copy differ")
+     check(authority["actual_scope_amendment_execution"], "CTF-09", frozen_started)

@@ -1,0 +1,46 @@
+--- accepted09/unit_shape.py
++++ proposed10/unit_shape.py
+@@ -8,7 +8,7 @@
+ MATERIAL_SCALARS = ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]
+ 
+ 
+-def review(result, request, need, bind, initial, methods, gamma, coefficients, retry):
++def review(result, request, need, bind, initial, methods, gamma, coefficients, retry, public):
+     counts = Counter()
+     statuses, ctor_statuses, init_statuses, phases = Counter(), Counter(), Counter(), Counter()
+     integrity = []
+@@ -135,6 +135,8 @@
+                         need(actual["ThicknessPerpend"]["value_bits"] == declared["ThicknessPerpend"]["bits"], "Actual seeded construction bits differ")
+         else:
+             need(model["actual_input_owner_identity"] is None, "Stopped model has fabricated seeded owner identity")
++        need(model["whole_Init_actual_source_invoked"] is False and model["whole_Init_unavailable_reason"] ==
++             "literal_direct_unit_flags_roughness_and_report_prerequisites_outside_selected_Init_scope", "Unit direct-call lane cannot claim whole Init")
+         diagnostics = model["source_diagnostics"]
+         boolean(diagnostics["available"])
+         need(isinstance(diagnostics["messages"], list), "Actual ordered diagnostic messages required")
+@@ -167,6 +169,7 @@
+             gamma.review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
+             coefficients.review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
+             retry.review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"], diagnostics["messages"])
++            public.review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
+             observed = operation["observations"]
+             if not invoked:
+                 need(observed is None, "Uninvoked source has fabricated phase observations"); continue
+@@ -174,7 +177,7 @@
+                 boolean(observed[flag])
+                 if observed[flag]: integrity.append(model["id"] + "/" + operation["id"] + "/" + flag)
+             need(observed["observer_failure"] is (any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]) or observed["MatrixAssembly"]["matrix_copy_integrity_failed"] or
+-                  observed["Exponential"]["method_copy_integrity_failed"] or observed["Inverse"]["method_copy_integrity_failed"] or observed["Gamma"]["method_copy_integrity_failed"] or observed["FinalCoefficients"]["method_copy_integrity_failed"] or observed["RetryDriver"]["retry_copy_integrity_failed"]), "Observer aggregate flag differs")
++                  observed["Exponential"]["method_copy_integrity_failed"] or observed["Inverse"]["method_copy_integrity_failed"] or observed["Gamma"]["method_copy_integrity_failed"] or observed["FinalCoefficients"]["method_copy_integrity_failed"] or observed["RetryDriver"]["retry_copy_integrity_failed"] or observed["PublicStorage"]["public_copy_integrity_failed"]), "Observer aggregate flag differs")
+             need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must not become operands")
+             actual_total, missing_prior = initial_count, False
+             for phase in PHASES:
+@@ -218,7 +221,7 @@
+     need(counts["initial_reached_phase_records"] + counts["initial_unreached_phase_records"] == counts["actual_operation_invocations"],
+          "Every actual invocation requires its genuine initial reached/unreached record")
+     initial.matrix_summary(result, counts, need)
+-    method_counts = {**methods.summary(result, counts, need), **gamma.summary(result, counts, need), **coefficients.summary(result, counts, need), **retry.summary(result, counts, need)}
++    method_counts = {**public.summary(result, counts, need), **methods.summary(result, counts, need), **gamma.summary(result, counts, need), **coefficients.summary(result, counts, need), **retry.summary(result, counts, need)}
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Global observer integrity summary differs")
+     for key in ["actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count"]:

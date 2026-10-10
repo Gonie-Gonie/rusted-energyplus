@@ -1,0 +1,125 @@
+{
+  "schema": "ctf10-existing-current09-rust-baseline-gap.v1",
+  "created_utc": "2026-10-10T23:32:36.051976+00:00",
+  "actual_original_DataQA_before_Rust": {
+    "unit": {
+      "path": ".runtime/porting/CTF-10/original-data-review-01/review.json",
+      "sha256": "700797737e0fe61230034f87f88206916db81d31c915388fda2c795c44ca22b5",
+      "size_bytes": 73499
+    },
+    "production": {
+      "path": ".runtime/porting/CTF-10/original-production-data-review-01/review.json",
+      "sha256": "51fa6c55da25fadf97fee0512263329edfc0996ac03a286fbd49df200e67af43",
+      "size_bytes": 116533
+    }
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-10/existing-production-build-command-01/receipt.json",
+    "sha256": "7fa60e44288ca7b973172dd3d6d54e747b9741d1cf60c899c1fde752e0878cd9",
+    "size_bytes": 4461
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/existing-production-command-01/receipt.json",
+    "sha256": "b27ebc885dfec860e6fe03fb51d8c02c73643a9c27778b9d33bee5b18434627f",
+    "size_bytes": 2928
+  },
+  "actual_results": {
+    "path": ".runtime/porting/CTF-10/existing-production-command-01/stdout.log",
+    "sha256": "e48268304e8dab986581d8fed6e15d118e20025ffd6efde9abe3f44d42aaa979",
+    "size_bytes": 621940
+  },
+  "actual_request": {
+    "path": ".runtime/porting/CTF-10/existing-production-inputs-01/request.json",
+    "sha256": "31ce665fb7738c09c873a1edc0574cb0e336cc6b43caa6eacc5f75d6939361be",
+    "size_bytes": 35763
+  },
+  "actual_current09_source_snapshot": {
+    "path": ".runtime/porting/source-objects/f2/f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced",
+    "sha256": "f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced"
+  },
+  "actual_captured_source_files": 3854,
+  "actual_first_assembly_observation_counts": [
+    {
+      "model_id": "A-24H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "A-72H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "A-ANNUAL",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-NOLIMIT-24H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-NOLIMIT-72H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-NOLIMIT-ANNUAL",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-FLOW-24H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-FLOW-72H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-FLOW-ANNUAL",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-CAPACITY-24H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-CAPACITY-72H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-CAPACITY-ANNUAL",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-BOTH-24H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-BOTH-72H",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    },
+    {
+      "model_id": "B-BOTH-ANNUAL",
+      "actual_first_assembly_owner_count": 0,
+      "owner_available": true
+    }
+  ],
+  "all15_cases_returned": true,
+  "whole_current09_initializer_and_math_unchanged": true,
+  "legacy04_first_assembly_DTO_only": true,
+  "new10_public_owner_coverage_or_numerical_PASS_claimed": false,
+  "Native_values_supplied_to_Rust": false,
+  "CTF10_math_applied_before_baseline": false,
+  "canonical_files_or_gates_updated": false
+}
