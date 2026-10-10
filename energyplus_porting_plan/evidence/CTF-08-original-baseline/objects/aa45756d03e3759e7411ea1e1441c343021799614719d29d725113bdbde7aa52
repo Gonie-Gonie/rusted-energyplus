@@ -1,0 +1,32 @@
+--- .runtime/porting/CTF-08/original-data-review-prep-01/README.md
++++ .runtime/porting/CTF-08/original-data-review-prep-02/README.md
+@@ -93,10 +93,11 @@
+ Production reuses its already authenticated result_ref in the output inventory,
+ so no second64MB bind is applied to the scientific result.
+ 
+-Exact immutable accepted07 before copies and all nine generated diffs are
+-included. initial/method/Gamma function ASTs are exact07; Gamma source is entirely
+-byte-exact, and only new08 retention literals change in inherited initial/method
+-modules. Existing shape routines add one coefficient call and integrity/count
++Exact immutable held08 predecessor before copies and all nine generated diffs
++are included. Initial record functions, method functions and Gamma function ASTs
++remain exact07; Gamma source is entirely byte-exact. Inherited initial packet
++routing uses the two exact current08 freeze field names described below; the
++new08 retention literals remain unchanged in initial/method modules. Existing shape routines add one coefficient call and integrity/count
+ routing. Preparation performs source/metadata reads, SHA/diff and Python AST only;
+ no module is imported, no tests/build/formatter/engine runs, no scientific/weather/
+ binary payload is read, and no canonical/Git file is changed.
+@@ -105,3 +106,13 @@
+ passive08 and Base authored helper/freezer/PE08. This is source/provenance and
+ structural validation, not independent certification of Header's own formulas.
+ Root and an other-author peer must fully review the held sources before execution.
++
++Fresh02 preserves held01 and corrects only pre-execution source routing. Both
++readers bind .runtime/porting/CTF-08/native-build-review-prep-01/manifest.json to
++the already approved08 digest56585de4; the old path was CTF-07. Initial packet
++validation now requires frozen_before_this_CTF08_helper_execution and
++inherited_CTF01_CTF06_or_CTF07_freeze_claimed_as_fresh_CTF08_freeze, exactly as
++emitted by the accepted08 freezer. Both readers rebind only INITIAL_SHA besides
++that PE path. The other six source bodies, all policies/profiles, scalar/shape/
++ledger/availability validation and physical bounds are byte-exact01. No target
++execution, scientific output inspection or tolerance change prepared this repair.

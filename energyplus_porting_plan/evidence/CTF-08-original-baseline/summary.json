@@ -1,0 +1,568 @@
+{
+  "schema": "ctf08-original-and-existing-current07-rust-baseline-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-08-original-baseline/manifest.json",
+    "sha256": "10cc62f846ebe199ca8d28351234bba0d77927642b3c68f118637ec6e0b153e9",
+    "size_bytes": 196063
+  },
+  "actual_unit_native_execution": {
+    "path": ".runtime/porting/CTF-08/native-unit-command-01/receipt.json",
+    "sha256": "f6c6a483bdc2e1efd10efb1c975c4edbc4a90b3965494c490e47f7028a5f50ff",
+    "size_bytes": 3178
+  },
+  "actual_production_native_execution": {
+    "path": ".runtime/porting/CTF-08/native-production-command-01/receipt.json",
+    "sha256": "c1d2071d2737de3a749e2fb13a5e302bdc5db6dd78d3215c2f679417162e1871",
+    "size_bytes": 3225
+  },
+  "actual_unit_original_data_QA": {
+    "path": ".runtime/porting/CTF-08/original-data-review-01/review.json",
+    "sha256": "855d87b4160029cd10870804097d4513fc41e9af86c97053a89b0e3ebb49af78",
+    "size_bytes": 41567
+  },
+  "actual_unit_original_data_QA_execution": {
+    "path": ".runtime/porting/CTF-08/original-data-review-command-01/receipt.json",
+    "sha256": "53051992e34c8c0bec51420d995c99b752379d42bbad7af0288d25ce37c2646f",
+    "size_bytes": 4277
+  },
+  "actual_production_original_data_QA": {
+    "path": ".runtime/porting/CTF-08/original-production-data-review-01/review.json",
+    "sha256": "e4be719f2f7b85444528aa868c619c30117da8f8af2ddaf5bb5467bbef30f9bf",
+    "size_bytes": 83929
+  },
+  "actual_production_original_data_QA_execution": {
+    "path": ".runtime/porting/CTF-08/original-production-data-review-command-01/receipt.json",
+    "sha256": "ea137713ee8cb65dce0a519202bbb5ed57067344a322294e8710dd5d58b1723e",
+    "size_bytes": 4380
+  },
+  "actual_existing_Rust_baseline_gap": {
+    "path": ".runtime/porting/CTF-08/existing-production-inputs-02/baseline-gap.json",
+    "sha256": "18188a71a8c4141d86cff2063108f7c0762d52d7d333f25c75b9a69bb46cfad3",
+    "size_bytes": 3681
+  },
+  "actual_existing_Rust_build": {
+    "path": ".runtime/porting/CTF-08/existing-production-build-command-02/receipt.json",
+    "sha256": "53f74b1b9ba2d798c44eca8c7d1443b99401c15a68923661e9d4c945c411c00e",
+    "size_bytes": 4371
+  },
+  "actual_existing_Rust_execution": {
+    "path": ".runtime/porting/CTF-08/existing-production-command-02/receipt.json",
+    "sha256": "2a128efb2e484d25a3e08b07786cab8d5a163b8346ed1d0aa9b78a5ec8b65c99",
+    "size_bytes": 2928
+  },
+  "unit_actual_observation_counts": {
+    "method_whole_call_records": 42,
+    "method_uninvoked_whole_call_records": 0,
+    "actual_exponential_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        41,
+        3154,
+        469,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_retained_power_control_count": 3154,
+      "actual_retained_square_control_count": 469,
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "exponential_selected_first_invocation_count": 25,
+    "exponential_later_unpaired_invocation_count": 16,
+    "exponential_actual_return_marker_count": 41,
+    "actual_inverse_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        0,
+        0,
+        0,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_retained_power_control_count": 0,
+      "actual_retained_square_control_count": 0,
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "inverse_selected_first_invocation_count": 25,
+    "inverse_later_unpaired_invocation_count": 16,
+    "inverse_actual_return_marker_count": 41,
+    "actual_gamma_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        41,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "gamma_whole_call_records": 42,
+    "gamma_uninvoked_whole_call_records": 0,
+    "gamma_selected_first_invocation_count": 25,
+    "gamma_later_unpaired_invocation_count": 16,
+    "gamma_actual_return_marker_count": 41,
+    "actual_final_coefficient_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "coefficient_whole_call_records": 42,
+    "coefficient_uninvoked_whole_call_records": 0,
+    "coefficient_selected_first_invocation_count": 25,
+    "coefficient_later_unpaired_invocation_count": 16,
+    "coefficient_actual_return_marker_count": 41,
+    "initial_record_count": 42,
+    "initial_reached_phase_records": 25,
+    "initial_unreached_phase_records": 17,
+    "initial_available_owner_count": 25,
+    "initial_unavailable_owner_count": 17,
+    "initial_selected_1D_owner_count": 25,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 25,
+    "matrix_whole_call_records": 42,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 17,
+    "actual_matrix_attempt_callback_count": 41,
+    "actual_retained_matrix_attempt_count": 41,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 25,
+    "matrix_later_unpaired_attempt_count": 16,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 131,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 2297230,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33,
+      "InitialDiscretization": 25
+    }
+  },
+  "production_actual_observation_counts": {
+    "method_whole_call_records": 21,
+    "method_uninvoked_whole_call_records": 0,
+    "actual_exponential_observation_counts": {
+      "actual_invocation_count": 15,
+      "actual_retained_invocation_count": 15,
+      "actual_stage_callback_counts": [
+        15,
+        15,
+        15,
+        213,
+        60,
+        15,
+        15
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_retained_power_control_count": 213,
+      "actual_retained_square_control_count": 60,
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "exponential_selected_first_invocation_count": 15,
+    "exponential_later_unpaired_invocation_count": 0,
+    "exponential_actual_return_marker_count": 15,
+    "actual_inverse_observation_counts": {
+      "actual_invocation_count": 15,
+      "actual_retained_invocation_count": 15,
+      "actual_stage_callback_counts": [
+        15,
+        15,
+        0,
+        0,
+        0,
+        15,
+        15
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_retained_power_control_count": 0,
+      "actual_retained_square_control_count": 0,
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "inverse_selected_first_invocation_count": 15,
+    "inverse_later_unpaired_invocation_count": 0,
+    "inverse_actual_return_marker_count": 15,
+    "actual_gamma_observation_counts": {
+      "actual_invocation_count": 15,
+      "actual_retained_invocation_count": 15,
+      "actual_stage_callback_counts": [
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "gamma_whole_call_records": 21,
+    "gamma_uninvoked_whole_call_records": 0,
+    "gamma_selected_first_invocation_count": 15,
+    "gamma_later_unpaired_invocation_count": 0,
+    "gamma_actual_return_marker_count": 15,
+    "actual_final_coefficient_observation_counts": {
+      "actual_invocation_count": 15,
+      "actual_retained_invocation_count": 15,
+      "actual_stage_callback_counts": [
+        15,
+        15,
+        15
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "coefficient_whole_call_records": 21,
+    "coefficient_uninvoked_whole_call_records": 0,
+    "coefficient_selected_first_invocation_count": 15,
+    "coefficient_later_unpaired_invocation_count": 0,
+    "coefficient_actual_return_marker_count": 15,
+    "initial_record_count": 21,
+    "initial_reached_phase_records": 15,
+    "initial_unreached_phase_records": 6,
+    "initial_available_owner_count": 15,
+    "initial_unavailable_owner_count": 6,
+    "initial_selected_1D_owner_count": 15,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 15,
+    "matrix_whole_call_records": 21,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 6,
+    "actual_matrix_attempt_callback_count": 15,
+    "actual_retained_matrix_attempt_count": 15,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 15,
+    "matrix_later_unpaired_attempt_count": 0,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "operation_records": 21,
+    "actual_CTF_invocations": 21,
+    "actual_CTF_skipped_construct_rows": 0,
+    "loader_unavailable_model_cases": 0,
+    "actual_phase_callback_count": 78,
+    "unreached_phase_records": 0,
+    "scalar_DTO_visits": 20505,
+    "snapshot_visits": 462,
+    "unavailable_snapshot_records": 0,
+    "actual_source_function_counts": {
+      "InputProcessor::processInput": 15,
+      "SimulationManager::PostIPProcessing": 15,
+      "EnergyPlusData::init_constant_state": 15,
+      "EnergyPlusData::init_state": 15,
+      "OutputReportPredefined::SetPredefinedTables": 15,
+      "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+      "OutputProcessor::SetupTimePointers(Zone)": 15,
+      "OutputProcessor::SetupTimePointers(System)": 15,
+      "HeatBalanceManager::GetProjectControlData": 15,
+      "HeatBalanceManager::GetSiteAtmosphereData": 15,
+      "Material::GetMaterialData": 15,
+      "HeatBalanceManager::GetConstructData": 15,
+      "HeatBalanceManager::GetBuildingData": 15,
+      "calculateTransferFunction": 21
+    },
+    "actual_CTF_status_counts": {
+      "source_returned": 21
+    },
+    "actual_loader_status_counts": {
+      "source_returned": 195
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 15
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 21,
+      "PostMerge": 21,
+      "PostConversion": 21,
+      "InitialDiscretization": 15
+    },
+    "unknown_whole_call_obligations_for_unavailable_loaders": 0
+  },
+  "Original_data_QA_completed_before_existing_Rust_build": true,
+  "unchanged_full_Rust_source_snapshot_sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+  "actual_existing_owners": {
+    "models": 15,
+    "CTF04_first_matrix_rows": 21,
+    "all15_initialization_source_returned": true,
+    "DTO_scope": "Existing04 first matrix owners only. Whole current07 Rust source/ordinary initializer executed unchanged; no current07 Gamma or08 private final numerical observation claimed."
+  },
+  "source_review": {
+    "OriginalDataQA": {
+      "path": ".runtime/porting/CTF-08/original-data-review-prep-02/manifest.json",
+      "sha256": "61c3efd7170fb04ab08a924591e5a5d38afb4d9ad08eadb0693ea0ed81d6a24e",
+      "size_bytes": 63705
+    },
+    "Nativehelper": {
+      "path": ".runtime/porting/CTF-08/native-helper-prep-01/manifest.json",
+      "sha256": "652a1d9cf1341d7a424575119d6339cb7b344cbc9b3a6f3e189d3ed4b2cf8cbf",
+      "size_bytes": 26873
+    },
+    "passive": {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/manifest.json",
+      "sha256": "75c82f69c1c28036b9b83f68d8125ab5db636dd3b1e819d1a5ad130f8047990c",
+      "size_bytes": 18329
+    },
+    "PE": {
+      "path": ".runtime/porting/CTF-08/native-build-review-prep-01/manifest.json",
+      "sha256": "56585de4265b28d25b557503a73992fcb411ce643da007045cdb8576211f0b1d",
+      "size_bytes": 5823
+    },
+    "Root_and_other_author_FULL_before_execution": true
+  },
+  "linked_originals_retained_now": true,
+  "linked_original_retention_intent": {
+    "schema": "ctf08-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF08-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "preserved_failed_attempts": [
+    {
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/existing-production-command-01/receipt.json",
+        "sha256": "fa9ad0a8464264a24ef6aad8dae07622632298c224b6a797e8edf73c8ec93ccb",
+        "size_bytes": 2930
+      },
+      "actual_exit_code": 2,
+      "reason": "Completed07 current card SHA differs from historical07 frozen live binding. Kept immutable; existing04 observer baseline02 uses refreshed current07 source inventory and unchanged literal inputs."
+    }
+  ],
+  "Rust_CTF08_candidate_applied": false,
+  "numerical_comparison_count": 0,
+  "numerical_PASS_claimed": false,
+  "pending": [
+    "actual08 source application/formatter correspondence/Cargo quality",
+    "same-input08 observers and seven exact private comparisons",
+    "fixed6 production CLI regression",
+    "separate genuine pair Original retirement",
+    "full retry/publicSI19/SUR and complete CTF gates"
+  ],
+  "actual_plan_validation": {
+    "path": ".runtime/porting/CTF-08/original-baseline-plan-check-command-01/receipt.json",
+    "sha256": "02949a0c0503c534408772abdecce07460c4e6927a355ebee78c63987d32c07a",
+    "size_bytes": 2862
+  },
+  "actual_plan_validation_role": "real current08 metadata check only, no numeric/full-card claim",
+  "committed_plan_validation_bytes": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-08/original-baseline-plan-check-command-01/receipt.json",
+        "sha256": "02949a0c0503c534408772abdecce07460c4e6927a355ebee78c63987d32c07a",
+        "size_bytes": 2862
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-original-baseline/validation/receipt.json",
+        "sha256": "02949a0c0503c534408772abdecce07460c4e6927a355ebee78c63987d32c07a",
+        "size_bytes": 2862
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-08/original-baseline-plan-check-command-01/stdout.log",
+        "sha256": "fe91fcb78958dc6ac1083d5072bf74ac2d0f4708ec704591c6780b34fe65f872",
+        "size_bytes": 665
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-original-baseline/objects/fe91fcb78958dc6ac1083d5072bf74ac2d0f4708ec704591c6780b34fe65f872",
+        "sha256": "fe91fcb78958dc6ac1083d5072bf74ac2d0f4708ec704591c6780b34fe65f872",
+        "size_bytes": 665
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-08/original-baseline-plan-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-original-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ]
+}

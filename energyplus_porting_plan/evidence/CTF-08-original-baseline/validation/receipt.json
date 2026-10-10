@@ -1,0 +1,75 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    "tools/porting/check_plan.py",
+    "--check",
+    "--card",
+    "CTF-08"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T21:05:59.392252+00:00",
+  "finished_utc": "2026-10-10T21:06:03.444274+00:00",
+  "elapsed_seconds": 4.052037899993593,
+  "repository_before": {
+    "head": "e9610e1b9c94ce0e7a2a1ee5f9e66e501ce49d3b",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": "?? energyplus_porting_plan/evidence/CTF-08-original-baseline/\u0000"
+  },
+  "repository_after": {
+    "head": "e9610e1b9c94ce0e7a2a1ee5f9e66e501ce49d3b",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": "?? energyplus_porting_plan/evidence/CTF-08-original-baseline/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/29/293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+    "sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-08/original-baseline-plan-check-command-01/stdout.log",
+    "sha256": "fe91fcb78958dc6ac1083d5072bf74ac2d0f4708ec704591c6780b34fe65f872"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-08/original-baseline-plan-check-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T21:06:03.444274+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

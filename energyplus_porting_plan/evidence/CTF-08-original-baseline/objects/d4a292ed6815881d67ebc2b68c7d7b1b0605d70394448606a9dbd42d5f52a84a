@@ -1,0 +1,107 @@
+# CTF08 OriginalDataQA source preparation
+
+SOURCE-READY HELD, unexecuted. These are the existing unit and production
+OriginalDataQA stages adapted from accepted CTF07 package1374abf9. They validate
+actual source-produced records and provenance before Root releases a Rust
+baseline. They never invoke an engine, evaluate coefficient formulas, compare
+Native against Rust, or claim numerical PASS. No new QA/proof/execution stage
+or framework is introduced. Root alone runs them after full source and peer review.
+
+Both CLIs retain the same eleven required option/value pairs:
+
+    python -X utf8 -B review_unit.py|review_production.py
+      --approved-source-sha256 <actual reviewed main SHA>
+      --approved-build-review-source-sha256 <actual reviewed PE reader SHA>
+      --native-execution <actual recorder path#SHA>
+      --results <actual Native result path#SHA, or path if genuinely absent>
+      --freeze-receipt <actual same-lane freeze path#SHA>
+      --freeze-execution <actual freeze recorder path#SHA>
+      --build <actual same-lane build path#SHA>
+      --build-execution <actual compile recorder path#SHA>
+      --build-review <actual independent PE report path#SHA>
+      --build-review-execution <actual independent PE recorder path#SHA>
+      --output-dir <fresh repository-contained CTF08 output directory>
+
+The actual PE source is held56585de4/reader52be9ce8 and must match the explicit
+approved SHA and real executed_reader archive. Its genuine argc11 command
+contains exact lane, actual build path#SHA and report output directory. Its
+stdout remains compact {review,status}; Native argc5 and the fresh freezer
+argc25 bind exact existing producers. Recorded configure/compile/derive/PE/
+freeze timings and sourceguards, full freeze stdout and empty stderr remain
+required. Compiled Native8/actual provider/no archive Construction provider,
+protected/core metadata, real linked Original and derived PE maps/custody and
+forward-only new08 retention intent stay authenticated. DataQA reads no binaries.
+
+Fresh schemas are ctf08[-production]-independent-original-data-review.v1;
+Native ctf08[-production]-helper-results.v1 and same-lane frozen input schemas
+are exact. Unit39/member calls42 and production fixed-CON15/lifecycle195 retain
+literal input order, caller bits, material members and ordered45 guard refs.
+Construct and method/callback counts derive only from actual records. Uninvoked
+construction/loader stops retain null snapshots and actual reason; unknown
+whole-call obligations are never invented as zero or success.
+
+Current scope is an actual ctf08-source-scope-amendment.v1 with current raw
+plan/card before/after identities and one real check0. Its exact role is
+real-CTF-08-check-only; final_coefficient_policy_source_inventory authenticates
+the held new projection policy. Historical prior07 is separate: same-lane
+real freeze/recorder, exact writer own2/argv31/archives, source contract, typed
+selected primary ranges, real scope/check and original document archives.
+Nested historical05/06 authority remains literal and independently authenticated
+with its same-lane freeze and both genuine card checks. Historical after-doc
+identities are never rebound to live current paths. Current08 authority cannot
+replace an earlier recorder or imply earlier numerical PASS.
+
+The pure coefficient_shape.py validator checks actual FinalCoefficients
+Entry, PrivateFinal and SourceReturn stages for every actual invocation,
+including all later visits. It checks ordered ordinals, first assembly/initial619
+context association, real preceding exponential/inverse/Gamma returns, actual
+Objexx bounds, per-owner copies, independent CMat/DMat and s/e availability,
+DTO class/bits, actual assigned NumCTFTerms and initialized private controls,
+actual caller-return marker and unchanged storage handoffs. Entry requires
+actual AExp/Iden/Gamma inputs; private final retains Gamma1/s0/PhiR0/Rnew/Rold
+and full allocated s/e tails. SourceReturn retains only real Gamma1/s0/s/e/
+NumCTFTerms and caller context. Private R workspaces and inum/CTFConvrg are
+unavailable there; no stale/deallocated/unassigned local is reconstructed.
+NumCTFTerms never truncates the allocated history obligation.
+
+Six typed failure kinds, three stage omissions, first/last failure association,
+per-visit and global counters, all copy masks and aggregate integrity flags
+must agree. Partial successful sibling copies remain actual context. Missing
+required copies, bad shape/order/association and append/omission failures are
+required integrity failure. A source exception may genuinely stop later stages;
+a returned whole call cannot invent a missing return. No record cap, dropping,
+deduplication, expected coefficients, identity synthesis or retry evaluator is used.
+
+Only actual first no-source1D invocation1/assembly1 is a prospective numerical
+pair; later Native visits remain retained unpaired/noPASS. Actual initial619
+dt/history are distinct from caller TimeStepZone; equality is never assumed.
+Seven fresh zero/class/shape/signedzero profiles and the discrete NumCTFTerms/
+inum/CTFConvrg obligations are authenticated separately from unchanged old
+preprocessing18/initial3/assembly7/exponential7/inverse2/Gamma3 handoffs.
+The inherited Gamma selector is literal07; ctf08_method_selection is separate.
+No caller convergence/retry, public SI19 store, complete CTF coefficient or
+surface handoff is certified by this factual review.
+
+Report keys include reviewed_final_coefficient_observation_policy,
+reviewed_final_coefficient_policy_contract, complete_actual_final_coefficient_records,
+selected_final_coefficient_invocation_ordinal, actual_observation_counts with
+actual_final_coefficient_observation_counts and observed-only coefficient
+whole/uninvoked/selected-first/later-unpaired/return-marker counts. Each lane
+archives seven executed reader sources; the whole package contains nine sources.
+The complete scientific observation physical bound remains1GiB; source and
+auxiliary ref bounds remain64,000,000B; small metadata remains16,000,000B.
+Production reuses its already authenticated result_ref in the output inventory,
+so no second64MB bind is applied to the scientific result.
+
+Exact immutable accepted07 before copies and all nine generated diffs are
+included. initial/method/Gamma function ASTs are exact07; Gamma source is entirely
+byte-exact, and only new08 retention literals change in inherited initial/method
+modules. Existing shape routines add one coefficient call and integrity/count
+routing. Preparation performs source/metadata reads, SHA/diff and Python AST only;
+no module is imported, no tests/build/formatter/engine runs, no scientific/weather/
+binary payload is read, and no canonical/Git file is changed.
+
+Header authored Native06 and pure/public Gamma07/private08. Raw authored new
+passive08 and Base authored helper/freezer/PE08. This is source/provenance and
+structural validation, not independent certification of Header's own formulas.
+Root and an other-author peer must fully review the held sources before execution.

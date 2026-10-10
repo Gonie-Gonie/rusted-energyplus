@@ -1,0 +1,20 @@
+--- .runtime/porting/CTF-08/original-data-review-prep-01/review_production.py
++++ .runtime/porting/CTF-08/original-data-review-prep-02/review_production.py
+@@ -10,7 +10,7 @@
+ PREP = Path(__file__).resolve().parent
+ IO_SHA = "4bd8050d920d983444d6155df029b801450bbeaa7c4bed0d1a1b09cbe2aa0f0d"
+ SHAPE_SHA = "5284455f65c1e9df0383f7abb9048ee702c9b5a83a36f7461a8a413ff0b2e9de"
+-INITIAL_SHA = "2f00761f41a1d2927c9c713f4843f7ae521c305550e4ad5f83447deb298b3ac3"
++INITIAL_SHA = "6c767b4a88f3e56848f61b3fe0699a311687d523856d39428ca48a3ab20bc022"
+ METHOD_SHA = "e4515854300e3aea1fa26c75b23121afe5c6cf6eff936357786c45f46a0320ab"
+ GAMMA_SHA = "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101"
+ COEFFICIENT_SHA = "9c32c62094cf6a08fa3680291b2dc9d6678231f6892a25ceced33e4a4604e1ef"
+@@ -127,7 +127,7 @@
+     m.require(passive_ref["sha256"] == "75c82f69c1c28036b9b83f68d8125ab5db636dd3b1e819d1a5ad130f8047990c", "Exact passive matrix observer required")
+     m.bind(passive_ref)
+     coefficients.scope(m, same, recorded, freeze, request, admission, projection, m.load(passive_ref), frozen_command["started_utc"], LANE)
+-    pe_inventory = m.bind({"path": ".runtime/porting/CTF-07/native-build-review-prep-01/manifest.json",
++    pe_inventory = m.bind({"path": ".runtime/porting/CTF-08/native-build-review-prep-01/manifest.json",
+                            "sha256": "56585de4265b28d25b557503a73992fcb411ce643da007045cdb8576211f0b1d"})
+     for row in freeze["reviewed_source_archives"]: m.bind(row["archive"])
+     inherited = m.load(freeze["source_authorities"]["inherited_input_only_packet"]["request"])

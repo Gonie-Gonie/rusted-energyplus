@@ -1,0 +1,85 @@
+{
+  "schema": "ctf08-current07-existing04-baseline-input-custody.v1",
+  "created_utc": "2026-10-10T21:03:17.922845+00:00",
+  "inherited_request": {
+    "path": ".runtime/porting/CTF-07/existing-production-inputs-01/request.json",
+    "sha256": "bdb314365ecf3800acaf8e840aedf04e2d46362a518f2ba2f74d494e930a131c",
+    "size_bytes": 35763
+  },
+  "request": {
+    "path": ".runtime/porting/CTF-08/existing-production-inputs-02/request.json",
+    "sha256": "6bec909e1b81eda68e8082dc327b45401539cf2251ab04db2263b7daebfbd747",
+    "size_bytes": 35763
+  },
+  "only_changes": [
+    {
+      "old": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5bccb2d4d7cca8669fdd97b8863b37b5f38699e7aee8c274923746b286e15127",
+        "size_bytes": 1507
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "e4329c6ff62d14fb2caf05c4aad6ba03fd10bbfb7c2426c3603f01e25822c422",
+        "size_bytes": 1571
+      }
+    },
+    {
+      "old": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "408a311e19f421bea84ffa9b9cfe799313ef1fa129a3773700f7186a80989514",
+        "size_bytes": 2332
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "6176af2a61b999846e885fb603dd2b2fcf2bb57af1e1aaddfc543953f9b4de1a",
+        "size_bytes": 2415
+      }
+    },
+    {
+      "old": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "72bc52478648ccb541a0e17dc1b0fa745fd46b1f605793da38e9e3787a45fe9b",
+        "size_bytes": 6055
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "34893aa5ceda71288a53e229ed07792ddbd3bab5f8400a1ff46f31a03ed26b17",
+        "size_bytes": 6081
+      }
+    },
+    {
+      "old": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "be8252a7dde2b21eb39d579223c3e9e924e480568b8de0b19cc4f8301130ec44",
+        "size_bytes": 19927
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "e8c1d67d49a4833ff1b9c8fd6a9d60106a9e051f4550361aed6128ea0c13b534",
+        "size_bytes": 20371
+      }
+    },
+    {
+      "old": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "3ff7e6561335a47b13f5c3eaf26d107bd020ba7fc9f5f5d045ae3a687ed617cf",
+        "size_bytes": 47287
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "f1472c1912e07fbdc39f68a2335c0de590214c9f5f32f521ef9779064005ec5e",
+        "size_bytes": 47493
+      }
+    }
+  ],
+  "change_scope": "Actual current07 API source identities only; all literal15 inputs/conversions/fixed scope/old04 Native input-only admission unchanged. Existing04 observer avoids replay of completed07 live card binding. Whole unchanged07 Source still executes real ordinary initializer.",
+  "prior07_observer_attempt_retained": {
+    "path": ".runtime/porting/CTF-08/existing-production-command-01/receipt.json",
+    "sha256": "fa9ad0a8464264a24ef6aad8dae07622632298c224b6a797e8edf73c8ec93ccb",
+    "size_bytes": 2930
+  },
+  "prior_attempt_actual_exit": 2,
+  "prior_attempt_reason": "Completed07 card live SHA differs from historical07 freeze; no old source/freeze edited or reinterpreted.",
+  "new08_source_applied": false
+}

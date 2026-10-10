@@ -1,0 +1,20 @@
+--- .runtime/porting/CTF-08/original-data-review-prep-01/initial_shape.py
++++ .runtime/porting/CTF-08/original-data-review-prep-02/initial_shape.py
+@@ -23,7 +23,7 @@
+ 
+ def packet(freeze, request, admission, projection, tolerances, inherited_tolerances, need):
+     for item in [freeze, request, admission, projection, tolerances]:
+-        need(item["frozen_before_this_CTF06_helper_execution"] is True and item["expected_values_supplied"] is False and
++        need(item["frozen_before_this_CTF08_helper_execution"] is True and item["expected_values_supplied"] is False and
+              item["expected_exits_supplied"] is False and item["scientific_execution_performed"] is False,
+              "Fresh input-only initial-state policy differs")
+     for item in [request, admission, projection, tolerances]:
+@@ -40,7 +40,7 @@
+          len(tolerances["ctf01_preprocessing_profiles"]) == 18 and
+          tolerances["tolerance_changes_after_output_inspection_permitted"] is False,
+          "Inherited18 context must remain separate and unchanged")
+-    need(freeze["inherited_CTF01_freeze_claimed_as_fresh_CTF06_freeze"] is False,
++    need(freeze["inherited_CTF01_CTF06_or_CTF07_freeze_claimed_as_fresh_CTF08_freeze"] is False,
+          "Historical CTF01 freeze cannot replace this initial-observation freeze")
+ 
+     matrix_packet(freeze, request, admission, projection, tolerances, need)

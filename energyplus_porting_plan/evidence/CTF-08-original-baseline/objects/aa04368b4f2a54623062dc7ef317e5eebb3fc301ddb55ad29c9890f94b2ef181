@@ -1,0 +1,27 @@
+{
+  "schema": "ctf08-unchanged07-baseline-input-custody.v1",
+  "authorship": "Root copied the literal actual07 production input request and validated all3 observer/35 API hashes against unchanged current07 sources after both genuine08 OriginalDataQA releases. No08 candidate source or Native expected values supplied.",
+  "created_utc": "2026-10-10T21:01:35.559320+00:00",
+  "inherited_request": {
+    "path": ".runtime/porting/CTF-07/candidate-production-inputs-02/request.json",
+    "sha256": "a7539528df091b56a51b5ad1d90aff45e01f71cf16c7a3db22ff0ebfea15d293",
+    "size_bytes": 37407
+  },
+  "request": {
+    "path": ".runtime/porting/CTF-08/existing-production-inputs-01/request.json",
+    "sha256": "a7539528df091b56a51b5ad1d90aff45e01f71cf16c7a3db22ff0ebfea15d293",
+    "size_bytes": 37407
+  },
+  "original_unit_data_QA": {
+    "path": ".runtime/porting/CTF-08/original-data-review-01/review.json",
+    "sha256": "855d87b4160029cd10870804097d4513fc41e9af86c97053a89b0e3ebb49af78",
+    "size_bytes": 41567
+  },
+  "original_production_data_QA": {
+    "path": ".runtime/porting/CTF-08/original-production-data-review-01/review.json",
+    "sha256": "e4be719f2f7b85444528aa868c619c30117da8f8af2ddaf5bb5467bbef30f9bf",
+    "size_bytes": 83929
+  },
+  "all_source_bindings_unchanged": true,
+  "new08_source_applied": false
+}

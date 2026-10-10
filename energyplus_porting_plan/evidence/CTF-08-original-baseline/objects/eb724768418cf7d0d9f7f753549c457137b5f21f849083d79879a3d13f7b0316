@@ -1,0 +1,71 @@
+{
+  "schema": "ctf08-production-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-10T20:58:14.702117+00:00",
+  "lane": "production",
+  "target": "ctf08_production_helper",
+  "actual_previous_compile_rows": 697,
+  "actual_current_compile_rows": 703,
+  "actual_protected_ref_count": 42,
+  "build": {
+    "path": ".runtime/porting/CTF-08/native-build-01/production/native-build.json",
+    "sha256": "8d76e6db632da6041a4dff6731176545c0cc88afc0802f6623dbeefb28d00e1b",
+    "size_bytes": 5322
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-08/native-build-01/production/derivation/derived-helper.exe",
+    "sha256": "be40607b6dcefdcd91bdc7fc8f6669198a102c5a852bf3d01bec30c05c17bfb4"
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf08_production_helper.exe",
+    "sha256": "7b404b9711ab751de31f6e29c84ba85c880e9914bb9f26126fd186dc170d43c1",
+    "size_bytes": 1303385937
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-08/native-build-01/production/derivation/receipt.json",
+    "sha256": "c3b6e9a6e39a051a7d187884de20c65e2d6c11627cb09260fc6402aa4bd1ae22",
+    "size_bytes": 12825
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf08-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF08-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/CTF-08/native-build-review-prep-01/review_build.py",
+    "sha256": "52be9ce8e43726d89b90da00a32bd94a1659b4ce116546f4d1babad6ff5a621a",
+    "size_bytes": 6214
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-08/native-production-build-review-01/original-pe.json",
+      "sha256": "133044df257ed4c6a3277ba87fd523fafb1facb5d5b6477180149b6a61787854",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-08/native-production-build-review-01/derived-pe.json",
+      "sha256": "ebf843fb6e4697a2c3aac51c030d38e80c0a80aa70a91bfb39c805798d310ecb",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-08/native-production-build-review-01/comparison-pe.json",
+      "sha256": "fca500379b2f2f05481de10d8b3c186f47e075003262d46ebff9e9b949e31ed6",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}
