@@ -19,6 +19,7 @@ mod external_interface;
 mod file_shading;
 mod internal_gain_cache;
 mod internal_gain_profile;
+pub mod production_trace;
 
 pub use cache::{
     CachedScheduleSeries, ScheduleCacheProfile, ScheduleSampleIter, ScheduleSampleStorage,

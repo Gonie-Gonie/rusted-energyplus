@@ -5915,6 +5915,10 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_w
     coupling_schedule_cache: &ScheduleSeriesCache,
     options: DirectZonePurchasedAirCoupledOptions,
 ) -> Result<DirectZonePurchasedAirCoupledSimulation, DirectZonePurchasedAirCoupledRuntimeError> {
+    crate::schedules::production_trace::record_cache(
+        crate::schedules::production_trace::ScheduleCacheOrigin::CoupledProductionArgument,
+        coupling_schedule_cache,
+    );
     simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
         model,
         HeatBalanceWeatherDriver::Production(weather_series),
@@ -5999,6 +6003,10 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
             let (schedule_cache, mut schedule_cache_profile) =
                 precompute_hour_only_internal_gain_schedule_cache_profiled(&model.typed)
                     .map_err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance)?;
+            crate::schedules::production_trace::record_cache(
+                crate::schedules::production_trace::ScheduleCacheOrigin::CoupledReferencedInitialization,
+                &schedule_cache,
+            );
             let mut state =
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
                     model,

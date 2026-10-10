@@ -348,6 +348,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         init_heat_balance_source_order_path(|| {
             let (schedule_cache, mut schedule_cache_profile) =
                 precompute_hour_only_internal_gain_schedule_cache_profiled(&model.typed)?;
+            crate::schedules::production_trace::record_cache(
+                crate::schedules::production_trace::ScheduleCacheOrigin::HeatBalanceReferencedInitialization,
+                &schedule_cache,
+            );
             let mut state =
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
                     model,

@@ -24,6 +24,7 @@ mod porting_scope;
 mod psy02_state_json;
 mod psy02_trace;
 mod psychrometrics_trace;
+mod sch01_trace;
 mod support;
 mod support_registry;
 mod weather_solar_controls;

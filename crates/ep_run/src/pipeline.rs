@@ -898,6 +898,26 @@ fn run_with_optional_porting_scope(
     config: &RunConfig,
     scope: Option<crate::PortingScope>,
 ) -> Result<RunOutcome, RunError> {
+    let schedule_scope = scope
+        .filter(|_| config.trace_level == TraceLevel::Full)
+        .map(crate::PortingScope::id);
+    let (outcome, trace) = ep_runtime::schedules::production_trace::capture(schedule_scope, || {
+        run_with_optional_porting_scope_schedule_observed(config, scope)
+    });
+    if let Some(trace) = trace
+        && !trace.observations.is_empty()
+        && outcome.is_ok()
+        && config.output_dir.is_dir()
+    {
+        crate::sch01_trace::write_runtime(config, &trace)?;
+    }
+    outcome
+}
+
+fn run_with_optional_porting_scope_schedule_observed(
+    config: &RunConfig,
+    scope: Option<crate::PortingScope>,
+) -> Result<RunOutcome, RunError> {
     let (((outcome, weather_trace), day_trace), sky_trace) =
         ep_runtime::weather::day::sky_transport_trace::capture(
             scope.is_some() && matches!(config.trace_level, TraceLevel::Full | TraceLevel::Summary),
@@ -1110,6 +1130,15 @@ fn run_with_optional_porting_scope_impl(
     write_compile_artifacts(&config.output_dir, &compile_result.report, typed_model)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     crate::geometry_trace::write_compiled_geometry(config, &raw_model, typed_model)?;
+    if let Some(scope) = scope.filter(|_| config.trace_level == TraceLevel::Full) {
+        crate::sch01_trace::write_compiled(
+            config,
+            scope,
+            &raw_model,
+            &compile_result.report,
+            typed_model,
+        )?;
+    }
 
     let support_start = Instant::now();
     let mut scoped_report;
@@ -3481,28 +3510,34 @@ fn prepare_runtime_inputs(
                 configuration,
             )
             .map_err(|error| format!("failed to open live EPW owner: {error}"))?;
-            let zone_timestep_schedule_cache =
-                if runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility {
-                    let environment_axis = build_environment_time_axes_with_weather_metadata(
-                        &model.typed,
-                        &weather_file.calendar_metadata,
-                    )
-                    .map_err(|error| {
-                        format!("failed to build zone-timestep environment axis: {error}")
-                    })?
-                    .into_iter()
-                    .next()
-                    .ok_or_else(|| "no zone-timestep environment axis was available".to_string())?;
-                    ep_runtime::psychrometrics::production_trace::register_environment_axis(
-                        &environment_axis,
+            let zone_timestep_schedule_cache = if runtime_class
+                == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+            {
+                let environment_axis = build_environment_time_axes_with_weather_metadata(
+                    &model.typed,
+                    &weather_file.calendar_metadata,
+                )
+                .map_err(|error| {
+                    format!("failed to build zone-timestep environment axis: {error}")
+                })?
+                .into_iter()
+                .next()
+                .ok_or_else(|| "no zone-timestep environment axis was available".to_string())?;
+                ep_runtime::psychrometrics::production_trace::register_environment_axis(
+                    &environment_axis,
+                );
+                let cache = precompute_schedule_cache_for_environment_time_axis(
+                    &model.typed,
+                    &environment_axis,
+                );
+                ep_runtime::schedules::production_trace::record_cache(
+                        ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineEnvironmentPrepared,
+                        &cache,
                     );
-                    Some(precompute_schedule_cache_for_environment_time_axis(
-                        &model.typed,
-                        &environment_axis,
-                    ))
-                } else {
-                    None
-                };
+                Some(cache)
+            } else {
+                None
+            };
             (
                 time_axis,
                 Some(weather_series),
@@ -3521,6 +3556,10 @@ fn prepare_runtime_inputs(
         runtime_class_requires_weather(runtime_class),
     )?;
     let schedule_cache = precompute_schedule_cache_for_time_axis(&model.typed, &time_axis);
+    ep_runtime::schedules::production_trace::record_cache(
+        ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineHourlyPrepared,
+        &schedule_cache,
+    );
     ep_runtime::psychrometrics::production_trace::register_time_axis(&time_axis);
 
     Ok(PreparedRuntimeInputs {
