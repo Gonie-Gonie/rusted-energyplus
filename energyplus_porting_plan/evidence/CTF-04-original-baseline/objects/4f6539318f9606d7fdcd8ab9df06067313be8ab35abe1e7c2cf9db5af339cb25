@@ -1,0 +1,1328 @@
+{
+  "schema": "ctf04-production-independent-original-data-review.v1",
+  "status": "pass-actual-original-production-data-and-provenance-before-Rust",
+  "started_utc": "2026-10-10T16:04:06.888365+00:00",
+  "finished_utc": "2026-10-10T16:04:07.910618+00:00",
+  "reviewed_results": {
+    "path": ".runtime/porting/CTF-04/production-native-output-01/ctf04-production-helper-results.json",
+    "sha256": "21f116ef207afcfb283952404a652b3e7057a2c4dc24477bb6c27b65d3c89560",
+    "size_bytes": 1850287
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CTF-04/production-native-command-01/receipt.json",
+    "sha256": "750d396bd028dd5f68a44de58dbc922f9cfbe9743a0289e7a675dd5b4cb45de8",
+    "size_bytes": 3225
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/helper-request.json",
+    "sha256": "7338544b7ba51670eaed436caf66caf191c2307c2016b881e940bd2732d53ff4",
+    "size_bytes": 25159
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/native-admission-contract.json",
+    "sha256": "3ac81641ebafa3e819bbc5099d4a00deb189aa682c0c3a0dc0f897f4dae1ed26",
+    "size_bytes": 15390
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/projection.json",
+    "sha256": "781aa0322dfb51d0c01cbc2bd7f3692c7acd0645ad985edbce6b6e28a5da4565",
+    "size_bytes": 27548
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-04/production-frozen-packet-01/source.json",
+      "sha256": "5d304b26b296366c5fc619eb49a09cc283c41adfba5885b8a499c69979bb4a19",
+      "size_bytes": 22934
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-04/production-frozen-packet-01/cases.json",
+      "sha256": "e72ea6adb8130be6821b0eef3645a0b29a88e654233033ea8df96ffcbfe7be06",
+      "size_bytes": 9291
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-04/production-frozen-packet-01/tolerances.json",
+      "sha256": "9ccfac2b6a7166a45c53d445aed6795a1e1d6dfcedf04133054d31c4ac8cab7f",
+      "size_bytes": 8803
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CTF-04/native-build-01/production/native-build.json",
+    "sha256": "89fa7509735b765fd85d03134ff35e957c661c3c09b5f8099e9bd16dabd76678",
+    "size_bytes": 5043
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-04/native-compile-command-01/receipt.json",
+    "sha256": "c49d07939fbb2f12510f77f23329d9cded9314fe7c06005152274d60be796acb",
+    "size_bytes": 2949
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-04/native-production-build-review-01/review.json",
+    "sha256": "bc509089967c5f6072770a63bc9416ee3724a900e5089a4d4897276429a36278",
+    "size_bytes": 3072
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-04/native-production-build-review-command-01/receipt.json",
+    "sha256": "96e833345350f0788a95ab66b68c8b30c2c4163e5a0b332fd3a4990329ca0a45",
+    "size_bytes": 3001
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/freeze-receipt.json",
+    "sha256": "fc22562e79e7575a2691c263a531b0ef78fe3f7a7ba72431413e8ddfa91dfb4b",
+    "size_bytes": 28057
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/CTF-04/production-input-freeze-command-01/receipt.json",
+    "sha256": "894b8c87180417e945fa9998d67fbecf1ef9e7c5fbc2aac69c7f5509694d0649",
+    "size_bytes": 4044
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": true,
+  "reviewed_native_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-helper-prep-01/manifest.json",
+    "sha256": "3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+    "size_bytes": 21447
+  },
+  "reviewed_passive_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-observer-prep-01/manifest.json",
+    "sha256": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+    "size_bytes": 13066,
+    "line_count": 344
+  },
+  "reviewed_freezer_source_inventory": {
+    "path": ".runtime/porting/CTF-04/input-writer-prep-01/manifest.json",
+    "sha256": "bec235e41fbebd22ff2ced292a0167b19788623fe7763b0fe6ae6e9bed9a03ec",
+    "size_bytes": 28131
+  },
+  "reviewed_PE_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-build-review-prep-01/manifest.json",
+    "sha256": "1e618aeb8ba003f758c4948a538d77abe876dd70923e83d74010be856247a8c7",
+    "size_bytes": 4333
+  },
+  "actual_matrix_failure_event_counts": {
+    "IdentityMismatch": 0,
+    "OrderFailure": 0,
+    "ActivePrefixShape": 0,
+    "MatrixShape": 0,
+    "CopyException": 0,
+    "LedgerAppendException": 0
+  },
+  "complete_actual_matrix_records": true,
+  "reviewed_matrix_observation_policy": {
+    "protocol": "ctf04-matrix-assembly.v1",
+    "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+    "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+    "selected_attempt_ordinal": 1,
+    "later_Native_attempts_paired": false,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "Rust_retry_driver_available": false,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "matrix_fields": [
+      "AMat",
+      "IdenMatrix",
+      "BMat",
+      "CMat",
+      "DMat"
+    ],
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "matrix_shapes": {
+      "AMat": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "BMat": 3,
+      "CMat": 2,
+      "DMat": 2
+    },
+    "actual_source_produced_identity_required": true,
+    "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+    "actual_current_retry_state_fields": [
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_converted_and_initial_handoff_retained": true,
+    "missing_attempt_or_copy_integrity_failure_is_required_failure": true,
+    "unreached_counted_as_PASS": false,
+    "retry_driver_or_matrix_answers_reconstructed": false
+  },
+  "reviewed_matrix_policy_contract": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/tolerances.json",
+    "sha256": "9ccfac2b6a7166a45c53d445aed6795a1e1d6dfcedf04133054d31c4ac8cab7f",
+    "size_bytes": 8803
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe",
+    "sha256": "18e56cfecef4f05fa8f5b9853cadb4e9d7fc4afce3644be88bffa60b10c85819",
+    "size_bytes": 1301364881
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf04-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF04-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "selected_matrix_attempt_ordinal": 1,
+  "later_attempts_observed_unpaired_noPASS": true,
+  "reviewed_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "reviewed_initial_policy_contract": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/tolerances.json",
+    "sha256": "9ccfac2b6a7166a45c53d445aed6795a1e1d6dfcedf04133054d31c4ac8cab7f",
+    "size_bytes": 8803
+  },
+  "actual_observation_counts": {
+    "initial_record_count": 21,
+    "initial_reached_phase_records": 15,
+    "initial_unreached_phase_records": 6,
+    "initial_available_owner_count": 15,
+    "initial_unavailable_owner_count": 6,
+    "initial_selected_1D_owner_count": 15,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 15,
+    "matrix_whole_call_records": 21,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 6,
+    "actual_matrix_attempt_callback_count": 15,
+    "actual_retained_matrix_attempt_count": 15,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 15,
+    "matrix_later_unpaired_attempt_count": 0,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "operation_records": 21,
+    "actual_CTF_invocations": 21,
+    "actual_CTF_skipped_construct_rows": 0,
+    "loader_unavailable_model_cases": 0,
+    "actual_phase_callback_count": 78,
+    "unreached_phase_records": 0,
+    "scalar_DTO_visits": 3630,
+    "snapshot_visits": 462,
+    "unavailable_snapshot_records": 0,
+    "actual_source_function_counts": {
+      "InputProcessor::processInput": 15,
+      "SimulationManager::PostIPProcessing": 15,
+      "EnergyPlusData::init_constant_state": 15,
+      "EnergyPlusData::init_state": 15,
+      "OutputReportPredefined::SetPredefinedTables": 15,
+      "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+      "OutputProcessor::SetupTimePointers(Zone)": 15,
+      "OutputProcessor::SetupTimePointers(System)": 15,
+      "HeatBalanceManager::GetProjectControlData": 15,
+      "HeatBalanceManager::GetSiteAtmosphereData": 15,
+      "Material::GetMaterialData": 15,
+      "HeatBalanceManager::GetConstructData": 15,
+      "HeatBalanceManager::GetBuildingData": 15,
+      "calculateTransferFunction": 21
+    },
+    "actual_CTF_status_counts": {
+      "source_returned": 21
+    },
+    "actual_loader_status_counts": {
+      "source_returned": 195
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 15
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 21,
+      "PostMerge": 21,
+      "PostConversion": 21,
+      "InitialDiscretization": 15
+    },
+    "unknown_whole_call_obligations_for_unavailable_loaders": 0
+  },
+  "actual_method_counts_unknown": false,
+  "actual_loaded_whole_call_obligations_unknown": false,
+  "actual_output_files": [
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-24H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-72H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/eio.txt",
+      "sha256": "5c54625fdad6813a1c019cf7ab7525bb139f0897f0ac1136056d5736fc17839a",
+      "size_bytes": 5595
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/A-ANNUAL/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-24H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-72H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-BOTH-ANNUAL/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-24H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-72H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-CAPACITY-ANNUAL/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-24H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-72H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-FLOW-ANNUAL/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-24H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-72H/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/audit.txt",
+      "sha256": "b81cec7431dca1da4d89a3d763704699a3c89f7db29cfdc589b1925164527793",
+      "size_bytes": 77
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/bnd.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/debug.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/dfs.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/edd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/eio.txt",
+      "sha256": "803c8997e3bbbe53b830f3d327553880b69dd5405fec5aebc69c66a29c4c0f6c",
+      "size_bytes": 5607
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/eso.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/mdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/mtd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/mtr.txt",
+      "sha256": "78b467343075736a62254ad7c1a6c4978ac0a57cba38f1e4b6343cfa122a0840",
+      "size_bytes": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/rdd.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/B-NOLIMIT-ANNUAL/shade.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-04/production-native-output-01/ctf04-production-helper-results.json",
+      "sha256": "21f116ef207afcfb283952404a652b3e7057a2c4dc24477bb6c27b65d3c89560",
+      "size_bytes": 1850287
+    }
+  ],
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 15,
+    "loader_phase_records": 195
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/review_production.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-production-data-review-01/000-review_production.py",
+        "sha256": "116ba70a8c3fb36e3e5e725d622cf289f20fe792f2315550e30be080c39b4baf",
+        "size_bytes": 27996
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/production_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-production-data-review-01/001-production_shape.py",
+        "sha256": "8cfcb4b86b28dba415b15fedd13f659fb6dce3108b2b11a435d11c6257a445f2",
+        "size_bytes": 20956
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-production-data-review-01/002-initial_shape.py",
+        "sha256": "e27836a5d798dbbf540f63b56a298e7b9bc64d64df5bfd87e64dd8d9c3565a85",
+        "size_bytes": 26612
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-production-data-review-01/003-packet_io.py",
+        "sha256": "17fd25e2b7adce28565d4c76522df8f1f0187ec4a2aa45bb3893f2124f41979d",
+        "size_bytes": 3892
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-04/original-production-data-review-01/000-review_production.py",
+    "sha256": "116ba70a8c3fb36e3e5e725d622cf289f20fe792f2315550e30be080c39b4baf",
+    "size_bytes": 27996
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored prior Native helper/CTF03 ingress/CTF04 identity glue; Base authored passive04. Reused factual03 source is retained. This is factual observation/provenance validation, not an independent own-formula certificate; Root and other-author source review are required."
+}

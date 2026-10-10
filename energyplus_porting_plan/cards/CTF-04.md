@@ -78,3 +78,12 @@ Numerical selection is first actual ordinal1 only, with genuine initial619 dt/hi
 Seven separate AMat/IdenMatrix/BMat/CMat/DMat/assembly_CTFTimeStep/caller_TimeStepZone profiles are frozen at atol=rtol=0 with exact class, actual shape and signedzero. Initial3 and preprocessing18 remain unchanged separate handoffs. Unit39/42 and fixed15/195 reuse only original literal/member/IDF input rows; production construction obligations remain dynamic. Actual source-return/fatal/exception/OS outcomes remain context and never imply missing values or PASS.
 
 New CTF04 linked originals carry prospective-debug-original intent from the start: actual identity/strict PE and both files verified before current helper execution, retained through PE/current execution, any future removal only via separately Root-authorized actual existing retention lifecycle record. Earlier live refs remain literal; no deletion occurs here. Scope passed; unit/integration/production and dependency completion remain pending. Actual CTF04 configure/compile/helper, candidate application and comparisons have not run.
+
+
+## Actual Original data and unchanged Rust baseline
+
+Both genuine CTF04 Native helpers and independent Original DataQA completed with actual exit0 before fresh unchanged CTF03 Cargo/production execution. Unit39/42 retained41 assembly visits: first25 selected, later16 unpaired/noPASS, no matrix omissions/failures. Fixed15 production/195 loader phases/21 CTF calls retained15 selected first visits, no omissions/failures. Actual preservation kept36 protected artifacts,631 present core objects,12 registered absent objects and all679 old compile rows (actual685); both independent PE reviews passed. Originals remain retained under the prospective04 intent.
+
+The fresh unchanged Rust baseline returned on all15 same authentic converted input-only models and exposed21 existing CTF03 owners. Exact nine new04 source paths are absent from disk/captured source snapshot. The first-assembly gap is structural unavailability; numerical mismatch count is null. Two unpublished derived summary field mistakes were corrected against actual producer manifests/owner arrays, with both earlier summaries retained; actual inputs/build/execution/results were unchanged. Reviewed candidate remains unapplied.
+
+Evidence: `evidence/CTF-04-original-baseline/summary.json` and selected content-addressed manifest. Binary/map payloads and full transitive replay closure are not included. No numerical or remaining-gate PASS is claimed.

@@ -1,0 +1,211 @@
+{
+  "schema": "ctf04-original-and-existing-rust-baseline-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-04-original-baseline/manifest.json",
+    "sha256": "66f1b58472e00af4e7bfa4ff03cbbdeaaacef0904cbdf48a68761b17b3cc4901",
+    "size_bytes": 349157
+  },
+  "actual_unit_native_execution": {
+    "path": ".runtime/porting/CTF-04/native-unit-command-01/receipt.json",
+    "sha256": "722fa7e18cf0d4b9e5aa4fe4317d6d41384544da0c06bed90b8bbbd5a5babb0f",
+    "size_bytes": 3179
+  },
+  "actual_production_native_execution": {
+    "path": ".runtime/porting/CTF-04/production-native-command-01/receipt.json",
+    "sha256": "750d396bd028dd5f68a44de58dbc922f9cfbe9743a0289e7a675dd5b4cb45de8",
+    "size_bytes": 3225
+  },
+  "actual_unit_original_data_QA": {
+    "path": ".runtime/porting/CTF-04/original-data-review-01/review.json",
+    "sha256": "2110a385f42090ae3c98553c42b7ef39680fe88aa08cbcf7ccfddeedabe5f35d",
+    "size_bytes": 12823
+  },
+  "actual_unit_original_data_QA_execution": {
+    "path": ".runtime/porting/CTF-04/original-data-review-command-01/receipt.json",
+    "sha256": "20373050f3cf4df13bc7ddb1976a8bb988581213b7c65df963fe685ddd9386ee",
+    "size_bytes": 4291
+  },
+  "actual_production_original_data_QA": {
+    "path": ".runtime/porting/CTF-04/original-production-data-review-01/review.json",
+    "sha256": "32d62d812e380cca7f0b7058b0689d24780af049daabe9a9e6ab8fdfab14a746",
+    "size_bytes": 55029
+  },
+  "actual_production_original_data_QA_execution": {
+    "path": ".runtime/porting/CTF-04/original-production-data-review-command-01/receipt.json",
+    "sha256": "7487c09c17d26bd7de5bf3dfe77474562543e1c727fa2e1a104b0821625cc73f",
+    "size_bytes": 4393
+  },
+  "actual_existing_Rust_baseline_gap": {
+    "path": ".runtime/porting/CTF-04/existing-production-inputs-01/baseline-gap-03.json",
+    "sha256": "551f0dbec3f87b8d46d119f6ce1eb20f1c10cf00b692d252921ed88dc63c7cf6",
+    "size_bytes": 15125
+  },
+  "actual_existing_Rust_build": {
+    "path": ".runtime/porting/CTF-04/existing-production-build-command-01/receipt.json",
+    "sha256": "661d068ff1608eec84ca528d8d9c55ea30b514919d34cf3f20877a4fcfa0c332",
+    "size_bytes": 4370
+  },
+  "actual_existing_Rust_execution": {
+    "path": ".runtime/porting/CTF-04/existing-production-command-01/receipt.json",
+    "sha256": "c770063ac334292616688ce2ebbd307345dd0973550301c1eb54db42db18606f",
+    "size_bytes": 2928
+  },
+  "unit_actual_observation_counts": {
+    "initial_record_count": 42,
+    "initial_reached_phase_records": 25,
+    "initial_unreached_phase_records": 17,
+    "initial_available_owner_count": 25,
+    "initial_unavailable_owner_count": 17,
+    "initial_selected_1D_owner_count": 25,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 25,
+    "matrix_whole_call_records": 42,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 17,
+    "actual_matrix_attempt_callback_count": 41,
+    "actual_retained_matrix_attempt_count": 41,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 25,
+    "matrix_later_unpaired_attempt_count": 16,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 131,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 137193,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33,
+      "InitialDiscretization": 25
+    }
+  },
+  "production_actual_observation_counts": {
+    "initial_record_count": 21,
+    "initial_reached_phase_records": 15,
+    "initial_unreached_phase_records": 6,
+    "initial_available_owner_count": 15,
+    "initial_unavailable_owner_count": 6,
+    "initial_selected_1D_owner_count": 15,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 15,
+    "matrix_whole_call_records": 21,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 6,
+    "actual_matrix_attempt_callback_count": 15,
+    "actual_retained_matrix_attempt_count": 15,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 15,
+    "matrix_later_unpaired_attempt_count": 0,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "operation_records": 21,
+    "actual_CTF_invocations": 21,
+    "actual_CTF_skipped_construct_rows": 0,
+    "loader_unavailable_model_cases": 0,
+    "actual_phase_callback_count": 78,
+    "unreached_phase_records": 0,
+    "scalar_DTO_visits": 3630,
+    "snapshot_visits": 462,
+    "unavailable_snapshot_records": 0,
+    "actual_source_function_counts": {
+      "InputProcessor::processInput": 15,
+      "SimulationManager::PostIPProcessing": 15,
+      "EnergyPlusData::init_constant_state": 15,
+      "EnergyPlusData::init_state": 15,
+      "OutputReportPredefined::SetPredefinedTables": 15,
+      "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+      "OutputProcessor::SetupTimePointers(Zone)": 15,
+      "OutputProcessor::SetupTimePointers(System)": 15,
+      "HeatBalanceManager::GetProjectControlData": 15,
+      "HeatBalanceManager::GetSiteAtmosphereData": 15,
+      "Material::GetMaterialData": 15,
+      "HeatBalanceManager::GetConstructData": 15,
+      "HeatBalanceManager::GetBuildingData": 15,
+      "calculateTransferFunction": 21
+    },
+    "actual_CTF_status_counts": {
+      "source_returned": 21
+    },
+    "actual_loader_status_counts": {
+      "source_returned": 195
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 15
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 21,
+      "PostMerge": 21,
+      "PostConversion": 21,
+      "InitialDiscretization": 15
+    },
+    "unknown_whole_call_obligations_for_unavailable_loaders": 0
+  },
+  "Original_data_QA_completed_before_existing_Rust_build": true,
+  "unchanged_full_Rust_source_snapshot_sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+  "actual_existing_owners": {
+    "models": 15,
+    "CTF01": 21,
+    "CTF03": 21,
+    "CTF04": 0
+  },
+  "source_review": {
+    "Root_FULL_and_other_author_completed": true,
+    "passive_native": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+    "helper": "3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+    "Original_DataQA": "4ba423a03f851a459ceb0cd246a0d44e09d8c67f7d21b2a3329c67b7a27520b0",
+    "comparer": "db6937e701aa8ffbf0bea23b3c52f4e1cd6ece5001243553f119749b28bf6155"
+  },
+  "linked_originals_retained_now": true,
+  "linked_original_retention_intent": {
+    "schema": "ctf04-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF04-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "Rust_CTF04_candidate_applied": false,
+  "numerical_comparison_count": null,
+  "numerical_PASS_claimed": false,
+  "pending": [
+    "Apply reviewed Rust first matrix assembly/ingress/observers",
+    "Actual Rust focused and workspace quality checks; genuine first-only comparisons",
+    "Later retry, exponential/inverse/Gamma/coefficient handoff and full production/dependency gates"
+  ]
+}

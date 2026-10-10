@@ -9743,7 +9743,7 @@
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Root FULL reviewed all new bodies/deltas against byte-identical FULL accepted CTF03 predecessors. Other-author FULL peers accepted passive, helpers, freezer, PE, OriginalDataQA, pure identity handoff, cache ingress and candidate observers. Actual CTF04 build/helper/candidate/comparison not yet executed; dependency completion and remaining gates pending.",
+      "source_boundary_note": "Root FULL and other-author FULL source reviews accepted. Actual04 Native build, independent PE, both genuine helpers and both Original DataQA completed with exit0 before fresh unchanged03 Rust production baseline. Unit first25 + later16 retained; fixed15 production first15. Reviewed Rust04 candidate remains unapplied; numerical/integration/production gates pending.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -10014,6 +10014,11 @@
           "deletion_performed": false
         },
         "dependency_completion_and_other_three_gates_pending": true
+      },
+      "actual_Original_and_unchanged_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-04-original-baseline/summary.json",
+        "sha256": "409495684466235b8402de9637de6797546872759674ae192953dc0a3502fc0b",
+        "size_bytes": 8561
       }
     },
     {

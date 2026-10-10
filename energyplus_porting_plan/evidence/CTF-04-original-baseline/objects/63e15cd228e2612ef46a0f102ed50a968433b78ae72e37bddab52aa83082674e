@@ -1,0 +1,329 @@
+{
+  "schema": "ctf04-independent-original-data-review.v1",
+  "status": "pass-actual-original-data-and-provenance-before-Rust",
+  "started_utc": "2026-10-10T16:03:53.593841+00:00",
+  "finished_utc": "2026-10-10T16:03:54.648536+00:00",
+  "reviewed_results": {
+    "path": ".runtime/porting/CTF-04/native-unit-output-01/ctf04-helper-results.json",
+    "sha256": "12c2129ecce04f827252627b89e6c6a0d00b9aa16fbea0c0f5a05960d8111d6e",
+    "size_bytes": 29485664
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CTF-04/native-unit-command-01/receipt.json",
+    "sha256": "722fa7e18cf0d4b9e5aa4fe4317d6d41384544da0c06bed90b8bbbd5a5babb0f",
+    "size_bytes": 3179
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/helper-request.json",
+    "sha256": "68bd86a8d514ea6feca08e1ab5dae95465d74520eeeffb7ae8a49f02511612be",
+    "size_bytes": 106710
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/native-admission-contract.json",
+    "sha256": "5a58f82c3932a18c7e6428159224d5ef84c35c53a3b3a24d1046d72ab545be0e",
+    "size_bytes": 14725
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/projection.json",
+    "sha256": "02f06a266a182d8ef3fdbb5b2a16bd7ad5abf1b9fff6ca938ee028961ca780bd",
+    "size_bytes": 27451
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-04/frozen-packet-01/source.json",
+      "sha256": "1602883e69d2838adebb8cd43bc37d15f0ae8ee9f434396ea79c3c88af5b67c0",
+      "size_bytes": 18387
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-04/frozen-packet-01/cases.json",
+      "sha256": "ad4e4d3596e459326991909162b870b8216cde62f4d7475a48cfc360e4763a82",
+      "size_bytes": 9270
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-04/frozen-packet-01/tolerances.json",
+      "sha256": "9fd61eecc8971eb9b1da78f3abc88a7033baee6f09b3b660aea138a51094b30f",
+      "size_bytes": 8781
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CTF-04/native-build-01/unit/native-build.json",
+    "sha256": "fb773fe193f071299e4f26c3d9cb956b7c724f2420c8f6589105979cff931263",
+    "size_bytes": 4977
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-04/native-compile-command-01/receipt.json",
+    "sha256": "c49d07939fbb2f12510f77f23329d9cded9314fe7c06005152274d60be796acb",
+    "size_bytes": 2949
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-04/native-unit-build-review-01/review.json",
+    "sha256": "ed6a82f0933af3988af1f251f9de34be7bc4f935656652c3e1d1adec8f2ea6c4",
+    "size_bytes": 3007
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-04/native-unit-build-review-command-01/receipt.json",
+    "sha256": "64627549cc44b791f1607cc028480fa19649d0ddc96a9a18cdd39e71a38bb2a5",
+    "size_bytes": 2971
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/freeze-receipt.json",
+    "sha256": "039cdc4c77b024892e796ae0303069fa7af5895e603eb67105b92f76e5478cbd",
+    "size_bytes": 22570
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/CTF-04/input-freeze-command-01/receipt.json",
+    "sha256": "fa3f27f7f773b0fecf28dcaf77f4972ad0b774e17500248b69bd6bdc6da04372",
+    "size_bytes": 4005
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": true,
+  "reviewed_native_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-helper-prep-01/manifest.json",
+    "sha256": "3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+    "size_bytes": 21447
+  },
+  "reviewed_passive_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-observer-prep-01/manifest.json",
+    "sha256": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+    "size_bytes": 13066,
+    "line_count": 344
+  },
+  "reviewed_freezer_source_inventory": {
+    "path": ".runtime/porting/CTF-04/input-writer-prep-01/manifest.json",
+    "sha256": "bec235e41fbebd22ff2ced292a0167b19788623fe7763b0fe6ae6e9bed9a03ec",
+    "size_bytes": 28131
+  },
+  "reviewed_PE_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-build-review-prep-01/manifest.json",
+    "sha256": "1e618aeb8ba003f758c4948a538d77abe876dd70923e83d74010be856247a8c7",
+    "size_bytes": 4333
+  },
+  "actual_matrix_failure_event_counts": {
+    "IdentityMismatch": 0,
+    "OrderFailure": 0,
+    "ActivePrefixShape": 0,
+    "MatrixShape": 0,
+    "CopyException": 0,
+    "LedgerAppendException": 0
+  },
+  "complete_actual_matrix_records": true,
+  "reviewed_matrix_observation_policy": {
+    "protocol": "ctf04-matrix-assembly.v1",
+    "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+    "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+    "selected_attempt_ordinal": 1,
+    "later_Native_attempts_paired": false,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "Rust_retry_driver_available": false,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "matrix_fields": [
+      "AMat",
+      "IdenMatrix",
+      "BMat",
+      "CMat",
+      "DMat"
+    ],
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "matrix_shapes": {
+      "AMat": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "BMat": 3,
+      "CMat": 2,
+      "DMat": 2
+    },
+    "actual_source_produced_identity_required": true,
+    "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+    "actual_current_retry_state_fields": [
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_converted_and_initial_handoff_retained": true,
+    "missing_attempt_or_copy_integrity_failure_is_required_failure": true,
+    "unreached_counted_as_PASS": false,
+    "retry_driver_or_matrix_answers_reconstructed": false
+  },
+  "reviewed_matrix_policy_contract": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/tolerances.json",
+    "sha256": "9fd61eecc8971eb9b1da78f3abc88a7033baee6f09b3b660aea138a51094b30f",
+    "size_bytes": 8781
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe",
+    "sha256": "290026e0d0400830764980d5dd21d2d19ea6932ab328b461e3b28753a0fc1aa7",
+    "size_bytes": 1298472674
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf04-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF04-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "selected_matrix_attempt_ordinal": 1,
+  "later_attempts_observed_unpaired_noPASS": true,
+  "reviewed_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "reviewed_initial_policy_contract": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/tolerances.json",
+    "sha256": "9fd61eecc8971eb9b1da78f3abc88a7033baee6f09b3b660aea138a51094b30f",
+    "size_bytes": 8781
+  },
+  "actual_observation_counts": {
+    "initial_record_count": 42,
+    "initial_reached_phase_records": 25,
+    "initial_unreached_phase_records": 17,
+    "initial_available_owner_count": 25,
+    "initial_unavailable_owner_count": 17,
+    "initial_selected_1D_owner_count": 25,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 25,
+    "matrix_whole_call_records": 42,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 17,
+    "actual_matrix_attempt_callback_count": 41,
+    "actual_retained_matrix_attempt_count": 41,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 25,
+    "matrix_later_unpaired_attempt_count": 16,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 131,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 137193,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33,
+      "InitialDiscretization": 25
+    }
+  },
+  "actual_method_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/review_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-data-review-01/000-review_unit.py",
+        "sha256": "c78648563b34b2fc9c69f59b0fda9be89c79e9ee4dd7e7228baaf861d91c60b6",
+        "size_bytes": 25367
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/unit_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-data-review-01/001-unit_shape.py",
+        "sha256": "a23177a01d0c6374a56d2b6bda595d39204e0dad8d24f1d22287fcc4538af456",
+        "size_bytes": 19352
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-data-review-01/002-initial_shape.py",
+        "sha256": "e27836a5d798dbbf540f63b56a298e7b9bc64d64df5bfd87e64dd8d9c3565a85",
+        "size_bytes": 26612
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-04/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/original-data-review-01/003-packet_io.py",
+        "sha256": "17fd25e2b7adce28565d4c76522df8f1f0187ec4a2aa45bb3893f2124f41979d",
+        "size_bytes": 3892
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-04/original-data-review-01/000-review_unit.py",
+    "sha256": "c78648563b34b2fc9c69f59b0fda9be89c79e9ee4dd7e7228baaf861d91c60b6",
+    "size_bytes": 25367
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored prior Native helper/CTF03 ingress/CTF04 identity glue; Base authored passive04. Reused factual03 source is retained. This is factual observation/provenance validation, not an independent own-formula certificate; Root and other-author source review are required."
+}

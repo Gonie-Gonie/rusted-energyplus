@@ -1,0 +1,186 @@
+{
+  "status": "pass-exact-retained-runtime-sections-and-directories",
+  "retained_section_count": 11,
+  "removed_debug_sections": [
+    {
+      "name": ".debug_aranges",
+      "rva": 71319552,
+      "virtual_size": 7736032,
+      "raw_size": 7736320,
+      "raw_offset": 71237632,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "6c765b58fe381d2277ebe4f8ba9febb3345c7e5934c988b88b0f78586905970b"
+    },
+    {
+      "name": ".debug_info",
+      "rva": 79056896,
+      "virtual_size": 1046068293,
+      "raw_size": 1046068736,
+      "raw_offset": 78973952,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "0b68cf34335b6f96271dd1fc03bcec5108ec0abc7f798218215d049207e5480c"
+    },
+    {
+      "name": ".debug_abbrev",
+      "rva": 1125126144,
+      "virtual_size": 3894556,
+      "raw_size": 3894784,
+      "raw_offset": 1125042688,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "ff0d68317686789a11f57d2700f23790339862d60e4da0ce1f13309459af0ef9"
+    },
+    {
+      "name": ".debug_line",
+      "rva": 1129021440,
+      "virtual_size": 39725235,
+      "raw_size": 39725568,
+      "raw_offset": 1128937472,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "781f628e0afb610e7fa1ce1c03dfef9e83bb82e75c6a4bb3d9de866334aec267"
+    },
+    {
+      "name": ".debug_frame",
+      "rva": 1168748544,
+      "virtual_size": 8794400,
+      "raw_size": 8794624,
+      "raw_offset": 1168663040,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "74b53867369e72648245e9bbae7c5bf17dd5bb13d744840a3c89119bc0681e7a"
+    },
+    {
+      "name": ".debug_str",
+      "rva": 1177546752,
+      "virtual_size": 8579115,
+      "raw_size": 8579584,
+      "raw_offset": 1177457664,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "2c702464d7367c959db93803e2776bc49ec7a00d10b7535aff7ebe7f5121c844"
+    },
+    {
+      "name": ".debug_line_str",
+      "rva": 1186127872,
+      "virtual_size": 2643646,
+      "raw_size": 2643968,
+      "raw_offset": 1186037248,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "b4bb7d5a3377c84bc97ec716c3f1f27cbd7d6e1dc411d839dc69eebce696b1e0"
+    },
+    {
+      "name": ".debug_loclists",
+      "rva": 1188773888,
+      "virtual_size": 8573566,
+      "raw_size": 8573952,
+      "raw_offset": 1188681216,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "b0fefff8077302b6ec79a3fb850c095ff8b2117526bc48b2e854d7d1e50e5210"
+    },
+    {
+      "name": ".debug_rnglists",
+      "rva": 1197350912,
+      "virtual_size": 6202623,
+      "raw_size": 6202880,
+      "raw_offset": 1197255168,
+      "characteristics": 1107296320,
+      "debug": true,
+      "raw_sha256": "882e89738cd3b2e63682a92815b89b46f7314240631ac21d6dfe3b372656a9e9"
+    }
+  ],
+  "removed_debug_raw_bytes": 1132220416,
+  "initialized_data_accounting": {
+    "retained_initialized_raw_bytes": 71236096,
+    "removed_debug_initialized_raw_bytes": 1132220416,
+    "original_included_debug": false
+  },
+  "raw_file_offset_changes": [
+    {
+      "name": ".text",
+      "before": 1536,
+      "after": 1024
+    },
+    {
+      "name": ".data",
+      "before": 39307776,
+      "after": 39307264
+    },
+    {
+      "name": ".rdata",
+      "before": 39391232,
+      "after": 39390720
+    },
+    {
+      "name": ".eh_frame",
+      "before": 66319360,
+      "after": 66318848
+    },
+    {
+      "name": ".pdata",
+      "before": 66319872,
+      "after": 66319360
+    },
+    {
+      "name": ".xdata",
+      "before": 67951104,
+      "after": 67950592
+    },
+    {
+      "name": ".idata",
+      "before": 70587904,
+      "after": 70587392
+    },
+    {
+      "name": ".CRT",
+      "before": 70622208,
+      "after": 70621696
+    },
+    {
+      "name": ".tls",
+      "before": 70622720,
+      "after": 70622208
+    },
+    {
+      "name": ".reloc",
+      "before": 70623232,
+      "after": 70622720
+    }
+  ],
+  "explained_header_changes": {
+    "section_count": {
+      "before": 20,
+      "after": 11
+    },
+    "symbol_table_offset": {
+      "before": 1203458048,
+      "after": 71237120
+    },
+    "symbol_count": {
+      "before": 1554927,
+      "after": 1325721
+    },
+    "coff_characteristics": {
+      "before": 38,
+      "after": 550
+    },
+    "image_size": {
+      "before": 1203556352,
+      "after": 71319552
+    },
+    "header_size": {
+      "before": 1536,
+      "after": 1024
+    },
+    "checksum": {
+      "before": 1301366526,
+      "after": 151292864
+    }
+  },
+  "code_or_data_masked": false,
+  "scientific_execution_certified": false
+}
