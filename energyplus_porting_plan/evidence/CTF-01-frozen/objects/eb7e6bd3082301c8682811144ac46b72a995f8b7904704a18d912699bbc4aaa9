@@ -1,0 +1,91 @@
+# CTF-01 whole-method explicit-member Native helper proposal
+
+SOURCE ONLY. This package has not been imported, configured, compiled or run.
+It adds a small caller and metadata serializer around the separately held full
+derived Construction translation unit. The original tree and cached archive are
+unchanged. Root must freeze the literal inputs, projection and variable precision
+before any actual Native call. There is no new source-review execution stage.
+
+The request/admission/projection/result schemas are `ctf01-helper-cases.v1`,
+`ctf01-native-admission-contract.v1`, `ctf01-observation-projection.v1`, and
+`ctf01-helper-results.v1`. Runtime argv is exactly:
+
+```
+ctf01_reference_helper <repository-root> <frozen-request> <native-admission-contract> <fresh-output-directory>
+```
+
+The request contains input-only `contracts: {source,tolerances}`; admission adds
+the cases contract, projection and exact seven Native code files. Cases binds the
+request/source/tolerances/fixed CON15/all45 guards. Projection binds request and
+all three contracts. No contract points forward to results, compiled hashes or a
+future receipt. The source-only input authority is the held input-design-prep-01;
+its 39 models/42 calls are proposed arrays, not hardcoded actual helper counts.
+Request/admission also bind the genuine runtime-supplied scope amendment and its
+actual execution receipt by identical path/SHA, without guessing future identities.
+
+Each model has the agreed six exact operand keys and the `explicit-member-unit`
+lane. Scalar inputs are finite, exact `{bits:16-lowercase-hex}` DTOs. NoMass-form
+members are genuine positive-zero d/k/rho/cp with positive literal stored R;
+ordinary massive members are positive. Ordered membership/call indices are
+bounded to the actual eleven-layer capacity. Source/sink and two-dimensional
+branches remain excluded. `Resistance` is copied as supplied; no d/k expression
+or loader is called by the wrapper. MaterialBase's constructor group is replaced
+by the explicitly selected actual Regular group for both forms. Other unselected
+members retain their real constructor defaults and are not claimed as loader data.
+
+A fresh real EnergyPlusData is constructed and init_constant_state is called per
+model. Both real owner arrays are allocated before any whole call. Every material
+is a MaterialBase owned by MaterialData; every construction is an actual Construct
+array element. LayerPoint contains the real material indices, and the output
+retains logical IDs, actual array indices/Num/names and original membership/order.
+The stable construction address is the real identity used by the unchanged
+downstream reverse-construction scan. Shared ErrorsFound/DoCTFErrorReport bools
+are initialized once per model and passed by reference in declared array order.
+ErrorsFound=true does not make the wrapper skip a subsequent call. Teardown calls
+MaterialData::clear_state exactly once because EnergyPlusData's default destructor
+does not delete its raw material pointees. No double-owned temporary is retained.
+
+Each actual whole calculateTransferFunction call has before/after public-owner
+snapshots, real diagnostic offsets and the held three-phase passive Capture.
+PostLoad/PostMerge emit no dyn/rs/cnd operands; PostConversion copies those actual
+initialized locals. Only the reached active prefix is serialized. Unreached
+checkpoints are unavailable, not zero arrays. IsUsedCTF=false and real early-return
+branches therefore receive no invented observations. The entire original method
+continues after the last callback; no prefix formula or early stop is substituted.
+Later coefficients, solver flags and thermal behavior are context-only/unpaired.
+
+Actual FatalError, std::exception (actual RTTI/message), nonstandard exception and
+normal return are separate outcomes. A returned method is not a scientific PASS;
+its actual error flags remain observed. After a caught constructor/init/source
+exception, remaining calls are explicitly not invoked, with unknown source
+fatal/exception fields and null Capture. An OS crash cannot be caught or turned
+into method records: the actual process exit and absent/incomplete output must be
+retained by a future launcher. This source does not infer those process outcomes.
+
+Observer integrity flags are separate from source outcomes. Binding/identity/
+duplicate/order/prefix failure never changes or short-circuits the genuine call.
+After all records are written, exit2 means an actual observer integrity failure;
+exit0 means the requested record ledger was written, not all phases or science
+passed. Wrapper admission/I/O errors return1. Logs are actual err/audit/eso/eio
+streams and callback messages. No expected diagnostics/exits are supplied.
+
+The CMake proposal includes the unchanged SCH05 adapter, preserving existing661
+command registrations. It adds three new executable source objects: helper,
+full instrumented Construction, and callback. They precede unchanged energypluslib
+in the normal executable link. No cached original Construction object is replaced,
+no archive is modified, and no whole-archive option is used. Definitions/includes
+come from the genuine core target/directory and the same project option targets.
+A real future link map must prove the derived object supplied the Construction
+symbols and the original Construction archive member was not selected. Counts,
+flags, object paths, protected artifacts and linker providers require actual build
+inspection; this package claims no compiled provenance or protected-byte check.
+The adapter takes explicit CTF01_HELPER_SOURCE_DIR/CTF01_OBSERVER_SOURCE_DIR and
+CLK03_REPOSITORY_ROOT, so reviewed canonical copies can be used without changing
+these held sources. Cached643 core objects/original sources remain protected.
+
+Fixed CON15/all45 bindings are preservation guards only for this unit helper.
+The later production lane requires genuine InputProcessor/Material/construction
+loaders and actual CTF-use owners. These literal seeds cannot certify that path.
+CTF02 through CTF10 and all thermal coefficient/results remain unclaimed. No
+canonical edit, engine, project import, compiler, formatter, Git, scientific
+result or binary read was performed while authoring this source proposal.

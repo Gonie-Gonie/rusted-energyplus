@@ -1,0 +1,182 @@
+{
+  "schema": "ctf01-tolerances-contract.v1",
+  "status": "Root-reviewed-zero-tolerances-frozen-before-first-numerical-execution",
+  "feasibility": "Strict zero tolerances are a source-grounded proposed criterion, not observed numerical equivalence. Preserve literal binary64 operations/constants, sqrt placement and loop association; fail discrepancies rather than retune after outputs.",
+  "copied_input_and_owner_profile": {
+    "fields": [
+      "Thickness",
+      "Conductivity",
+      "Density",
+      "SpecHeat",
+      "Resistance",
+      "ThicknessPerpend",
+      "TimeStepZone",
+      "TimeStepZoneSec"
+    ],
+    "binary64_class_exact": true,
+    "binary64_bits_exact": true,
+    "source": "same declared bit operands copied into actual independent Native/Rust owners; actual loader lane must use observed loader-owned members",
+    "no_formula_or_recomputed_input_substitution": true
+  },
+  "arithmetic_profiles_by_variable": [
+    {
+      "variable": "PostLoad.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dyn",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "scope": "actual one-dimensional assignment only"
+    },
+    {
+      "variable": "PostConversion.rs",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cnd",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    }
+  ],
+  "discrete_exact": [
+    "actual owner/input order",
+    "LayerPoint",
+    "TotLayers",
+    "LayersInConstruct",
+    "NumResLayers",
+    "ResLayer",
+    "ErrorsFound at selected boundary",
+    "actual phase availability and source/process outcomes"
+  ],
+  "arithmetic_source_constraints": [
+    "No sqrt replacement, reassociation, fused multiply-add, clipping, floor or guarded conductance substitution",
+    "Preserve literal air cp=1.007/rho=1.1614/rk=0.0263 without unit-comment correction",
+    "Preserve DataConversions.hh58-69 ordered constant dependencies and source per-layer conversion order",
+    "Preserve cp /= (CFC * 1000.0), not a prior extra input factor1000",
+    "Preserve left-to-right interior lr += following lr, active shift, and later ordered English-unit rs += lr",
+    "Preserve cnd = 1.0 / rs with no artificial guard; pathological full-Native nonfinite cases are not admitted by this proposal"
+  ],
+  "nonfinite_policy": "If genuinely observed, retain bits/class and availability. Nonfinite class matching alone is no finite numerical-error/PASS claim; any policy for such active inputs must be frozen separately before execution.",
+  "sqrt_scope": "Classifier result ResLayer is exact discrete data. The sqrt intermediate is not captured by three callbacks and must not be reconstructed as an observed operand.",
+  "diagnostic_text": "Preserve actual ordered Native messages separately; do not require Rust to emulate C++ exception RTTI or unowned diagnostic formatting.",
+  "scientific_values_compared_or_PASS_claimed": false,
+  "tolerance_changes_after_output_inspection_permitted": false,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "source_proposal": {
+    "path": ".runtime/porting/CTF-01/input-design-prep-01/numeric-policy.json",
+    "sha256": "6ecd9a12803d2e3379e37754a77305a2b00092ca6057f784fce2587d596ece88",
+    "size_bytes": 4425
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\cmake-4.4.4\\cmake-4.4.4-windows-x86_64\\bin\\cmake.exe",
+    "--build",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0",
+    "--target",
+    "ctf01_reference_helper",
+    "--parallel",
+    "1",
+    "--verbose"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T11:11:10.342841+00:00",
+  "finished_utc": "2026-10-10T11:16:17.553671+00:00",
+  "elapsed_seconds": 307.2072468000115,
+  "repository_before": {
+    "head": "4b87771a4a6b2518554871bef316c31914638a24",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CTF-01.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "repository_after": {
+    "head": "4b87771a4a6b2518554871bef316c31914638a24",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CTF-01.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/4c/4cd2233681b829c8e701a471f38c70f06508ef388987d926a7b3656720ed8332",
+    "sha256": "4cd2233681b829c8e701a471f38c70f06508ef388987d926a7b3656720ed8332"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-01/native-compile-command-01/stdout.log",
+    "sha256": "4351ab85888b206b7256db8d241b5ea4732c0030197fb65377abf6194f50f868"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-01/native-compile-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T11:16:17.553671+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

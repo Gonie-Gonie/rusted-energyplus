@@ -1,0 +1,183 @@
+"""Author input-only proposal bytes and source inventory; never import targets."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import struct
+
+PREP = Path(__file__).resolve().parent
+ROOT = PREP.parents[3]
+NATIVE = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def write(name, value):
+    path = PREP / name
+    if path.exists():
+        raise ValueError('Preserve existing held proposal bytes')
+    path.write_text(value, encoding='utf-8', newline='\n')
+
+
+def compact_sections(value):
+    lines = ['{']
+    for index, (key, item) in enumerate(value.items()):
+        suffix = ',' if index + 1 < len(value) else ''
+        if isinstance(item, list):
+            lines += ['  ' + json.dumps(key) + ': [']
+            lines += ['    ' + json.dumps(row, ensure_ascii=False, allow_nan=False)
+                      + (',' if i + 1 < len(item) else '') for i, row in enumerate(item)]
+            lines += ['  ]' + suffix]
+        else:
+            lines += ['  ' + json.dumps(key) + ': ' + json.dumps(item, ensure_ascii=False, allow_nan=False) + suffix]
+    return '\n'.join(lines + ['}']) + '\n'
+
+
+def main():
+    # These are literal input encodings, not a classifier, evaluator or oracle.
+    decimals = ['0.0', '0.0000000000000001', '0.001', '0.0078125', '0.025', '0.08', '0.1', '0.12',
+                '0.125', '0.15', '0.16', '0.2', '0.25', '0.3', '0.4', '0.5', '0.8',
+                '1.0', '3.75', '30.0', '128.0', '800.0', '900.0', '1000.0', '1400.0', '1800.0', '100000.0']
+    scalars = [{'id': text, 'bits': struct.pack('>d', float(text)).hex(),
+                'literal_decimal_input': text} for text in decimals]
+    edges = [('threshold-below', '3eb0c6f7a0b5ed8c'), ('threshold-equal', '3eb0c6f7a0b5ed8d'),
+             ('threshold-above', '3eb0c6f7a0b5ed8e'), ('R-below', '3f50624dd2f1a9fb'),
+             ('R-equal', '3f50624dd2f1a9fc'), ('R-above', '3f50624dd2f1a9fd'),
+             ('thickness-below', '4007ffffffffffff'), ('thickness-equal', '4008000000000000'),
+             ('thickness-above', '4008000000000001')]
+    scalars += [{'id': name, 'bits': bits, 'literal_binary64_input': True} for name, bits in edges]
+    materials = []
+
+    def material(name, d, k, rho, cp, resistance, r_only):
+        materials.append({'id': name, 'group_member': 'Regular', 'members': {
+            'Thickness': d, 'Conductivity': k, 'Density': rho, 'SpecHeat': cp,
+            'Resistance': resistance, 'ROnly': r_only}, 'provenance': 'explicit-member-input-not-loader-output'})
+
+    material('MASS_A', '0.12', '0.8', '1800.0', '900.0', '0.15', False)
+    material('MASS_B', '0.08', '0.16', '800.0', '1400.0', '0.5', False)
+    material('MASS_C', '0.025', '0.2', '30.0', '1000.0', '0.125', False)
+    for name, resistance in [('N125', '0.125'), ('N25', '0.25'), ('N50', '0.5'),
+                             ('N10', '0.1'), ('N20', '0.2'), ('N30', '0.3'), ('N40', '0.4'),
+                             ('N_R_BELOW', 'R-below'), ('N_R_EQUAL', 'R-equal'), ('N_R_ABOVE', 'R-above')]:
+        material(name, '0.0', '0.0', '0.0', '0.0', resistance, True)
+    for edge in ['below', 'equal', 'above']:
+        material('K_' + edge, '0.1', 'threshold-' + edge, '0.0078125', '128.0', '100000.0', False)
+        material('THIN_' + edge, 'threshold-' + edge, '1.0', '0.0078125', '128.0', 'threshold-' + edge, False)
+        material('THICK_' + edge, 'thickness-' + edge, '0.8', '1800.0', '900.0', '3.75', False)
+    material('LIGHT_MASS', '0.25', '1.0', '0.0000000000000001', '1000.0', '0.25', False)
+    cases = []
+
+    def case(name, layers, intent, used=True):
+        cases.append({'id': name, 'lane': 'explicit-member-unit', 'initial_ErrorsFound': False,
+            'initial_DoCTFErrorReport': False, 'construction_calls': [
+                {'id': 'construction-1', 'IsUsedCTF': used, 'layer_material_ids': layers}],
+            'source_branch_intent_not_actual_coverage': intent})
+
+    prefixes = [
+        ['MASS_A'], ['MASS_A', 'MASS_B'], ['MASS_A', 'MASS_B', 'MASS_C'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A'],
+        ['MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B', 'MASS_C', 'MASS_A', 'MASS_B']]
+    for count, layers in enumerate(prefixes, 1):
+        case(f'active-prefix-{count:02d}', layers, 'actual capacity/prefix and normal-mass loading; cc201-269')
+    case('unused-before-layer-loading', ['N_R_BELOW'], 'unused return cc163 before any local callback', False)
+    extras = [
+        ('single-no-mass', ['N25'], 'single layer is both outside/inside boundary; cc274-305'),
+        ('two-boundary-no-mass', ['N125', 'N25'], 'both boundary air-equivalent branches; cc296-300'),
+        ('outside-no-mass', ['N25', 'MASS_A'], 'outside boundary resistance'),
+        ('inside-no-mass', ['MASS_A', 'N25'], 'inside boundary resistance'),
+        ('interior-no-mass', ['MASS_A', 'N25', 'MASS_B'], 'interior ROnly branch cc301-305'),
+        ('two-adjacent-interior', ['MASS_A', 'N125', 'N25', 'MASS_B'], 'interior adjacent merge cc324-361'),
+        ('three-adjacent-interior', ['MASS_A', 'N10', 'N20', 'N30', 'MASS_B'], 'shift-adjusted left-to-right repeated merge'),
+        ('disjoint-adjacent-interiors', ['MASS_A', 'N125', 'N25', 'MASS_B', 'N10', 'N20', 'MASS_C'], 'two separated merge runs'),
+        ('boundary-neighbor-three-layers', ['N125', 'N25', 'MASS_A'], 'three-layer merge gate and boundary handling'),
+        ('boundary-neighbor-four-layers', ['N125', 'N25', 'N50', 'MASS_A'], 'interior pair only; original outside boundary excluded'),
+        ('computed-reslayer-not-ronly', ['MASS_A', 'K_equal', 'LIGHT_MASS', 'MASS_B'], 'computed ResLayer differs from ROnly; cc296 and327'),
+        ('ordered-resistance-forward', ['N10', 'N20', 'N30', 'N40', 'N125', 'N25', 'N50'], 'actual ordered merges and English rs sum'),
+        ('ordered-resistance-reversed', ['N50', 'N25', 'N125', 'N40', 'N30', 'N20', 'N10'], 'same literal members in reversed construction order')]
+    for name, layers, intent in extras:
+        case(name, layers, intent)
+    for edge in ['below', 'equal', 'above']:
+        case('conductivity-threshold-' + edge, ['K_' + edge], 'literal binary64 neighbors of <= PhysPropLimit; cc263')
+        case('thin-metric-threshold-' + edge, ['THIN_' + edge], 'literal strict-< neighbors with binary-exact rho=1/128, cp=128, k=1; cc268')
+        case('resistance-minimum-' + edge, ['N_R_' + edge.upper()], 'literal neighbors of < RValueLowLimit; cc277')
+        case('thickness-maximum-' + edge, ['THICK_' + edge], 'literal neighbors of >3; cc257; actual whole-call exit remains unknown')
+    cases += [
+        {'id': 'shared-error-then-valid-then-unused', 'lane': 'explicit-member-unit',
+         'initial_ErrorsFound': False, 'initial_DoCTFErrorReport': False,
+         'construction_calls': [{'id': 'construction-1', 'IsUsedCTF': True, 'layer_material_ids': ['N_R_BELOW']},
+             {'id': 'construction-2', 'IsUsedCTF': True, 'layer_material_ids': ['MASS_A']},
+             {'id': 'construction-3', 'IsUsedCTF': False, 'layer_material_ids': ['MASS_B']}],
+         'source_branch_intent_not_actual_coverage': 'same shared references; selected load error persists into following calls; HBM6155-6158'},
+        {'id': 'incoming-shared-error-and-report-flag', 'lane': 'explicit-member-unit',
+         'initial_ErrorsFound': True, 'initial_DoCTFErrorReport': True,
+         'construction_calls': [{'id': 'construction-1', 'IsUsedCTF': True, 'layer_material_ids': ['MASS_A']},
+             {'id': 'construction-2', 'IsUsedCTF': True, 'layer_material_ids': ['N25']}],
+         'source_branch_intent_not_actual_coverage': 'incoming sticky error does not skip loading; later selected phases unavailable at cc313'}]
+    names = {row['id'] for row in materials}
+    scalar_ids = {row['id'] for row in scalars}
+    assert len(names) == len(materials) and len({row['id'] for row in cases}) == len(cases)
+    assert all(set(row['members'].values()) - {False, True} <= scalar_ids for row in materials)
+    assert all(1 <= len(call['layer_material_ids']) <= 11 and set(call['layer_material_ids']) <= names
+               for row in cases for call in row['construction_calls'])
+    matrix = {'schema': 'ctf01-explicit-member-unit-input-proposal.v1', 'status': 'source-only-not-frozen-not-executed',
+        'scalar_input_encoding': 'exact binary64 bits; decimal annotations never override bits',
+        'common_caller_inputs': {'TimeStepZone': '0.25', 'TimeStepZoneSec': '900.0'},
+        'common_construction_inputs': {'SourceSinkPresent': False, 'SolutionDimensions': 1,
+            'SourceAfterLayer': 0, 'TempAfterLayer': 0, 'ThicknessPerpend': '0.0'},
+        'input_owner_rule': 'actual MaterialBase objects and actual Construct array elements; literal ordered LayerPoint membership',
+        'shared_flag_rule': 'initial flags once per model; pass same actual references in declared construction call order',
+        'scalar_literals': scalars, 'material_member_seeds': materials, 'model_cases': cases,
+        'proposed_array_derived_counts': {'model_cases': len(cases), 'calculateTransferFunction_calls':
+            sum(len(row['construction_calls']) for row in cases)},
+        'expected_output_arrays_or_method_exits_or_PASS_supplied': False}
+    write('case-matrix.json', compact_sections(matrix))
+    sources = [NATIVE / name for name in ['Construction.cc', 'Construction.hh', 'Material.hh', 'Material.cc',
+               'DataConversions.hh', 'HeatBalanceManager.cc']]
+    sources += [ROOT / name for name in ['energyplus_porting_plan/cards/CTF-01.md',
+        'energyplus_porting_plan/contracts/scope.json', 'crates/ep_model/src/objects/materials.rs',
+        'crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs']]
+    idd = ROOT / '.reference/energyplus-src/26.1.0/idd/Energy+.idd.in'
+    sources += [idd]
+    spans = [('Construction.cc', 59, 165), ('Construction.cc', 167, 221), ('Construction.cc', 222, 261),
+        ('Construction.cc', 263, 309), ('Construction.cc', 311, 315), ('Construction.cc', 317, 372),
+        ('Construction.cc', 374, 401), ('Construction.cc', 403, 466), ('Construction.hh', 67, 67),
+        ('Construction.hh', 138, 145), ('Construction.hh', 188, 198), ('Construction.hh', 260, 260),
+        ('Construction.hh', 317, 333), ('Material.hh', 218, 241), ('Material.cc', 170, 225),
+        ('Material.cc', 249, 285), ('DataConversions.hh', 58, 69),
+        ('HeatBalanceManager.cc', 1403, 1413), ('HeatBalanceManager.cc', 6153, 6167)]
+    ranges = []
+    for name, first, last in spans:
+        lines = (NATIVE / name).read_bytes().splitlines(keepends=True)
+        data = b''.join(lines[first-1:last])
+        ranges.append({'source': ref(NATIVE / name), 'start_line': first, 'end_line': last,
+                       'range_sha256': hashlib.sha256(data).hexdigest(), 'range_size_bytes': len(data)})
+    for first, last in [(4912, 4948), (4965, 4985)]:
+        data = b''.join(idd.read_bytes().splitlines(keepends=True)[first-1:last])
+        ranges.append({'source': ref(idd), 'start_line': first, 'end_line': last,
+                       'range_sha256': hashlib.sha256(data).hexdigest(), 'range_size_bytes': len(data)})
+    assert ref(NATIVE / 'Construction.cc')['sha256'] == 'd85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695'
+    manifest = {'schema': 'ctf01-input-projection-source-proposal.v1', 'status': 'SOURCE-READY-held-unexecuted-proposal',
+        'held_utc': datetime.now(timezone.utc).isoformat(),
+        'documents': [ref(PREP / name) for name in ['case-matrix.json', 'projection.json', 'numeric-policy.json', 'design.md', 'prepare_design.py']],
+        'primary_source_identities': [ref(path) for path in sources], 'primary_source_ranges': ranges,
+        'reviewed_observer_protocol_source': ref(ROOT / '.runtime/porting/CTF-01/native-observer-prep-01/manifest.json'),
+        'actual_case_arrays_derived_counts': matrix['proposed_array_derived_counts'],
+        'frozen_scientific_input_or_precision_policy': False, 'Root_approval_or_future_execution_hashes_invented': False,
+        'target_imports_builds_engines_Git_canonical_edits_or_result_binary_payload_reads_performed': False,
+        'new_QA_or_execution_stage_required': False}
+    write('manifest.json', json.dumps(manifest, indent=2, ensure_ascii=False, allow_nan=False) + '\n')
+    print(json.dumps({'manifest': ref(PREP / 'manifest.json'), 'proposed_counts': matrix['proposed_array_derived_counts']}))
+
+
+if __name__ == '__main__':
+    main()

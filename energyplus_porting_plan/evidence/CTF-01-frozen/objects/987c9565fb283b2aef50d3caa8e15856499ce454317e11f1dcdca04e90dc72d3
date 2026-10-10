@@ -1,0 +1,100 @@
+# CTF-01 literal member inputs and pre-output policy proposal
+
+This is a source-only draft for Root's first Native input/projection freeze. It
+contains literal input cases, a proposed field selection and separate variable
+precision criteria. It contains no expected array, numerical evaluator, expected
+method exit, engine result, scientific PASS, build command or new QA stage.
+The existing card and its four gates are unchanged.
+
+The primary source is pinned EnergyPlus26.1.0 commit
+`6f2e40d10250a105b49966baa24d843711e61048`, Construction.cc59-401. The real public
+method must continue through its unchanged downstream body; callbacks after309,
+372 and401 only copy actual private locals. A prefix reimplementation or stopping
+the method after401 cannot stand in for the Native observation.
+
+`case-matrix.json` holds scalar bit literals, actual MaterialBase member seeds,
+and ordered construction calls. Its compact references expand only input data.
+Scalar bits are authoritative; decimal annotations are not expected answers.
+The proposed model/call totals are derived from those arrays, not hardcoded
+scientific coverage. Branch-intent labels describe source selection before any
+run; they do not assert that an actual call reached or returned from a branch.
+
+The default explicit lane uses positive finite Regular properties and genuine
+NoMass-form zero property defaults with positive R. MaterialBase group is Regular
+for both forms, matching the actual NoMass loader. The baseline massive R seeds
+are physically consistent literals; threshold diagnostic seeds still remain
+explicit member inputs, never claimed results of Material::GetMaterialData.
+There are no artificial NaN/Inf or zero-thickness Regular full-call cases. No
+unguarded cnd semantics are removed merely because such pathological inputs are
+outside this admitted Native proposal.
+
+The matrix covers actual active lengths1 through11, single/multiple mass layers,
+boundary and interior NoMass, computed ResLayer distinct from ROnly, two/three
+adjacent interior layers, disjoint runs, boundary-neighbor merge gating, and
+forward/reversed literal resistance stacks. Exact binary64 threshold neighbors
+exercise conductivity <=1e-6, strict thinness <1e-6, R <0.001 and thickness >3.
+For thinness neighbors, binary-exact rho=1/128, cp=128 and k=1 keep the declared
+property ratio at the threshold canary while respecting the IDD cp minimum100.
+The comparer never evaluates this expression for an answer. Low-R error seeds
+are explicitly member-level diagnostics below the IDD NoMass minimum, not
+claims that a production loader accepts those IDF values.
+
+Two groups test real shared ErrorsFound/DoCTFErrorReport references and declared
+construction order. One starts with a selected loading error before valid and
+unused calls. The other starts with incoming errors/report flags. These source
+early-return groups avoid depending on later CTF solver flags as Rust operands.
+For every model, actual incoming/outgoing whole-call flags must still be retained.
+Later solver flag changes are unpaired context outside this card; do not copy
+Native after-state into a Rust input to manufacture matching caller history.
+
+Future request spelling is `ctf01-helper-cases.v1` with `model_cases` containing
+`id`, `lane`, `caller`, `materials`, `constructions`, and ordered `operations`.
+Caller fields are TimeStepZone/TimeStepZoneSec binary64 DTOs and initial
+ErrorsFound/DoCTFErrorReport bools. Material fields are id/Name and literal
+Thickness/Conductivity/Density/SpecHeat/Resistance DTOs plus ROnly. Construction
+fields are id/Name, IsUsedCTF, SourceSinkPresent=false, SolutionDimensions=1,
+SourceAfterLayer=0, TempAfterLayer=0, ThicknessPerpend=0 DTO, and ordered
+layer_material_ids. Each operation is id/kind=calculateTransferFunction/
+construction_id. The future writer derives TotLayers and real insertion indices
+from actual arrays, then observes real Num/index/LayerPoint; no ID remapping hides
+order. All stable real owners exist before the first call.
+
+The original TotLayers and LayerPoint do not shrink with local merges. Only the
+actual active prefix1..LayersInConstruct is observable; neither unused array
+tails nor normalized material-ID labels are invented. PostLoad/PostMerge float
+locals cannot be replaced by original input fields because source branches may
+have changed them. The last callback also captures actual ordered-English rs,
+unguarded cnd and one-dimensional dyn. Earlier phases have no dyn/rs/cnd operands.
+The three checkpoints do not provide a separate per-merge event trace or sqrt
+intermediate; final-array parity must not be advertised as such a trace.
+
+`numeric-policy.json` proposes individual atol=rtol=0 profiles with exact class
+and shape for every phase/variable, and bit-exact copied member inputs. This is
+feasible as a strict criterion under identical binary64 operands and source
+operation order, not demonstrated equality. sqrt classification, conversion
+constants, cp1.007 and cp/=(CFC*1000) retain the literal source. Do not reinterpret
+the contradictory cp comment or replace cnd with a safe resistance accessor.
+Root must settle the profiles before first Native outputs; later differences
+remain failures rather than reasons to tune tolerances.
+
+Reached required fields missing on either or both sides fail. Unused calls,
+genuine source stops and process failures retain explicit unavailable phases,
+zero numeric comparisons and no PASS. An observed nonfinite local remains
+present with bits/class; finiteness is not invocation/observation availability.
+DoCTFErrorReport and later coefficients have no matching selected Rust owner and
+remain unpaired. Whole-call return/exception/OS status is its own actual ledger,
+not a substitute for reached checkpoint availability.
+
+The production lane is separate and remains pending: fixed ordered CON15/all45
+guard refs, genuine input/Material/construction loaders, actual stored Resistance
+and CTF-use owners. Unit literal seeds cannot certify that pipeline. The current
+Rust material/cache context lacks stored Regular Resistance and these normalized
+arrays; Raw's ignored owner proposal is a future source candidate, not current
+production or execution proof. CTF-02 throughCTF-10, source/sink and two-dimensional
+branches, other materials, zero/>11 active counts and thermal results are excluded.
+
+The manifest binds exact primary source bytes/ranges and the held passive
+observer source protocol. These are source identities, not future compiled hashes
+or approval receipts. Only stdlib input encoding/source hashing/static syntax were
+used to author this package. No target imports, builds, engines, project numerical
+results, binaries, canonical documents or Git were read/executed/changed.

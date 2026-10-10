@@ -1,0 +1,37 @@
+--- /dev/null
++++ .runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference.cmake
+@@ -0,0 +1,34 @@
++# Source proposal only: keep all661 existing command rows and cached643 core objects.
++if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED CTF01_HELPER_SOURCE_DIR OR NOT DEFINED CTF01_OBSERVER_SOURCE_DIR)
++  message(FATAL_ERROR "CTF01 requires explicit repository/helper/observer source directories")
++endif()
++include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/SCH-01/builder-prep-05/sch01_reference.cmake")
++if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
++  get_property(_ctf01_scheduled GLOBAL PROPERTY CTF01_REFERENCE_SCHEDULED)
++  if(NOT _ctf01_scheduled)
++    set_property(GLOBAL PROPERTY CTF01_REFERENCE_SCHEDULED TRUE)
++    function(ctf01_add_original_reference)
++      if(NOT TARGET energypluslib)
++        message(FATAL_ERROR "CTF01 requires the unchanged genuine GNU core archive")
++      endif()
++      get_target_property(_ctf01_target_defs energypluslib COMPILE_DEFINITIONS)
++      get_directory_property(_ctf01_directory_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
++      set(_ctf01_defs ${_ctf01_target_defs} ${_ctf01_directory_defs})
++      list(FILTER _ctf01_defs EXCLUDE REGEX "-NOTFOUND$")
++      list(REMOVE_DUPLICATES _ctf01_defs)
++      add_executable(ctf01_reference_helper
++        "${CTF01_HELPER_SOURCE_DIR}/ctf01_reference_helper.cpp"
++        "${CTF01_OBSERVER_SOURCE_DIR}/Construction.ctf01.cc"
++        "${CTF01_OBSERVER_SOURCE_DIR}/ctf01_observer.cc")
++      target_include_directories(ctf01_reference_helper PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>"
++        "${CTF01_HELPER_SOURCE_DIR}" "${CTF01_OBSERVER_SOURCE_DIR}")
++      target_compile_definitions(ctf01_reference_helper PRIVATE ${_ctf01_defs})
++      target_link_libraries(ctf01_reference_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
++      target_compile_features(ctf01_reference_helper PRIVATE cxx_std_20)
++      target_link_options(ctf01_reference_helper PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/ctf01_reference_helper.map")
++      # New object paths are distinct. Do not replace core Construction.cc.obj,
++      # modify energypluslib or use whole-archive; verify providers from the real map.
++    endfunction()
++    cmake_language(DEFER CALL ctf01_add_original_reference)
++  endif()
++endif()

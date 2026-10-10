@@ -1,0 +1,45 @@
+# CTF-01 passive Native local observations, source proposal
+
+This package is unexecuted source preparation. It contains the complete pinned `Construction.cc` translation unit with one include and three output-only calls added. The original protected source remains unchanged. There is no helper main, case packet, frozen tolerance, compiler invocation, engine result or scientific PASS claim here.
+
+The selected card is `energyplus_porting_plan/cards/CTF-01.md`, dependent only on CON-01. This proposal observes the source's layer normalization and conversion operands; CTF-02 through CTF-10 coefficient results and thermal behavior remain outside its claim.
+
+## Exact additions
+
+`before/Construction.cc` is a byte-exact copy of the pinned original. `Construction.ctf01.from-original.diff` contains seven added lines and no removals: the callback header include after original line 55 and two-line calls after original lines 309, 372 and 401. Removing those four exact additions reproduces the original complete 2,115-line file, including the whole `calculateTransferFunction` method at original lines 59-1103 and all later methods.
+
+| Phase | Genuine boundary | Available local observations |
+| --- | --- | --- |
+| PostLoad | After the complete layer loop at 309, before the error return at 313 | Actual active `dl/rk/rho/cp/lr/ResLayer`, layer/resistive counts and error/report flags |
+| PostMerge | After the full adjacent-resistance conditional at 372 | The same actual active arrays and counts after any genuine merge |
+| PostConversion | After actual `cnd = 1.0 / rs` at 401 | Converted active arrays/counts plus actual `dyn`, ordered-sum `rs` and actual `cnd` |
+
+No callback reads `cnd` before its source assignment. A construction with `IsUsedCTF == false` returns before all three callbacks. A genuine error return after PostLoad or fatal exception within the merge leaves subsequent phases unreached. Unreached observations are unavailable; they are not zero operands or successful method outcomes.
+
+## Callback and record contract
+
+`ctf01_observer.hh` declares three free `noexcept` callbacks, fixed-size output records and an RAII `Binding`. A future helper binds an explicit actual `EnergyPlusData` and an actual element of `state.dataConstruction->Construct` before calling that element's unchanged public method. It must check `Binding::active()`; nested bindings are rejected as observer metadata. The pointers are internal identity guards, not serialized owner IDs.
+
+`ctf01_observer.cc` accepts const references to the actual source arrays and actual scalar locals. It verifies the bound state/construction addresses and array allocation/lower/upper bounds, then copies only indices `1..LayersInConstruct` into a fixed maximum-11 record. Floating-point values use `memcpy` into a `uint64_t`, preserving the object's signed-zero and nonfinite bits without floating-point arithmetic. `ResLayer` is copied as its actual bool. The callbacks allocate no heap memory, perform no I/O, call no engine/math routines and write no scientific object, local or input array.
+
+The only writes are the separate observer capture and its thread-local binding pointer. The RAII binding is cleared on ordinary return or C++ exception unwinding. An OS crash still has no guaranteed final observation artifact; the future launcher must retain that real process outcome rather than fabricate a method result.
+
+A future serializer must emit only the observed active prefix when `active_prefix_available` is true, with the actual copied count. The fixed buffer tail is not an observation. An unavailable prefix must be null with its observer reason, never an empty successful array. `dyn/rs/cnd` are optional and absent before the reached PostConversion callback. Duplicate, out-of-order, identity or prefix errors are explicit observer metadata failures; they do not modify or repair the Native computation. The future helper supplies actual owner IDs and original `LayerPoint` membership separately. No original-material mapping is reconstructed after source merges.
+
+## Explicit input and caller boundary
+
+This standalone proposal uses an explicit-member-input scope: actual construction members, actual material members and actual caller state are the future inputs. It does not claim to have invoked or observed `Material::GetMaterialData`, a construction input loader or the original IDF-to-member pathway. In particular, wrapper-computed `d/k` must not be described as an observed Native loader `Resistance`. A later production lane using the fixed 15 admitted IDFs may use genuine InputProcessor, Material and construction loaders after its input/projection decision; that helper is not authored here.
+
+The future caller must construct real `ConstructionProps` objects, preserve original construction/material order and IDs, allocate stable actual array/pointer owners, and keep the selected object inside the actual `Construct` array. The reverse-construction loop below 401 compares its address to preceding array elements and can borrow their genuine CTF owners. Shared `ErrorsFound`/`DoCTFErrorReport` must follow the real caller order rather than being silently reset for each construction. Fresh `EnergyPlusData` initialization and object lifetime must be genuine, including diagnostic state and material raw-pointer ownership. Input members and call outcomes remain separate from these passive local copies.
+
+The current default-CON proposal has `SourceSinkPresent == false`, `SolutionDimensions == 1`, source/user-temperature layer positions zero and perpendicular thickness zero, following the pinned HeatBalanceManager defaults. These values are not imposed by the callbacks. Other branches need separate admission before execution. The whole original method continues through reverse-owner checks, node/matrix construction, exponential/inverse/gamma/final coefficient routines, convergence/error paths, final coefficient storage and cleanup; no prefix replacement function or stop-before-downstream call is introduced.
+
+## ABI and cached build reuse
+
+No original class declaration, layout, method signature, calling convention, arithmetic statement, source branch or source return is changed. New free callback symbols and an additional header include are instrumented source additions, not a claim that the linked binary is the pristine Original binary. Source-only copying cannot establish numerical identity; that remains unverified until actual execution under the eventual frozen contract.
+
+The existing SCH-01 CMake adapter copies the actual `energypluslib` definitions/includes and links its unchanged static archive with project FP/warning options. A future CTF target can place a new helper object, this full derived Construction object and the callback object before the unchanged archive, using the genuine Construction compile ABI/options. It must use distinct object paths, preserve all existing compile rows and the cached original Construction object/archive, and derive new-TU counts from the actual build. A real link map must later prove the derived object supplies the Construction symbols and the archive's original Construction member was not selected. No build/link success is asserted by this package, and no new build/approval/QA execution stage is introduced.
+
+## Source-only verification and limits
+
+The preparation checked the original SHA before and after writing, exact original-copy bytes, generated unified diff equality, seven added lines/no removals, and exact inverse restoration of the full original file. Callback source/API review checked the pinned Objexx allocation/bounds/const-access definitions and the real maximum-layer constant. No compiler, formatter, project import, engine, scientific result, binary parser or binary hash was run/read. The manifest records current source identities and byte-faithful selected source ranges; it is an inventory, not an execution receipt or scientific certificate.

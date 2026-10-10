@@ -1,0 +1,68 @@
+# CTF-01 literal member packet writer — source preparation
+
+This held source has not been imported or executed. Root alone may execute it
+after full source review and other-author peer review. No separate SourceQA
+execution stage is introduced. The only non-stdlib import is the adjacent
+`packet_io.py`, authenticated against its literal SHA before import.
+
+The input is the held `input-design-prep-01` matrix, projection and numeric policy.
+The writer expands literal scalar IDs into `{ "bits": "<16 lowercase hex>" }`.
+It does not evaluate thickness/conductivity, resistance, classification, merges,
+conversions, expected arrays, method outcomes or numerical answers.
+
+Models retain matrix order. Each model's material list is its referenced subset
+of the original material-seed registry in registry order, without sorting.
+Material `id` and `Name` equal the declared seed ID. Constructions retain literal
+call order; their `id` and `Name` equal the declared construction-call ID.
+Each operation has that same local ID, kind `calculateTransferFunction`, and
+that construction ID. Layer references retain literal order and repetition.
+Caller flags are initialized once per model; the helper passes the actual shared
+references between whole calls. All 39/42 counts derive from literal arrays.
+
+The exact Native model/caller/material/construction/operation key counts are
+6/4/8/9/3, matching the held helper admission. Resistance is a declared member
+input, never a Material loader observation or a wrapper-computed d/k value.
+The same independent literal model rows are suitable for a future Rust caller;
+no Native results or reference answers are available to this writer.
+
+Root settled the eighteen named profiles before any output: zero atol/rtol,
+binary64 class and shape exact. Copied members require exact bits/class.
+The tolerance document retains the held profile list, copied-member profile,
+discrete policy and source arithmetic constraints. No tolerance adjustment or
+numeric selection is derived from results.
+
+The one-way file DAG is source+tolerances → request → cases → projection →
+admission → receipt. The request refers only to source/tolerances; cases binds
+that request and both earlier contracts; projection and admission bind all
+three contracts. Native source inventory is exactly the helper manifest's seven
+direct sources. Before/after checks bind those sources, selected original source
+ranges and all 45 ordered inherited CON input/weather/metadata references.
+Those 45 files are hashed only, not parsed for numerical content.
+
+The original design's card and Rust identities remain historical. Root supplies
+the actual current CTF card hash explicitly. The real scope amendment's archived
+before-card must match the old design card; its actual after-card must match the
+explicit current card. The genuine recorded `check_plan --check --card CTF-01`
+validates Root-authored documents; it is not claimed to have authored them.
+The scope pair and its streams are hash-bound; the actual validation exit must
+be integer zero with an unchanged source guard. All four gates remain pending.
+
+Future Root command (replace manifest/writer SHA placeholders with held values):
+
+```text
+python -X utf8 -B .runtime/porting/CTF-01/input-writer-prep-01/freeze_packet.py
+  --approved-source-sha256 <freeze_packet.py SHA>
+  --source-manifest .runtime/porting/CTF-01/input-writer-prep-01/manifest.json#<SHA>
+  --native-source-manifest .runtime/porting/CTF-01/native-helper-prep-01/manifest.json#9aa3be7157e352d280ac7a5e30ee35e6ee5864f7d85a49c0056d140705d57f59
+  --current-card energyplus_porting_plan/cards/CTF-01.md#<actual current SHA>
+  --actual-scope-amendment .runtime/porting/CTF-01/scope-amendment-01/amendment.json#b49e658bbd004d8c6a0c56e5666cbf98d8403df848d47afdb72c2d15990d2968
+  --actual-scope-amendment-execution .runtime/porting/CTF-01/scope-amendment-command-01/receipt.json#c82731cb5dfd1536934b7231288e870c73d094492b6158b4d567d0777c125571
+  --output-dir .runtime/porting/CTF-01/frozen-packet-01
+```
+
+Actual future stdout is the complete `ctf01-frozen-packet.v1` receipt JSON.
+It contains the six packet file identities, actual literal-derived counts,
+source approval, exact source byte archives and scope/input authorities.
+Fresh contained output only; no overwrite, engines, project imports, builds,
+canonical files, gates or expected outputs. The real fixed-CON15 Material loader
+lane remains separately required and pending; this member packet cannot certify it.

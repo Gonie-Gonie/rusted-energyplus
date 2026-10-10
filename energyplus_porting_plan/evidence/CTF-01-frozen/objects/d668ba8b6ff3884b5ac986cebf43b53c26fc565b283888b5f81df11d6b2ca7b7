@@ -1,0 +1,55 @@
+{
+  "schema": "ctf01-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-10T11:24:16.922821+00:00",
+  "build": {
+    "path": ".runtime/porting/CTF-01/native-build-01/native-build.json",
+    "sha256": "14f9e13851a242140c827c3a7b69a3e7778c13c81002f489831ddee2c7470fcf",
+    "size_bytes": 3905
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-01/native-build-01/derivation/derived-helper.exe",
+    "sha256": "d34ad2716c880e016662f4830167b4de86305a995408d9168c5e62188ef265e4"
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf01_reference_helper.exe",
+    "sha256": "2335018497cb99ada74e95d6aeb2965982d48ec7e03031a781edcc068cb97865",
+    "size_bytes": 1296573481
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-01/native-build-01/derivation/receipt.json",
+    "sha256": "f16a66905e51b0433d498eed9eab6f3e3f70ca4c55021a661dcbfcac50ef96d5",
+    "size_bytes": 12770
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/CTF-01/independent-native-build-review-01/review_build.py",
+    "sha256": "407d5aff7e03f982f22e1cb7a6bcd6c76f6b773be61bb0f630a0410d25503a19",
+    "size_bytes": 4213
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-01/independent-native-build-review-01/original-pe.json",
+      "sha256": "636930feb013e24ced1f2c37c4eb3bf72eb38a7bdd5c7ef79f682f8324733753",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-01/independent-native-build-review-01/derived-pe.json",
+      "sha256": "05ecdb9321e46966f442e2b1e0fc3ced6dcc1b1079a869a178eda110f20747f8",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-01/independent-native-build-review-01/comparison-pe.json",
+      "sha256": "9800e2ccfe53cc15169b435fe0ac9bc456fa9c8bb87f9485b33b8ee0776c455d",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

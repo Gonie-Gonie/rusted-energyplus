@@ -1,0 +1,79 @@
+{
+  "schema": "ctf01-preoutput-projection-proposal.v1",
+  "status": "source-only-proposal-not-frozen-not-executed",
+  "selected_source": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048",
+    "symbol": "Construction::ConstructionProps::calculateTransferFunction",
+    "card_range": [59, 401],
+    "actual_invocation": "whole original public method continues through1103; no prefix replacement or early observer stop",
+    "callbacks": [
+      {"phase": "PostLoad", "after_original_line": 309},
+      {"phase": "PostMerge", "after_original_line": 372},
+      {"phase": "PostConversion", "after_original_line": 401}
+    ]
+  },
+  "lanes": [
+    {
+      "name": "explicit-member-unit",
+      "inputs": "literal actual material/construction/caller members from case-matrix.json",
+      "Resistance": "literal supplied stored member; never reconstructed d/k or called loader output",
+      "models": "fresh EnergyPlusData/real initialization per model; stable actual MaterialBase owners and real Construct array elements before calls",
+      "order": "input material/construction/call order retained; actual Num/index and LayerPoint membership observed",
+      "flags": "one shared ErrorsFound/DoCTFErrorReport pair per model, initialized once and passed unchanged by the wrapper between actual calls",
+      "scalars": "exact declared binary64 bits; float annotations are input documentation only",
+      "allowed_regular_inputs": "positive finite material members with cp>=100, literal threshold neighbors; no artificial NaN/Inf/zero-thickness Regular full-call coverage",
+      "NoMass_inputs": "zero d/k/rho/cp members and positive literal Resistance reflect genuine MaterialBase NoMass form",
+      "expected_values_or_method_exit_codes": false
+    },
+    {
+      "name": "production-fixed-CON15-real-loader",
+      "status": "separate-required-production-design-pending",
+      "authority": "energyplus_porting_plan/contracts/scope.json ordered15 cases/all45 input-weather-metadata guards",
+      "path": "real InputProcessor + Material::GetMaterialData + construction loader + actual CTF-use selection before genuine whole calls",
+      "Resistance": "copy actual loader-owned stored member; no wrapper or comparer d/k substitution",
+      "case_selection": "all fixed15 retained; actual used ordinary opaque constructions and Regular/NoMass layer owners only",
+      "scope_expansion_or_new_IDFs": false,
+      "unit_seed_cases_certify_this_lane": false,
+      "actual_loader_observations_available_in_this_source_proposal": false
+    }
+  ],
+  "required_observed_fields_when_phase_reached": {
+    "every_phase": ["LayersInConstruct", "NumResLayers", "copied_layer_count", "ErrorsFound", "active_prefix_available"],
+    "active_prefix": ["dl", "rk", "rho", "cp", "lr", "ResLayer"],
+    "PostConversion_only": ["dyn", "rs", "cnd"],
+    "original_owner_context": ["actual material IDs/order/members", "actual construction index", "TotLayers", "LayerPoint", "IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TimeStepZone"]
+  },
+  "pairing": {
+    "Native_rhs": "actual passive local copies only, never reconstructed arrays/formulas or public post-whole-call approximations",
+    "Rust_lhs": "actual reached normalization owner fields from a separately authenticated real Rust invocation; missing owner is unavailable/failure",
+    "PostLoad": "actual Rust after_load with active layers/count and selected sticky error state",
+    "PostMerge": "actual Rust after_merge with active layers/count",
+    "PostConversion": "actual Rust after_conversion.active/dyn_spacing/total_resistance/conductance",
+    "identity": "join declared logical inputs with observed actual owner IDs; no arbitrary ordinal/name remapping of original LayerPoint order",
+    "normalized_material_ID_mapping": "unavailable: source merges local numerical arrays without updating original TotLayers/LayerPoint; do not invent material labels",
+    "merge_order": "source loop/index order is frozen; compare actual before/after active arrays on repeated/disjoint canaries; no invented per-merge event trace",
+    "DoCTFErrorReport": "Native actual formal flag recorded, unpaired because proposed Rust preprocessing has no matching owner",
+    "Native_after_whole_method_flags_and_coefficients": "context-only unpaired outside selected prefix; cannot relabel them selected preprocessing state"
+  },
+  "availability": {
+    "unreached_phase": "unavailable with actual reason/source/process outcome; zero numerical comparisons and no PASS",
+    "unused": "actual IsUsedCTF false returns before local allocation; no arithmetic coverage or zero-prefix success",
+    "load_error": "actual PostLoad may be available while later phases are unreached; preserve selected error and ordered diagnostics",
+    "required_reached_operand_absence": "one-sided or both-sided absence fails; no generic null equality",
+    "observer_error": "identity/binding/duplicate/order/prefix errors fail observation integrity, never repair source state",
+    "nonfinite_observed_return_or_local": "remains observed/available with actual bits/class; never null because isfinite=false",
+    "OS_crash_or_exception": "separate actual process/method ledger; never fabricate phase contents, invocation counts or successful return",
+    "array_tail": "indices beyond actual LayersInConstruct are not observations, even after source zeros shifted slots",
+    "complete_observation_or_PASS_claimed_by_this_proposal": false
+  },
+  "excluded": [
+    "SourceSinkPresent true/high-diffusivity warning branch and source/temp-layer adjustment",
+    "SolutionDimensions other than1 and perpendicular dyn calculation",
+    "zero or greater-than-MaxLayers Native active input counts",
+    "unsupported Material/Construction families excluded by CON-01",
+    "CTF-02 throughCTF-10 coefficient/reverse/stability results",
+    "thermal surface/gain execution and Native-output injection into Rust"
+  ],
+  "new_QA_or_execution_stage_required": false
+}

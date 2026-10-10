@@ -1,0 +1,142 @@
+// No engine calls, floating-point arithmetic, allocation, I/O or scientific writes.
+#include "ctf01_observer.hh"
+
+#include <cstring>
+#include <limits>
+
+namespace EnergyPlus::CTF01Observation {
+namespace {
+
+static_assert(sizeof(Real64) == sizeof(std::uint64_t));
+static_assert(std::numeric_limits<Real64>::is_iec559);
+thread_local Capture *active_capture = nullptr;
+
+Binary64Copy copy_bits(Real64 const &value) noexcept
+{
+    Binary64Copy copy;
+    std::memcpy(&copy.bits, &value, sizeof(value));
+    return copy;
+}
+
+template <typename T> bool covers_prefix(Array1D<T> const &values, int count) noexcept
+{
+    return count == 0 || (values.allocated() && values.l() == 1 && values.u() >= count);
+}
+
+Snapshot *copy_prefix(Phase phase, EnergyPlusData const &state,
+                      Construction::ConstructionProps const &construction,
+                      bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                      Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                      Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                      Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept
+{
+    Capture *capture = active_capture;
+    if (capture == nullptr) {
+        return nullptr;
+    }
+    std::size_t const index = static_cast<std::size_t>(phase);
+    std::size_t const previous_count = capture->actual_callback_count++;
+    if (capture->bound_state != &state || capture->bound_construction != &construction) {
+        capture->identity_mismatch = true;
+        return nullptr;
+    }
+    ++capture->actual_phase_callback_counts[index];
+    if (previous_count != index) {
+        capture->phase_order_invalid = true;
+    }
+    Snapshot &snapshot = capture->phases[index];
+    if (snapshot.reached) {
+        capture->duplicate_phase = true;
+        return nullptr;
+    }
+    snapshot.reached = true;
+    snapshot.ErrorsFound = ErrorsFound;
+    snapshot.DoCTFErrorReport = DoCTFErrorReport;
+    snapshot.LayersInConstruct = LayersInConstruct;
+    snapshot.NumResLayers = NumResLayers;
+    if (LayersInConstruct < 0 || LayersInConstruct > Construction::MaxLayersInConstruct ||
+        !covers_prefix(dl, LayersInConstruct) || !covers_prefix(rk, LayersInConstruct) ||
+        !covers_prefix(rho, LayersInConstruct) || !covers_prefix(cp, LayersInConstruct) ||
+        !covers_prefix(lr, LayersInConstruct) || !covers_prefix(ResLayer, LayersInConstruct)) {
+        capture->active_prefix_invalid = true;
+        return &snapshot;
+    }
+    for (int layer = 1; layer <= LayersInConstruct; ++layer) {
+        LayerSnapshot &copy = snapshot.active_prefix[static_cast<std::size_t>(layer - 1)];
+        copy.dl = copy_bits(dl(layer));
+        copy.rk = copy_bits(rk(layer));
+        copy.rho = copy_bits(rho(layer));
+        copy.cp = copy_bits(cp(layer));
+        copy.lr = copy_bits(lr(layer));
+        copy.ResLayer = ResLayer(layer);
+    }
+    snapshot.copied_layer_count = static_cast<std::size_t>(LayersInConstruct);
+    snapshot.active_prefix_available = true;
+    return &snapshot;
+}
+
+} // namespace
+
+Binding::Binding(Capture &capture, EnergyPlusData const &state,
+                 Construction::ConstructionProps const &construction) noexcept : capture_(&capture)
+{
+    if (active_capture != nullptr) {
+        capture.binding_error = true;
+        return;
+    }
+    capture = Capture{};
+    capture.bound_state = &state;
+    capture.bound_construction = &construction;
+    active_capture = &capture;
+    active_ = true;
+}
+
+Binding::~Binding() noexcept
+{
+    if (!active_) {
+        return;
+    }
+    if (active_capture == capture_) {
+        active_capture = nullptr;
+    } else {
+        capture_->binding_error = true;
+    }
+}
+
+void post_load(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+               bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+               Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+               Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+               Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept
+{
+    copy_prefix(Phase::PostLoad, state, construction, ErrorsFound, DoCTFErrorReport,
+                LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+}
+
+void post_merge(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept
+{
+    copy_prefix(Phase::PostMerge, state, construction, ErrorsFound, DoCTFErrorReport,
+                LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+}
+
+void post_conversion(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                     bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                     Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                     Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                     Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                     Real64 const &dyn, Real64 const &rs, Real64 const &cnd) noexcept
+{
+    Snapshot *snapshot = copy_prefix(Phase::PostConversion, state, construction, ErrorsFound, DoCTFErrorReport,
+                                     LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+    if (snapshot != nullptr) {
+        snapshot->dyn = copy_bits(dyn);
+        snapshot->rs = copy_bits(rs);
+        snapshot->cnd = copy_bits(cnd);
+    }
+}
+
+} // namespace EnergyPlus::CTF01Observation

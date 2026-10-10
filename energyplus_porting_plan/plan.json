@@ -9264,18 +9264,18 @@
       "title": "구성체 열물성 전처리",
       "source": "Construction.cc",
       "symbols": "ConstructionProps::calculateTransferFunction",
-      "block": "재료층 입력을 dl/rk/rho/cp/lr로 가져오는 블록; 저항층 판정·연속 저항층 처리·필요 단위 변환.",
+      "block": "Selected Construction.cc59-401: actual reset/unused return, material-member layer loading, computed resistance classification, error return, ordered interior resistance merging and SI-to-English conversion/rs/cnd. Actual Native whole public method continues unchanged through1103; later CTF algorithms remain separate.",
       "dependencies": [
         "CON-01"
       ],
-      "inputs": "층별 두께·k·rho·cp·R; layer order",
-      "outputs": "정규화 층목록, 저항층 flag, 총 R 및 CTF 계산용 단위값",
+      "inputs": "Literal binary64 stored MaterialBase d/k/rho/cp/Resistance/ROnly, real construction membership/order/IsUsedCTF and caller flags/timestep. Unit member lane is separate from required unchanged CON15 genuine-loader production lane.",
+      "outputs": "Actual active dl/rk/rho/cp/lr/ResLayer arrays at PostLoad/PostMerge/PostConversion; local counts and selected ErrorsFound state; final assigned dyn/rs/cnd. Original TotLayers/LayerPoint retained; no invented merged material IDs/tails.",
       "timing": "구성체 초기화",
       "unit_tests": "단층·다층·연속 저항층·저항+유질량 층; 전처리 중간값 비교",
       "integration_test": "CTF-02/03에 전달되는 배열·순서 검증",
       "rust_candidate": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
       "assessment": "기존 구현 보완",
-      "companion": "Construction.hh::ConstructionProps의 열전도 필드; Material.hh 사용 필드",
+      "companion": "Construction.hh capacity/constructor/actual owners; Material.hh and Material.cc Regular/NoMass storage; DataConversions.hh58-69; HeatBalanceManager.cc6153-6167 actual shared references and call order; SurfaceGeometry.cc9081-9107 actual CTF-use owner.",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "미확인",
@@ -9283,9 +9283,81 @@
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
-      "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
+      "source_boundary_note": "Amended before first Native execution: selected59-401 and companions reviewed; genuine method continuation through1103 retained, not replaced by prefix arithmetic. CTF02-10/source-sink/2D/unselected material families excluded. Four gates pending actual validation.",
+      "numeric_policy": "18 separate arithmetic profiles atol=rtol=0 with exact class/shape; copied inputs binary64 bits exact. Literal source constants/order/sqrt/unguarded conductance preserved. Required reached absence fails on either or both sides; unreached/stopped/unknown states never numeric PASS. No tolerance retuning after outputs.",
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
+      "source_ranges_input_only": [
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "line_ranges": [
+            [
+              59,
+              401
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+          "line_ranges": [
+            [
+              170,
+              225
+            ],
+            [
+              249,
+              285
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataConversions.hh",
+          "line_ranges": [
+            [
+              58,
+              69
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+          "line_ranges": [
+            [
+              6153,
+              6167
+            ]
+          ]
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+          "line_ranges": [
+            [
+              9081,
+              9107
+            ]
+          ]
+        }
+      ],
+      "scope_design": {
+        "fixed_scope": {
+          "path": "energyplus_porting_plan/contracts/scope.json",
+          "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+          "size_bytes": 15325
+        },
+        "literal_unit_models": 39,
+        "declared_whole_calls": 42,
+        "strict_profiles_settled_before_outputs": true,
+        "actual_production_loader_lane_pending": true,
+        "existing_Rust_stored_Regular_R_and_normalized_owners_absent": true,
+        "later_solver_flags_and_coefficients_unpaired": true,
+        "full_CTF_method_math_certified": false,
+        "frozen_packet_pending": false,
+        "frozen_pre_execution_evidence": {
+          "path": "energyplus_porting_plan/evidence/CTF-01-frozen/summary.json",
+          "sha256": "58fab5204013171fda426a6de850ac2c150100e180813db7c0e40d289f863613",
+          "size_bytes": 1465
+        },
+        "native_build_and_PE_verified_before_engine": true
+      }
     },
     {
       "id": "CTF-02",

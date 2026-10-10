@@ -1,0 +1,37 @@
+--- .reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc
++++ .runtime/porting/CTF-01/native-observer-prep-01/Construction.ctf01.cc
+@@ -53,6 +53,7 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/OutputReportPredefined.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
++#include "ctf01_observer.hh"
+ 
+ namespace EnergyPlus::Construction {
+ 
+@@ -307,6 +308,8 @@
+             }
+         } // ... end of resistive layer determination IF-THEN block.
+     } // ... end of layer loop.
++    EnergyPlus::CTF01Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,
++        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // If errors have been found, just return
+ 
+@@ -370,6 +373,8 @@
+             }
+         }
+     }
++    EnergyPlus::CTF01Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,
++        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // Convert SI units to English.  In theory, conversion to English
+     // units is not necessary; however, Russ Taylor noted that some
+@@ -399,6 +404,8 @@
+     }
+ 
+     cnd = 1.0 / rs; // Conductivity is the inverse of resistivity
++    EnergyPlus::CTF01Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,
++        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, dyn, rs, cnd);
+ 
+     bool RevConst = false;
+ 

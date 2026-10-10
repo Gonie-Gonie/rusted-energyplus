@@ -1,0 +1,51 @@
+{
+  "schema": "ctf01-source-scope-amendment.v1",
+  "created_utc": "2026-10-10T11:02:43.538371+00:00",
+  "purpose": "Root-authored actual card/plan scope correction before any CTF Native build/run; subsequent recorded check validates documents and does not author them.",
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-01/scope-amendment-01/before-card.md",
+      "sha256": "5b23cb752ecbf678db36319ca4e6f0faa5ea60abf27012fbac510b31334b29c2",
+      "size_bytes": 2847
+    },
+    {
+      "path": ".runtime/porting/CTF-01/scope-amendment-01/before-plan.json",
+      "sha256": "28888ebddef66457a98fcd3f550666f63d262a46125e135710d51b6510f81872",
+      "size_bytes": 612130
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-01.md",
+      "sha256": "f87d981f89e475883468bcb6794476693c116e121d511c0f7f0e1c73e189bd8b",
+      "size_bytes": 6578
+    },
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "50ab0327c0816622df93c54e6a15da84e986cadf10786305ed734c9b426b2719",
+      "size_bytes": 614677
+    }
+  ],
+  "input_design": {
+    "path": ".runtime/porting/CTF-01/input-design-prep-01/manifest.json",
+    "sha256": "28016195bc72bff53ab5140abfb6dca43fb0f82c117f04f824acf07a1a53583f",
+    "size_bytes": 13567
+  },
+  "native_observer": {
+    "path": ".runtime/porting/CTF-01/native-observer-prep-01/manifest.json",
+    "sha256": "da47576f07da2283ce28ac65452332221e80679c66992fb62e7ea9952701fe26",
+    "size_bytes": 13869
+  },
+  "native_helper": {
+    "path": ".runtime/porting/CTF-01/native-helper-prep-01/manifest.json",
+    "sha256": "9aa3be7157e352d280ac7a5e30ee35e6ee5864f7d85a49c0056d140705d57f59",
+    "size_bytes": 10048
+  },
+  "strict_profiles_settled_before_outputs": true,
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42
+  },
+  "actual_CTF_build_or_engine_execution_performed": false,
+  "all_four_gates_pending": true
+}

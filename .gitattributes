@@ -2,4 +2,5 @@
 
 # Evidence payloads retain their original bytes, including line endings.
 energyplus_porting_plan/evidence/**/*.part binary
+energyplus_porting_plan/evidence/**/objects/* binary
 

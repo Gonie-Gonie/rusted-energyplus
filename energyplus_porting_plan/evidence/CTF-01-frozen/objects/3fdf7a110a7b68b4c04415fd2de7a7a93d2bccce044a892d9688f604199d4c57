@@ -1,0 +1,4007 @@
+{
+  "schema": "ctf01-helper-cases.v1",
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-01/scope-amendment-01/amendment.json",
+    "sha256": "b49e658bbd004d8c6a0c56e5666cbf98d8403df848d47afdb72c2d15990d2968",
+    "size_bytes": 1933
+  },
+  "actual_scope_amendment_execution": {
+    "path": ".runtime/porting/CTF-01/scope-amendment-command-01/receipt.json",
+    "sha256": "c82731cb5dfd1536934b7231288e870c73d094492b6158b4d567d0777c125571",
+    "size_bytes": 3014
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+      "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+      "size_bytes": 15120
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+      "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+      "size_bytes": 5520
+    }
+  },
+  "observation_policy": {
+    "selected_source": {
+      "version": "26.1.0",
+      "commit": "6f2e40d10250a105b49966baa24d843711e61048",
+      "symbol": "Construction::ConstructionProps::calculateTransferFunction",
+      "card_range": [
+        59,
+        401
+      ],
+      "actual_invocation": "whole original public method continues through1103; no prefix replacement or early observer stop",
+      "callbacks": [
+        {
+          "phase": "PostLoad",
+          "after_original_line": 309
+        },
+        {
+          "phase": "PostMerge",
+          "after_original_line": 372
+        },
+        {
+          "phase": "PostConversion",
+          "after_original_line": 401
+        }
+      ]
+    },
+    "required_observed_fields_when_phase_reached": {
+      "every_phase": [
+        "LayersInConstruct",
+        "NumResLayers",
+        "copied_layer_count",
+        "ErrorsFound",
+        "active_prefix_available"
+      ],
+      "active_prefix": [
+        "dl",
+        "rk",
+        "rho",
+        "cp",
+        "lr",
+        "ResLayer"
+      ],
+      "PostConversion_only": [
+        "dyn",
+        "rs",
+        "cnd"
+      ],
+      "original_owner_context": [
+        "actual material IDs/order/members",
+        "actual construction index",
+        "TotLayers",
+        "LayerPoint",
+        "IsUsedCTF",
+        "SourceSinkPresent",
+        "SolutionDimensions",
+        "TimeStepZone"
+      ]
+    },
+    "pairing": {
+      "Native_rhs": "actual passive local copies only, never reconstructed arrays/formulas or public post-whole-call approximations",
+      "Rust_lhs": "actual reached normalization owner fields from a separately authenticated real Rust invocation; missing owner is unavailable/failure",
+      "PostLoad": "actual Rust after_load with active layers/count and selected sticky error state",
+      "PostMerge": "actual Rust after_merge with active layers/count",
+      "PostConversion": "actual Rust after_conversion.active/dyn_spacing/total_resistance/conductance",
+      "identity": "join declared logical inputs with observed actual owner IDs; no arbitrary ordinal/name remapping of original LayerPoint order",
+      "normalized_material_ID_mapping": "unavailable: source merges local numerical arrays without updating original TotLayers/LayerPoint; do not invent material labels",
+      "merge_order": "source loop/index order is frozen; compare actual before/after active arrays on repeated/disjoint canaries; no invented per-merge event trace",
+      "DoCTFErrorReport": "Native actual formal flag recorded, unpaired because proposed Rust preprocessing has no matching owner",
+      "Native_after_whole_method_flags_and_coefficients": "context-only unpaired outside selected prefix; cannot relabel them selected preprocessing state"
+    },
+    "availability": {
+      "unreached_phase": "unavailable with actual reason/source/process outcome; zero numerical comparisons and no PASS",
+      "unused": "actual IsUsedCTF false returns before local allocation; no arithmetic coverage or zero-prefix success",
+      "load_error": "actual PostLoad may be available while later phases are unreached; preserve selected error and ordered diagnostics",
+      "required_reached_operand_absence": "one-sided or both-sided absence fails; no generic null equality",
+      "observer_error": "identity/binding/duplicate/order/prefix errors fail observation integrity, never repair source state",
+      "nonfinite_observed_return_or_local": "remains observed/available with actual bits/class; never null because isfinite=false",
+      "OS_crash_or_exception": "separate actual process/method ledger; never fabricate phase contents, invocation counts or successful return",
+      "array_tail": "indices beyond actual LayersInConstruct are not observations, even after source zeros shifted slots",
+      "complete_observation_or_PASS_claimed_by_this_proposal": false
+    },
+    "excluded": [
+      "SourceSinkPresent true/high-diffusivity warning branch and source/temp-layer adjustment",
+      "SolutionDimensions other than1 and perpendicular dyn calculation",
+      "zero or greater-than-MaxLayers Native active input counts",
+      "unsupported Material/Construction families excluded by CON-01",
+      "CTF-02 throughCTF-10 coefficient/reverse/stability results",
+      "thermal surface/gain execution and Native-output injection into Rust"
+    ],
+    "production_fixed15_real_loader_lane": "separate-required-pending; not certified by this explicit-member packet"
+  },
+  "model_cases": [
+    {
+      "id": "active-prefix-01",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-02",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-03",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-04",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-05",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-06",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-07",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-08",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-09",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-10",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "active-prefix-11",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B",
+            "MASS_C",
+            "MASS_A",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "unused-before-layer-loading",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N_R_BELOW",
+          "Name": "N_R_BELOW",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3f50624dd2f1a9fb"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": false,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N_R_BELOW"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "single-no-mass",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N25"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "two-boundary-no-mass",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N125",
+            "N25"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "outside-no-mass",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N25",
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "inside-no-mass",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "N25"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "interior-no-mass",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "N25",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "two-adjacent-interior",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "N125",
+            "N25",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "three-adjacent-interior",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N10",
+          "Name": "N10",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fb999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N20",
+          "Name": "N20",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N30",
+          "Name": "N30",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd3333333333333"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "N10",
+            "N20",
+            "N30",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "disjoint-adjacent-interiors",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_C",
+          "Name": "MASS_C",
+          "Thickness": {
+            "bits": "3f9999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3fc999999999999a"
+          },
+          "Density": {
+            "bits": "403e000000000000"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N10",
+          "Name": "N10",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fb999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N20",
+          "Name": "N20",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc999999999999a"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "N125",
+            "N25",
+            "MASS_B",
+            "N10",
+            "N20",
+            "MASS_C"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "boundary-neighbor-three-layers",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N125",
+            "N25",
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "boundary-neighbor-four-layers",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N50",
+          "Name": "N50",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N125",
+            "N25",
+            "N50",
+            "MASS_A"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "computed-reslayer-not-ronly",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "K_equal",
+          "Name": "K_equal",
+          "Thickness": {
+            "bits": "3fb999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3eb0c6f7a0b5ed8d"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "40f86a0000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "LIGHT_MASS",
+          "Name": "LIGHT_MASS",
+          "Thickness": {
+            "bits": "3fd0000000000000"
+          },
+          "Conductivity": {
+            "bits": "3ff0000000000000"
+          },
+          "Density": {
+            "bits": "3c9cd2b297d889bc"
+          },
+          "SpecHeat": {
+            "bits": "408f400000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A",
+            "K_equal",
+            "LIGHT_MASS",
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "ordered-resistance-forward",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N50",
+          "Name": "N50",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N10",
+          "Name": "N10",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fb999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N20",
+          "Name": "N20",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N30",
+          "Name": "N30",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd3333333333333"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N40",
+          "Name": "N40",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd999999999999a"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N10",
+            "N20",
+            "N30",
+            "N40",
+            "N125",
+            "N25",
+            "N50"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "ordered-resistance-reversed",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N125",
+          "Name": "N125",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N50",
+          "Name": "N50",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N10",
+          "Name": "N10",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fb999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N20",
+          "Name": "N20",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fc999999999999a"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N30",
+          "Name": "N30",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd3333333333333"
+          },
+          "ROnly": true
+        },
+        {
+          "id": "N40",
+          "Name": "N40",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd999999999999a"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N50",
+            "N25",
+            "N125",
+            "N40",
+            "N30",
+            "N20",
+            "N10"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "conductivity-threshold-below",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "K_below",
+          "Name": "K_below",
+          "Thickness": {
+            "bits": "3fb999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3eb0c6f7a0b5ed8c"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "40f86a0000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "K_below"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "thin-metric-threshold-below",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "THIN_below",
+          "Name": "THIN_below",
+          "Thickness": {
+            "bits": "3eb0c6f7a0b5ed8c"
+          },
+          "Conductivity": {
+            "bits": "3ff0000000000000"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "3eb0c6f7a0b5ed8c"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "THIN_below"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "resistance-minimum-below",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N_R_BELOW",
+          "Name": "N_R_BELOW",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3f50624dd2f1a9fb"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N_R_BELOW"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "thickness-maximum-below",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "THICK_below",
+          "Name": "THICK_below",
+          "Thickness": {
+            "bits": "4007ffffffffffff"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "400e000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "THICK_below"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "conductivity-threshold-equal",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "K_equal",
+          "Name": "K_equal",
+          "Thickness": {
+            "bits": "3fb999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3eb0c6f7a0b5ed8d"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "40f86a0000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "K_equal"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "thin-metric-threshold-equal",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "THIN_equal",
+          "Name": "THIN_equal",
+          "Thickness": {
+            "bits": "3eb0c6f7a0b5ed8d"
+          },
+          "Conductivity": {
+            "bits": "3ff0000000000000"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "3eb0c6f7a0b5ed8d"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "THIN_equal"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "resistance-minimum-equal",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N_R_EQUAL",
+          "Name": "N_R_EQUAL",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3f50624dd2f1a9fc"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N_R_EQUAL"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "thickness-maximum-equal",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "THICK_equal",
+          "Name": "THICK_equal",
+          "Thickness": {
+            "bits": "4008000000000000"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "400e000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "THICK_equal"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "conductivity-threshold-above",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "K_above",
+          "Name": "K_above",
+          "Thickness": {
+            "bits": "3fb999999999999a"
+          },
+          "Conductivity": {
+            "bits": "3eb0c6f7a0b5ed8e"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "40f86a0000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "K_above"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "thin-metric-threshold-above",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "THIN_above",
+          "Name": "THIN_above",
+          "Thickness": {
+            "bits": "3eb0c6f7a0b5ed8e"
+          },
+          "Conductivity": {
+            "bits": "3ff0000000000000"
+          },
+          "Density": {
+            "bits": "3f80000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4060000000000000"
+          },
+          "Resistance": {
+            "bits": "3eb0c6f7a0b5ed8e"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "THIN_above"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "resistance-minimum-above",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "N_R_ABOVE",
+          "Name": "N_R_ABOVE",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3f50624dd2f1a9fd"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N_R_ABOVE"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "thickness-maximum-above",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "THICK_above",
+          "Name": "THICK_above",
+          "Thickness": {
+            "bits": "4008000000000001"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "400e000000000000"
+          },
+          "ROnly": false
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "THICK_above"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        }
+      ]
+    },
+    {
+      "id": "shared-error-then-valid-then-unused",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": false,
+        "DoCTFErrorReport": false
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "MASS_B",
+          "Name": "MASS_B",
+          "Thickness": {
+            "bits": "3fb47ae147ae147b"
+          },
+          "Conductivity": {
+            "bits": "3fc47ae147ae147b"
+          },
+          "Density": {
+            "bits": "4089000000000000"
+          },
+          "SpecHeat": {
+            "bits": "4095e00000000000"
+          },
+          "Resistance": {
+            "bits": "3fe0000000000000"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N_R_BELOW",
+          "Name": "N_R_BELOW",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3f50624dd2f1a9fb"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N_R_BELOW"
+          ]
+        },
+        {
+          "id": "construction-2",
+          "Name": "construction-2",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A"
+          ]
+        },
+        {
+          "id": "construction-3",
+          "Name": "construction-3",
+          "IsUsedCTF": false,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_B"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        },
+        {
+          "id": "construction-2",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-2"
+        },
+        {
+          "id": "construction-3",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-3"
+        }
+      ]
+    },
+    {
+      "id": "incoming-shared-error-and-report-flag",
+      "lane": "explicit-member-unit",
+      "caller": {
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        },
+        "ErrorsFound": true,
+        "DoCTFErrorReport": true
+      },
+      "materials": [
+        {
+          "id": "MASS_A",
+          "Name": "MASS_A",
+          "Thickness": {
+            "bits": "3fbeb851eb851eb8"
+          },
+          "Conductivity": {
+            "bits": "3fe999999999999a"
+          },
+          "Density": {
+            "bits": "409c200000000000"
+          },
+          "SpecHeat": {
+            "bits": "408c200000000000"
+          },
+          "Resistance": {
+            "bits": "3fc3333333333333"
+          },
+          "ROnly": false
+        },
+        {
+          "id": "N25",
+          "Name": "N25",
+          "Thickness": {
+            "bits": "0000000000000000"
+          },
+          "Conductivity": {
+            "bits": "0000000000000000"
+          },
+          "Density": {
+            "bits": "0000000000000000"
+          },
+          "SpecHeat": {
+            "bits": "0000000000000000"
+          },
+          "Resistance": {
+            "bits": "3fd0000000000000"
+          },
+          "ROnly": true
+        }
+      ],
+      "constructions": [
+        {
+          "id": "construction-1",
+          "Name": "construction-1",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "MASS_A"
+          ]
+        },
+        {
+          "id": "construction-2",
+          "Name": "construction-2",
+          "IsUsedCTF": true,
+          "SourceSinkPresent": false,
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "bits": "0000000000000000"
+          },
+          "layer_material_ids": [
+            "N25"
+          ]
+        }
+      ],
+      "operations": [
+        {
+          "id": "construction-1",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-1"
+        },
+        {
+          "id": "construction-2",
+          "kind": "calculateTransferFunction",
+          "construction_id": "construction-2"
+        }
+      ]
+    }
+  ],
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  }
+}

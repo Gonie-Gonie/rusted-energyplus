@@ -1,0 +1,110 @@
+// Output-only observations of actual Construction.cc local storage.
+#ifndef CTF01_OBSERVER_HH_INCLUDED
+#define CTF01_OBSERVER_HH_INCLUDED
+
+#include <EnergyPlus/Construction.hh>
+#include <ObjexxFCL/Array1D.hh>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+
+namespace EnergyPlus::CTF01Observation {
+
+enum class Phase : std::size_t
+{
+    PostLoad = 0,
+    PostMerge = 1,
+    PostConversion = 2
+};
+
+// Object-representation copies preserve signed zero and nonfinite payload bits.
+struct Binary64Copy
+{
+    std::uint64_t bits = 0;
+};
+
+struct LayerSnapshot
+{
+    Binary64Copy dl;
+    Binary64Copy rk;
+    Binary64Copy rho;
+    Binary64Copy cp;
+    Binary64Copy lr;
+    bool ResLayer = false;
+};
+
+struct Snapshot
+{
+    bool reached = false;
+    bool active_prefix_available = false;
+    bool ErrorsFound = false;
+    bool DoCTFErrorReport = false;
+    int LayersInConstruct = 0;
+    int NumResLayers = 0;
+    std::size_t copied_layer_count = 0;
+    // Only [0, copied_layer_count) is an observation. Never emit the tail.
+    std::array<LayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    // Empty until the actual post-401 callback; not invented zero operands.
+    std::optional<Binary64Copy> dyn;
+    std::optional<Binary64Copy> rs;
+    std::optional<Binary64Copy> cnd;
+};
+
+struct Capture
+{
+    // Internal identity checks only. A future helper supplies its real owner ID.
+    EnergyPlusData const *bound_state = nullptr;
+    Construction::ConstructionProps const *bound_construction = nullptr;
+    std::array<Snapshot, 3> phases{};
+    std::array<std::size_t, 3> actual_phase_callback_counts{};
+    std::size_t actual_callback_count = 0;
+    bool binding_error = false;
+    bool identity_mismatch = false;
+    bool duplicate_phase = false;
+    bool phase_order_invalid = false;
+    bool active_prefix_invalid = false;
+};
+
+// A helper binds its explicit actual state/array element before one genuine call.
+// Nested bindings are rejected as observer metadata; they do not replace a call.
+class Binding
+{
+public:
+    Binding(Capture &capture, EnergyPlusData const &state,
+            Construction::ConstructionProps const &construction) noexcept;
+    ~Binding() noexcept;
+    Binding(Binding const &) = delete;
+    Binding &operator=(Binding const &) = delete;
+    Binding(Binding &&) = delete;
+    Binding &operator=(Binding &&) = delete;
+    [[nodiscard]] bool active() const noexcept { return active_; }
+
+private:
+    Capture *capture_ = nullptr;
+    bool active_ = false;
+};
+
+void post_load(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+               bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+               Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+               Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+               Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept;
+
+void post_merge(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept;
+
+void post_conversion(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                     bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                     Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                     Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                     Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                     Real64 const &dyn, Real64 const &rs, Real64 const &cnd) noexcept;
+
+} // namespace EnergyPlus::CTF01Observation
+
+#endif

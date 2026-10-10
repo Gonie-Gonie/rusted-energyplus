@@ -1,0 +1,39 @@
+{
+  "schema": "ctf01-frozen-pre-execution-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-frozen/manifest.json",
+    "sha256": "10772c8782879a9b1251705a4971b49bea7bcdaa6ccbf547e6d9dbfa884ed6b1",
+    "size_bytes": 53710
+  },
+  "models": 39,
+  "declared_whole_calls": 42,
+  "strict_profiles": 18,
+  "atol": 0,
+  "rtol": 0,
+  "request": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+    "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+    "size_bytes": 103619
+  },
+  "freeze": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/freeze-receipt.json",
+    "sha256": "9329ee40a7afb2c062ebb39201f6fd0dd9462ab86efdcb1051b48c5b1c3b7911",
+    "size_bytes": 20861
+  },
+  "build": {
+    "path": ".runtime/porting/CTF-01/native-build-01/native-build.json",
+    "sha256": "14f9e13851a242140c827c3a7b69a3e7778c13c81002f489831ddee2c7470fcf",
+    "size_bytes": 3905
+  },
+  "independent_build_PE_review": {
+    "path": ".runtime/porting/CTF-01/independent-native-build-review-01/review.json",
+    "sha256": "d668ba8b6ff3884b5ac986cebf43b53c26fc565b283888b5f81df11d6b2ca7b7",
+    "size_bytes": 2287
+  },
+  "existing_core_registered": 643,
+  "existing_core_present_unchanged": 631,
+  "existing_registered_absent_unchanged": 12,
+  "protected_artifacts_unchanged": 24,
+  "CTF_scientific_execution_performed": false,
+  "four_gates_passed": false
+}
