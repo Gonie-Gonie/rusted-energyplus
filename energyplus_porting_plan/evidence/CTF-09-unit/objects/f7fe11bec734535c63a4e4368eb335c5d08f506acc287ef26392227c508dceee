@@ -1,0 +1,350 @@
+--- .runtime/porting/CTF-08/rust-observer-prep-01/ctf08_candidate_unit_observer.rs
++++ crates/ep_run/examples/ctf09_candidate_unit_observer.rs
+@@ -1,12 +1,17 @@
+ //! Actual explicit-member preprocessing and source-owned initial CTF03 route; no solver answers.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf08_candidate_unit_support/fields.rs"]
++#[path = "ctf09_candidate_unit_support/fields.rs"]
+ mod fields;
+ 
+ use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
+ use ep_runtime::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
+-use ep_runtime::heat_balance::ctf_first_final_coefficients_ingress::initialize_construction_ctf_first_matrix_with_final_coefficients;
++use ep_runtime::heat_balance::ctf_retry_initialization::{
++    initialize_construction_ctf_retry, skip_construction_ctf_retry,
++};
++use ep_runtime::heat_balance::surface_manager::ctf_caller_stability::{
++    CtfCallerDiagnosticNames, CtfCallerSharedFlags,
++};
+ use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+@@ -83,7 +88,7 @@
+ }
+ fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+     require(
+-        inventory["schema"] == "ctf08-candidate-unit-runtime-source-bindings.v1"
++        inventory["schema"] == "ctf09-candidate-unit-runtime-source-bindings.v1"
+             && inventory
+                 .as_object()
+                 .is_some_and(|object| object.len() == 3),
+@@ -115,7 +120,8 @@
+     )?;
+     let mut association = BTreeMap::new();
+     let mut typed = Vec::new();
+-    for (index, material) in rows(&model["materials"])?.iter().enumerate() {
++    let material_declarations = rows(&model["materials"])?;
++    for (index, material) in material_declarations.iter().enumerate() {
+         let id = text(&material["id"])?;
+         require(
+             association.insert(id, index).is_none(),
+@@ -169,82 +175,99 @@
+             internal_heat_source: None,
+         });
+     }
+-    let mut selected_errors = flag(&model["caller"]["ErrorsFound"])?;
++    let mut selected_flags = CtfCallerSharedFlags {
++        errors_found: flag(&model["caller"]["ErrorsFound"])?,
++        do_ctf_error_report: flag(&model["caller"]["DoCTFErrorReport"])?,
++    };
++    let mut prior_stop = None;
+     let mut observed = Vec::new();
+     for (index, ((declaration, construction), operation)) in declarations
+-        .iter()
+-        .zip(&constructions)
+-        .zip(operations)
+-        .enumerate()
++        .iter().zip(&constructions).zip(operations).enumerate()
+     {
+-        require(
+-            operation["kind"] == "calculateTransferFunction"
+-                && operation["construction_id"] == declaration["id"],
+-            "declared Native call/construction order differs",
+-        )?;
+-        let layers = construction
+-            .effective_layers()
+-            .iter()
+-            .map(|id| {
+-                let index = usize::try_from(id.0)?;
+-                typed
+-                    .get(index)
+-                    .copied()
+-                    .ok_or_else(|| "typed material association absent".into())
+-            })
+-            .collect::<Result<Vec<_>>>()?;
+-        let before = selected_errors;
+-        // Actual selected context is supplied separately. The typed stack above
+-        // does not fabricate an internal-source declaration for rejected lanes.
++        require(operation["kind"] == "calculateTransferFunction"
++            && operation["construction_id"] == declaration["id"],
++            "declared Native call/construction order differs")?;
++        let original_names = construction.effective_layers().iter().map(|id| {
++            let index = usize::try_from(id.0)?;
++            let material = material_declarations.get(index).ok_or("original material name owner absent")?;
++            text(&material["Name"])
++        }).collect::<Result<Vec<_>>>()?;
++        let names = CtfCallerDiagnosticNames {
++            construction_name: &construction.name.0,
++            original_tot_layers: i32::try_from(construction.effective_layers().len())?,
++            original_layer_material_names: &original_names,
++        };
++        let before = selected_flags;
++        if let Some(stop) = prior_stop {
++            let skipped = skip_construction_ctf_retry(construction.id, selected_flags, names, stop);
++            selected_flags = skipped.flags_on_return;
++            observed.push(json!({"id":operation["id"],"declared_native_operation_kind":operation["kind"],
++                "logical_construction_id":declaration["id"],"actual_construction_id":construction.id.0,
++                "actual_Rust_API":"preprocess_ctf_layers","actual_source_invoked":false,
++                "selected_flags_before":fields::flags(before),"selected_flags_after":fields::flags(selected_flags),
++                "selected_ErrorsFound_before":before.errors_found,"selected_ErrorsFound_after":selected_flags.errors_found,
++                "actual_layer_material_ids":construction.effective_layers().iter().map(|id|id.0).collect::<Vec<_>>(),
++                "original_layer_membership":declaration["layer_material_ids"],"result":null,
++                "CTF03_initial":{"owner_available":false,"snapshot":null,"actual_public_API_invoked":false,
++                    "unavailable_reason":"selected Rust chain stopped before this call","counted_as_PASS":false},
++                "CTF04_first_assembly":{"owner_available":false,"snapshot":null,"actual_public_API_invoked":false,
++                    "unavailable_reason":"selected Rust chain stopped before this call","counted_as_PASS":false},
++                "actual_Rust_CTF03_API_invoked":false,"actual_Rust_CTF04_API_invoked":false,
++                "CTF06_first_exponential":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_exponential",construction.id.0),
++                "CTF05_first_inverse":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_inverse",construction.id.0),
++                "CTF07_first_gammas":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_gammas",construction.id.0),
++                "CTF08_first_private_coefficients":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_final_coefficients",construction.id.0),
++                "CTF09_retry_initialization":fields::retry_initialization(&skipped),
++                "actual_Rust_retry_driver_API_invoked":false,"actual_Rust_combined_API_invoked":false,
++                "Native_fatal_exception_method_phase_or_OS_status_inferred":false}));
++            continue;
++        }
++        let layers = construction.effective_layers().iter().map(|id| {
++            let index = usize::try_from(id.0)?;
++            typed.get(index).copied().ok_or_else(|| "typed material association absent".into())
++        }).collect::<Result<Vec<_>>>()?;
+         let context = CtfLayerContext {
+-            is_used_ctf: flag(&declaration["IsUsedCTF"])?,
+-            errors_found: before,
++            is_used_ctf: flag(&declaration["IsUsedCTF"])?, errors_found: before.errors_found,
+             source_sink_present: flag(&declaration["SourceSinkPresent"])?,
+-            solution_dimensions: i32::try_from(
+-                declaration["SolutionDimensions"]
+-                    .as_i64()
+-                    .ok_or("typed dimensions required")?,
+-            )?,
++            solution_dimensions: i32::try_from(declaration["SolutionDimensions"].as_i64().ok_or("typed dimensions required")?)?,
+         };
+-        let result = preprocess_ctf_layers(&layers, context);
+         let preprocessing = ConstructionCtfLayerPreprocessing {
+-            construction_id: construction.id,
+-            is_used_ctf: context.is_used_ctf,
+-            result,
++            construction_id: construction.id, is_used_ctf: context.is_used_ctf,
++            result: preprocess_ctf_layers(&layers, context),
+         };
++        if let Ok(actual) = &preprocessing.result {
++            selected_flags.errors_found = actual.errors_found;
++        }
++        let after_preprocessing = selected_flags;
+         let time_step_zone = scalar(&model["caller"]["TimeStepZone"])?;
+-        let initial = initialize_construction_ctf_initial(
+-            construction,
+-            &constructions[..index],
+-            &used,
+-            &preprocessing,
+-            context,
+-            time_step_zone,
+-        );
+-        let first_assembly = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
+-        let first_with_private = initialize_construction_ctf_first_matrix_with_final_coefficients(&first_assembly);
+-        let first_functions = &first_with_private.methods;
+-        if let Ok(actual) = &preprocessing.result {
+-            selected_errors = actual.errors_found;
+-        }
++        let initial = initialize_construction_ctf_initial(construction,&constructions[..index],
++            &used,&preprocessing,context,time_step_zone);
++        let first_assembly = initialize_construction_ctf_first_assembly(&initial,&preprocessing);
++        // Serialize the real owners before consuming the original Box. No clone,
++        // replay, reconstructed first wrapper, or Native operands enter the driver.
++        let preprocessing_copy = fields::result(&preprocessing.result);
++        let initial_copy = fields::initial(&initial,Some(&preprocessing));
++        let first_assembly_copy = fields::first_assembly(&first_assembly,Some(&initial),Some(&preprocessing));
++        let retry = initialize_construction_ctf_retry(first_assembly,selected_flags,names);
++        selected_flags = retry.flags_on_return;
++        prior_stop = retry.selected_chain_stop;
+         observed.push(json!({"id":operation["id"],"declared_native_operation_kind":operation["kind"],
+             "logical_construction_id":declaration["id"],"actual_Rust_API":"preprocess_ctf_layers",
+-            "actual_source_invoked":true,"selected_ErrorsFound_before":before,
+-            "selected_ErrorsFound_after":selected_errors,"actual_layer_material_ids":layers.iter().map(|v|v.material_id.0).collect::<Vec<_>>(),
+-            "original_layer_membership":declaration["layer_material_ids"],"result":fields::result(&preprocessing.result),
+-            "CTF03_initial":fields::initial(&initial,Some(&preprocessing)),
+-            "CTF04_first_assembly":fields::first_assembly(&first_assembly,Some(&initial),Some(&preprocessing)),
++            "actual_source_invoked":true,"selected_flags_before":fields::flags(before),
++            "selected_flags_after_preprocessing":fields::flags(after_preprocessing),
++            "selected_flags_after":fields::flags(selected_flags),
++            "selected_ErrorsFound_before":before.errors_found,"selected_ErrorsFound_after":selected_flags.errors_found,
++            "actual_layer_material_ids":layers.iter().map(|v|v.material_id.0).collect::<Vec<_>>(),
++            "original_layer_membership":declaration["layer_material_ids"],"result":preprocessing_copy,
++            "CTF03_initial":initial_copy,"CTF04_first_assembly":first_assembly_copy,
+             "actual_Rust_CTF04_API":"initialize_construction_ctf_first_assembly","actual_Rust_CTF04_API_invoked":true,
+-            "preprocessing_or_initial_reexecuted_for_assembly_owner":false,
+-            "CTF06_first_exponential":fields::first_exponential(&first_functions.exponential,Some(&first_assembly)),
+-            "CTF05_first_inverse":fields::first_inverse(&first_functions.inverse,Some(&first_assembly)),
+-            "CTF07_first_gammas":fields::first_gammas(&first_with_private.gammas,Some(&first_assembly),
+-                Some(&first_functions.exponential),Some(&first_functions.inverse)),
+-            "CTF08_first_private_coefficients":fields::first_private_coefficients(&first_with_private.final_coefficients,
+-                Some(&first_assembly),Some(&first_functions.exponential),Some(&first_functions.inverse),
+-                Some(&first_with_private.gammas)),
+-            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_with_final_coefficients",
+-            "actual_Rust_combined_API_invoked":true,
++            "actual_first_assembly_owner_consumed_once":true,"preprocessing_or_initial_reexecuted_for_assembly_owner":false,
++            "CTF06_first_exponential":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_exponential",construction.id.0),
++            "CTF05_first_inverse":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_inverse",construction.id.0),
++            "CTF07_first_gammas":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_gammas",construction.id.0),
++            "CTF08_first_private_coefficients":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_final_coefficients",construction.id.0),
++            "CTF09_retry_initialization":fields::retry_initialization(&retry),
++            "actual_Rust_retry_driver_API_invoked":true,"actual_Rust_combined_API_invoked":false,
+             "predecessor_owners_reexecuted_for_method_observation":false,
+             "actual_Rust_CTF03_API":"initialize_construction_ctf_initial","actual_Rust_CTF03_API_invoked":true,
+             "actual_initial_discretization_owner_available":initial.result.is_ok(),
+@@ -255,14 +278,15 @@
+             "preprocessing_reexecuted_for_initial_owner":false,"observer_reverse_classifier_duplicated":false,
+             "Native_whole_method_outcome_or_later_flags_inferred":false}));
+     }
+-    Ok(
+-        json!({"id":model["id"],"lane":model["lane"],"declared_caller":model["caller"],
+-        "materials":rows(&model["materials"])?.iter().zip(&typed).map(|(declared,actual)|json!({
++    Ok(json!({"id":model["id"],"lane":model["lane"],"declared_caller":model["caller"],
++        "materials":material_declarations.iter().zip(&typed).map(|(declared,actual)|json!({
+             "logical_id":declared["id"],"declared_name":declared["Name"],"actual_typed_input":fields::input(actual)
+         })).collect::<Vec<_>>(),"declared_constructions":model["constructions"],"operations":observed,
+-        "final_selected_ErrorsFound":selected_errors,"DoCTFErrorReport":fields::unpaired_later_flag(),
+-        "explicit_member_input_not_Material_loader_observation":true}),
+-    )
++        "final_selected_flags":fields::flags(selected_flags),
++        "final_selected_ErrorsFound":selected_flags.errors_found,
++        "final_selected_DoCTFErrorReport":selected_flags.do_ctf_error_report,
++        "selected_chain_stop":prior_stop.as_ref().map(|stop|format!("{stop:?}")),
++        "explicit_member_input_not_Material_loader_observation":true}))
+ }
+ fn main() {
+     if let Err(error) = run() {
+@@ -325,9 +349,9 @@
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     let sources: Value = serde_json::from_slice(&sources_bytes)?;
+     require(
+-        request["schema"] == "ctf08-helper-cases.v1"
+-            && admission["schema"] == "ctf08-native-admission-contract.v1"
+-            && request["frozen_before_this_CTF08_helper_execution"] == true
++        request["schema"] == "ctf09-helper-cases.v1"
++            && admission["schema"] == "ctf09-native-admission-contract.v1"
++            && request["frozen_before_this_CTF09_helper_execution"] == true
+             && request["expected_values_supplied"] == false
+             && request["expected_exits_supplied"] == false
+             && request["scientific_execution_performed"] == false,
+@@ -354,14 +378,26 @@
+         bindings.push(request[key].clone());
+     }
+     require(
+-        request["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only"
++        request["actual_scope_amendment_execution_role"] == "real-CTF-09-check-only"
+             && admission["actual_scope_amendment_execution_role"] == request["actual_scope_amendment_execution_role"]
+-            && admission["historical_prior_07_authority"] == request["historical_prior_07_authority"]
++            && admission["historical_prior_08_authority"] == request["historical_prior_08_authority"]
+             && admission["current_cards"] == request["current_cards"],
+-        "current08 authority or separate historical prior07 authority differs",
+-    )?;
+-    bindings.push(request["current_cards"]["CTF-08"].clone());
+-    let prior = &request["historical_prior_07_authority"];
++        "current09 authority or separate historical prior08 authority differs",
++    )?;
++    bindings.push(request["current_cards"]["CTF-09"].clone());
++    let prior08 = &request["historical_prior_08_authority"];
++    require(prior08["prior08_numerical_PASS_inferred"] == false,
++        "historical prior08 authority must infer no numerical PASS")?;
++    for key in ["prior_08_freeze", "prior_08_freeze_execution", "prior_08_writer_manifest",
++        "prior_08_source_contract", "prior_08_scope_amendment", "prior_08_scope_check_execution"] {
++        bindings.push(prior08[key].clone());
++    }
++    let (_, source08_bytes) = bound(&root, &prior08["prior_08_source_contract"])?;
++    let source08: Value = serde_json::from_slice(&source08_bytes)?;
++    require(prior08["prior_08_selected_primary_ranges"] == source08["ctf08_selected_primary_ranges"]
++        && prior08["historical_prior_07_authority"] == source08["source_authorities"]["historical_prior_07_authority"],
++        "historical prior08 ranges or nested prior07 literal ancestry differs")?;
++    let prior = &prior08["historical_prior_07_authority"];
+     require(prior["prior07_numerical_PASS_inferred"] == false,
+         "historical prior07 authority must infer no numerical PASS")?;
+     for key in ["prior_07_freeze", "prior_07_freeze_execution", "prior_07_writer_manifest",
+@@ -373,11 +409,13 @@
+     require(prior["prior_07_selected_primary_ranges"] == historical_source["ctf07_selected_primary_ranges"]
+         && prior["historical_prior_05_06_authority"] == historical_source["source_authorities"]["prior_05_06_authority"],
+         "historical prior07 ranges or nested prior05/06 literal ancestry differs")?;
+-    for binding in rows(&prior["historical_before_document_archives"])? {
+-        bindings.push(binding.clone());
+-    }
+-    for binding in rows(&prior["available_prior_frozen_document_archives"])? {
+-        bindings.push(binding["archive"].clone());
++    for authority in [prior08, prior] {
++        for binding in rows(&authority["historical_before_document_archives"])? {
++            bindings.push(binding.clone());
++        }
++        for binding in rows(&authority["available_prior_frozen_document_archives"])? {
++            bindings.push(binding["archive"].clone());
++        }
+     }
+     let nested = &prior["historical_prior_05_06_authority"];
+     for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+@@ -393,8 +431,8 @@
+     for binding in rows(&nested["available_prior_frozen_document_archives"])? {
+         bindings.push(binding["archive"].clone());
+     }
+-    // Historical selected-range SHAs and after-doc identities are documentary;
+-    // bind their authentic source contract/available archives, never live docs.
++    // Historical selected-range SHAs and after-document identities are documentary;
++    // authenticate source contracts/available archives, never current live documents.
+     bindings.extend(rows(&request["all_45_guard_refs"])?.iter().cloned());
+     require(
+         rows(&request["all_45_guard_refs"])?.len() == 45,
+@@ -420,6 +458,11 @@
+         "frozen counts differ",
+     )?;
+     let models = cases.iter().map(model_case).collect::<Result<Vec<_>>>()?;
++    let actual_calls = |key: &str| -> Result<usize> {
++        Ok(models.iter().map(|model| rows(&model["operations"]).map(|operations|
++            operations.iter().filter(|operation| operation[key] == true).count()))
++            .collect::<Result<Vec<_>>>()?.into_iter().sum())
++    };
+     let initial_calls = models
+         .iter()
+         .map(|model| {
+@@ -445,12 +488,12 @@
+     )?;
+     println!(
+         "{}",
+-        serde_json::to_string_pretty(&json!({"schema":"ctf08-candidate-unit-observer-results.v1",
++        serde_json::to_string(&json!({"schema":"ctf09-candidate-unit-observer-results.v1",
+         "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admission_bytes)},
+         "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+         "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+         "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],
+-        "historical_prior_07_authority":request["historical_prior_07_authority"],"current_cards":request["current_cards"],
++        "historical_prior_08_authority":request["historical_prior_08_authority"],"current_cards":request["current_cards"],
+         "actual_scope_amendment_execution_role":request["actual_scope_amendment_execution_role"],
+         "runtime_source_bindings":{"path":sources_path,"sha256":digest::sha256(&sources_bytes)},"authenticated_source_inventory":sources,
+         "ctf03_initial_observation_policy":request["ctf03_initial_observation_policy"],
+@@ -459,12 +502,15 @@
+         "ctf05_inverse_observation_policy":request["ctf05_inverse_observation_policy"],
+         "ctf07_gamma_observation_policy":request["ctf07_gamma_observation_policy"],
+         "ctf08_final_coefficient_observation_policy":request["ctf08_final_coefficient_observation_policy"],
+-        "actual_Rust_combined_API_invocations":calls,
+-        "actual_Rust_CTF04_API_invocations":calls,"Rust_retry_driver_available":false,
++        "ctf09_retry_observation_policy":request["ctf09_retry_observation_policy"],
++        "ctf09_attempt_selection":request["ctf09_attempt_selection"],
++        "actual_Rust_combined_API_invocations":0,
++        "actual_Rust_retry_driver_API_invocations":actual_calls("actual_Rust_retry_driver_API_invoked")?,
++        "actual_Rust_CTF04_API_invocations":actual_calls("actual_Rust_CTF04_API_invoked")?,"Rust_retry_driver_available":true,
+         "later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,
+-        "actual_Rust_preprocess_invocations":calls,"actual_Rust_CTF03_API_invocations":initial_calls,
++        "actual_Rust_preprocess_invocations":actual_calls("actual_source_invoked")?,"actual_Rust_CTF03_API_invocations":initial_calls,
+         "model_cases":models,"all_bound_inputs_and_sources_unchanged":true,
+-        "shared_flag_scope":"selected preprocessing ErrorsFound only; no whole Native solver carry injected",
++        "shared_flag_scope":"actual selected preprocessing and caller09 flags; no Native global backend or flags injected",
+         "compiled_source_identity_independently_certified":false,"actual_Cargo_source_capture_required":true,
+         "Native_result_or_expected_values_read":false,"scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+         "production_loader_lane_certified":false,"CTF05_through_CTF10_certified":false,"gates_updated":false}))?

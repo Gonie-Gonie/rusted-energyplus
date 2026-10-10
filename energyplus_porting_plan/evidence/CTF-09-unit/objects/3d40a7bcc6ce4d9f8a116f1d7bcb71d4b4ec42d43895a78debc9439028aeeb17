@@ -1,0 +1,992 @@
+{
+  "schema": "ctf09-rust-observer-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-uninstalled-unformatted-unexecuted",
+  "own_source_rows": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/ctf09_candidate_unit_observer.rs",
+        "sha256": "3c4f4938ebb85bc6514eabec895ca2d0f7ce40d21e52108e4b2c8d8bdb9c3f36",
+        "size_bytes": 27357,
+        "line_count": 519
+      },
+      "canonical_install_path": "crates/ep_run/examples/ctf09_candidate_unit_observer.rs",
+      "accepted08_before": {
+        "path": ".runtime/porting/CTF-08/rust-observer-prep-01/ctf08_candidate_unit_observer.rs",
+        "sha256": "9280856e079996d764eab52a1d5c79c69fb7d4b37d11d1c137f4fc4f8f2a3a63",
+        "size_bytes": 22307,
+        "line_count": 473
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/before/ctf09_candidate_unit_observer.rs",
+        "sha256": "9280856e079996d764eab52a1d5c79c69fb7d4b37d11d1c137f4fc4f8f2a3a63",
+        "size_bytes": 22307,
+        "line_count": 473
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/diffs/ctf09_candidate_unit_observer.rs.from-ctf08.diff",
+        "sha256": "f7fe11bec734535c63a4e4368eb335c5d08f506acc287ef26392227c508dceee",
+        "size_bytes": 23350,
+        "line_count": 350
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/unit_fields.rs",
+        "sha256": "21176b80a39158a8523749c9f33969fb621410e6a68d8654049602c1c19ec2e5",
+        "size_bytes": 32496,
+        "line_count": 520
+      },
+      "canonical_install_path": "crates/ep_run/examples/ctf09_candidate_unit_support/fields.rs",
+      "accepted08_before": {
+        "path": ".runtime/porting/CTF-08/rust-observer-prep-01/unit_fields.rs",
+        "sha256": "7bc526258804eaec17b6bf1de88728684038de9d701a1f95f13f17fa096599e0",
+        "size_bytes": 33846,
+        "line_count": 569
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/before/unit_fields.rs",
+        "sha256": "7bc526258804eaec17b6bf1de88728684038de9d701a1f95f13f17fa096599e0",
+        "size_bytes": 33846,
+        "line_count": 569
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/diffs/unit_fields.rs.from-ctf08.diff",
+        "sha256": "9707167e642679e0afdf43550108b711efa144ab0f1408605aa8cb714ef1c3bc",
+        "size_bytes": 33557,
+        "line_count": 522
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/ctf09_candidate_production_observer.rs",
+        "sha256": "b341602b7d74031376417a8893892df1497eb2b2f0ac4b6ba0a69df00e083a8e",
+        "size_bytes": 20831,
+        "line_count": 459
+      },
+      "canonical_install_path": "crates/ep_run/examples/ctf09_candidate_production_observer.rs",
+      "accepted08_before": {
+        "path": ".runtime/porting/CTF-08/rust-observer-prep-01/ctf08_candidate_production_observer.rs",
+        "sha256": "66d0d527032bc6e79f48c2615b45f6c46a0ecba3efbabac48394a8ae72b1538e",
+        "size_bytes": 19568,
+        "line_count": 441
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/before/ctf09_candidate_production_observer.rs",
+        "sha256": "66d0d527032bc6e79f48c2615b45f6c46a0ecba3efbabac48394a8ae72b1538e",
+        "size_bytes": 19568,
+        "line_count": 441
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/diffs/ctf09_candidate_production_observer.rs.from-ctf08.diff",
+        "sha256": "1f1b73382fd15332eb507bdb084247436f745027522e6f088391af6536f52b10",
+        "size_bytes": 9352,
+        "line_count": 155
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/production_fields.rs",
+        "sha256": "427084e74450f8502787aa0862731a44653a4b6a0f8f4d65294932868af49055",
+        "size_bytes": 16255,
+        "line_count": 230
+      },
+      "canonical_install_path": "crates/ep_run/examples/ctf09_candidate_production_support/fields.rs",
+      "accepted08_before": {
+        "path": ".runtime/porting/CTF-08/rust-observer-prep-01/production_fields.rs",
+        "sha256": "9896c3d9f439bcaaae2cee467ff41650eaa40758dce4bd7a16ea51385a59ccfa",
+        "size_bytes": 18435,
+        "line_count": 269
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/before/production_fields.rs",
+        "sha256": "9896c3d9f439bcaaae2cee467ff41650eaa40758dce4bd7a16ea51385a59ccfa",
+        "size_bytes": 18435,
+        "line_count": 269
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/diffs/production_fields.rs.from-ctf08.diff",
+        "sha256": "128966c9c9c47f5c425a54054b59b84cfe858cce63842e91296144da8a3f8949",
+        "size_bytes": 15393,
+        "line_count": 215
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/production_unit_fields.rs",
+        "sha256": "21176b80a39158a8523749c9f33969fb621410e6a68d8654049602c1c19ec2e5",
+        "size_bytes": 32496,
+        "line_count": 520
+      },
+      "canonical_install_path": "crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs",
+      "accepted08_before": {
+        "path": ".runtime/porting/CTF-08/rust-observer-prep-01/production_unit_fields.rs",
+        "sha256": "7bc526258804eaec17b6bf1de88728684038de9d701a1f95f13f17fa096599e0",
+        "size_bytes": 33846,
+        "line_count": 569
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/before/production_unit_fields.rs",
+        "sha256": "7bc526258804eaec17b6bf1de88728684038de9d701a1f95f13f17fa096599e0",
+        "size_bytes": 33846,
+        "line_count": 569
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/rust-observer-prep-01/diffs/production_unit_fields.rs.from-ctf08.diff",
+        "sha256": "b0fcfc3487eaa98c061555bd89b5a643466f81ffea6003f3c4c94b50118ed0cc",
+        "size_bytes": 33579,
+        "line_count": 522
+      }
+    }
+  ],
+  "observer_source_counts": {
+    "unit": 2,
+    "production": 3
+  },
+  "API_paths": {
+    "unit": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/ids.rs",
+      "crates/ep_runtime/Cargo.toml",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs"
+    ],
+    "production": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_raw_model/src/lib.rs",
+      "crates/ep_raw_model/src/idf_order.rs",
+      "crates/ep_compiler/src/lib.rs",
+      "crates/ep_compiler/src/compiler.rs",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/model.rs",
+      "crates/ep_model/src/objects/materials.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_model/src/objects/building.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_compiler/src/compiler/surface_space.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs"
+    ]
+  },
+  "API_source_counts": {
+    "unit": 28,
+    "production": 41
+  },
+  "API_source_identities": [
+    {
+      "canonical_path": "crates/ep_run/Cargo.toml",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524,
+        "line_count": 21
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/lib.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284,
+        "line_count": 15
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/ids.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_model/src/ids.rs",
+        "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+        "size_bytes": 2029,
+        "line_count": 61
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/Cargo.toml",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327,
+        "line_count": 17
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/lib.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868,
+        "line_count": 41
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/mod.rs",
+        "sha256": "752c4e351601c358747b3d0d4f7b5178e0b5772b9d7b31027b7f4b2c8c95e782",
+        "size_bytes": 1721,
+        "line_count": 69
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/proposed/surface_manager.rs",
+        "sha256": "005ee065a1a2784b2d66d17bd30d9eddc7cf37de5cc5009f886a2b0c415e8b71",
+        "size_bytes": 6143,
+        "line_count": 177
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+        "size_bytes": 11747,
+        "line_count": 316
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+        "sha256": "9fb5548009e539ba6dfbdc42c592aff3359cdc9901c34ca2dd6c137590fa0bb5",
+        "size_bytes": 7433,
+        "line_count": 201
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+        "sha256": "0d5b57ec2c0b60111cdc29d94288d38d6abce78a95b4f9bbb155624babe558e5",
+        "size_bytes": 5605,
+        "line_count": 136
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/construction.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_model/src/objects/construction.rs",
+        "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+        "size_bytes": 18134,
+        "line_count": 445
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172,
+        "line_count": 75
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs",
+        "sha256": "b3d569d19ba73f584c9241f3443f99e8517c01adb165b642da96f01cf7bee3c0",
+        "size_bytes": 17747,
+        "line_count": 454
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+        "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+        "size_bytes": 5167,
+        "line_count": 126
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+        "sha256": "32765ebea79d230319352d39de6fabf099a7c15a3c294456810c58bc1e21cc73",
+        "size_bytes": 9825,
+        "line_count": 264
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+        "sha256": "a6f1d30c0c8228d943a660f33c6dc853f36001bf0f8e42d0a01d4d918ad01b5b",
+        "size_bytes": 4259,
+        "line_count": 102
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+        "sha256": "3676c27ee3a0c0f9e2540e1df028c6df4305e14d80b49d65e37a7f6be5d123a8",
+        "size_bytes": 3628,
+        "line_count": 104
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+        "sha256": "e4e50e38d21ea1b7fa1537a440dbfcdf53c5b876050987b5f247cc6b160f63a4",
+        "size_bytes": 4612,
+        "line_count": 110
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+        "sha256": "218c2f5ee11581437f48d56a7a1a90e4e7af832d42854e09c8753a8198f859ff",
+        "size_bytes": 4152,
+        "line_count": 95
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+        "sha256": "ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3",
+        "size_bytes": 6499,
+        "line_count": 156
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+        "sha256": "f90e3b4ab611c3ab1acec463541fcdb0fac31a3204265f09f7b07a9b558c076d",
+        "size_bytes": 7659,
+        "line_count": 174
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+        "sha256": "08541dd2d6a3e75f5418643dca857155edf33cb083bceb044ff8f19de9842249",
+        "size_bytes": 1812,
+        "line_count": 38
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+      "role": "immutable actual formatted08 source; runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-08/applied-final-source-01/crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+        "sha256": "a7e5afcd2daf74dc599a8eb340ec3df579756a09e6df991e41691530d2d5fb55",
+        "size_bytes": 10350,
+        "line_count": 257
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "role": "immutable actual formatted08 source; runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-08/applied-final-source-01/crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+        "sha256": "5f701d1e767ce8c10473b1029b9f34566d1e1a2df8617f4d861f667cdf66f30f",
+        "size_bytes": 9143,
+        "line_count": 203
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+      "role": "immutable actual formatted08 source; runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-08/applied-final-source-01/crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+        "sha256": "c404116f307951477eac749781c86c5ff2de794d02834edda7c69961e6610f1d",
+        "size_bytes": 2323,
+        "line_count": 48
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability.rs",
+        "sha256": "64c3706a2b74369bf9a98bafa71bb2d9cea3865c17946b202cc1e2981051ec78",
+        "size_bytes": 13474,
+        "line_count": 277
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver.rs",
+        "sha256": "ad24532de5896e033cd43cc44784c078fdd933d6da3f8fda5031f71e2fc100dc",
+        "size_bytes": 17927,
+        "line_count": 385
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/new/ctf_retry_initialization.rs",
+        "sha256": "97f4e420c52d62bd6bdc5ba66924f5726b690028b257117ff9656996ddaddbfc",
+        "size_bytes": 6662,
+        "line_count": 133
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_raw_model/src/lib.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_raw_model/src/idf_order.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+        "size_bytes": 28468,
+        "line_count": 789
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/lib.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_compiler/src/lib.rs",
+        "sha256": "1931ed21f1fae2fe5d7e90bb954f1f91812fec1d1eeb7daf102a6ba0007424fe",
+        "size_bytes": 165,
+        "line_count": 7
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820,
+        "line_count": 19738
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/model.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_model/src/model.rs",
+        "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "size_bytes": 92680,
+        "line_count": 2322
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/materials.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_model/src/objects/materials.rs",
+        "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+        "size_bytes": 54627,
+        "line_count": 1205
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/initialization.rs",
+        "sha256": "cf11441c2520af8b375e1d0085814ba50f4d4a1b442e56f6ab4ecbc64242a915",
+        "size_bytes": 11490,
+        "line_count": 232
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+        "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+        "size_bytes": 4401,
+        "line_count": 118
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/initialization/state_shell.rs",
+        "sha256": "b447255d2cdeade1c77babd71a24cec5fdd651717a03eab840e2f33c5a9ad191",
+        "size_bytes": 2639,
+        "line_count": 48
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/surface_manager/construction_cache.rs",
+        "sha256": "37e90f4e0cfd0ecfe34543c6ae9b5552e0537624b6b815dafc0c468d89ba7873",
+        "size_bytes": 22276,
+        "line_count": 550
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "role": "accepted prospective09 source; actual formatted runtime identity required",
+      "source": {
+        "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/state.rs",
+        "sha256": "25362edca93f558ea9edaf55d6b499084a9a4bd9d6e0cc8e53e990900a1e201c",
+        "size_bytes": 48108,
+        "line_count": 1039
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+        "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+        "size_bytes": 29922,
+        "line_count": 814
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/building.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_model/src/objects/building.rs",
+        "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+        "size_bytes": 11621,
+        "line_count": 373
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+        "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+        "size_bytes": 4902,
+        "line_count": 122
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "role": "source identity observed during preparation; runtime identity required",
+      "source": {
+        "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+        "sha256": "8e7dccc67a68ccb71b9c284f78c83a681a81940998672cf945c9c0e8cfb7a379",
+        "size_bytes": 9708,
+        "line_count": 254
+      },
+      "actual_future_formatted_Cargo_source_capture_required": true
+    }
+  ],
+  "accepted_dependency_manifests": [
+    {
+      "path": ".runtime/porting/CTF-08/rust-observer-prep-01/manifest.json",
+      "sha256": "be4d116741d7b524d7ec093ceaac3954599c8222dec0cac621a437d6a858bc09",
+      "size_bytes": 51488,
+      "line_count": 1104
+    },
+    {
+      "path": ".runtime/porting/CTF-08/applied-final-source-02/manifest.json",
+      "sha256": "0a68da81100d51953baae319237195f6218ae234365429523eaf2aa9fceedb95",
+      "size_bytes": 25886,
+      "line_count": 538
+    },
+    {
+      "path": ".runtime/porting/CTF-09/caller-stability-prep-01/manifest.json",
+      "sha256": "742e9810c9d815ee3142e1f45c1ef6abc93c7cc396e199e3e606be75c3ce52d2",
+      "size_bytes": 12291,
+      "line_count": 318
+    },
+    {
+      "path": ".runtime/porting/CTF-09/assembly-reassignment-prep-02/manifest.json",
+      "sha256": "d8abb7a215434455c8b6c80bcb1854cda58883fb0e8e5ff152477b2136b3f1ad",
+      "size_bytes": 12124,
+      "line_count": 310
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retry-driver-prep-02/manifest.json",
+      "sha256": "cda605d3760c77146593f09321dc5822218ff0fafa886d65ef3867417fc2bcfa",
+      "size_bytes": 22406,
+      "line_count": 533
+    },
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/manifest.json",
+      "sha256": "e371060479853b4a9945a753e9d3baf3a7ae505c5f40432d79f2ece2a9ad77d2",
+      "size_bytes": 29796,
+      "line_count": 689
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+      "sha256": "b4e15e0986d65b451ba803cb1b6f9a9bc1c8fe8a6caea90ac3c74e581ee4a315",
+      "size_bytes": 26151,
+      "line_count": 658
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+      "sha256": "4934fe49f601a87e1d41016a03b8e10fba6117a79b65a376b949e68e033dd0bf",
+      "size_bytes": 13336,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
+      "sha256": "4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd",
+      "size_bytes": 37991,
+      "line_count": 972
+    }
+  ],
+  "actual08_formatted_source_authority": {
+    "path": ".runtime/porting/CTF-08/applied-final-source-02/manifest.json",
+    "sha256": "0a68da81100d51953baae319237195f6218ae234365429523eaf2aa9fceedb95",
+    "size_bytes": 25886,
+    "line_count": 538
+  },
+  "prospective09_parent_rebase_to_actual08_required_before_application": false,
+  "producer_interface_sources": [
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/input-policy-proposal.json",
+      "sha256": "df7c1ac21c6aed6f5656ab2cb8e6975f308fcb4c63ceaf09ebc337bb04e618ec",
+      "size_bytes": 32044,
+      "line_count": 861
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef",
+      "size_bytes": 39665,
+      "line_count": 1309
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_observation_fields.hh",
+      "sha256": "63cfebeb5bcf806fbd745edfd761af8911000b243b5acfe0f15a50e520717173",
+      "size_bytes": 82493,
+      "line_count": 1016
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/freeze_packet.py",
+      "sha256": "7a029cad7a65d0ea303af03155658f3541e979abb2731c659f3f45389baad54c",
+      "size_bytes": 53730,
+      "line_count": 626
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/new/ctf_retry_initialization.rs",
+      "start_line": 12,
+      "end_line": 129,
+      "sha256": "f00b6ff0f87a5c88568d70c163312122a591f6b229cc9ab6739bedf7fd6add4d",
+      "size_bytes": 6071,
+      "purpose": "actual wrapper/stop/result routing and readonly original names"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/surface_manager/construction_cache.rs",
+      "start_line": 117,
+      "end_line": 187,
+      "sha256": "8cc41b1333efdd76a2bb029d53ba9e340a712d0353efe20f195e0639dcb9bd39",
+      "size_bytes": 3604,
+      "purpose": "ordinary selected shared flags/genuine first move/stop ledger"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/initialization/state_shell.rs",
+      "start_line": 14,
+      "end_line": 47,
+      "sha256": "a21bf7cd095b44a7fc6df236f8a156e47d602cdd9c7159384971cf07f9107f2a",
+      "size_bytes": 2094,
+      "purpose": "actual state vector custody handoff"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver.rs",
+      "start_line": 85,
+      "end_line": 164,
+      "sha256": "d4f07047bb8fdb01ed3e1fe16cfa05d9d6a37b701cfecd23c06e65ac26580433",
+      "size_bytes": 4099,
+      "purpose": "public actual visit/reassignment/terminal/checkpoint owners"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver.rs",
+      "start_line": 196,
+      "end_line": 385,
+      "sha256": "924dd893768ce30cdc6a69502da2cc59a695e1fadc8fd5087d49d5bde6dc5508",
+      "size_bytes": 8874,
+      "purpose": "actual method calls and selected retry order"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs",
+      "start_line": 95,
+      "end_line": 136,
+      "sha256": "b1509ceabda23aef527dca281017d96743812d565d3f56e7f0c3afd3aea23fc8",
+      "size_bytes": 1825,
+      "purpose": "genuine producer checkpoint owner"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability.rs",
+      "start_line": 87,
+      "end_line": 125,
+      "sha256": "d2083485e972bee1366ccb6ef7ffe49211f1a0eb6ecf8be4f8aaf11defa254c9",
+      "size_bytes": 1930,
+      "purpose": "actual caller decision/sums/optional expression bookkeeping owners"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/freeze_packet.py",
+      "start_line": 229,
+      "end_line": 331,
+      "sha256": "93c640b0807e096582d54439578802f9378affd43af23e34a21c63550d262026",
+      "size_bytes": 9075,
+      "purpose": "separate historical08 typed refs/ranges/archive-only ancestry"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/freeze_packet.py",
+      "start_line": 549,
+      "end_line": 602,
+      "sha256": "0b59ede82da461daef5a88f5036ce6343d3c4c73591648dc57add66a044a9dc0",
+      "size_bytes": 5352,
+      "purpose": "current09 source and inherited separate profile contract"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 728,
+      "sha256": "2ce6630a39c803e3223017da320d00e44d56d6c02f74f3ee6177e6f01c277913",
+      "size_bytes": 5348,
+      "purpose": "once allocation/identity/preband and repeated band source boundary"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 875,
+      "end_line": 981,
+      "sha256": "5061e7af483ca7dd7f3b8c0637421ee042bb036fdb82a05d6d54e1653dc26120",
+      "size_bytes": 7452,
+      "purpose": "actual method/caller sum/fatal/severe/retry ordering"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 6153,
+      "end_line": 6165,
+      "sha256": "db131b40f59d9054b7cdc86fc6b15c9b027734ba834601ec97a9d6520f205d8e",
+      "size_bytes": 633,
+      "purpose": "genuine construction order and shared flags"
+    }
+  ],
+  "own_preparation_source": {
+    "path": ".runtime/porting/CTF-09/rust-observer-prep-01/prepare_sources.py",
+    "sha256": "fca679d525edb02922e79aad82b7ba9e74bb999fa7dcc377b27c5d13c9275a6e",
+    "size_bytes": 22752,
+    "line_count": 314
+  },
+  "own_source_text_snippets": [
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/retry_fields.rs.txt",
+      "sha256": "7ddac4f833621739883ce0b169171a554b3b8cdf67e786a2de69eee2f25c3794",
+      "size_bytes": 15832,
+      "line_count": 213
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/unit_calls.rs.txt",
+      "sha256": "0b75c09238abf22fb272ece4475ca7f22ee2df9c845105ce04674bc82b733e9b",
+      "size_bytes": 8884,
+      "line_count": 113
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/authority_bindings.rs.txt",
+      "sha256": "b7b7fb7c3588c3f10446c84900caeca39455e93e464dac998bf68836342498e4",
+      "size_bytes": 3507,
+      "line_count": 56
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/production_retry_fields.rs.txt",
+      "sha256": "8350248d97a97ff9be679f4ab7737649ff56a4a425b4e5612e47514230bfaca0",
+      "size_bytes": 5275,
+      "line_count": 71
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-09/rust-observer-prep-01/README.md",
+    "sha256": "36d9149ab1a99bb68c8766ad6a4a65c3ee442dcb9d2da631a9e0962cfccf8bd6",
+    "size_bytes": 6323,
+    "line_count": 88
+  },
+  "runtime_interfaces": {
+    "unit_argv": [
+      "request_path",
+      "request_sha256",
+      "admission_path",
+      "admission_sha256",
+      "runtime_sources_path"
+    ],
+    "unit_sources_schema": "ctf09-candidate-unit-runtime-source-bindings.v1",
+    "unit_result_schema": "ctf09-candidate-unit-observer-results.v1",
+    "production_argv": [
+      "wrapper_request_path",
+      "wrapper_request_sha256"
+    ],
+    "production_request_schema": "ctf09-candidate-production-observer-request.v1",
+    "production_result_schema": "ctf09-candidate-production-observer-results.v1"
+  },
+  "new_observation": {
+    "unit_operation_field": "CTF09_retry_initialization",
+    "production_field": "selected_CTF09_owners",
+    "production_owner_field": "construction_retry_initialization",
+    "initialization_protocol": "ctf09-actual-rust-retry-initialization.v1",
+    "driver_protocol": "ctf09-actual-rust-retry-owner.v1",
+    "actual_all_visits_serialized_without_cap": true,
+    "genuine_initial_checkpoint_mandatory_for_first_selected_preband_pairing": true,
+    "old_first_wrapper_05_06_07_08_DTOs": "explicit uninvoked context; no old first-wrapper PASS",
+    "old04_owner": "actual constructor called then original owner consumed once",
+    "Native_callback_events_return_markers_OS_outcomes_or_answers_inferred": false,
+    "relative_expression_bookkeeping_and_diagnostic_call_intents_are_separate_unpaired_owners": true,
+    "whole_Native_return_or_SI19_store_safety_certified": false
+  },
+  "scope_authority": {
+    "current_role": "real-CTF-09-check-only",
+    "historical_key": "historical_prior_08_authority",
+    "nested_literal_keys": [
+      "historical_prior_07_authority",
+      "historical_prior_05_06_authority"
+    ],
+    "prior_selected_ranges_are_typed_byte_descriptors_not_full_file_refs": true,
+    "historical_after_live_documents_replayed": false,
+    "future_success_refs_or_profiles_authored": false
+  },
+  "unchanged_input_counts": {
+    "unit_models": 39,
+    "unit_declared_operations": 42,
+    "production_models": 15,
+    "production_loader_phase_records": 195,
+    "fixed_guard_refs": 45
+  },
+  "integrity": {
+    "before_five_exact_accepted08": true,
+    "five_diffs_exact": true,
+    "shared_serializers_byte_identical": true,
+    "source_before_after_binding_protocol_retained": true,
+    "compact_new09_result_JSON_complete_no_caps": true,
+    "actual_formatted_runtime_source_hashes_not_guessed": true,
+    "missing_or_nonfinite_required_owner_never_zeroed_or_PASS": true
+  },
+  "preparation_boundary": {
+    "own_stdlib_source_emitter_and_AST_only": true,
+    "project_imports_or_targets": false,
+    "Cargo_build_test_formatter_engine": false,
+    "scientific_weather_binary_payload_reads": false,
+    "canonical_or_Git_mutation": false,
+    "new_QA_or_execution_framework": false,
+    "scientific_PASS_or_gate_mutation": false
+  },
+  "authorship_limits": "Raw authored caller/driver and preceding pure/native transport; source transport review is not independent formula/output certification."
+}

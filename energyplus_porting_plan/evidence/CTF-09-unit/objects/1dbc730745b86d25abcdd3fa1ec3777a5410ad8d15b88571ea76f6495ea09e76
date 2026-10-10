@@ -1,0 +1,19 @@
+--- accepted-CTF09-02/README.md
++++ proposed-CTF09-03/README.md
+@@ -89,3 +89,16 @@
+ Header authored09 Native/assembly/ingress, and Base authored the DataQA source.
+ This is a transport/owner comparison proposal, not independent certification of
+ the authors' formulas, full CTF09 completion or a downstream surface handoff.
++
++Fresh03 repairs only all-visit validator owner wiring. The shared validate_all
++now forwards each actual operation["after"] snapshot to matrix, method, Gamma,
++coefficient and retry validators, matching accepted OriginalDataQA02 unit and
++production call sites. The two mains change only their authenticated RETRY_PAIR_SHA.
++The other seven bodies, final QA02 inventory, scientific pairing, profiles,
++shape/count/absence assertions, and output/source chronology rules are unchanged.
++
++Immutable comparer02 and the genuine failed unit comparison receipt remain
++preserved. This source successor makes no claim about the failed invocation's
++scientific results or any future comparison; Root must review and run fresh
++comparisons against the retained actual operands. Historical02 metadata fields
++and cumulative accepted08 before references retain their original authority.

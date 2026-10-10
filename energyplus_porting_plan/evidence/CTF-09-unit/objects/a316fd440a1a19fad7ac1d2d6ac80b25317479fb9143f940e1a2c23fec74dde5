@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/mod.rs
++++ crates/ep_runtime/src/heat_balance/mod.rs
+@@ -19,6 +19,7 @@
+ pub mod ctf_first_inverse_owner;
+ pub mod ctf_first_matrix_owner;
+ pub mod ctf_initial_owner;
++pub mod ctf_retry_driver;
+ pub(crate) mod id_slot_index;
+ pub mod initialization;
+ pub mod inside_convection;

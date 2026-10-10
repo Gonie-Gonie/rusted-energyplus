@@ -1,0 +1,314 @@
+"""Ignored source authoring only; no project imports, target calls or outputs."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path.cwd()
+DEST = ROOT / '.runtime/porting/CTF-09/rust-observer-prep-01'
+OLD = ROOT / '.runtime/porting/CTF-08/rust-observer-prep-01'
+
+def write(name, value):
+    path = DEST / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(value.encode('utf-8'))
+    return path
+
+def ref(path):
+    raw = path.read_bytes()
+    return {'path':path.relative_to(ROOT).as_posix(), 'sha256':hashlib.sha256(raw).hexdigest(),
+            'size_bytes':len(raw), 'line_count':len(raw.splitlines())}
+
+def replace_once(source, before, after):
+    assert source.count(before) == 1, before[:100]
+    return source.replace(before, after, 1)
+
+def old_function(source, name):
+    start = source.index('pub(super) fn ' + name + '(')
+    end = source.index('\npub(super) fn ', start + 1) if '\npub(super) fn ' in source[start+1:] else len(source)
+    return source[start:end]
+
+def fields_source():
+    old = (OLD / 'unit_fields.rs').read_text(encoding='utf-8')
+    prefix = old[old.index('pub(super) fn scalar('):old.index('fn matrix_values(')]
+    prefix = replace_once(prefix, old_function(prefix, 'unpaired_later_flag'), '')
+    copies = old[old.index('fn matrix_values('):old.index('fn original_assembly(')]
+    imports = '''//! Copies actual selected retry owners; no source arithmetic or Native event reconstruction.
+use ep_runtime::heat_balance::ctf_first_assembly_owner::{
+    ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable,
+};
+use ep_runtime::heat_balance::ctf_initial_owner::{
+    ConstructionCtfInitialDiscretization, CtfInitialUnavailable,
+};
+use ep_runtime::heat_balance::ctf_retry_driver::{
+    ConstructionCtfRetryDriver, CtfRetryAssemblySnapshot, CtfRetryAttempt,
+};
+use ep_runtime::heat_balance::ctf_retry_initialization::ConstructionCtfRetryInitialization;
+use ep_runtime::heat_balance::surface_manager::ctf_caller_stability::{
+    CtfCallerSharedFlags, CtfCallerStabilityDecision, CtfCallerStabilityScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_exponential_matrix::{
+    CtfExponentialObservation, CtfExponentialScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_final_coefficients::{
+    CtfFinalCoefficientObservation, CtfFinalCoefficientScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_gamma_matrix::{
+    CtfGammaObservation, CtfGammaScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_inverse_matrix::{
+    CtfInverseMatrix, CtfInverseScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+    ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput,
+    CtfLayerPreprocessing, CtfLayerScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::{
+    CtfAssemblyContext, CtfAssemblyObservation,
+};
+use serde_json::{Value, json};
+
+'''
+    tail = (DEST / 'retry_fields.rs.txt').read_text(encoding='utf-8')
+    paths = old[old.index('pub(super) const OBSERVER_PATHS:'):]
+    paths = paths.replace('ctf08_candidate_', 'ctf09_candidate_')
+    paths = paths.rstrip().removesuffix('];') + '''    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+];
+'''
+    return imports + prefix + copies + tail + '\n' + paths
+
+def unit_source():
+    source = (OLD / 'ctf08_candidate_unit_observer.rs').read_text(encoding='utf-8')
+    source = source.replace('ctf08_candidate_', 'ctf09_candidate_')
+    source = source.replace('ctf08-candidate-unit-', 'ctf09-candidate-unit-')
+    source = replace_once(source,
+        'use ep_runtime::heat_balance::ctf_first_final_coefficients_ingress::initialize_construction_ctf_first_matrix_with_final_coefficients;',
+        '''use ep_runtime::heat_balance::ctf_retry_initialization::{
+    initialize_construction_ctf_retry, skip_construction_ctf_retry,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_caller_stability::{
+    CtfCallerDiagnosticNames, CtfCallerSharedFlags,
+};''')
+    source = replace_once(source,
+        '    for (index, material) in rows(&model["materials"])?.iter().enumerate() {',
+        '    let material_declarations = rows(&model["materials"])?;\n    for (index, material) in material_declarations.iter().enumerate() {')
+    start = source.index('    let mut selected_errors =')
+    end = source.index('fn main() {', start)
+    source = source[:start] + (DEST / 'unit_calls.rs.txt').read_text(encoding='utf-8') + source[end:]
+    for old,new in [('ctf08-helper-cases.v1','ctf09-helper-cases.v1'),
+                    ('ctf08-native-admission-contract.v1','ctf09-native-admission-contract.v1'),
+                    ('frozen_before_this_CTF08_helper_execution','frozen_before_this_CTF09_helper_execution')]:
+        source = replace_once(source,old,new)
+    start = source.index('    require(\n        request["actual_scope_amendment_execution_role"]')
+    end = source.index('    bindings.extend(rows(&request["all_45_guard_refs"])',start)
+    source = source[:start] + (DEST / 'authority_bindings.rs.txt').read_text(encoding='utf-8') + source[end:]
+    source = replace_once(source,
+        '"historical_prior_07_authority":request["historical_prior_07_authority"],"current_cards":request["current_cards"],',
+        '"historical_prior_08_authority":request["historical_prior_08_authority"],"current_cards":request["current_cards"],')
+    source = replace_once(source,
+        '"ctf08_final_coefficient_observation_policy":request["ctf08_final_coefficient_observation_policy"],',
+        '''"ctf08_final_coefficient_observation_policy":request["ctf08_final_coefficient_observation_policy"],
+        "ctf09_retry_observation_policy":request["ctf09_retry_observation_policy"],
+        "ctf09_attempt_selection":request["ctf09_attempt_selection"],''')
+    source = replace_once(source,'    let initial_calls = models', '    let actual_calls = |key: &str| -> Result<usize> {\n        Ok(models.iter().map(|model| rows(&model["operations"]).map(|operations|\n            operations.iter().filter(|operation| operation[key] == true).count()))\n            .collect::<Result<Vec<_>>>()?.into_iter().sum())\n    };\n    let initial_calls = models')
+    source = replace_once(source,
+        '''"actual_Rust_combined_API_invocations":calls,
+        "actual_Rust_CTF04_API_invocations":calls,"Rust_retry_driver_available":false,''',
+        '''"actual_Rust_combined_API_invocations":0,
+        "actual_Rust_retry_driver_API_invocations":actual_calls("actual_Rust_retry_driver_API_invoked")?,
+        "actual_Rust_CTF04_API_invocations":actual_calls("actual_Rust_CTF04_API_invoked")?,"Rust_retry_driver_available":true,''')
+    source = replace_once(source,'"actual_Rust_preprocess_invocations":calls,','"actual_Rust_preprocess_invocations":actual_calls("actual_source_invoked")?,')
+    source = replace_once(source,
+        '"shared_flag_scope":"selected preprocessing ErrorsFound only; no whole Native solver carry injected",',
+        '"shared_flag_scope":"actual selected preprocessing and caller09 flags; no Native global backend or flags injected",')
+    source = replace_once(source,'serde_json::to_string_pretty(&json!(', 'serde_json::to_string(&json!(')
+    return source
+
+def production_fields_source():
+    source = (OLD / 'production_fields.rs').read_text(encoding='utf-8')
+    source = source.replace('unit_fields::unpaired_later_flag()',
+        'missing("Native whole-method flag is separate from the actual selected Rust caller flag")')
+    start = source.index('pub(super) fn ctf04_unavailable()')
+    end = source.index('pub(super) fn typed(', start)
+    source = source[:start] + (DEST / 'production_retry_fields.rs.txt').read_text(encoding='utf-8') + '\n' + source[end:]
+    source = source.replace('ctf08_candidate_', 'ctf09_candidate_')
+    start = source.index('pub(super) const API_PATHS:')
+    end = source.index('pub(super) const OBSERVER_PATHS:', start)
+    source = source[:start] + source[start:end].rstrip().removesuffix('];') + '''    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+];
+''' + source[end:]
+    return source
+
+def production_source():
+    source = (OLD / 'ctf08_candidate_production_observer.rs').read_text(encoding='utf-8')
+    source = source.replace('ctf08_candidate_', 'ctf09_candidate_')
+    source = source.replace('ctf08-candidate-production-', 'ctf09-candidate-production-')
+    for old,new in [('ctf08-production-helper-cases.v1','ctf09-production-helper-cases.v1'),
+                    ('ctf08-production-native-admission-contract.v1','ctf09-production-native-admission-contract.v1'),
+                    ('frozen_before_this_CTF08_helper_execution','frozen_before_this_CTF09_helper_execution')]:
+        source = replace_once(source,old,new)
+    source = source.replace('actual frozen CTF08 production packet differs','actual frozen CTF09 production packet differs')
+    start = source.index('    require(\n        native["actual_scope_amendment_execution_role"]')
+    end = source.index('    let native_cases = rows(&native["model_cases"])?;', start)
+    authority = (DEST / 'authority_bindings.rs.txt').read_text(encoding='utf-8').replace('request[','native[')
+    source = source[:start] + authority + source[end:]
+    source = replace_once(source,
+        '"historical_prior_07_authority":native["historical_prior_07_authority"],"current_cards":native["current_cards"],',
+        '"historical_prior_08_authority":native["historical_prior_08_authority"],"current_cards":native["current_cards"],')
+    source = replace_once(source,
+        '"ctf08_final_coefficient_observation_policy":native["ctf08_final_coefficient_observation_policy"],',
+        '''"ctf08_final_coefficient_observation_policy":native["ctf08_final_coefficient_observation_policy"],
+        "ctf09_retry_observation_policy":native["ctf09_retry_observation_policy"],
+        "ctf09_attempt_selection":native["ctf09_attempt_selection"],''')
+    source = source.replace('"Rust_retry_driver_available":false','"Rust_retry_driver_available":true')
+    source = replace_once(source,'serde_json::to_string_pretty(', 'serde_json::to_string(')
+    source = replace_once(source,'"selected_CTF08_owners":fields::ctf08_unavailable(),',
+        '"selected_CTF08_owners":fields::ctf08_unavailable(),\n        "selected_CTF09_owners":fields::ctf09_unavailable(),')
+    source = replace_once(source,'            out["selected_CTF08_owners"] = fields::ctf08_selected(&state);',
+        '            out["selected_CTF08_owners"] = fields::ctf08_selected(&state);\n            out["selected_CTF09_owners"] = fields::ctf09_selected(&state);')
+    return source
+
+def finalize():
+    old_manifest = json.loads((OLD / 'manifest.json').read_text(encoding='utf-8'))
+    files = [
+        ('ctf09_candidate_unit_observer.rs','ctf08_candidate_unit_observer.rs','crates/ep_run/examples/ctf09_candidate_unit_observer.rs'),
+        ('unit_fields.rs','unit_fields.rs','crates/ep_run/examples/ctf09_candidate_unit_support/fields.rs'),
+        ('ctf09_candidate_production_observer.rs','ctf08_candidate_production_observer.rs','crates/ep_run/examples/ctf09_candidate_production_observer.rs'),
+        ('production_fields.rs','production_fields.rs','crates/ep_run/examples/ctf09_candidate_production_support/fields.rs'),
+        ('production_unit_fields.rs','production_unit_fields.rs','crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs'),
+    ]
+    owned = []
+    for name,old_name,canonical in files:
+        before = OLD / old_name
+        archived = DEST / 'before' / name
+        archived.parent.mkdir(parents=True,exist_ok=True)
+        archived.write_bytes(before.read_bytes())
+        diff = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True),
+            (DEST/name).read_text(encoding='utf-8').splitlines(True),fromfile=ref(before)['path'],tofile=canonical))
+        delta = write('diffs/'+name+'.from-ctf08.diff',diff)
+        owned.append({'source':ref(DEST/name),'canonical_install_path':canonical,
+            'accepted08_before':ref(before),'before_archive':ref(archived),'exact_diff':ref(delta)})
+    assert (DEST/'unit_fields.rs').read_bytes()==(DEST/'production_unit_fields.rs').read_bytes()
+    api = {}
+    for lane,name in [('unit','unit_fields.rs'),('production','production_fields.rs')]:
+        source=(DEST/name).read_text(encoding='utf-8').split('const API_PATHS:')[1].split('];',1)[0]
+        api[lane]=re.findall(r'"([^"\n]+)"',source)
+    assert len(api['unit'])==28 and len(api['production'])==41
+    new_root = ROOT / '.runtime/porting/CTF-09'
+    ingress=json.loads((new_root/'cache-ingress-prep-02/manifest.json').read_text(encoding='utf-8'))
+    proposed={c['canonical_path']:ROOT/c['proposed']['path'] for c in ingress['changes'] if not c['canonical_path'].endswith('_tests.rs')}
+    proposed.update({
+        'crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs':new_root/'retry-driver-prep-02/new/ctf_retry_driver.rs',
+        'crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs':new_root/'caller-stability-prep-01/new/ctf_caller_stability.rs',
+        'crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs':new_root/'assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs',
+        'crates/ep_runtime/src/heat_balance/surface_manager.rs':new_root/'caller-stability-prep-01/proposed/surface_manager.rs',
+    })
+    formatted_path=ROOT/'.runtime/porting/CTF-08/applied-final-source-02/manifest.json'
+    formatted=json.loads(formatted_path.read_text(encoding='utf-8'))
+    actual08={r['canonical_path']:ROOT/r['actual_final_source']['path'] for r in formatted['actual_sources']}
+    identities=[]
+    for canonical in dict.fromkeys(api['unit']+api['production']):
+        if canonical in proposed:
+            source=proposed[canonical];role='accepted prospective09 source; actual formatted runtime identity required'
+        elif canonical in actual08:
+            source=actual08[canonical];role='immutable actual formatted08 source; runtime identity required'
+        else:
+            source=ROOT/canonical;role='source identity observed during preparation; runtime identity required'
+        identities.append({'canonical_path':canonical,'role':role,'source':ref(source),
+            'actual_future_formatted_Cargo_source_capture_required':True})
+    manifests=[OLD/'manifest.json',formatted_path,
+        new_root/'caller-stability-prep-01/manifest.json',new_root/'assembly-reassignment-prep-02/manifest.json',
+        new_root/'retry-driver-prep-02/manifest.json',new_root/'cache-ingress-prep-02/manifest.json',
+        new_root/'native-helper-prep-01/manifest.json',new_root/'native-observer-prep-01/manifest.json',
+        new_root/'input-writer-prep-01/manifest.json']
+    producer_sources=[]
+    native=json.loads((new_root/'native-helper-prep-01/manifest.json').read_text(encoding='utf-8'))
+    producer_sources.extend(row['proposal'] for row in native['policy_proposals'])
+    producer_sources.append(native['own_sources'][0]['source'])
+    producer_sources.append(ref(new_root/'input-writer-prep-01/freeze_packet.py'))
+    ranges=[]
+    for path,first,last,purpose in [
+        (new_root/'cache-ingress-prep-02/new/ctf_retry_initialization.rs',12,129,'actual wrapper/stop/result routing and readonly original names'),
+        (new_root/'cache-ingress-prep-02/proposed/surface_manager/construction_cache.rs',117,187,'ordinary selected shared flags/genuine first move/stop ledger'),
+        (new_root/'cache-ingress-prep-02/proposed/initialization/state_shell.rs',14,47,'actual state vector custody handoff'),
+        (new_root/'retry-driver-prep-02/new/ctf_retry_driver.rs',85,164,'public actual visit/reassignment/terminal/checkpoint owners'),
+        (new_root/'retry-driver-prep-02/new/ctf_retry_driver.rs',196,385,'actual method calls and selected retry order'),
+        (new_root/'assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs',95,136,'genuine producer checkpoint owner'),
+        (new_root/'caller-stability-prep-01/new/ctf_caller_stability.rs',87,125,'actual caller decision/sums/optional expression bookkeeping owners'),
+        (new_root/'input-writer-prep-01/freeze_packet.py',229,331,'separate historical08 typed refs/ranges/archive-only ancestry'),
+        (new_root/'input-writer-prep-01/freeze_packet.py',549,602,'current09 source and inherited separate profile contract'),
+        (ROOT/'.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc',638,728,'once allocation/identity/preband and repeated band source boundary'),
+        (ROOT/'.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc',875,981,'actual method/caller sum/fatal/severe/retry ordering'),
+        (ROOT/'.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc',6153,6165,'genuine construction order and shared flags'),
+    ]:
+        raw=b''.join(path.read_bytes().splitlines(keepends=True)[first-1:last])
+        ranges.append({'path':path.relative_to(ROOT).as_posix(),'start_line':first,'end_line':last,
+            'sha256':hashlib.sha256(raw).hexdigest(),'size_bytes':len(raw),'purpose':purpose})
+    m={'schema':'ctf09-rust-observer-source-preparation.v1','status':'SOURCE-READY-HELD-uninstalled-unformatted-unexecuted',
+        'own_source_rows':owned,'observer_source_counts':{'unit':2,'production':3},
+        'API_paths':api,'API_source_counts':{'unit':28,'production':41},'API_source_identities':identities,
+        'accepted_dependency_manifests':[ref(p) for p in manifests],
+        'actual08_formatted_source_authority':ref(formatted_path),
+        'prospective09_parent_rebase_to_actual08_required_before_application':False,
+        'producer_interface_sources':producer_sources,'source_ranges':ranges,
+        'own_preparation_source':ref(Path(__file__)),
+        'own_source_text_snippets':[ref(DEST/name) for name in ['retry_fields.rs.txt','unit_calls.rs.txt','authority_bindings.rs.txt','production_retry_fields.rs.txt']],
+        'README':ref(DEST/'README.md'),
+        'runtime_interfaces':{'unit_argv':['request_path','request_sha256','admission_path','admission_sha256','runtime_sources_path'],
+            'unit_sources_schema':'ctf09-candidate-unit-runtime-source-bindings.v1','unit_result_schema':'ctf09-candidate-unit-observer-results.v1',
+            'production_argv':['wrapper_request_path','wrapper_request_sha256'],
+            'production_request_schema':'ctf09-candidate-production-observer-request.v1','production_result_schema':'ctf09-candidate-production-observer-results.v1'},
+        'new_observation':{'unit_operation_field':'CTF09_retry_initialization','production_field':'selected_CTF09_owners',
+            'production_owner_field':'construction_retry_initialization','initialization_protocol':'ctf09-actual-rust-retry-initialization.v1',
+            'driver_protocol':'ctf09-actual-rust-retry-owner.v1','actual_all_visits_serialized_without_cap':True,
+            'genuine_initial_checkpoint_mandatory_for_first_selected_preband_pairing':True,
+            'old_first_wrapper_05_06_07_08_DTOs':'explicit uninvoked context; no old first-wrapper PASS',
+            'old04_owner':'actual constructor called then original owner consumed once',
+            'Native_callback_events_return_markers_OS_outcomes_or_answers_inferred':False,
+            'relative_expression_bookkeeping_and_diagnostic_call_intents_are_separate_unpaired_owners':True,
+            'whole_Native_return_or_SI19_store_safety_certified':False},
+        'scope_authority':{'current_role':'real-CTF-09-check-only','historical_key':'historical_prior_08_authority',
+            'nested_literal_keys':['historical_prior_07_authority','historical_prior_05_06_authority'],
+            'prior_selected_ranges_are_typed_byte_descriptors_not_full_file_refs':True,
+            'historical_after_live_documents_replayed':False,'future_success_refs_or_profiles_authored':False},
+        'unchanged_input_counts':{'unit_models':39,'unit_declared_operations':42,'production_models':15,'production_loader_phase_records':195,'fixed_guard_refs':45},
+        'integrity':{'before_five_exact_accepted08':True,'five_diffs_exact':True,'shared_serializers_byte_identical':True,
+            'source_before_after_binding_protocol_retained':True,'compact_new09_result_JSON_complete_no_caps':True,
+            'actual_formatted_runtime_source_hashes_not_guessed':True,'missing_or_nonfinite_required_owner_never_zeroed_or_PASS':True},
+        'preparation_boundary':{'own_stdlib_source_emitter_and_AST_only':True,'project_imports_or_targets':False,
+            'Cargo_build_test_formatter_engine':False,'scientific_weather_binary_payload_reads':False,
+            'canonical_or_Git_mutation':False,'new_QA_or_execution_framework':False,'scientific_PASS_or_gate_mutation':False},
+        'authorship_limits':'Raw authored caller/driver and preceding pure/native transport; source transport review is not independent formula/output certification.'}
+    write('manifest.json',json.dumps(m,indent=2)+'\n')
+    descriptors=[]
+    def visit(value):
+        if isinstance(value,dict):
+            if 'path' in value and 'sha256' in value:descriptors.append(value)
+            for child in value.values():visit(child)
+        elif isinstance(value,list):
+            for child in value:visit(child)
+    visit(m)
+    for r in descriptors:
+        b=(ROOT/r['path']).read_bytes()
+        if 'start_line' in r:b=b''.join(b.splitlines(True)[r['start_line']-1:r['end_line']])
+        assert hashlib.sha256(b).hexdigest()==r['sha256'],r
+        assert len(b)==r['size_bytes'],r
+        if 'line_count' in r:assert len(b.splitlines())==r['line_count'],r
+    print(json.dumps({'manifest':ref(DEST/'manifest.json'),'own_sources':[ref(DEST/name) for name,_,_ in files],
+        'unique_whole_refs':len({(r['path'],r['sha256']) for r in descriptors if 'start_line' not in r}),
+        'typed_ranges':len(ranges),'diff_lines':sum(row['exact_diff']['line_count'] for row in owned)}))
+
+if __name__ == '__main__':
+    ast.parse(Path(__file__).read_text(encoding='utf-8'))
+    write('unit_fields.rs', fields_source())
+    write('ctf09_candidate_unit_observer.rs', unit_source())
+    write('production_fields.rs', production_fields_source())
+    write('ctf09_candidate_production_observer.rs', production_source())
+    write('production_unit_fields.rs', fields_source())
+    finalize()

@@ -1,0 +1,20 @@
+/// Real initial producer storage immediately after its BMat(3) reset.
+///
+/// AMat and IdenMatrix are copied from the allocated owner before the first
+/// band assignment. This is not a reconstruction from matrix dimensions or
+/// a second assembly call. Construction NumCTFTerms/shared flags are outside
+/// this pure API and are not invented here.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CtfAssemblyPreAssignment {
+    /// Actual context supplied to the same initial producer invocation.
+    pub context: CtfAssemblyContext,
+    /// Actual source matrix dimension for the copied storage.
+    pub rcmax: i32,
+    /// Actual pre-band AMat values in the existing row-first layout.
+    pub a_mat: Vec<f64>,
+    /// Actual source-produced identity owner before the band assignments.
+    pub iden_matrix: Vec<f64>,
+    /// Actual BMat(3) immediately after the source reset, not BMat(1/2).
+    pub b_mat3_after_reset: f64,
+}
+

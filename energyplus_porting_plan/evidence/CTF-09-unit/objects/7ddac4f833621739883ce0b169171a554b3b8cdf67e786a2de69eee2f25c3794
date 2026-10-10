@@ -1,0 +1,213 @@
+pub(super) fn first_wrapper_uninvoked(api: &str, construction_id: u32) -> Value {
+    json!({"protocol":"ctf09-uninvoked-first-wrapper-context.v1",
+        "construction_id":construction_id,"actual_public_API":api,
+        "actual_public_API_invoked":false,"owner_available":false,"snapshot":null,
+        "unavailable_reason":"retry driver invokes the actual pure methods; this first-only public wrapper was not invoked",
+        "actual_first_method_handoff_location":"CTF09_retry_initialization.driver.first_method_handoff",
+        "historical_first_only_policy_reinterpreted":false,"counted_as_PASS":false})
+}
+pub(super) fn retry_initialization(source: &ConstructionCtfRetryInitialization) -> Value {
+    json!({"protocol":"ctf09-actual-rust-retry-initialization.v1",
+        "construction_id":source.construction_id.0,"construction_name":source.construction_name,
+        "original_tot_layers":source.original_tot_layers,
+        "original_layer_material_names":source.original_layer_material_names,
+        "flags_on_entry":flags(source.flags_on_entry),"flags_on_return":flags(source.flags_on_return),
+        "actual_initialization_API":"initialize_construction_ctf_retry",
+        "actual_initialization_API_invoked":source.result.is_ok(),
+        "actual_skip_API":"skip_construction_ctf_retry","actual_skip_API_invoked":source.result.is_err(),
+        "actual_retry_driver_invoked":source.result.is_ok(),
+        "actual_unavailable_reason":source.result.as_ref().err().map(|reason|format!("{reason:?}")),
+        "selected_chain_stop":source.selected_chain_stop.as_ref().map(|stop|format!("{stop:?}")),
+        "driver":source.result.as_ref().ok().map(retry_driver),
+        "Native_global_fatal_or_OS_status_inferred":false,"counted_as_PASS":false})
+}
+fn method(api: &str, invoked: bool, route: &str, reason: Option<String>, snapshot: Value) -> Value {
+    json!({"actual_Rust_API":api,"actual_source_invoked":invoked,
+        "status":if !invoked { "not-invoked" } else if route == "ScopeError" { "scope-error-returned" } else { "source-returned" },
+        "owner_available":!snapshot.is_null(),"actual_source_route":route,
+        "unavailable_reason":reason,"snapshot":snapshot,
+        "Native_stage_or_return_marker_inferred":false,"counted_as_PASS":false})
+}
+fn uninvoked(api: &str) -> Value {
+    method(api,false,"NotInvoked",Some("actual preceding Rust stop; no method Result owner".to_owned()),Value::Null)
+}
+fn exponential(source: &Result<CtfExponentialObservation,CtfExponentialScopeError>) -> Value {
+    let api = "calculate_selected_ctf_matrix_exponential";
+    match source {
+        Err(error) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+        Ok(CtfExponentialObservation::Unavailable(reason)) => method(api,true,"Unavailable",Some(format!("{reason:?}")),Value::Null),
+        Ok(CtfExponentialObservation::Exponential(actual)) => method(api,true,"Exponential",None,
+            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                "AMatRowNormMax":scalar(actual.a_mat_row_norm_max),"k":actual.k,
+                "fact":scalar(actual.fact),"CheckVal":scalar(actual.check_val),"l":actual.l,
+                "final_i":actual.final_power_i,
+                "PowerControl":actual.power_steps.iter().map(|event|json!({"i":event.i,"SigFigLimit":event.sig_fig_limit})).collect::<Vec<_>>(),
+                "SquareControl":actual.square_steps.iter().map(|event|json!({"isq":event.isq,"Backup":event.backup})).collect::<Vec<_>>(),
+                "actual_power_control_count":actual.power_steps.len(),"actual_square_control_count":actual.square_steps.len(),
+                "matrices":{"AExp":matrix_values(&actual.a_exp),"AMat1":matrix_values(&actual.a_mat1),
+                    "AMato":matrix_values(&actual.a_mato),"AMatN":matrix_values(&actual.a_mat_n)},
+                "actual_matrix_value_counts":{"AExp":actual.a_exp.len(),"AMat1":actual.a_mat1.len(),
+                    "AMato":actual.a_mato.len(),"AMatN":actual.a_mat_n.len()},
+                "storage_order":"source_i1_outer_i2_inner_row_first"})),
+    }
+}
+fn inverse(source: Option<&Result<CtfInverseMatrix,CtfInverseScopeError>>, context: &CtfAssemblyContext) -> Value {
+    let api = "invert_selected_ctf_matrix";
+    match source {
+        None => uninvoked(api),
+        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+        Some(Ok(actual)) => method(api,true,"Inverse",None,
+            json!({"actual_call_context":attempt_context(context),"rcmax":actual.rcmax,
+                "matrices":{"AInv":matrix_values(&actual.a_inv),"AMat1":matrix_values(&actual.a_mat1)},
+                "actual_matrix_value_counts":{"AInv":actual.a_inv.len(),"AMat1":actual.a_mat1.len()},
+                "inverse_input_is_original_AMat_and_IdenMatrix":true,
+                "storage_order":"source_i1_outer_i2_inner_row_first"})),
+    }
+}
+fn gammas(source: Option<&Result<CtfGammaObservation,CtfGammaScopeError>>) -> Value {
+    let api = "calculate_selected_ctf_gammas";
+    match source {
+        None => uninvoked(api),
+        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+        Some(Ok(CtfGammaObservation::Unavailable(reason))) => method(api,true,"Unavailable",Some(format!("{reason:?}")),Value::Null),
+        Some(Ok(CtfGammaObservation::Gamma(actual))) => method(api,true,"Gamma",None,
+            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                "matrices":{"ATemp":matrix_values(&actual.a_temp),
+                    "Gamma1":matrix_values(&actual.gamma1),"Gamma2":matrix_values(&actual.gamma2)},
+                "actual_matrix_value_counts":{"ATemp":actual.a_temp.len(),
+                    "Gamma1":actual.gamma1.len(),"Gamma2":actual.gamma2.len()},
+                "actual_matrix_shapes":{"ATemp":[actual.rcmax,actual.rcmax],
+                    "Gamma1":[3,actual.rcmax],"Gamma2":[3,actual.rcmax]},
+                "ATemp_storage_order":"source_i1_outer_i2_inner_row_first",
+                "Gamma_storage_order":"source_j_outer_i_inner_row_first"})),
+    }
+}
+fn coefficients(source: Option<&Result<CtfFinalCoefficientObservation,CtfFinalCoefficientScopeError>>) -> Value {
+    let api = "calculate_selected_ctf_final_coefficients";
+    match source {
+        None => uninvoked(api),
+        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+        Some(Ok(CtfFinalCoefficientObservation::Unavailable(reason))) => method(api,true,"Unavailable",Some(format!("{reason:?}")),Value::Null),
+        Some(Ok(CtfFinalCoefficientObservation::Coefficients(actual))) => method(api,true,"Coefficients",None,
+            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                "NumCTFTerms":actual.num_ctf_terms,
+                "controls":{"inum":actual.next_history_term,"CTFConvrg":actual.history_loop_converged},
+                "matrices":{"s0":matrix_values(&actual.s0),"s":matrix_values(&actual.s),
+                    "e":matrix_values(&actual.e),"Gamma1":matrix_values(&actual.gamma1_minus_gamma2),
+                    "PhiR0":matrix_values(&actual.phi_r0),"Rnew":matrix_values(&actual.rnew),
+                    "Rold":matrix_values(&actual.rold)},
+                "actual_matrix_value_counts":{"s0":actual.s0.len(),"s":actual.s.len(),"e":actual.e.len(),
+                    "Gamma1":actual.gamma1_minus_gamma2.len(),"PhiR0":actual.phi_r0.len(),
+                    "Rnew":actual.rnew.len(),"Rold":actual.rold.len()},
+                "actual_matrix_shapes":{"s0":[3,4],"s":[3,4,actual.rcmax],"e":[actual.rcmax],
+                    "Gamma1":[3,actual.rcmax],"PhiR0":[actual.rcmax,actual.rcmax],
+                    "Rnew":[actual.rcmax,actual.rcmax],"Rold":[actual.rcmax,actual.rcmax]},
+                "square_storage_order":"source_i1_outer_i2_inner_row_first",
+                "Gamma_storage_order":"source_j_outer_i_inner_row_first",
+                "s0_storage_order":"source_j_outer_k_inner",
+                "s_storage_order":"source_j_outer_k_middle_term_inner",
+                "private_method_final_owner_only":true,"Native_SourceReturn_workspace_inferred":false})),
+    }
+}
+pub(super) fn flags(source: CtfCallerSharedFlags) -> Value {
+    json!({"ErrorsFound":source.errors_found,"DoCTFErrorReport":source.do_ctf_error_report})
+}
+fn caller(source: Option<&Result<CtfCallerStabilityDecision,CtfCallerStabilityScopeError>>) -> Value {
+    let api = "decide_selected_ctf_caller_stability";
+    match source {
+        None => uninvoked(api),
+        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+        Some(Ok(actual)) => method(api,true,"CallerDecision",None,
+            json!({"input_context":attempt_context(&actual.input_context),
+                "postcheck_context":attempt_context(&actual.postcheck_context),
+                "flags_before":flags(actual.flags_before),"flags_after":flags(actual.flags_after),
+                "NumCTFTerms":actual.num_ctf_terms,"caller_CTFConvrg":actual.caller_ctf_converged,
+                "retry_reason":actual.retry_reason.map(|reason|format!("{reason:?}")),
+                "outcome":format!("{:?}",actual.outcome),
+                "assigned_sums":actual.sums.map(|sums|json!({"assignedAbsSumXi":scalar(sums.sum_xi),
+                    "assignedAbsSumYi":scalar(sums.sum_yi),"assignedAbsSumZi":scalar(sums.sum_zi),
+                    "BiggestSum":scalar(sums.biggest_sum)})),
+                "unpaired_Rust_expression_bookkeeping":{"first_relative_error":actual.first_relative_error.map(scalar),
+                    "second_relative_error":actual.second_relative_error.map(scalar),
+                    "Native_ratio_local_owner_available":false,"counted_as_PASS":false},
+                "diagnostic_call_intents":actual.diagnostics.iter().map(|record|json!({
+                    "level":format!("{:?}",record.level),"message":record.message})).collect::<Vec<_>>(),
+                "Native_global_diagnostics_or_fatal_backend_invoked":false,
+                "diagnostic_intents_equated_to_Native_global_messages":false,
+                "terminal_decision_is_whole_method_return_or_SI_store_safety":false})),
+    }
+}
+fn assembly_values(context: &CtfAssemblyContext, rcmax: i32, a_mat: &[f64], iden_matrix: &[f64], b_mat: &[f64], c_mat: &[f64], d_mat: &[f64]) -> Value {
+    json!({"context":attempt_context(context),"rcmax":rcmax,
+        "matrices":{"AMat":matrix_values(a_mat),"IdenMatrix":matrix_values(iden_matrix),
+            "BMat":matrix_values(b_mat),"CMat":matrix_values(c_mat),"DMat":matrix_values(d_mat)},
+        "actual_matrix_value_counts":{"AMat":a_mat.len(),"IdenMatrix":iden_matrix.len(),
+            "BMat":b_mat.len(),"CMat":c_mat.len(),"DMat":d_mat.len()},
+        "storage_order":"source_i1_outer_i2_inner_row_first"})
+}
+fn assembly_snapshot(source: &CtfRetryAssemblySnapshot) -> Value {
+    assembly_values(&source.context,source.rcmax,&source.a_mat,&source.iden_matrix,
+        &source.b_mat,&source.c_mat,&source.d_mat)
+}
+fn attempt(source: &CtfRetryAttempt) -> Value {
+    json!({"attempt_ordinal":source.assembly.context.attempt_ordinal,
+        "assembly":assembly_snapshot(&source.assembly),
+        "Exponential":exponential(&source.exponential),
+        "Inverse":inverse(source.inverse.as_ref(),&source.assembly.context),
+        "Gammas":gammas(source.gammas.as_ref()),
+        "FinalCoefficients":coefficients(source.final_coefficients.as_ref()),
+        "caller":caller(source.caller.as_ref()),
+        "Native_callback_events_or_return_markers_reconstructed":false,"counted_as_PASS":false})
+}
+pub(super) fn retry_driver(source: &ConstructionCtfRetryDriver) -> Value {
+    let initial_checkpoint = source.initial_pre_assignment().map(|actual|json!({
+        "context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+        "pre_AMat":matrix_values(&actual.a_mat),"pre_IdenMatrix":matrix_values(&actual.iden_matrix),
+        "BMat3_after_actual_reset":scalar(actual.b_mat3_after_reset),
+        "actual_matrix_value_counts":{"pre_AMat":actual.a_mat.len(),"pre_IdenMatrix":actual.iden_matrix.len()},
+        "captured_by_actual_initial_assembly_producer":true,
+        "NumCTFTerms_and_shared_flags_not_owned_by_checkpoint":true}));
+    let terminal = source.retained_assembly.as_ref().map(|actual|json!({
+        "assembly":assembly_values(&actual.context,actual.rcmax,&actual.a_mat,&actual.iden_matrix,
+            &actual.b_mat,&actual.c_mat,&actual.d_mat),
+        "active_prefix":actual.layers.iter().enumerate().map(|(index,layer)|json!({
+            "dl":scalar(layer.dl),"rk":scalar(layer.rk),"rho":scalar(layer.rho),"cp":scalar(layer.cp),
+            "lr":scalar(layer.lr),"ResLayer":layer.res_layer,"Nodes":actual.nodes.get(index).copied(),
+            "dx":actual.dx.get(index).copied().map(scalar)})).collect::<Vec<_>>(),
+        "actual_nodes_count":actual.nodes.len(),"actual_dx_count":actual.dx.len(),
+        "last_method_stamp_distinct_from_postcheck_stamp":true}));
+    json!({"protocol":"ctf09-actual-rust-retry-owner.v1","construction_id":source.construction_id.0,
+        "actual_Rust_API":"run_selected_construction_ctf_retry_driver","actual_source_invoked":true,
+        "flags_on_entry":flags(source.flags_on_entry),"flags_on_return":flags(source.flags_on_return),
+        "initial_context":source.initial_context.as_ref().map(attempt_context),
+        "postcheck_context":source.postcheck_context.as_ref().map(attempt_context),
+        "outcome":format!("{:?}",source.outcome),
+        "initial_pre_assignment_owner_available":initial_checkpoint.is_some(),
+        "initial_pre_assignment":initial_checkpoint,
+        "genuine_initial_checkpoint_required_for_selected_first_preband_pairing":true,
+        "first_method_handoff":source.attempts.first().map(attempt),
+        "attempts":source.attempts.iter().map(attempt).collect::<Vec<_>>(),
+        "reassignments":source.reassignments.iter().map(|record|json!({
+            "actual_Rust_API":"reassign_1d_ctf_state_space","actual_source_invoked":true,
+            "before_reassignment_call":assembly_snapshot(&record.before),
+            "preceding_NumCTFTerms":record.preceding_num_ctf_terms,
+            "supplied_context":attempt_context(&record.supplied_context),
+            "actual_result":format!("{:?}",record.result),
+            "actual_returned_ok":record.result.is_ok(),"context_after":attempt_context(&record.context_after),
+            "before_call_BMat3_not_claimed_as_after_reset_checkpoint":true,
+            "Native_pre_assignment_event_or_return_marker_inferred":false})).collect::<Vec<_>>(),
+        "actual_attempt_count":source.attempts.len(),"actual_reassignment_count":source.reassignments.len(),
+        "actual_method_invocation_counts":{"Exponential":source.attempts.len(),
+            "Inverse":source.attempts.iter().filter(|attempt|attempt.inverse.is_some()).count(),
+            "Gammas":source.attempts.iter().filter(|attempt|attempt.gammas.is_some()).count(),
+            "FinalCoefficients":source.attempts.iter().filter(|attempt|attempt.final_coefficients.is_some()).count(),
+            "CallerStability":source.attempts.iter().filter(|attempt|attempt.caller.is_some()).count()},
+        "retained_original_assembly":terminal,
+        "original_first_assembly_consumed_once_without_clone_or_replay":true,
+        "old_first_public_wrappers_invoked":false,
+        "all_actual_Rust_visits_retained":true,"record_cap":null,
+        "Native_counts_operands_flags_or_callback_events_supplied_to_Rust":false,
+        "observer_matrix_or_control_arithmetic_performed":false,
+        "global_diagnostics_whole_Native_return_or_SI19_storage_certified":false,
+        "scientific_comparison_performed":false,"counted_as_PASS":false})
+}

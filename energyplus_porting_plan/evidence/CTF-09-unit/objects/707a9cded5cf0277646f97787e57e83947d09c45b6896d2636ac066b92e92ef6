@@ -1,0 +1,226 @@
+"""Emit ignored source proposals and metadata only; never import reviewed targets."""
+import ast
+import difflib
+import hashlib
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-08/comparer-prep-04"
+QA = ROOT / ".runtime/porting/CTF-09/original-data-review-prep-02"
+OBS = ROOT / ".runtime/porting/CTF-09/rust-observer-prep-01"
+
+
+def identity(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def assignments(path):
+    result = {}
+    for node in ast.parse(path.read_text(encoding="utf-8")).body:
+        if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
+            try:
+                result[node.targets[0].id] = ast.literal_eval(node.value)
+            except (ValueError, TypeError):
+                pass
+    return result
+
+
+def replace(text, old, new, count=1):
+    assert text.count(old) == count, (old[:120], text.count(old), count)
+    return text.replace(old, new)
+
+
+def write(name, text):
+    (PREP / name).write_text(text, encoding="utf-8", newline="\n")
+
+
+def diff(before, after, label):
+    return "".join(difflib.unified_diff(before.splitlines(keepends=True), after.splitlines(keepends=True),
+        fromfile=("accepted-CTF08/" + label if before else "/dev/null"), tofile="proposed-CTF09/" + label))
+
+
+def rust_paths(path, name):
+    source = path.read_text(encoding="utf-8")
+    body = re.search(r"const " + name + r": &\[&str\] = &\[(.*?)\];", source, re.S).group(1)
+    return re.findall(r'"([^"]+)"', body)
+
+
+def main():
+    assert not (PREP / "manifest.json").exists(), "Immutable held source is never rewritten"
+    before = PREP / "before"; before.mkdir(exist_ok=True)
+    deltas = PREP / "diffs"; deltas.mkdir(exist_ok=True)
+    # The exact old numeric helper is retained; only its copied/values/matrix_map utilities run.
+    copy_sources = {"method_compare.py": OLD, "packet_io.py": OLD, "initial_shape.py": QA,
+        "method_shape.py": QA, "gamma_shape.py": QA, "coefficient_shape.py": QA, "retry_shape.py": QA}
+    for name, owner in copy_sources.items():
+        raw = (owner / name).read_bytes()
+        (PREP / name).write_bytes(raw if name != "packet_io.py" else raw.replace(b'CTF-08"', b'CTF-09"'))
+    old_names = ["compare_unit.py", "compare_production.py", "packet_io.py", "method_compare.py",
+                 "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "gamma_compare.py", "coefficient_compare.py"]
+    for name in old_names + ["manifest.json", "README.md"]:
+        (before / name).write_bytes((OLD / name).read_bytes())
+    inventories = {key: identity(ROOT / path) for key, path in {
+        "reviewed_native_source_inventory": ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+        "reviewed_passive_source_inventory": ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+        "reviewed_freezer_source_inventory": ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
+        "reviewed_PE_source_inventory": ".runtime/porting/CTF-09/native-build-review-prep-01/manifest.json"}.items()}
+    initial_constants = assignments(QA / "initial_shape.py")
+    for lane in ["unit", "production"]:
+        name = "compare_" + lane + ".py"
+        source = (OLD / name).read_text(encoding="utf-8")
+        original = source
+        # Transport identifiers only; inherited CTF08 policy/field names remain literal.
+        source = source.replace("ctf08_", "ctf09_").replace("ctf08-", "ctf09-")
+        # Restore every inherited CTF08 observation/profile/owner key altered by that prefix rename.
+        for suffix in ["final_coefficient_observation_policy", "final_coefficient_profiles"]:
+            source = source.replace("ctf09_" + suffix, "ctf08_" + suffix)
+        tree = ast.parse(source)
+        changes = {
+            "DATAQA_SOURCE_INVENTORY": repr(identity(QA / "manifest.json")),
+            "SOURCE_INVENTORIES": repr(inventories),
+            "OBSERVER_PATHS": repr(rust_paths(OBS / ("unit_fields.rs" if lane == "unit" else "production_fields.rs"), "OBSERVER_PATHS")),
+            "API_PATHS": repr(rust_paths(OBS / ("unit_fields.rs" if lane == "unit" else "production_fields.rs"), "API_PATHS")),
+            "RETENTION_INTENT": repr(initial_constants["RETENTION_INTENT"]),
+        }
+        for key, value in changes.items():
+            source = re.sub(r"^" + key + r" = .*$", key + " = " + value, source, flags=re.M)
+        pins = {"IO_SHA": "packet_io.py", "PAIR_SHA": "method_compare.py", "METHOD_SHA": "method_shape.py",
+                "GAMMA_SHAPE_SHA": "gamma_shape.py", "COEFFICIENT_SHAPE_SHA": "coefficient_shape.py"}
+        for key, filename in pins.items():
+            source = re.sub(r"^" + key + r" = .*$", key + " = " + repr(identity(PREP / filename)["sha256"]), source, flags=re.M)
+        source = re.sub(r"^GAMMA_PAIR_SHA = .*\n", "", source, flags=re.M)
+        source = re.sub(r"^COEFFICIENT_PAIR_SHA = .*\n", "", source, flags=re.M)
+        extra = "\nINITIAL_SHAPE_SHA = " + repr(identity(PREP / "initial_shape.py")["sha256"])
+        extra += "\nRETRY_SHAPE_SHA = " + repr(identity(PREP / "retry_shape.py")["sha256"])
+        extra += "\nRETRY_PAIR_SHA = " + repr(identity(PREP / "retry_compare.py")["sha256"])
+        extra += "\nRETRY_VARIABLES = " + repr(["CTF09."+key for key in ["pre_AMat","pre_IdenMatrix","assignedAbsSumXi",
+                    "assignedAbsSumYi","assignedAbsSumZi","BiggestSum","pre_CTFTimeStep","post_CTFTimeStep"]]) + "\n"
+        source = source.replace("\n\nclass Comparison:", extra + "\nclass Comparison:")
+        source = replace(source, "VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES",
+                         "VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES + RETRY_VARIABLES")
+        source = re.sub(r'    gamma_pairing = boot\(.*\n', "", source)
+        source = re.sub(r'    coefficient_pairing = boot\(.*\n', "", source)
+        marker = '    coefficients = boot("ctf09_private_coefficients_structure", "coefficient_shape.py", COEFFICIENT_SHAPE_SHA)\n'
+        source = replace(source, marker, marker +
+            '    initial = boot("ctf09_initial_matrix_structure", "initial_shape.py", INITIAL_SHAPE_SHA)\n' +
+            '    retry = boot("ctf09_retry_structure", "retry_shape.py", RETRY_SHAPE_SHA)\n' +
+            '    retry_pairing = boot("ctf09_retry_pairing", "retry_compare.py", RETRY_PAIR_SHA)\n')
+        source = source.replace("frozen_before_this_CTF08_helper_execution", "frozen_before_this_CTF09_helper_execution")
+        source = source.replace("frozen-inherited-input-and-fresh-CTF08-private-final-policy-before-helper",
+                                "frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper")
+        source = source.replace("historical_prior_07_authority", "historical_prior_08_authority")
+        source = source.replace('"coefficient_shape.py", "packet_io.py"]', '"coefficient_shape.py", "retry_shape.py", "packet_io.py"]')
+        source = source.replace('== 7, "Exact accepted DataQA lane seven-source closure required"', '== 8, "Exact accepted DataQA lane eight-source closure required"')
+        source = source.replace('len(by_owner) == 7', 'len(by_owner) == 8')
+        source = replace(source, "lane, methods, gamma, coefficients):", "lane, initial, methods, gamma, coefficients, retry):")
+        source = replace(source, 'policy,same,recorded,"' + lane + '",methods,gamma,coefficients)',
+                         'policy,same,recorded,"' + lane + '",initial,methods,gamma,coefficients,retry)')
+        source = replace(source, '    methods.packet(freeze, request, admission, projection, policy, m.require)\n',
+            '    initial.packet(freeze, request, admission, projection, policy, prior, m.require)\n' +
+            '    initial.matrix_packet(freeze, request, admission, projection, policy, m.require)\n' +
+            '    methods.packet(freeze, request, admission, projection, policy, m.require)\n')
+        source = source.replace('"selected_method_invocation_ordinals":coefficients.SELECTION',
+                                '"inherited_first_only_method_selection":coefficients.SELECTION')
+        source = replace(source, '    coefficients.packet(freeze, request, admission, projection, policy, m.require)\n',
+                         '    coefficients.packet(freeze, request, admission, projection, policy, m.require)\n' +
+                         '    retry.packet(freeze, request, admission, projection, policy, m.require)\n')
+        source = replace(source, '    coefficients.scope(m, same, preceding, freeze, request, admission, projection,\n' +
+            '                m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane)',
+            '    retry.scope(m, same, preceding, freeze, request, admission, projection,\n' +
+            '                m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane, coefficients)')
+        source = replace(source, '    return profiles,inherited,initial_policy,initial_profiles',
+            '    same(qa["reviewed_retry_policy_contract"],qa["reviewed_contracts"]["tolerances"])\n' +
+            '    m.require(qa["reviewed_retry_observation_policy"] == retry.POLICY and\n' +
+            '              qa["reviewed_retry_attempt_selection"] == retry.SELECTION and qa["complete_actual_retry_records"] is True and\n' +
+            '              qa["retry_loop_exit_certifies_whole_return_or_SI_store"] is False,"Actual reviewed all-visit retry policy required")\n' +
+            '    return profiles,inherited,initial_policy,initial_profiles')
+        source = source.replace('rust["Rust_retry_driver_available"] is False', 'rust["Rust_retry_driver_available"] is True')
+        source = source.replace('"Actual frozen first-only matrix policy required"', '"Inherited first-only policy remains separate from genuine retry owner"')
+        source = replace(source, '    comparison = Comparison(m.require)\n',
+            '    m.require(rust["ctf09_retry_observation_policy"] == native["CTF09_retry_observation_policy"] == retry.POLICY and\n' +
+            '              rust["ctf09_attempt_selection"] == native["CTF09_attempt_selection"] == retry.SELECTION,\n' +
+            '              "Actual separate all-visit retry policy/selection differs")\n' +
+            '    comparison = Comparison(m.require)\n')
+        start = source.index('    actual_gamma_counts = gamma_pairing.validate_all')
+        end = source.index('    result = comparison.report()', start)
+        source = source[:start] + (
+            '    actual_counts = retry_pairing.validate_all(comparison,native,qa,initial,methods,gamma,coefficients,retry' +
+            (',production=True' if lane == "production" else '') + ')\n' +
+            ('    ledger = compare_models(native,rust,request,comparison)\n' if lane == "production" else '    compare_models(native,rust,request,comparison)\n') +
+            '    initial_ledger = compare_initial_models(native,rust,request,comparison)\n' +
+            '    retry_ledger = retry_pairing.compare_' + lane + '(comparison,native,rust,request,pairing' +
+            (',normalized,owners' if lane == "production" else '') + ')\n') + source[end:]
+        # First-only05--08 pairing functions are not called; these names now hold all-visit facts.
+        source = source.replace('"actual_matrix_owner_ledger":matrix_ledger,"actual_method_owner_ledger":method_ledger,"actual_method_observation_counts":actual_method_counts,',
+            '"actual_retry_owner_ledger":retry_ledger,"actual_all_visit_observation_counts":actual_counts,')
+        source = source.replace('"actual_final_coefficient_owner_ledger":coefficient_ledger,"actual_final_coefficient_observation_counts":actual_coefficient_counts,',
+            '"historical_first_wrapper_pairing_performed":False,')
+        source = source.replace('"actual_Gamma_owner_ledger":gamma_ledger,"actual_Gamma_observation_counts":actual_gamma_counts,',
+            '"reviewed_retry_observation_policy":retry.POLICY,"reviewed_retry_attempt_selection":retry.SELECTION,')
+        source = source.replace('"all_later_Native_method_visits_unpaired_noPASS":True,', '"all_actual_retry_visits_selected_by_separate09policy":True,')
+        source = source.replace('"all_later_Native_attempts_unpaired_noPASS":True,', '"partial_or_uninvoked_retry_visits_counted_as_PASS":False,')
+        source = source.replace('"Rust_retry_driver_available":False', '"Rust_retry_driver_available":True')
+        source = source.replace('"frozen_numeric_profiles": {"CTF08": policy["ctf08_final_coefficient_profiles"]}',
+            '"frozen_numeric_profiles": {"CTF09":policy["ctf09_retry_profiles"]},"inherited_private_final_handoff_profiles":policy["ctf08_final_coefficient_profiles"],"all_visit_handoff_profile_groups":policy["ctf09_all_visit_handoff_profile_groups"]')
+        source = source.replace('"pass-selected-first-private-final-coefficients"', '"pass-selected-actual-retry-visits"').replace(
+            '"fail-selected-first-private-final-coefficients"', '"fail-selected-actual-retry-visits"').replace(
+            '"pass-selected-loader-to-first-private-final-coefficients"', '"pass-selected-loader-to-actual-retry-visits"').replace(
+            '"fail-selected-loader-to-first-private-final-coefficients"', '"fail-selected-loader-to-actual-retry-visits"')
+        source = source.replace('"selected_fixed15_first_private_final_coefficients_PASS_claimed"', '"selected_fixed15_retry_visits_PASS_claimed"')
+        source = source.replace('"complete_CTF08_PASS_claimed": False,', '"complete_CTF08_PASS_claimed": False, "complete_CTF09_PASS_claimed": False,')
+        source = re.sub(r'"authorship_limits": "Raw adapted accepted07 comparers.*?own formulas\."',
+            '"authorship_limits": "Raw authored retry caller/driver, Rust09 transports and some prior pure06; Header authored09 Native/assembly/ingress and Base DataQA. This pairs actual owners and provenance, not independent certification of own formulas."', source)
+        source = source.replace('PREP / "gamma_compare.py", ', '').replace('PREP / "coefficient_compare.py", ', '')
+        source = source.replace('PREP / "coefficient_shape.py"]', 'PREP / "coefficient_shape.py", PREP / "initial_shape.py", PREP / "retry_shape.py", PREP / "retry_compare.py"]')
+        if lane == "unit":
+            marker = '    actual_calls=sum(op["actual_Rust_CTF03_API_invoked"] is True for model in rust["model_cases"] for op in model["operations"])\n'
+            source = replace(source, marker,
+                '    m.require(rust["actual_Rust_combined_API_invocations"] == 0 and\n' +
+                '              rust["actual_Rust_retry_driver_API_invocations"] == sum(op["actual_Rust_retry_driver_API_invoked"] is True\n' +
+                '                  for model in rust["model_cases"] for op in model["operations"]),\n' +
+                '              "Genuine retry invocation count and uninvoked old combined wrapper required")\n' + marker)
+            source = replace(source, 'type(rust["actual_Rust_preprocess_invocations"]) is int and rust["actual_Rust_preprocess_invocations"] == calls and',
+                'type(rust["actual_Rust_preprocess_invocations"]) is int and rust["actual_Rust_preprocess_invocations"] ==\n' +
+                '              sum(op["actual_source_invoked"] is True for model in rust["model_cases"] for op in model["operations"]) and')
+            source = replace(source, 'rust["actual_Rust_CTF04_API_invocations"] == actual_assembly_calls == calls',
+                'rust["actual_Rust_CTF04_API_invocations"] == actual_assembly_calls')
+            marker = '            c.exact(path+"/actual_API_invoked",True,right["actual_Rust_CTF03_API_invoked"])\n'
+            source = replace(source, marker,
+                '            if right["actual_Rust_CTF03_API_invoked"] is not True:\n' +
+                '                c.absence(path+"/actual_initial_API",left["actual_source_invoked"],False,left["actual_source_invoked"],\n' +
+                '                          "Real prior selected stop leaves03 uninvoked; no fabricated Result or PASS")\n' +
+                '                ledger.append({"model_id":expected["id"],"operation_id":declared["id"],"Rust_initial_uninvoked":True,"counted_as_PASS":False})\n' +
+                '                continue\n' + marker)
+        else:
+            source = replace(source, 'c.exact(path+"/CTF03_owner_order",ids,[row["construction_id"] for row in results])',
+                'c.exact(path+"/CTF03_owner_order",[cid for cid in ids if cid in {row["construction_id"] for row in results}],\n' +
+                '                [row["construction_id"] for row in results])')
+            source = replace(source, 'c.exact(path + "/preprocessing_owner_order", [rcon[name]["id"] for name in ncon if name in rcon], [row["construction_id"] for row in actual])',
+                'c.exact(path + "/preprocessing_owner_order", [rcon[name]["id"] for name in ncon if name in rcon and rcon[name]["id"] in rresults], [row["construction_id"] for row in actual])')
+        source = source.replace('passed = result["mismatch_count"] == 0',
+            'passed = result["mismatch_count"] == 0 and comparison.counts["retry_selected_attempt_owner_pairs"] > 0')
+        source = source.replace("Actual Rust current08 and separately historical07", "Actual Rust current09 and separately historical08")
+        source = source.replace("Actual DataQA current08 and separately historical07", "Actual DataQA current09 and separately historical08")
+        source = source.replace("Genuine input-only CTF08 request with separate historical07", "Genuine input-only CTF09 request with separate historical08")
+        source = source.replace("Actual successful fresh CTF08 freeze", "Actual successful fresh CTF09 freeze")
+        # Keep old Comparison.number byte/AST correspondence; separate old metrics from primary09.
+        marker = '    passed = result["mismatch_count"] == 0' if lane == "unit" else '; passed = result["mismatch_count"] == 0'
+        if lane == "unit":
+            source = replace(source, marker, '    result["private_final_handoff_metrics"] = {key:result["metrics"].pop(key) for key in COEFFICIENT_VARIABLES}\n' + marker)
+        else:
+            source = replace(source, marker, '; result["private_final_handoff_metrics"] = {key:result["metrics"].pop(key) for key in COEFFICIENT_VARIABLES}' + marker)
+        write(name, source)
+        write("diffs/" + name + ".from-ctf08.diff", diff(original, source, name))
+    for name in copy_sources:
+        old = OLD / name
+        old_text = old.read_text(encoding="utf-8") if old.exists() else ""
+        write("diffs/" + name + ".from-ctf08.diff", diff(old_text,(PREP/name).read_text(encoding="utf-8"),name))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,77 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs
+@@ -214,8 +214,18 @@
+ 
+     let mut initial_pre_assignment = None;
+     let (c_mat, d_mat) = assign_1d_ctf_state_space(
+-        layers, input.nodes, dx, rcmax, &mut a_mat, &mut b_mat,
+-        Some((&mut initial_pre_assignment, context, source_rcmax, &iden_matrix)),
++        layers,
++        input.nodes,
++        dx,
++        rcmax,
++        &mut a_mat,
++        &mut b_mat,
++        Some((
++            &mut initial_pre_assignment,
++            context,
++            source_rcmax,
++            &iden_matrix,
++        )),
+     );
+     Ok(CtfAssemblyObservation::Assembled(Box::new(
+         CtfStateSpaceAssembly {
+@@ -313,7 +323,8 @@
+         return Err(Error::Scope(CtfAssemblyScopeError::ActivePrefixShape));
+     }
+     for (index, &nodes) in assembly.nodes.iter().enumerate() {
+-        let interior_resistance = index > 0 && index + 1 < count && assembly.layers[index].res_layer;
++        let interior_resistance =
++            index > 0 && index + 1 < count && assembly.layers[index].res_layer;
+         let valid = if interior_resistance {
+             nodes == 1
+         } else {
+@@ -357,7 +368,12 @@
+     rcmax: usize,
+     a_mat: &mut [f64],
+     b_mat: &mut [f64; 3],
+-    checkpoint: Option<(&mut Option<CtfAssemblyPreAssignment>, CtfAssemblyContext, i32, &[f64])>,
++    checkpoint: Option<(
++        &mut Option<CtfAssemblyPreAssignment>,
++        CtfAssemblyContext,
++        i32,
++        &[f64],
++    )>,
+ ) -> ([f64; 2], [f64; 2]) {
+     let count = layers.len();
+     // Construction.cc 659, before the selected 1D assignments.
+@@ -412,13 +428,7 @@
+             cap = layers[layer].rho * layers[layer].cp * dx[layer];
+             dxtmp = 1.0 / dx[layer] / cap;
+             write_a(a_mat, rcmax, node - 1, node, layers[layer].rk * dxtmp);
+-            write_a(
+-                a_mat,
+-                rcmax,
+-                node,
+-                node,
+-                -2.0 * layers[layer].rk * dxtmp,
+-            );
++            write_a(a_mat, rcmax, node, node, -2.0 * layers[layer].rk * dxtmp);
+             write_a(a_mat, rcmax, node + 1, node, layers[layer].rk * dxtmp);
+         }
+         node_in_layer += 1;
+@@ -428,13 +438,7 @@
+     cap = layers[last].rho * layers[last].cp * dx[last];
+     cap *= 1.5;
+     dxtmp = 1.0 / dx[last] / cap;
+-    write_a(
+-        a_mat,
+-        rcmax,
+-        rcmax,
+-        rcmax,
+-        -2.0 * layers[last].rk * dxtmp,
+-    );
++    write_a(a_mat, rcmax, rcmax, rcmax, -2.0 * layers[last].rk * dxtmp);
+     write_a(a_mat, rcmax, rcmax - 1, rcmax, layers[last].rk * dxtmp);
+     b_mat[1] = layers[last].rk * dxtmp;
+     let c_mat = [-layers[0].rk / dx[0], layers[last].rk / dx[last]];

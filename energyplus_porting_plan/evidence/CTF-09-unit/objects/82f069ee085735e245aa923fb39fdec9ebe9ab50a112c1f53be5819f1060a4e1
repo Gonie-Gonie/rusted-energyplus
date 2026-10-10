@@ -1,0 +1,11 @@
+--- accepted-CTF09-01/README.md
++++ proposed-CTF09-02/README.md
+@@ -72,7 +72,7 @@
+ separately. Historical08 documentary after identities are never looked up as
+ current live files; actual frozen archives and nested07/05/06 ancestry are bound.
+ The accepted prospective1GiB bound applies only to complete observation files;
+-metadata remains16MiB. Existing sample limits affect report diagnostics only,
++metadata remains exactly16,000,000 bytes. Existing sample limits affect report diagnostics only,
+ never actual observation retention, pairing or numerical mismatch counts.
+ 
+ CLI remains the existing comparison stage: both mains require

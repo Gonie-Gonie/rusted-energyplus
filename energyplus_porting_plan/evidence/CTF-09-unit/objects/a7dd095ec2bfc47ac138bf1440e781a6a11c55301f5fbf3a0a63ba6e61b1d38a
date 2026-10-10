@@ -1,0 +1,226 @@
+use super::*;
+use crate::heat_balance::ctf_initial_owner::CtfInitialUnavailable;
+use crate::heat_balance::surface_manager::ctf_layer_preprocessing::CtfNormalizedLayer;
+use crate::heat_balance::surface_manager::ctf_state_space_assembly::{
+    CtfAssemblyInput, assemble_1d_ctf_state_space,
+};
+
+type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
+
+fn flags() -> CtfCallerSharedFlags {
+    CtfCallerSharedFlags { errors_found: false, do_ctf_error_report: false }
+}
+
+fn names() -> CtfCallerDiagnosticNames<'static> {
+    CtfCallerDiagnosticNames {
+        construction_name: "LITERAL MASS CONSTRUCTION", original_tot_layers: 1,
+        original_layer_material_names: &["LITERAL MASS MATERIAL"],
+    }
+}
+
+fn first_assembly() -> TestResult<ConstructionCtfFirstAssembly> {
+    // Literal input operands from the accepted08 routing fixture, not Native answers.
+    let layers = [CtfNormalizedLayer {
+        dl: 0.5, rk: 0.25, rho: 1.0, cp: 1.0, lr: 2.0, res_layer: false,
+    }];
+    let context = CtfAssemblyContext {
+        construction_id: ConstructionId(7), route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1, source_sink_present: false, node_source: 0, node_user_temp: 0,
+        attempt_ordinal: 1, time_step_zone: 0.25, ctf_time_step: 0.5, num_histories: 2,
+    };
+    let observed = assemble_1d_ctf_state_space(CtfAssemblyInput {
+        layers: &layers, nodes: &[6], dx: &[0.1], rcmax: 5,
+    }, context).map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    Ok(ConstructionCtfFirstAssembly { construction_id: context.construction_id, result: Ok(observed) })
+}
+
+fn actual(owner: &mut ConstructionCtfFirstAssembly) -> TestResult<&mut CtfStateSpaceAssembly> {
+    match &mut owner.result {
+        Ok(CtfAssemblyObservation::Assembled(value)) => Ok(value),
+        other => Err(std::io::Error::other(format!("fixture assembly unavailable: {other:?}")).into()),
+    }
+}
+
+fn bits(values: &[f64]) -> Vec<u64> {
+    values.iter().map(|value| value.to_bits()).collect()
+}
+
+#[test]
+fn genuine_chain_keeps_the_original_allocations_and_actual_visit_order() -> TestResult {
+    let mut first = first_assembly()?;
+    let original = actual(&mut first)?;
+    let pointers = (original.a_mat.as_ptr(), original.iden_matrix.as_ptr(),
+        original.layers.as_ptr(), original.nodes.as_ptr(), original.dx.as_ptr());
+    let original_layers = original.layers.clone();
+    let original_nodes = original.nodes.clone();
+    let original_dx = bits(&original.dx);
+    let identity_bits = bits(&original.iden_matrix);
+    let result = run_selected_construction_ctf_retry_driver(first, flags(), names());
+    assert!(matches!(result.outcome, CtfRetryDriverOutcome::ConvergedLoopExit
+        | CtfRetryDriverOutcome::SevenHourSevereBreak | CtfRetryDriverOutcome::FatalNoCtfs));
+    assert!(!result.attempts.is_empty());
+    let retained = result.retained_assembly.as_ref()
+        .ok_or_else(|| std::io::Error::other("actual assembly was lost"))?;
+    assert_eq!(pointers, (retained.a_mat.as_ptr(), retained.iden_matrix.as_ptr(),
+        retained.layers.as_ptr(), retained.nodes.as_ptr(), retained.dx.as_ptr()));
+    assert_eq!(retained.layers, original_layers);
+    assert_eq!(retained.nodes, original_nodes);
+    assert_eq!(bits(&retained.dx), original_dx);
+    assert_eq!(bits(&retained.iden_matrix), identity_bits);
+    for (index, attempt) in result.attempts.iter().enumerate() {
+        let context = attempt.assembly.context;
+        assert_eq!(context.attempt_ordinal, index + 1);
+        assert_eq!(context.construction_id, result.construction_id);
+        assert_eq!(bits(&attempt.assembly.iden_matrix), identity_bits);
+        let Ok(CtfExponentialObservation::Exponential(exponential)) = &attempt.exponential else {
+            return Err(std::io::Error::other("actual exponential did not return its owner").into());
+        };
+        let Some(Ok(inverse)) = &attempt.inverse else {
+            return Err(std::io::Error::other("actual inverse did not return its owner").into());
+        };
+        let Some(Ok(CtfGammaObservation::Gamma(gammas))) = &attempt.gammas else {
+            return Err(std::io::Error::other("actual Gamma did not return its owner").into());
+        };
+        let Some(Ok(CtfFinalCoefficientObservation::Coefficients(private))) = &attempt.final_coefficients else {
+            return Err(std::io::Error::other("actual private final method did not return its owner").into());
+        };
+        let Some(Ok(caller)) = &attempt.caller else {
+            return Err(std::io::Error::other("actual caller decision did not return").into());
+        };
+        assert_eq!(exponential.context, context);
+        assert_eq!(inverse.rcmax, attempt.assembly.rcmax);
+        assert_eq!(gammas.context, context);
+        assert_eq!(private.context, context);
+        assert_eq!(caller.input_context, context);
+        assert_eq!(caller.postcheck_context.attempt_ordinal, context.attempt_ordinal);
+    }
+    assert_eq!(retained.context, result.attempts.last()
+        .ok_or_else(|| std::io::Error::other("missing last real attempt"))?.assembly.context);
+    assert_eq!(result.postcheck_context, result.attempts.last()
+        .and_then(|attempt| attempt.caller.as_ref()).and_then(|caller| caller.as_ref().ok())
+        .map(|caller| caller.postcheck_context));
+    assert_eq!(result.reassignments.len() + 1, result.attempts.len());
+    for (index, reassignment) in result.reassignments.iter().enumerate() {
+        let previous = &result.attempts[index];
+        let caller = previous.caller.as_ref().and_then(|value| value.as_ref().ok())
+            .ok_or_else(|| std::io::Error::other("reassignment lacks actual preceding caller"))?;
+        assert_eq!(caller.outcome, CtfCallerStabilityOutcome::Retry);
+        assert_eq!(reassignment.before, previous.assembly);
+        assert_eq!(reassignment.preceding_num_ctf_terms, caller.num_ctf_terms);
+        assert_eq!(reassignment.supplied_context, next_retry_context(caller.postcheck_context)
+            .map_err(|error| std::io::Error::other(format!("{error:?}")))?);
+        assert_eq!(reassignment.result, Ok(()));
+        assert_eq!(reassignment.context_after, result.attempts[index + 1].assembly.context);
+    }
+    Ok(())
+}
+
+#[test]
+fn actual_prerequisite_error_has_no_invented_assembly_or_method() {
+    let reason = CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::UnusedConstruction);
+    let shared = CtfCallerSharedFlags { errors_found: true, do_ctf_error_report: true };
+    let result = run_selected_construction_ctf_retry_driver(ConstructionCtfFirstAssembly {
+        construction_id: ConstructionId(2), result: Err(reason),
+    }, shared, names());
+    assert_eq!(result.outcome, CtfRetryDriverOutcome::ScopeStopped(CtfRetryDriverStop::FirstAssembly(reason)));
+    assert!(result.retained_assembly.is_none());
+    assert!(result.attempts.is_empty());
+    assert!(result.reassignments.is_empty());
+    assert_eq!(result.initial_context, None);
+    assert_eq!(result.postcheck_context, None);
+    assert_eq!(result.flags_on_return, shared);
+}
+
+#[test]
+fn unavailable_original_route_does_not_become_a_zero_matrix() {
+    let reason = CtfAssemblyUnavailable::AllResistive;
+    let result = run_selected_construction_ctf_retry_driver(ConstructionCtfFirstAssembly {
+        construction_id: ConstructionId(4), result: Ok(CtfAssemblyObservation::Unavailable(reason)),
+    }, flags(), names());
+    assert_eq!(result.outcome, CtfRetryDriverOutcome::ScopeStopped(CtfRetryDriverStop::FirstAssemblyRoute(reason)));
+    assert!(result.retained_assembly.is_none());
+    assert!(result.attempts.is_empty());
+    assert!(result.reassignments.is_empty());
+}
+
+#[test]
+fn mismatched_identity_or_nonfirst_owner_stops_before_methods() -> TestResult {
+    let mut mismatched = first_assembly()?;
+    mismatched.construction_id = ConstructionId(99);
+    let result = run_selected_construction_ctf_retry_driver(mismatched, flags(), names());
+    assert_eq!(result.outcome, CtfRetryDriverOutcome::ScopeStopped(CtfRetryDriverStop::ConstructionIdentityMismatch));
+    assert!(result.retained_assembly.is_some());
+    assert!(result.attempts.is_empty());
+    let mut later = first_assembly()?;
+    actual(&mut later)?.context.attempt_ordinal = 2;
+    let result = run_selected_construction_ctf_retry_driver(later, flags(), names());
+    assert_eq!(result.outcome, CtfRetryDriverOutcome::ScopeStopped(CtfRetryDriverStop::NotInitialAttempt(2)));
+    assert!(result.retained_assembly.is_some());
+    assert!(result.attempts.is_empty());
+    Ok(())
+}
+
+#[test]
+fn actual_exponential_shape_error_retains_result_and_stops_later_invocations() -> TestResult {
+    let mut first = first_assembly()?;
+    assert!(actual(&mut first)?.a_mat.pop().is_some());
+    let before = copy_assembly(actual(&mut first)?);
+    let result = run_selected_construction_ctf_retry_driver(first, flags(), names());
+    assert_eq!(result.outcome, CtfRetryDriverOutcome::ScopeStopped(
+        CtfRetryDriverStop::Exponential(CtfExponentialScopeError::MatrixShape)));
+    assert_eq!(result.attempts.len(), 1);
+    let attempt = &result.attempts[0];
+    assert_eq!(attempt.assembly, before);
+    assert_eq!(attempt.exponential, Err(CtfExponentialScopeError::MatrixShape));
+    assert!(attempt.inverse.is_none() && attempt.gammas.is_none()
+        && attempt.final_coefficients.is_none() && attempt.caller.is_none());
+    assert!(result.reassignments.is_empty());
+    assert_eq!(result.postcheck_context, None);
+    assert_eq!(result.flags_on_return, flags());
+    Ok(())
+}
+
+#[test]
+fn undefined_source_cast_domain_is_an_actual_scope_stop_without_later_methods() -> TestResult {
+    let mut first = first_assembly()?;
+    actual(&mut first)?.a_mat.fill(f64::INFINITY);
+    let result = run_selected_construction_ctf_retry_driver(first, flags(), names());
+    assert_eq!(result.outcome, CtfRetryDriverOutcome::ScopeStopped(
+        CtfRetryDriverStop::Exponential(CtfExponentialScopeError::UndefinedScalingExponent)));
+    assert_eq!(result.attempts.len(), 1);
+    let attempt = &result.attempts[0];
+    assert_eq!(attempt.exponential, Err(CtfExponentialScopeError::UndefinedScalingExponent));
+    assert!(attempt.inverse.is_none() && attempt.gammas.is_none()
+        && attempt.final_coefficients.is_none() && attempt.caller.is_none());
+    assert!(result.reassignments.is_empty());
+    Ok(())
+}
+
+#[test]
+fn next_stamp_copies_actual_postcheck_bits_and_only_advances_ordinal() -> TestResult {
+    let mut first = first_assembly()?;
+    let context = actual(&mut first)?.context;
+    let postcheck = CtfAssemblyContext { ctf_time_step: 0.75, num_histories: 3, ..context };
+    let next = next_retry_context(postcheck)
+        .map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    assert_eq!(next, CtfAssemblyContext { attempt_ordinal: 2, ..postcheck });
+    // This helper performs no numeric validation or substitute timestep math.
+    let unusual = CtfAssemblyContext {
+        time_step_zone: -0.0, ctf_time_step: f64::from_bits(0x7ff8_0000_0000_0042), ..postcheck
+    };
+    let copied = next_retry_context(unusual)
+        .map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    assert_eq!(copied.time_step_zone.to_bits(), unusual.time_step_zone.to_bits());
+    assert_eq!(copied.ctf_time_step.to_bits(), unusual.ctf_time_step.to_bits());
+    assert_eq!(copied.num_histories, unusual.num_histories);
+    assert_eq!(copied.attempt_ordinal, 2);
+    Ok(())
+}
+
+#[test]
+fn unrepresentable_observation_ordinal_never_wraps_to_a_fake_attempt() -> TestResult {
+    let mut first = first_assembly()?;
+    let last = CtfAssemblyContext { attempt_ordinal: usize::MAX, ..actual(&mut first)?.context };
+    assert_eq!(next_retry_context(last), Err(CtfRetryDriverStop::AttemptOrdinalOverflow));
+    Ok(())
+}

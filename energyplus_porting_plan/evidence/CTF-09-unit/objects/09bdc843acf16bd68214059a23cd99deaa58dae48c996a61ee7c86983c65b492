@@ -1,0 +1,68 @@
+# CTF-09 persistent selected assembly source proposal
+
+Status: SOURCE-ONLY held proposal. No target import, formatter, compilation,
+test, engine, scientific result or binary inspection was performed.
+
+The proposed destination is
+`crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs`.
+The new test destination is the sibling `ctf_state_space_reassignment_tests.rs`.
+The canonical sources are untouched; `before` is an exact byte archive.
+
+The existing `assemble_1d_ctf_state_space` signature, supported route guards,
+initial validation, initial AMat allocation/zeroing, actual identity producer,
+returned struct fields, and existing test module remain literal. Its arithmetic
+now calls one private `assign_1d_ctf_state_space` body. The existing arithmetic's
+`clippy::neg_multiply` allowance moves with that body. No first-only wrapper
+or its guards is edited, and no existing result route is broadened.
+
+The private body preserves the accepted CTF-04 assignments and operand order.
+Only parameter aliases change: `input.nodes` becomes the borrowed `nodes`, and
+`&mut a_mat` becomes the already mutable slice. Its explicit `b_mat[2] = 0.0`
+models Original line 659 before every selected assignment. B1/B2 are overwritten;
+there is no whole-B reset. The first entrypoint's initial B zero remains.
+
+The new public `reassign_1d_ctf_state_space` borrows the same mutable assembly.
+It assigns only the original AMat band, compressed B/C/D, and supplied current
+context. AMat's off-band bits, all IdenMatrix bits, active layer order, Nodes,
+dx and vector storage are preserved. No allocation, resize, clear, identity
+producer, node placement or spacing calculation occurs in reassignment.
+
+Required custody is explicit: the future enclosing driver must retain the
+original converted prefix and actual nodal storage unchanged. This API checks
+supported shape and bounded stored node counts, not a reconstruction of Nodes.
+Original construction ID, route, dimensions, source/selectors and TimeStepZone
+bits must match the stored context. The next ordinal must be exactly the old
+ordinal's checked successor. CTFTimeStep and NumHistories are copied literally;
+there is no inferred duration/history relationship or finite/value clamp.
+Typed precondition errors are Rust API outcomes, not Native source outcomes.
+Every rejected precondition precedes mutation. No retry choice is made here.
+
+Original 638-655 allocates solver storage once; AMat zeroing and identity
+construction at 640-648 precede the retry loop at 657. Original 659-728 repeats
+the selected 1D assignments. Node placement/initial timestep end before 619.
+Exponential 1183-1185 copies AMat to local AMat1; Backup 1362-1365 restores AExp,
+not AMat. Inverse 1404-1407 copies AMat to local AMat1 and initializes AInv from
+actual IdenMatrix; only its local copy is destroyed at 1493. Gamma and final
+coefficient helpers do not assign source AMat or IdenMatrix. Those original
+owners remain live until whole-call cleanup at 1082-1089. Consequently neither
+inverse's final AMat1 nor a reconstructed identity belongs in reassignment.
+This finding concerns source normal-return paths; it does not invent storage
+or a successful continuation after an exception or process stop.
+
+Five new unexecuted tests target persistent pointer/capacity identity, literal
+band and compressed assignments, untouched off-band signed zero/NaN bits,
+unchanged identity bits, interior-resistance interfaces, precondition rejection
+without mutation, exact next/overflow ordinals, and literal dynamic stamps.
+The NaN and malformed-owner sentinels are Rust source API tests; they are not
+new Native input fixtures or expected observations. Existing numeric fixtures
+and tests are archived unchanged. No tests were run or generated from outputs.
+
+Raw's separate caller stability decision owns Original 903-977. Its postcheck
+context retains the current ordinal; only a future real retry driver may choose
+to supply the next ordinal to this API. There is no driver/cache/state activation,
+helper observation change, tolerance/profile change, final SI public store,
+SUR integration, CTF-09 completion or numerical PASS claim in this proposal.
+
+Header authored this factoring/reassignment and prior pure Gamma/public owners.
+Root and another author must review these held sources before any future apply.
+The metadata records source byte correspondence only, not an execution stage.

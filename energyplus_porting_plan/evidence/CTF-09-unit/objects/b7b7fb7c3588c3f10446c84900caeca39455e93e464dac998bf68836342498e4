@@ -1,0 +1,56 @@
+    require(
+        request["actual_scope_amendment_execution_role"] == "real-CTF-09-check-only"
+            && admission["actual_scope_amendment_execution_role"] == request["actual_scope_amendment_execution_role"]
+            && admission["historical_prior_08_authority"] == request["historical_prior_08_authority"]
+            && admission["current_cards"] == request["current_cards"],
+        "current09 authority or separate historical prior08 authority differs",
+    )?;
+    bindings.push(request["current_cards"]["CTF-09"].clone());
+    let prior08 = &request["historical_prior_08_authority"];
+    require(prior08["prior08_numerical_PASS_inferred"] == false,
+        "historical prior08 authority must infer no numerical PASS")?;
+    for key in ["prior_08_freeze", "prior_08_freeze_execution", "prior_08_writer_manifest",
+        "prior_08_source_contract", "prior_08_scope_amendment", "prior_08_scope_check_execution"] {
+        bindings.push(prior08[key].clone());
+    }
+    let (_, source08_bytes) = bound(&root, &prior08["prior_08_source_contract"])?;
+    let source08: Value = serde_json::from_slice(&source08_bytes)?;
+    require(prior08["prior_08_selected_primary_ranges"] == source08["ctf08_selected_primary_ranges"]
+        && prior08["historical_prior_07_authority"] == source08["source_authorities"]["historical_prior_07_authority"],
+        "historical prior08 ranges or nested prior07 literal ancestry differs")?;
+    let prior = &prior08["historical_prior_07_authority"];
+    require(prior["prior07_numerical_PASS_inferred"] == false,
+        "historical prior07 authority must infer no numerical PASS")?;
+    for key in ["prior_07_freeze", "prior_07_freeze_execution", "prior_07_writer_manifest",
+        "prior_07_source_contract", "prior_07_scope_amendment", "prior_07_scope_check_execution"] {
+        bindings.push(prior[key].clone());
+    }
+    let (_, historical_source_bytes) = bound(&root, &prior["prior_07_source_contract"])?;
+    let historical_source: Value = serde_json::from_slice(&historical_source_bytes)?;
+    require(prior["prior_07_selected_primary_ranges"] == historical_source["ctf07_selected_primary_ranges"]
+        && prior["historical_prior_05_06_authority"] == historical_source["source_authorities"]["prior_05_06_authority"],
+        "historical prior07 ranges or nested prior05/06 literal ancestry differs")?;
+    for authority in [prior08, prior] {
+        for binding in rows(&authority["historical_before_document_archives"])? {
+            bindings.push(binding.clone());
+        }
+        for binding in rows(&authority["available_prior_frozen_document_archives"])? {
+            bindings.push(binding["archive"].clone());
+        }
+    }
+    let nested = &prior["historical_prior_05_06_authority"];
+    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+        "prior_06_writer_manifest", "prior_06_source_contract"] {
+        bindings.push(nested[key].clone());
+    }
+    for card in ["CTF-05", "CTF-06"] {
+        bindings.push(nested["prior_scope_checks"][card].clone());
+    }
+    for binding in rows(&nested["historical_before_document_archives"])? {
+        bindings.push(binding.clone());
+    }
+    for binding in rows(&nested["available_prior_frozen_document_archives"])? {
+        bindings.push(binding["archive"].clone());
+    }
+    // Historical selected-range SHAs and after-document identities are documentary;
+    // authenticate source contracts/available archives, never current live documents.

@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-09\comparer-prep-02\compare_unit.py", line 871, in <module>
+    raise SystemExit(run(parser.parse_args()))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-09\comparer-prep-02\compare_unit.py", line 818, in run
+    actual_counts = retry_pairing.validate_all(comparison,native,qa,initial,methods,gamma,coefficients,retry)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-09\comparer-prep-02\retry_compare.py", line 16, in validate_all
+    initial.matrix_review(operation, None, c.need, c.dto, counts, integrity, label)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-09\comparer-prep-02\initial_shape.py", line 275, in matrix_review
+    need(isinstance(owner_snapshot, dict) and type(index) is int and 1 <= index <= len(owner_snapshot["constructions"]), "Actual matrix construction owner required")
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-09\comparer-prep-02\packet_io.py", line 16, in require
+    raise ValueError(message)
+ValueError: Actual matrix construction owner required
+{"receipt": {"path": ".runtime/porting/CTF-09/unit-comparison-command-01/receipt.json", "sha256": "7f2c1da5550d800714704e8a7722d08f2ae9895813e5ea82b90f3f4676f21473"}, "exit_code": 1, "source_bytes_match_before_and_after": true}

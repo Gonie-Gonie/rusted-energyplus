@@ -1,0 +1,156 @@
+--- .runtime/porting/CTF-09/retry-driver-prep-02/before-01/ctf_retry_driver_tests.rs
++++ .runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver_tests.rs
+@@ -55,6 +55,8 @@
+     let original_nodes = original.nodes.clone();
+     let original_dx = bits(&original.dx);
+     let identity_bits = bits(&original.iden_matrix);
++    let checkpoint = original.initial_pre_assignment.clone()
++        .ok_or_else(|| std::io::Error::other("genuine initial producer checkpoint absent"))?;
+     let result = run_selected_construction_ctf_retry_driver(first, flags(), names());
+     assert!(matches!(result.outcome, CtfRetryDriverOutcome::ConvergedLoopExit
+         | CtfRetryDriverOutcome::SevenHourSevereBreak | CtfRetryDriverOutcome::FatalNoCtfs));
+@@ -67,6 +69,12 @@
+     assert_eq!(retained.nodes, original_nodes);
+     assert_eq!(bits(&retained.dx), original_dx);
+     assert_eq!(bits(&retained.iden_matrix), identity_bits);
++    let retained_checkpoint = result.initial_pre_assignment()
++        .ok_or_else(|| std::io::Error::other("driver lost the genuine initial producer checkpoint"))?;
++    assert_eq!(retained_checkpoint.context, checkpoint.context);
++    assert_eq!(bits(&retained_checkpoint.a_mat), bits(&checkpoint.a_mat));
++    assert_eq!(bits(&retained_checkpoint.iden_matrix), bits(&checkpoint.iden_matrix));
++    assert_eq!(retained_checkpoint.b_mat3_after_reset.to_bits(), checkpoint.b_mat3_after_reset.to_bits());
+     for (index, attempt) in result.attempts.iter().enumerate() {
+         let context = attempt.assembly.context;
+         assert_eq!(context.attempt_ordinal, index + 1);
+@@ -128,6 +136,7 @@
+     assert!(result.reassignments.is_empty());
+     assert_eq!(result.initial_context, None);
+     assert_eq!(result.postcheck_context, None);
++    assert!(result.initial_pre_assignment().is_none());
+     assert_eq!(result.flags_on_return, shared);
+ }
+ 
+@@ -141,6 +150,7 @@
+     assert!(result.retained_assembly.is_none());
+     assert!(result.attempts.is_empty());
+     assert!(result.reassignments.is_empty());
++    assert!(result.initial_pre_assignment().is_none());
+ }
+ 
+ #[test]
+@@ -224,3 +234,115 @@
+     assert_eq!(next_retry_context(last), Err(CtfRetryDriverStop::AttemptOrdinalOverflow));
+     Ok(())
+ }
++
++// Existing frozen39 active-prefix-11 INPUTS only, helper-request SHA3fdf7a11.
++// These stored member bits and original IDs pass through the real public
++// preprocessing/initial/assembly owners. No normalized/node/timestep answers.
++fn frozen_active_prefix_11() -> TestResult<ConstructionCtfFirstAssembly> {
++    use crate::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
++    use crate::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
++    use crate::heat_balance::surface_manager::ctf_layer_preprocessing::{
++        ConstructionCtfLayerPreprocessing, CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
++    };
++    use ep_model::{Construction, ConstructionKind, MaterialId, NormalizedName};
++    use std::collections::BTreeSet;
++
++    let members = [
++        CtfLayerInput {
++            material_id: MaterialId(0),
++            thickness: f64::from_bits(0x3fbeb851eb851eb8),
++            conductivity: f64::from_bits(0x3fe999999999999a),
++            density: f64::from_bits(0x409c200000000000),
++            specific_heat: f64::from_bits(0x408c200000000000),
++            resistance: f64::from_bits(0x3fc3333333333333), resistance_only: false,
++        },
++        CtfLayerInput {
++            material_id: MaterialId(1),
++            thickness: f64::from_bits(0x3fb47ae147ae147b),
++            conductivity: f64::from_bits(0x3fc47ae147ae147b),
++            density: f64::from_bits(0x4089000000000000),
++            specific_heat: f64::from_bits(0x4095e00000000000),
++            resistance: f64::from_bits(0x3fe0000000000000), resistance_only: false,
++        },
++        CtfLayerInput {
++            material_id: MaterialId(2),
++            thickness: f64::from_bits(0x3f9999999999999a),
++            conductivity: f64::from_bits(0x3fc999999999999a),
++            density: f64::from_bits(0x403e000000000000),
++            specific_heat: f64::from_bits(0x408f400000000000),
++            resistance: f64::from_bits(0x3fc0000000000000), resistance_only: false,
++        },
++    ];
++    let original_indices = [0_usize, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1];
++    let input = original_indices.iter().map(|&index| members[index]).collect::<Vec<_>>();
++    let layers = input.iter().map(|member| member.material_id).collect::<Vec<_>>();
++    let construction = Construction {
++        id: ConstructionId(0), name: NormalizedName("construction-1".to_owned()),
++        kind: ConstructionKind::Opaque, outside_layer: layers.first().copied(), layers,
++        thermochromic_master: None, ground_factor: None, air_boundary: None,
++        complex_fenestration: None, window_equivalent_layer: None, internal_heat_source: None,
++    };
++    let context = CtfLayerContext {
++        is_used_ctf: true, errors_found: false, source_sink_present: false, solution_dimensions: 1,
++    };
++    let preprocessing = ConstructionCtfLayerPreprocessing {
++        construction_id: construction.id, is_used_ctf: true,
++        result: preprocess_ctf_layers(&input, context),
++    };
++    let used = BTreeSet::from([construction.id.0]);
++    let initial = initialize_construction_ctf_initial(
++        &construction, &[], &used, &preprocessing, context, f64::from_bits(0x3fd0000000000000),
++    );
++    let first = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
++    if !matches!(&first.result, Ok(CtfAssemblyObservation::Assembled(_))) {
++        return Err(std::io::Error::other(format!("frozen active-prefix-11 route unavailable: {:?}", first.result)).into());
++    }
++    Ok(first)
++}
++
++#[test]
++fn frozen_active_prefix_11_reaches_natural_retries_and_fresh_gamma_owners() -> TestResult {
++    let first = frozen_active_prefix_11()?;
++    let original_names = ["MASS_A", "MASS_B", "MASS_C", "MASS_A", "MASS_B", "MASS_C",
++        "MASS_A", "MASS_B", "MASS_C", "MASS_A", "MASS_B"];
++    let diagnostics = CtfCallerDiagnosticNames {
++        construction_name: "construction-1", original_tot_layers: 11,
++        original_layer_material_names: &original_names,
++    };
++    let result = run_selected_construction_ctf_retry_driver(first, flags(), diagnostics);
++    assert!(matches!(result.outcome, CtfRetryDriverOutcome::ConvergedLoopExit
++        | CtfRetryDriverOutcome::SevenHourSevereBreak | CtfRetryDriverOutcome::FatalNoCtfs));
++    assert!(result.attempts.len() > 1, "existing frozen input must exercise an actual retry");
++    let initial_checkpoint = result.initial_pre_assignment()
++        .ok_or_else(|| std::io::Error::other("natural retry lost its actual initial checkpoint"))?;
++    assert_eq!(Some(initial_checkpoint.context), result.initial_context);
++    assert_eq!(initial_checkpoint.context.attempt_ordinal, 1);
++    assert_eq!(bits(&initial_checkpoint.iden_matrix), bits(&result.attempts[0].assembly.iden_matrix));
++    assert_eq!(result.reassignments.len() + 1, result.attempts.len());
++    for (index, pair) in result.attempts.windows(2).enumerate() {
++        let caller = pair[0].caller.as_ref().and_then(|value| value.as_ref().ok())
++            .ok_or_else(|| std::io::Error::other("natural retry lacks an actual caller"))?;
++        assert_eq!(caller.outcome, CtfCallerStabilityOutcome::Retry);
++        let previous = pair[0].assembly.context;
++        let next = pair[1].assembly.context;
++        assert_eq!(next.attempt_ordinal, previous.attempt_ordinal + 1);
++        assert_eq!(next.ctf_time_step.to_bits(), caller.postcheck_context.ctf_time_step.to_bits());
++        assert_eq!(next.num_histories, caller.postcheck_context.num_histories);
++        assert_eq!(next.time_step_zone.to_bits(), previous.time_step_zone.to_bits());
++        assert_eq!(result.reassignments[index].preceding_num_ctf_terms, caller.num_ctf_terms);
++        let Some(Ok(CtfGammaObservation::Gamma(before))) = &pair[0].gammas else {
++            return Err(std::io::Error::other("preceding actual Gamma unavailable").into());
++        };
++        let Some(Ok(CtfGammaObservation::Gamma(after))) = &pair[1].gammas else {
++            return Err(std::io::Error::other("retry actual Gamma unavailable").into());
++        };
++        assert_eq!(before.context, previous);
++        assert_eq!(after.context, next);
++        // Both real owners stay live; the retry cannot reuse a mutated old buffer.
++        assert_ne!(before.gamma1.as_ptr(), after.gamma1.as_ptr());
++        assert_ne!(before.gamma2.as_ptr(), after.gamma2.as_ptr());
++        assert_eq!(before.gamma1.len(), after.gamma1.len());
++        assert_eq!(before.gamma2.len(), after.gamma2.len());
++    }
++    Ok(())
++}

@@ -1,0 +1,50 @@
+{
+  "schema": "ctf09-doc-only-quality-correction-proposal.v1",
+  "author": "Root",
+  "changes": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/before/ctf_retry_driver.rs",
+        "sha256": "5741aa0c0436ccd064ce7ad9947020d67b5ccc0d33cbcaf2332fce7df77809fd",
+        "size_bytes": 18801
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/proposed/ctf_retry_driver.rs",
+        "sha256": "67826f6cd4a53bde2f61d311b8f57713e820d4f97b6c72fb2db2d7d1410374ad",
+        "size_bytes": 18937
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/ctf_retry_driver.rs.diff",
+        "sha256": "0b46549a916e545f7686d1a326866699fe5bcf627d1af3d8afca40e4f7f123e9",
+        "size_bytes": 519
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/before/ctf_retry_initialization.rs",
+        "sha256": "fb2592df7b829c22bf481d5994b51e9139d0c3f4ad832f92365c833f725690db",
+        "size_bytes": 7022
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/proposed/ctf_retry_initialization.rs",
+        "sha256": "954b6d97f206c041137d5f524243cb69ffc277ee6fe0dd7ab746164f71c2587e",
+        "size_bytes": 7505
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/ctf_retry_initialization.rs.diff",
+        "sha256": "a3ded4dcb38c7f003b5e5679aac4296e973bef24644d5e40f073d2c170abe151",
+        "size_bytes": 1536
+      }
+    }
+  ],
+  "actual_failed_Clippy": {
+    "path": ".runtime/porting/CTF-09/quality-clippy-command-01/receipt.json",
+    "sha256": "be8a6158f2bac506a6479d661d6823bd6935ccd7e7cc8df5de819c9fa4b17d61",
+    "size_bytes": 5553
+  },
+  "scope": "Eight public enum-field doc comments only; existing math, controls, values and types retained. Two inline variants expanded to host their comments. No warning suppression.",
+  "canonical_changed": false,
+  "execution_performed": false
+}

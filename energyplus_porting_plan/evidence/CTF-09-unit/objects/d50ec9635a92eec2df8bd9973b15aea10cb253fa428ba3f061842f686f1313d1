@@ -1,0 +1,20 @@
+--- accepted-CTF09-02/retry_compare.py
++++ proposed-CTF09-03/retry_compare.py
+@@ -13,11 +13,12 @@
+     for model in native["model_cases"]:
+         for operation in model["operations"]:
+             label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])
+-            initial.matrix_review(operation, None, c.need, c.dto, counts, integrity, label)
+-            methods.review(operation, None, c.need, c.dto, counts, integrity, label)
+-            gamma.review(operation, None, c.need, c.dto, counts, integrity, label)
+-            coefficients.review(operation, None, c.need, c.dto, counts, integrity, label)
+-            retry.review(operation, None, c.need, c.dto, counts, integrity, label, model["source_diagnostics"]["messages"])
++            owner = operation["after"]
++            initial.matrix_review(operation, owner, c.need, c.dto, counts, integrity, label)
++            methods.review(operation, owner, c.need, c.dto, counts, integrity, label)
++            gamma.review(operation, owner, c.need, c.dto, counts, integrity, label)
++            coefficients.review(operation, owner, c.need, c.dto, counts, integrity, label)
++            retry.review(operation, owner, c.need, c.dto, counts, integrity, label, model["source_diagnostics"]["messages"])
+     initial.matrix_summary(native, counts, c.need)
+     actual = {**methods.summary(native, counts, c.need), **gamma.summary(native, counts, c.need),
+               **coefficients.summary(native, counts, c.need), **retry.summary(native, counts, c.need)}

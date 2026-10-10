@@ -1,0 +1,162 @@
+--- a/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ b/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -14,13 +14,16 @@
+     ConstructionCtfFirstAssembly, initialize_construction_ctf_first_assembly,
+ };
+ use crate::heat_balance::ctf_first_exponential_owner::ConstructionCtfFirstExponential;
+-use crate::heat_balance::ctf_first_final_coefficients_ingress::initialize_construction_ctf_first_matrix_with_final_coefficients;
+ use crate::heat_balance::ctf_first_final_coefficients_owner::ConstructionCtfFirstFinalCoefficients;
+ use crate::heat_balance::ctf_first_gamma_owner::ConstructionCtfFirstGammas;
+ use crate::heat_balance::ctf_first_matrix_owner::ConstructionCtfFirstInverseAfterExponential;
+ use crate::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+ };
++use crate::heat_balance::ctf_retry_initialization::{
++    ConstructionCtfRetryInitialization, initialize_construction_ctf_retry, skip_construction_ctf_retry,
++};
++use super::ctf_caller_stability::{CtfCallerDiagnosticNames, CtfCallerSharedFlags};
+ use crate::heat_balance::id_slot_index::TypedIdSlotIndex;
+ use ep_model::{
+     Construction, ConstructionId, Material, MaterialId, MaterialSurfaceRoughness,
+@@ -62,6 +65,7 @@
+     first_inverses: Vec<ConstructionCtfFirstInverseAfterExponential>,
+     first_gammas: Vec<ConstructionCtfFirstGammas>,
+     first_private_coefficients: Vec<ConstructionCtfFirstFinalCoefficients>,
++    retry_initializations: Vec<ConstructionCtfRetryInitialization>,
+     construction_slots: TypedIdSlotIndex,
+     entry_index_by_construction_slot: Vec<Option<usize>>,
+     pub(crate) no_mass_construction_ids: Vec<ConstructionId>,
+@@ -87,11 +91,12 @@
+                 .count(),
+         );
+         let mut initial_discretizations = Vec::with_capacity(entries.capacity());
+-        let mut first_assemblies = Vec::with_capacity(entries.capacity());
+-        let mut first_exponentials = Vec::with_capacity(entries.capacity());
+-        let mut first_inverses = Vec::with_capacity(entries.capacity());
+-        let mut first_gammas = Vec::with_capacity(entries.capacity());
+-        let mut first_private_coefficients = Vec::with_capacity(entries.capacity());
++        let first_assemblies = Vec::new();
++        let first_exponentials = Vec::new();
++        let first_inverses = Vec::new();
++        let first_gammas = Vec::new();
++        let first_private_coefficients = Vec::new();
++        let mut retry_initializations = Vec::with_capacity(entries.capacity());
+         let time_step_zone_hours = 1.0 / f64::from(model.timestep.number_of_timesteps_per_hour);
+         let mut no_mass_construction_ids = Vec::new();
+         let mut massive_ctf_construction_ids = Vec::new();
+@@ -112,14 +117,15 @@
+             .iter()
+             .map(|surface| surface.construction.0)
+             .collect::<BTreeSet<_>>();
+-        let mut preprocessing_errors_found = false;
++        let mut shared_flags = CtfCallerSharedFlags { errors_found: false, do_ctf_error_report: false };
++        let mut selected_chain_stop = None;
+         for (construction_index, construction) in model.constructions.iter().enumerate() {
+             if !construction.is_ordinary_opaque() {
+                 continue;
+             }
+             let context = CtfLayerContext {
+                 is_used_ctf: used_ctf_constructions.contains(&construction.id.0),
+-                errors_found: preprocessing_errors_found,
++                errors_found: shared_flags.errors_found,
+                 source_sink_present: construction.has_internal_heat_source(),
+                 // Normal Construction defaults in HeatBalanceManager1410.
+                 // Internal-source declarations are explicitly rejected.
+@@ -133,31 +139,45 @@
+                 ctf_coefficients_by_construction,
+                 context,
+             )?;
+-            let initial = initialize_construction_ctf_initial(
+-                construction,
+-                &model.constructions[..construction_index],
+-                &used_ctf_constructions,
+-                &entry.ctf01_layer_preprocessing,
+-                context,
+-                time_step_zone_hours,
+-            );
+-            let first_assembly = initialize_construction_ctf_first_assembly(
+-                &initial,
+-                &entry.ctf01_layer_preprocessing,
+-            );
+-            // Same original first assembly: actual06, then05, public07, public08.
+-            // Each actual error/non-invocation owner remains separate.
+-            let first_functions =
+-                initialize_construction_ctf_first_matrix_with_final_coefficients(&first_assembly);
+-            first_exponentials.push(first_functions.methods.exponential);
+-            first_inverses.push(first_functions.methods.inverse);
+-            first_gammas.push(first_functions.gammas);
+-            first_private_coefficients.push(first_functions.final_coefficients);
+-            first_assemblies.push(first_assembly);
+-            initial_discretizations.push(initial);
+-            if let Ok(preprocessing) = &entry.ctf01_layer_preprocessing.result {
+-                preprocessing_errors_found = preprocessing.errors_found;
++            // Legacy thermal/EIO construction remains separate after a selected stop.
++            // Only a genuinely invoked selected chain may update its shared flags.
++            if selected_chain_stop.is_none() {
++                if let Ok(preprocessing) = &entry.ctf01_layer_preprocessing.result {
++                    shared_flags.errors_found = preprocessing.errors_found;
++                }
+             }
++            let original_materials = layer_materials(
++                model, &material_slots, construction, &entry.material_layer_stack,
++            )?;
++            let original_layer_names = original_materials.iter()
++                .map(|material| material.name.0.as_str()).collect::<Vec<_>>();
++            let names = CtfCallerDiagnosticNames {
++                construction_name: construction.name.0.as_str(),
++                original_tot_layers: original_layer_names.len() as i32,
++                original_layer_material_names: &original_layer_names,
++            };
++            let retry = if let Some(prior_stop) = selected_chain_stop {
++                skip_construction_ctf_retry(construction.id, shared_flags, names, prior_stop)
++            } else {
++                let initial = initialize_construction_ctf_initial(
++                    construction,
++                    &model.constructions[..construction_index],
++                    &used_ctf_constructions,
++                    &entry.ctf01_layer_preprocessing,
++                    context,
++                    time_step_zone_hours,
++                );
++                let first_assembly = initialize_construction_ctf_first_assembly(
++                    &initial,
++                    &entry.ctf01_layer_preprocessing,
++                );
++                initial_discretizations.push(initial);
++                // Move the original first Box once; no combined08 call or replay.
++                initialize_construction_ctf_retry(first_assembly, shared_flags, names)
++            };
++            shared_flags = retry.flags_on_return;
++            selected_chain_stop = retry.selected_chain_stop;
++            retry_initializations.push(retry);
+             if entry.heat_capacity_j_per_m2_k.is_some() {
+                 massive_ctf_construction_ids.push(entry.construction_id);
+             } else {
+@@ -185,6 +205,7 @@
+             first_inverses,
+             first_gammas,
+             first_private_coefficients,
++            retry_initializations,
+             construction_slots,
+             entry_index_by_construction_slot,
+             no_mass_construction_ids,
+@@ -230,6 +251,11 @@
+ 
+     pub(crate) fn first_private_coefficients(&self) -> Vec<ConstructionCtfFirstFinalCoefficients> {
+         self.first_private_coefficients.clone()
++    }
++
++    /// Move actual selected storage into the final state without cloning a Box.
++    pub(crate) fn take_retry_initializations(&mut self) -> Vec<ConstructionCtfRetryInitialization> {
++        std::mem::take(&mut self.retry_initializations)
+     }
+ 
+     pub(crate) fn len(&self) -> usize {
+@@ -518,3 +544,7 @@
+     }
+     hasher.finish()
+ }
++
++#[cfg(test)]
++#[path = "ctf_retry_cache_tests.rs"]
++mod retry_tests;

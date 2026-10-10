@@ -1,0 +1,47 @@
+--- .runtime/porting/CTF-09/assembly-reassignment-prep-02/before/ctf_state_space_reassignment_tests.rs
++++ .runtime/porting/CTF-09/assembly-reassignment-prep-02/new/ctf_state_space_reassignment_tests.rs
+@@ -44,6 +44,44 @@
+ 
+ fn bits(values: &[f64]) -> Vec<u64> {
+     values.iter().map(|value| value.to_bits()).collect()
++}
++
++#[test]
++fn initial_checkpoint_is_real_pre_band_storage_after_the_single_b3_reset() -> TestResult {
++    let owner = single()?;
++    let checkpoint = owner.initial_pre_assignment.as_ref()
++        .ok_or_else(|| "initial producer checkpoint unavailable".to_string())?;
++    assert_eq!(checkpoint.context, owner.context);
++    assert_eq!(checkpoint.rcmax, owner.rcmax);
++    assert_eq!(checkpoint.a_mat.len(), owner.a_mat.len());
++    assert!(checkpoint.a_mat.iter().all(|value| value.to_bits() == 0));
++    assert_eq!(bits(&checkpoint.iden_matrix), bits(&owner.iden_matrix));
++    assert_eq!(checkpoint.b_mat3_after_reset.to_bits(), 0);
++    assert_ne!(bits(&checkpoint.a_mat), bits(&owner.a_mat));
++    Ok(())
++}
++
++#[test]
++fn later_reassignment_preserves_the_original_checkpoint_bits_and_context() -> TestResult {
++    let mut owner = single()?;
++    let checkpoint = owner.initial_pre_assignment.clone()
++        .ok_or_else(|| "initial producer checkpoint unavailable".to_string())?;
++    owner.a_mat[2] = f64::from_bits(0x7ff8_0000_0000_0031);
++    owner.iden_matrix[0] = -0.0;
++    let candidate = next(&owner);
++    reassign_1d_ctf_state_space(&mut owner, candidate)
++        .map_err(|error| format!("actual repeat rejected: {error:?}"))?;
++    let retained = owner.initial_pre_assignment.as_ref()
++        .ok_or_else(|| "repeat discarded initial producer checkpoint".to_string())?;
++    assert_eq!(retained.context, checkpoint.context);
++    assert_eq!(retained.rcmax, checkpoint.rcmax);
++    assert_eq!(bits(&retained.a_mat), bits(&checkpoint.a_mat));
++    assert_eq!(bits(&retained.iden_matrix), bits(&checkpoint.iden_matrix));
++    assert_eq!(retained.b_mat3_after_reset.to_bits(), checkpoint.b_mat3_after_reset.to_bits());
++    assert_ne!(retained.context.attempt_ordinal, owner.context.attempt_ordinal);
++    assert_eq!(owner.a_mat[2].to_bits(), 0x7ff8_0000_0000_0031);
++    assert_eq!(owner.iden_matrix[0].to_bits(), (-0.0_f64).to_bits());
++    Ok(())
+ }
+ 
+ fn rejected_without_write(

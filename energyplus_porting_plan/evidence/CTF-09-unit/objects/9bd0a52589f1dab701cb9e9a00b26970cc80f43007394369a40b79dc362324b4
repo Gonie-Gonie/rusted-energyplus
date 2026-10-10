@@ -1,0 +1,9 @@
+    if let Some((destination, context, source_rcmax, iden_matrix)) = checkpoint {
+        *destination = Some(CtfAssemblyPreAssignment {
+            context,
+            rcmax: source_rcmax,
+            a_mat: a_mat.to_vec(),
+            iden_matrix: iden_matrix.to_vec(),
+            b_mat3_after_reset: b_mat[2],
+        });
+    }

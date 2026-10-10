@@ -1,0 +1,853 @@
+--- held-CTF09-03/manifest.json
++++ proposed-CTF09-04/manifest.json
+@@ -4,14 +4,14 @@
+   "own_sources": [
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_unit.py",
+-        "sha256": "75695f6264e8eca33906706980aa4697f7fb5f5a51c849def259d7300d966f2e",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_unit.py",
++        "sha256": "955b31f1aa3fdab51d5e31eda2bdcd9f61ce8d36b07c71a360344ff97c995f54",
+         "size_bytes": 80804,
+         "line_count": 871
+       },
+       "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/diffs/compare_unit.py.from-ctf08.diff",
+-        "sha256": "d952a6d40b5930aadd4f299a6c97b53600cfee321ad8e5fe26dbf634853deed1",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/diffs/compare_unit.py.from-ctf08.diff",
++        "sha256": "be1f7426685288c721f3a3edecffc61f030a64784d975628074a0d604988d210",
+         "size_bytes": 41633,
+         "line_count": 329
+       },
+@@ -31,14 +31,14 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_production.py",
+-        "sha256": "ca931b635bb1213a6c795bdc88778073035e1b7abd0dcb2859061ea2609bf347",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_production.py",
++        "sha256": "bd28cfb35f74c2a3dd8f53d795be71c3c29d5ebb398be5f9b8dbaf0f81645f5c",
+         "size_bytes": 93945,
+         "line_count": 986
+       },
+       "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/diffs/compare_production.py.from-ctf08.diff",
+-        "sha256": "e961bb1bfcfa05d939ca9f5bcdede9b96d8358d54dbd15a03f65b79754d9d821",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/diffs/compare_production.py.from-ctf08.diff",
++        "sha256": "fbd6572de292b4b6f7b879e81bf6bae42e7aca2a81dde6f6287b94120cf81bf7",
+         "size_bytes": 42910,
+         "line_count": 298
+       },
+@@ -58,7 +58,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/packet_io.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/packet_io.py",
+         "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+         "size_bytes": 4723,
+         "line_count": 120
+@@ -85,7 +85,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_compare.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_compare.py",
+         "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+         "size_bytes": 22937,
+         "line_count": 282
+@@ -112,7 +112,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/initial_shape.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/initial_shape.py",
+         "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+         "size_bytes": 26626,
+         "line_count": 309
+@@ -127,7 +127,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_shape.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_shape.py",
+         "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+         "size_bytes": 30929,
+         "line_count": 284
+@@ -154,7 +154,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/gamma_shape.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/gamma_shape.py",
+         "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+         "size_bytes": 34636,
+         "line_count": 316
+@@ -181,7 +181,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/coefficient_shape.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/coefficient_shape.py",
+         "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+         "size_bytes": 50650,
+         "line_count": 516
+@@ -208,7 +208,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_shape.py",
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_shape.py",
+         "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+         "size_bytes": 45117,
+         "line_count": 407
+@@ -223,15 +223,15 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_compare.py",
+-        "sha256": "f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519",
+-        "size_bytes": 38428,
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_compare.py",
++        "sha256": "80a4fecec35bd345cb301b72aef6be8952fe01b9ef2a17327f7f9a4eb3a91355",
++        "size_bytes": 38478,
+         "line_count": 479
+       },
+       "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/diffs/retry_compare.py.from-ctf08.diff",
+-        "sha256": "a8e7c36435578c0c0139c10738a0f385742bd74d86d87deefea84095d0d825fe",
+-        "size_bytes": 38975,
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/diffs/retry_compare.py.from-ctf08.diff",
++        "sha256": "28e5db3e2c47589ca63600520a0e8c3709c76de19ce5a25263b8f9e0ee3ed673",
++        "size_bytes": 39025,
+         "line_count": 482
+       },
+       "new_source": true
+@@ -272,10 +272,10 @@
+     }
+   ],
+   "README": {
+-    "path": ".runtime/porting/CTF-09/comparer-prep-03/README.md",
+-    "sha256": "78f4ddaf73b7bf2f1e654671f041018c29e2ae3a6b4cb718f61ac34352167675",
+-    "size_bytes": 7035,
+-    "line_count": 104
++    "path": ".runtime/porting/CTF-09/comparer-prep-04/README.md",
++    "sha256": "c0244a0e9b3770bd9cee0a611188069730299e9cc522ac543c856ee6794484ba",
++    "size_bytes": 7821,
++    "line_count": 115
+   },
+   "authoring_sources": [
+     {
+@@ -801,6 +801,14 @@
+       "sha256": "83f3b7fbae439b0b6d2249b4ccb74d1e4c5d61962918b92e8057d577fc62d060",
+       "size_bytes": 556,
+       "purpose": "Reached matrix requires actual construction and caller owner"
++    },
++    {
++      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/production_shape.py",
++      "start_line": 38,
++      "end_line": 82,
++      "sha256": "416fee8aeb82d888a21ebf43f352356c36bafd2aca1235feb6afa7f711a1d090",
++      "size_bytes": 4019,
++      "purpose": "Actual production availability wrapper normalizes to its inner snapshot or genuine None"
+     }
+   ],
+   "source_correspondence": {
+@@ -1180,225 +1188,243 @@
+     "observation_1GiB_bound_unchanged": true,
+     "science_profiles_Comparison_methods_and_target_imports_changed": false
+   },
+-  "narrow_source_correspondence": [
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_unit.py",
+-        "sha256": "75695f6264e8eca33906706980aa4697f7fb5f5a51c849def259d7300d966f2e",
+-        "size_bytes": 80804,
+-        "line_count": 871
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/compare_unit.py",
+-        "sha256": "04ac2faecb1177a107c871a4f5b02e15b98433ad1768bdf3a634c6f6bb829dba",
+-        "size_bytes": 80804,
+-        "line_count": 871
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/compare_unit.py.diff",
+-        "sha256": "9c5f28d644a5425a238fa441bf7941a06bea1cfd4755baaa2859673ddf5a6bf8",
+-        "size_bytes": 672,
+-        "line_count": 11
+-      },
+-      "byte_exact_accepted02": false
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_production.py",
+-        "sha256": "ca931b635bb1213a6c795bdc88778073035e1b7abd0dcb2859061ea2609bf347",
+-        "size_bytes": 93945,
+-        "line_count": 986
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/compare_production.py",
+-        "sha256": "491aced377247a7b93da924ae30439b8db656b54338b0936aacb367a4c7baa5b",
+-        "size_bytes": 93945,
+-        "line_count": 986
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/compare_production.py.diff",
+-        "sha256": "17476daf29caf70df4770271e594dc3c1582fe6ce497206a950734b227375edd",
+-        "size_bytes": 684,
+-        "line_count": 11
+-      },
+-      "byte_exact_accepted02": false
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/packet_io.py",
+-        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+-        "size_bytes": 4723,
+-        "line_count": 120
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/packet_io.py",
+-        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+-        "size_bytes": 4723,
+-        "line_count": 120
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/packet_io.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_compare.py",
+-        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+-        "size_bytes": 22937,
+-        "line_count": 282
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/method_compare.py",
+-        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+-        "size_bytes": 22937,
+-        "line_count": 282
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/method_compare.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/initial_shape.py",
+-        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+-        "size_bytes": 26626,
+-        "line_count": 309
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/initial_shape.py",
+-        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+-        "size_bytes": 26626,
+-        "line_count": 309
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/initial_shape.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_shape.py",
+-        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+-        "size_bytes": 30929,
+-        "line_count": 284
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/method_shape.py",
+-        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+-        "size_bytes": 30929,
+-        "line_count": 284
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/method_shape.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/gamma_shape.py",
+-        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+-        "size_bytes": 34636,
+-        "line_count": 316
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/gamma_shape.py",
+-        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+-        "size_bytes": 34636,
+-        "line_count": 316
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/gamma_shape.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/coefficient_shape.py",
+-        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+-        "size_bytes": 50650,
+-        "line_count": 516
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/coefficient_shape.py",
+-        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+-        "size_bytes": 50650,
+-        "line_count": 516
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/coefficient_shape.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_shape.py",
+-        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+-        "size_bytes": 45117,
+-        "line_count": 407
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/retry_shape.py",
+-        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+-        "size_bytes": 45117,
+-        "line_count": 407
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/retry_shape.py.diff",
+-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-        "size_bytes": 0,
+-        "line_count": 0
+-      },
+-      "byte_exact_accepted02": true
+-    },
+-    {
+-      "source": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_compare.py",
+-        "sha256": "f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519",
+-        "size_bytes": 38428,
+-        "line_count": 479
+-      },
+-      "before": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/retry_compare.py",
+-        "sha256": "965b062fd76958f83a5c52ea77c61a577529f7ec33170a7210e69897406914a8",
+-        "size_bytes": 38384,
+-        "line_count": 478
+-      },
+-      "exact_diff": {
+-        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/retry_compare.py.diff",
+-        "sha256": "d50ec9635a92eec2df8bd9973b15aea10cb253fa428ba3f061842f686f1313d1",
+-        "size_bytes": 1566,
+-        "line_count": 20
+-      },
+-      "byte_exact_accepted02": false
+-    }
+-  ],
+   "README_delta_from_02": {
+     "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/README.md.diff",
+     "sha256": "1dbc730745b86d25abcdd3fa1ec3777a5410ad8d15b88571ea76f6495ea09e76",
+     "size_bytes": 1203,
+     "line_count": 19
+   },
+-  "fresh03_change": {
++  "held_CTF09_03_manifest": {
++    "path": ".runtime/porting/CTF-09/comparer-prep-03/manifest.json",
++    "sha256": "d5e29fe2b353d2286b5c25530be115b11e48f4bcaab9587a80d5033f1cc6a907",
++    "size_bytes": 54811,
++    "line_count": 1418
++  },
++  "before_03_manifest": {
++    "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/manifest.json",
++    "sha256": "d5e29fe2b353d2286b5c25530be115b11e48f4bcaab9587a80d5033f1cc6a907",
++    "size_bytes": 54811,
++    "line_count": 1418
++  },
++  "before_03_README": {
++    "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/README.md",
++    "sha256": "78f4ddaf73b7bf2f1e654671f041018c29e2ae3a6b4cb718f61ac34352167675",
++    "size_bytes": 7035,
++    "line_count": 104
++  },
++  "historical_fresh03_source_correspondence": [
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_unit.py",
++        "sha256": "75695f6264e8eca33906706980aa4697f7fb5f5a51c849def259d7300d966f2e",
++        "size_bytes": 80804,
++        "line_count": 871
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/compare_unit.py",
++        "sha256": "04ac2faecb1177a107c871a4f5b02e15b98433ad1768bdf3a634c6f6bb829dba",
++        "size_bytes": 80804,
++        "line_count": 871
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/compare_unit.py.diff",
++        "sha256": "9c5f28d644a5425a238fa441bf7941a06bea1cfd4755baaa2859673ddf5a6bf8",
++        "size_bytes": 672,
++        "line_count": 11
++      },
++      "byte_exact_accepted02": false
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_production.py",
++        "sha256": "ca931b635bb1213a6c795bdc88778073035e1b7abd0dcb2859061ea2609bf347",
++        "size_bytes": 93945,
++        "line_count": 986
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/compare_production.py",
++        "sha256": "491aced377247a7b93da924ae30439b8db656b54338b0936aacb367a4c7baa5b",
++        "size_bytes": 93945,
++        "line_count": 986
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/compare_production.py.diff",
++        "sha256": "17476daf29caf70df4770271e594dc3c1582fe6ce497206a950734b227375edd",
++        "size_bytes": 684,
++        "line_count": 11
++      },
++      "byte_exact_accepted02": false
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/packet_io.py",
++        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
++        "size_bytes": 4723,
++        "line_count": 120
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/packet_io.py",
++        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
++        "size_bytes": 4723,
++        "line_count": 120
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/packet_io.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_compare.py",
++        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
++        "size_bytes": 22937,
++        "line_count": 282
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/method_compare.py",
++        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
++        "size_bytes": 22937,
++        "line_count": 282
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/method_compare.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/initial_shape.py",
++        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
++        "size_bytes": 26626,
++        "line_count": 309
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/initial_shape.py",
++        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
++        "size_bytes": 26626,
++        "line_count": 309
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/initial_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_shape.py",
++        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
++        "size_bytes": 30929,
++        "line_count": 284
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/method_shape.py",
++        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
++        "size_bytes": 30929,
++        "line_count": 284
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/method_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/gamma_shape.py",
++        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
++        "size_bytes": 34636,
++        "line_count": 316
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/gamma_shape.py",
++        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
++        "size_bytes": 34636,
++        "line_count": 316
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/gamma_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/coefficient_shape.py",
++        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
++        "size_bytes": 50650,
++        "line_count": 516
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/coefficient_shape.py",
++        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
++        "size_bytes": 50650,
++        "line_count": 516
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/coefficient_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_shape.py",
++        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
++        "size_bytes": 45117,
++        "line_count": 407
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/retry_shape.py",
++        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
++        "size_bytes": 45117,
++        "line_count": 407
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/retry_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_accepted02": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_compare.py",
++        "sha256": "f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519",
++        "size_bytes": 38428,
++        "line_count": 479
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/retry_compare.py",
++        "sha256": "965b062fd76958f83a5c52ea77c61a577529f7ec33170a7210e69897406914a8",
++        "size_bytes": 38384,
++        "line_count": 478
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/retry_compare.py.diff",
++        "sha256": "d50ec9635a92eec2df8bd9973b15aea10cb253fa428ba3f061842f686f1313d1",
++        "size_bytes": 1566,
++        "line_count": 20
++      },
++      "byte_exact_accepted02": false
++    }
++  ],
++  "historical_fresh03_change": {
+     "source_only_owner_snapshot_wiring": true,
+     "changed_executable_files": [
+       "compare_unit.py",
+@@ -1414,5 +1440,240 @@
+     "held02_and_actual_failed_invocation_preserved": true,
+     "target_import_execution_or_scientific_payload_reads_performed": false,
+     "metadata_authoring": "Inline stdlib copy/SHA/difflib/AST only; no new executable preparation stage."
++  },
++  "narrow_source_correspondence": [
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_unit.py",
++        "sha256": "955b31f1aa3fdab51d5e31eda2bdcd9f61ce8d36b07c71a360344ff97c995f54",
++        "size_bytes": 80804,
++        "line_count": 871
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/compare_unit.py",
++        "sha256": "75695f6264e8eca33906706980aa4697f7fb5f5a51c849def259d7300d966f2e",
++        "size_bytes": 80804,
++        "line_count": 871
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/compare_unit.py.diff",
++        "sha256": "422aebaa917b2e84ee82311b0c2b64324e152a59a6cd0ef3a421d4011061dabd",
++        "size_bytes": 668,
++        "line_count": 11
++      },
++      "byte_exact_held03": false
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_production.py",
++        "sha256": "bd28cfb35f74c2a3dd8f53d795be71c3c29d5ebb398be5f9b8dbaf0f81645f5c",
++        "size_bytes": 93945,
++        "line_count": 986
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/compare_production.py",
++        "sha256": "ca931b635bb1213a6c795bdc88778073035e1b7abd0dcb2859061ea2609bf347",
++        "size_bytes": 93945,
++        "line_count": 986
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/compare_production.py.diff",
++        "sha256": "f597cac24e779be7a7db565cbb5278a0a3b325c465a1f2664bdfb175c368c086",
++        "size_bytes": 680,
++        "line_count": 11
++      },
++      "byte_exact_held03": false
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/packet_io.py",
++        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
++        "size_bytes": 4723,
++        "line_count": 120
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/packet_io.py",
++        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
++        "size_bytes": 4723,
++        "line_count": 120
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/packet_io.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_compare.py",
++        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
++        "size_bytes": 22937,
++        "line_count": 282
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/method_compare.py",
++        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
++        "size_bytes": 22937,
++        "line_count": 282
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/method_compare.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/initial_shape.py",
++        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
++        "size_bytes": 26626,
++        "line_count": 309
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/initial_shape.py",
++        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
++        "size_bytes": 26626,
++        "line_count": 309
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/initial_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_shape.py",
++        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
++        "size_bytes": 30929,
++        "line_count": 284
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/method_shape.py",
++        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
++        "size_bytes": 30929,
++        "line_count": 284
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/method_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/gamma_shape.py",
++        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
++        "size_bytes": 34636,
++        "line_count": 316
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/gamma_shape.py",
++        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
++        "size_bytes": 34636,
++        "line_count": 316
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/gamma_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/coefficient_shape.py",
++        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
++        "size_bytes": 50650,
++        "line_count": 516
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/coefficient_shape.py",
++        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
++        "size_bytes": 50650,
++        "line_count": 516
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/coefficient_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_shape.py",
++        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
++        "size_bytes": 45117,
++        "line_count": 407
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/retry_shape.py",
++        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
++        "size_bytes": 45117,
++        "line_count": 407
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/retry_shape.py.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "byte_exact_held03": true
++    },
++    {
++      "source": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_compare.py",
++        "sha256": "80a4fecec35bd345cb301b72aef6be8952fe01b9ef2a17327f7f9a4eb3a91355",
++        "size_bytes": 38478,
++        "line_count": 479
++      },
++      "before": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/retry_compare.py",
++        "sha256": "f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519",
++        "size_bytes": 38428,
++        "line_count": 479
++      },
++      "exact_diff": {
++        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/retry_compare.py.diff",
++        "sha256": "ac6bb0000dae933f4e08dc3a3785f93717934113f976f3374e8e151cc81309c2",
++        "size_bytes": 698,
++        "line_count": 11
++      },
++      "byte_exact_held03": false
++    }
++  ],
++  "README_delta_from_03": {
++    "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/README.md.diff",
++    "sha256": "ee7abddc9f1bfd05e0a651897e613e8b421c36d2dc17662b0dc74c5ba22c6fbb",
++    "size_bytes": 1113,
++    "line_count": 17
++  },
++  "fresh04_change": {
++    "source_only_actual_lane_owner_wiring": true,
++    "changed_executable_files": [
++      "compare_unit.py",
++      "compare_production.py",
++      "retry_compare.py"
++    ],
++    "actual_owner_expression": "operation[\"after\"][\"snapshot\"] if production else operation[\"after\"]",
++    "production_unavailable_snapshot_None_preserved": true,
++    "all_five_validators_receive_same_actual_owner": true,
++    "both_main_changes_only_RETRY_PAIR_SHA": true,
++    "seven_other_executable_bodies_byte_exact_02_and03": true,
++    "final_OriginalDataQA02_inventory_unchanged": true,
++    "Comparison_science_pairing_profiles_counts_absence_selection_source_guards_changed": false,
++    "held03_preserved_not_executed": true,
++    "target_import_execution_or_scientific_payload_reads_performed": false
+   }
+ }

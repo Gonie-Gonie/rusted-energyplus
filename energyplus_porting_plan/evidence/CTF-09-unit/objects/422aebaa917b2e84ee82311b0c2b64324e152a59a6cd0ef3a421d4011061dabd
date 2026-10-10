@@ -1,0 +1,11 @@
+--- held-CTF09-03/compare_unit.py
++++ proposed-CTF09-04/compare_unit.py
+@@ -38,7 +38,7 @@
+ 
+ INITIAL_SHAPE_SHA = '13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc'
+ RETRY_SHAPE_SHA = 'c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a'
+-RETRY_PAIR_SHA = 'f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519'
++RETRY_PAIR_SHA = '80a4fecec35bd345cb301b72aef6be8952fe01b9ef2a17327f7f9a4eb3a91355'
+ RETRY_VARIABLES = ['CTF09.pre_AMat', 'CTF09.pre_IdenMatrix', 'CTF09.assignedAbsSumXi', 'CTF09.assignedAbsSumYi', 'CTF09.assignedAbsSumZi', 'CTF09.BiggestSum', 'CTF09.pre_CTFTimeStep', 'CTF09.post_CTFTimeStep']
+ 
+ class Comparison:

@@ -59,7 +59,7 @@ SUR-06에서 실제 NumHistories 소비; 단위 W와 상대오차 혼용 금지
 ## 종료 체크
 
 - [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -80,3 +80,11 @@ Sum owners exist only after the actual919-930 branch. The >18 term branch skips 
 LoopExit is distinct from whole calculateTransferFunction return. Severe break may continue into public SI stores1024-1077; public19 capacity, SI conversion/stores, reverse/2D/internal-source branches and SUR handoff remain outside this selected retry proposal. No fatal, severe, partial, uninvoked or unavailable branch receives PASS. Actual Native diagnostics remain global occupied message records; Rust selected call intents are not substituted for that backend.
 
 Same literal39 unit models/42 whole calls and fixed15 production models/195 loader phases/45 guards are inherited without new expected outcomes. Current09 amendment/check authority must be real and separate from immutable historical_prior_08_authority, including nested historical07 ancestry. This draft changes no canonical gate and claims no numerical, integration, production or complete-card PASS. Source/full peer, actual amendment/check, fresh freeze, protected build/derive/PE and structural Original review remain Root actions.
+
+## Actual selected retry-visit comparison
+
+Same frozen inputs and strict zero profiles: unit numeric945014/discrete3840604, fixed15 loader numeric7350/discrete40251; all mismatch0. Eight primary retry profiles and inherited assembly/method/Gamma/private-final handoffs have max absolute error/RMSE0. All actual selected visit owners are paired by real call/attempt identity; partial, absent and unavailable observations receive no PASS.
+
+Actual Clippy/fmt checks0; focused162 and workspace4782 tests passed with0 failed. All candidate/quality/comparison recorders bind Sourcef280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced. The genuine first Clippy missing-docs and second macro recursion-limit failures are preserved. Corrections add eight field descriptions and a single unit-observer crate macro expansion limit; no math or input changes. Full actual scientific bytes, sources and commands are retained in evidence/CTF-09-unit/{manifest,summary}.json.
+
+Only the selected unit gate passes. Whole Native public SI19 stores, reports/final fatal backend, SUR/cache handoff and integration/production/full-card gates remain pending. Fixed6 CLI and precise Original retirement will be recorded separately.

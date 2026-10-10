@@ -1,0 +1,55 @@
+CTF09 retry driver02: genuine producer checkpoint and natural retry test
+
+SOURCE-ONLY HELD; predecessor01 remains immutable and unexecuted.
+Root and Base accepted the complete01 driver. This successor changes only a
+borrowed checkpoint accessor, tests, and exact source/dependency metadata.
+
+ConstructionCtfRetryDriver::initial_pre_assignment() borrows the optional real
+CtfStateSpaceAssembly.initial_pre_assignment from the original retained Box.
+Accepted producer02 captures it inside the same initial assignment body after
+its one B3 reset and before any cap/band arithmetic, using actual allocated AMat
+and source-produced IdenMatrix. The driver does not recreate zeros/identity,
+replay assembly, clone the first owner, or update that captured initial stamp.
+Absent owner/checkpoint remains None, not a zero fallback or PASS. NumCTFTerms
+and shared flags are not invented as fields of that pure producer checkpoint.
+Later reassignment snapshots remain actual pre-call copies, with genuine preceding
+private NumCTFTerms and literal supplied next context; Native broader fields stay
+separate unless an actual Rust owner exists. The new borrowed accessor is
+the only added execution-module code; inverse restoration reproduces01 exactly.
+
+The ninth proposed test uses only INPUTS from the existing frozen39 case
+active-prefix-11, helper-request SHA3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57.
+Exact MASS_A/B/C member bits, original11 MaterialId order, caller0.25 and false
+shared flags pass through real preprocessing, public initial classification,
+first assembly and the retry driver once. No nodes, dx, initial dt/history,
+NumCTFTerms, convergence flags or numerical output arrays are supplied as answers.
+The test asserts more than one actual visit and checks actual caller-postcheck
+to-next-stamp association, preceding term counts, fresh live Gamma1/2 allocations,
+and retained genuine initial checkpoint. No Native input case is added or changed.
+Stdlib text/input association checks authenticate all15 member bits and the
+original IDs/caller; they do not evaluate a matrix formula or run a target.
+This source-plausible natural multi-visit assertion remains UNEXECUTED. If Root's
+real test does not reach retries, it is a genuine test failure, not evidence to
+silently fabricate branch activation or substitute Native expected values.
+
+The actual arithmetic/control/caller/stop/reassignment loop is byte-exact01.
+Original06 exponential→05 inverse on original AMat/Iden→fresh07 Gamma→08 private
+final→09 caller order, strict postincrement/unconditional severe/fatal decisions,
+no attempt cap and separate method/postcheck stamps all remain unchanged.
+Private terminal outcome is not a whole Native return or public19-store safety
+claim: Source severe break may retain excessive terms; CTF10 stores are excluded.
+No cache/state activation, global diagnostic backend, retry-answer injection,
+coefficient hash/SI19 store or complete CTF09/SUR integration PASS is introduced.
+
+The one parent declaration remains the exact accepted01 prospective08 mod67→68
+proposal. It is not current canonical07; fresh actual08 parent/Cargo source
+bindings and Root prerequisites/review remain mandatory before application.
+Old01 absence language remains historical; genuine first checkpoint now exists
+only through the separately reviewed producer02 API. All original07/08 numerical
+and first-only policies remain unchanged; future09 comparison is not run here.
+
+Nine tests are proposed, none executed. Only source/input/metadata reads and
+stdlib packaging occurred; no project imports, Cargo/tests/build/formatter,
+engines, scientific/weather/binary reads, canonical/Git changes or new framework.
+Author wrote pure06/caller09/driver01; Base's independent source peer and Root
+FULL review are required, without claiming self-formula scientific certification.

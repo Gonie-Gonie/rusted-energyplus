@@ -1,0 +1,233 @@
+"""Stdlib-only source proposal packaging; never imports a project or target."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/CTF-09/retry-driver-prep-01'
+assert not (BASE / 'manifest.json').exists(), 'immutable held preparation already exists'
+
+def raw(path):
+    return (ROOT / path).read_bytes()
+
+def ref(path):
+    data = raw(path)
+    return {'path': path, 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def write(relative, data):
+    path = BASE / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+    return path.relative_to(ROOT).as_posix()
+
+def delta(before, after, destination, name):
+    old = raw(before).decode('utf8').splitlines(keepends=True) if before else []
+    new = raw(after).decode('utf8').splitlines(keepends=True)
+    text = ''.join(difflib.unified_diff(old, new, fromfile=destination if before else '/dev/null',
+                                       tofile=destination))
+    return ref(write('diffs/' + name, text.encode('utf8')))
+
+def selected(path, first, last, purpose):
+    lines = raw(path).splitlines(keepends=True)
+    assert 1 <= first <= last <= len(lines)
+    data = b''.join(lines[first - 1:last])
+    return {'path': path, 'start_line': first, 'end_line': last,
+            'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'purpose': purpose}
+
+prefix = BASE.relative_to(ROOT).as_posix()
+parent = '.runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/proposed/crates/ep_runtime/src/heat_balance/mod.rs'
+assert ref(parent)['sha256'] == '424adf0129da84cc0877279802678bcbfd8627ed1318d68d9cdc5b94c2c944c1'
+before = write('before/mod.rs', raw(parent))
+body = raw(parent).decode('utf8')
+anchor = 'pub mod ctf_initial_owner;\n'
+assert body.count(anchor) == 1 and 'pub mod ctf_retry_driver;' not in body
+proposed = write('proposed/mod.rs', body.replace(anchor, anchor + 'pub mod ctf_retry_driver;\n').encode('utf8'))
+
+changes = []
+for name in ['ctf_retry_driver.rs', 'ctf_retry_driver_tests.rs']:
+    path = prefix + '/new/' + name
+    destination = 'crates/ep_runtime/src/heat_balance/' + name
+    changes.append({'destination': destination, 'before': None, 'proposed': ref(path),
+                    'exact_diff': delta(None, path, destination, name + '.diff')})
+changes.append({'destination': 'crates/ep_runtime/src/heat_balance/mod.rs',
+                'before_role': 'immutable prospective08 parent, not a claim of current canonical bytes',
+                'before_authority': ref(parent), 'before': ref(before), 'proposed': ref(proposed),
+                'exact_diff': delta(before, proposed, 'crates/ep_runtime/src/heat_balance/mod.rs', 'mod.rs.diff')})
+
+assembly = '.runtime/porting/CTF-09/assembly-reassignment-prep-01/proposed/ctf_state_space_assembly.rs'
+caller = '.runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability.rs'
+exponential = '.runtime/porting/source-objects/32/32765ebea79d230319352d39de6fabf099a7c15a3c294456810c58bc1e21cc73'
+inverse = '.runtime/porting/source-objects/36/3676c27ee3a0c0f9e2540e1df028c6df4305e14d80b49d65e37a7f6be5d123a8'
+first = '.runtime/porting/source-objects/dd/dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2'
+gamma = '.runtime/porting/CTF-07/applied-final-source-02/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs'
+final = '.runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs'
+native = '.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc'
+headers = '.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh'
+fmath = '.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh'
+utility = '.reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc'
+pins = {
+    assembly: '3758cdacc94694866fec03cdf2a71a6f67c0d70d9f85afa37539dbd86937c8fe',
+    caller: '64c3706a2b74369bf9a98bafa71bb2d9cea3865c17946b202cc1e2981051ec78',
+    gamma: 'ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3',
+    final: 'aa2e45908e291436ec654699020759f37909b358104aef478224c16e3e3ec4d4',
+    native: 'd85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695',
+}
+for path, sha in pins.items():
+    assert ref(path)['sha256'] == sha, path
+
+dependency_paths = [
+    'energyplus_porting_plan/cards/CTF-09.md', native, headers, fmath, utility,
+    '.runtime/porting/CTF-09/readiness-audit-01/manifest.json',
+    '.runtime/porting/CTF-09/readiness-audit-01/audit.md',
+    '.runtime/porting/CTF-09/caller-stability-prep-01/manifest.json', caller,
+    '.runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability_tests.rs',
+    '.runtime/porting/CTF-09/assembly-reassignment-prep-01/manifest.json', assembly,
+    '.runtime/porting/CTF-09/assembly-reassignment-prep-01/new/ctf_state_space_reassignment_tests.rs',
+    '.runtime/porting/CTF-07/applied-final-source-02/manifest.json', gamma,
+    '.runtime/porting/CTF-08/rust-final-coefficients-prep-01/manifest.json', final,
+    '.runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/manifest.json',
+    '.runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/new/ctf_first_final_coefficients_owner.rs',
+    '.runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-06/manifest.json',
+    '.runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/new/ctf_first_final_coefficients_ingress.rs',
+    '.runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/new/ctf_first_final_coefficients_ingress_tests.rs',
+    first, exponential, inverse,
+    '.runtime/porting/source-objects/0c/0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7',
+    'crates/ep_model/src/ids.rs', parent,
+]
+
+readme = '''Selected CTF09 retry owner, source proposal only
+
+The public run_selected_construction_ctf_retry_driver consumes the genuine
+ConstructionCtfFirstAssembly by value. It moves the original Box and retains
+its AMat, source-produced IdenMatrix, converted layers, Nodes and dx storage.
+It does not replay the first638-728 assembly or invoke first-only wrappers.
+Every actual visit calls pure06 exponential, pure05 inverse on ORIGINAL AMat
+and Iden, fresh pure07 Gamma, pure08 private coefficients, then caller09 in
+that order. Existing method bodies, profiles and first-only APIs are unchanged.
+
+A returned Retry alone advances the checked observation ordinal and supplies
+the caller's exact postcheck timestep/history to the accepted same-storage
+reassignment API. No timestep/history is derived by the driver. Original657-981
+has no arbitrary attempt cap; neither does this proposal. Shared flags are
+carried literally and only the actually reached caller decision may change them.
+Converged, seven-hour severe break and fatal boundaries remain distinct.
+Fatal returns a selected Rust decision before stores; no Native throw or global
+diagnostic backend/counters are fabricated. Explicit diagnostic call intents
+retain original construction and LayerPoint material names, not merged names.
+
+Each attempt records actual method Results and caller input/postcheck stamps.
+None for a later method means it was genuinely uninvoked after a prior stop.
+Separate reassignment records copy real retained pre-call AMat/Iden/context,
+the preceding actual NumCTFTerms, exact supplied next stamp, actual return,
+and actual post-call context. These observation copies never feed arithmetic.
+The first pre-band buffer state is unavailable here: the consumed first owner
+already returned after assignment. It is not reconstructed as zeros/identity.
+The Native first pre-band capture therefore cannot be claimed paired by this API.
+Later pre-call copies precede the internal B3 reset; pair AMat/Iden only with the
+Native after661 pre-band record, not an invented full intermediate checkpoint.
+
+The retained assembly ends with the last actual METHOD stamp. Last caller
+postcheck_context may have advanced dt/history even on terminal severe break;
+it never relabels the returned private method owner. A later scope stop keeps
+the last genuinely returned caller stamp distinct from the current assembly.
+All visits and reassignment calls are retained without truncation or guessed
+counts. Rust shape/defined-int-domain/association failures are explicit scope
+stops, not Native fatal outcomes. No synthetic values or default success result.
+
+Existing pure APIs allocate separate per-visit workspaces. This owner promises
+original AMat/Iden/prefix storage persistence, not Native allocation identity
+for AExp/AInv/Gamma/private workspaces. Source reinitializes Gamma1/2 and s0/s/e
+on each actual method invocation; each returned Rust owner preserves that call.
+Private PhiR0/Rnew/Rold remain method-local; preceding NumCTFTerms is not reset.
+Global DisplayString/report side effects and actual diagnostic callback ordering
+remain unpaired until the separate genuine Native09 observation is frozen.
+
+Eight proposed tests cover actual real-chain call custody and original allocation
+lifetime, prerequisite/unavailable stops, identity/first-ordinal rejection,
+actual exponential shape/undefined-cast stops, literal next-stamp copying and
+checked ordinal overflow. They contain literal inputs and structural assertions,
+not Native expected arrays. Tests are not executed and certify no scientific PASS.
+Existing caller09 tests cover skipped sums, strict threshold/NaN/short-circuit,
+postincrement/fatal/severe behavior; the driver adds no duplicate formulas.
+
+The sole parent declaration uses immutable prospective08 mod.rs67 as BEFORE,
+not current canonical07. Caller09 and reassignment09 are accepted held prerequisites;
+private08 and prospective08 parents remain installation dependencies. A fresh
+actual08 parent/Cargo source rebase and Root review are mandatory before apply.
+No cache/state/production initializer is activated. CTF10 SI/public19 stores,
+SUR consumers, reverse reuse, all-resistive/loading-error/unused routes and
+full whole-method initialization/completion remain outside this selected driver.
+
+Author wrote pure06, caller09 and some transport proposals. Root and Base must
+independently review this new orchestration; this is no self-formula certificate.
+Only source/metadata reads and stdlib packaging occurred. No project/target import,
+Cargo/build/test/formatter/engine/Git invocation, canonical edit, result/weather/
+binary payload read, new QA framework or actual execution claim is included.
+'''
+readme_path = write('README.md', readme.encode('utf8'))
+module = raw(prefix + '/new/ctf_retry_driver.rs').decode('utf8')
+tests = raw(prefix + '/new/ctf_retry_driver_tests.rs').decode('utf8')
+assert tests.count('#[test]') == 8
+assert '.unwrap(' not in tests and '.expect(' not in tests
+assert 'assembly.a_mat = ' not in module and 'assembly.iden_matrix = ' not in module
+ast.parse(raw(prefix + '/prepare.py').decode('utf8'))
+
+manifest = {
+    'schema': 'ctf09-selected-retry-driver-source-preparation.v1',
+    'status': 'SOURCE-ONLY-HELD-not-installed-or-executed',
+    'energyplus_commit': '6f2e40d10250a105b49966baa24d843711e61048',
+    'changes': changes, 'README': ref(readme_path), 'source_authoring': ref(prefix + '/prepare.py'),
+    'dependencies': [ref(path) for path in dict.fromkeys(dependency_paths)],
+    'source_ranges': [
+        selected(native, 638, 660, 'once-only source allocations and identity producer before657 loop'),
+        selected(native, 661, 728, 'selected repeated1D assignment, original band and compressed owners'),
+        selected(native, 875, 903, 'actual06/05/07/08 order followed by separate caller convergence variable'),
+        selected(native, 908, 941, 'excessive-term skip, ordered sums, postincrement, noreturn fatal boundary'),
+        selected(native, 943, 981, 'unconditional seven-hour diagnostics/flags/break and loop exit'),
+        selected(native, 1019, 1077, 'explicitly excluded public SI stores after selected loop'),
+        selected(native, 1079, 1103, 'original assembly-buffer lifetime through cleanup before whole return'),
+        selected(native, 1183, 1185, 'exponential copies original AMat into private local workspace'),
+        selected(native, 1362, 1365, 'Backup restores AExp, not original AMat or Iden'),
+        selected(native, 1404, 1407, 'inverse private AMat1/AInv initialize from originals'),
+        selected(native, 1529, 1558, 'each Gamma call reinitializes actual Gamma buffers'),
+        selected(native, 1637, 1644, 'each final method reinitializes actual private s0/s/e'),
+        selected(fmath, 479, 481, 'caller actual ternary max including ties and NaN'),
+        selected(assembly, 1, 418, 'accepted persistent assembly and same-storage reassign API'),
+        selected(caller, 1, 277, 'accepted caller09 decision/diagnostics and branch-assigned stamps'),
+        selected(first, 1, 126, 'actual first wrapper, source-backed original owner association'),
+    ],
+    'public_API': {
+        'function': 'run_selected_construction_ctf_retry_driver(ConstructionCtfFirstAssembly, CtfCallerSharedFlags, CtfCallerDiagnosticNames) -> ConstructionCtfRetryDriver',
+        'first_assembly_consumed_by_value': True,
+        'actual_method_order': ['06 exponential', '05 inverse original AMat/Iden', '07 fresh Gamma', '08 private final', '09 caller'],
+        'later_method_None_means': 'not invoked after an actual prior route/error; no outcome invented',
+        'retained_assembly_stamp': 'last actual method invocation; terminal caller postcheck stamp separate',
+        'retry_source': 'only actual Retry decision; checked ordinal increment, literal postcheck dt/history',
+        'diagnostics': 'selected call intents, not Native/global backend message records',
+        'first_preband_snapshot': 'unavailable; first owner already assigned; never reconstructed',
+        'all_attempts_and_actual_reassignment_returns_retained': True,
+    },
+    'tests_proposed_not_executed': 8,
+    'activation_boundary': {
+        'prospective08_parent_not_current_canonical': True,
+        'fresh_actual08_before_and_Cargo_snapshot_required': True,
+        'Root_and_independent_FULL_peer_required': True,
+        'cache_state_production_activation': False,
+        'CTF10_SI_public19_stores_or_whole_CTF_completion': False,
+        'Native_expected_arrays_or_results_enter_API': False,
+        'new_QA_proof_execution_framework': False,
+    },
+    'verification': {
+        'exact_diff_regeneration': True, 'source_dependency_hashes_and_range_hashes': True,
+        'stdlib_source_authoring_AST_only': True, 'Rust_compiler_or_AST_parser_invoked': False,
+        'target_or_project_imports_execution_build_tests_formatter_Git': False,
+        'canonical_edits_or_scientific_weather_binary_reads': False,
+    },
+}
+write('manifest.json', (json.dumps(manifest, indent=2, ensure_ascii=True) + '\n').encode('utf8'))
+print(json.dumps({'manifest': ref(prefix + '/manifest.json'),
+                  'own_proposals': [row['proposed'] for row in changes],
+                  'tests_proposed_not_executed': 8}, indent=2))

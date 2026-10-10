@@ -1,0 +1,58 @@
+# CTF09 selected caller-stability decision owner
+
+SOURCE-READY HELD, unapplied, unformatted and unexecuted. This proposal ports only
+Construction.cc903-977 into a pure decision API. It borrows an actually returned
+private CtfFinalCoefficients owner and the identical caller CtfAssemblyContext,
+shared ErrorsFound/DoCTFErrorReport flags, original construction Name, original
+TotLayers and original LayerPoint material names in outside-to-inside order.
+The actual private08 owner is a held prerequisite, not current compiled code.
+
+The owner retains input and postcheck attempt stamps separately. NumCTFTerms>18
+increments signed histories before adding the actual caller TimeStepZone, sets
+caller convergence false, and leaves sums/ratios unavailable. Otherwise Xi/Yi/Zi
+are seeded from actual s0 and accumulated in exact HistTerm order, then abs is
+applied in source order. BiggestSum uses the literal ObjexxFCL ternary max with
+its NaN/tie semantics. The strict0.01 OR evaluates its second ratio only when the
+first comparison is false. This source constant is not a comparison tolerance.
+Private08 history_loop_converged is not substituted for caller903 convergence.
+
+The else of BiggestSum>0.0 includes NaN and returns FatalNoCtfs at the selected
+noreturn call boundary, before the seven-hour check. A typed diagnostic records
+only the explicit source call intent; global error summaries, callbacks, counts
+and FatalError throwing are not fabricated. Independently of convergence, the
+postcheck timestep>=7.0 branch emits the exact ordered severe/continued messages
+using original material names, assigns DoCTFErrorReport then ErrorsFound, and
+returns SevenHourSevereBreak. Existing flags otherwise carry unchanged. A one-
+layer original construction has only the outside material line, as the source.
+
+Only selected one-dimensional/no-source actual attempts with same-context bits,
+positive rcmax and full s/e allocation are admitted. A selected history increment
+at i32::MAX is an explicit scope error: C++ signed overflow has no defined result.
+No finite/default/clamp rule changes source floating operations or comparisons.
+Missing original names are rejected only if their severe-report branch executes.
+Unavailable routes and malformed owners are scope errors, not Native outcomes.
+
+Ten proposed tests cover term18/19; strict0.01 and adjacent literal inputs;
+short-circuit absence; Objexx NaN/signed-zero selection; fatal-before-severe;
+converged-at-seven; additive retry-to-seven; original material order; shared flag
+carry and caller/private convergence distinction; ordered history accumulation;
+context/shape/name and defined-integer domain. They are source-derived fixtures,
+not frozen Native answers. No test or numerical comparison has been executed.
+
+The declaration-only parent proposal starts from the immutable prospective08
+parent, which itself retains actual07 source custody. Its before copy is not
+claimed to be current canonical. Root must install/review the actual08 dependency
+and refresh composition before any activation. No current cache/state/caller is
+modified. Header's repeated-assembly factoring proposal is a separate dependency.
+
+Full retry orchestration, once-only workspace lifetime, repeated04 assignments,
+actual06->05->07->08 calls, observation ordinals, SI19 public stores/CTF10,
+reverse/all-R/2D/source branches, InitConductionTransferFunctions global report/
+fatal effects and SUR integration remain outside this owner. There is no arbitrary
+iteration cap, identity rebuild, Native flag injection or full CTF09 PASS claim.
+
+Root and another author must fully review source, bindings and exact diffs before
+application. Only source-byte SHA/size/line/range/diff and stdlib authoring AST
+checks occur here; no project imports, Cargo/build/test/formatter/engine, scientific
+or weather or binary reads, canonical edits or Git actions. The author previously
+authored some pure predecessors; this is not independent formula certification.

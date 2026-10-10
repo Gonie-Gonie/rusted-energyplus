@@ -1,0 +1,168 @@
+use super::*;
+use crate::heat_balance::ctf_retry_driver::{CtfRetryDriverOutcome, CtfRetryDriverStop};
+use crate::heat_balance::ctf_first_assembly_owner::CtfFirstAssemblyUnavailable;
+use crate::heat_balance::ctf_initial_owner::CtfInitialUnavailable;
+use ep_model::{
+    AutoOrNumber, ConstructionKind, MaterialDefinition, NoMassMaterial, NormalizedName,
+    OpaqueSurfaceProperties, OutsideBoundaryCondition, RegularMaterial, SpaceId, SunExposure,
+    SurfaceId, SurfaceType, WindExposure, ZoneId,
+};
+
+type TestResult = Result<(), String>;
+
+fn material(id: u32, resistance_only: bool, resistance: f64) -> Material {
+    let surface = OpaqueSurfaceProperties::default();
+    Material {
+        id: MaterialId(id), name: NormalizedName::new(&format!("M{id}")),
+        definition: if resistance_only {
+            MaterialDefinition::NoMass(NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::MediumRough,
+                thermal_resistance_m2_k_per_w: resistance, surface,
+            })
+        } else {
+            MaterialDefinition::Regular(RegularMaterial {
+                roughness: MaterialSurfaceRoughness::MediumRough,
+                thickness_m: 0.2, conductivity_w_per_m_k: 1.0,
+                density_kg_per_m3: 1000.0, specific_heat_j_per_kg_k: 1000.0,
+                thermal_resistance_m2_k_per_w: resistance, surface,
+            })
+        },
+    }
+}
+
+fn construction(id: u32, material_id: u32) -> Construction {
+    Construction {
+        id: ConstructionId(id), name: NormalizedName::new(&format!("C{id}")),
+        kind: ConstructionKind::Opaque, outside_layer: Some(MaterialId(material_id)),
+        layers: vec![MaterialId(material_id)], thermochromic_master: None,
+        ground_factor: None, air_boundary: None, complex_fenestration: None,
+        window_equivalent_layer: None, internal_heat_source: None,
+    }
+}
+
+fn surface(id: u32, construction_id: u32) -> Surface {
+    Surface {
+        id: SurfaceId(id), name: NormalizedName::new(&format!("S{id}")),
+        surface_type: SurfaceType::Wall, construction: ConstructionId(construction_id),
+        zone: ZoneId(0), space: SpaceId(0),
+        outside_boundary_condition: OutsideBoundaryCondition::Adiabatic,
+        outside_boundary_condition_object: None, sun_exposure: SunExposure::NoSun,
+        wind_exposure: WindExposure::NoWind, view_factor_to_ground: AutoOrNumber::Value(0.0),
+        vertices: Vec::new(), computed_geometry: None,
+    }
+}
+
+fn massive_model() -> TypedModel {
+    // Typed input operands only; no fixture supplies nodes, matrices or coefficients.
+    let mut model = TypedModel::default();
+    model.timestep.number_of_timesteps_per_hour = 3;
+    model.materials.push(material(5, false, 0.2));
+    model.constructions.push(construction(30, 5));
+    model.surfaces.push(surface(0, 30));
+    model
+}
+
+#[test]
+fn ordinary_cache_retains_actual_retry_visits_and_not_replayed_first_wrappers() -> TestResult {
+    let model = massive_model();
+    let mut cache = ConstructionThermalDataCache::build(&model, &BTreeMap::new())
+        .map_err(|error| format!("actual retry cache ingress: {error:?}"))?;
+    assert!(cache.first_assemblies().is_empty());
+    assert!(cache.first_exponentials().is_empty());
+    assert!(cache.first_inverses().is_empty());
+    assert!(cache.first_gammas().is_empty());
+    assert!(cache.first_private_coefficients().is_empty());
+    let ordered = cache.take_retry_initializations();
+    assert_eq!(ordered.len(), 1);
+    let owner = &ordered[0];
+    assert_eq!(owner.construction_id, ConstructionId(30));
+    assert_eq!(owner.construction_name, "C30");
+    assert_eq!(owner.original_layer_material_names, ["M5"]);
+    let actual = owner.result.as_ref().map_err(|error| format!("retry initialization: {error:?}"))?;
+    let first = actual.attempts.first().ok_or("genuine first retry visit missing")?;
+    assert_eq!(first.assembly.context.construction_id, ConstructionId(30));
+    assert_eq!(first.assembly.context.attempt_ordinal, 1);
+    assert_eq!(first.assembly.context.time_step_zone.to_bits(), (1.0_f64 / 3.0).to_bits());
+    assert!(actual.initial_pre_assignment().is_some());
+    assert_eq!(owner.flags_on_return, actual.flags_on_return);
+    assert!(cache.take_retry_initializations().is_empty());
+    assert_eq!(cache.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn unused_construction_returns_without_stopping_the_next_genuine_massive_owner() -> TestResult {
+    let mut model = massive_model();
+    model.materials.insert(0, material(9, false, 0.2));
+    model.constructions.insert(0, construction(70, 9));
+    let mut cache = ConstructionThermalDataCache::build(&model, &BTreeMap::new())
+        .map_err(|error| format!("ordered cache: {error:?}"))?;
+    let ordered = cache.take_retry_initializations();
+    assert_eq!(ordered.iter().map(|owner| owner.construction_id).collect::<Vec<_>>(),
+        [ConstructionId(70), ConstructionId(30)]);
+    let skipped = ordered[0].result.as_ref().map_err(|error| format!("unused owner: {error:?}"))?;
+    assert_eq!(skipped.outcome, CtfRetryDriverOutcome::ScopeStopped(CtfRetryDriverStop::FirstAssembly(
+        CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::UnusedConstruction))));
+    assert!(skipped.attempts.is_empty());
+    assert_eq!(ordered[0].selected_chain_stop, None);
+    let next = ordered[1].result.as_ref().map_err(|error| format!("next owner: {error:?}"))?;
+    assert!(!next.attempts.is_empty());
+    assert_eq!(ordered[1].flags_on_entry, ordered[0].flags_on_return);
+    Ok(())
+}
+
+#[test]
+fn real_preprocessing_errors_remain_shared_and_do_not_become_invented_fatal_outcomes() -> TestResult {
+    let mut model = massive_model();
+    model.materials.insert(0, material(9, true, 0.0001));
+    model.constructions.insert(0, construction(70, 9));
+    model.surfaces.insert(0, surface(1, 70));
+    let mut cache = ConstructionThermalDataCache::build(&model, &BTreeMap::new())
+        .map_err(|error| format!("shared source error cache: {error:?}"))?;
+    let ordered = cache.take_retry_initializations();
+    assert_eq!(ordered.len(), 2);
+    assert!(ordered[0].flags_on_entry.errors_found);
+    assert!(ordered[1].flags_on_entry.errors_found);
+    for owner in ordered {
+        assert_eq!(owner.selected_chain_stop, None);
+        let actual = owner.result.as_ref().map_err(|error| format!("error-return owner: {error:?}"))?;
+        assert_eq!(actual.outcome, CtfRetryDriverOutcome::ScopeStopped(CtfRetryDriverStop::FirstAssembly(
+            CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::PreprocessingErrorReturn))));
+        assert!(actual.attempts.is_empty());
+        assert!(actual.flags_on_return.errors_found);
+    }
+    Ok(())
+}
+
+#[test]
+fn vector_handoff_moves_original_storage_and_retains_legacy_eio_precedence() -> TestResult {
+    let model = massive_model();
+    let row = ConstructionCtfCoefficientOverride {
+        construction_name: "C30".to_string(), time_index: 0,
+        outside_w_per_m2_k: 7.0, cross_w_per_m2_k: 8.0, inside_w_per_m2_k: 9.0, flux: None,
+    };
+    let overrides = BTreeMap::from([("C30".to_string(), vec![&row])]);
+    let mut cache = ConstructionThermalDataCache::build(&model, &overrides)
+        .map_err(|error| format!("EIO cache: {error:?}"))?;
+    let entry = cache.data_for_surface(&model.surfaces[0])
+        .map_err(|error| format!("legacy surface lookup: {error:?}"))?;
+    assert_eq!(entry.ctf_coefficient_source, ConstructionCtfCoefficientSource::EnergyPlusEioSeeded);
+    assert_eq!(entry.ctf_coefficients, [row]);
+    let before = cache.retry_initializations[0].result.as_ref()
+        .map_err(|error| format!("retry owner: {error:?}"))?.retained_assembly.as_ref()
+        .ok_or("actual storage absent")?;
+    let pointers = (before.a_mat.as_ptr(), before.iden_matrix.as_ptr());
+    let cache_hash = cache.coefficient_cache_hash;
+    // The final state shell uses this exact move-only handoff, not driver.clone().
+    let owners = cache.take_retry_initializations();
+    let after = owners[0].result.as_ref()
+        .map_err(|error| format!("state retry owner: {error:?}"))?.retained_assembly.as_ref()
+        .ok_or("state original storage absent")?;
+    assert_eq!(pointers, (after.a_mat.as_ptr(), after.iden_matrix.as_ptr()));
+    assert_eq!(cache.coefficient_cache_hash, cache_hash);
+    assert_eq!(cache.eio_seeded_count(), 1);
+    assert!(cache.take_retry_initializations().is_empty());
+    assert!(cache.first_assemblies().is_empty());
+    assert!(cache.first_private_coefficients().is_empty());
+    Ok(())
+}

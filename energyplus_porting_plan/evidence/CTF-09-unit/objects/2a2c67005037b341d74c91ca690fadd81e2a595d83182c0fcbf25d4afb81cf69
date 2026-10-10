@@ -1,0 +1,243 @@
+--- accepted-literal/crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs
++++ actual-formatted/crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs
+@@ -25,8 +25,8 @@
+     CtfInverseMatrix, CtfInverseScopeError,
+ };
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+-    ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput,
+-    CtfLayerPreprocessing, CtfLayerScopeError,
++    ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing,
++    CtfLayerScopeError,
+ };
+ use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::{
+     CtfAssemblyContext, CtfAssemblyObservation,
+@@ -299,14 +299,36 @@
+         "Native_stage_or_return_marker_inferred":false,"counted_as_PASS":false})
+ }
+ fn uninvoked(api: &str) -> Value {
+-    method(api,false,"NotInvoked",Some("actual preceding Rust stop; no method Result owner".to_owned()),Value::Null)
+-}
+-fn exponential(source: &Result<CtfExponentialObservation,CtfExponentialScopeError>) -> Value {
++    method(
++        api,
++        false,
++        "NotInvoked",
++        Some("actual preceding Rust stop; no method Result owner".to_owned()),
++        Value::Null,
++    )
++}
++fn exponential(source: &Result<CtfExponentialObservation, CtfExponentialScopeError>) -> Value {
+     let api = "calculate_selected_ctf_matrix_exponential";
+     match source {
+-        Err(error) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+-        Ok(CtfExponentialObservation::Unavailable(reason)) => method(api,true,"Unavailable",Some(format!("{reason:?}")),Value::Null),
+-        Ok(CtfExponentialObservation::Exponential(actual)) => method(api,true,"Exponential",None,
++        Err(error) => method(
++            api,
++            true,
++            "ScopeError",
++            Some(format!("{error:?}")),
++            Value::Null,
++        ),
++        Ok(CtfExponentialObservation::Unavailable(reason)) => method(
++            api,
++            true,
++            "Unavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
++        ),
++        Ok(CtfExponentialObservation::Exponential(actual)) => method(
++            api,
++            true,
++            "Exponential",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "AMatRowNormMax":scalar(actual.a_mat_row_norm_max),"k":actual.k,
+                 "fact":scalar(actual.fact),"CheckVal":scalar(actual.check_val),"l":actual.l,
+@@ -318,29 +340,60 @@
+                     "AMato":matrix_values(&actual.a_mato),"AMatN":matrix_values(&actual.a_mat_n)},
+                 "actual_matrix_value_counts":{"AExp":actual.a_exp.len(),"AMat1":actual.a_mat1.len(),
+                     "AMato":actual.a_mato.len(),"AMatN":actual.a_mat_n.len()},
+-                "storage_order":"source_i1_outer_i2_inner_row_first"})),
++                "storage_order":"source_i1_outer_i2_inner_row_first"}),
++        ),
+     }
+ }
+-fn inverse(source: Option<&Result<CtfInverseMatrix,CtfInverseScopeError>>, context: &CtfAssemblyContext) -> Value {
++fn inverse(
++    source: Option<&Result<CtfInverseMatrix, CtfInverseScopeError>>,
++    context: &CtfAssemblyContext,
++) -> Value {
+     let api = "invert_selected_ctf_matrix";
+     match source {
+         None => uninvoked(api),
+-        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+-        Some(Ok(actual)) => method(api,true,"Inverse",None,
++        Some(Err(error)) => method(
++            api,
++            true,
++            "ScopeError",
++            Some(format!("{error:?}")),
++            Value::Null,
++        ),
++        Some(Ok(actual)) => method(
++            api,
++            true,
++            "Inverse",
++            None,
+             json!({"actual_call_context":attempt_context(context),"rcmax":actual.rcmax,
+                 "matrices":{"AInv":matrix_values(&actual.a_inv),"AMat1":matrix_values(&actual.a_mat1)},
+                 "actual_matrix_value_counts":{"AInv":actual.a_inv.len(),"AMat1":actual.a_mat1.len()},
+                 "inverse_input_is_original_AMat_and_IdenMatrix":true,
+-                "storage_order":"source_i1_outer_i2_inner_row_first"})),
++                "storage_order":"source_i1_outer_i2_inner_row_first"}),
++        ),
+     }
+ }
+-fn gammas(source: Option<&Result<CtfGammaObservation,CtfGammaScopeError>>) -> Value {
++fn gammas(source: Option<&Result<CtfGammaObservation, CtfGammaScopeError>>) -> Value {
+     let api = "calculate_selected_ctf_gammas";
+     match source {
+         None => uninvoked(api),
+-        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+-        Some(Ok(CtfGammaObservation::Unavailable(reason))) => method(api,true,"Unavailable",Some(format!("{reason:?}")),Value::Null),
+-        Some(Ok(CtfGammaObservation::Gamma(actual))) => method(api,true,"Gamma",None,
++        Some(Err(error)) => method(
++            api,
++            true,
++            "ScopeError",
++            Some(format!("{error:?}")),
++            Value::Null,
++        ),
++        Some(Ok(CtfGammaObservation::Unavailable(reason))) => method(
++            api,
++            true,
++            "Unavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
++        ),
++        Some(Ok(CtfGammaObservation::Gamma(actual))) => method(
++            api,
++            true,
++            "Gamma",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "matrices":{"ATemp":matrix_values(&actual.a_temp),
+                     "Gamma1":matrix_values(&actual.gamma1),"Gamma2":matrix_values(&actual.gamma2)},
+@@ -349,16 +402,35 @@
+                 "actual_matrix_shapes":{"ATemp":[actual.rcmax,actual.rcmax],
+                     "Gamma1":[3,actual.rcmax],"Gamma2":[3,actual.rcmax]},
+                 "ATemp_storage_order":"source_i1_outer_i2_inner_row_first",
+-                "Gamma_storage_order":"source_j_outer_i_inner_row_first"})),
++                "Gamma_storage_order":"source_j_outer_i_inner_row_first"}),
++        ),
+     }
+ }
+-fn coefficients(source: Option<&Result<CtfFinalCoefficientObservation,CtfFinalCoefficientScopeError>>) -> Value {
++fn coefficients(
++    source: Option<&Result<CtfFinalCoefficientObservation, CtfFinalCoefficientScopeError>>,
++) -> Value {
+     let api = "calculate_selected_ctf_final_coefficients";
+     match source {
+         None => uninvoked(api),
+-        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+-        Some(Ok(CtfFinalCoefficientObservation::Unavailable(reason))) => method(api,true,"Unavailable",Some(format!("{reason:?}")),Value::Null),
+-        Some(Ok(CtfFinalCoefficientObservation::Coefficients(actual))) => method(api,true,"Coefficients",None,
++        Some(Err(error)) => method(
++            api,
++            true,
++            "ScopeError",
++            Some(format!("{error:?}")),
++            Value::Null,
++        ),
++        Some(Ok(CtfFinalCoefficientObservation::Unavailable(reason))) => method(
++            api,
++            true,
++            "Unavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
++        ),
++        Some(Ok(CtfFinalCoefficientObservation::Coefficients(actual))) => method(
++            api,
++            true,
++            "Coefficients",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "NumCTFTerms":actual.num_ctf_terms,
+                 "controls":{"inum":actual.next_history_term,"CTFConvrg":actual.history_loop_converged},
+@@ -376,18 +448,31 @@
+                 "Gamma_storage_order":"source_j_outer_i_inner_row_first",
+                 "s0_storage_order":"source_j_outer_k_inner",
+                 "s_storage_order":"source_j_outer_k_middle_term_inner",
+-                "private_method_final_owner_only":true,"Native_SourceReturn_workspace_inferred":false})),
++                "private_method_final_owner_only":true,"Native_SourceReturn_workspace_inferred":false}),
++        ),
+     }
+ }
+ pub(super) fn flags(source: CtfCallerSharedFlags) -> Value {
+     json!({"ErrorsFound":source.errors_found,"DoCTFErrorReport":source.do_ctf_error_report})
+ }
+-fn caller(source: Option<&Result<CtfCallerStabilityDecision,CtfCallerStabilityScopeError>>) -> Value {
++fn caller(
++    source: Option<&Result<CtfCallerStabilityDecision, CtfCallerStabilityScopeError>>,
++) -> Value {
+     let api = "decide_selected_ctf_caller_stability";
+     match source {
+         None => uninvoked(api),
+-        Some(Err(error)) => method(api,true,"ScopeError",Some(format!("{error:?}")),Value::Null),
+-        Some(Ok(actual)) => method(api,true,"CallerDecision",None,
++        Some(Err(error)) => method(
++            api,
++            true,
++            "ScopeError",
++            Some(format!("{error:?}")),
++            Value::Null,
++        ),
++        Some(Ok(actual)) => method(
++            api,
++            true,
++            "CallerDecision",
++            None,
+             json!({"input_context":attempt_context(&actual.input_context),
+                 "postcheck_context":attempt_context(&actual.postcheck_context),
+                 "flags_before":flags(actual.flags_before),"flags_after":flags(actual.flags_after),
+@@ -404,10 +489,19 @@
+                     "level":format!("{:?}",record.level),"message":record.message})).collect::<Vec<_>>(),
+                 "Native_global_diagnostics_or_fatal_backend_invoked":false,
+                 "diagnostic_intents_equated_to_Native_global_messages":false,
+-                "terminal_decision_is_whole_method_return_or_SI_store_safety":false})),
++                "terminal_decision_is_whole_method_return_or_SI_store_safety":false}),
++        ),
+     }
+ }
+-fn assembly_values(context: &CtfAssemblyContext, rcmax: i32, a_mat: &[f64], iden_matrix: &[f64], b_mat: &[f64], c_mat: &[f64], d_mat: &[f64]) -> Value {
++fn assembly_values(
++    context: &CtfAssemblyContext,
++    rcmax: i32,
++    a_mat: &[f64],
++    iden_matrix: &[f64],
++    b_mat: &[f64],
++    c_mat: &[f64],
++    d_mat: &[f64],
++) -> Value {
+     json!({"context":attempt_context(context),"rcmax":rcmax,
+         "matrices":{"AMat":matrix_values(a_mat),"IdenMatrix":matrix_values(iden_matrix),
+             "BMat":matrix_values(b_mat),"CMat":matrix_values(c_mat),"DMat":matrix_values(d_mat)},
+@@ -416,8 +510,15 @@
+         "storage_order":"source_i1_outer_i2_inner_row_first"})
+ }
+ fn assembly_snapshot(source: &CtfRetryAssemblySnapshot) -> Value {
+-    assembly_values(&source.context,source.rcmax,&source.a_mat,&source.iden_matrix,
+-        &source.b_mat,&source.c_mat,&source.d_mat)
++    assembly_values(
++        &source.context,
++        source.rcmax,
++        &source.a_mat,
++        &source.iden_matrix,
++        &source.b_mat,
++        &source.c_mat,
++        &source.d_mat,
++    )
+ }
+ fn attempt(source: &CtfRetryAttempt) -> Value {
+     json!({"attempt_ordinal":source.assembly.context.attempt_ordinal,

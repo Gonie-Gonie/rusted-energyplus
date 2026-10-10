@@ -1,0 +1,14 @@
+--- a/crates/ep_runtime/src/heat_balance/state.rs
++++ b/crates/ep_runtime/src/heat_balance/state.rs
+@@ -80,6 +80,11 @@
+     /// Actual private first CTF08 return; public SI coefficient stores and retry remain separate.
+     pub construction_ctf08_first_private_coefficients:
+         Vec<super::ctf_first_final_coefficients_owner::ConstructionCtfFirstFinalCoefficients>,
++    /// Ordered actual selected09 returns or explicit prior-stop records.
++    /// Legacy first-wrapper vectors above are empty in this move-only retry route.
++    /// First assembly/method views are actual driver visit1, not replayed wrappers.
++    pub construction_ctf09_retry_driver:
++        Vec<super::ctf_retry_initialization::ConstructionCtfRetryInitialization>,
+     /// Construction coefficient cache build time in seconds.
+     pub construction_cache_build_wall_seconds: f64,
+     /// Number of construction cache entries.

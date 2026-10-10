@@ -1,0 +1,78 @@
+--- .runtime/porting/CTF-09/assembly-reassignment-prep-02/before/ctf_state_space_assembly.rs
++++ .runtime/porting/CTF-09/assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs
+@@ -85,9 +85,31 @@
+     AttemptOrdinal,
+ }
+ 
++/// Real initial producer storage immediately after its BMat(3) reset.
++///
++/// AMat and IdenMatrix are copied from the allocated owner before the first
++/// band assignment. This is not a reconstruction from matrix dimensions or
++/// a second assembly call. Construction NumCTFTerms/shared flags are outside
++/// this pure API and are not invented here.
++#[derive(Clone, Debug, PartialEq)]
++pub struct CtfAssemblyPreAssignment {
++    /// Actual context supplied to the same initial producer invocation.
++    pub context: CtfAssemblyContext,
++    /// Actual source matrix dimension for the copied storage.
++    pub rcmax: i32,
++    /// Actual pre-band AMat values in the existing row-first layout.
++    pub a_mat: Vec<f64>,
++    /// Actual source-produced identity owner before the band assignments.
++    pub iden_matrix: Vec<f64>,
++    /// Actual BMat(3) immediately after the source reset, not BMat(1/2).
++    pub b_mat3_after_reset: f64,
++}
++
+ /// Owned initialized compressed state at the pre-exponential call boundary.
+ #[derive(Clone, Debug, PartialEq)]
+ pub struct CtfStateSpaceAssembly {
++    /// Retained actual initial producer checkpoint, never overwritten by retries.
++    pub initial_pre_assignment: Option<CtfAssemblyPreAssignment>,
+     /// Metadata for the latest actual assignment into this persistent storage.
+     pub context: CtfAssemblyContext,
+     /// The unchanged actual converted layer inputs, without invented IDs.
+@@ -190,11 +212,14 @@
+     }
+     let mut b_mat = [0.0; 3];
+ 
++    let mut initial_pre_assignment = None;
+     let (c_mat, d_mat) = assign_1d_ctf_state_space(
+         layers, input.nodes, dx, rcmax, &mut a_mat, &mut b_mat,
++        Some((&mut initial_pre_assignment, context, source_rcmax, &iden_matrix)),
+     );
+     Ok(CtfAssemblyObservation::Assembled(Box::new(
+         CtfStateSpaceAssembly {
++            initial_pre_assignment,
+             context,
+             layers: layers.to_vec(),
+             nodes: input.nodes.to_vec(),
+@@ -315,6 +340,7 @@
+         rcmax,
+         &mut assembly.a_mat,
+         &mut assembly.b_mat,
++        None,
+     );
+     assembly.c_mat = c_mat;
+     assembly.d_mat = d_mat;
+@@ -331,10 +357,20 @@
+     rcmax: usize,
+     a_mat: &mut [f64],
+     b_mat: &mut [f64; 3],
++    checkpoint: Option<(&mut Option<CtfAssemblyPreAssignment>, CtfAssemblyContext, i32, &[f64])>,
+ ) -> ([f64; 2], [f64; 2]) {
+     let count = layers.len();
+     // Construction.cc 659, before the selected 1D assignments.
+     b_mat[2] = 0.0;
++    if let Some((destination, context, source_rcmax, iden_matrix)) = checkpoint {
++        *destination = Some(CtfAssemblyPreAssignment {
++            context,
++            rcmax: source_rcmax,
++            a_mat: a_mat.to_vec(),
++            iden_matrix: iden_matrix.to_vec(),
++            b_mat3_after_reset: b_mat[2],
++        });
++    }
+     let mut cap = layers[0].rho * layers[0].cp * dx[0];
+     cap *= 1.5;
+     let mut dxtmp = 1.0 / dx[0] / cap;

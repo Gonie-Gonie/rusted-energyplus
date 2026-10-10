@@ -1,0 +1,194 @@
+"""Stdlib-only immutable successor packaging, never project or target execution."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+import re
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/CTF-09/retry-driver-prep-02'
+OLD = '.runtime/porting/CTF-09/retry-driver-prep-01'
+assert not (BASE / 'manifest.json').exists()
+
+def raw(path):
+    return (ROOT / path).read_bytes()
+
+def ref(path):
+    data = raw(path)
+    return {'path': path, 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def write(name, data):
+    path = BASE / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+    return path.relative_to(ROOT).as_posix()
+
+def diff(before, after, name, destination=None):
+    text = ''.join(difflib.unified_diff(
+        raw(before).decode('utf8').splitlines(keepends=True) if before else [],
+        raw(after).decode('utf8').splitlines(keepends=True),
+        fromfile=destination if before and destination else before or '/dev/null',
+        tofile=destination or after))
+    return ref(write('diffs/' + name, text.encode('utf8')))
+
+def selected(path, first, last, purpose):
+    lines = raw(path).splitlines(keepends=True)
+    assert 1 <= first <= last <= len(lines)
+    data = b''.join(lines[first - 1:last])
+    return {'path': path, 'start_line': first, 'end_line': last,
+            'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'purpose': purpose}
+
+prefix = BASE.relative_to(ROOT).as_posix()
+old_manifest = json.loads(raw(OLD + '/manifest.json'))
+assert ref(OLD + '/manifest.json')['sha256'] == 'd9fa70d34a9a11d9088ab5702758467c782e58c79634f5559f2899c5982430a3'
+old_archive = ref(write('before-01/manifest.json', raw(OLD + '/manifest.json')))
+old_readme_archive = ref(write('before-01/README.md', raw(OLD + '/README.md')))
+changes = []
+increments = []
+for name in ['ctf_retry_driver.rs', 'ctf_retry_driver_tests.rs']:
+    before = prefix + '/before-01/' + name
+    after = prefix + '/new/' + name
+    assert raw(before) == raw(OLD + '/new/' + name)
+    destination = 'crates/ep_runtime/src/heat_balance/' + name
+    changes.append({'destination': destination, 'before': None, 'proposed': ref(after),
+                    'exact_diff': diff(None, after, name + '.diff', destination)})
+    increments.append({'before': ref(before), 'after': ref(after),
+                       'exact_diff': diff(before, after, name + '.from-01.diff')})
+# The prospective08 declaration is literally unchanged from the accepted hold.
+changes.append(copy.deepcopy(old_manifest['changes'][2]))
+
+producer_base = '.runtime/porting/CTF-09/assembly-reassignment-prep-02'
+producer_manifest = ref(producer_base + '/manifest.json')
+assert producer_manifest['sha256'] == 'd8abb7a215434455c8b6c80bcb1854cda58883fb0e8e5ff152477b2136b3f1ad'
+producer = producer_base + '/proposed/ctf_state_space_assembly.rs'
+assert ref(producer)['sha256'] == 'b3d569d19ba73f584c9241f3443f99e8517c01adb165b642da96f01cf7bee3c0'
+
+module = raw(prefix + '/new/ctf_retry_driver.rs').decode('utf8')
+old_module = raw(OLD + '/new/ctf_retry_driver.rs').decode('utf8')
+start = module.index('impl ConstructionCtfRetryDriver {\n')
+end = module.index('#[derive(Clone, Copy)]\nenum AttemptControl', start)
+restored = module[:start] + module[end:]
+restored = restored.replace('CtfAssemblyObservation, CtfAssemblyPreAssignment,', 'CtfAssemblyObservation,')
+assert restored == old_module, 'new driver body changed beyond the genuine borrowed accessor'
+
+input_path = '.runtime/porting/CTF-01/frozen-packet-01/helper-request.json'
+assert ref(input_path)['sha256'] == '3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57'
+packet = json.loads(raw(input_path))
+row = next(row for row in packet['model_cases'] if row['id'] == 'active-prefix-11')
+tests = raw(prefix + '/new/ctf_retry_driver_tests.rs').decode('utf8')
+assert tests.count('#[test]') == 9
+assert '.unwrap(' not in tests and '.expect(' not in tests
+fixture = tests[tests.index('fn frozen_active_prefix_11()'):tests.index('#[test]\nfn frozen_active_prefix_11_reaches')]
+blocks = re.findall(r'CtfLayerInput \{(.*?)\n        \}', fixture, re.S)
+keys = {'thickness': 'Thickness', 'conductivity': 'Conductivity', 'density': 'Density',
+        'specific_heat': 'SpecHeat', 'resistance': 'Resistance'}
+assert len(blocks) == len(row['materials']) == 3
+for index, (block, material) in enumerate(zip(blocks, row['materials'])):
+    assert 'material_id: MaterialId(' + str(index) + ')' in block
+    for rust, source in keys.items():
+        assert re.search(rust + r': f64::from_bits\(0x([0-9a-f]+)\)', block).group(1) == material[source]['bits']
+    assert 'resistance_only: false' in block and material['ROnly'] is False
+association = {material['id']: index for index, material in enumerate(row['materials'])}
+assert [association[name] for name in row['constructions'][0]['layer_material_ids']] == [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1]
+assert row['caller']['TimeStepZone']['bits'] == '3fd0000000000000'
+assert row['caller']['ErrorsFound'] is False and row['caller']['DoCTFErrorReport'] is False
+assert row['constructions'][0]['IsUsedCTF'] is True
+assert row['constructions'][0]['SourceSinkPresent'] is False and row['constructions'][0]['SolutionDimensions'] == 1
+
+readme = '''CTF09 retry driver02: genuine producer checkpoint and natural retry test
+
+SOURCE-ONLY HELD; predecessor01 remains immutable and unexecuted.
+Root and Base accepted the complete01 driver. This successor changes only a
+borrowed checkpoint accessor, tests, and exact source/dependency metadata.
+
+ConstructionCtfRetryDriver::initial_pre_assignment() borrows the optional real
+CtfStateSpaceAssembly.initial_pre_assignment from the original retained Box.
+Accepted producer02 captures it inside the same initial assignment body after
+its one B3 reset and before any cap/band arithmetic, using actual allocated AMat
+and source-produced IdenMatrix. The driver does not recreate zeros/identity,
+replay assembly, clone the first owner, or update that captured initial stamp.
+Absent owner/checkpoint remains None, not a zero fallback or PASS. NumCTFTerms
+and shared flags are not invented as fields of that pure producer checkpoint.
+Later reassignment snapshots remain actual pre-call copies, with genuine preceding
+private NumCTFTerms and literal supplied next context; Native broader fields stay
+separate unless an actual Rust owner exists. The new borrowed accessor is
+the only added execution-module code; inverse restoration reproduces01 exactly.
+
+The ninth proposed test uses only INPUTS from the existing frozen39 case
+active-prefix-11, helper-request SHA3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57.
+Exact MASS_A/B/C member bits, original11 MaterialId order, caller0.25 and false
+shared flags pass through real preprocessing, public initial classification,
+first assembly and the retry driver once. No nodes, dx, initial dt/history,
+NumCTFTerms, convergence flags or numerical output arrays are supplied as answers.
+The test asserts more than one actual visit and checks actual caller-postcheck
+to-next-stamp association, preceding term counts, fresh live Gamma1/2 allocations,
+and retained genuine initial checkpoint. No Native input case is added or changed.
+Stdlib text/input association checks authenticate all15 member bits and the
+original IDs/caller; they do not evaluate a matrix formula or run a target.
+This source-plausible natural multi-visit assertion remains UNEXECUTED. If Root's
+real test does not reach retries, it is a genuine test failure, not evidence to
+silently fabricate branch activation or substitute Native expected values.
+
+The actual arithmetic/control/caller/stop/reassignment loop is byte-exact01.
+Original06 exponential→05 inverse on original AMat/Iden→fresh07 Gamma→08 private
+final→09 caller order, strict postincrement/unconditional severe/fatal decisions,
+no attempt cap and separate method/postcheck stamps all remain unchanged.
+Private terminal outcome is not a whole Native return or public19-store safety
+claim: Source severe break may retain excessive terms; CTF10 stores are excluded.
+No cache/state activation, global diagnostic backend, retry-answer injection,
+coefficient hash/SI19 store or complete CTF09/SUR integration PASS is introduced.
+
+The one parent declaration remains the exact accepted01 prospective08 mod67→68
+proposal. It is not current canonical07; fresh actual08 parent/Cargo source
+bindings and Root prerequisites/review remain mandatory before application.
+Old01 absence language remains historical; genuine first checkpoint now exists
+only through the separately reviewed producer02 API. All original07/08 numerical
+and first-only policies remain unchanged; future09 comparison is not run here.
+
+Nine tests are proposed, none executed. Only source/input/metadata reads and
+stdlib packaging occurred; no project imports, Cargo/tests/build/formatter,
+engines, scientific/weather/binary reads, canonical/Git changes or new framework.
+Author wrote pure06/caller09/driver01; Base's independent source peer and Root
+FULL review are required, without claiming self-formula scientific certification.
+'''
+readme_path = write('README.md', readme.encode('utf8'))
+readme_diff = diff(OLD + '/README.md', readme_path, 'README.md.from-01.diff')
+
+manifest = copy.deepcopy(old_manifest)
+manifest['schema'] = 'ctf09-selected-retry-driver-source-preparation.v2'
+manifest['changes'] = changes
+manifest['README'] = ref(readme_path)
+manifest['source_authoring'] = ref(prefix + '/prepare.py')
+manifest['predecessor'] = {'manifest': ref(OLD + '/manifest.json'), 'manifest_archive': old_archive,
+                          'README_archive': old_readme_archive, 'source_deltas': increments,
+                          'README_exact_diff': readme_diff}
+manifest['dependencies'] = [row for row in manifest['dependencies']
+    if row['path'] not in ['.runtime/porting/CTF-09/assembly-reassignment-prep-01/manifest.json',
+                          '.runtime/porting/CTF-09/assembly-reassignment-prep-01/proposed/ctf_state_space_assembly.rs']]
+manifest['dependencies'] += [producer_manifest, ref(producer), ref(producer_base + '/README.md'),
+    ref(producer_base + '/new/ctf_state_space_reassignment_tests.rs'), ref(input_path)]
+manifest['source_ranges'] = [row for row in manifest['source_ranges'] if row['path'] != '.runtime/porting/CTF-09/assembly-reassignment-prep-01/proposed/ctf_state_space_assembly.rs']
+manifest['source_ranges'].append(selected(producer, 1, 454, 'accepted persistent producer02 with genuine initial preassignment checkpoint'))
+manifest['source_ranges'].append(selected('.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc', 490, 619, 'actual initial owner computes Nodes/dx/dt/history from frozen member input, not test answers'))
+manifest['public_API']['initial_pre_assignment'] = 'borrow actual retained producer02 Option; no reconstruction or replay; old first APIs unchanged'
+manifest['public_API'].pop('first_preband_snapshot')
+manifest['tests_proposed_not_executed'] = 9
+manifest['fresh02'] = {
+    'module_except_new_borrowed_accessor_and_type_import_byte_exact01': True,
+    'parent_before_proposed_and_exact_diff_descriptors_literal01': True,
+    'producer02_source_dependency': producer_manifest,
+    'natural_multi_visit_fixture': {'input': ref(input_path), 'case_id': 'active-prefix-11',
+        'scope': 'existing explicit-member-unit case, no new Native input',
+        'member_bits_ID_order_caller_checked_against_actual_frozen_input': True,
+        'normalized_nodes_timestep_history_outputs_injected': False,
+        'more_than_one_actual_attempt_asserted_in_proposed_test': True,
+        'actual_test_or_multi_visit_activation_performed': False},
+    'scientific_profiles_input_scope_formulas_control_decisions_changed': False,
+}
+ast.parse(raw(prefix + '/prepare.py').decode('utf8'))
+write('manifest.json', (json.dumps(manifest, indent=2, ensure_ascii=True) + '\n').encode('utf8'))
+print(json.dumps({'manifest': ref(prefix + '/manifest.json'), 'new_sources': [row['proposed'] for row in changes[:2]],
+                  'incremental_diffs': [row['exact_diff'] for row in increments], 'tests_proposed_not_executed': 9}, indent=2))

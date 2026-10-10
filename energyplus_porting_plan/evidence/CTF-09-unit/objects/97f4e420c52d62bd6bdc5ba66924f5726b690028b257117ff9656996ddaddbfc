@@ -1,0 +1,133 @@
+//! Ordered ordinary initialization of the selected retry owner, not SI stores.
+
+use super::ctf_first_assembly_owner::{ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable};
+use super::ctf_initial_owner::CtfInitialUnavailable;
+use super::ctf_retry_driver::{
+    ConstructionCtfRetryDriver, CtfRetryDriverOutcome, CtfRetryDriverStop,
+    run_selected_construction_ctf_retry_driver,
+};
+use super::surface_manager::ctf_caller_stability::{CtfCallerDiagnosticNames, CtfCallerSharedFlags};
+use ep_model::ConstructionId;
+
+/// An actual selected terminal boundary prevents later selected invocations.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfRetryChainStop {
+    /// The reached caller09 fatal boundary, without a fake global error backend.
+    Fatal { construction_id: ConstructionId },
+    /// An actual domain/custody stop, distinct from a Native fatal outcome.
+    ScopeStopped { construction_id: ConstructionId, reason: CtfRetryDriverStop },
+}
+
+/// No selected first constructor or driver was invoked after an earlier stop.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfRetryInitializationUnavailable {
+    /// The earlier actual selected caller reached its fatal boundary.
+    PriorFatal { construction_id: ConstructionId },
+    /// The earlier selected driver returned this actual domain/custody stop.
+    PriorScopeStopped { construction_id: ConstructionId, reason: CtfRetryDriverStop },
+}
+
+/// One ordered construction record; original names are read-only caller inputs.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionCtfRetryInitialization {
+    /// Actual original typed construction identity.
+    pub construction_id: ConstructionId,
+    /// Actual original construction name, not a normalized layer name.
+    pub construction_name: String,
+    /// Original LayerPoint count supplied to the selected caller.
+    pub original_tot_layers: i32,
+    /// Original outside-to-inside material names, never merged active layers.
+    pub original_layer_material_names: Vec<String>,
+    /// Actual selected shared flags before this invocation or prior-stop record.
+    pub flags_on_entry: CtfCallerSharedFlags,
+    /// Actual driver flags, or unchanged flags when no driver was invoked.
+    pub flags_on_return: CtfCallerSharedFlags,
+    /// Ok retains the actual driver return; Err never fabricates a driver outcome.
+    pub result: Result<ConstructionCtfRetryDriver, CtfRetryInitializationUnavailable>,
+    /// Actual or inherited selected terminal boundary; not whole Native success.
+    pub selected_chain_stop: Option<CtfRetryChainStop>,
+}
+
+/// Classify an actual driver return without changing any Source arithmetic.
+///
+/// Unused, loading-error, all-resistive and reverse construction routes return
+/// before the selected massive loop and do not invent a global fatal/domain stop.
+/// All other actual ScopeStopped reasons stop this selected chain honestly.
+#[must_use]
+pub fn selected_ctf_retry_chain_stop(actual: &ConstructionCtfRetryDriver) -> Option<CtfRetryChainStop> {
+    match actual.outcome {
+        CtfRetryDriverOutcome::FatalNoCtfs => Some(CtfRetryChainStop::Fatal {
+            construction_id: actual.construction_id,
+        }),
+        CtfRetryDriverOutcome::ScopeStopped(reason) => {
+            let ordinary_source_route = matches!(reason,
+                CtfRetryDriverStop::FirstAssembly(CtfFirstAssemblyUnavailable::InitialUnavailable(
+                    CtfInitialUnavailable::UnusedConstruction
+                    | CtfInitialUnavailable::PreprocessingErrorReturn
+                    | CtfInitialUnavailable::AllResistiveBranch
+                    | CtfInitialUnavailable::ReverseConstruction { .. }
+                )) | CtfRetryDriverStop::FirstAssemblyRoute(_));
+            if ordinary_source_route { None } else {
+                Some(CtfRetryChainStop::ScopeStopped {
+                    construction_id: actual.construction_id, reason,
+                })
+            }
+        }
+        CtfRetryDriverOutcome::ConvergedLoopExit | CtfRetryDriverOutcome::SevenHourSevereBreak => None,
+    }
+}
+
+/// Consume the genuine first owner once and invoke the reviewed retry driver once.
+///
+/// The old first-only05/06/07/08 wrappers are not invoked by this route. First
+/// method views borrow the actual first driver visit; no cloned first Box is used
+/// for storage or another calculation. Terminal private-method and advanced
+/// postcheck contexts remain separate inside the actual returned driver owner.
+pub fn initialize_construction_ctf_retry(
+    first: ConstructionCtfFirstAssembly,
+    flags: CtfCallerSharedFlags,
+    names: CtfCallerDiagnosticNames<'_>,
+) -> ConstructionCtfRetryInitialization {
+    let construction_id = first.construction_id;
+    let actual = run_selected_construction_ctf_retry_driver(first, flags, names);
+    let selected_chain_stop = selected_ctf_retry_chain_stop(&actual);
+    ConstructionCtfRetryInitialization {
+        construction_id, construction_name: names.construction_name.to_string(),
+        original_tot_layers: names.original_tot_layers,
+        original_layer_material_names: names.original_layer_material_names.iter()
+            .map(|name| (*name).to_string()).collect(),
+        flags_on_entry: flags, flags_on_return: actual.flags_on_return,
+        result: Ok(actual), selected_chain_stop,
+    }
+}
+
+/// Retain a later declared construction without invoking its selected chain.
+///
+/// The caller must gate before producing its initial/first assembly owners.
+/// Legacy thermal/EIO initialization is separate from this selected stop ledger.
+#[must_use]
+pub fn skip_construction_ctf_retry(
+    construction_id: ConstructionId,
+    flags: CtfCallerSharedFlags,
+    names: CtfCallerDiagnosticNames<'_>,
+    prior_stop: CtfRetryChainStop,
+) -> ConstructionCtfRetryInitialization {
+    let reason = match prior_stop {
+        CtfRetryChainStop::Fatal { construction_id } =>
+            CtfRetryInitializationUnavailable::PriorFatal { construction_id },
+        CtfRetryChainStop::ScopeStopped { construction_id, reason } =>
+            CtfRetryInitializationUnavailable::PriorScopeStopped { construction_id, reason },
+    };
+    ConstructionCtfRetryInitialization {
+        construction_id, construction_name: names.construction_name.to_string(),
+        original_tot_layers: names.original_tot_layers,
+        original_layer_material_names: names.original_layer_material_names.iter()
+            .map(|name| (*name).to_string()).collect(),
+        flags_on_entry: flags, flags_on_return: flags,
+        result: Err(reason), selected_chain_stop: Some(prior_stop),
+    }
+}
+
+#[cfg(test)]
+#[path = "ctf_retry_initialization_tests.rs"]
+mod tests;

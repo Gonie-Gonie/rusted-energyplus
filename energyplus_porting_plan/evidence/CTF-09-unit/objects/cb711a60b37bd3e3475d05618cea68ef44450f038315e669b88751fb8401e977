@@ -1,0 +1,29 @@
+--- .runtime/porting/CTF-09/retry-driver-prep-02/before-01/ctf_retry_driver.rs
++++ .runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver.rs
+@@ -20,7 +20,7 @@
+     CtfInverseInput, CtfInverseMatrix, CtfInverseScopeError, invert_selected_ctf_matrix,
+ };
+ use super::surface_manager::ctf_state_space_assembly::{
+-    CtfAssemblyContext, CtfAssemblyObservation, CtfAssemblyReassignmentError, CtfAssemblyRoute,
++    CtfAssemblyContext, CtfAssemblyObservation, CtfAssemblyPreAssignment, CtfAssemblyReassignmentError, CtfAssemblyRoute,
+     CtfAssemblyUnavailable, CtfStateSpaceAssembly, reassign_1d_ctf_state_space,
+ };
+ use ep_model::ConstructionId;
+@@ -152,6 +152,17 @@
+     pub reassignments: Vec<CtfRetryReassignment>,
+     /// Exact selected terminal decision or typed scope stop.
+     pub outcome: CtfRetryDriverOutcome,
++}
++
++impl ConstructionCtfRetryDriver {
++    /// Borrow the genuine once-captured initial producer checkpoint, if present.
++    ///
++    /// This is the retained first owner's optional copy, not a reconstruction
++    /// from the later band, dimension, or advanced caller/attempt timestamp.
++    #[must_use]
++    pub fn initial_pre_assignment(&self) -> Option<&CtfAssemblyPreAssignment> {
++        self.retained_assembly.as_ref()?.initial_pre_assignment.as_ref()
++    }
+ }
+ 
+ #[derive(Clone, Copy)]

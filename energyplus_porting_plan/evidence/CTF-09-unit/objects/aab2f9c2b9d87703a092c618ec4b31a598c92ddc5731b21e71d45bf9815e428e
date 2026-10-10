@@ -1,0 +1,178 @@
+"""Freeze source identities/differences with stdlib only; never import targets."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-08/comparer-prep-04"
+QA = ROOT / ".runtime/porting/CTF-09/original-data-review-prep-02"
+OBS = ROOT / ".runtime/porting/CTF-09/rust-observer-prep-01"
+OWN = ["compare_unit.py", "compare_production.py", "packet_io.py", "method_compare.py",
+       "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py",
+       "retry_shape.py", "retry_compare.py"]
+
+
+def identity(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def document(path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def dump(node):
+    return ast.dump(node, include_attributes=False)
+
+
+def functions(path):
+    return {node.name: node for node in ast.parse(path.read_text(encoding="utf-8")).body
+            if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+
+
+def range_ref(row):
+    first = row.get("start_line", row.get("first_line"))
+    last = row.get("end_line", row.get("last_line"))
+    path = ROOT / row["path"]
+    lines = path.read_bytes().splitlines(keepends=True)
+    assert 1 <= first <= last <= len(lines), (str(path), first, last, len(lines))
+    raw = b"".join(lines[first - 1:last])
+    assert hashlib.sha256(raw).hexdigest() == row["sha256"]
+    assert len(raw) == row["size_bytes"]
+    return row
+
+
+def main():
+    assert not (PREP / "manifest.json").exists(), "Held packages are immutable"
+    rows, correspondence = [], {}
+    for name in OWN:
+        source = PREP / name
+        ast.parse(source.read_text(encoding="utf-8"))
+        old = OLD / name
+        before = old.read_text(encoding="utf-8") if old.exists() else ""
+        after = source.read_text(encoding="utf-8")
+        exact = "".join(difflib.unified_diff(before.splitlines(keepends=True), after.splitlines(keepends=True),
+            fromfile="accepted-CTF08/" + name if old.exists() else "/dev/null", tofile="proposed-CTF09/" + name))
+        delta = PREP / "diffs" / (name + ".from-ctf08.diff")
+        if name == "retry_compare.py":
+            delta.write_text(exact, encoding="utf-8", newline="\n")
+        assert delta.read_text(encoding="utf-8") == exact
+        row = {"source": identity(source), "exact_diff": identity(delta), "new_source": not old.exists()}
+        if old.exists():
+            assert (PREP / "before" / name).read_bytes() == old.read_bytes()
+            row["accepted_CTF08_source"] = identity(old)
+            row["before_archive"] = identity(PREP / "before" / name)
+        rows.append(row)
+    for lane in ["unit", "production"]:
+        name = "compare_" + lane + ".py"
+        before, after = functions(OLD / name), functions(PREP / name)
+        old_methods = {node.name: node for node in before["Comparison"].body if isinstance(node, ast.FunctionDef)}
+        new_methods = {node.name: node for node in after["Comparison"].body if isinstance(node, ast.FunctionDef)}
+        assert old_methods.keys() == new_methods.keys()
+        unchanged = [key for key in old_methods if key != "__init__"]
+        assert all(dump(old_methods[key]) == dump(new_methods[key]) for key in unchanged)
+        assert ast.get_source_segment((OLD/name).read_text(encoding="utf-8"),old_methods["number"]) == ast.get_source_segment(
+            (PREP/name).read_text(encoding="utf-8"),new_methods["number"])
+        correspondence[lane] = {"Comparison_methods_except_metric_inventory_AST_exact": unchanged,
+            "Comparison_number_text_exact": True,
+            "unused_historical_first_assembly_functions": ["first_assembly_storage", "matrix_count_proof", "compare_matrix_models"]}
+    assert (PREP / "method_compare.py").read_bytes() == (OLD / "method_compare.py").read_bytes()
+    structural = ["initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "retry_shape.py"]
+    for name in structural:
+        assert (PREP/name).read_bytes() == (QA/name).read_bytes()
+    packet_before = (OLD / "packet_io.py").read_bytes()
+    assert (PREP / "packet_io.py").read_bytes() == packet_before.replace(b'CTF-08"', b'CTF-09"')
+    obs = document(OBS / "manifest.json")
+    native_path = ROOT / ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json"
+    native = document(native_path)
+    qa = document(QA / "manifest.json")
+    ranges = []
+    seen = set()
+    for row in obs["source_ranges"] + native["primary_source_ranges"]:
+        key = (row["path"],row.get("start_line",row.get("first_line")),row.get("end_line",row.get("last_line")))
+        if key not in seen:
+            seen.add(key); ranges.append(range_ref(row))
+    dependency_names = [
+        ".runtime/porting/CTF-08/comparer-prep-04/manifest.json",
+        ".runtime/porting/CTF-09/rust-observer-prep-01/manifest.json",
+        ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+        ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+        ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
+        ".runtime/porting/CTF-09/native-build-review-prep-01/manifest.json",
+        ".runtime/porting/CTF-09/original-data-review-prep-02/manifest.json",
+        ".runtime/porting/CTF-09/retry-driver-prep-02/manifest.json",
+        ".runtime/porting/CTF-09/assembly-reassignment-prep-02/manifest.json",
+        ".runtime/porting/CTF-09/caller-stability-prep-01/manifest.json",
+        ".runtime/porting/CTF-09/cache-ingress-prep-02/manifest.json"]
+    direct_sources = []
+    for row in obs["own_source_rows"] + native["own_sources"]:
+        expected = row["source"]
+        assert identity(ROOT / expected["path"]) == expected
+        direct_sources.append(expected)
+    for expected in qa["own_sources"]:
+        assert identity(ROOT / expected["path"]) == expected
+        direct_sources.append(expected)
+    for name in ["manifest.json", "README.md", "gamma_compare.py", "coefficient_compare.py"]:
+        assert (PREP/"before"/name).read_bytes() == (OLD/name).read_bytes()
+    for name in ["prepare_sources.py", "prepare_manifest.py"]:
+        ast.parse((PREP/name).read_text(encoding="utf-8"))
+    report = {
+        "schema": "ctf09-strict-retry-comparer-source-preparation.v1", "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+        "own_sources": rows, "owned_Python_body_count": len(OWN), "executed_sources_per_lane": 9,
+        "predecessor_manifest": identity(OLD/"manifest.json"),
+        "before_manifest": identity(PREP/"before/manifest.json"),
+        "before_README": identity(PREP/"before/README.md"),
+        "unused_historical_pairing_before_archives": [identity(PREP/"before"/name) for name in ["gamma_compare.py","coefficient_compare.py"]],
+        "README": identity(PREP/"README.md"),
+        "authoring_sources": [identity(PREP/name) for name in ["prepare_sources.py","prepare_manifest.py"]],
+        "accepted_dependency_manifests": [identity(ROOT/name) for name in dependency_names],
+        "producer_interface_sources": direct_sources,
+        "selected_source_ranges": ranges,
+        "source_correspondence": {**correspondence,
+            "method_compare_byte_exact_CTF08": True,
+            "only_method_compare_functions_called": ["copied","values","matrix_map"],
+            "structural_validator_files_byte_exact_final_OriginalDataQA02": structural,
+            "packet_io_only_CTF_root_literal_changed": True},
+        "runtime_interfaces": {
+            "common_required_CLI": ["approved-source-sha256","original-data-review","original-data-review-execution",
+                "Rust-build-execution","Rust-execution","Rust-results","output-dir"],
+            "production_extra_CLI": ["conversion-ledger","conversion-execution"],
+            "runtime_reference_syntax": "actual path#SHA256 supplied by Root; no future values",
+            "actual_Cargo_source_snapshot_and_unique_compiler_artifact_required": True,
+            "observer_own_source_counts": obs["observer_source_counts"],
+            "observer_API_source_counts": obs["API_source_counts"],
+            "actual_QA_executed_source_archives_per_lane": 8,
+            "observation_file_bound_bytes": 1024*1024*1024,
+            "metadata_file_bound_bytes": 16*1024*1024},
+        "selected_pairing": {
+            "new_primary_profile_group": "ctf09_retry_profiles", "new_primary_profile_count": 8,
+            "historical_handoff_groups": ["ctf01_preprocessing_profiles","ctf03_initial_profiles","arithmetic_profiles_by_variable",
+                "ctf06_exponential_profiles","ctf05_inverse_profiles","ctf07_gamma_profiles","ctf08_final_coefficient_profiles"],
+            "all_genuine_no_source_1D_actual_visits_required": True,
+            "first_pre_assignment_from_actual_producer_required": True,
+            "first_BMat3_after_reset_class_and_bits_required": True,
+            "later_pre_call_BMat3_not_after_reset_owner": True,
+            "old_first_wrapper05_through08_DTOs_remain_uninvoked_context": True,
+            "Native_global_diagnostic_temporal_owners_not_equated_to_Rust_intents": True,
+            "selected_PASS_requires_observed_complete_attempt_owner_pair_and_zero_mismatches": True,
+            "missing_required_one_or_both_sides_fails": True,
+            "nonfinite_required_values_not_PASS": True,
+            "current09_and_historical08_authorities_separate": True,
+            "historical_after_documents_not_replayed_as_current_live_files": True,
+            "whole_Original_return_SI19_store_and_full_CTF09_certified": False},
+        "preparation_boundary": {"targets_imported_or_executed": False,"scientific_weather_binary_payloads_read": False,
+            "canonical_or_Git_modified": False,"new_QA_proof_or_execution_framework": False,
+            "arithmetic_or_retry_evaluator": False,"numerical_PASS_claimed": False,"gates_updated": False},
+        "authorship_limits": "Raw authored caller/driver/Rust09 transport and some pure06. Header authored Native09/assembly/ingress; Base authored DataQA. This is actual owner/provenance pairing, not independent certification of the authors' formulas."
+    }
+    (PREP/"manifest.json").write_text(json.dumps(report,ensure_ascii=False,allow_nan=False,indent=2)+"\n",encoding="utf-8",newline="\n")
+    print(json.dumps({"manifest":identity(PREP/"manifest.json"),"own_sources":[row["source"] for row in rows],
+                      "range_count":len(ranges)},indent=2))
+
+
+if __name__ == "__main__":
+    main()

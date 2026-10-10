@@ -1,0 +1,91 @@
+"""Metadata-only successor; stdlib source copying/diff/AST, no target imports."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-09/comparer-prep-01"
+
+
+def identity(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def difference(before, after, name):
+    return "".join(difflib.unified_diff(before.splitlines(keepends=True), after.splitlines(keepends=True),
+        fromfile="accepted-CTF09-01/" + name, tofile="proposed-CTF09-02/" + name))
+
+
+def main():
+    assert not (PREP / "manifest.json").exists(), "Held successors are immutable"
+    old = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+    assert identity(OLD / "manifest.json")["sha256"] == "e43bd107183bd376d9775a7a339dfc614d0cb66a8898015e6d7a762ac35f3d71"
+    report = copy.deepcopy(old)
+    old_prefix, new_prefix = OLD.relative_to(ROOT).as_posix(), PREP.relative_to(ROOT).as_posix()
+    def rebind(value):
+        if isinstance(value, dict):
+            return {key: rebind(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [rebind(item) for item in value]
+        if isinstance(value, str) and value.startswith(old_prefix + "/"):
+            return new_prefix + value[len(old_prefix):]
+        return value
+    report = rebind(report)
+    for name in ["before", "before-01", "diffs", "from-01"]:
+        (PREP/name).mkdir(exist_ok=True)
+    for source in (OLD/"before").iterdir():
+        assert source.is_file()
+        (PREP/"before"/source.name).write_bytes(source.read_bytes())
+    for source in (OLD/"diffs").iterdir():
+        assert source.is_file()
+        (PREP/"diffs"/source.name).write_bytes(source.read_bytes())
+    narrow = []
+    for row in old["own_sources"]:
+        source = ROOT / row["source"]["path"]
+        raw = source.read_bytes()
+        ast.parse(raw.decode("utf-8"))
+        (PREP/source.name).write_bytes(raw)
+        (PREP/"before-01"/source.name).write_bytes(raw)
+        delta = PREP/"from-01"/(source.name + ".diff")
+        delta.write_text(difference(raw.decode("utf-8"),raw.decode("utf-8"),source.name),encoding="utf-8",newline="\n")
+        narrow.append({"source":identity(PREP/source.name),"before":identity(PREP/"before-01"/source.name),
+                       "exact_diff":identity(delta),"byte_exact_accepted01":True})
+    for name in ["manifest.json", "README.md"]:
+        (PREP/"before-01"/name).write_bytes((OLD/name).read_bytes())
+    before = (OLD/"README.md").read_text(encoding="utf-8")
+    assert before.count("metadata remains16MiB.") == 1
+    after = before.replace("metadata remains16MiB.","metadata remains exactly16,000,000 bytes.")
+    (PREP/"README.md").write_text(after,encoding="utf-8",newline="\n")
+    doc_delta = PREP/"from-01/README.md.diff"
+    doc_delta.write_text(difference(before,after,"README.md"),encoding="utf-8",newline="\n")
+    report["README"] = identity(PREP/"README.md")
+    report["authoring_sources"] = old["authoring_sources"] + [identity(Path(__file__))]
+    report["runtime_interfaces"]["metadata_file_bound_bytes"] = 16000000
+    report["accepted_CTF09_01_manifest"] = identity(OLD/"manifest.json")
+    report["before_01_manifest"] = identity(PREP/"before-01/manifest.json")
+    report["before_01_README"] = identity(PREP/"before-01/README.md")
+    report["narrow_source_correspondence"] = narrow
+    report["README_delta_from_01"] = identity(doc_delta)
+    report["fresh02_change"] = {"metadata_only":True,
+        "exact_unchanged_packet_io_load_metadata_bound_bytes":16000000,
+        "README_and_runtime_interfaces_bound_corrected":True,
+        "all_ten_executable_bodies_byte_exact_accepted01":True,
+        "observation_1GiB_bound_unchanged":True,
+        "science_profiles_Comparison_methods_and_target_imports_changed":False}
+    output = PREP/"manifest.json"
+    output.write_text(json.dumps(report,ensure_ascii=False,allow_nan=False,indent=2)+"\n",encoding="utf-8",newline="\n")
+    manifest_delta = PREP/"manifest.json.from-01.diff"
+    manifest_delta.write_text(difference((OLD/"manifest.json").read_text(encoding="utf-8"),
+        output.read_text(encoding="utf-8"),"manifest.json"),encoding="utf-8",newline="\n")
+    print(json.dumps({"manifest":identity(output),"manifest_diff":identity(manifest_delta),
+                      "README_diff":identity(doc_delta),"ten_bodies_byte_exact01":True},indent=2))
+
+
+if __name__ == "__main__":
+    main()

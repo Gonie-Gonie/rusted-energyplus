@@ -1,0 +1,12 @@
+--- actual-before/ctf_retry_driver.rs
++++ proposed-doc-only/ctf_retry_driver.rs
+@@ -52,7 +52,9 @@
+     UnsupportedContext,
+     /// A method actually returned its typed unavailable route; later calls stop.
+     MethodRoute {
++        /// Actual pure method that returned its unavailable route.
+         method: CtfRetryMethod,
++        /// Typed unavailable route copied from that method result.
+         reason: CtfAssemblyUnavailable,
+     },
+     /// The invoked exponential returned this actual shape/domain error.

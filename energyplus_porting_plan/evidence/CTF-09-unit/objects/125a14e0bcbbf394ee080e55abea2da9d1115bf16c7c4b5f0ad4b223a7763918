@@ -1,0 +1,348 @@
+--- .runtime/porting/CTF-09/assembly-reassignment-prep-01/before/ctf_state_space_assembly.rs
++++ .runtime/porting/CTF-09/assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs
+@@ -85,10 +85,32 @@
+     AttemptOrdinal,
+ }
+ 
++/// Real initial producer storage immediately after its BMat(3) reset.
++///
++/// AMat and IdenMatrix are copied from the allocated owner before the first
++/// band assignment. This is not a reconstruction from matrix dimensions or
++/// a second assembly call. Construction NumCTFTerms/shared flags are outside
++/// this pure API and are not invented here.
++#[derive(Clone, Debug, PartialEq)]
++pub struct CtfAssemblyPreAssignment {
++    /// Actual context supplied to the same initial producer invocation.
++    pub context: CtfAssemblyContext,
++    /// Actual source matrix dimension for the copied storage.
++    pub rcmax: i32,
++    /// Actual pre-band AMat values in the existing row-first layout.
++    pub a_mat: Vec<f64>,
++    /// Actual source-produced identity owner before the band assignments.
++    pub iden_matrix: Vec<f64>,
++    /// Actual BMat(3) immediately after the source reset, not BMat(1/2).
++    pub b_mat3_after_reset: f64,
++}
++
+ /// Owned initialized compressed state at the pre-exponential call boundary.
+ #[derive(Clone, Debug, PartialEq)]
+ pub struct CtfStateSpaceAssembly {
+-    /// Metadata copied for this attempt; later retries create separate owners.
++    /// Retained actual initial producer checkpoint, never overwritten by retries.
++    pub initial_pre_assignment: Option<CtfAssemblyPreAssignment>,
++    /// Metadata for the latest actual assignment into this persistent storage.
+     pub context: CtfAssemblyContext,
+     /// The unchanged actual converted layer inputs, without invented IDs.
+     pub layers: Vec<CtfNormalizedLayer>,
+@@ -135,7 +157,6 @@
+ ///
+ /// This function does not allocate the downstream solver workspaces, call the
+ /// exponential/inverse/Gamma/coefficient helpers, choose a route or run retries.
+-#[allow(clippy::neg_multiply)] // Retain the original interface multiplication order.
+ pub fn assemble_1d_ctf_state_space(
+     input: CtfAssemblyInput<'_>,
+     context: CtfAssemblyContext,
+@@ -191,76 +212,14 @@
+     }
+     let mut b_mat = [0.0; 3];
+ 
+-    let mut cap = layers[0].rho * layers[0].cp * dx[0];
+-    cap *= 1.5;
+-    let mut dxtmp = 1.0 / dx[0] / cap;
+-    write_a(&mut a_mat, rcmax, 1, 1, -2.0 * layers[0].rk * dxtmp);
+-    write_a(&mut a_mat, rcmax, 2, 1, layers[0].rk * dxtmp);
+-    b_mat[0] = layers[0].rk * dxtmp;
+-
+-    let mut layer = 0;
+-    let mut node_in_layer = 2;
+-    for node in 2..rcmax {
+-        if node_in_layer == input.nodes[layer] && count != 1 {
+-            cap = (layers[layer].rho * layers[layer].cp * dx[layer]
+-                + layers[layer + 1].rho * layers[layer + 1].cp * dx[layer + 1])
+-                * 0.5;
+-            write_a(
+-                &mut a_mat,
+-                rcmax,
+-                node - 1,
+-                node,
+-                layers[layer].rk / dx[layer] / cap,
+-            );
+-            write_a(
+-                &mut a_mat,
+-                rcmax,
+-                node,
+-                node,
+-                -1.0 * (layers[layer].rk / dx[layer] + layers[layer + 1].rk / dx[layer + 1]) / cap,
+-            );
+-            write_a(
+-                &mut a_mat,
+-                rcmax,
+-                node + 1,
+-                node,
+-                layers[layer + 1].rk / dx[layer + 1] / cap,
+-            );
+-            node_in_layer = 0;
+-            layer += 1;
+-        } else {
+-            cap = layers[layer].rho * layers[layer].cp * dx[layer];
+-            dxtmp = 1.0 / dx[layer] / cap;
+-            write_a(&mut a_mat, rcmax, node - 1, node, layers[layer].rk * dxtmp);
+-            write_a(
+-                &mut a_mat,
+-                rcmax,
+-                node,
+-                node,
+-                -2.0 * layers[layer].rk * dxtmp,
+-            );
+-            write_a(&mut a_mat, rcmax, node + 1, node, layers[layer].rk * dxtmp);
+-        }
+-        node_in_layer += 1;
+-    }
+-
+-    let last = count - 1;
+-    cap = layers[last].rho * layers[last].cp * dx[last];
+-    cap *= 1.5;
+-    dxtmp = 1.0 / dx[last] / cap;
+-    write_a(
+-        &mut a_mat,
+-        rcmax,
+-        rcmax,
+-        rcmax,
+-        -2.0 * layers[last].rk * dxtmp,
++    let mut initial_pre_assignment = None;
++    let (c_mat, d_mat) = assign_1d_ctf_state_space(
++        layers, input.nodes, dx, rcmax, &mut a_mat, &mut b_mat,
++        Some((&mut initial_pre_assignment, context, source_rcmax, &iden_matrix)),
+     );
+-    write_a(&mut a_mat, rcmax, rcmax - 1, rcmax, layers[last].rk * dxtmp);
+-    b_mat[1] = layers[last].rk * dxtmp;
+-    let c_mat = [-layers[0].rk / dx[0], layers[last].rk / dx[last]];
+-    let d_mat = [layers[0].rk / dx[0], -layers[last].rk / dx[last]];
+     Ok(CtfAssemblyObservation::Assembled(Box::new(
+         CtfStateSpaceAssembly {
++            initial_pre_assignment,
+             context,
+             layers: layers.to_vec(),
+             nodes: input.nodes.to_vec(),
+@@ -275,9 +234,221 @@
+     )))
+ }
+ 
++/// A failed reassignment precondition, never a Native retry decision.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum CtfAssemblyReassignmentError {
++    /// The stored selected owner has an unsupported scope or shape.
++    Scope(CtfAssemblyScopeError),
++    /// Reassignment cannot turn an unavailable route into initialized storage.
++    UnavailableRoute(CtfAssemblyUnavailable),
++    /// The invocation belongs to a different original construction.
++    ConstructionIdentityMismatch,
++    /// Route, dimensions, selectors or original caller bits changed.
++    StaticContextMismatch,
++    /// The caller did not supply exactly the next representable ordinal.
++    AttemptSequence,
++}
++
++/// Repeat Construction.cc 659-728 in the same actual matrix storage.
++///
++/// The caller retains custody of the unchanged converted prefix, Nodes, dx,
++/// AMat and IdenMatrix from the initial allocation. This checks their supported
++/// shape without placing nodes or deriving spacings. Only the original band,
++/// compressed B/C/D and invocation context are assigned. In particular AMat's
++/// other cells and every IdenMatrix bit survive, as they do in the source loop.
++///
++/// The caller supplies current CTFTimeStep and NumHistories literally; this API
++/// neither chooses a retry nor verifies an invented arithmetic relationship.
++/// No mutation occurs on a rejected precondition. First-only owners do not
++/// invoke this function and keep their existing guards and result contracts.
++pub fn reassign_1d_ctf_state_space(
++    assembly: &mut CtfStateSpaceAssembly,
++    current_context: CtfAssemblyContext,
++) -> Result<(), CtfAssemblyReassignmentError> {
++    use CtfAssemblyReassignmentError as Error;
++
++    let previous = assembly.context;
++    if let CtfAssemblyRoute::Unavailable(reason) = previous.route {
++        return Err(Error::UnavailableRoute(reason));
++    }
++    if let CtfAssemblyRoute::Unavailable(reason) = current_context.route {
++        return Err(Error::UnavailableRoute(reason));
++    }
++    if previous.construction_id != current_context.construction_id {
++        return Err(Error::ConstructionIdentityMismatch);
++    }
++    if previous.route != current_context.route
++        || previous.solution_dimensions != current_context.solution_dimensions
++        || previous.source_sink_present != current_context.source_sink_present
++        || previous.node_source != current_context.node_source
++        || previous.node_user_temp != current_context.node_user_temp
++        || previous.time_step_zone.to_bits() != current_context.time_step_zone.to_bits()
++    {
++        return Err(Error::StaticContextMismatch);
++    }
++    if previous.source_sink_present {
++        return Err(Error::Scope(CtfAssemblyScopeError::InternalSource));
++    }
++    if previous.solution_dimensions != 1 {
++        return Err(Error::Scope(CtfAssemblyScopeError::UnsupportedDimensions(
++            previous.solution_dimensions,
++        )));
++    }
++    if previous.node_source != 0 || previous.node_user_temp != 0 {
++        return Err(Error::Scope(CtfAssemblyScopeError::SourceNodeState));
++    }
++    if previous.attempt_ordinal == 0 {
++        return Err(Error::Scope(CtfAssemblyScopeError::AttemptOrdinal));
++    }
++    if previous.attempt_ordinal.checked_add(1) != Some(current_context.attempt_ordinal) {
++        return Err(Error::AttemptSequence);
++    }
++
++    // Check the already stored nodal owner, not a new node placement.
++    let count = assembly.layers.len();
++    if count == 0 || count > 11 {
++        return Err(Error::Scope(CtfAssemblyScopeError::LayerCount(count)));
++    }
++    if assembly.nodes.len() != count || assembly.dx.len() != count {
++        return Err(Error::Scope(CtfAssemblyScopeError::ActivePrefixShape));
++    }
++    for (index, &nodes) in assembly.nodes.iter().enumerate() {
++        let interior_resistance = index > 0 && index + 1 < count && assembly.layers[index].res_layer;
++        let valid = if interior_resistance {
++            nodes == 1
++        } else {
++            (6..=19).contains(&nodes)
++        };
++        if !valid {
++            return Err(Error::Scope(CtfAssemblyScopeError::NodeCount(index + 1)));
++        }
++    }
++    // One-through-eleven validated node counts bound this sum and product.
++    let source_rcmax = assembly.nodes.iter().sum::<i32>() - 1;
++    if assembly.rcmax != source_rcmax {
++        return Err(Error::Scope(CtfAssemblyScopeError::MatrixShape));
++    }
++    let rcmax = source_rcmax as usize;
++    if assembly.a_mat.len() != rcmax * rcmax || assembly.iden_matrix.len() != rcmax * rcmax {
++        return Err(Error::Scope(CtfAssemblyScopeError::MatrixShape));
++    }
++
++    let (c_mat, d_mat) = assign_1d_ctf_state_space(
++        &assembly.layers,
++        &assembly.nodes,
++        &assembly.dx,
++        rcmax,
++        &mut assembly.a_mat,
++        &mut assembly.b_mat,
++        None,
++    );
++    assembly.c_mat = c_mat;
++    assembly.d_mat = d_mat;
++    assembly.context = current_context;
++    Ok(())
++}
++
++// The single copy of the selected source loop's repeated assignments.
++#[allow(clippy::neg_multiply)] // Retain the original interface multiplication order.
++fn assign_1d_ctf_state_space(
++    layers: &[CtfNormalizedLayer],
++    nodes: &[i32],
++    dx: &[f64],
++    rcmax: usize,
++    a_mat: &mut [f64],
++    b_mat: &mut [f64; 3],
++    checkpoint: Option<(&mut Option<CtfAssemblyPreAssignment>, CtfAssemblyContext, i32, &[f64])>,
++) -> ([f64; 2], [f64; 2]) {
++    let count = layers.len();
++    // Construction.cc 659, before the selected 1D assignments.
++    b_mat[2] = 0.0;
++    if let Some((destination, context, source_rcmax, iden_matrix)) = checkpoint {
++        *destination = Some(CtfAssemblyPreAssignment {
++            context,
++            rcmax: source_rcmax,
++            a_mat: a_mat.to_vec(),
++            iden_matrix: iden_matrix.to_vec(),
++            b_mat3_after_reset: b_mat[2],
++        });
++    }
++    let mut cap = layers[0].rho * layers[0].cp * dx[0];
++    cap *= 1.5;
++    let mut dxtmp = 1.0 / dx[0] / cap;
++    write_a(a_mat, rcmax, 1, 1, -2.0 * layers[0].rk * dxtmp);
++    write_a(a_mat, rcmax, 2, 1, layers[0].rk * dxtmp);
++    b_mat[0] = layers[0].rk * dxtmp;
++
++    let mut layer = 0;
++    let mut node_in_layer = 2;
++    for node in 2..rcmax {
++        if node_in_layer == nodes[layer] && count != 1 {
++            cap = (layers[layer].rho * layers[layer].cp * dx[layer]
++                + layers[layer + 1].rho * layers[layer + 1].cp * dx[layer + 1])
++                * 0.5;
++            write_a(
++                a_mat,
++                rcmax,
++                node - 1,
++                node,
++                layers[layer].rk / dx[layer] / cap,
++            );
++            write_a(
++                a_mat,
++                rcmax,
++                node,
++                node,
++                -1.0 * (layers[layer].rk / dx[layer] + layers[layer + 1].rk / dx[layer + 1]) / cap,
++            );
++            write_a(
++                a_mat,
++                rcmax,
++                node + 1,
++                node,
++                layers[layer + 1].rk / dx[layer + 1] / cap,
++            );
++            node_in_layer = 0;
++            layer += 1;
++        } else {
++            cap = layers[layer].rho * layers[layer].cp * dx[layer];
++            dxtmp = 1.0 / dx[layer] / cap;
++            write_a(a_mat, rcmax, node - 1, node, layers[layer].rk * dxtmp);
++            write_a(
++                a_mat,
++                rcmax,
++                node,
++                node,
++                -2.0 * layers[layer].rk * dxtmp,
++            );
++            write_a(a_mat, rcmax, node + 1, node, layers[layer].rk * dxtmp);
++        }
++        node_in_layer += 1;
++    }
++
++    let last = count - 1;
++    cap = layers[last].rho * layers[last].cp * dx[last];
++    cap *= 1.5;
++    dxtmp = 1.0 / dx[last] / cap;
++    write_a(
++        a_mat,
++        rcmax,
++        rcmax,
++        rcmax,
++        -2.0 * layers[last].rk * dxtmp,
++    );
++    write_a(a_mat, rcmax, rcmax - 1, rcmax, layers[last].rk * dxtmp);
++    b_mat[1] = layers[last].rk * dxtmp;
++    let c_mat = [-layers[0].rk / dx[0], layers[last].rk / dx[last]];
++    let d_mat = [layers[0].rk / dx[0], -layers[last].rk / dx[last]];
++    (c_mat, d_mat)
++}
++
+ fn write_a(values: &mut [f64], rcmax: usize, i1: usize, i2: usize, value: f64) {
+     values[(i1 - 1) * rcmax + i2 - 1] = value;
+ }
+ 
+ #[cfg(test)]
+ mod tests;
++
++#[cfg(test)]
++#[path = "ctf_state_space_reassignment_tests.rs"]
++mod reassignment_tests;

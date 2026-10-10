@@ -1,0 +1,12 @@
+--- .runtime/porting/CTF-09/cache-ingress-prep-01/proposed/initialization/state_shell.rs
++++ .runtime/porting/CTF-09/cache-ingress-prep-02/proposed/initialization/state_shell.rs
+@@ -25,7 +25,8 @@
+         construction_ctf06_first_exponential: construction_thermal_data.first_exponentials(),
+         construction_ctf05_first_inverse: construction_thermal_data.first_inverses(),
+         construction_ctf07_first_gammas: construction_thermal_data.first_gammas(),
+-        construction_ctf08_first_private_coefficients: construction_thermal_data.first_private_coefficients(),
++        construction_ctf08_first_private_coefficients: construction_thermal_data
++            .first_private_coefficients(),
+         construction_ctf09_retry_driver: construction_thermal_data.take_retry_initializations(),
+         construction_cache_build_wall_seconds: construction_thermal_data.build_wall_seconds,
+         construction_cache_entry_count: construction_thermal_data.len(),

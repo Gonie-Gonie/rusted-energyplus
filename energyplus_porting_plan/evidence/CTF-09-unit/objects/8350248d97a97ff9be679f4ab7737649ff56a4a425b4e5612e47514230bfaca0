@@ -1,0 +1,71 @@
+pub(super) fn ctf04_unavailable() -> Value {
+    json!({"owner_available":false,"construction_first_assembly":null,
+        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+}
+pub(super) fn ctf04_selected(source: &HeatBalanceState) -> Value {
+    json!({"owner_available":false,"construction_first_assembly":[],
+        "actual_compatibility_vector_count":source.construction_ctf04_first_assembly.len(),
+        "unavailable_reason":"actual first owner moved into retry driver; no retained first-only Box or replay",
+        "actual_constructor_ledger":source.construction_ctf09_retry_driver.iter().enumerate().map(|(index,actual)|json!({
+            "state_vector_index":index,"construction_id":actual.construction_id.0,
+            "actual_public_API":"initialize_construction_ctf_first_assembly",
+            "actual_public_API_invoked":actual.result.is_ok(),
+            "actual_first_assembly_location":"selected_CTF09_owners.construction_retry_initialization[].result.driver.attempts[0].assembly",
+            "Native_invocation_or_first_result_reconstructed":false})).collect::<Vec<_>>(),
+        "first_owner_consumed_once":true,"predecessors_reexecuted_by_observer":false,"counted_as_PASS":false})
+}
+fn first_wrapper_context(source: &HeatBalanceState, api: &str, key: &str, retained_count: usize) -> Value {
+    let mut out = json!({"owner_available":false,"actual_compatibility_vector_count":retained_count,
+        "unavailable_reason":"retry driver invokes actual pure methods; first-only public wrappers uninvoked",
+        "actual_wrapper_ledger":source.construction_ctf09_retry_driver.iter().enumerate().map(|(index,actual)|json!({
+            "state_vector_index":index,"construction_id":actual.construction_id.0,
+            "result":unit_fields::first_wrapper_uninvoked(api,actual.construction_id.0)})).collect::<Vec<_>>(),
+        "actual_first_method_handoff_location":"selected_CTF09_owners.construction_retry_initialization[].result.driver.first_method_handoff",
+        "historical_first_only_policy_reinterpreted":false,"counted_as_PASS":false});
+    out[key] = json!([]);
+    out
+}
+fn unavailable_first(key: &str) -> Value {
+    let mut out = json!({"owner_available":false,
+        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false});
+    out[key] = Value::Null;
+    out
+}
+pub(super) fn ctf06_unavailable() -> Value { unavailable_first("construction_first_exponential") }
+pub(super) fn ctf05_unavailable() -> Value { unavailable_first("construction_first_inverse") }
+pub(super) fn ctf07_unavailable() -> Value { unavailable_first("construction_first_gammas") }
+pub(super) fn ctf08_unavailable() -> Value { unavailable_first("construction_first_private_coefficients") }
+pub(super) fn ctf06_selected(source: &HeatBalanceState) -> Value {
+    first_wrapper_context(source,"initialize_construction_ctf_first_exponential","construction_first_exponential",
+        source.construction_ctf06_first_exponential.len())
+}
+pub(super) fn ctf05_selected(source: &HeatBalanceState) -> Value {
+    first_wrapper_context(source,"initialize_construction_ctf_first_inverse","construction_first_inverse",
+        source.construction_ctf05_first_inverse.len())
+}
+pub(super) fn ctf07_selected(source: &HeatBalanceState) -> Value {
+    first_wrapper_context(source,"initialize_construction_ctf_first_gammas","construction_first_gammas",
+        source.construction_ctf07_first_gammas.len())
+}
+pub(super) fn ctf08_selected(source: &HeatBalanceState) -> Value {
+    first_wrapper_context(source,"initialize_construction_ctf_first_final_coefficients","construction_first_private_coefficients",
+        source.construction_ctf08_first_private_coefficients.len())
+}
+pub(super) fn ctf09_unavailable() -> Value {
+    json!({"owner_available":false,"construction_retry_initialization":null,
+        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+}
+pub(super) fn ctf09_selected(source: &HeatBalanceState) -> Value {
+    json!({"owner_available":true,"construction_retry_initialization":source.construction_ctf09_retry_driver.iter()
+        .enumerate().map(|(index,actual)|json!({"state_vector_index":index,
+            "construction_id":actual.construction_id.0,"result":unit_fields::retry_initialization(actual)})).collect::<Vec<_>>(),
+        "actual_owner_count":source.construction_ctf09_retry_driver.len(),
+        "actual_retry_driver_invocations":source.construction_ctf09_retry_driver.iter().filter(|owner|owner.result.is_ok()).count(),
+        "actual_prior_stop_records":source.construction_ctf09_retry_driver.iter().filter(|owner|owner.result.is_err()).count(),
+        "ordinary_initializer_owns_preprocessing_initial_first_and_retry_calls":true,
+        "observer_reexecutes_preprocessing_first_wrappers_or_retry_driver":false,
+        "original_Box_cloned_for_observation":false,"Native_flags_events_or_OS_status_inferred":false,
+        "actual_Rust_relative_error_bookkeeping_unpaired":true,
+        "diagnostic_call_intents_are_not_Native_global_message_owners":true,
+        "terminal_decisions_certify_whole_Native_return_or_SI_store_safety":false,"counted_as_PASS":false})
+}

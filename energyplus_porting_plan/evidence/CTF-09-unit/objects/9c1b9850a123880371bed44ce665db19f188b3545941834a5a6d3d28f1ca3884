@@ -1,0 +1,62 @@
+--- accepted-CTF08/coefficient_shape.py
++++ proposed-CTF09/coefficient_shape.py
+@@ -326,37 +326,38 @@
+              "Exact zero/class/shape/signedzero private coefficient profile differs")
+ 
+ 
+-def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane):
++def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane, *, historical_prior_07=None):
+     from datetime import datetime
+     from pathlib import Path
+     authority, need = freeze["source_authorities"], m.require
+     counts = {"unit": {"model_cases": 39, "calculateTransferFunction": 42}, "production": {"model_cases": 15, "loader_phase_records": 195}}
+-    need(set(authority["current_cards"]) == {"CTF-08"} and authority["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only",
+-         "Current08 scope role differs")
+-    amendment = m.load(authority["actual_scope_amendment"])
+-    need(amendment["schema"] == "ctf08-source-scope-amendment.v1" and amendment["cards"] == ["CTF-08"] and
+-         amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
+-         amendment["strict_profiles_settled_before_outputs"] is True and amendment["actual_CTF08_build_or_engine_execution_performed"] is False and
+-         amendment["requested_counts"] == counts, "Actual pre-output08 amendment required")
+-    for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
+-                        ("final_coefficient_policy_source_inventory", authority["final_coefficient_policy_source_inventory"])]:
+-        same(amendment[key], target); m.bind(target)
+-    before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
+-    need(len(before) == len(after) == 2 and len({r["path"] for r in before}) == len({r["path"] for r in after}) == 2 and
+-         before == authority["historical_scope_documents"] and after == authority["current_scope_documents"], "Current08 raw document identities differ")
+-    card = m.bind(authority["current_cards"]["CTF-08"])
+-    historical = next(r for r in passive["source_refs"] if r["path"] == card["path"])
+-    need(card["path"] == "energyplus_porting_plan/cards/CTF-08.md" and card in after and m.identity("energyplus_porting_plan/plan.json") in after and
+-         any(r["sha256"] == historical["sha256"] and r["size_bytes"] == historical["size_bytes"] for r in before),
+-         "Current08 plan/card or historical before copy differs")
+ 
+     def check(ref, name, prior_to):
+         command = recorded(ref, prior_to)
+         need(command["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", name] and
+              m.contained(command["stderr"]["path"]).stat().st_size == 0, "Real card check0/empty stderr required")
+ 
+-    check(authority["actual_scope_amendment_execution"], "CTF-08", frozen_started)
+-    prior = authority["historical_prior_07_authority"]
++    if historical_prior_07 is None:
++        need(set(authority["current_cards"]) == {"CTF-08"} and authority["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only",
++             "Current08 scope role differs")
++        amendment = m.load(authority["actual_scope_amendment"])
++        need(amendment["schema"] == "ctf08-source-scope-amendment.v1" and amendment["cards"] == ["CTF-08"] and
++             amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
++             amendment["strict_profiles_settled_before_outputs"] is True and amendment["actual_CTF08_build_or_engine_execution_performed"] is False and
++             amendment["requested_counts"] == counts, "Actual pre-output08 amendment required")
++        for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
++                            ("final_coefficient_policy_source_inventory", authority["final_coefficient_policy_source_inventory"])]:
++            same(amendment[key], target); m.bind(target)
++        before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
++        need(len(before) == len(after) == 2 and len({r["path"] for r in before}) == len({r["path"] for r in after}) == 2 and
++             before == authority["historical_scope_documents"] and after == authority["current_scope_documents"], "Current08 raw document identities differ")
++        card = m.bind(authority["current_cards"]["CTF-08"])
++        historical = next(r for r in passive["source_refs"] if r["path"] == card["path"])
++        need(card["path"] == "energyplus_porting_plan/cards/CTF-08.md" and card in after and m.identity("energyplus_porting_plan/plan.json") in after and
++             any(r["sha256"] == historical["sha256"] and r["size_bytes"] == historical["size_bytes"] for r in before),
++             "Current08 plan/card or historical before copy differs")
++        check(authority["actual_scope_amendment_execution"], "CTF-08", frozen_started)
++    prior = historical_prior_07 if historical_prior_07 is not None else authority["historical_prior_07_authority"]
+     prior_ref, execution_ref = prior["prior_07_freeze"], prior["prior_07_freeze_execution"]
+     old07 = m.load(prior_ref); command07 = recorded(execution_ref, frozen_started)
+     prefix = "ctf07-" + ("production-" if lane == "production" else "")

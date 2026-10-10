@@ -1,0 +1,42 @@
+# CTF09 actual initial pre-assignment producer amendment
+
+SOURCE-ONLY HELD; no canonical edits, target imports, formatter, compiler, tests, engine, or outputs read.
+The accepted reassignment01 source remains immutable; this is a separate minimal successor.
+Root and another author must fully review it before any eventual application/execution.
+
+The earlier driver receives an already assigned first assembly owner and correctly cannot reconstruct its pre-band matrices.
+This amendment retains the actual initial producer checkpoint rather than replaying assembly or building an identity in an observer.
+CtfStateSpaceAssembly gains optional initial_pre_assignment: CtfAssemblyPreAssignment.
+It copies actual supplied CtfAssemblyContext, validated source rcmax, live AMat/Iden vectors and BMat3 after reset.
+The checkpoint is filled inside the same private assignment body immediately after its one literal BMat[2]=0.0,
+before cap arithmetic or any band/B1/B2/CMat/DMat assignment. No duplicate reset or assembly invocation exists.
+The initial API/guards/allocations/identity producer remain unchanged, and the same initialized owners feed the same arithmetic once.
+Only the initial call supplies a destination; reassign supplies None and retains the original checkpoint indefinitely.
+All matrix arithmetic statements and their order remain byte-exact01 after removal of the declared additive copy/signature plumbing.
+
+The checkpoint owns bit-preserving copies of the actual vectors; it does not recalculate entries from dimensions.
+Original AMat/Iden/prefix storage pointers and contents still obey the accepted reassignment custody rules.
+The original copied checkpoint is separate from later mutable matrix storage and its advanced context.
+No inverse AMat1, Native operand, numeric answer, retry decision, or expected outcome enters the producer.
+No public first-only wrapper or numerical guard is relaxed. No driver/cache/observer activation is included here.
+
+The pure assembly API does not own construction NumCTFTerms or shared ErrorsFound/DoCTFErrorReport/outer CTFConvrg.
+Those values are intentionally absent from this checkpoint; a future genuine caller must retain its own actual members separately.
+This producer checkpoint establishes only pre_AMat/pre_IdenMatrix/B3 and its actual assembly-context custody.
+Native after661 retains its genuine broader context independently; absent Rust caller fields cannot be synthesized from this checkpoint.
+Required paired operands remain required under the Root-settled future09 policy, not silently waived.
+
+Source inventory found one actual CtfStateSpaceAssembly literal constructor in crates, in the assembly module itself.
+The existing tests obtain owners through the real assemble API. ConstructionCtfFirstAssembly wrapper literals need no change.
+This package does not mutate those public wrapper/test consumers or speculate about serialization fields.
+Raw will consume the reviewed optional checkpoint in a separate fresh retry-driver proposal.
+
+Existing five reassignment tests remain unchanged. Two new unexecuted tests cover actual before-band capture timing,
+independent initial context/bit custody after real repeated mutation, and unchanged NaN/signed-zero off-band/identity storage.
+They do not use Native results or provide expected scientific output operands.
+The proposed module and tests are deliberately unformatted; Root owns later real formatter and test receipts.
+
+Exact01 before copies, two from01 deltas, and original-base cumulative deltas are supplied.
+The struct/copy addition fragments support byte-exact inverse correspondence; metadata hashing is not target execution.
+Header authored reassignment and this producer; Base's earlier04 formula authorship and any peer review are disclosed separately.
+No CTF09/full retry/PASS or whole-building/CTF10 handoff claim is made.

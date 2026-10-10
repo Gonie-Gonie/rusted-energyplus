@@ -1,0 +1,21 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+    Checking ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Checking ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+error: recursion limit reached while expanding `$crate::json_internal!`
+   --> crates\ep_run\examples\ctf09_candidate_unit_observer.rs:564:32
+    |
+564 |   ...   serde_json::to_string(&json!({"schema":"ctf09-candidate-unit-observer-results.v1",
+    |  ______________________________^
+565 | | ...   "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admi...
+566 | | ...   "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+567 | | ...   "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+...   |
+588 | | ...   "Native_result_or_expected_values_read":false,"scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+589 | | ...   "production_loader_lane_certified":false,"CTF05_through_CTF10_certified":false,"gates_updated":false}))?
+    | |____________________________________________________________________________________________________________^
+    |
+    = help: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`ctf09_candidate_unit_observer`)
+    = note: this error originates in the macro `$crate::json_internal` which comes from the expansion of the macro `json` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: could not compile `ep_run` (example "ctf09_candidate_unit_observer") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

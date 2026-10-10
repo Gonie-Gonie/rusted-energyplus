@@ -1,0 +1,11 @@
+--- held-CTF09-03/retry_compare.py
++++ proposed-CTF09-04/retry_compare.py
+@@ -13,7 +13,7 @@
+     for model in native["model_cases"]:
+         for operation in model["operations"]:
+             label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])
+-            owner = operation["after"]
++            owner = operation["after"]["snapshot"] if production else operation["after"]
+             initial.matrix_review(operation, owner, c.need, c.dto, counts, integrity, label)
+             methods.review(operation, owner, c.need, c.dto, counts, integrity, label)
+             gamma.review(operation, owner, c.need, c.dto, counts, integrity, label)

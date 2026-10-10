@@ -1,0 +1,146 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs
+@@ -6,7 +6,9 @@
+     ConstructionCtfRetryDriver, CtfRetryDriverOutcome, CtfRetryDriverStop,
+     run_selected_construction_ctf_retry_driver,
+ };
+-use super::surface_manager::ctf_caller_stability::{CtfCallerDiagnosticNames, CtfCallerSharedFlags};
++use super::surface_manager::ctf_caller_stability::{
++    CtfCallerDiagnosticNames, CtfCallerSharedFlags,
++};
+ use ep_model::ConstructionId;
+ 
+ /// An actual selected terminal boundary prevents later selected invocations.
+@@ -15,7 +17,10 @@
+     /// The reached caller09 fatal boundary, without a fake global error backend.
+     Fatal { construction_id: ConstructionId },
+     /// An actual domain/custody stop, distinct from a Native fatal outcome.
+-    ScopeStopped { construction_id: ConstructionId, reason: CtfRetryDriverStop },
++    ScopeStopped {
++        construction_id: ConstructionId,
++        reason: CtfRetryDriverStop,
++    },
+ }
+ 
+ /// No selected first constructor or driver was invoked after an earlier stop.
+@@ -24,7 +29,10 @@
+     /// The earlier actual selected caller reached its fatal boundary.
+     PriorFatal { construction_id: ConstructionId },
+     /// The earlier selected driver returned this actual domain/custody stop.
+-    PriorScopeStopped { construction_id: ConstructionId, reason: CtfRetryDriverStop },
++    PriorScopeStopped {
++        construction_id: ConstructionId,
++        reason: CtfRetryDriverStop,
++    },
+ }
+ 
+ /// One ordered construction record; original names are read-only caller inputs.
+@@ -54,26 +62,35 @@
+ /// before the selected massive loop and do not invent a global fatal/domain stop.
+ /// All other actual ScopeStopped reasons stop this selected chain honestly.
+ #[must_use]
+-pub fn selected_ctf_retry_chain_stop(actual: &ConstructionCtfRetryDriver) -> Option<CtfRetryChainStop> {
++pub fn selected_ctf_retry_chain_stop(
++    actual: &ConstructionCtfRetryDriver,
++) -> Option<CtfRetryChainStop> {
+     match actual.outcome {
+         CtfRetryDriverOutcome::FatalNoCtfs => Some(CtfRetryChainStop::Fatal {
+             construction_id: actual.construction_id,
+         }),
+         CtfRetryDriverOutcome::ScopeStopped(reason) => {
+-            let ordinary_source_route = matches!(reason,
++            let ordinary_source_route = matches!(
++                reason,
+                 CtfRetryDriverStop::FirstAssembly(CtfFirstAssemblyUnavailable::InitialUnavailable(
+                     CtfInitialUnavailable::UnusedConstruction
+-                    | CtfInitialUnavailable::PreprocessingErrorReturn
+-                    | CtfInitialUnavailable::AllResistiveBranch
+-                    | CtfInitialUnavailable::ReverseConstruction { .. }
+-                )) | CtfRetryDriverStop::FirstAssemblyRoute(_));
+-            if ordinary_source_route { None } else {
++                        | CtfInitialUnavailable::PreprocessingErrorReturn
++                        | CtfInitialUnavailable::AllResistiveBranch
++                        | CtfInitialUnavailable::ReverseConstruction { .. }
++                )) | CtfRetryDriverStop::FirstAssemblyRoute(_)
++            );
++            if ordinary_source_route {
++                None
++            } else {
+                 Some(CtfRetryChainStop::ScopeStopped {
+-                    construction_id: actual.construction_id, reason,
++                    construction_id: actual.construction_id,
++                    reason,
+                 })
+             }
+         }
+-        CtfRetryDriverOutcome::ConvergedLoopExit | CtfRetryDriverOutcome::SevenHourSevereBreak => None,
++        CtfRetryDriverOutcome::ConvergedLoopExit | CtfRetryDriverOutcome::SevenHourSevereBreak => {
++            None
++        }
+     }
+ }
+ 
+@@ -92,12 +109,18 @@
+     let actual = run_selected_construction_ctf_retry_driver(first, flags, names);
+     let selected_chain_stop = selected_ctf_retry_chain_stop(&actual);
+     ConstructionCtfRetryInitialization {
+-        construction_id, construction_name: names.construction_name.to_string(),
++        construction_id,
++        construction_name: names.construction_name.to_string(),
+         original_tot_layers: names.original_tot_layers,
+-        original_layer_material_names: names.original_layer_material_names.iter()
+-            .map(|name| (*name).to_string()).collect(),
+-        flags_on_entry: flags, flags_on_return: actual.flags_on_return,
+-        result: Ok(actual), selected_chain_stop,
++        original_layer_material_names: names
++            .original_layer_material_names
++            .iter()
++            .map(|name| (*name).to_string())
++            .collect(),
++        flags_on_entry: flags,
++        flags_on_return: actual.flags_on_return,
++        result: Ok(actual),
++        selected_chain_stop,
+     }
+ }
+ 
+@@ -113,18 +136,30 @@
+     prior_stop: CtfRetryChainStop,
+ ) -> ConstructionCtfRetryInitialization {
+     let reason = match prior_stop {
+-        CtfRetryChainStop::Fatal { construction_id } =>
+-            CtfRetryInitializationUnavailable::PriorFatal { construction_id },
+-        CtfRetryChainStop::ScopeStopped { construction_id, reason } =>
+-            CtfRetryInitializationUnavailable::PriorScopeStopped { construction_id, reason },
++        CtfRetryChainStop::Fatal { construction_id } => {
++            CtfRetryInitializationUnavailable::PriorFatal { construction_id }
++        }
++        CtfRetryChainStop::ScopeStopped {
++            construction_id,
++            reason,
++        } => CtfRetryInitializationUnavailable::PriorScopeStopped {
++            construction_id,
++            reason,
++        },
+     };
+     ConstructionCtfRetryInitialization {
+-        construction_id, construction_name: names.construction_name.to_string(),
++        construction_id,
++        construction_name: names.construction_name.to_string(),
+         original_tot_layers: names.original_tot_layers,
+-        original_layer_material_names: names.original_layer_material_names.iter()
+-            .map(|name| (*name).to_string()).collect(),
+-        flags_on_entry: flags, flags_on_return: flags,
+-        result: Err(reason), selected_chain_stop: Some(prior_stop),
++        original_layer_material_names: names
++            .original_layer_material_names
++            .iter()
++            .map(|name| (*name).to_string())
++            .collect(),
++        flags_on_entry: flags,
++        flags_on_return: flags,
++        result: Err(reason),
++        selected_chain_stop: Some(prior_stop),
+     }
+ }
+ 

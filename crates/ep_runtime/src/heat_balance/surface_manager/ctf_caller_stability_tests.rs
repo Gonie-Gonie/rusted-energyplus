@@ -1,0 +1,330 @@
+use super::*;
+use ep_model::ConstructionId;
+
+fn context() -> CtfAssemblyContext {
+    CtfAssemblyContext {
+        construction_id: ConstructionId(8),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 1,
+        time_step_zone: 0.25,
+        ctf_time_step: 0.5,
+        num_histories: 0,
+    }
+}
+
+// Literal private-owner fixtures for caller branches, never Native answers.
+fn coefficients(n: usize, terms: i32, xi: f64, yi: f64, zi: f64) -> CtfFinalCoefficients {
+    let mut s0 = [0.0; 12];
+    s0[5] = xi;
+    s0[1] = yi;
+    s0[0] = zi;
+    CtfFinalCoefficients {
+        context: context(),
+        rcmax: n as i32,
+        gamma1_minus_gamma2: vec![0.0; 3 * n],
+        s0,
+        s: vec![0.0; 12 * n],
+        e: vec![0.0; n],
+        num_ctf_terms: terms,
+        history_loop_converged: false,
+        next_history_term: terms,
+        phi_r0: vec![0.0; n * n],
+        rnew: vec![0.0; n * n],
+        rold: vec![0.0; n * n],
+    }
+}
+
+fn flags() -> CtfCallerSharedFlags {
+    CtfCallerSharedFlags {
+        errors_found: false,
+        do_ctf_error_report: false,
+    }
+}
+
+fn names() -> CtfCallerDiagnosticNames<'static> {
+    CtfCallerDiagnosticNames {
+        construction_name: "ORIGINAL",
+        original_tot_layers: 3,
+        original_layer_material_names: &["OUTSIDE", "MIDDLE", "INSIDE"],
+    }
+}
+
+fn decide(
+    value: &CtfFinalCoefficients,
+) -> Result<CtfCallerStabilityDecision, CtfCallerStabilityScopeError> {
+    decide_selected_ctf_caller_stability(value, value.context, flags(), names())
+}
+
+#[test]
+fn eighteen_terms_evaluates_sums_nineteen_skips_them() -> Result<(), CtfCallerStabilityScopeError> {
+    let at_limit = decide(&coefficients(19, 18, 1.0, 1.0, 1.0))?;
+    assert_eq!(
+        at_limit.outcome,
+        CtfCallerStabilityOutcome::ConvergedLoopExit
+    );
+    assert!(at_limit.sums.is_some());
+    let mut excessive = coefficients(19, 19, f64::NAN, f64::NAN, f64::NAN);
+    excessive.s.fill(f64::NAN);
+    let actual = decide(&excessive)?;
+    assert_eq!(actual.outcome, CtfCallerStabilityOutcome::Retry);
+    assert_eq!(
+        actual.retry_reason,
+        Some(CtfCallerRetryReason::ExcessiveTerms)
+    );
+    assert!(actual.sums.is_none());
+    assert!(actual.first_relative_error.is_none());
+    assert!(actual.second_relative_error.is_none());
+    assert_eq!(actual.input_context, context());
+    assert_eq!(actual.postcheck_context.num_histories, 1);
+    assert_eq!(
+        actual.postcheck_context.ctf_time_step.to_bits(),
+        0.75_f64.to_bits()
+    );
+    assert_eq!(actual.postcheck_context.attempt_ordinal, 1);
+    assert!(!actual.caller_ctf_converged);
+    Ok(())
+}
+
+#[test]
+fn strict_error_boundary_and_adjacent_literal_owners() -> Result<(), CtfCallerStabilityScopeError> {
+    let equal = decide(&coefficients(1, 1, 100.0, 99.0, 99.0))?;
+    assert_eq!(
+        equal.first_relative_error.map(f64::to_bits),
+        Some(0.01_f64.to_bits())
+    );
+    assert_eq!(equal.outcome, CtfCallerStabilityOutcome::ConvergedLoopExit);
+    let outer = f64::from_bits(99.0_f64.to_bits() - 1);
+    let inner = f64::from_bits(99.0_f64.to_bits() + 1);
+    let retry = decide(&coefficients(1, 1, 100.0, outer, outer))?;
+    assert_eq!(
+        retry.retry_reason,
+        Some(CtfCallerRetryReason::SeriesMismatch)
+    );
+    assert_eq!(retry.postcheck_context.num_histories, 1);
+    assert_eq!(
+        retry.postcheck_context.ctf_time_step.to_bits(),
+        0.75_f64.to_bits()
+    );
+    assert!(retry.second_relative_error.is_none());
+    assert_eq!(
+        decide(&coefficients(1, 1, 100.0, inner, inner))?.outcome,
+        CtfCallerStabilityOutcome::ConvergedLoopExit
+    );
+    Ok(())
+}
+
+#[test]
+fn true_first_or_operand_never_evaluates_nan_second() -> Result<(), CtfCallerStabilityScopeError> {
+    let actual = decide(&coefficients(1, 1, 100.0, 98.0, f64::NAN))?;
+    assert_eq!(
+        actual.first_relative_error.map(f64::to_bits),
+        Some(0.02_f64.to_bits())
+    );
+    assert!(actual.second_relative_error.is_none());
+    assert_eq!(
+        actual.retry_reason,
+        Some(CtfCallerRetryReason::SeriesMismatch)
+    );
+    assert!(
+        actual
+            .sums
+            .is_some_and(|sums| sums.sum_zi.is_nan() && sums.biggest_sum == 100.0)
+    );
+    Ok(())
+}
+
+#[test]
+fn literal_objexx_max_preserves_nan_middle_and_signed_zero_tie()
+-> Result<(), CtfCallerStabilityScopeError> {
+    assert_eq!(source_max3(-0.0, 0.0, -0.0).to_bits(), (-0.0_f64).to_bits());
+    let actual = decide(&coefficients(1, 1, 1.0, f64::NAN, 2.0))?;
+    assert_eq!(actual.outcome, CtfCallerStabilityOutcome::ConvergedLoopExit);
+    assert!(actual.sums.is_some_and(|sums| sums.biggest_sum == 2.0));
+    assert!(actual.first_relative_error.is_some_and(f64::is_nan));
+    assert!(actual.second_relative_error.is_some_and(f64::is_nan));
+    Ok(())
+}
+
+#[test]
+fn fatal_zero_or_nan_biggest_sum_bypasses_later_severe_check()
+-> Result<(), CtfCallerStabilityScopeError> {
+    for (xi, yi, zi) in [(0.0, 0.0, 0.0), (f64::NAN, 1.0, 1.0)] {
+        let mut value = coefficients(1, 1, xi, yi, zi);
+        value.context.ctf_time_step = 8.0;
+        let initial_flags = CtfCallerSharedFlags {
+            errors_found: true,
+            do_ctf_error_report: false,
+        };
+        // The fatal path needs the construction name, not an unexecuted layer report.
+        let actual = decide_selected_ctf_caller_stability(
+            &value,
+            value.context,
+            initial_flags,
+            CtfCallerDiagnosticNames {
+                construction_name: "FATAL",
+                original_tot_layers: 0,
+                original_layer_material_names: &[],
+            },
+        )?;
+        assert_eq!(actual.outcome, CtfCallerStabilityOutcome::FatalNoCtfs);
+        assert_eq!(actual.flags_after, initial_flags);
+        assert_eq!(actual.postcheck_context, value.context);
+        assert!(actual.first_relative_error.is_none());
+        assert!(actual.second_relative_error.is_none());
+        assert_eq!(
+            actual.diagnostics,
+            vec![CtfCallerDiagnostic {
+                level: CtfCallerDiagnosticLevel::Fatal,
+                message: "Illegal construction definition, no CTFs calculated for FATAL".into(),
+            }]
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn converged_at_seven_still_emits_ordered_original_layer_report()
+-> Result<(), CtfCallerStabilityScopeError> {
+    let mut value = coefficients(1, 1, 1.0, 1.0, 1.0);
+    value.context.ctf_time_step = 7.0;
+    let actual = decide(&value)?;
+    assert_eq!(
+        actual.outcome,
+        CtfCallerStabilityOutcome::SevenHourSevereBreak
+    );
+    assert!(actual.caller_ctf_converged);
+    assert!(actual.retry_reason.is_none());
+    assert_eq!(actual.postcheck_context, value.context);
+    assert!(actual.flags_after.errors_found && actual.flags_after.do_ctf_error_report);
+    assert_eq!(actual.diagnostics.len(), 18);
+    assert_eq!(
+        actual.diagnostics[0].level,
+        CtfCallerDiagnosticLevel::Severe
+    );
+    assert_eq!(actual.diagnostics[2].message, "(outside)=\"OUTSIDE\"");
+    assert_eq!(actual.diagnostics[3].message, "(next)=\"MIDDLE\"");
+    assert_eq!(actual.diagnostics[4].message, "(inside)=\"INSIDE\"");
+    Ok(())
+}
+
+#[test]
+fn additive_retry_reaches_seven_with_distinct_private_stamp()
+-> Result<(), CtfCallerStabilityScopeError> {
+    let mut value = coefficients(19, 19, f64::NAN, f64::NAN, f64::NAN);
+    value.context.ctf_time_step = 6.75;
+    value.context.num_histories = 27;
+    let actual = decide(&value)?;
+    assert_eq!(
+        actual.outcome,
+        CtfCallerStabilityOutcome::SevenHourSevereBreak
+    );
+    assert_eq!(
+        actual.retry_reason,
+        Some(CtfCallerRetryReason::ExcessiveTerms)
+    );
+    assert_eq!(
+        actual.input_context.ctf_time_step.to_bits(),
+        6.75_f64.to_bits()
+    );
+    assert_eq!(
+        actual.postcheck_context.ctf_time_step.to_bits(),
+        7.0_f64.to_bits()
+    );
+    assert_eq!(
+        (
+            actual.input_context.num_histories,
+            actual.postcheck_context.num_histories
+        ),
+        (27, 28)
+    );
+    assert!(actual.sums.is_none());
+    Ok(())
+}
+
+#[test]
+fn immediately_below_seven_keeps_shared_flags_and_private_convergence_distinct()
+-> Result<(), CtfCallerStabilityScopeError> {
+    let mut value = coefficients(1, 1, 1.0, 1.0, 1.0);
+    value.context.ctf_time_step = f64::from_bits(7.0_f64.to_bits() - 1);
+    value.history_loop_converged = false;
+    let carried = CtfCallerSharedFlags {
+        errors_found: true,
+        do_ctf_error_report: true,
+    };
+    let actual = decide_selected_ctf_caller_stability(&value, value.context, carried, names())?;
+    assert_eq!(actual.outcome, CtfCallerStabilityOutcome::ConvergedLoopExit);
+    assert!(actual.caller_ctf_converged);
+    assert_eq!(actual.flags_after, carried);
+    assert!(actual.diagnostics.is_empty());
+    Ok(())
+}
+
+#[test]
+fn history_sums_use_actual_history_order_before_absolute_values()
+-> Result<(), CtfCallerStabilityScopeError> {
+    let mut value = coefficients(2, 2, -1.0, -1.0, -1.0);
+    for offset in [0, 2, 10] {
+        value.s[offset] = -2.0;
+        value.s[offset + 1] = 4.0;
+    }
+    let actual = decide(&value)?;
+    assert_eq!(
+        actual.sums,
+        Some(CtfCallerSeriesSums {
+            sum_xi: 1.0,
+            sum_yi: 1.0,
+            sum_zi: 1.0,
+            biggest_sum: 1.0,
+        })
+    );
+    assert_eq!(actual.outcome, CtfCallerStabilityOutcome::ConvergedLoopExit);
+    Ok(())
+}
+
+#[test]
+fn scope_rejects_changed_attempt_bad_owner_and_undefined_increment() {
+    let value = coefficients(1, 1, 1.0, 1.0, 1.0);
+    let mut other = value.context;
+    other.construction_id = ConstructionId(9);
+    assert_eq!(
+        decide_selected_ctf_caller_stability(&value, other, flags(), names()),
+        Err(CtfCallerStabilityScopeError::AttemptContextMismatch)
+    );
+    other = value.context;
+    other.time_step_zone = f64::from_bits(other.time_step_zone.to_bits() + 1);
+    assert_eq!(
+        decide_selected_ctf_caller_stability(&value, other, flags(), names()),
+        Err(CtfCallerStabilityScopeError::AttemptContextMismatch)
+    );
+    let mut bad_shape = value.clone();
+    bad_shape.s.pop();
+    assert_eq!(
+        decide(&bad_shape),
+        Err(CtfCallerStabilityScopeError::PrivateOwnerShape)
+    );
+    let mut overflow = coefficients(19, 19, 1.0, 1.0, 1.0);
+    overflow.context.num_histories = i32::MAX;
+    assert_eq!(
+        decide(&overflow),
+        Err(CtfCallerStabilityScopeError::UndefinedHistoryIncrement)
+    );
+    let mut severe = value;
+    severe.context.ctf_time_step = 7.0;
+    assert_eq!(
+        decide_selected_ctf_caller_stability(
+            &severe,
+            severe.context,
+            flags(),
+            CtfCallerDiagnosticNames {
+                construction_name: "ORIGINAL",
+                original_tot_layers: 3,
+                original_layer_material_names: &["MERGED"]
+            }
+        ),
+        Err(CtfCallerStabilityScopeError::OriginalLayerNames)
+    );
+}

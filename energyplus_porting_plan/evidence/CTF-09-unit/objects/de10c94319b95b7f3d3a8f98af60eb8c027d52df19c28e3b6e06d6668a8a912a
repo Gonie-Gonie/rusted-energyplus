@@ -1,0 +1,290 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs
+@@ -20,8 +20,9 @@
+     CtfInverseInput, CtfInverseMatrix, CtfInverseScopeError, invert_selected_ctf_matrix,
+ };
+ use super::surface_manager::ctf_state_space_assembly::{
+-    CtfAssemblyContext, CtfAssemblyObservation, CtfAssemblyPreAssignment, CtfAssemblyReassignmentError, CtfAssemblyRoute,
+-    CtfAssemblyUnavailable, CtfStateSpaceAssembly, reassign_1d_ctf_state_space,
++    CtfAssemblyContext, CtfAssemblyObservation, CtfAssemblyPreAssignment,
++    CtfAssemblyReassignmentError, CtfAssemblyRoute, CtfAssemblyUnavailable, CtfStateSpaceAssembly,
++    reassign_1d_ctf_state_space,
+ };
+ use ep_model::ConstructionId;
+ 
+@@ -50,7 +51,10 @@
+     /// Selected original one-dimensional/no-source route is required.
+     UnsupportedContext,
+     /// A method actually returned its typed unavailable route; later calls stop.
+-    MethodRoute { method: CtfRetryMethod, reason: CtfAssemblyUnavailable },
++    MethodRoute {
++        method: CtfRetryMethod,
++        reason: CtfAssemblyUnavailable,
++    },
+     /// The invoked exponential returned this actual shape/domain error.
+     Exponential(CtfExponentialScopeError),
+     /// The invoked inverse returned this actual shape error.
+@@ -111,7 +115,8 @@
+     /// Fresh real Gamma result; never the prior attempt's mutated Gamma1.
+     pub gammas: Option<Result<CtfGammaObservation, CtfGammaScopeError>>,
+     /// Actual private s0/full s/e return or scope error, not public19 stores.
+-    pub final_coefficients: Option<Result<CtfFinalCoefficientObservation, CtfFinalCoefficientScopeError>>,
++    pub final_coefficients:
++        Option<Result<CtfFinalCoefficientObservation, CtfFinalCoefficientScopeError>>,
+     /// Actual caller decision; unavailable when a preceding method did not return.
+     pub caller: Option<Result<CtfCallerStabilityDecision, CtfCallerStabilityScopeError>>,
+ }
+@@ -161,7 +166,10 @@
+     /// from the later band, dimension, or advanced caller/attempt timestamp.
+     #[must_use]
+     pub fn initial_pre_assignment(&self) -> Option<&CtfAssemblyPreAssignment> {
+-        self.retained_assembly.as_ref()?.initial_pre_assignment.as_ref()
++        self.retained_assembly
++            .as_ref()?
++            .initial_pre_assignment
++            .as_ref()
+     }
+ }
+ 
+@@ -176,17 +184,28 @@
+     },
+ }
+ 
+-fn next_retry_context(postcheck: CtfAssemblyContext) -> Result<CtfAssemblyContext, CtfRetryDriverStop> {
+-    let ordinal = postcheck.attempt_ordinal.checked_add(1)
++fn next_retry_context(
++    postcheck: CtfAssemblyContext,
++) -> Result<CtfAssemblyContext, CtfRetryDriverStop> {
++    let ordinal = postcheck
++        .attempt_ordinal
++        .checked_add(1)
+         .ok_or(CtfRetryDriverStop::AttemptOrdinalOverflow)?;
+-    Ok(CtfAssemblyContext { attempt_ordinal: ordinal, ..postcheck })
++    Ok(CtfAssemblyContext {
++        attempt_ordinal: ordinal,
++        ..postcheck
++    })
+ }
+ 
+ fn copy_assembly(assembly: &CtfStateSpaceAssembly) -> CtfRetryAssemblySnapshot {
+     CtfRetryAssemblySnapshot {
+-        context: assembly.context, rcmax: assembly.rcmax, a_mat: assembly.a_mat.clone(),
+-        iden_matrix: assembly.iden_matrix.clone(), b_mat: assembly.b_mat,
+-        c_mat: assembly.c_mat, d_mat: assembly.d_mat,
++        context: assembly.context,
++        rcmax: assembly.rcmax,
++        a_mat: assembly.a_mat.clone(),
++        iden_matrix: assembly.iden_matrix.clone(),
++        b_mat: assembly.b_mat,
++        c_mat: assembly.c_mat,
++        d_mat: assembly.d_mat,
+     }
+ }
+ 
+@@ -199,10 +218,18 @@
+     let context = assembly.context;
+     let mut record = CtfRetryAttempt {
+         assembly: copy_assembly(assembly),
+-        exponential: calculate_selected_ctf_matrix_exponential(CtfExponentialInput {
+-            rcmax: assembly.rcmax, a_mat: &assembly.a_mat, iden_matrix: &assembly.iden_matrix,
+-        }, context),
+-        inverse: None, gammas: None, final_coefficients: None, caller: None,
++        exponential: calculate_selected_ctf_matrix_exponential(
++            CtfExponentialInput {
++                rcmax: assembly.rcmax,
++                a_mat: &assembly.a_mat,
++                iden_matrix: &assembly.iden_matrix,
++            },
++            context,
++        ),
++        inverse: None,
++        gammas: None,
++        final_coefficients: None,
++        caller: None,
+     };
+     let exponential = match &record.exponential {
+         Err(error) => {
+@@ -210,14 +237,19 @@
+             return (record, AttemptControl::Stop(stop));
+         }
+         Ok(CtfExponentialObservation::Unavailable(reason)) => {
+-            let stop = Stop::MethodRoute { method: CtfRetryMethod::Exponential, reason: *reason };
++            let stop = Stop::MethodRoute {
++                method: CtfRetryMethod::Exponential,
++                reason: *reason,
++            };
+             return (record, AttemptControl::Stop(stop));
+         }
+         Ok(CtfExponentialObservation::Exponential(actual)) => actual,
+     };
+     // Native887 consumes original AMat/Iden, never AExp or final AMat1.
+     let inverse_result = invert_selected_ctf_matrix(CtfInverseInput {
+-        rcmax: assembly.rcmax, a_mat: &assembly.a_mat, iden_matrix: &assembly.iden_matrix,
++        rcmax: assembly.rcmax,
++        a_mat: &assembly.a_mat,
++        iden_matrix: &assembly.iden_matrix,
+     });
+     let inverse = match &inverse_result {
+         Err(error) => {
+@@ -228,10 +260,16 @@
+         Ok(actual) => actual,
+     };
+     // A fresh Gamma method call resets its own real Gamma1/Gamma2 each visit.
+-    let gamma_result = calculate_selected_ctf_gammas(CtfGammaInput {
+-        rcmax: assembly.rcmax, a_inv: &inverse.a_inv, a_exp: &exponential.a_exp,
+-        iden_matrix: &assembly.iden_matrix, b_mat: &assembly.b_mat,
+-    }, context);
++    let gamma_result = calculate_selected_ctf_gammas(
++        CtfGammaInput {
++            rcmax: assembly.rcmax,
++            a_inv: &inverse.a_inv,
++            a_exp: &exponential.a_exp,
++            iden_matrix: &assembly.iden_matrix,
++            b_mat: &assembly.b_mat,
++        },
++        context,
++    );
+     record.inverse = Some(inverse_result);
+     let gamma = match &gamma_result {
+         Err(error) => {
+@@ -240,16 +278,27 @@
+             return (record, AttemptControl::Stop(stop));
+         }
+         Ok(CtfGammaObservation::Unavailable(reason)) => {
+-            let stop = Stop::MethodRoute { method: CtfRetryMethod::Gammas, reason: *reason };
++            let stop = Stop::MethodRoute {
++                method: CtfRetryMethod::Gammas,
++                reason: *reason,
++            };
+             record.gammas = Some(gamma_result);
+             return (record, AttemptControl::Stop(stop));
+         }
+         Ok(CtfGammaObservation::Gamma(actual)) => actual,
+     };
+-    let coefficient_result = calculate_selected_ctf_final_coefficients(CtfFinalCoefficientInput {
+-        rcmax: assembly.rcmax, a_exp: &exponential.a_exp, iden_matrix: &assembly.iden_matrix,
+-        gamma1: &gamma.gamma1, gamma2: &gamma.gamma2, c_mat: &assembly.c_mat, d_mat: &assembly.d_mat,
+-    }, context);
++    let coefficient_result = calculate_selected_ctf_final_coefficients(
++        CtfFinalCoefficientInput {
++            rcmax: assembly.rcmax,
++            a_exp: &exponential.a_exp,
++            iden_matrix: &assembly.iden_matrix,
++            gamma1: &gamma.gamma1,
++            gamma2: &gamma.gamma2,
++            c_mat: &assembly.c_mat,
++            d_mat: &assembly.d_mat,
++        },
++        context,
++    );
+     record.gammas = Some(gamma_result);
+     let coefficients = match &coefficient_result {
+         Err(error) => {
+@@ -258,7 +307,10 @@
+             return (record, AttemptControl::Stop(stop));
+         }
+         Ok(CtfFinalCoefficientObservation::Unavailable(reason)) => {
+-            let stop = Stop::MethodRoute { method: CtfRetryMethod::FinalCoefficients, reason: *reason };
++            let stop = Stop::MethodRoute {
++                method: CtfRetryMethod::FinalCoefficients,
++                reason: *reason,
++            };
+             record.final_coefficients = Some(coefficient_result);
+             return (record, AttemptControl::Stop(stop));
+         }
+@@ -269,7 +321,8 @@
+     let control = match &caller_result {
+         Err(error) => AttemptControl::Stop(Stop::Caller(*error)),
+         Ok(actual) => AttemptControl::Caller {
+-            outcome: actual.outcome, postcheck_context: actual.postcheck_context,
++            outcome: actual.outcome,
++            postcheck_context: actual.postcheck_context,
+             flags_after: actual.flags_after,
+             num_ctf_terms: actual.num_ctf_terms,
+         },
+@@ -286,9 +339,15 @@
+ ) -> ConstructionCtfRetryDriver {
+     let initial_context = assembly.as_ref().map(|actual| actual.context);
+     ConstructionCtfRetryDriver {
+-        construction_id, flags_on_entry: flags, flags_on_return: flags,
+-        initial_context, postcheck_context: None, retained_assembly: assembly,
+-        attempts: Vec::new(), reassignments: Vec::new(), outcome: CtfRetryDriverOutcome::ScopeStopped(reason),
++        construction_id,
++        flags_on_entry: flags,
++        flags_on_return: flags,
++        initial_context,
++        postcheck_context: None,
++        retained_assembly: assembly,
++        attempts: Vec::new(),
++        reassignments: Vec::new(),
++        outcome: CtfRetryDriverOutcome::ScopeStopped(reason),
+     }
+ }
+ 
+@@ -321,10 +380,16 @@
+         Some(Stop::ConstructionIdentityMismatch)
+     } else if initial.attempt_ordinal != 1 {
+         Some(Stop::NotInitialAttempt(initial.attempt_ordinal))
+-    } else if initial.route != CtfAssemblyRoute::Assemble || initial.solution_dimensions != 1
+-        || initial.source_sink_present || initial.node_source != 0 || initial.node_user_temp != 0 {
++    } else if initial.route != CtfAssemblyRoute::Assemble
++        || initial.solution_dimensions != 1
++        || initial.source_sink_present
++        || initial.node_source != 0
++        || initial.node_user_temp != 0
++    {
+         Some(Stop::UnsupportedContext)
+-    } else { None };
++    } else {
++        None
++    };
+     if let Some(stop) = stop {
+         return stopped_before_methods(id, flags, Some(assembly), stop);
+     }
+@@ -339,7 +404,12 @@
+             AttemptControl::Stop(reason) => {
+                 break Outcome::ScopeStopped(reason);
+             }
+-            AttemptControl::Caller { outcome, postcheck_context, flags_after, num_ctf_terms } => {
++            AttemptControl::Caller {
++                outcome,
++                postcheck_context,
++                flags_after,
++                num_ctf_terms,
++            } => {
+                 last_postcheck_context = Some(postcheck_context);
+                 flags_on_return = flags_after;
+                 match outcome {
+@@ -353,8 +423,11 @@
+                         let before = copy_assembly(&assembly);
+                         let result = reassign_1d_ctf_state_space(&mut assembly, next);
+                         reassignments.push(CtfRetryReassignment {
+-                            before, preceding_num_ctf_terms: num_ctf_terms,
+-                            supplied_context: next, result, context_after: assembly.context,
++                            before,
++                            preceding_num_ctf_terms: num_ctf_terms,
++                            supplied_context: next,
++                            result,
++                            context_after: assembly.context,
+                         });
+                         if let Err(error) = result {
+                             break Outcome::ScopeStopped(Stop::Reassignment(error));
+@@ -374,9 +447,15 @@
+         }
+     };
+     ConstructionCtfRetryDriver {
+-        construction_id: id, flags_on_entry: flags, flags_on_return,
+-        initial_context: Some(initial), postcheck_context: last_postcheck_context,
+-        retained_assembly: Some(assembly), attempts, reassignments, outcome,
++        construction_id: id,
++        flags_on_entry: flags,
++        flags_on_return,
++        initial_context: Some(initial),
++        postcheck_context: last_postcheck_context,
++        retained_assembly: Some(assembly),
++        attempts,
++        reassignments,
++        outcome,
+     }
+ }
+ 

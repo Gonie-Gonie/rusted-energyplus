@@ -1,0 +1,318 @@
+{
+  "schema": "ctf09-caller-stability-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unapplied-unformatted-unexecuted",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "author": "Raw",
+  "changes": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "proposed": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability.rs",
+        "sha256": "64c3706a2b74369bf9a98bafa71bb2d9cea3865c17946b202cc1e2981051ec78",
+        "size_bytes": 13474,
+        "line_count": 277
+      },
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/ctf_caller_stability.rs.new.diff",
+        "sha256": "ef4a8148ae4ad18367ca070e9666d4ad6500981aeaf42197de54031206e5065d",
+        "size_bytes": 13864,
+        "line_count": 280
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability_tests.rs",
+      "proposed": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability_tests.rs",
+        "sha256": "47441081b3c80623c41240f94646e2d992d93e7475e1f7a2616d18bee06ad88d",
+        "size_bytes": 10111,
+        "line_count": 209
+      },
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/ctf_caller_stability_tests.rs.new.diff",
+        "sha256": "e1827fbf88f14a1eac2c76f6691bce28e0c87dba0ab8c19677cdf3e5831d2e23",
+        "size_bytes": 10439,
+        "line_count": 212
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "proposed": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/proposed/surface_manager.rs",
+        "sha256": "005ee065a1a2784b2d66d17bd30d9eddc7cf37de5cc5009f886a2b0c415e8b71",
+        "size_bytes": 6143,
+        "line_count": 177
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/before/surface_manager.rs",
+        "sha256": "764cd11c0c21b3232bc24a68a8eaeade14836befb49e265995f0cb14f2163773",
+        "size_bytes": 6113,
+        "line_count": 176
+      },
+      "before_role": "immutable-prospective08-parent-not-current-canonical",
+      "before_authority": {
+        "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "764cd11c0c21b3232bc24a68a8eaeade14836befb49e265995f0cb14f2163773",
+        "size_bytes": 6113,
+        "line_count": 176
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/caller-stability-prep-01/surface_manager.rs.diff",
+        "sha256": "0e2320d5752880f4551636389d56503cfaee3fe092b1b9f21fe875c5900c89f9",
+        "size_bytes": 315,
+        "line_count": 10
+      }
+    }
+  ],
+  "own_authoring_source": {
+    "path": ".runtime/porting/CTF-09/caller-stability-prep-01/prepare_source.py",
+    "sha256": "c8f7e27e6f0ca4fbfa8c22f63f7c7c5cac8a968b53cfddcb542ba61d02936d64",
+    "size_bytes": 8538,
+    "line_count": 130
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-09/caller-stability-prep-01/README.md",
+    "sha256": "19a6b5de83ed035c6ee1410032774f9e1d5f5e07c47c916c703ba1ac06ceca98",
+    "size_bytes": 3978,
+    "line_count": 58
+  },
+  "dependencies": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-09.md",
+      "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+      "size_bytes": 2765,
+      "line_count": 70
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "size_bytes": 27600,
+      "line_count": 1330
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+      "size_bytes": 81995,
+      "line_count": 1813
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "65ec2a19c1721ab3a685a7e24e9b95d67d3ff910fe17976a76405ea32c155c73",
+      "size_bytes": 10624,
+      "line_count": 283
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "34893aa5ceda71288a53e229ed07792ddbd3bab5f8400a1ff46f31a03ed26b17",
+      "size_bytes": 6081,
+      "line_count": 175
+    },
+    {
+      "path": ".runtime/porting/CTF-09/readiness-audit-01/manifest.json",
+      "sha256": "9b088a0e6205f61e810affd6ab91e83058f015df959e8ea862878428fe2a13c2",
+      "size_bytes": 13576,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-09/readiness-audit-01/audit.md",
+      "sha256": "841976a9c816d679de069b2cdcd17fc0cf415910a6bbf05bcde59ddea74ac11c",
+      "size_bytes": 8749,
+      "line_count": 45
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/manifest.json",
+      "sha256": "728984104d79c9ba9e7cc9fdf90a0287d54bf8f64e1145f5d1fbe8cce2dd4fe0",
+      "size_bytes": 15354,
+      "line_count": 380
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs",
+      "sha256": "aa2e45908e291436ec654699020759f37909b358104aef478224c16e3e3ec4d4",
+      "size_bytes": 10163,
+      "line_count": 244
+    },
+    {
+      "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/manifest.json",
+      "sha256": "eaa0dc53bb29dbf80a25619103683918c3a8bcacead874bd02802bb461d142e2",
+      "size_bytes": 14480,
+      "line_count": 371
+    },
+    {
+      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-06/manifest.json",
+      "sha256": "e1d8c63e12f77830f45e6ef627651b59c3e6dbd624b96429c07aead2ebacf1c4",
+      "size_bytes": 45933,
+      "line_count": 931
+    },
+    {
+      "path": ".runtime/porting/CTF-07/applied-final-source-02/manifest.json",
+      "sha256": "c67e440187bc3731d667d8bb79970c80ef82f9e37c26eac3dda4fc66c116414b",
+      "size_bytes": 23046,
+      "line_count": 470
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 129,
+      "end_line": 138,
+      "sha256": "77463f8838cb6fd26fea7ee1c17ca70b92eadc54745bbf283f7c041351f56074",
+      "size_bytes": 643,
+      "purpose": "literal1percent-and7hour-source-constants"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 884,
+      "end_line": 910,
+      "sha256": "ad91fe4b98a84df182adcba81389f246661a555a004add7bb8dab58483b8b7fb",
+      "size_bytes": 1510,
+      "purpose": "actualorderedmethodreturns-then-caller-convergence-and-term-limit"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 917,
+      "end_line": 940,
+      "sha256": "838b39411e8b00e4ef50f288c1f3e29dbe8161e424853448ce095a9f98fbef39",
+      "size_bytes": 1440,
+      "purpose": "exactseries-order-max-shortcircuit-and-fatal"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 948,
+      "end_line": 977,
+      "sha256": "32067bf26f84d46ab3713692978e376002990a86a71c9d3b5e51a1bc1bc1fde4",
+      "size_bytes": 2896,
+      "purpose": "unconditional-postcheck-severe-originalnames-flags-break"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1019,
+      "end_line": 1077,
+      "sha256": "585e00ac5804ef224af4d21a5bc156343339b89cf5c7ec70995ea1c3eaefc053",
+      "size_bytes": 3079,
+      "purpose": "laterSI19stores-excluded-not-clipped-or-claimed"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 67,
+      "end_line": 69,
+      "sha256": "e7388e3e84e7d3ce55bf1ddf20fc8ea63053244b5f02597721ba248f2a668c8c",
+      "size_bytes": 282,
+      "purpose": "actualMaxCTFTerms19"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "start_line": 479,
+      "end_line": 481,
+      "sha256": "2c69e5a0cfa64794ab4d68df05d29eba06e3c1f1885e5ffcfe4d5a4e79728ff2",
+      "size_bytes": 115,
+      "purpose": "literalObjexxternarymax"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 759,
+      "end_line": 794,
+      "sha256": "8da2d7836295e61d779268d9b2a7a6a601ba852bc956c420c20433cb02f59f9b",
+      "size_bytes": 1660,
+      "purpose": "realFatalbackend-and-throw-effects-not-fabricated"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "start_line": 21,
+      "end_line": 56,
+      "sha256": "e7a5777b3b0c68eababa6b2030c9a49480b57c9f94af0967cf535fc94a420a1b",
+      "size_bytes": 1611,
+      "purpose": "actualattemptcontext-and-unavailable-route"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs",
+      "start_line": 49,
+      "end_line": 80,
+      "sha256": "545f7f9b20e6dcc078341bade33f6996a5a51b7e8289fb22d93e9f2f8ddc4535",
+      "size_bytes": 1488,
+      "purpose": "actualprivate08returnedowner-fields-and-layout"
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "start_line": 1,
+      "end_line": 25,
+      "sha256": "dc0f31bea46334eb58a4f1a5180fea790c17be9ad0bbfcd5060e96f605697013",
+      "size_bytes": 758,
+      "purpose": "actualtypedConstructionId"
+    }
+  ],
+  "scope": {
+    "primary": "Construction.cc903-977-only",
+    "actual_private08_owner_borrowed": true,
+    "same_attempt_bits_required": true,
+    "original_diagnostic_names_required_on_severe_branch": true,
+    "input_and_postcheck_context_separate": true,
+    "actual_history_increment_order": "histories-then-dt-plus-caller-zone",
+    "excessive_terms_skip_sums": true,
+    "literal_Objexx_ternary_max": true,
+    "strict_OR_shortcircuit": true,
+    "fatal_before_severe": true,
+    "severe_even_after_convergence": true,
+    "no_float_conditioning": true,
+    "defined_signed_i32_increment_only": true,
+    "proposed_tests": 10,
+    "tests_executed": false,
+    "numerical_PASS_claimed": false,
+    "full_CTF09_or_SUR_integration_claimed": false
+  },
+  "exclusions": [
+    "retry-orchestration",
+    "once-only-workspace-lifetime",
+    "repeated04assembly",
+    "precursor-method-invocation",
+    "Native-diagnostic-backend-effects",
+    "public19SIstores-CTF10",
+    "cache-or-state-activation",
+    "reverse-allR-2D-source-branches",
+    "arbitrary-iteration-cap"
+  ],
+  "composition": {
+    "parent_before_is_prospective08_not_current": true,
+    "actual08_installation_and_current_parent_refresh_required": true,
+    "repeated_assembly_factoring_owned_by_Header": true,
+    "Root_and_other_author_FULL_source_review_required": true
+  },
+  "verification": {
+    "stdlib_source_SHA_size_lines_ranges_exact_diffs": true,
+    "authoring_python_AST_only": true,
+    "project_imports": false,
+    "execution_or_build_or_tests": false,
+    "scientific_weather_or_binary_reads": false,
+    "canonical_or_Git_mutation": false
+  }
+}

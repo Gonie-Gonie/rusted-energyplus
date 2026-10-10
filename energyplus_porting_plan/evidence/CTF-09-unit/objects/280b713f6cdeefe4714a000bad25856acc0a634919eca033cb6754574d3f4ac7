@@ -1,0 +1,8 @@
+--- actual09/unit-observer
++++ doc-compiler-limit/unit-observer
+@@ -1,4 +1,5 @@
+ //! Actual explicit-member preprocessing and source-owned initial CTF03 route; no solver answers.
++#![recursion_limit = "256"]
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+ #[path = "ctf09_candidate_unit_support/fields.rs"]

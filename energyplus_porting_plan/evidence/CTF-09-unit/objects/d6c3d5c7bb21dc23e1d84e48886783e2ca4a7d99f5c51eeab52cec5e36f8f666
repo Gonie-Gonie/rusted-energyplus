@@ -1,0 +1,73 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf09_candidate_unit_observer.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-09\\frozen-packet-01\\helper-request.json",
+    "38aefbb60b80c31ada6205cecdc82be2cec261c9774f4e0599264c9079b79448",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-09\\frozen-packet-01\\native-admission-contract.json",
+    "a1fd61826281959ec0709d75ea5b56d3984a9c7aaef8d1682eb0e1c4ed3da4d9",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-09\\candidate-unit-inputs-01\\source-bindings.json"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T22:39:56.640487+00:00",
+  "finished_utc": "2026-10-10T22:40:36.454252+00:00",
+  "elapsed_seconds": 39.81420249998337,
+  "repository_before": {
+    "head": "38e1bc3df8ebacb1214cc8b0c0dfb05216c2673a",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs\u0000?? crates/ep_run/examples/ctf09_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf09_candidate_production_support/\u0000?? crates/ep_run/examples/ctf09_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf09_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_driver_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_initialization_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_retry_cache_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_reassignment_tests.rs\u0000"
+  },
+  "repository_after": {
+    "head": "38e1bc3df8ebacb1214cc8b0c0dfb05216c2673a",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs\u0000?? crates/ep_run/examples/ctf09_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf09_candidate_production_support/\u0000?? crates/ep_run/examples/ctf09_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf09_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_driver_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_retry_initialization_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_retry_cache_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_reassignment_tests.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/f2/f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced",
+    "sha256": "f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-09/candidate-unit-command-01/stdout.log",
+    "sha256": "f49d9acf94e34809faf1519b963119adc660253632b4fa7a240de051b47f072a"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-09/candidate-unit-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T22:40:36.454252+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

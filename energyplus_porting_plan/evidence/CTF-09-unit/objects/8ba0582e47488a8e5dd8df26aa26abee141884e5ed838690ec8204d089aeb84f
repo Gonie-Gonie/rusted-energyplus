@@ -1,0 +1,351 @@
+use super::*;
+
+type TestResult = Result<(), String>;
+
+fn layer(rk: f64, rho: f64, cp: f64, res_layer: bool) -> CtfNormalizedLayer {
+    CtfNormalizedLayer {
+        dl: 12.0,
+        rk,
+        rho,
+        cp,
+        lr: 4.0,
+        res_layer,
+    }
+}
+
+fn context() -> CtfAssemblyContext {
+    CtfAssemblyContext {
+        construction_id: ConstructionId(7),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 1,
+        time_step_zone: 0.25,
+        ctf_time_step: 0.5,
+        num_histories: 2,
+    }
+}
+
+fn assembled(
+    layers: &[CtfNormalizedLayer],
+    nodes: &[i32],
+    dx: &[f64],
+    rcmax: i32,
+) -> Result<CtfStateSpaceAssembly, String> {
+    match assemble_1d_ctf_state_space(
+        CtfAssemblyInput {
+            layers,
+            nodes,
+            dx,
+            rcmax,
+        },
+        context(),
+    )
+    .map_err(|error| format!("selected fixture scope: {error:?}"))?
+    {
+        CtfAssemblyObservation::Assembled(value) => Ok(*value),
+        CtfAssemblyObservation::Unavailable(reason) => {
+            Err(format!("fixture unavailable: {reason:?}"))
+        }
+    }
+}
+
+fn single() -> Result<CtfStateSpaceAssembly, String> {
+    assembled(&[layer(3.0, 2.0, 2.0, false)], &[6], &[2.0], 5)
+}
+
+fn next(owner: &CtfStateSpaceAssembly) -> CtfAssemblyContext {
+    CtfAssemblyContext {
+        attempt_ordinal: 2,
+        ctf_time_step: 0.75,
+        num_histories: 3,
+        ..owner.context
+    }
+}
+
+fn bits(values: &[f64]) -> Vec<u64> {
+    values.iter().map(|value| value.to_bits()).collect()
+}
+
+#[test]
+fn initial_checkpoint_is_real_pre_band_storage_after_the_single_b3_reset() -> TestResult {
+    let owner = single()?;
+    let checkpoint = owner
+        .initial_pre_assignment
+        .as_ref()
+        .ok_or_else(|| "initial producer checkpoint unavailable".to_string())?;
+    assert_eq!(checkpoint.context, owner.context);
+    assert_eq!(checkpoint.rcmax, owner.rcmax);
+    assert_eq!(checkpoint.a_mat.len(), owner.a_mat.len());
+    assert!(checkpoint.a_mat.iter().all(|value| value.to_bits() == 0));
+    assert_eq!(bits(&checkpoint.iden_matrix), bits(&owner.iden_matrix));
+    assert_eq!(checkpoint.b_mat3_after_reset.to_bits(), 0);
+    assert_ne!(bits(&checkpoint.a_mat), bits(&owner.a_mat));
+    Ok(())
+}
+
+#[test]
+fn later_reassignment_preserves_the_original_checkpoint_bits_and_context() -> TestResult {
+    let mut owner = single()?;
+    let checkpoint = owner
+        .initial_pre_assignment
+        .clone()
+        .ok_or_else(|| "initial producer checkpoint unavailable".to_string())?;
+    owner.a_mat[2] = f64::from_bits(0x7ff8_0000_0000_0031);
+    owner.iden_matrix[0] = -0.0;
+    let candidate = next(&owner);
+    reassign_1d_ctf_state_space(&mut owner, candidate)
+        .map_err(|error| format!("actual repeat rejected: {error:?}"))?;
+    let retained = owner
+        .initial_pre_assignment
+        .as_ref()
+        .ok_or_else(|| "repeat discarded initial producer checkpoint".to_string())?;
+    assert_eq!(retained.context, checkpoint.context);
+    assert_eq!(retained.rcmax, checkpoint.rcmax);
+    assert_eq!(bits(&retained.a_mat), bits(&checkpoint.a_mat));
+    assert_eq!(bits(&retained.iden_matrix), bits(&checkpoint.iden_matrix));
+    assert_eq!(
+        retained.b_mat3_after_reset.to_bits(),
+        checkpoint.b_mat3_after_reset.to_bits()
+    );
+    assert_ne!(
+        retained.context.attempt_ordinal,
+        owner.context.attempt_ordinal
+    );
+    assert_eq!(owner.a_mat[2].to_bits(), 0x7ff8_0000_0000_0031);
+    assert_eq!(owner.iden_matrix[0].to_bits(), (-0.0_f64).to_bits());
+    Ok(())
+}
+
+fn rejected_without_write(
+    owner: &mut CtfStateSpaceAssembly,
+    candidate: CtfAssemblyContext,
+    error: CtfAssemblyReassignmentError,
+) {
+    let before = owner.clone();
+    assert_eq!(reassign_1d_ctf_state_space(owner, candidate), Err(error));
+    assert_eq!(*owner, before);
+}
+
+#[test]
+fn repeat_preserves_storage_off_band_and_identity_but_rewrites_only_source_assignments()
+-> TestResult {
+    let mut owner = single()?;
+    let storage = (
+        (owner.a_mat.as_ptr(), owner.a_mat.capacity()),
+        (owner.iden_matrix.as_ptr(), owner.iden_matrix.capacity()),
+        (owner.layers.as_ptr(), owner.layers.capacity()),
+        (owner.nodes.as_ptr(), owner.nodes.capacity()),
+        (owner.dx.as_ptr(), owner.dx.capacity()),
+    );
+    let nan = f64::from_bits(0x7ff8_0000_0000_0029);
+    owner.a_mat[0] = 99.0; // Source assignment must overwrite this band cell.
+    owner.a_mat[2] = -0.0; // Neither this cell nor the next is assigned in 1D.
+    owner.a_mat[4] = nan;
+    owner.iden_matrix[0] = -0.0;
+    owner.iden_matrix[1] = nan;
+    let identity_bits = bits(&owner.iden_matrix);
+    owner.b_mat = [nan; 3];
+    owner.c_mat = [nan; 2];
+    owner.d_mat = [nan; 2];
+    let candidate = next(&owner);
+    reassign_1d_ctf_state_space(&mut owner, candidate)
+        .map_err(|error| format!("repeat: {error:?}"))?;
+    assert_eq!(owner.context, candidate);
+    assert_eq!(owner.a(1, 1), Some(-0.25));
+    assert_eq!(owner.a(2, 1), Some(0.125));
+    assert_eq!(owner.a(1, 2), Some(0.1875));
+    assert_eq!(owner.a_mat[2].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(owner.a_mat[4].to_bits(), nan.to_bits());
+    assert_eq!(bits(&owner.iden_matrix), identity_bits);
+    assert_eq!(owner.b_mat, [0.125, 0.125, 0.0]);
+    assert_eq!(owner.b_mat[2].to_bits(), 0.0_f64.to_bits());
+    assert_eq!(owner.c_mat, [-1.5, 1.5]);
+    assert_eq!(owner.d_mat, [1.5, -1.5]);
+    assert_eq!(
+        storage,
+        (
+            (owner.a_mat.as_ptr(), owner.a_mat.capacity()),
+            (owner.iden_matrix.as_ptr(), owner.iden_matrix.capacity()),
+            (owner.layers.as_ptr(), owner.layers.capacity()),
+            (owner.nodes.as_ptr(), owner.nodes.capacity()),
+            (owner.dx.as_ptr(), owner.dx.capacity()),
+        )
+    );
+    Ok(())
+}
+
+#[test]
+fn interior_resistance_reuses_the_stored_prefix_and_both_adjacent_interfaces() -> TestResult {
+    let layers = [
+        layer(3.0, 2.0, 2.0, false),
+        layer(1.0, 0.0, 0.0, true),
+        layer(6.0, 4.0, 2.0, false),
+    ];
+    let mut owner = assembled(&layers, &[6, 1, 6], &[2.0, 1.0, 2.0], 12)?;
+    let before = owner.clone();
+    let candidate = next(&owner);
+    reassign_1d_ctf_state_space(&mut owner, candidate)
+        .map_err(|error| format!("interfaces: {error:?}"))?;
+    assert_eq!(owner.layers, before.layers);
+    assert_eq!(owner.nodes, before.nodes);
+    assert_eq!(bits(&owner.dx), bits(&before.dx));
+    assert_eq!(bits(&owner.a_mat), bits(&before.a_mat));
+    assert_eq!(owner.a(5, 6), Some(0.375));
+    assert_eq!(owner.a(6, 6), Some(-0.625));
+    assert_eq!(owner.a(7, 6), Some(0.25));
+    assert_eq!(owner.a(6, 7), Some(0.125));
+    assert_eq!(owner.a(7, 7), Some(-0.5));
+    assert_eq!(owner.a(8, 7), Some(0.375));
+    Ok(())
+}
+
+#[test]
+fn static_association_and_exact_next_ordinal_fail_before_any_write() -> TestResult {
+    use CtfAssemblyReassignmentError as Error;
+    let original = single()?;
+    let valid = next(&original);
+    for (candidate, error) in [
+        (
+            CtfAssemblyContext {
+                construction_id: ConstructionId(8),
+                ..valid
+            },
+            Error::ConstructionIdentityMismatch,
+        ),
+        (
+            CtfAssemblyContext {
+                route: CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::LoadingError),
+                ..valid
+            },
+            Error::UnavailableRoute(CtfAssemblyUnavailable::LoadingError),
+        ),
+        (
+            CtfAssemblyContext {
+                solution_dimensions: 2,
+                ..valid
+            },
+            Error::StaticContextMismatch,
+        ),
+        (
+            CtfAssemblyContext {
+                source_sink_present: true,
+                ..valid
+            },
+            Error::StaticContextMismatch,
+        ),
+        (
+            CtfAssemblyContext {
+                node_source: 1,
+                ..valid
+            },
+            Error::StaticContextMismatch,
+        ),
+        (
+            CtfAssemblyContext {
+                node_user_temp: 1,
+                ..valid
+            },
+            Error::StaticContextMismatch,
+        ),
+        (
+            CtfAssemblyContext {
+                time_step_zone: 0.5,
+                ..valid
+            },
+            Error::StaticContextMismatch,
+        ),
+        (
+            CtfAssemblyContext {
+                attempt_ordinal: 1,
+                ..valid
+            },
+            Error::AttemptSequence,
+        ),
+        (
+            CtfAssemblyContext {
+                attempt_ordinal: 3,
+                ..valid
+            },
+            Error::AttemptSequence,
+        ),
+    ] {
+        rejected_without_write(&mut original.clone(), candidate, error);
+    }
+    let mut owner = original.clone();
+    owner.context.time_step_zone = 0.0;
+    let candidate = CtfAssemblyContext {
+        time_step_zone: -0.0,
+        ..next(&owner)
+    };
+    rejected_without_write(&mut owner, candidate, Error::StaticContextMismatch);
+    owner.context.attempt_ordinal = usize::MAX;
+    let candidate = CtfAssemblyContext {
+        attempt_ordinal: 0,
+        ..owner.context
+    };
+    rejected_without_write(&mut owner, candidate, Error::AttemptSequence);
+    Ok(())
+}
+
+#[test]
+fn malformed_persistent_storage_or_nodal_shape_is_rejected_without_mutation() -> TestResult {
+    use CtfAssemblyReassignmentError::Scope;
+    let original = single()?;
+    for case in 0..5 {
+        let mut owner = original.clone();
+        let error = match case {
+            0 => {
+                owner.a_mat.truncate(owner.a_mat.len() - 1);
+                CtfAssemblyScopeError::MatrixShape
+            }
+            1 => {
+                owner.iden_matrix.truncate(owner.iden_matrix.len() - 1);
+                CtfAssemblyScopeError::MatrixShape
+            }
+            2 => {
+                owner.dx.clear();
+                CtfAssemblyScopeError::ActivePrefixShape
+            }
+            3 => {
+                owner.nodes[0] = 1;
+                CtfAssemblyScopeError::NodeCount(1)
+            }
+            _ => {
+                owner.rcmax += 1;
+                CtfAssemblyScopeError::MatrixShape
+            }
+        };
+        let candidate = next(&owner);
+        rejected_without_write(&mut owner, candidate, Scope(error));
+    }
+    Ok(())
+}
+
+#[test]
+fn current_dynamic_stamps_are_copied_without_a_timestep_or_history_formula() -> TestResult {
+    let mut owner = single()?;
+    let nan = f64::from_bits(0x7ff8_0000_0000_0017);
+    let candidate = CtfAssemblyContext {
+        ctf_time_step: nan,
+        num_histories: i32::MIN,
+        ..next(&owner)
+    };
+    reassign_1d_ctf_state_space(&mut owner, candidate)
+        .map_err(|error| format!("literal NaN stamp: {error:?}"))?;
+    assert_eq!(owner.context.ctf_time_step.to_bits(), nan.to_bits());
+    assert_eq!(owner.context.num_histories, i32::MIN);
+    let candidate = CtfAssemblyContext {
+        attempt_ordinal: 3,
+        ctf_time_step: -0.0,
+        num_histories: i32::MAX,
+        ..owner.context
+    };
+    reassign_1d_ctf_state_space(&mut owner, candidate)
+        .map_err(|error| format!("literal zero stamp: {error:?}"))?;
+    assert_eq!(owner.context.ctf_time_step.to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(owner.context.num_histories, i32::MAX);
+    Ok(())
+}

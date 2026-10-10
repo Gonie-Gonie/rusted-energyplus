@@ -1,0 +1,130 @@
+"""Emit ignored source-only metadata/diffs; never import or run proposed Rust."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = Path(__file__).resolve().parent
+
+def rel(path):
+    return path.relative_to(ROOT).as_posix()
+
+def ref(path):
+    path = ROOT / path if isinstance(path, str) else path
+    raw = path.read_bytes()
+    return dict(path=rel(path), sha256=hashlib.sha256(raw).hexdigest(),
+                size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+def selected(path, first, last, purpose):
+    source = ROOT / path
+    lines = source.read_bytes().splitlines(keepends=True)
+    assert 1 <= first <= last <= len(lines)
+    raw = b"".join(lines[first-1:last])
+    return dict(path=path, start_line=first, end_line=last,
+                sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), purpose=purpose)
+
+def diff(before, after, destination, canonical):
+    old = before.read_text(encoding="utf-8").splitlines(keepends=True) if before else []
+    new = after.read_text(encoding="utf-8").splitlines(keepends=True)
+    value = "".join(difflib.unified_diff(old, new,
+                   fromfile="a/"+canonical if before else "/dev/null", tofile="b/"+canonical))
+    destination.write_text(value, encoding="utf-8", newline="\n")
+    return ref(destination)
+
+def main():
+    before_dir = PREP / "before"
+    proposed_dir = PREP / "proposed"
+    before_dir.mkdir(exist_ok=True)
+    proposed_dir.mkdir(exist_ok=True)
+    future_parent = ROOT / ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs"
+    before = before_dir / "surface_manager.rs"
+    before.write_bytes(future_parent.read_bytes())
+    after = proposed_dir / "surface_manager.rs"
+    marker = "pub mod ctf_all_resistive;\n"
+    old = before.read_text(encoding="utf-8")
+    assert old.count(marker) == 1 and "pub mod ctf_caller_stability;" not in old
+    after.write_text(old.replace(marker, marker+"pub mod ctf_caller_stability;\n"), encoding="utf-8", newline="\n")
+    changes = []
+    for name in ["ctf_caller_stability.rs", "ctf_caller_stability_tests.rs"]:
+        canonical = "crates/ep_runtime/src/heat_balance/surface_manager/"+name
+        proposed = PREP / "new" / name
+        changes.append(dict(canonical_path=canonical, proposed=ref(proposed),
+                            before=None, exact_diff=diff(None, proposed, PREP/(name+".new.diff"), canonical)))
+    canonical = "crates/ep_runtime/src/heat_balance/surface_manager.rs"
+    changes.append(dict(canonical_path=canonical, proposed=ref(after), before=ref(before),
+                        before_role="immutable-prospective08-parent-not-current-canonical",
+                        before_authority=ref(future_parent),
+                        exact_diff=diff(before, after, PREP/"surface_manager.rs.diff", canonical)))
+    dependencies = [
+        "energyplus_porting_plan/cards/CTF-09.md", "Cargo.toml",
+        ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+        ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+        "crates/ep_model/src/ids.rs",
+        "crates/ep_runtime/src/lib.rs",
+        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+        "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        ".runtime/porting/CTF-09/readiness-audit-01/manifest.json",
+        ".runtime/porting/CTF-09/readiness-audit-01/audit.md",
+        ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/manifest.json",
+        ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs",
+        ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/manifest.json",
+        ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-06/manifest.json",
+        ".runtime/porting/CTF-07/applied-final-source-02/manifest.json",
+    ]
+    cc = ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc"
+    ranges = [
+        selected(cc, 129, 138, "literal1percent-and7hour-source-constants"),
+        selected(cc, 884, 910, "actualorderedmethodreturns-then-caller-convergence-and-term-limit"),
+        selected(cc, 917, 940, "exactseries-order-max-shortcircuit-and-fatal"),
+        selected(cc, 948, 977, "unconditional-postcheck-severe-originalnames-flags-break"),
+        selected(cc, 1019, 1077, "laterSI19stores-excluded-not-clipped-or-claimed"),
+        selected(".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh", 67, 69, "actualMaxCTFTerms19"),
+        selected(".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh", 479, 481, "literalObjexxternarymax"),
+        selected(".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc", 759, 794, "realFatalbackend-and-throw-effects-not-fabricated"),
+        selected("crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs", 21, 56, "actualattemptcontext-and-unavailable-route"),
+        selected(".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs", 49, 80, "actualprivate08returnedowner-fields-and-layout"),
+        selected("crates/ep_model/src/ids.rs", 1, 25, "actualtypedConstructionId"),
+    ]
+    module = (PREP/"new/ctf_caller_stability.rs").read_text(encoding="utf-8")
+    tests = (PREP/"new/ctf_caller_stability_tests.rs").read_text(encoding="utf-8")
+    assert tests.count("#[test]") == 10
+    assert ".expect(" not in tests and ".unwrap(" not in tests
+    assert "if coefficients.num_ctf_terms > (19 - 1)" in module
+    assert module.index("context.num_histories =") < module.index("context.ctf_time_step +=")
+    assert module.index("CtfCallerStabilityOutcome::FatalNoCtfs;") < module.index("if result.postcheck_context.ctf_time_step >= 7.0")
+    assert module.index("result.flags_after.do_ctf_error_report = true") < module.index("result.flags_after.errors_found = true")
+    ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    manifest = dict(
+        schema="ctf09-caller-stability-source-preparation.v1",
+        status="SOURCE-READY-HELD-unapplied-unformatted-unexecuted",
+        energyplus_commit="6f2e40d10250a105b49966baa24d843711e61048",
+        author="Raw", changes=changes, own_authoring_source=ref(Path(__file__)),
+        README=ref(PREP/"README.md"), dependencies=[ref(p) for p in dependencies], source_ranges=ranges,
+        scope=dict(primary="Construction.cc903-977-only", actual_private08_owner_borrowed=True,
+            same_attempt_bits_required=True, original_diagnostic_names_required_on_severe_branch=True,
+            input_and_postcheck_context_separate=True, actual_history_increment_order="histories-then-dt-plus-caller-zone",
+            excessive_terms_skip_sums=True, literal_Objexx_ternary_max=True,
+            strict_OR_shortcircuit=True, fatal_before_severe=True, severe_even_after_convergence=True,
+            no_float_conditioning=True, defined_signed_i32_increment_only=True,
+            proposed_tests=10, tests_executed=False, numerical_PASS_claimed=False,
+            full_CTF09_or_SUR_integration_claimed=False),
+        exclusions=["retry-orchestration", "once-only-workspace-lifetime", "repeated04assembly",
+            "precursor-method-invocation", "Native-diagnostic-backend-effects", "public19SIstores-CTF10",
+            "cache-or-state-activation", "reverse-allR-2D-source-branches", "arbitrary-iteration-cap"],
+        composition=dict(parent_before_is_prospective08_not_current=True,
+            actual08_installation_and_current_parent_refresh_required=True,
+            repeated_assembly_factoring_owned_by_Header=True,
+            Root_and_other_author_FULL_source_review_required=True),
+        verification=dict(stdlib_source_SHA_size_lines_ranges_exact_diffs=True,
+            authoring_python_AST_only=True, project_imports=False, execution_or_build_or_tests=False,
+            scientific_weather_or_binary_reads=False, canonical_or_Git_mutation=False))
+    (PREP/"manifest.json").write_text(json.dumps(manifest, indent=2)+"\n", encoding="utf-8", newline="\n")
+    print(json.dumps(dict(manifest=ref(PREP/"manifest.json"), own_sources=[row["proposed"] for row in changes],
+                          tests=10, target_execution=False)))
+
+if __name__ == "__main__":
+    main()

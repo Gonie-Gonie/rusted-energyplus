@@ -1,0 +1,76 @@
+   Compiling serde_json v1.0.150
+    Checking memchr v2.8.1
+    Checking itoa v1.0.18
+    Checking ep_model v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_model)
+    Checking hashbrown v0.17.1
+    Checking equivalent v1.0.2
+    Checking toml_write v0.1.2
+    Checking winnow v0.7.15
+    Checking ep_compare v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_compare)
+    Checking ep_oracle v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_oracle)
+    Checking serde_core v1.0.228
+    Checking zmij v1.0.21
+    Checking indexmap v2.14.0
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+    Checking serde v1.0.228
+    Checking serde_spanned v0.6.9
+    Checking toml_datetime v0.6.11
+    Checking toml_edit v0.22.27
+    Checking ep_raw_model v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_raw_model)
+    Checking ep_compiler v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_compiler)
+    Checking toml v0.8.23
+    Checking ep_conformance v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_conformance)
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_driver.rs:55:9
+   |
+55 |         method: CtfRetryMethod,
+   |         ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `-D missing-docs` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(missing_docs)]`
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_driver.rs:56:9
+   |
+56 |         reason: CtfAssemblyUnavailable,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_initialization.rs:18:13
+   |
+18 |     Fatal { construction_id: ConstructionId },
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_initialization.rs:21:9
+   |
+21 |         construction_id: ConstructionId,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_initialization.rs:22:9
+   |
+22 |         reason: CtfRetryDriverStop,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_initialization.rs:30:18
+   |
+30 |     PriorFatal { construction_id: ConstructionId },
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_initialization.rs:33:9
+   |
+33 |         construction_id: ConstructionId,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: missing documentation for a struct field
+  --> crates\ep_runtime\src\heat_balance\ctf_retry_initialization.rs:34:9
+   |
+34 |         reason: CtfRetryDriverStop,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `ep_runtime` (lib) due to 8 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `ep_runtime` (lib test) due to 8 previous errors

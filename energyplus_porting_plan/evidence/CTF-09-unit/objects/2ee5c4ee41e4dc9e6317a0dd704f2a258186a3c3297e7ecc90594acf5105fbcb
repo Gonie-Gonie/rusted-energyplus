@@ -1,0 +1,10 @@
+--- a/crates/ep_runtime/src/heat_balance/initialization.rs
++++ b/crates/ep_runtime/src/heat_balance/initialization.rs
+@@ -227,6 +227,6 @@
+         zones,
+         surfaces,
+         surface_indexes,
+-        &construction_thermal_data,
++        construction_thermal_data,
+     ))
+ }

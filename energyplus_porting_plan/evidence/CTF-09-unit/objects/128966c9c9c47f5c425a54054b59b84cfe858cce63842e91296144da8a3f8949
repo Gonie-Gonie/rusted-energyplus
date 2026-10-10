@@ -1,0 +1,215 @@
+--- .runtime/porting/CTF-08/rust-observer-prep-01/production_fields.rs
++++ crates/ep_run/examples/ctf09_candidate_production_support/fields.rs
+@@ -15,7 +15,7 @@
+     json!({"owner_available":false,"construction_preprocessing":null,
+         "reason":"initializer has not returned an actual HeatBalanceState owner",
+         "counted_as_PASS":false,"Native_IsUsedCTF":missing("Native flag has no Rust owner"),
+-        "Native_DoCTFErrorReport":unit_fields::unpaired_later_flag()})
++        "Native_DoCTFErrorReport":missing("Native whole-method flag is separate from the actual selected Rust caller flag")})
+ }
+ pub(super) fn selected(source: &HeatBalanceState) -> Value {
+     json!({"owner_available":true,"construction_preprocessing":source.construction_ctf01_layers.iter()
+@@ -25,7 +25,7 @@
+             "result":unit_fields::result(&actual.result)})).collect::<Vec<_>>(),
+         "actual_owner_count":source.construction_ctf01_layers.len(),
+         "Native_IsUsedCTF":missing("Rust use owner is surface-derived; Native loader flag remains separately unpaired"),
+-        "Native_DoCTFErrorReport":unit_fields::unpaired_later_flag(),
++        "Native_DoCTFErrorReport":missing("Native whole-method flag is separate from the actual selected Rust caller flag"),
+         "Native_whole_solver_final_ErrorsFound":missing("selected Rust preprocessing flag is not the whole Native solver flag"),
+         "selected_ErrorsFound_observed_only_in_actual_results":true,
+         "preprocessing_reexecuted_by_observer":false,"numerical_PASS_claimed":false})
+@@ -53,114 +53,72 @@
+         "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+ }
+ pub(super) fn ctf04_selected(source: &HeatBalanceState) -> Value {
+-    json!({"owner_available":true,"construction_first_assembly":source.construction_ctf04_first_assembly.iter()
+-        .enumerate().map(|(index,actual)| {
+-            let initial = source.construction_ctf03_initial.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            let preprocessing = source.construction_ctf01_layers.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+-                "result":unit_fields::first_assembly(actual,initial,preprocessing)})
+-        }).collect::<Vec<_>>(),
+-        "actual_owner_count":source.construction_ctf04_first_assembly.len(),
+-        "preprocessing_initial_or_assembly_reexecuted_by_observer":false,
+-        "observer_reverse_classifier_duplicated":false,"external_CTF_rows_supplied_to_initializer":false,
+-        "only_first_Rust_assembly_invocation_owned":true,"retry_driver_available":false,
+-        "later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,
+-        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+-}
+-
+-pub(super) fn ctf06_unavailable() -> Value {
+-    json!({"owner_available":false,"construction_first_exponential":null,
++    json!({"owner_available":false,"construction_first_assembly":[],
++        "actual_compatibility_vector_count":source.construction_ctf04_first_assembly.len(),
++        "unavailable_reason":"actual first owner moved into retry driver; no retained first-only Box or replay",
++        "actual_constructor_ledger":source.construction_ctf09_retry_driver.iter().enumerate().map(|(index,actual)|json!({
++            "state_vector_index":index,"construction_id":actual.construction_id.0,
++            "actual_public_API":"initialize_construction_ctf_first_assembly",
++            "actual_public_API_invoked":actual.result.is_ok(),
++            "actual_first_assembly_location":"selected_CTF09_owners.construction_retry_initialization[].result.driver.attempts[0].assembly",
++            "Native_invocation_or_first_result_reconstructed":false})).collect::<Vec<_>>(),
++        "first_owner_consumed_once":true,"predecessors_reexecuted_by_observer":false,"counted_as_PASS":false})
++}
++fn first_wrapper_context(source: &HeatBalanceState, api: &str, key: &str, retained_count: usize) -> Value {
++    let mut out = json!({"owner_available":false,"actual_compatibility_vector_count":retained_count,
++        "unavailable_reason":"retry driver invokes actual pure methods; first-only public wrappers uninvoked",
++        "actual_wrapper_ledger":source.construction_ctf09_retry_driver.iter().enumerate().map(|(index,actual)|json!({
++            "state_vector_index":index,"construction_id":actual.construction_id.0,
++            "result":unit_fields::first_wrapper_uninvoked(api,actual.construction_id.0)})).collect::<Vec<_>>(),
++        "actual_first_method_handoff_location":"selected_CTF09_owners.construction_retry_initialization[].result.driver.first_method_handoff",
++        "historical_first_only_policy_reinterpreted":false,"counted_as_PASS":false});
++    out[key] = json!([]);
++    out
++}
++fn unavailable_first(key: &str) -> Value {
++    let mut out = json!({"owner_available":false,
++        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false});
++    out[key] = Value::Null;
++    out
++}
++pub(super) fn ctf06_unavailable() -> Value { unavailable_first("construction_first_exponential") }
++pub(super) fn ctf05_unavailable() -> Value { unavailable_first("construction_first_inverse") }
++pub(super) fn ctf07_unavailable() -> Value { unavailable_first("construction_first_gammas") }
++pub(super) fn ctf08_unavailable() -> Value { unavailable_first("construction_first_private_coefficients") }
++pub(super) fn ctf06_selected(source: &HeatBalanceState) -> Value {
++    first_wrapper_context(source,"initialize_construction_ctf_first_exponential","construction_first_exponential",
++        source.construction_ctf06_first_exponential.len())
++}
++pub(super) fn ctf05_selected(source: &HeatBalanceState) -> Value {
++    first_wrapper_context(source,"initialize_construction_ctf_first_inverse","construction_first_inverse",
++        source.construction_ctf05_first_inverse.len())
++}
++pub(super) fn ctf07_selected(source: &HeatBalanceState) -> Value {
++    first_wrapper_context(source,"initialize_construction_ctf_first_gammas","construction_first_gammas",
++        source.construction_ctf07_first_gammas.len())
++}
++pub(super) fn ctf08_selected(source: &HeatBalanceState) -> Value {
++    first_wrapper_context(source,"initialize_construction_ctf_first_final_coefficients","construction_first_private_coefficients",
++        source.construction_ctf08_first_private_coefficients.len())
++}
++pub(super) fn ctf09_unavailable() -> Value {
++    json!({"owner_available":false,"construction_retry_initialization":null,
+         "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+ }
+-pub(super) fn ctf05_unavailable() -> Value {
+-    json!({"owner_available":false,"construction_first_inverse":null,
+-        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+-}
+-pub(super) fn ctf06_selected(source: &HeatBalanceState) -> Value {
+-    json!({"owner_available":true,"construction_first_exponential":source.construction_ctf06_first_exponential.iter()
+-        .enumerate().map(|(index,actual)| {
+-            let assembly = source.construction_ctf04_first_assembly.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+-                "result":unit_fields::first_exponential(actual,assembly)})
+-        }).collect::<Vec<_>>(),
+-        "actual_owner_count":source.construction_ctf06_first_exponential.len(),
+-        "preprocessing_initial_assembly_or_exponential_reexecuted_by_observer":false,
+-        "actual_CTF06_then_CTF05_order_is_producer_owned":true,
+-        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+-        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+-        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+-}
+-pub(super) fn ctf05_selected(source: &HeatBalanceState) -> Value {
+-    json!({"owner_available":true,"construction_first_inverse":source.construction_ctf05_first_inverse.iter()
+-        .enumerate().map(|(index,actual)| {
+-            let assembly = source.construction_ctf04_first_assembly.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+-                "result":unit_fields::first_inverse(actual,assembly)})
+-        }).collect::<Vec<_>>(),
+-        "actual_owner_count":source.construction_ctf05_first_inverse.len(),
+-        "preprocessing_initial_assembly_exponential_or_inverse_reexecuted_by_observer":false,
+-        "actual_CTF06_then_CTF05_order_is_producer_owned":true,
+-        "inverse_input_is_original_AMat_and_IdenMatrix":true,"AExp_supplied_as_inverse_input":false,
+-        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+-        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+-        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+-}
+-
+-pub(super) fn ctf07_unavailable() -> Value {
+-    json!({"owner_available":false,"construction_first_gammas":null,
+-        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+-}
+-pub(super) fn ctf07_selected(source: &HeatBalanceState) -> Value {
+-    json!({"owner_available":true,"construction_first_gammas":source.construction_ctf07_first_gammas.iter()
+-        .enumerate().map(|(index,actual)| {
+-            let assembly = source.construction_ctf04_first_assembly.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            let exponential = source.construction_ctf06_first_exponential.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            let inverse = source.construction_ctf05_first_inverse.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+-                "result":unit_fields::first_gammas(actual,assembly,exponential,inverse)})
+-        }).collect::<Vec<_>>(),
+-        "actual_owner_count":source.construction_ctf07_first_gammas.len(),
+-        "predecessor_or_Gamma_owners_reexecuted_by_observer":false,
+-        "actual_CTF06_then_CTF05_then_CTF07_order_is_producer_owned":true,
+-        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+-        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+-        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+-}
+-
+-pub(super) fn ctf08_unavailable() -> Value {
+-    json!({"owner_available":false,"construction_first_private_coefficients":null,
+-        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+-}
+-pub(super) fn ctf08_selected(source: &HeatBalanceState) -> Value {
+-    json!({"owner_available":true,"construction_first_private_coefficients":source.construction_ctf08_first_private_coefficients.iter()
+-        .enumerate().map(|(index,actual)| {
+-            let assembly = source.construction_ctf04_first_assembly.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            let exponential = source.construction_ctf06_first_exponential.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            let inverse = source.construction_ctf05_first_inverse.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            let gammas = source.construction_ctf07_first_gammas.iter()
+-                .find(|owner|owner.construction_id == actual.construction_id);
+-            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+-                "result":unit_fields::first_private_coefficients(actual,assembly,exponential,inverse,gammas)})
+-        }).collect::<Vec<_>>(),
+-        "actual_owner_count":source.construction_ctf08_first_private_coefficients.len(),
+-        "predecessor_or_private_coefficient_owners_reexecuted_by_observer":false,
+-        "actual_CTF06_then_CTF05_then_CTF07_then_CTF08_order_is_producer_owned":true,
+-        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+-        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+-        "Native_whole_solver_flags_unpaired":true,"public_SI19_coefficients_observed":false,
+-        "numerical_PASS_claimed":false})
+-}
+-
++pub(super) fn ctf09_selected(source: &HeatBalanceState) -> Value {
++    json!({"owner_available":true,"construction_retry_initialization":source.construction_ctf09_retry_driver.iter()
++        .enumerate().map(|(index,actual)|json!({"state_vector_index":index,
++            "construction_id":actual.construction_id.0,"result":unit_fields::retry_initialization(actual)})).collect::<Vec<_>>(),
++        "actual_owner_count":source.construction_ctf09_retry_driver.len(),
++        "actual_retry_driver_invocations":source.construction_ctf09_retry_driver.iter().filter(|owner|owner.result.is_ok()).count(),
++        "actual_prior_stop_records":source.construction_ctf09_retry_driver.iter().filter(|owner|owner.result.is_err()).count(),
++        "ordinary_initializer_owns_preprocessing_initial_first_and_retry_calls":true,
++        "observer_reexecutes_preprocessing_first_wrappers_or_retry_driver":false,
++        "original_Box_cloned_for_observation":false,"Native_flags_events_or_OS_status_inferred":false,
++        "actual_Rust_relative_error_bookkeeping_unpaired":true,
++        "diagnostic_call_intents_are_not_Native_global_message_owners":true,
++        "terminal_decisions_certify_whole_Native_return_or_SI_store_safety":false,"counted_as_PASS":false})
++}
+ 
+ pub(super) fn typed(model: &TypedModel) -> Value {
+     let materials = model.materials.iter().enumerate().map(|(index,material)| {
+@@ -261,9 +219,12 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf08_candidate_production_observer.rs",
+-    "crates/ep_run/examples/ctf08_candidate_production_support/fields.rs",
+-    "crates/ep_run/examples/ctf08_candidate_production_support/unit_fields.rs",
++    "crates/ep_run/examples/ctf09_candidate_production_observer.rs",
++    "crates/ep_run/examples/ctf09_candidate_production_support/fields.rs",
++    "crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs",
+ ];

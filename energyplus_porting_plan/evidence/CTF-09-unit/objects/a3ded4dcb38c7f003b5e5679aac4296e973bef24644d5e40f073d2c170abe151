@@ -1,0 +1,36 @@
+--- actual-before/ctf_retry_initialization.rs
++++ proposed-doc-only/ctf_retry_initialization.rs
+@@ -15,10 +15,15 @@
+ #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+ pub enum CtfRetryChainStop {
+     /// The reached caller09 fatal boundary, without a fake global error backend.
+-    Fatal { construction_id: ConstructionId },
++    Fatal {
++        /// Construction whose selected caller reached its fatal boundary.
++        construction_id: ConstructionId,
++    },
+     /// An actual domain/custody stop, distinct from a Native fatal outcome.
+     ScopeStopped {
++        /// Construction whose actual driver returned this domain or custody stop.
+         construction_id: ConstructionId,
++        /// Original typed stop, distinct from a Native fatal outcome.
+         reason: CtfRetryDriverStop,
+     },
+ }
+@@ -27,10 +32,15 @@
+ #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+ pub enum CtfRetryInitializationUnavailable {
+     /// The earlier actual selected caller reached its fatal boundary.
+-    PriorFatal { construction_id: ConstructionId },
++    PriorFatal {
++        /// Earlier stopping construction whose selected caller reached fatal.
++        construction_id: ConstructionId,
++    },
+     /// The earlier selected driver returned this actual domain/custody stop.
+     PriorScopeStopped {
++        /// Earlier stopping construction with the actual domain or custody stop.
+         construction_id: ConstructionId,
++        /// Typed original stop retained from that earlier driver.
+         reason: CtfRetryDriverStop,
+     },
+ }

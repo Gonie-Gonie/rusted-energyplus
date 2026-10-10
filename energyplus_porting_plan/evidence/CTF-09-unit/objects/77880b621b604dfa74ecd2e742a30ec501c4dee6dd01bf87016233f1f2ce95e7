@@ -1,0 +1,32 @@
+{
+  "schema": "ctf09-compiler-macro-limit-source-proposal.v1",
+  "author": "Root",
+  "changes": [
+    {
+      "canonical_path": "crates/ep_run/examples/ctf09_candidate_unit_observer.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-09/quality-macro-limit-prep-01/before.rs",
+        "sha256": "f85964f1872b10c19a8d0236878a8b52b663a4cde257b1ea2f8364edba727c13",
+        "size_bytes": 28317
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-09/quality-macro-limit-prep-01/proposed.rs",
+        "sha256": "56d5da70d75a31eb6688062556e61bfb8de57739bbfe918255025aa4339e422a",
+        "size_bytes": 28345
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/quality-macro-limit-prep-01/exact.diff",
+        "sha256": "280b713f6cdeefe4714a000bad25856acc0a634919eca033cb6754574d3f4ac7",
+        "size_bytes": 342
+      }
+    }
+  ],
+  "actual_failed_Clippy": {
+    "path": ".runtime/porting/CTF-09/quality-clippy-command-02/receipt.json",
+    "sha256": "0634ea5552f006de3e749056d2e55d60c6296ed5a091c69cfad732947c9d9034",
+    "size_bytes": 5553
+  },
+  "scope": "One crate macro expansion recursion_limit attribute, using rustc suggested256 for the existing JSON object; no executable code, math, input, schema or warning policy changes.",
+  "canonical_changed": false,
+  "execution_performed": false
+}

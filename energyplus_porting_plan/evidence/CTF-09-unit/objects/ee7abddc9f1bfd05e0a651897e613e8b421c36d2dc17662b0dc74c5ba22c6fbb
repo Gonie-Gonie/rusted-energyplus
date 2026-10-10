@@ -1,0 +1,17 @@
+--- held-CTF09-03/README.md
++++ proposed-CTF09-04/README.md
+@@ -102,3 +102,14 @@
+ scientific results or any future comparison; Root must review and run fresh
+ comparisons against the retained actual operands. Historical02 metadata fields
+ and cumulative accepted08 before references retain their original authority.
++
++Fresh04 completes the same owner wiring repair with the actual lane schema:
++unit operation.after is the direct owner; production operation.after is the
++availability wrapper and its actual snapshot field is forwarded. The accepted
++production QA validates that unavailable wrappers contain snapshot:null. This
++source preserves that None without a fabricated owner. Held03 is preserved and
++was not executed; its direct unit routing was source-correct, but its production
++wrapper routing was blocked by independent review before execution. The fresh04
++main changes again only rebind RETRY_PAIR_SHA. All validation/pairing criteria,
++final QA02 identities, counters, profiles, availability and source guards stay
++unchanged. Root reviews and executes fresh comparisons using actual operands.
