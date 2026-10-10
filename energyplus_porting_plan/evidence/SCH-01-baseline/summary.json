@@ -1,0 +1,67 @@
+{
+  "schema": "sch01-legacy-baseline-observation-summary.v1",
+  "legacy_commit": "b4f1a9a8a67534128369236ca720351d08933d06",
+  "EnergyPlus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "requested_counts": {
+    "model_cases": 82,
+    "ProcessInput": 82,
+    "ProcessScheduleInput": 82,
+    "total_operations": 164
+  },
+  "actual_Native_process_counts": {
+    "attempted": 82,
+    "exit_zero": 80,
+    "exit_nonzero": 2,
+    "spawn_errors": 0,
+    "result_files_available_for_independent_review": 80
+  },
+  "actual_Native_observation_counts": {
+    "model_cases": 80,
+    "operation_records": 160,
+    "actual_operation_invocations": 157,
+    "actual_operations_skipped": 3,
+    "actual_source_function_counts": {
+      "ProcessInput": 80,
+      "ProcessScheduleInput": 77
+    },
+    "actual_source_status_counts": {
+      "source_returned": 132,
+      "source_fatal": 25,
+      "source_not_invoked_after_stop": 3
+    },
+    "actual_constant_initialization_status_counts": {
+      "source_returned": 80
+    },
+    "unavailable_model_cases": 2,
+    "unknown_requested_operation_records": 4,
+    "method_invocations_for_unavailable_models": null,
+    "applies_only_to_available_child_results": true
+  },
+  "numeric_comparison_count": 7592089,
+  "numeric_mismatch_count": 0,
+  "discrete_comparison_count": 281539,
+  "discrete_mismatch_count": 295,
+  "required_availability_failures": 139,
+  "numerical_PASS": false,
+  "complete_unit_PASS": false,
+  "converter_without_output_cases": 3,
+  "gates_updated": false,
+  "gap_report": {
+    "path": ".runtime/porting/SCH-01/existing-baseline-gap-01/existing-baseline-gap.json",
+    "sha256": "f3e0e28f9fb32c5babae66a644fd8154bdd6e4a7b952dce8e2221bd8f5cd8894"
+  },
+  "actual_debug_findings": [
+    {
+      "case": "missing-overlapping-annual-coverage-1",
+      "process_exit": 3221225477,
+      "actual_stack": "ScheduleManager.cc3332 ScheduleDetailed::setMinMaxVals, null week pointer",
+      "debugger_exit_is_Native_success": false
+    },
+    {
+      "case": "missing-through-or-value-2",
+      "process_exit": 3221226505,
+      "actual_stack": "ObjexxFCL/Array1.hh861 contains(i), i=7, ScheduleManager.cc1444",
+      "debugger_exit_is_Native_success": false
+    }
+  ]
+}
