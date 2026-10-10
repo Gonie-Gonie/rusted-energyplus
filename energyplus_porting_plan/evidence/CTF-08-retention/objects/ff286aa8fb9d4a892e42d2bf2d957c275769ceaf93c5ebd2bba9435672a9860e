@@ -1,0 +1,6 @@
+tree af1954abf55aeb8a837d342ff88e6a8745bca9dd
+parent b9ede7233e3bbf2e321573877cb036dc1274fafc
+author Hyeong-Gon Jo <hg221089@gmail.com> 1791668401 +0900
+committer Hyeong-Gon Jo <hg221089@gmail.com> 1791668401 +0900
+
+test(ctf): record six actual CLI regressions for private coefficients

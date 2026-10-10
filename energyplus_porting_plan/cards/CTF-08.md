@@ -90,3 +90,7 @@ Only the selected unit gate passes. Whole retry, final public SI19 stores, SUR/c
 ## Actual fixed six ordinary CLI executions
 
 A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final08 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-08-production-cli/{manifest,summary}.json.
+
+## Actual exact-pair Original retirement
+
+The two new08 linked debug Originals were removed through the reviewed exact LiteralPath mechanism after the committed comparison/quality/CLI proof. Actual removed bytes2604258635; both paths are absent. Prior42 protected artifacts, both08 runtime derivatives and631 core objects remain unchanged;12 absent registered paths and all prior04/06/07 Original absences remain unchanged. No registry/history rewrite or scientific rerun. Evidence: evidence/CTF-08-retention/{manifest,summary}.json. Integration/production/full-card gates remain pending.

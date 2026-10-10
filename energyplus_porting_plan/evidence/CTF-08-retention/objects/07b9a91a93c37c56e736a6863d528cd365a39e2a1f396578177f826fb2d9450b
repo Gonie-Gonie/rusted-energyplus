@@ -1,0 +1,324 @@
+"""Authenticate Root-checked selected08 metadata, archive objects and live protection."""
+from common import *
+
+QUALITY = ['focused_coefficient_tests', 'workspace_tests', 'clippy', 'format_check']
+QUALITY_COMMANDS = {
+    'focused_coefficient_tests': ['test', '--locked', '-p', 'ep_runtime', '--lib', 'ctf_'],
+    'workspace_tests': ['test', '--locked', '--workspace', '--all-targets'],
+    'clippy': ['clippy', '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
+    'format_check': ['fmt', '--all', '--', '--check'],
+}
+ROLES = ['PE', 'helper', 'DataQA', 'comparison']
+
+
+def target_name(lane):
+    return 'ctf08_' + ('unit' if lane == 'unit' else 'production') + '_helper'
+
+
+def original_ref(target):
+    row = TARGETS[target]
+    return {'path': row['historical_path'], 'sha256': row['sha256'], 'size_bytes': row['size_bytes']}
+
+
+def build_metadata(lane, value):
+    same(value, BUILDS[lane])
+    build = read(value)
+    schema = 'ctf08-native-build.v1' if lane == 'unit' else 'ctf08-production-native-build.v1'
+    require(build['schema'] == schema and build['target'] == target_name(lane)
+            and build['status'] == 'pass-actual-3TU-link-and-preservation', 'Actual selected08 build required')
+    require(build['linked_original'] == original_ref(target_name(lane)), 'Only the exact real linked original is eligible')
+    intent = build['linked_original_retention_intent']
+    require(intent == {
+        'schema': 'ctf08-debug-original-retention-intent.v1', 'role': 'prospective-debug-original',
+        'scope': 'new-CTF08-linked-originals-only', 'actual_file_identity_required': True,
+        'both_original_and_helper_verified_before_execution': True,
+        'retain_through_PE_validation_and_current_helper_execution': True,
+        'removal_requires_separate_Root_authorized_actual_retention_record': True,
+        'earlier_live_refs_reinterpreted': False, 'deletion_performed': False,
+    }, 'Actual prospectively declared exact08 retention intent required')
+    require((build['core_registered'], build['core_present'], build['core_absent'], build['protected_ref_count'])
+            == (643, 631, 12, 42) and build['protected_artifacts_and_present_core_objects_unchanged'] is True,
+            'Actual build protection inventory differs')
+    for key in ['configure_execution', 'compile_execution', 'derivation_execution', 'core_before_check']:
+        recorded(build[key])
+    for key in ['validated_derivative', 'preservation']:
+        bound(build[key])
+    return build
+
+
+def protected(builds):
+    inventory = read(BEFORE)
+    require(inventory['schema'] == 'ctf08-actual-before-build-preservation.v1'
+            and inventory['core_registered'] == 643
+            and inventory['all_previously_protected_refs_and_present_core_objects_match'] is True
+            and inventory['actual_CTF08_configure_compile_or_engine_performed'] is False,
+            'Genuine pre08 protection inventory required')
+    require(inventory['CTF04_CTF06_CTF07_originals_absent_and_derivatives_now_explicitly_protected'] is True
+            and inventory['legacy_registry_rewritten'] is False, 'Literal prior04/06/07 retirement history required')
+    prior = {}
+    history = read(inventory['actual_prior_CTF07_final_preservation'])['protected_after']['literal_prior_pair_retirements']
+    prior['actual_prior_CTF07_final_preservation'] = bound(inventory['actual_prior_CTF07_final_preservation'])
+    for card, paths in [('CTF04', PRIOR_RETIRED_CTF04_ORIGINAL_PATHS), ('CTF06', PRIOR_RETIRED_CTF06_ORIGINAL_PATHS), ('CTF07', PRIOR_RETIRED_CTF07_ORIGINAL_PATHS)]:
+        for suffix in ['', '_execution']:
+            key = 'actual_prior_' + card + '_pair_retirement' + suffix
+            prior[key] = bound(inventory[key] if card == 'CTF07' else history[key])
+            if suffix: recorded(prior[key])
+        for path in paths:
+            require(absent(path), 'Previously retired original reappeared: ' + path)
+    legacy, core, missing = (inventory[key] for key in ['protected_refs', 'present_objects', 'absent_registered_object_paths'])
+    require(len(legacy) == 42 and len(core) == 631 and len(missing) == 12, 'Exact prior protection/core counts required')
+    derivatives = []
+    for lane in ['unit', 'production']:
+        derivative = read(builds[lane]['validated_derivative'])
+        require(derivative['schema'] == 'validated-debug-derivative.v1'
+                and derivative['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+                and derivative['source_bytes_match_before_and_after'] is True
+                and derivative['accepted_derivative_bytes_unchanged'] is True
+                and derivative['accepted_derivative'] == derivative['observed_derivative'],
+                'Actual accepted derivative identity/physical size custody required')
+        same(derivative['accepted_derivative'], builds[lane]['helper_binary'])
+        derivatives.append(derivative['accepted_derivative'])
+    originals = {row['historical_path'] for row in TARGETS.values()}
+    live = legacy + derivatives + core
+    paths = [row['path'] for row in live]
+    require(len(paths) == len(set(paths)) and not originals.intersection(paths)
+            and len(set(missing)) == 12 and not set(missing).intersection(paths), 'Protection and removal sets must be disjoint and unique')
+    observed = []
+    for row in live:
+        require(type(row.get('size_bytes')) is int and row['size_bytes'] > 0, 'Actual protected physical size required')
+        observed.append({**bound(row, remember=False), 'size_bytes': row['size_bytes']})
+    for path in missing:
+        require(absent(path), 'Registered absent core object appeared: ' + path)
+    bound(inventory['compile_commands'])
+    return {'legacy_protected': observed[:42], 'retained_CTF08_derivatives': observed[42:44],
+            'present_core_objects': observed[44:], 'absent_registered_object_paths': list(missing),
+            'legacy_count': 42, 'retained_derivative_count': 2, 'core_present_count': 631, 'core_absent_count': 12,
+            'literal_prior_pair_retirements': prior,
+            'previously_retired_CTF04_original_paths_still_absent': list(PRIOR_RETIRED_CTF04_ORIGINAL_PATHS),
+            'previously_retired_CTF06_original_paths_still_absent': list(PRIOR_RETIRED_CTF06_ORIGINAL_PATHS),
+            'previously_retired_CTF07_original_paths_still_absent': list(PRIOR_RETIRED_CTF07_ORIGINAL_PATHS)}
+
+
+def git_object(row, kind):
+    binding = bound(row['raw_body'])
+    path = regular(binding['path'])
+    require(path.stat().st_size <= 16 * 1024 * 1024, 'Bounded Git metadata object body required')
+    body = path.read_bytes()
+    oid = hashlib.sha1((kind + ' ' + str(len(body)) + '\0').encode('ascii') + body).hexdigest()
+    require(oid == row['git_object_id'] and re.fullmatch(r'[0-9a-f]{40}', oid), 'Actual Git object identity differs')
+    return oid, body
+
+
+def committed_archive(value):
+    """Check raw commit/tree metadata and indexed file bytes without executing Git."""
+    manifest_ref = bound(value['manifest'])
+    commit_oid, commit = git_object(value['commit'], 'commit')
+    first = commit.split(b'\n', 1)[0]
+    require(first.startswith(b'tree ') and re.fullmatch(rb'[0-9a-f]{40}', first[5:]), 'Actual Git commit root tree required')
+    root_tree = first[5:].decode('ascii')
+    trees = {}
+    for row in value['trees']:
+        oid, body = git_object(row, 'tree')
+        require(oid not in trees, 'Duplicate Git tree body')
+        entries = {}
+        offset = 0
+        while offset < len(body):
+            split = body.index(b' ', offset)
+            zero = body.index(b'\0', split + 1)
+            mode, name = body[offset:split], body[split + 1:zero].decode('utf8')
+            require(name not in entries and name not in {'', '.', '..'} and '/' not in name and '\\' not in name
+                    and zero + 21 <= len(body), 'Exact unambiguous Git tree entry required')
+            entries[name] = (mode, body[zero + 1:zero + 21].hex())
+            offset = zero + 21
+        trees[oid] = entries
+    rows = value['indexed_files']
+    require(type(rows) is list and 0 < len(rows) <= 1000 and len({row['path'] for row in rows}) == len(rows)
+            and manifest_ref['path'] in {row['path'] for row in rows}, 'Bounded unique committed archive index including manifest required')
+    for row in rows:
+        require(type(row['file'].get('size_bytes')) is int and row['file']['size_bytes'] >= 0,
+                'Actual indexed archive file size required')
+        binding = bound(row['file'])
+        require(row['path'] == binding['path'], 'Archive index path differs')
+        parts = Path(row['path']).parts
+        tree = root_tree
+        for part in parts[:-1]:
+            require(tree in trees and part in trees[tree], 'Archive ancestor tree is missing')
+            mode, tree = trees[tree][part]
+            require(mode == b'40000', 'Archive path parent must be a real Git tree')
+        require(tree in trees and parts[-1] in trees[tree], 'Archive file is not indexed by supplied commit')
+        mode, blob_oid = trees[tree][parts[-1]]
+        require(mode in {b'100644', b'100755'} and blob_oid == row['git_blob_oid'], 'Archive Git blob identity differs')
+        path = regular(binding['path'])
+        prefix = ('blob ' + str(path.stat().st_size) + '\0').encode('ascii')
+        require(digest(path, 'sha1', prefix) == blob_oid, 'Committed archive bytes differ from actual Git blob')
+    require(value['Root_verified_archive_complete_for_selected_CTF08'] is True, 'Root must verify selected08 archive coverage')
+    return {'manifest': manifest_ref, 'git_commit': commit_oid, 'git_root_tree': root_tree,
+            'indexed_file_count': len(rows), 'archive_coverage_authority': 'Root-checked approved proof-bindings',
+            'exact_commit_tree_and_indexed_file_bytes_authenticated': True}
+
+
+def proof_pair(row, role, started):
+    report = bound(row['report'])
+    execution = bound(row['execution'])
+    command = recorded(execution)
+    require(time_of(command['finished_utc']) <= time_of(started), 'All prerequisite execution must precede retention')
+    facts = row['Root_checked_metadata']
+    require(row['Root_semantically_verified'] is True and facts['source_report'] == report
+            and type(facts['schema']) is str and facts['schema']
+            and type(facts['status']) is str and facts['status'], 'Root-checked exact report extraction required: ' + role)
+    return report, execution, facts
+
+
+def source_scope(value, started):
+    require(set(value) == {'amendment', 'execution'}, 'Exact actual08 scope pair required')
+    for key, expected in SCOPE_METADATA.items(): same(value[key], expected)
+    scope = read(value['amendment'])
+    command = recorded(value['execution'])
+    require(time_of(scope['created_utc']) <= time_of(command['started_utc'])
+            and time_of(command['finished_utc']) <= time_of(started), 'Actual08 scope must precede retention')
+    require(scope['schema'] == 'ctf08-source-scope-amendment.v1' and scope['cards'] == ['CTF-08']
+            and scope['scope_review_passed'] is True and scope['all_other_gates_pending'] is True
+            and scope['strict_profiles_settled_before_outputs'] is True
+            and scope['actual_CTF08_build_or_engine_execution_performed'] is False
+            and scope['scope_only_no_numerical_PASS'] is True
+            and scope['recorder_role'] == 'real-CTF-08-check-only',
+            'Literal pre-output08 scope metadata required; no full-card claim')
+    require(command['command'][1:] == ['-X', 'utf8', '-B', 'tools/porting/check_plan.py', '--check', '--card', 'CTF-08']
+            and Path(command['command'][0]).name.lower() in ['python', 'python.exe'], 'Genuine actual08 card check command required')
+    require(scope['requested_counts'] == {'unit': {'model_cases': 39, 'calculateTransferFunction': 42},
+                                        'production': {'model_cases': 15, 'loader_phase_records': 195}},
+            'Actual08 unchanged input scope differs')
+    for key in ['native_observer', 'passive_observer', 'final_coefficient_policy_source_inventory']: bound(scope[key])
+    for row in scope['before_documents']: bound(row)
+    after = scope['after_documents']
+    require(len(after) == 2 and {row['path'] for row in after} ==
+            {'energyplus_porting_plan/plan.json', 'energyplus_porting_plan/cards/CTF-08.md'}, 'Literal historical08 after-document identities required')
+    for row in after:
+        require(re.fullmatch(r'[0-9a-f]{64}', row['sha256']) and type(row['size_bytes']) is int and row['size_bytes'] > 0,
+                'Typed historical08 after-document SHA/size required')
+    # These after-document identities are historical; published current docs may differ.
+    return bound(value['amendment']), bound(value['execution'])
+
+
+def all_proofs(binding, started):
+    pins = read(binding)
+    require(pins['schema'] == 'ctf08-two-original-retention-proof-bindings.v1'
+            and pins['scope'] == 'selected-CTF08-first-private-coefficients-only'
+            and pins['Root_approved_for_exact_pair'] is True and pins['future_hashes_guessed'] is False
+            and pins['targets'] == list(TARGETS), 'Explicit Root-approved actual exact-pair proof bindings required')
+    require(set(pins['lanes']) == {'unit', 'production'}, 'Exactly two actual lanes required')
+    builds, refs = {}, {}
+    for lane in ['unit', 'production']:
+        data = pins['lanes'][lane]
+        require(set(data) == {'build', *ROLES}, 'Exact actual lane proof roles required')
+        builds[lane] = build_metadata(lane, data['build'])
+        refs[lane + '/build'] = bound(data['build'])
+        for role in ROLES:
+            report, command, facts = proof_pair(data[role], lane + '/' + role, started)
+            refs[lane + '/' + role] = report
+            refs[lane + '/' + role + '-execution'] = command
+            if role == 'comparison':
+                expected = ('ctf08-unit-comparison.v1', 'pass-selected-first-private-final-coefficients', 'selected_unit_PASS_claimed') if lane == 'unit' else (
+                    'ctf08-production-comparison.v1', 'pass-selected-loader-to-first-private-final-coefficients', 'selected_fixed15_first_private_final_coefficients_PASS_claimed')
+                require((facts['schema'], facts['status']) == expected[:2] and facts[expected[2]] is True
+                        and facts['complete_CTF04_PASS_claimed'] is False
+                        and facts['complete_CTF05_PASS_claimed'] is False
+                        and facts['complete_CTF06_PASS_claimed'] is False
+                        and facts['complete_CTF07_PASS_claimed'] is False and facts['complete_CTF08_PASS_claimed'] is False
+                        and type(facts['comparison']['mismatch_count']) is int and facts['comparison']['mismatch_count'] == 0,
+                        'Actual selected08 comparison0 required; no whole-card completion inference')
+            if role == 'PE':
+                expected_schema = 'ctf08-independent-build-PE-review.v1' if lane == 'unit' else 'ctf08-production-independent-build-PE-review.v1'
+                require(facts['schema'] == expected_schema
+                        and facts['status'] == 'pass-exact-retained-PE-runtime-and-actual-build-identity', 'Actual08 PE schema/status required')
+                require(facts['original_and_derivative_verified'] is True
+                        and facts['linked_original'] == builds[lane]['linked_original']
+                        and facts['helper_binary'] == builds[lane]['helper_binary'], 'Root-checked PE pair identity differs')
+            if role == 'helper':
+                expected_schema = 'ctf08-helper-results.v1' if lane == 'unit' else 'ctf08-production-helper-results.v1'
+                require(facts['schema'] == expected_schema, 'Actual08 helper schema required')
+                require(facts['actual_helper_exit_code'] == 0 and type(facts['actual_helper_exit_code']) is int
+                        and facts['preservation_checks_passed'] is True, 'Actual real helper0 and preservation required')
+            if role == 'DataQA':
+                expected = ('ctf08-independent-original-data-review.v1', 'pass-actual-original-data-and-provenance-before-Rust') if lane == 'unit' else (
+                    'ctf08-production-independent-original-data-review.v1', 'pass-actual-original-production-data-and-provenance-before-Rust')
+                require((facts['schema'], facts['status']) == expected, 'Actual08 structural DataQA schema/status required')
+                require(facts['structural_provenance_release_passed'] is True
+                        and facts['numerical_PASS_claimed'] is False, 'Actual structural DataQA0 required')
+    quality_source = pins['quality_source']
+    require(set(quality_source) == {'final_source_manifest', 'final_source_snapshot'}, 'One actual final08 source context required')
+    for key in ['final_source_manifest', 'final_source_snapshot']:
+        refs['quality-source/' + key] = bound(quality_source[key])
+    same(quality_source['final_source_manifest'], QUALITY_SOURCE_METADATA['final_source_manifest'])
+    final_manifest = read(quality_source['final_source_manifest'])
+    require(final_manifest['schema'] == 'ctf08-actual-final-reviewed-formatted-source.v1'
+            and final_manifest['Root_and_Raw_FULL_formatter_correspondence_reviewed'] is True
+            and final_manifest['format_deltas_review_pending'] is False
+            and final_manifest['numeric_PASS_claimed'] is False,
+            'Actual accepted08 formatted-source metadata required; this source authority is not numerical PASS')
+    same(final_manifest['formatter_predecessor'], QUALITY_SOURCE_METADATA['prior_formatted_source_manifest'])
+    prior = read(final_manifest['formatter_predecessor'])
+    require(final_manifest['actual_sources'] == prior['actual_sources'] and len(final_manifest['actual_sources']) == 16,
+            'Exactly sixteen reviewed final source rows must retain formatter01 bytes')
+    bound(final_manifest['applied_reviewed_source'])
+    formatter = final_manifest['actual_formatter']
+    require(formatter['command'] == ['cargo', 'fmt', '--all'] and type(formatter['exit_code']) is int and formatter['exit_code'] == 0
+            and time_of(formatter['started_utc']) <= time_of(formatter['finished_utc']), 'Actual formatter identity/interval required')
+    for key in ['stdout', 'stderr']:
+        bound(formatter[key])
+        require(formatter[key]['size_bytes'] == 0, 'Actual formatter streams must be empty')
+    for row in final_manifest['format_deltas']:
+        for key in ['before', 'after', 'exact_diff']: bound(row[key])
+    snapshot = read(quality_source['final_source_snapshot'])
+    require(snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False,
+            'Actual byte-exact recorder source snapshot required')
+    source_rows = {row['historical_path']: row for row in snapshot['files']}
+    require(len(source_rows) == len(snapshot['files']), 'Unique actual source snapshot associations required')
+    paths = []
+    for current in final_manifest['actual_sources']:
+        paths.append(current['canonical_path'])
+        archive = bound(current['actual_final_source'])
+        bound(current['accepted_unformatted_source'])
+        row = source_rows[current['canonical_path']]
+        require(row['archive']['sha256'] == archive['sha256'] and row['size_bytes'] == current['actual_final_source']['size_bytes'],
+                'Final actual source/archive snapshot association differs')
+    require(len(set(paths)) == 16, 'Unique reviewed16 source owner associations required')
+    for lane in ['unit', 'production']:
+        same(recorded(refs[lane + '/comparison-execution'])['source_snapshot'], quality_source['final_source_snapshot'])
+    require(set(pins['quality']) == set(QUALITY), 'All four actual quality checks required')
+    for role in QUALITY:
+        value = bound(pins['quality'][role])
+        command = recorded(value)
+        require(time_of(command['finished_utc']) <= time_of(started), 'Final actual quality must precede retention')
+        require(Path(command['command'][0]).name.lower() in ['cargo', 'cargo.exe']
+                and command['command'][1:] == QUALITY_COMMANDS[role], 'Exact actual quality role command required')
+        same(command['source_snapshot'], quality_source['final_source_snapshot'])
+        refs['quality/' + role] = value
+    refs['source-scope/amendment'], refs['source-scope/execution'] = source_scope(pins['source_scope'], started)
+    published = pins['selected_published_summary']
+    report = bound(published['report'])
+    facts = published['Root_checked_metadata']
+    require(published['Root_semantically_verified'] is True and facts['source_report'] == report
+            and facts['selected_unit_and_fixed15_comparisons_passed'] is True
+            and facts['complete_CTF04_PASS_claimed'] is False and facts['complete_CTF05_PASS_claimed'] is False
+            and facts['complete_CTF06_PASS_claimed'] is False and facts['complete_CTF07_PASS_claimed'] is False and facts['complete_CTF08_PASS_claimed'] is False,
+            'Root-checked published selected08 summary required; no whole-card completion claim')
+    refs['selected-published-summary'] = report
+    report, execution, facts = proof_pair(pins['fixed_six_CLI'], 'fixed-six-CLI', started)
+    require(facts['schema'] == 'ctf08-fixed-six-actual-cli-executions.v1'
+            and facts['execution_role'] == 'actual-plan-validation-after-Root-authored-CLI-summary'
+            and facts['all6_exit0_and_source_unchanged'] is True and facts['all45_input_guards_unchanged_after'] is True
+            and type(facts['executions']) is list and len(facts['executions']) == 6,
+            'Actual six production CLI commands and 45 unchanged inputs required')
+    require(len({row['path'] for row in facts['executions']}) == 6, 'Six distinct actual CLI receipts required')
+    for index, row in enumerate(facts['executions']):
+        value = bound(row)
+        command = recorded(value)
+        require(time_of(command['finished_utc']) <= time_of(started), 'Actual CLI must precede retention')
+        same(command['source_snapshot'], quality_source['final_source_snapshot'])
+        refs['fixed-six-CLI/' + str(index)] = value
+    refs['fixed-six-CLI'] = report
+    refs['fixed-six-CLI-execution'] = execution
+    archive = committed_archive(pins['committed_archive'])
+    unchanged()
+    return builds, refs, archive

@@ -1,0 +1,99 @@
+--- .runtime/porting/CTF-08/retirement-plan-prep-01/before-CTF07/common.py
++++ .runtime/porting/CTF-08/retirement-plan-prep-01/common.py
+@@ -1,4 +1,4 @@
+-"""Byte guards for Root's exact two-original CTF07 retention action."""
++"""Byte guards for Root's exact two-original CTF08 retention action."""
+ from __future__ import annotations
+ from datetime import datetime, timezone
+ import hashlib
+@@ -8,50 +8,38 @@
+ import stat
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-BASE = '.runtime/porting/CTF-07/'
++BASE = '.runtime/porting/CTF-08/'
+ NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+-TARGETS = {
+-    'ctf07_unit_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe',
+-        'sha256': '52231b5ca6a1be36179c2ee489520539d6651c32630afcfa26bbbc3eab7c88de',
+-        'size_bytes': 1300191163,
+-    },
+-    'ctf07_production_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe',
+-        'sha256': '499e6b2e85bda5cc9ef0a717c9eecf74a9122acf2b0d15126f73d001a8883585',
+-        'size_bytes': 1302795649,
+-    },
+-}
+-BUILDS = {
+-    'unit': {'path': BASE + 'native-build-01/unit/native-build.json',
+-             'sha256': '4a9229ad19645f63608e2cf4b6b7fe012549356519ae0d9db05b618813fce7da'},
+-    'production': {'path': BASE + 'native-build-01/production/native-build.json',
+-                   'sha256': 'a5fa87ec99caebb2ca361f50905d9cc652c060ee1693d6c5693ac2ca9af1e3dc'},
+-}
+-BEFORE = {'path': BASE + 'native-build-01/before/preservation.json',
+-          'sha256': '7d0f45375a79b3fa3032827082c1624aa4d5f12116a2e37bb20b2ede635f177d'}
+-QUALITY_SOURCE_METADATA = {
+-    'final_source_manifest': {'path': BASE + 'applied-final-source-02/manifest.json',
+-                              'sha256': 'c67e440187bc3731d667d8bb79970c80ef82f9e37c26eac3dda4fc66c116414b'},
+-    'prior_formatted_source_manifest': {'path': BASE + 'applied-final-source-01/manifest.json',
+-                              'sha256': '344ed7b311e745f4556378655a90fff602cb4a178b44d7d88c927af0ccfe424f'},
+-    'reviewed_lint_source_preparation': {'path': BASE + 'lint-amendment-prep-01/manifest.json',
+-                                       'sha256': 'a79f7cb070c6cff248c0b55bc7dad460e12a5dbade0be0c6a475fbf9b6f491db'},
+-}
+-SCOPE_METADATA = {
+-    'amendment': {'path': BASE + 'scope-amendment-01/amendment.json',
+-                  'sha256': '05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423'},
+-    'execution': {'path': BASE + 'scope-check-command-01/receipt.json',
+-                  'sha256': '9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8'},
+-}
+-PRIOR_RETIRED_CTF04_ORIGINAL_PATHS = [
+-    '.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe',
+-    '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe',
+-]
+-PRIOR_RETIRED_CTF06_ORIGINAL_PATHS = [
+-    '.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe',
+-    '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe',
+-]
++TARGETS = {'ctf08_unit_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf08_unit_helper.exe',
++                       'sha256': 'efc48494527edcfae35cda57b21ab48e9bd3ab3504c6c5c9426de2c79b6bea59',
++                       'size_bytes': 1300872698},
++ 'ctf08_production_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf08_production_helper.exe',
++                             'sha256': '7b404b9711ab751de31f6e29c84ba85c880e9914bb9f26126fd186dc170d43c1',
++                             'size_bytes': 1303385937}}
++BUILDS = {'unit': {'path': '.runtime/porting/CTF-08/native-build-01/unit/native-build.json',
++          'sha256': 'd80125f0461b3fc624f11ff2d83b2fb429cd9a1ef8107817337e04e35b32884f',
++          'size_bytes': 5256},
++ 'production': {'path': '.runtime/porting/CTF-08/native-build-01/production/native-build.json',
++                'sha256': '8d76e6db632da6041a4dff6731176545c0cc88afc0802f6623dbeefb28d00e1b',
++                'size_bytes': 5322}}
++BEFORE = {'path': '.runtime/porting/CTF-08/native-build-01/before/preservation.json',
++ 'sha256': '1bfe2ff94fcfb3db4854f9cddff46c3e8e6e84efaa619a512038d605d2ab8f43',
++ 'size_bytes': 164529}
++QUALITY_SOURCE_METADATA = {'final_source_manifest': {'path': '.runtime/porting/CTF-08/applied-final-source-02/manifest.json',
++                           'sha256': '0a68da81100d51953baae319237195f6218ae234365429523eaf2aa9fceedb95',
++                           'size_bytes': 25886},
++ 'prior_formatted_source_manifest': {'path': '.runtime/porting/CTF-08/applied-final-source-01/manifest.json',
++                                     'sha256': 'f2afcdc7d47364194b86e1511677c40dde33a1a627296417695ba3e1f855e4af',
++                                     'size_bytes': 25536}}
++SCOPE_METADATA = {'amendment': {'path': '.runtime/porting/CTF-08/scope-amendment-01/amendment.json',
++               'sha256': '2398bd45495e6dd1f0ddfe0131c97520580572a736f26df319d2dff72c09b9a9',
++               'size_bytes': 2077},
++ 'execution': {'path': '.runtime/porting/CTF-08/scope-check-command-01/receipt.json',
++               'sha256': 'fd364d0c4da9a89e2d6c0b45ef693dc63e6f0ead48cff3ebbf102aab8c2506c3',
++               'size_bytes': 3006}}
++PRIOR_RETIRED_CTF04_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe']
++PRIOR_RETIRED_CTF06_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe']
++PRIOR_RETIRED_CTF07_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe']
+ SEEN = {}
+ 
+ 
+@@ -211,7 +199,7 @@
+ 
+ def approved_sources(manifest_ref, approved_sha, entry):
+     manifest = read(manifest_ref)
+-    require(manifest['schema'] == 'ctf07-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
++    require(manifest['schema'] == 'ctf08-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
+     rows = manifest['own_sources']
+     require([Path(row['path']).name for row in rows] == NAMES, 'Exactly four ordered source files required')
+     for name, row in zip(NAMES, rows):

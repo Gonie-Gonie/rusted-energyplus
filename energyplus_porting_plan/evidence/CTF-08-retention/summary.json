@@ -1,0 +1,46 @@
+{
+  "schema": "ctf08-actual-precise-original-retirement-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-08-retention/manifest.json",
+    "sha256": "53697fe339eeb453131f8a4dd72437f9dea65bd0b69041a84bb90fc805128a69",
+    "size_bytes": 48029
+  },
+  "actual_plan": {
+    "path": ".runtime/porting/CTF-08/retirement-plan-01/plan.json",
+    "sha256": "fd4dd21349f4c6dd66daf6da4d224507f9f2a5f0e8927580492a5b9fef15e5fc",
+    "size_bytes": 186584
+  },
+  "actual_plan_execution": {
+    "path": ".runtime/porting/CTF-08/retirement-plan-command-01/receipt.json",
+    "sha256": "931f9bb021f6caf8cab289953a2d225e100a1bce8ba930c6fc98b87cff724881",
+    "size_bytes": 3185
+  },
+  "actual_retirement": {
+    "path": ".runtime/porting/CTF-08/retirement-01/retirement.json",
+    "sha256": "1601a0fcc296ecfd73ce8ffaf59c14401dff88e8beb207fe0234edfd643b11c9",
+    "size_bytes": 176930
+  },
+  "actual_retirement_execution": {
+    "path": ".runtime/porting/CTF-08/retirement-command-01/receipt.json",
+    "sha256": "fc3630b3c512e6a91ddc57b7baf22f1fc4d0c7a0722d57bab2b1c9a4f1af2d54",
+    "size_bytes": 3401
+  },
+  "actual_indexed_archive_commit": "03fed4a75706785ec6d134644a948fa574ebf669",
+  "indexed_archive_files": 487,
+  "exact_new_Original_pair_removed_bytes": 2604258635,
+  "both_exact_new_originals_absent": true,
+  "prior_protected_artifacts_retained": 42,
+  "new_verified_derivatives_retained": 2,
+  "registered_core_present_unchanged": 631,
+  "registered_core_absent_unchanged": 12,
+  "prior_CTF04_CTF06_CTF07_Originals_remain_absent": true,
+  "registry_rewritten": false,
+  "previous_history_or_refs_reinterpreted": false,
+  "scientific_execution_repeated": false,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "discarded_debug_bytes_recoverable_from_hash_or_map": false
+}
