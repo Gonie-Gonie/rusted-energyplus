@@ -1,0 +1,86 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\production-comparer-prep-01\\compare_production.py",
+    "--approved-source-sha256",
+    "abf1f7328b3c0adfd2a708f73e32896a200d1a1856217f1718ff564863f4bde7",
+    "--original-data-review",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\production-original-data-review-01\\review.json#47c7801aa1b59473a49360ecd3e8efd1e963509e1351a1fb27dfe8fa2e5e6a57",
+    "--original-data-review-execution",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\production-original-data-review-command-01\\receipt.json#0a63d0d6c74471f0c6f54ad97fa96138f1250bf7e97172840a509724e9ed5fcb",
+    "--Rust-build-execution",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-production-build-command-02\\receipt.json#73bcad109a959ab876edf219a6130362aa47084d0517311d60930f016e22acb7",
+    "--Rust-execution",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-production-command-02\\receipt.json#203e073cc2272eadbffbdb17ce5bd6d2eb5d49307fc7f9e9c745f5f638d72038",
+    "--Rust-results",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-production-command-02\\stdout.log#20c9f2a0a7c47a9caeb5d049cfef72602535bc84d1e95675242fb3aedc8e3efb",
+    "--output-dir",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-production-comparison-02"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T12:46:20.180553+00:00",
+  "finished_utc": "2026-10-10T12:46:22.053357+00:00",
+  "elapsed_seconds": 1.8728493000089657,
+  "repository_before": {
+    "head": "aaea8f080749eb3a0c19ec5903c22e84d7b0c77a",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_compiler/src/compiler.rs\u0000 M crates/ep_compiler/src/compiler/surface_space.rs\u0000 M crates/ep_compiler/src/compiler/tests/surface_space.rs\u0000"
+  },
+  "repository_after": {
+    "head": "aaea8f080749eb3a0c19ec5903c22e84d7b0c77a",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_compiler/src/compiler.rs\u0000 M crates/ep_compiler/src/compiler/surface_space.rs\u0000 M crates/ep_compiler/src/compiler/tests/surface_space.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/9e/9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+    "sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-01/candidate-production-comparison-command-02/stdout.log",
+    "sha256": "031bd17d494039eff9265f5c0b15a948f03f4aeea806cff96c50158ec99d0c50"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-01/candidate-production-comparison-command-02/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T12:46:22.053357+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

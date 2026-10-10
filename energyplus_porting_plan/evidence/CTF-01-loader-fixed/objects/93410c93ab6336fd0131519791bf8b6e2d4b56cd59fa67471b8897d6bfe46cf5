@@ -1,0 +1,370 @@
+{
+  "schema": "ctf01-surface-registration-source-proposal.v1",
+  "source_only": true,
+  "canonical_modified": false,
+  "target_imported_or_executed": false,
+  "scientific_or_binary_payloads_read": false,
+  "changes": [
+    {
+      "owner": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "current_before": {
+        "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+        "sha256": "2423cd8a5ed2df4dcbcb6641e5464c982de5696bf294fdc9509b545604d080f1",
+        "size_bytes": 7597,
+        "line_count": 206
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/before/crates/ep_compiler/src/compiler/surface_space.rs",
+        "sha256": "2423cd8a5ed2df4dcbcb6641e5464c982de5696bf294fdc9509b545604d080f1",
+        "size_bytes": 7597,
+        "line_count": 206
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/proposed/crates/ep_compiler/src/compiler/surface_space.rs",
+        "sha256": "3a0ead8311101e97b1a06e230bc7e3a2e80d117bfb6817577dd5c535a7ae97d8",
+        "size_bytes": 9657,
+        "line_count": 250
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/crates__ep_compiler__src__compiler__surface_space.rs.diff",
+        "sha256": "0aa22415b30f15f835b476688550df575b32285c3d99f35a8dd35cd1ee75a27b",
+        "size_bytes": 2660,
+        "line_count": 60
+      }
+    },
+    {
+      "owner": "crates/ep_compiler/src/compiler/tests/surface_space.rs",
+      "current_before": {
+        "path": "crates/ep_compiler/src/compiler/tests/surface_space.rs",
+        "sha256": "914dff6e8f5a07dbff1ed7efd8c0b5cfb7d96c050fb1fff79f6535f8ef94e3b9",
+        "size_bytes": 12226,
+        "line_count": 367
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/before/crates/ep_compiler/src/compiler/tests/surface_space.rs",
+        "sha256": "914dff6e8f5a07dbff1ed7efd8c0b5cfb7d96c050fb1fff79f6535f8ef94e3b9",
+        "size_bytes": 12226,
+        "line_count": 367
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/proposed/crates/ep_compiler/src/compiler/tests/surface_space.rs",
+        "sha256": "8dce36c9a3289dcb12f883d65aae1aa988790d82468552ae071501bf40529b16",
+        "size_bytes": 17186,
+        "line_count": 461
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/crates__ep_compiler__src__compiler__tests__surface_space.rs.diff",
+        "sha256": "c2bede5c133a104b12833afd996736d078d476f7d4201301951e2e044e8e7803",
+        "size_bytes": 5255,
+        "line_count": 100
+      }
+    },
+    {
+      "owner": "crates/ep_compiler/src/compiler.rs",
+      "current_before": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+        "size_bytes": 771761,
+        "line_count": 19737
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/before/crates/ep_compiler/src/compiler.rs",
+        "sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+        "size_bytes": 771761,
+        "line_count": 19737
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/proposed/crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820,
+        "line_count": 19738
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-01/surface-registration-prep-01/crates__ep_compiler__src__compiler.rs.diff",
+        "sha256": "de0a31dc82bad84f1db5037bff058727d1f8f9d7dd309c09bff99ee796512354",
+        "size_bytes": 375,
+        "line_count": 10
+      }
+    }
+  ],
+  "source_inventory": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+      "size_bytes": 941682,
+      "line_count": 15690
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.hh",
+      "sha256": "359720562a1122716bf842f23a54a9967d6bdaeea2e5c31638b8002e31f7160e",
+      "size_bytes": 30479,
+      "line_count": 562
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+      "size_bytes": 28468,
+      "line_count": 789
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+      "size_bytes": 16493,
+      "line_count": 491
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+      "size_bytes": 771761,
+      "line_count": 19737
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "sha256": "2423cd8a5ed2df4dcbcb6641e5464c982de5696bf294fdc9509b545604d080f1",
+      "size_bytes": 7597,
+      "line_count": 206
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/variable_absorptance_surface.rs",
+      "sha256": "3afde4a308039e6bd2b7ab24e7f98447b838be00efb1269c2dea1fecd085e99d",
+      "size_bytes": 12227,
+      "line_count": 325
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/surface_solar_incident.rs",
+      "sha256": "82630bd6e8be6d870695dacabb2d30dc0487cceddf485819e9483d221473ce34",
+      "size_bytes": 3979,
+      "line_count": 105
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621,
+      "line_count": 373
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+      "size_bytes": 92680,
+      "line_count": 2322
+    },
+    {
+      "path": "crates/ep_model/src/names.rs",
+      "sha256": "e1761bfdcdadfc8a04ac8b7ddabb530a7275d0ea74b5a838f638c427a3d4b1f8",
+      "size_bytes": 1859,
+      "line_count": 69
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 1407,
+      "end_line": 1549,
+      "sha256": "d726130fef7815f49c6d8cfb27b333e320c6ae08b16d63114e9150f712db6808",
+      "size_bytes": 7653
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 1677,
+      "end_line": 1736,
+      "sha256": "d8232aaf804e7320b69b31dd953a195492e6528ed4b225c3e446cfe23caa20ae",
+      "size_bytes": 3341
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 1773,
+      "end_line": 1795,
+      "sha256": "bc4d01d66af04693c1a59abc05d2a19f17ef43c81e96a94cf4d55afd9f3c6829",
+      "size_bytes": 1450
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 2917,
+      "end_line": 3017,
+      "sha256": "950fe5c014b4a84aea13cc4c1e6782957b73734c0a0efcf7c36bdc5f80f4d408",
+      "size_bytes": 6292
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 3831,
+      "end_line": 3936,
+      "sha256": "88df90963be7fbef1fa3de96e1891c6df204f7ec6c96ba54682f5d979a03bb2d",
+      "size_bytes": 5592
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.hh",
+      "start_line": 544,
+      "end_line": 552,
+      "sha256": "78a03765b50e675aece3b213ff6a2791270a81c823f05e1422098499b4cab91f",
+      "size_bytes": 495
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "start_line": 57,
+      "end_line": 72,
+      "sha256": "9b7913f9fcddffae61442c8174e9283e4f78148f6e639118745a2bec1e661708",
+      "size_bytes": 616
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "start_line": 121,
+      "end_line": 165,
+      "sha256": "ba8aeab5039a5eb3b506d20411e3b9fe8f1dc9e0ab2039d5c3969f7496125dd5",
+      "size_bytes": 1749
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "start_line": 613,
+      "end_line": 633,
+      "sha256": "265b5d134cf3a6ba517a417d51d1ec3616e50a90afe5209c000a7a3493a0ae33",
+      "size_bytes": 1112
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "start_line": 112,
+      "end_line": 168,
+      "sha256": "d3dd6338aae824006ef5f5730234e9485fab9492f641fb9f367da2510508099a",
+      "size_bytes": 2629
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "start_line": 705,
+      "end_line": 720,
+      "sha256": "4ea0227a36c44013c56957bc14138af165357edfb679a07c076e807ee16e0ed6",
+      "size_bytes": 990
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "start_line": 740,
+      "end_line": 745,
+      "sha256": "a4165f4e71f97de247e1dcd14c0bd422563e146ac879e792dace7c53393ef86e",
+      "size_bytes": 299
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "start_line": 13848,
+      "end_line": 14006,
+      "sha256": "b6bc3277b81e3ed5ad5b03de5d118fe2977b195538bbbd74becc0ab49a7523e1",
+      "size_bytes": 6023
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "start_line": 14062,
+      "end_line": 14101,
+      "sha256": "485aa6fa97b956c7d5d3619947d11147f4f604de8f1e1beea288015a4342ecc8",
+      "size_bytes": 1436
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "start_line": 14835,
+      "end_line": 14881,
+      "sha256": "e7398be3d52e933512c50155ae23091d829e7e38da76dbf42583b091b2c87d4c",
+      "size_bytes": 1561
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "start_line": 1,
+      "end_line": 205,
+      "sha256": "13157a1a3f6198e82696f66c6f731c18a2d1f42fe8c9fa79ccacb6715b609f8f",
+      "size_bytes": 7595
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/variable_absorptance_surface.rs",
+      "start_line": 21,
+      "end_line": 39,
+      "sha256": "22574a8cb55447145fb4bc1db964663b8d7c3d84dce8f11d3831baa8a86c9080",
+      "size_bytes": 825
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/variable_absorptance_surface.rs",
+      "start_line": 80,
+      "end_line": 100,
+      "sha256": "57abb6fb1c0cb9ace6a6244dc0efb0687551bd23d2f052f95ac5b00174b93a5b",
+      "size_bytes": 882
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/variable_absorptance_surface.rs",
+      "start_line": 149,
+      "end_line": 155,
+      "sha256": "7cab31a0429e575011d9b30736d23a81dbaf61975f2c0bbee4a824786b20106c",
+      "size_bytes": 320
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/surface_solar_incident.rs",
+      "start_line": 12,
+      "end_line": 65,
+      "sha256": "60a5cbf63b1cf5faaf38045e3515a9dab014b33ee5244b19247ec26238c43d8b",
+      "size_bytes": 2121
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "start_line": 166,
+      "end_line": 197,
+      "sha256": "ad27a66466f7368b837a8bda0ece7c75331d80da617c3dd637b921963532e476",
+      "size_bytes": 1189
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "start_line": 250,
+      "end_line": 285,
+      "sha256": "2bfa6fddf2b9360bfa369e85399709e990fd070280815cb04c0d08c82d429f63",
+      "size_bytes": 1519
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "start_line": 339,
+      "end_line": 361,
+      "sha256": "609f22a6251168e8d8c4607e36c7b745b8c94b921903c1739df05dd1d79b1d8a",
+      "size_bytes": 785
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "start_line": 270,
+      "end_line": 288,
+      "sha256": "103072b7955c9fee0c892728ca8767dba31255ab5a8b36c9e51080562627bda1",
+      "size_bytes": 1174
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "start_line": 409,
+      "end_line": 415,
+      "sha256": "89ad7e62d34c9543ef97d53744a4cf0f5c285af9eb666f7e68f99a7c574c1638",
+      "size_bytes": 375
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "start_line": 548,
+      "end_line": 561,
+      "sha256": "886dd972258d8783ebcb2ccca54a11c692166b5aa470c7ddadf5e219761dd661",
+      "size_bytes": 435
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "start_line": 604,
+      "end_line": 616,
+      "sha256": "3d1169ab7dbd1e1718223a1c41561ca16f292cff22d68006d62c199576ee351d",
+      "size_bytes": 418
+    },
+    {
+      "path": "crates/ep_model/src/names.rs",
+      "start_line": 19,
+      "end_line": 69,
+      "sha256": "89a9cc0b8b1ae34fc8bcdfe79051418c973ff3c10a506e37ef7b4fd9b36d59a2",
+      "size_bytes": 1287
+    }
+  ],
+  "readme": {
+    "path": ".runtime/porting/CTF-01/surface-registration-prep-01/README.md",
+    "sha256": "5f505d5fe6538f6a93528bd0454d3f9bc83d9e09dcdd6e0262cf72861651afc8",
+    "size_bytes": 3417,
+    "line_count": 57
+  },
+  "tests_proposed_not_executed": 2,
+  "no_comparer_or_profile_change": true
+}

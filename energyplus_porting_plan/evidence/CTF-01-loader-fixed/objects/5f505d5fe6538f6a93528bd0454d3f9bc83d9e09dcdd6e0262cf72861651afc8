@@ -1,0 +1,57 @@
+# CTF-01 surface registration source proposal
+
+Status: SOURCE-READY; ignored source proposal only. No canonical edits, formatter,
+compiler, test, engine, import, scientific result or binary reads were performed.
+Root retains the genuine failed production comparison and owns all execution.
+
+## Source cause and change
+
+Native SurfaceGeometry::GetSurfaceData calls CreateMissingSpaces at 1443, then
+registers actual Surface array elements by Zone (1469), each Zone's spaceIndexes
+(1470), BaseSurfIDs (1506), and stable SurfaceTmp order (1508-1528).
+SurfaceGeometry.hh 549 fixes BaseSurfIDs as Wall, Floor, Roof.
+GetHTSurfaceData 3918-3920 maps Ceiling to Roof. The separate legacy
+AllSurfaceListReportOrder is not the Surface array registration order.
+
+RawModel already preserves BuildingSurface:Detailed IDF declaration order;
+direct epJSON retains its ordinary map order. This proposal leaves RawModel
+unchanged and adds the missing final compiler registration permutation after
+successful CreateMissingSpaces. Stable sort retains original relative order
+within each actual Zone/Space/class group. It retains every Surface object,
+reassigns zero-based SurfaceIds, and rebuilds both NameMap lookup and name order.
+An unavailable owning group or duplicate normalized registration name is an
+explicit internal compile error; no record is dropped or guessed.
+
+## Prior SurfaceId association audit
+
+At this point the only SurfaceId holders are Surface.id, surface_names, and
+local explicit_space_assignments (compiler 13944-13997). The latter is fully
+consumed by CreateMissingSpaces before registration and is not published.
+Surface outside_boundary_condition_object is a NormalizedName, not SurfaceId;
+Zone stores SpaceIds, and Space has no cached SurfaceId list. Material,
+Construction, Zone, Space, boundary names, vertices and scalar fields move
+with each unchanged Surface object. Surface-dependent typed vectors start
+empty (model.rs 409-415). Variable absorptance bindings, solar attachments and
+vapor attachments are constructed only after parse_surfaces (compiler711-745).
+ModelGraph is created later from final typed owners (model.rs558-561/609-615).
+No stale ID remapping of an earlier published consumer is therefore required.
+
+## Scope and proposed verification
+
+Only ordinary opaque BuildingSurface:Detailed Wall/Floor/Roof/Ceiling owners
+already admitted by this compiler are affected. This does not port shading,
+air boundaries, internal mass, windows, generated interzone surfaces, or new
+Native surface families. It changes registration identity/order, not physics,
+comparison sorting, precision profiles, frozen inputs, or observation masks.
+
+Two focused tests are proposed, not executed: (1) mixed classes under direct
+and IDF-overlaid input, stable same-class declaration order, unchanged raw
+order, complete sequential IDs/name ledger, real downstream vapor attachment
+and graph references; (2) multiple Zones and authored/remainder/default Spaces,
+with Space grouping before class grouping and no lost or duplicated owner.
+Existing error-barrier tests continue to cover skipping registration when
+surface parsing fails. Root should run the focused module then relevant
+compiler/package tests and rerun the original frozen production comparison.
+
+The author previously authored CTF01 preprocessing and observation/provenance
+sources. This source change is not an independent numerical certificate.

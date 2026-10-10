@@ -1,0 +1,10 @@
+--- a/crates/ep_compiler/src/compiler.rs
++++ b/crates/ep_compiler/src/compiler.rs
+@@ -14002,6 +14002,7 @@
+             .any(|diagnostic| diagnostic.severity == DiagnosticSeverity::Error);
+         if !surface_errors {
+             self.create_missing_spaces(model, &explicit_space_assignments);
++            self.register_surfaces_in_source_order(model);
+         }
+     }
+ 

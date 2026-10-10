@@ -1,0 +1,100 @@
+--- a/crates/ep_compiler/src/compiler/tests/surface_space.rs
++++ b/crates/ep_compiler/src/compiler/tests/surface_space.rs
+@@ -365,3 +365,97 @@
+     assert_eq!(model.object_count(), 11);
+     Ok(())
+ }
++
++// GetHTSurfaceData maps Ceiling to Roof; GetSurfaceData then groups by
++// Zone, each Zone's Space order, and Wall/Floor/Roof with stable input order.
++fn surface_of_type(name: &str, kind: &str, zone: &str, space: &str, x: f64) -> String {
++    surface(name, zone, space, x).replacen(
++        "\"surface_type\":\"Wall\"",
++        &format!("\"surface_type\":\"{kind}\""),
++        1,
++    )
++}
++
++#[test]
++fn registration_groups_classes_preserves_idf_order_and_rebinds_surface_consumers()
++-> Result<(), Box<dyn std::error::Error>> {
++    let surfaces = [
++        surface_of_type("Floor First", "Floor", "Zone One", "", 0.0),
++        surface_of_type("Ceiling First", "Ceiling", "Zone One", "", 1.0),
++        surface_of_type("Zulu Wall", "Wall", "Zone One", "", 2.0),
++        surface_of_type("Roof Last", "Roof", "Zone One", "", 3.0),
++        surface_of_type("Alpha Wall", "Wall", "Zone One", "", 4.0),
++    ].join(",");
++    let mut raw = raw_fixture(r#""Zone One":{}"#, None, &surfaces)?;
++    raw.objects.extend(parse_epjson_str(r#"{
++        "SurfaceProperties:VaporCoefficients": {
++            "Floor Attachment":{"surface_name":"Floor First"}
++        }
++    }"#)?.objects);
++    let direct_result = compile_raw_model(&raw);
++    let direct = model(&direct_result)?;
++    assert_eq!(direct.surfaces.iter().map(|surface| surface.name.0.as_str()).collect::<Vec<_>>(),
++        ["ALPHA WALL", "ZULU WALL", "FLOOR FIRST", "CEILING FIRST", "ROOF LAST"]);
++
++    ep_raw_model::apply_idf_declaration_order(&mut raw, concat!(
++        "BuildingSurface:Detailed,Floor First,Floor;\n",
++        "BuildingSurface:Detailed,Ceiling First,Ceiling;\n",
++        "BuildingSurface:Detailed,Zulu Wall,Wall;\n",
++        "BuildingSurface:Detailed,Roof Last,Roof;\n",
++        "BuildingSurface:Detailed,Alpha Wall,Wall;"
++    ), &[ep_raw_model::IdfOrderTarget {
++        object_type: "BuildingSurface:Detailed", name_field_index: 0,
++    }])?;
++    let raw_order = raw.ordered_instances("BuildingSurface:Detailed")?
++        .iter().map(|(name, _)| name.0.clone()).collect::<Vec<_>>();
++    let result = compile_raw_model(&raw);
++    let typed = model(&result)?;
++    let expected = ["ZULU WALL", "ALPHA WALL", "FLOOR FIRST", "CEILING FIRST", "ROOF LAST"];
++    assert_eq!(typed.surfaces.iter().map(|surface| surface.name.0.as_str()).collect::<Vec<_>>(), expected);
++    assert_eq!(typed.surface_names.names().iter().map(|name| name.0.as_str()).collect::<Vec<_>>(), expected);
++    for (index, surface) in typed.surfaces.iter().enumerate() {
++        assert_eq!(surface.id.0 as usize, index);
++        assert_eq!(typed.surface_names.resolve(&surface.name.0), Some(surface.id));
++        assert_eq!(surface.zone, typed.zones[0].id);
++        assert_eq!(surface.space, typed.zones[0].spaces[0]);
++        assert_eq!(surface.construction, typed.constructions[0].id);
++    }
++    assert_eq!(typed.surface_vapor_coefficients[0].reference_surface, ep_model::SurfaceId(2));
++    let graph = ep_model::ModelGraph::from_typed(typed);
++    assert_eq!(graph.zone_surfaces.iter().map(|edge| edge.surface).collect::<Vec<_>>(),
++        typed.surfaces.iter().map(|surface| surface.id).collect::<Vec<_>>());
++    assert_eq!(raw.ordered_instances("BuildingSurface:Detailed")?
++        .iter().map(|(name, _)| name.0.clone()).collect::<Vec<_>>(), raw_order);
++    Ok(())
++}
++
++#[test]
++fn registration_follows_zone_and_final_space_groups_before_surface_class()
++-> Result<(), Box<dyn std::error::Error>> {
++    let surfaces = [
++        surface_of_type("A Floor Authored", "Floor", "Zone A", r#", "space_name":"Office""#, 0.0),
++        surface_of_type("B Wall Remainder", "Wall", "Zone A", "", 1.0),
++        surface_of_type("C Floor Other Zone", "Floor", "Zone B", "", 2.0),
++        surface_of_type("D Roof Remainder", "Roof", "Zone A", "", 3.0),
++        surface_of_type("E Wall Authored", "Wall", "Zone A", r#", "space_name":"Office""#, 4.0),
++        surface_of_type("F Wall Other Zone", "Wall", "Zone B", "", 5.0),
++    ].join(",");
++    let result = compile_fixture(r#""Zone A":{},"Zone B":{}"#,
++        Some(r#""Office":{"zone_name":"Zone A"}"#), &surfaces)?;
++    let typed = model(&result)?;
++    assert_eq!(typed.surfaces.iter().map(|surface| surface.name.0.as_str()).collect::<Vec<_>>(), [
++        "E WALL AUTHORED", "A FLOOR AUTHORED", "B WALL REMAINDER",
++        "D ROOF REMAINDER", "F WALL OTHER ZONE", "C FLOOR OTHER ZONE"
++    ]);
++    assert_eq!(typed.spaces[typed.zones[0].spaces[1].0 as usize].origin, SpaceOrigin::AutoZoneRemainder);
++    assert_eq!(typed.surfaces[0].space, typed.zones[0].spaces[0]);
++    assert_eq!(typed.surfaces[2].space, typed.zones[0].spaces[1]);
++    assert_eq!(typed.surfaces[4].space, typed.zones[1].spaces[0]);
++    assert_eq!(typed.surfaces.len(), 6);
++    assert_eq!(typed.surface_names.len(), 6);
++    for (index, surface) in typed.surfaces.iter().enumerate() {
++        assert_eq!(surface.id.0 as usize, index);
++        assert_eq!(typed.surface_names.resolve(&surface.name.0), Some(surface.id));
++    }
++    Ok(())
++}

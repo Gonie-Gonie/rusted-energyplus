@@ -1,0 +1,60 @@
+--- a/crates/ep_compiler/src/compiler/surface_space.rs
++++ b/crates/ep_compiler/src/compiler/surface_space.rs
+@@ -1,5 +1,5 @@
+ use ep_model::{
+-    AutoOrNumber, NormalizedName, Space, SpaceId, SpaceOrigin, SurfaceId, TypedModel, ZoneId,
++    AutoOrNumber, NameMap, NormalizedName, Space, SpaceId, SpaceOrigin, SurfaceId, SurfaceType, TypedModel, ZoneId,
+ };
+ use ep_raw_model::RawObject;
+ 
+@@ -194,6 +194,50 @@
+         }
+     }
+ 
++    /// Publish ordinary opaque surfaces in GetSurfaceData registration order.
++    pub(super) fn register_surfaces_in_source_order(&mut self, model: &mut TypedModel) {
++        // CreateMissingSpaces has completed; no downstream SurfaceId consumer
++        // exists yet. The stable permutation retains each group's input order.
++        if let Some(surface) = model.surfaces.iter().find(|surface| {
++            !model.zones.iter().any(|zone| {
++                zone.id == surface.zone && zone.spaces.contains(&surface.space)
++            })
++        }) {
++            self.internal_surface_space_error(
++                &surface.name.0,
++                "has no owning Zone/Space registration group".to_string(),
++            );
++            return;
++        }
++        let zones = &model.zones;
++        model.surfaces.sort_by_key(|surface| {
++            let zone_position = zones.iter().position(|zone| zone.id == surface.zone);
++            let space_position = zones.iter().find(|zone| zone.id == surface.zone)
++                .and_then(|zone| zone.spaces.iter().position(|space| *space == surface.space));
++            let class_position = match surface.surface_type {
++                SurfaceType::Wall => 0,
++                SurfaceType::Floor => 1,
++                SurfaceType::Roof | SurfaceType::Ceiling => 2,
++            };
++            (zone_position, space_position, class_position)
++        });
++        let mut names = NameMap::default();
++        for (index, surface) in model.surfaces.iter_mut().enumerate() {
++            let Some(id) = self.checked_id(SURFACE_OBJECT_TYPE, &surface.name.0, index) else {
++                return;
++            };
++            surface.id = SurfaceId(id);
++            if names.insert(&surface.name.0, surface.id).is_some() {
++                self.internal_surface_space_error(
++                    &surface.name.0,
++                    "duplicates a normalized name during registration".to_string(),
++                );
++                return;
++            }
++        }
++        model.surface_names = names;
++    }
++
+     fn internal_surface_space_error(&mut self, surface_name: &str, detail: String) {
+         self.error(
+             "InternalReferenceError",

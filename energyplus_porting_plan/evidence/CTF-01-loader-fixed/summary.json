@@ -1,0 +1,83 @@
+{
+  "schema": "ctf01-actual-loader-fixed-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-loader-fixed/manifest.json",
+    "sha256": "6d689eb1530c4e413a7b0dc53bf269e56acd9a7c7c489919d6f2ecdd6e428462",
+    "size_bytes": 46961
+  },
+  "previous_actual_failed_gap": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-loader-gap/summary.json",
+    "sha256": "01444b2ccbeeffdb09ff8de49603900e14453f3005ab5ca56527a9070f5118cd",
+    "size_bytes": 3602
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-01/candidate-production-comparison-02/comparison.json",
+    "sha256": "354230f617b6d8c2b2b351bf60ddae5b49c9202101381250f8a8c8c8a34bb825",
+    "size_bytes": 91606
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/CTF-01/candidate-production-comparison-command-02/receipt.json",
+    "sha256": "cac094663539e5a5bf42685c8343b26cd0e14eadf85a828cfb29f36bf0292538",
+    "size_bytes": 4648
+  },
+  "source_repair": "Actual compiler registers all opaque surfaces by Zone, final Space, Wall/Floor/Roof; stable ties retain declaration order. Surface IDs and both NameMap owners are rebuilt before any dependent attachment or graph. Raw input ordering, comparer, original data, input cases and all eighteen zero-tolerance profiles are unchanged.",
+  "actual_fixed_models": 15,
+  "actual_preprocessing_owners": 21,
+  "numeric_comparisons": 378,
+  "discrete_comparisons": 1614,
+  "mismatches": 0,
+  "selected_profiles": 18,
+  "maximum_absolute_error_and_RMSE_all_zero": true,
+  "workspace_tests": {
+    "passed": 4644,
+    "failed": 0,
+    "ignored": 0,
+    "test_binaries": 33
+  },
+  "actual_commands": [
+    {
+      "path": ".runtime/porting/CTF-01/candidate-surface-quality-tests-command-01/receipt.json",
+      "sha256": "8ea1e44d4943a6f9fd996122c166b759af3cd14e600542e748c502a887363133",
+      "size_bytes": 3018
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-build-command-02/receipt.json",
+      "sha256": "73bcad109a959ab876edf219a6130362aa47084d0517311d60930f016e22acb7",
+      "size_bytes": 4701
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-command-02/receipt.json",
+      "sha256": "203e073cc2272eadbffbdb17ce5bd6d2eb5d49307fc7f9e9c745f5f638d72038",
+      "size_bytes": 3187
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-comparison-command-02/receipt.json",
+      "sha256": "cac094663539e5a5bf42685c8343b26cd0e14eadf85a828cfb29f36bf0292538",
+      "size_bytes": 4648
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-surface-quality-clippy-command-01/receipt.json",
+      "sha256": "db467f7e044054a097fca514763f5b21d7e44a99ceed88e2d0fdc8d06bb2067a",
+      "size_bytes": 3057
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-surface-quality-fmt-command-01/receipt.json",
+      "sha256": "d39253770069d66847dbc35ab96cd8cf5eb602d89dd781dc5ff69cd24cbfe6ca",
+      "size_bytes": 2985
+    }
+  ],
+  "same_actual_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/9e/9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+    "sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390"
+  },
+  "all_actual_commands_exit0_and_source_unchanged": true,
+  "selected_loader_to_preprocessor_lane_PASS": true,
+  "complete_integration_GATE_PASS": false,
+  "production_GATE_PASS": false,
+  "whole_CTF01_PASS": false,
+  "pending": [
+    "actual fixed six production CLI executions",
+    "genuine downstream CTF02/03 preprocessing handoff"
+  ],
+  "source_peer": "Root full changed-source/context review plus other-author Base full source peer; no peer numerical certificate is implied."
+}
