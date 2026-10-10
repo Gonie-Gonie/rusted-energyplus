@@ -1,0 +1,97 @@
+# CTF08 input and private-final-policy freezer source
+
+SOURCE-READY HELD, not executed or frozen. This adapts the accepted CTF07
+stdlib freezer to the genuine unchanged unit39/member-call42 and fixed-CON15
+loader-phase195 input lanes, plus the fresh CTF08 private final policy.
+Root alone runs the writer after full source and other-author review. This is
+an existing input-freeze stage; no source-QA/proof framework is introduced.
+
+The writer never imports project code, runs Native/Rust/converter engines,
+evaluates CTF arithmetic, emits expected arrays/exits, or supplies reference
+answers to Rust. Literal existing model/member/caller/operation order and bits
+are copied from the authentic CTF01 input-only request. Production IDF input
+order and the exact fixed scope15/ordered45 guards remain unchanged. Counts are
+derived from actual model/operation or loader arrays, then checked against the
+previous frozen input count. Dynamic Construct calls are never guessed as195.
+
+Root invocation keeps ten explicit option/value pairs (25 argv including
+python -X utf8 -B and script):
+
+    python -X utf8 -B <freeze_packet.py>
+      --lane unit|production
+      --approved-source-sha256 <actual reviewed writer SHA>
+      --source-manifest <this held manifest path#SHA>
+      --native-source-manifest <held Native08 helper manifest path#SHA>
+      --current-card-08 <actual current CTF08 card path#SHA>
+      --actual-scope-amendment <actual Root amendment path#SHA>
+      --actual-scope-amendment-execution <actual CTF08 check recorder path#SHA>
+      --prior-07-freeze <genuine same-lane CTF07 freeze receipt path#SHA>
+      --prior-07-freeze-execution <its genuine writer recorder path#SHA>
+      --output-dir <fresh repository-contained CTF08 directory>
+
+The current amendment schema is ctf08-source-scope-amendment.v1, cards[CTF-08],
+with final_coefficient_policy_source_inventory bound to the exact held helper
+projection proposal. Native/passive source refs, original card before-copy,
+actual current plan/card, strict policy settlement and all-other-gates-pending
+facts are bound before writing. The genuine check_plan --check --card CTF-08
+recorder must return0 with sourceguard and empty stderr. Its exact role is
+real-CTF-08-check-only; it validates Root-authored documents rather than claiming
+to author the amendment or stand for historical checks.
+
+Historical CTF07 authority is a separate historical_prior_07_authority object,
+identical in common request/admission/projection and source_authorities. Six
+genuine file refs are prior_07_freeze, prior_07_freeze_execution,
+prior_07_writer_manifest, prior_07_source_contract, prior_07_scope_amendment and
+prior_07_scope_check_execution. The authentic prior writer own2/argv31/approval,
+full receipt stdout/empty stderr/sourceguard/chronology and exact input rows are
+checked. The prior07 source/receipt authorities and literal old policies must
+agree. No earlier numerical PASS is inferred.
+
+prior_07_selected_primary_ranges is a literal list of typed byte-range
+descriptors copied from the authenticated prior07 source contract. Its SHA is
+a range SHA, never a whole-file ref. historical_before_document_archives is an
+array of genuine archived before-document refs. historical_after_document_
+identities contains {historical_path,sha256,size_bytes} descriptors only;
+available_prior_frozen_document_archives contains {historical_path,archive}
+rows. Both prior07 before/after bytes must have authentic frozen archives.
+No historical after-document identity is checked against live current docs.
+historical_prior_05_06_authority is copied literally from authentic prior07
+source_authorities.prior_05_06_authority. Its genuine freeze/execution/writer/
+source/amendment/check/archive refs remain bound, with historical after identities
+retaining their original role. No combined or fabricated check receipt is made.
+
+The new ctf08_final_coefficient_observation_policy and seven separate profiles
+cover s0[3,4], full s[3,4,rcmax], e[rcmax], mutated_Gamma1[3,rcmax] and square
+PhiR0/Rnew/Rold. All atol/rtol are literal floating0.0; class, shape and signed
+zero are exact. NumCTFTerms/inum/CTFConvrg are discrete exact. The inherited
+preprocessing18/initial3/assembly7/exponential7/inverse2/Gamma3 profiles and
+policies remain unchanged independent handoffs. Existing Gamma method_selection
+stays literal; new ctf08_method_selection is separate. No output-driven policy
+or tolerance change is allowed.
+
+First actual08 invocation1 must match assembly1/Gamma1 and the actual initial619
+context, after exponential884/inverse887/Gamma890. All later Native records are
+retained unpaired/noPASS; no retry driver, public SI19 stores or complete handoff
+is certified. Entry/PrivateFinal/SourceReturn availability is source-owned.
+Phi/Rnew/Rold/private controls are unavailable at SourceReturn after deallocation.
+Full history storage is not truncated by NumCTFTerms. Independent s/e and CMat/
+DMat availability stays explicit. Missing required owners on one or both sides
+and observer copy/shape/order/append/omission failures remain required failure.
+
+The output DAG is source -> tolerances -> request -> cases -> projection ->
+admission, followed by the actual input-freeze receipt. Every file is fresh,
+source identities and reviewed bytes are archived, and tracked inputs are
+rechecked. Stdout is the full receipt JSON. Schemas are ctf08[-production]-*
+and the universal fresh flag is frozen_before_this_CTF08_helper_execution.
+Original source7/21 and lane Native8 refs are exact. The new prospective-debug-
+Original retention intent only concerns new08 linked Originals and cannot
+retire/reinterpret any live earlier reference.
+
+This hold includes exact accepted07 before copies, two generated source diffs,
+actual source/helper/passive/proposal and input-only metadata descriptors, typed
+primary ranges and literal45 guard descriptors. Preparation performed only
+source/input-metadata reads, source hashing/diff and Python AST parse. Weather
+and scientific/binary payloads were not read; runtime writer guard hashing is
+not claimed as already executed. No frozen08 files or outcomes are fabricated.
+Base authored prior transport/passive/routing work; peer review addresses this
+new freezer/provenance adaptation, not own numerical formula certification.

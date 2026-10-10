@@ -1,0 +1,333 @@
+--- .runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc
++++ .runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc
+@@ -1,11 +1,11 @@
+ // Output-only copies; observation allocation exceptions never reach the engine.
+-#include "ctf07_observer.hh"
++#include "ctf08_observer.hh"
+ 
+ #include <cstring>
+ #include <initializer_list>
+ #include <limits>
+ 
+-namespace EnergyPlus::CTF07Observation {
++namespace EnergyPlus::CTF08Observation {
+ namespace {
+ 
+ static_assert(sizeof(Real64) == sizeof(std::uint64_t));
+@@ -972,4 +972,315 @@
+         {{GammaMatrixOwner::Gamma1, &construction.Gamma1}, {GammaMatrixOwner::Gamma2, &construction.Gamma2}});
+ }
+ 
+-} // namespace EnergyPlus::CTF07Observation
++// Independent08 copier: actual private owners only, never coefficient formulas.
++namespace {
++
++void coefficient_failure(Capture &capture, FinalCoefficientInvocationSnapshot *invocation,
++                          FinalCoefficientStage stage, MethodFailureKind kind) noexcept
++{
++    FinalCoefficientCapture &ledger = capture.final_coefficients;
++    ledger.observer_failure = true;
++    std::size_t const index = static_cast<std::size_t>(kind);
++    ++ledger.failure_event_counts[index];
++    if (invocation != nullptr) invocation->failure_kinds[index] = true;
++    FinalCoefficientFailure const failure{ledger.actual_invocation_count,
++        invocation == nullptr ? capture.actual_matrix_attempt_callback_count : invocation->observed_assembly_ordinal,
++        stage, kind};
++    if (!ledger.first_failure) ledger.first_failure = failure;
++    ledger.last_failure = failure;
++}
++
++bool coefficient_prior_Gamma_returned(Capture const &capture,
++                                      Construction::ConstructionProps const &construction,
++                                      std::size_t ordinal) noexcept
++{
++    GammaCapture const &ledger = capture.gamma;
++    std::size_t const returned = static_cast<std::size_t>(GammaStage::SourceReturn);
++    if (ledger.actual_invocation_count != ordinal || ledger.actual_stage_callback_counts[returned] != ordinal ||
++        ledger.invocations.empty() || !gamma_prior_methods_returned(capture, ordinal)) return false;
++    GammaInvocationSnapshot const &prior = ledger.invocations.back();
++    if (prior.observed_invocation_ordinal != ordinal || prior.observed_assembly_ordinal != ordinal ||
++        !prior.association_available || !prior.source_return.reached ||
++        !prior.source_return.caller_context_available || !prior.source_return.caller_TimeStepZone) return false;
++    MatrixAttemptSnapshot const *assembly = associated_assembly(capture, construction, ordinal);
++    if (assembly == nullptr) return false;
++    MethodContext const &context = prior.source_return.context;
++    return context.assembly_context_available &&
++        context.IsUsedCTF == construction.IsUsedCTF && context.SourceSinkPresent == construction.SourceSinkPresent &&
++        context.SolutionDimensions == construction.SolutionDimensions && context.TotLayers == construction.TotLayers &&
++        context.rcmax == construction.rcmax && context.NodeSource == construction.NodeSource &&
++        context.NodeUserTemp == construction.NodeUserTemp && context.NumHistories == construction.NumHistories &&
++        context.CTFTimeStep.bits == copy_bits(construction.CTFTimeStep).bits &&
++        context.assembly_ErrorsFound == assembly->ErrorsFound &&
++        context.assembly_DoCTFErrorReport == assembly->DoCTFErrorReport &&
++        context.assembly_TimeStepZone.bits == assembly->TimeStepZone.bits &&
++        prior.source_return.caller_ErrorsFound == assembly->ErrorsFound &&
++        prior.source_return.caller_DoCTFErrorReport == assembly->DoCTFErrorReport &&
++        prior.source_return.caller_TimeStepZone->bits == assembly->TimeStepZone.bits;
++}
++
++FinalCoefficientInvocationSnapshot *coefficient_visit(Capture &capture,
++    Construction::ConstructionProps const &construction, FinalCoefficientStage stage) noexcept
++{
++    FinalCoefficientCapture &ledger = capture.final_coefficients;
++    std::size_t const index = static_cast<std::size_t>(stage);
++    ++ledger.actual_stage_callback_counts[index];
++    if (ledger.invocations.empty() ||
++        ledger.invocations.back().observed_invocation_ordinal != ledger.actual_invocation_count) {
++        ++ledger.stage_records_omitted[index];
++        coefficient_failure(capture, nullptr, stage, MethodFailureKind::AssociationFailure);
++        return nullptr;
++    }
++    FinalCoefficientInvocationSnapshot &invocation = ledger.invocations.back();
++    if (++invocation.actual_stage_callback_counts[index] > 1) {
++        ++ledger.stage_records_omitted[index];
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::OrderFailure);
++        return nullptr;
++    }
++    if (capture.bound_state == nullptr || capture.bound_construction != &construction) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::IdentityMismatch);
++    }
++    if (invocation.observed_invocation_ordinal != invocation.observed_assembly_ordinal ||
++        associated_assembly(capture, construction, invocation.observed_assembly_ordinal) == nullptr ||
++        !coefficient_prior_Gamma_returned(capture, construction, invocation.observed_assembly_ordinal)) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::AssociationFailure);
++    }
++    bool ordered = invocation.entry.reached && !invocation.source_return.reached;
++    switch (stage) {
++    case FinalCoefficientStage::PrivateFinal:
++        ordered = ordered && !invocation.private_final.reached;
++        break;
++    case FinalCoefficientStage::SourceReturn:
++        ordered = ordered && invocation.private_final.reached;
++        break;
++    case FinalCoefficientStage::Entry:
++        ordered = false;
++        break;
++    }
++    if (!ordered) coefficient_failure(capture, &invocation, stage, MethodFailureKind::OrderFailure);
++    return &invocation;
++}
++
++struct FinalCoefficientMatrixView
++{
++    FinalCoefficientMatrixOwner owner;
++    Array2D<Real64> const *values;
++};
++
++void copy_coefficient_matrices(Capture &capture, FinalCoefficientInvocationSnapshot &invocation,
++    FinalCoefficientStage stage, Construction::ConstructionProps const &construction,
++    FinalCoefficientValueSnapshot &snapshot, std::initializer_list<FinalCoefficientMatrixView> views) noexcept
++{
++    snapshot.reached = true;
++    snapshot.context = method_context(capture, construction, invocation.observed_assembly_ordinal);
++    snapshot.NumOfPerpendNodes = construction.NumOfPerpendNodes;
++    if (capture.bound_state == nullptr || capture.bound_construction != &construction) return;
++    if (views.size() > snapshot.matrices.size()) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++        return;
++    }
++    snapshot.observed_matrix_count = views.size();
++    std::size_t index = 0;
++    for (FinalCoefficientMatrixView const &view : views) {
++        FinalCoefficientMatrixSnapshot &copy = snapshot.matrices[index++];
++        copy.owner = view.owner;
++        copy.bounds = array_bounds(*view.values);
++    }
++    int const n = snapshot.context.rcmax;
++    if (n < 1) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++        return;
++    }
++    index = 0;
++    bool complete = true;
++    for (FinalCoefficientMatrixView const &view : views) {
++        FinalCoefficientMatrixSnapshot &copy = snapshot.matrices[index++];
++        bool const gamma = view.owner == FinalCoefficientMatrixOwner::Gamma1 || view.owner == FinalCoefficientMatrixOwner::Gamma2;
++        int const rows = gamma || view.owner == FinalCoefficientMatrixOwner::s0 ? 3 : n;
++        int const columns = view.owner == FinalCoefficientMatrixOwner::s0 ? 4 : n;
++        std::size_t const row_count = static_cast<std::size_t>(rows);
++        std::size_t const column_count = static_cast<std::size_t>(columns);
++        if (column_count > std::numeric_limits<std::size_t>::max() / row_count) {
++            complete = false;
++            coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++            continue;
++        }
++        std::size_t const elements = row_count * column_count;
++        if (!copy.bounds || copy.bounds->lower1 != 1 || copy.bounds->upper1 != rows ||
++            copy.bounds->lower2 != 1 || copy.bounds->upper2 != columns || copy.bounds->size != elements) {
++            complete = false;
++            coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++            continue;
++        }
++        try {
++            copy.values.reserve(elements);
++            for (int i1 = 1; i1 <= rows; ++i1) {
++                for (int i2 = 1; i2 <= columns; ++i2) {
++                    copy.values.push_back(copy_bits((*view.values)(i1, i2)));
++                }
++            }
++            copy.copy_available = copy.values.size() == elements;
++            if (!copy.copy_available) {
++                complete = false;
++                coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++            }
++        } catch (...) {
++            copy.values.clear();
++            complete = false;
++            coefficient_failure(capture, &invocation, stage, MethodFailureKind::CopyException);
++        }
++    }
++    snapshot.matrices_available = complete;
++}
++
++void copy_coefficient_history(Capture &capture, FinalCoefficientInvocationSnapshot &invocation,
++    FinalCoefficientStage stage, Construction::ConstructionProps const &construction,
++    FinalCoefficientValueSnapshot &snapshot) noexcept
++{
++    if (capture.bound_state == nullptr || capture.bound_construction != &construction) return;
++    snapshot.NumCTFTerms = construction.NumCTFTerms;
++    if (construction.s.allocated()) {
++        snapshot.s_bounds = Array3Bounds{construction.s.l1(), construction.s.u1(),
++            construction.s.l2(), construction.s.u2(), construction.s.l3(), construction.s.u3(), construction.s.size()};
++    }
++    snapshot.e_bounds = array_bounds(construction.e);
++    int const n = construction.rcmax;
++    if (n < 1 || static_cast<std::size_t>(n) > std::numeric_limits<std::size_t>::max() / 12) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++        return;
++    }
++    std::size_t const count = static_cast<std::size_t>(n);
++    bool const s_shape = snapshot.s_bounds && snapshot.s_bounds->lower1 == 1 && snapshot.s_bounds->upper1 == 3 &&
++        snapshot.s_bounds->lower2 == 1 && snapshot.s_bounds->upper2 == 4 &&
++        snapshot.s_bounds->lower3 == 1 && snapshot.s_bounds->upper3 == n && snapshot.s_bounds->size == 12 * count;
++    if (!s_shape) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++    } else {
++        try {
++            snapshot.s.reserve(12 * count);
++            for (int j = 1; j <= 3; ++j) {
++                for (int k = 1; k <= 4; ++k) {
++                    for (int term = 1; term <= n; ++term) snapshot.s.push_back(copy_bits(construction.s(j, k, term)));
++                }
++            }
++            snapshot.s_available = snapshot.s.size() == 12 * count;
++            if (!snapshot.s_available) coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++        } catch (...) {
++            snapshot.s.clear();
++            coefficient_failure(capture, &invocation, stage, MethodFailureKind::CopyException);
++        }
++    }
++    if (!exact_vector(snapshot.e_bounds, n)) {
++        coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++    } else {
++        try {
++            snapshot.e.reserve(count);
++            for (int term = 1; term <= n; ++term) snapshot.e.push_back(copy_bits(construction.e(term)));
++            snapshot.e_available = snapshot.e.size() == count;
++            if (!snapshot.e_available) coefficient_failure(capture, &invocation, stage, MethodFailureKind::MatrixShape);
++        } catch (...) {
++            snapshot.e.clear();
++            coefficient_failure(capture, &invocation, stage, MethodFailureKind::CopyException);
++        }
++    }
++    snapshot.history_available = snapshot.s_available && snapshot.e_available;
++}
++
++} // namespace
++
++void final_coefficient_entry(Construction::ConstructionProps const &construction) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    FinalCoefficientCapture &ledger = capture->final_coefficients;
++    std::size_t const ordinal = ++ledger.actual_invocation_count;
++    std::size_t const entry = static_cast<std::size_t>(FinalCoefficientStage::Entry);
++    ++ledger.actual_stage_callback_counts[entry];
++    bool const previous_returned = ordinal == 1 ||
++        (!ledger.invocations.empty() && ledger.invocations.back().observed_invocation_ordinal == ordinal - 1 &&
++         ledger.invocations.back().source_return.reached);
++    try {
++        ledger.invocations.emplace_back();
++    } catch (...) {
++        ++ledger.stage_records_omitted[entry];
++        coefficient_failure(*capture, nullptr, FinalCoefficientStage::Entry, MethodFailureKind::LedgerAppendException);
++        return;
++    }
++    FinalCoefficientInvocationSnapshot &invocation = ledger.invocations.back();
++    invocation.observed_invocation_ordinal = ordinal;
++    invocation.observed_assembly_ordinal = capture->actual_matrix_attempt_callback_count;
++    ++invocation.actual_stage_callback_counts[entry];
++    if (capture->bound_state == nullptr || capture->bound_construction != &construction) {
++        coefficient_failure(*capture, &invocation, FinalCoefficientStage::Entry, MethodFailureKind::IdentityMismatch);
++        invocation.entry.reached = true;
++        return;
++    }
++    invocation.association_available = ordinal == invocation.observed_assembly_ordinal &&
++        associated_assembly(*capture, construction, invocation.observed_assembly_ordinal) != nullptr &&
++        coefficient_prior_Gamma_returned(*capture, construction, ordinal);
++    if (!invocation.association_available) {
++        coefficient_failure(*capture, &invocation, FinalCoefficientStage::Entry, MethodFailureKind::AssociationFailure);
++    }
++    if (!previous_returned) coefficient_failure(*capture, &invocation, FinalCoefficientStage::Entry, MethodFailureKind::OrderFailure);
++    copy_coefficient_matrices(*capture, invocation, FinalCoefficientStage::Entry, construction, invocation.entry,
++        {{FinalCoefficientMatrixOwner::AExp, &construction.AExp}, {FinalCoefficientMatrixOwner::IdenMatrix, &construction.IdenMatrix},
++         {FinalCoefficientMatrixOwner::Gamma1, &construction.Gamma1}, {FinalCoefficientMatrixOwner::Gamma2, &construction.Gamma2}});
++    invocation.entry.CMat_bounds = array_bounds(construction.CMat);
++    invocation.entry.DMat_bounds = array_bounds(construction.DMat);
++    if (exact_vector(invocation.entry.CMat_bounds, 2)) {
++        for (int i = 1; i <= 2; ++i) invocation.entry.CMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.CMat(i));
++        invocation.entry.CMat_available = true;
++    } else {
++        coefficient_failure(*capture, &invocation, FinalCoefficientStage::Entry, MethodFailureKind::MatrixShape);
++    }
++    if (exact_vector(invocation.entry.DMat_bounds, 2)) {
++        for (int i = 1; i <= 2; ++i) invocation.entry.DMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.DMat(i));
++        invocation.entry.DMat_available = true;
++    } else {
++        coefficient_failure(*capture, &invocation, FinalCoefficientStage::Entry, MethodFailureKind::MatrixShape);
++    }
++}
++
++void final_coefficient_private_final(Construction::ConstructionProps const &construction,
++    Array2D<Real64> const &PhiR0, Array2D<Real64> const &Rnew, Array2D<Real64> const &Rold,
++    int inum, bool CTFConvrg) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    FinalCoefficientInvocationSnapshot *invocation = coefficient_visit(*capture, construction, FinalCoefficientStage::PrivateFinal);
++    if (invocation == nullptr) return;
++    if (capture->bound_state != nullptr && capture->bound_construction == &construction) {
++        invocation->private_final.controls = FinalCoefficientControls{inum, CTFConvrg};
++    }
++    copy_coefficient_matrices(*capture, *invocation, FinalCoefficientStage::PrivateFinal, construction, invocation->private_final,
++        {{FinalCoefficientMatrixOwner::Gamma1, &construction.Gamma1}, {FinalCoefficientMatrixOwner::s0, &construction.s0},
++         {FinalCoefficientMatrixOwner::PhiR0, &PhiR0}, {FinalCoefficientMatrixOwner::Rnew, &Rnew}, {FinalCoefficientMatrixOwner::Rold, &Rold}});
++    copy_coefficient_history(*capture, *invocation, FinalCoefficientStage::PrivateFinal, construction, invocation->private_final);
++}
++
++void final_coefficient_return(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
++    bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    FinalCoefficientInvocationSnapshot *invocation = coefficient_visit(*capture, construction, FinalCoefficientStage::SourceReturn);
++    if (invocation == nullptr) return;
++    if (capture->bound_state != &state) {
++        coefficient_failure(*capture, invocation, FinalCoefficientStage::SourceReturn, MethodFailureKind::IdentityMismatch);
++    }
++    FinalCoefficientValueSnapshot &snapshot = invocation->source_return;
++    snapshot.caller_context_available = capture->bound_state == &state && capture->bound_construction == &construction;
++    snapshot.caller_ErrorsFound = ErrorsFound;
++    snapshot.caller_DoCTFErrorReport = DoCTFErrorReport;
++    snapshot.caller_TimeStepZone = copy_bits(TimeStepZone);
++    MatrixAttemptSnapshot const *assembly = associated_assembly(*capture, construction, invocation->observed_assembly_ordinal);
++    if (assembly == nullptr || assembly->ErrorsFound != ErrorsFound ||
++        assembly->DoCTFErrorReport != DoCTFErrorReport || assembly->TimeStepZone.bits != copy_bits(TimeStepZone).bits) {
++        coefficient_failure(*capture, invocation, FinalCoefficientStage::SourceReturn, MethodFailureKind::AssociationFailure);
++    }
++    copy_coefficient_matrices(*capture, *invocation, FinalCoefficientStage::SourceReturn, construction, snapshot,
++        {{FinalCoefficientMatrixOwner::Gamma1, &construction.Gamma1}, {FinalCoefficientMatrixOwner::s0, &construction.s0}});
++    copy_coefficient_history(*capture, *invocation, FinalCoefficientStage::SourceReturn, construction, snapshot);
++}
++
++} // namespace EnergyPlus::CTF08Observation

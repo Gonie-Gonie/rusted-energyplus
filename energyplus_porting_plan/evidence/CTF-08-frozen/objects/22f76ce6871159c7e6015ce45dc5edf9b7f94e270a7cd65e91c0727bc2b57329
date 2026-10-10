@@ -1,0 +1,93 @@
+// Independent private final-coefficient visits; earlier ledgers stay unchanged.
+enum class FinalCoefficientStage : std::size_t { Entry = 0, PrivateFinal = 1, SourceReturn = 2 };
+enum class FinalCoefficientMatrixOwner : std::size_t
+{
+    AExp = 0, IdenMatrix = 1, Gamma1 = 2, Gamma2 = 3,
+    s0 = 4, PhiR0 = 5, Rnew = 6, Rold = 7
+};
+struct Array3Bounds
+{
+    int lower1 = 0;
+    int upper1 = 0;
+    int lower2 = 0;
+    int upper2 = 0;
+    int lower3 = 0;
+    int upper3 = 0;
+    std::size_t size = 0;
+};
+struct FinalCoefficientFailure
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    FinalCoefficientStage stage = FinalCoefficientStage::Entry;
+    MethodFailureKind kind = MethodFailureKind::IdentityMismatch;
+};
+struct FinalCoefficientMatrixSnapshot
+{
+    FinalCoefficientMatrixOwner owner = FinalCoefficientMatrixOwner::AExp;
+    std::optional<Array2Bounds> bounds;
+    bool copy_available = false;
+    // Actual first-index outer, second-index inner; no transposition.
+    std::vector<Binary64Copy> values;
+};
+struct FinalCoefficientControls
+{
+    // Only copied at the real private-final boundary after both are initialized.
+    int inum = 0;
+    bool CTFConvrg = false;
+};
+struct FinalCoefficientValueSnapshot
+{
+    bool reached = false;
+    bool matrices_available = false;
+    MethodContext context;
+    int NumOfPerpendNodes = 0;
+    std::size_t observed_matrix_count = 0;
+    // Only observed_matrix_count slots represent actual owners.
+    std::array<FinalCoefficientMatrixSnapshot, 5> matrices;
+    // Entry-only actual compressed input owners; unavailable slots are not zeros.
+    bool CMat_available = false;
+    bool DMat_available = false;
+    std::optional<Array1Bounds> CMat_bounds;
+    std::optional<Array1Bounds> DMat_bounds;
+    std::array<Binary64Copy, 2> CMat{};
+    std::array<Binary64Copy, 2> DMat{};
+    // PrivateFinal/SourceReturn only. Entry never reads stale/uninitialized work.
+    bool history_available = false;
+    bool s_available = false;
+    bool e_available = false;
+    std::optional<Array3Bounds> s_bounds;
+    std::optional<Array1Bounds> e_bounds;
+    // s(j,k,term): j outer, k middle, term inner; all3*4*rcmax slots.
+    std::vector<Binary64Copy> s;
+    std::vector<Binary64Copy> e;
+    std::optional<int> NumCTFTerms;
+    std::optional<FinalCoefficientControls> controls;
+    bool caller_context_available = false;
+    bool caller_ErrorsFound = false;
+    bool caller_DoCTFErrorReport = false;
+    std::optional<Binary64Copy> caller_TimeStepZone;
+};
+struct FinalCoefficientInvocationSnapshot
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    bool association_available = false;
+    std::array<bool, 6> failure_kinds{};
+    std::array<std::size_t, 3> actual_stage_callback_counts{};
+    FinalCoefficientValueSnapshot entry;
+    FinalCoefficientValueSnapshot private_final;
+    FinalCoefficientValueSnapshot source_return;
+};
+struct FinalCoefficientCapture
+{
+    std::size_t actual_invocation_count = 0;
+    std::array<std::size_t, 3> actual_stage_callback_counts{};
+    std::vector<FinalCoefficientInvocationSnapshot> invocations;
+    std::array<std::size_t, 3> stage_records_omitted{};
+    bool observer_failure = false;
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::optional<FinalCoefficientFailure> first_failure;
+    std::optional<FinalCoefficientFailure> last_failure;
+};
+

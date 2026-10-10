@@ -1,0 +1,96 @@
+# CTF08 passive private final-coefficient observations
+
+SOURCE ONLY. This immutable proposal extends accepted Native07 passive02 with
+three output-only callbacks. It adds no helper, serializer, freezer, input,
+profile, QA/comparer, build target, execution stage or runtime activation.
+Root and another author must review the complete source before any execution.
+The exact accepted07 three sources, manifest and README are archived in before/.
+
+Construction.ctf08.cc remains the whole pinned Original translation unit. Every
+Original formula, branch, loop, allocation/deallocation, retry, return and
+exception path is unchanged. The existing four phase checkpoints, all actual
+matrix attempts, exponential/inverse observations and five Gamma stages retain
+their exact bodies and fields after the mechanical08 namespace/file rename.
+Three new standalone calls extend that adapter:
+
+- Entry after Original1592, immediately after the method's opening brace and
+  before local allocation/initialization or Gamma1 mutation. Copies actual
+  AExp, original IdenMatrix, Gamma1/Gamma2, compressed CMat2/DMat2 and context.
+  It never reads stale s0/s/e/NumCTFTerms or uninitialized local controls.
+- PrivateFinal after Original1902, before PhiR0/Rnew/Rold destruction1903-1905.
+  Copies actual mutated Gamma1, all s0(3,4), s(3,4,rcmax), e(rcmax), NumCTFTerms
+  and live PhiR0/Rnew/Rold. Only initialized inum and local CTFConvrg are copied
+  as controls. avg, rat, trace and SurfNodeFac are never passed or inspected.
+- SourceReturn after actual caller894, before caller convergence903 or any
+  retry/stability work. Copies actual retained Gamma1/s0/s/e/NumCTFTerms and
+  real caller state identity, ErrorsFound, DoCTFErrorReport and TimeStepZone.
+  Private locals and controls are unavailable here; no return is reconstructed
+  from a private-final snapshot or an OS/process outcome.
+
+FinalCoefficientCapture is independent of every inherited ledger. Actual entries
+and three actual stage counts are recorded, with unbounded ordered invocation
+records, stage-specific omitted-record counts, six typed failure counters and
+first/last failure identity. Failure kinds reuse the established six labels:
+IdentityMismatch, AssociationFailure, OrderFailure, MatrixShape, CopyException,
+LedgerAppendException. They are observer failures, never Native method outcomes.
+Every actual visit is retained without a cap. Duplicate value callbacks count
+as extra actual callbacks plus explicit order failure/omission while preserving
+the first value record. Failed entry appends keep actual counts and omissions;
+subsequent real callbacks retain their own counts/omissions without inventing
+missing invocation rows, callback values or return markers.
+
+An entry is associated with the actual post728 assembly ordinal and exact bound
+Construction address/state. The same ordinal's actual exponential and inverse
+returns and Gamma SourceReturn must already exist. The Gamma invocation and
+assembly IDs, real caller-context availability, current member fields and earlier
+assembly context/flags/timestep bits must agree. Subsequent08 stages recheck that
+association. A later08 entry additionally requires the preceding08 actual return.
+This authenticates observed call order884/887/890/894; the observer calls no
+scientific method and never treats same numeric values as causal identity.
+
+The existing MethodContext copies fresh Construction members and labels the
+checked earlier assembly_* stack context separately. NumOfPerpendNodes is copied
+as actual branch context only. caller_* fields exist only at the real894 return.
+Initial619 timestep/history and later actual attempt context remain distinct;
+there is no caller timestep equals initial CTF timestep assertion or retry input.
+
+Bounds are read from allocated actual Objexx owners. AExp/Iden/PhiR0/Rnew/Rold
+must be1..rcmax square; Gamma1/2 are1..3 by1..rcmax; s0 is1..3 by1..4; CMat/DMat
+are actual two-element vectors; s is1..3 by1..4 by1..rcmax; e is1..rcmax.
+Only checked allocation-size multiplication is performed, never CTF arithmetic.
+Copies use actual first-index outer/second-index inner; s copies j outer/k middle/
+term inner. All initialized tails are copied, without term-count truncation.
+Each value is a memcpy binary64 object representation preserving signed zero and
+nonfinite payloads. No identity, zero, coefficient, matrix product or answer is
+generated. Shape checks are observation integrity, not a new scientific guard.
+
+Only observed_matrix_count slots and copy_available matrices represent values.
+CMat/DMat have independent bounds/availability. s/e have independent availability
+and copy failures; a failed owner does not suppress the other actual owner.
+history_available is their conjunction. NumCTFTerms is optional and read only
+after its source assignment; controls are optional only at PrivateFinal. Default
+slots are unavailable, never coefficient zeros. noexcept copy/append handling
+contains observation allocation failures without changing Native continuation.
+Any integrity failure must block future integrity/PASS, while retaining partial
+copied data and actual callbacks. A process fault can prevent serialization of
+all memory snapshots; absent durable output/invocations/outcomes stay unknown.
+
+Prospective pairing remains actual first selected1D/no-source/nonreverse assembly
+and08 invocation ordinal1, after real07 return with initial619 custody. The adapter
+observes every later actual visit as context/unpaired/noPASS until a real Rust
+retry driver exists. This package freezes no numeric profile or input selection.
+The08 private result is distinct from caller903 convergence, retry/stability,
+public19-slot SI stores1031-1074, UValue1077, EIO, SUR or whole CTF completion.
+
+The three exact predecessor diffs, Original additions diff and addition ledger
+authenticate removal back to full accepted07 and full Original bytes. No linking
+or provider claim is made. Future helpers must use this header/copier/TU together,
+retain all new counts/failures/omissions/availability and never link competing
+old/new Construction implementations. No helper or future result is authored.
+
+Authorship limits: Raw authored07 passive/helper transports and some earlier
+pure Rust owners. Header authored pure/public07 Gamma and pure/public08; Base
+independently peered earlier sources. This passive proposal is not independent
+formula or output certification. Only ignored source/docs and metadata are
+written; no target import, build/test/Cargo/formatter/engine/Git, canonical edit,
+scientific/weather/binary payload read or numerical evaluation is performed.

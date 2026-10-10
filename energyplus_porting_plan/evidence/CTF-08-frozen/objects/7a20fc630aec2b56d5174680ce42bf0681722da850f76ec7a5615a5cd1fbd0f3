@@ -1,0 +1,196 @@
+--- .reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc
++++ .runtime/porting/CTF-08/native-observer-prep-01/Construction.ctf08.cc
+@@ -53,6 +53,7 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/OutputReportPredefined.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
++#include "ctf08_observer.hh"
+ 
+ namespace EnergyPlus::Construction {
+ 
+@@ -307,6 +308,8 @@
+             }
+         } // ... end of resistive layer determination IF-THEN block.
+     } // ... end of layer loop.
++    EnergyPlus::CTF08Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,
++        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // If errors have been found, just return
+ 
+@@ -370,6 +373,8 @@
+             }
+         }
+     }
++    EnergyPlus::CTF08Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,
++        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // Convert SI units to English.  In theory, conversion to English
+     // units is not necessary; however, Russ Taylor noted that some
+@@ -399,6 +404,8 @@
+     }
+ 
+     cnd = 1.0 / rs; // Conductivity is the inverse of resistivity
++    EnergyPlus::CTF08Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,
++        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, dyn, rs, cnd);
+ 
+     bool RevConst = false;
+ 
+@@ -616,6 +623,9 @@
+                     this->NumHistories = 1;
+                 }
+             }
++
++            EnergyPlus::CTF08Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,
++                LayersInConstruct, NumResLayers, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+             // Calculate the CTFs using the state space method
+             // outlined in Seem's dissertation.  The main matrices
+@@ -726,6 +736,9 @@
+                     this->CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct);  // of all other
+                     this->DMat(1) = rk(1) / dx(1);                                  // matrices for the state
+                     this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method
++                    EnergyPlus::CTF08Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
++                                                                       LayersInConstruct, NumResLayers, dl, rk, rho, cp,
++                                                                       lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+                 } else { // 2-D solution requested (assign matrices appropriately)
+ 
+@@ -882,16 +895,24 @@
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
+                 this->calculateExponentialMatrix(); // Compute exponential of AMat
++                EnergyPlus::CTF08Observation::method_return(EnergyPlus::CTF08Observation::MethodKind::Exponential,
++                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
+                 this->calculateInverseMatrix(); // Compute inverse of AMat
++                EnergyPlus::CTF08Observation::method_return(EnergyPlus::CTF08Observation::MethodKind::Inverse,
++                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
+                 this->calculateGammas();
++                EnergyPlus::CTF08Observation::gamma_return(state, *this, ErrorsFound, DoCTFErrorReport,
++                    state.dataGlobal->TimeStepZone);
+                 // Compute "gamma"s from AMat, AExp, and AInv
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
+                 this->calculateFinalCoefficients(); // Compute CTFs
++                EnergyPlus::CTF08Observation::final_coefficient_return(state, *this, ErrorsFound, DoCTFErrorReport,
++                    state.dataGlobal->TimeStepZone);
+ 
+                 // Now check to see if the number of transfer functions
+                 // is greater than MaxCTFTerms.  If it is, then increase the
+@@ -1176,6 +1197,7 @@
+     // the significant figure limit for REAL(r64)
+     // variables reached)
+ 
++    EnergyPlus::CTF08Observation::method_entry(EnergyPlus::CTF08Observation::MethodKind::Exponential, *this);
+     AMat1.allocate(this->rcmax, this->rcmax);
+     AMato.allocate(this->rcmax, this->rcmax);
+     AMatN.allocate(this->rcmax, this->rcmax);
+@@ -1188,6 +1210,7 @@
+     this->AExp = 0.0;
+     AMato = 0.0;
+     AMatN = 0.0;
++    EnergyPlus::CTF08Observation::exponential_initialized(*this, AMat1, AMato, AMatN);
+ 
+     // Step 1, page 128 (Seem's thesis):  Compute the matrix row norm.
+     // See equation (A.3) which states that the matrix row norm is the
+@@ -1249,6 +1272,7 @@
+ 
+     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
+     l = int(CheckVal);
++    EnergyPlus::CTF08Observation::exponential_scaled(*this, AMat1, AMatRowNormMax, k, fact, CheckVal, l);
+ 
+     // Step 5, page 128:  Calculate the exponential.  First, add the
+     // linear term to the identity matrix.
+@@ -1325,6 +1349,7 @@
+                 break; // DO loop (anytime SigFigLimit is false, AMat must continue to be raised another power)
+             }
+         }
++        EnergyPlus::CTF08Observation::exponential_power_control(*this, i, SigFigLimit);
+ 
+         // Compute next term, only if necessary.  If SigFigLimit is still true,
+         // then all of the new terms being added to AExp are too small to
+@@ -1359,6 +1384,7 @@
+                 }
+             }
+         }
++        EnergyPlus::CTF08Observation::exponential_square_control(*this, isq, Backup);
+         // Backup is true when every item of AExp didn't pass the TinyLimit test
+         if (Backup) {
+             this->AExp = AMato;
+@@ -1366,6 +1392,7 @@
+         }
+ 
+     } // ... end of squaring loop and Step 6.
++    EnergyPlus::CTF08Observation::exponential_final(*this, AMat1, AMato, AMatN, AMatRowNormMax, k, fact, CheckVal, l, i);
+ 
+     AMat1.deallocate();
+     AMato.deallocate();
+@@ -1401,10 +1428,12 @@
+     Array2D<Real64> AMat1; // Intermediate calculation matrix equivalent at first to AMat
+ 
+     // Subroutine initializations ...
++    EnergyPlus::CTF08Observation::method_entry(EnergyPlus::CTF08Observation::MethodKind::Inverse, *this);
+     AMat1.allocate(this->rcmax, this->rcmax);
+ 
+     AMat1 = AMat;                  // Set AMat1 = AMat to avoid AMat changes
+     this->AInv = this->IdenMatrix; // Set AInv to Identity Matrix
++    EnergyPlus::CTF08Observation::inverse_initialized(*this, AMat1);
+ 
+     // Use Gaussian elimination to zero all of the elements of AMat left
+     // of the diagonal.
+@@ -1486,6 +1515,7 @@
+             AMat1(ir, irr) = 0.0;
+         }
+     } // ... end of reverse elimination loop.
++    EnergyPlus::CTF08Observation::inverse_final(*this, AMat1);
+ 
+     // At this point, AMat1 is equal to the identity matrix (I)
+     // and AInv is equal to the inverse of AMat.
+@@ -1495,6 +1525,7 @@
+ 
+ void ConstructionProps::calculateGammas()
+ {
++    EnergyPlus::CTF08Observation::gamma_entry(*this);
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Russ Taylor
+@@ -1528,6 +1559,7 @@
+ 
+     ATemp.allocate(this->rcmax, this->rcmax);
+     ATemp = this->AExp - this->IdenMatrix;
++    EnergyPlus::CTF08Observation::gamma_ATemp_ready(*this, ATemp);
+     Gamma1 = 0.0;
+ 
+     for (int i = 1; i <= this->rcmax; ++i) {
+@@ -1549,6 +1581,7 @@
+             }
+         }
+     }
++    EnergyPlus::CTF08Observation::gamma1_final(*this);
+ 
+     ATemp.deallocate();
+     // Compute Gamma2 from equation (2.1.13) in Seem's dissertation which
+@@ -1586,10 +1619,12 @@
+             }
+         }
+     }
++    EnergyPlus::CTF08Observation::gamma2_final(*this);
+ }
+ 
+ void ConstructionProps::calculateFinalCoefficients()
+ {
++    EnergyPlus::CTF08Observation::final_coefficient_entry(*this);
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Russ Taylor
+@@ -1900,6 +1935,7 @@
+ 
+     } // ... end of IF block for calculation of last e and S.
+ 
++    EnergyPlus::CTF08Observation::final_coefficient_private_final(*this, PhiR0, Rnew, Rold, inum, CTFConvrg);
+     PhiR0.deallocate();
+     Rnew.deallocate();
+     Rold.deallocate();

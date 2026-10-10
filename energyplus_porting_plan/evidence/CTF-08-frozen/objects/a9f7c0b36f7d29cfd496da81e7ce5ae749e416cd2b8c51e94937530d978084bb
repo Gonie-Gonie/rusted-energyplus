@@ -1,0 +1,8 @@
+// No unassigned avg/rat/trace/SurfNodeFac values are ever passed or read.
+void final_coefficient_entry(Construction::ConstructionProps const &construction) noexcept;
+void final_coefficient_private_final(Construction::ConstructionProps const &construction,
+                                     Array2D<Real64> const &PhiR0, Array2D<Real64> const &Rnew,
+                                     Array2D<Real64> const &Rold, int inum, bool CTFConvrg) noexcept;
+void final_coefficient_return(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                              bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
+

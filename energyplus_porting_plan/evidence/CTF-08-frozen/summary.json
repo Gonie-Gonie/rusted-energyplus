@@ -1,0 +1,46 @@
+{
+  "schema": "ctf08-actual-pre-output-scope-and-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-08-frozen/manifest.json",
+    "sha256": "8128e01d72491bf4f83527e87c1730eefae0089848243365c2565162f2c0d0ed",
+    "size_bytes": 101924
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-08/scope-amendment-01/amendment.json",
+    "sha256": "2398bd45495e6dd1f0ddfe0131c97520580572a736f26df319d2dff72c09b9a9",
+    "size_bytes": 2077
+  },
+  "actual_scope_check": {
+    "path": ".runtime/porting/CTF-08/scope-check-command-01/receipt.json",
+    "sha256": "fd364d0c4da9a89e2d6c0b45ef693dc63e6f0ead48cff3ebbf102aab8c2506c3",
+    "size_bytes": 3006
+  },
+  "unit_freeze": {
+    "path": ".runtime/porting/CTF-08/frozen-packet-01/freeze-receipt.json",
+    "sha256": "c0f5bd9d0d3db82e541b12252ab3d53924309c4c5fa5a1e1ef5a1857448253e5",
+    "size_bytes": 43137
+  },
+  "unit_freeze_execution": {
+    "path": ".runtime/porting/CTF-08/freeze-command-01/receipt.json",
+    "sha256": "83928bd84a55658d06ceee8a55d655b4cd4aa570c9a9d2e71d1a7e4fb341f6be",
+    "size_bytes": 4306
+  },
+  "production_freeze": {
+    "path": ".runtime/porting/CTF-08/production-frozen-packet-01/freeze-receipt.json",
+    "sha256": "1eb4bd8bc86fce44e66428000c4b20828411de4cacebe67eec9a46393d80d184",
+    "size_bytes": 49031
+  },
+  "production_freeze_execution": {
+    "path": ".runtime/porting/CTF-08/production-freeze-command-01/receipt.json",
+    "sha256": "634a09a25000c8d2964a58602a6421b9257e79e872bc31cba3eb0157f02f1808",
+    "size_bytes": 4366
+  },
+  "actual_CTF08_helper_build_or_execution_performed": false,
+  "seven_exact_private_profiles_settled_before_outputs": true,
+  "all_literal_inputs_and_prior_profiles_unchanged": true,
+  "historical_prior07_authority_rebound_to_current_live_documents": false,
+  "scientific_values_or_expected_arrays_evaluated": false,
+  "numerical_PASS_claimed": false,
+  "unit_integration_production_PASS_claimed": false,
+  "Original_and_unchanged_Rust_baseline_pending": true
+}

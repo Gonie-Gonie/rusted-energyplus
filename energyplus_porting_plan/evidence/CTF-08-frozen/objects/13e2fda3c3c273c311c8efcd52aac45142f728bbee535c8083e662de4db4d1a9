@@ -1,0 +1,158 @@
+"""Author ignored Source artifacts only; never import or execute reviewed code."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[3]
+PREVIOUS = ROOT / '.runtime/porting/CTF-07/native-observer-prep-02'
+
+def rel(path):
+    return path.relative_to(ROOT).as_posix()
+
+def descriptor(path):
+    data = path.read_bytes()
+    return dict(path=rel(path), sha256=hashlib.sha256(data).hexdigest(),
+                size_bytes=len(data), line_count=len(data.splitlines()))
+
+def write(name, text):
+    path = HERE / name
+    path.write_bytes(text.encode('utf-8'))
+    return path
+
+def diff(name, before, after, before_name, after_name):
+    return write(name, ''.join(difflib.unified_diff(before.splitlines(keepends=True),
+        after.splitlines(keepends=True), fromfile=before_name, tofile=after_name)))
+
+def rename(text):
+    return text.replace('ctf07_observer', 'ctf08_observer').replace('CTF07Observation', 'CTF08Observation').replace('CTF07_OBSERVER', 'CTF08_OBSERVER')
+
+before = HERE / 'before'
+before.mkdir(exist_ok=False)
+assert descriptor(PREVIOUS / 'manifest.json')['sha256'] == 'd61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06'
+names = ['ctf07_observer.hh', 'ctf07_observer.cc', 'Construction.ctf07.cc', 'manifest.json', 'README.md']
+for name in names:
+    (before / name).write_bytes((PREVIOUS / name).read_bytes())
+old_header = (before / names[0]).read_bytes().decode('utf-8')
+old_impl = (before / names[1]).read_bytes().decode('utf-8')
+old_tu = (before / names[2]).read_bytes().decode('utf-8')
+header_add = (HERE / 'header_additions.txt').read_text(encoding='utf-8')
+functions = (HERE / 'function_declarations.txt').read_text(encoding='utf-8')
+impl_add = (HERE / 'implementation_additions.txt').read_text(encoding='utf-8')
+header = rename(old_header)
+assert header.count('struct Capture\n') == 1 and header.count('    GammaCapture gamma;\n') == 1
+header = header.replace('#include <ObjexxFCL/Array2D.hh>\n', '#include <ObjexxFCL/Array2D.hh>\n#include <ObjexxFCL/Array3D.hh>\n')
+header = header.replace('struct Capture\n', header_add + 'struct Capture\n')
+header = header.replace('    GammaCapture gamma;\n', '    GammaCapture gamma;\n    FinalCoefficientCapture final_coefficients;\n')
+header = header.replace('} // namespace EnergyPlus::CTF08Observation\n', functions + '} // namespace EnergyPlus::CTF08Observation\n')
+impl = rename(old_impl)
+impl = impl.replace('} // namespace EnergyPlus::CTF08Observation\n', impl_add + '} // namespace EnergyPlus::CTF08Observation\n')
+assert header.replace('#include <ObjexxFCL/Array3D.hh>\n', '').replace(header_add, '').replace('    FinalCoefficientCapture final_coefficients;\n', '').replace(functions, '') == rename(old_header)
+assert impl.replace(impl_add, '') == rename(old_impl)
+
+original = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc'
+original_text = original.read_bytes().decode('utf-8')
+old_additions = json.loads((PREVIOUS / 'additions.json').read_text(encoding='utf-8'))['all_declared_passive_additions']
+def compose(additions):
+    by_line = {row['after_original_line']: row['exact_source'] for row in additions}
+    assert len(by_line) == len(additions)
+    return ''.join(line + by_line.get(index, '') for index, line in enumerate(original_text.splitlines(keepends=True), 1))
+assert compose(old_additions) == old_tu
+new_additions = [
+    dict(after_original_line=894, exact_source='                EnergyPlus::CTF08Observation::final_coefficient_return(state, *this, ErrorsFound, DoCTFErrorReport,\n                    state.dataGlobal->TimeStepZone);\n'),
+    dict(after_original_line=1592, exact_source='    EnergyPlus::CTF08Observation::final_coefficient_entry(*this);\n'),
+    dict(after_original_line=1902, exact_source='    EnergyPlus::CTF08Observation::final_coefficient_private_final(*this, PhiR0, Rnew, Rold, inum, CTFConvrg);\n'),
+]
+all_additions = [dict(after_original_line=row['after_original_line'], exact_source=rename(row['exact_source'])) for row in old_additions] + new_additions
+tu = compose(all_additions)
+restored07 = tu
+for row in new_additions:
+    assert restored07.count(row['exact_source']) == 1
+    restored07 = restored07.replace(row['exact_source'], '')
+assert restored07 == rename(old_tu)
+restored = tu
+for row in all_additions:
+    assert restored.count(row['exact_source']) == 1
+    restored = restored.replace(row['exact_source'], '')
+assert restored == original_text
+sources = []
+for name, content, old_name, role in [
+    ('ctf08_observer.hh', header, names[0], 'passive capture declarations'),
+    ('ctf08_observer.cc', impl, names[1], 'actual copied values and independent integrity ledgers'),
+    ('Construction.ctf08.cc', tu, names[2], 'whole pinned Original TU with standalone passive calls'),
+]:
+    own = write(name, content)
+    patch = diff(name + '.from-ctf07.diff', (before / old_name).read_bytes().decode('utf-8'), content, rel(PREVIOUS / old_name), rel(own))
+    sources.append(dict(role=role, source=descriptor(own), before=dict(historical_path=rel(PREVIOUS / old_name), archive=descriptor(before / old_name)), exact_diff=descriptor(patch)))
+original_diff = diff('Construction.ctf08.cc.from-original.diff', original_text, tu, rel(original), rel(HERE / 'Construction.ctf08.cc'))
+additions_path = write('additions.json', json.dumps(dict(new_final_coefficient_additions=new_additions, all_declared_passive_additions=all_additions), indent=2) + '\n')
+
+paths = [original, original.with_suffix('.hh'),
+    ROOT / '.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh',
+    ROOT / '.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh',
+    ROOT / '.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array3.hh',
+    ROOT / '.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array3D.hh',
+    ROOT / 'energyplus_porting_plan/cards/CTF-08.md',
+    ROOT / '.runtime/porting/CTF-08/rust-final-coefficients-prep-01/manifest.json',
+    ROOT / '.runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs',
+    ROOT / '.runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/manifest.json',
+    ROOT / '.runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/new/ctf_first_final_coefficients_owner.rs',
+    PREVIOUS / 'manifest.json', PREVIOUS / 'README.md', PREVIOUS / names[0], PREVIOUS / names[1], PREVIOUS / names[2], PREVIOUS / 'additions.json']
+specs = [(original,1591,1906,'whole actual method and safe initialized final state'),
+    (original,877,897,'ordered actual exponential/inverse/Gamma/final caller returns'),
+    (original,638,657,'actual matrix/Gamma/history allocations before retry'),
+    (original,1021,1103,'excluded later public SI stores and workspace cleanup'),
+    (original.with_suffix('.hh'),304,344,'real array owner declarations and constructor'),
+    (paths[2],608,627,'actual two-index access orientation'),
+    (paths[2],866,920,'actual two-index bounds'),
+    (paths[4],307,326,'actual three-index access orientation'),
+    (paths[4],628,714,'actual three-index lower/upper bounds'),
+    (PREVIOUS / names[1],15,20,'object representation copy only'),
+    (PREVIOUS / names[1],208,224,'inherited actual vector/matrix bounds'),
+    (PREVIOUS / names[1],377,419,'actual retained assembly and member context'),
+    (PREVIOUS / names[1],738,749,'real preceding exponential/inverse returns'),
+    (PREVIOUS / names[1],951,973,'real preceding Gamma caller return and context')]
+ranges=[]
+for path,lo,hi,purpose in specs:
+    data=b''.join(path.read_bytes().splitlines(keepends=True)[lo-1:hi])
+    ranges.append(dict(path=rel(path), start_line=lo,end_line=hi,sha256=hashlib.sha256(data).hexdigest(),size_bytes=len(data),purpose=purpose))
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+manifest = dict(schema='ctf08-passive-native-source-preparation.v1', status='SOURCE-READY-HELD-unexecuted',
+    energyplus_commit='6f2e40d10250a105b49966baa24d843711e61048', own_sources=sources,
+    predecessor_manifest=descriptor(PREVIOUS / 'manifest.json'), archived_predecessor_manifest=descriptor(before / 'manifest.json'),
+    archived_predecessor_README=descriptor(before / 'README.md'), source_refs=[descriptor(path) for path in paths], primary_source_ranges=ranges,
+    original_additions_diff=descriptor(original_diff), declared_addition_ledger=descriptor(additions_path), README=descriptor(HERE / 'README.md'),
+    authoring_sources=[descriptor(HERE / name) for name in ['prepare_sources.py','header_additions.txt','function_declarations.txt','implementation_additions.txt']],
+    new_callback_sites=[dict(stage='Entry',after_original_line=1592,owners=['AExp','IdenMatrix','Gamma1','Gamma2','CMat2','DMat2','context']),
+        dict(stage='PrivateFinal',after_original_line=1902,before_original_deallocation_line=1903,owners=['mutated Gamma1','s0(3,4)','s(3,4,rcmax)','e(rcmax)','NumCTFTerms','PhiR0','Rnew','Rold','initialized inum','initialized CTFConvrg']),
+        dict(stage='SourceReturn',after_original_line=894,owners=['mutated Gamma1','s0','s','e','NumCTFTerms','actual caller context'])],
+    record_contract=dict(independent_ledgers=True, stages=['Entry','PrivateFinal','SourceReturn'], stage_count=3,
+        failure_kinds=['IdentityMismatch','AssociationFailure','OrderFailure','MatrixShape','CopyException','LedgerAppendException'],
+        typed_failure_count=6, all_actual_visits_retained_without_cap=True, actual_ordinals_not_expected_counts=True,
+        actual_preceding_Gamma_return_same_construction_assembly_context_required=True,
+        both_actual_prior_method_returns_required=True, previous08_actual_return_required_before_next_entry=True,
+        partial_per_owner_availability=True, s_and_e_independent_copies=True, duplicate_callback_counts_failure_and_omission=True,
+        default_slots_are_not_values=True, initialized_controls_only_at_PrivateFinal=True,
+        unassigned_locals_never_read=['avg','rat','trace','SurfNodeFac'],
+        actual_allocated_bounds_required=True, observed_matrix_slots_maximum=5,
+        copy='memcpy binary64; two-index i1 outer/i2 inner; s j outer/k middle/term inner',
+        scientific_floating_point_operations=False, NumCTFTerms_does_not_truncate_allocated_history=True,
+        caller_return_only_real894=True, process_fault_snapshots_not_durable=True),
+    prospective_pairing=dict(first_assembly_and08_invocation_ordinal=1, selected='existing1D/no-source/nonreverse',
+        initial619_and_actual_attempt_context_distinct=True, later_actual_visits='context/unpaired/noPASS',
+        profiles_or_input_selection_frozen=False, retry_driver_public19_SI_EIO_SUR_or_whole_CTF_claimed=False),
+    restoration=dict(original=descriptor(original),restored_sha256=hashlib.sha256(restored.encode('utf-8')).hexdigest(),
+        exact_original_bytes=True, original_removed_lines=0, all_additions_including_include=len(all_additions),
+        old_callback_count=len(old_additions)-1, new_callback_count=3,
+        old_header_body_exact_after_removing_new_additions_and_names=True,
+        old_implementation_exact_after_removing_new_append_and_names=True,
+        old_whole_TU_exact_after_removing_three_calls_and_names=True),
+    checks=dict(exact_three_before_copies=True,exact_three_predecessor_diffs=True,exact_original_additions_diff=True,
+        authoring_python_AST_only=True, reviewed_source_imports_or_execution=False,Cpp_or_scientific_formula_evaluation=False,
+        target_build_test_Cargo_formatter_engine_Git=False, canonical_edits=False, scientific_weather_binary_payload_reads=False,
+        helper_freezer_QA_comparer_or_new_framework_added=False, scientific_PASS_or_gates_claimed=False),
+    authorship_limits='Raw authored07 passive/transports and some earlier Rust CTF owners; Header authored pure/public07 and08; Base independent peer. This output-only proposal is not independent formula or scientific-output certification.')
+write('manifest.json', json.dumps(manifest, indent=2) + '\n')
+print(descriptor(HERE / 'manifest.json'))

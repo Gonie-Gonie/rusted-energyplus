@@ -1,0 +1,3 @@
+# CTF-08 source scope and input freeze
+
+See [summary](summary.json) and [literal evidence manifest](manifest.json). Actual selected card check and both packet writers exited zero before any08 helper build/run. Seven private coefficient profiles were prospectively fixed with zero absolute/relative tolerance and exact class, shape and signed zero. Same literal unit39/42 and production15/195/45 input guards and all older profiles remain unchanged. Historical prior07 document identities retain their archived meaning. No scientific values, expected arrays, exits or PASS are supplied by this freeze.

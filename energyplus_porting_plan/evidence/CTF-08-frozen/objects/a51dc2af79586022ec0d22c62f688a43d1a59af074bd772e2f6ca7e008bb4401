@@ -1,0 +1,249 @@
+--- .runtime/porting/CTF-08/native-helper-prep-01/before/projection-policy-proposal.json
++++ .runtime/porting/CTF-08/native-helper-prep-01/projection-policy-proposal.json
+@@ -1,5 +1,5 @@
+ {
+-  "schema": "ctf07-gamma-projection-source-proposal.v1",
++  "schema": "ctf08-private-final-coefficient-projection-source-proposal.v1",
+   "status": "SOURCE-PROPOSAL-not-yet-frozen",
+   "ctf04_matrix_observation_policy": {
+     "protocol": "ctf04-matrix-assembly.v1",
+@@ -370,9 +370,9 @@
+     "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+   },
+   "linked_original_retention_intent": {
+-    "schema": "ctf07-debug-original-retention-intent.v1",
++    "schema": "ctf08-debug-original-retention-intent.v1",
+     "role": "prospective-debug-original",
+-    "scope": "new-CTF07-linked-originals-only",
++    "scope": "new-CTF08-linked-originals-only",
+     "actual_file_identity_required": true,
+     "both_original_and_helper_verified_before_execution": true,
+     "retain_through_PE_validation_and_current_helper_execution": true,
+@@ -622,5 +622,226 @@
+     "no_Rust_retry_driver_claim": true,
+     "stopped_or_uninvoked": "unavailable/noPASS, real source or OS outcome retained separately"
+   },
+-  "primary_arithmetic_profiles_role": "three fresh Gamma1/Gamma2/ATemp zero profiles; earlier06seven/05two/04seven/03three/01eighteen remain separate handoffs"
++  "primary_arithmetic_profiles_role": "seven fresh private s0/s/e/mutated_Gamma1/PhiR0/Rnew/Rold zero profiles; old07three/06seven/05two/04seven/03three/01eighteen unchanged separate handoffs",
++  "inherited_ctf07_linked_original_retention_intent": {
++    "schema": "ctf07-debug-original-retention-intent.v1",
++    "role": "prospective-debug-original",
++    "scope": "new-CTF07-linked-originals-only",
++    "actual_file_identity_required": true,
++    "both_original_and_helper_verified_before_execution": true,
++    "retain_through_PE_validation_and_current_helper_execution": true,
++    "removal_requires_separate_Root_authorized_actual_retention_record": true,
++    "earlier_live_refs_reinterpreted": false,
++    "deletion_performed": false
++  },
++  "ctf08_final_coefficient_observation_policy": {
++    "protocol": "ctf08-private-final-coefficient-observation.v1",
++    "actual_method": "ConstructionProps::calculateFinalCoefficients",
++    "actual_caller_line": 894,
++    "actual_method_source_lines": [
++      1591,
++      1906
++    ],
++    "actual_stage_names": [
++      "Entry",
++      "PrivateFinal",
++      "SourceReturn"
++    ],
++    "actual_capture_boundaries": {
++      "Entry": "after_original1592_before_local_initialization_or_Gamma1_mutation",
++      "PrivateFinal": "after_original1902_before_private_workspace_deallocation1903_1905",
++      "SourceReturn": "after_actual_caller894_before_convergence_and_retry903"
++    },
++    "entry_matrices": [
++      "AExp",
++      "IdenMatrix",
++      "Gamma1",
++      "Gamma2"
++    ],
++    "entry_compressed_inputs": [
++      "CMat",
++      "DMat"
++    ],
++    "private_final_matrices": [
++      "Gamma1",
++      "s0",
++      "PhiR0",
++      "Rnew",
++      "Rold"
++    ],
++    "return_matrices": [
++      "Gamma1",
++      "s0"
++    ],
++    "private_final_and_return_history": [
++      "s",
++      "e",
++      "NumCTFTerms"
++    ],
++    "private_final_controls": [
++      "inum",
++      "CTFConvrg"
++    ],
++    "private_controls_and_R_workspaces_available_at_SourceReturn": false,
++    "uninitialized_avg_rat_trace_SurfNodeFac_observed": false,
++    "matrix_shapes": {
++      "AExp": "actual_rcmax_by_rcmax",
++      "IdenMatrix": "actual_rcmax_by_rcmax",
++      "Gamma1": "actual_3_by_rcmax",
++      "Gamma2": "actual_3_by_rcmax",
++      "s0": [
++        3,
++        4
++      ],
++      "s": "actual_3_by_4_by_rcmax",
++      "e": "actual_rcmax",
++      "PhiR0": "actual_rcmax_by_rcmax",
++      "Rnew": "actual_rcmax_by_rcmax",
++      "Rold": "actual_rcmax_by_rcmax",
++      "CMat": [
++        2
++      ],
++      "DMat": [
++        2
++      ]
++    },
++    "storage_order": "source_i1_outer_i2_inner_row_first; s_j_outer_k_middle_term_inner",
++    "full_allocated_history_including_initialized_tails_retained": true,
++    "NumCTFTerms_does_not_truncate_storage": true,
++    "independent_s_e_and_CMat_DMat_availability": true,
++    "actual_caller_source_order": [
++      "exponential884",
++      "inverse887",
++      "Gamma890",
++      "finalCoefficients894"
++    ],
++    "actual_matching_Gamma_return_precedes_entry": true,
++    "selected_invocation_ordinal": 1,
++    "selected_assembly_ordinal": 1,
++    "selected_Gamma_invocation_ordinal": 1,
++    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
++    "required_owner_context": {
++      "SourceSinkPresent": false,
++      "SolutionDimensions": 1
++    },
++    "actual_source_produced_identity_required": true,
++    "actual_assembly_and_prior_method_context_association_required": true,
++    "actual_return_marker_required_for_return_claim": true,
++    "all_actual_visits_retained": true,
++    "later_Native_attempts_paired": false,
++    "later_Native_attempts_counted_as_PASS": false,
++    "Rust_retry_driver_available": false,
++    "uninvoked_counted_as_PASS": false,
++    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
++    "observer_failure_or_omission_is_integrity_failure": true,
++    "values_identity_return_private_controls_or_retry_state_reconstructed": false,
++    "caller_convergence_retry_public_SI19_stores_or_complete_coefficient_handoff_certified": false,
++    "discrete_fields_exact": [
++      "NumCTFTerms",
++      "inum",
++      "CTFConvrg"
++    ]
++  },
++  "ctf08_final_coefficient_profiles": [
++    {
++      "variable": "s0",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": [
++        3,
++        4
++      ]
++    },
++    {
++      "variable": "s",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "actual_3_by_4_by_rcmax"
++    },
++    {
++      "variable": "e",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "actual_rcmax"
++    },
++    {
++      "variable": "mutated_Gamma1",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "actual_3_by_rcmax"
++    },
++    {
++      "variable": "PhiR0",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "actual_rcmax_by_rcmax"
++    },
++    {
++      "variable": "Rnew",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "actual_rcmax_by_rcmax"
++    },
++    {
++      "variable": "Rold",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "actual_rcmax_by_rcmax"
++    }
++  ],
++  "ctf08_discrete_exact": [
++    "NumCTFTerms",
++    "inum",
++    "CTFConvrg",
++    "actual owner/bounds/order/context/callback/omission/failure/availability",
++    "all allocated history slots without NumCTFTerms truncation"
++  ],
++  "private_scope_boundary": {
++    "selected_stage": "PrivateFinal",
++    "actual_Gamma_return_and_original_assembly_required": true,
++    "first_only": true,
++    "unselected_later_visits": "all retained context, unpaired/noPASS",
++    "SourceReturn": "only actual retained Gamma1/s0/s/e/NumCTFTerms and caller; private controls/R workspaces unavailable",
++    "coefficient_retry_publicSI19_or_complete_handoff_certified": false
++  },
++  "ctf08_method_selection": {
++    "actual_assembly_ordinal": 1,
++    "actual_exponential_invocation_ordinal": 1,
++    "actual_inverse_invocation_ordinal": 1,
++    "association": "same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history",
++    "actual_order": [
++      "assembly728",
++      "exponential884",
++      "inverse887",
++      "Gamma890",
++      "finalCoefficients894"
++    ],
++    "later_actual_visits": "all retained unpaired context/noPASS",
++    "no_initial_dt_equals_TimeStepZone_assertion": true,
++    "no_Rust_retry_driver_claim": true,
++    "stopped_or_uninvoked": "unavailable/noPASS, real source or OS outcome retained separately",
++    "actual_Gamma_invocation_ordinal": 1,
++    "actual_final_coefficient_invocation_ordinal": 1
++  }
+ }

@@ -1,0 +1,483 @@
+{
+  "schema": "ctf08-passive-native-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources": [
+    {
+      "role": "passive capture declarations",
+      "source": {
+        "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh",
+        "sha256": "d52aed5b0eff85721ea87a34b3e3dc85deece0477841a0efe92ffcea9497c131",
+        "size_bytes": 21757,
+        "line_count": 581
+      },
+      "before": {
+        "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh",
+        "archive": {
+          "path": ".runtime/porting/CTF-08/native-observer-prep-01/before/ctf07_observer.hh",
+          "sha256": "d28ac30443415bbb3df1da9b989cfd429ebaeb01843d80444e4c076a50f96b0d",
+          "size_bytes": 17557,
+          "line_count": 478
+        }
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh.from-ctf07.diff",
+        "sha256": "3cb250d24b785eb0977bfa1a9f15be1704663ed3fb9feecc4d058609798161bf",
+        "size_bytes": 5697,
+        "line_count": 149
+      }
+    },
+    {
+      "role": "actual copied values and independent integrity ledgers",
+      "source": {
+        "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+        "sha256": "53a49afae8336d8478ac2682eb14a163d9405d27e47d7a9fe24561ee6f38ccd7",
+        "size_bytes": 66295,
+        "line_count": 1286
+      },
+      "before": {
+        "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+        "archive": {
+          "path": ".runtime/porting/CTF-08/native-observer-prep-01/before/ctf07_observer.cc",
+          "sha256": "719ab0efcb21fd5a71f121677d6ae129ebcd4aff9053d78177760708833c6442",
+          "size_bytes": 48648,
+          "line_count": 975
+        }
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc.from-ctf07.diff",
+        "sha256": "534e82c659f9d894616278994e7ba7450d4f9756b275adb712664738bb39a445",
+        "size_bytes": 18715,
+        "line_count": 333
+      }
+    },
+    {
+      "role": "whole pinned Original TU with standalone passive calls",
+      "source": {
+        "path": ".runtime/porting/CTF-08/native-observer-prep-01/Construction.ctf08.cc",
+        "sha256": "cc1fcebd733b20ff943c2e19b3bcafd068a1dade09308c6a7998f060a17734c7",
+        "size_bytes": 113422,
+        "line_count": 2151
+      },
+      "before": {
+        "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/Construction.ctf07.cc",
+        "archive": {
+          "path": ".runtime/porting/CTF-08/native-observer-prep-01/before/Construction.ctf07.cc",
+          "sha256": "82a834d91f30cbfa92fe76e90b41df19aaf37d4121edc3cd264144c3fb653a28",
+          "size_bytes": 113077,
+          "line_count": 2147
+        }
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-08/native-observer-prep-01/Construction.ctf08.cc.from-ctf07.diff",
+        "sha256": "eedd0a3d3e200c3f5a223ecdd0f6b0c444c3830277409d047c6539fb791688e1",
+        "size_bytes": 10129,
+        "line_count": 211
+      }
+    }
+  ],
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+    "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+    "size_bytes": 18141,
+    "line_count": 451
+  },
+  "archived_predecessor_manifest": {
+    "path": ".runtime/porting/CTF-08/native-observer-prep-01/before/manifest.json",
+    "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+    "size_bytes": 18141,
+    "line_count": 451
+  },
+  "archived_predecessor_README": {
+    "path": ".runtime/porting/CTF-08/native-observer-prep-01/before/README.md",
+    "sha256": "7937a412c2f6500f06ba269c9965158fe4273a2c8577118b25b5a2c62dae1d99",
+    "size_bytes": 6655,
+    "line_count": 97
+  },
+  "source_refs": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+      "size_bytes": 22000,
+      "line_count": 1060
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "sha256": "b2a4eab99a6a631083e8598ef1c19ee6e6c6cbe87b6c2ed9a2d2fcff7549afbb",
+      "size_bytes": 25946,
+      "line_count": 1319
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array3.hh",
+      "sha256": "a6f63a75e516b407457d12928ac83c02c6142c6391e2f51d4b83fec37dab9978",
+      "size_bytes": 16791,
+      "line_count": 823
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array3D.hh",
+      "sha256": "c2779fc2822609543e54d55caa07fa71028a2d80ea36068de8c6a974a8c498cf",
+      "size_bytes": 13663,
+      "line_count": 600
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-08.md",
+      "sha256": "6c9297e026ab13700514170dfada762a2551afec73115387bdd7a6904dee3cb1",
+      "size_bytes": 2703,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/manifest.json",
+      "sha256": "728984104d79c9ba9e7cc9fdf90a0287d54bf8f64e1145f5d1fbe8cce2dd4fe0",
+      "size_bytes": 15354,
+      "line_count": 380
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs",
+      "sha256": "aa2e45908e291436ec654699020759f37909b358104aef478224c16e3e3ec4d4",
+      "size_bytes": 10163,
+      "line_count": 244
+    },
+    {
+      "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/manifest.json",
+      "sha256": "eaa0dc53bb29dbf80a25619103683918c3a8bcacead874bd02802bb461d142e2",
+      "size_bytes": 14480,
+      "line_count": 371
+    },
+    {
+      "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/new/ctf_first_final_coefficients_owner.rs",
+      "sha256": "587d5d64c98f38990781066ee265f40c1708c2ac655cd0dba3a46384d1feeb62",
+      "size_bytes": 8815,
+      "line_count": 177
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+      "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+      "size_bytes": 18141,
+      "line_count": 451
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/README.md",
+      "sha256": "7937a412c2f6500f06ba269c9965158fe4273a2c8577118b25b5a2c62dae1d99",
+      "size_bytes": 6655,
+      "line_count": 97
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh",
+      "sha256": "d28ac30443415bbb3df1da9b989cfd429ebaeb01843d80444e4c076a50f96b0d",
+      "size_bytes": 17557,
+      "line_count": 478
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "sha256": "719ab0efcb21fd5a71f121677d6ae129ebcd4aff9053d78177760708833c6442",
+      "size_bytes": 48648,
+      "line_count": 975
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/Construction.ctf07.cc",
+      "sha256": "82a834d91f30cbfa92fe76e90b41df19aaf37d4121edc3cd264144c3fb653a28",
+      "size_bytes": 113077,
+      "line_count": 2147
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/additions.json",
+      "sha256": "67e91d33e4c5522e65d055f2dd4cda4ca46bc50941c692b3e4cc1e7f20d4e27d",
+      "size_bytes": 5222,
+      "line_count": 114
+    }
+  ],
+  "primary_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1591,
+      "end_line": 1906,
+      "sha256": "e1bb975a9b50ae7bdbca34fabd94dc2f1bc23b3e13cf9537f743c4d14d3530ee",
+      "size_bytes": 15474,
+      "purpose": "whole actual method and safe initialized final state"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 877,
+      "end_line": 897,
+      "sha256": "2a4340df4aa75c26830f60a0bdc0b5de7fda75908b97e0eac1b468c95c62aeac",
+      "size_bytes": 1244,
+      "purpose": "ordered actual exponential/inverse/Gamma/final caller returns"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 657,
+      "sha256": "6592e767ef0c1fdf436d5b02620fc8ef0006f73d531751e0165d8c4f9a52b3f1",
+      "size_bytes": 845,
+      "purpose": "actual matrix/Gamma/history allocations before retry"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1021,
+      "end_line": 1103,
+      "sha256": "132150df27cfb452884ca9366f40d9120824bcfdc927f926f487aafd36777932",
+      "size_bytes": 3591,
+      "purpose": "excluded later public SI stores and workspace cleanup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 344,
+      "sha256": "b8e186183e8f5665c0164d4a8e8da880b18ad96fa6dc52019660d12b90c95458",
+      "size_bytes": 2539,
+      "purpose": "real array owner declarations and constructor"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 608,
+      "end_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389,
+      "purpose": "actual two-index access orientation"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 866,
+      "end_line": 920,
+      "sha256": "3fbe19e6967789b11832fb7c337d51f07d932bf83cf6ea86188cf6a9d1411532",
+      "size_bytes": 596,
+      "purpose": "actual two-index bounds"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array3.hh",
+      "start_line": 307,
+      "end_line": 326,
+      "sha256": "a498c7ba12a051e1e1333b8b0b76f8b70965d54940879e68974d9568db69fea8",
+      "size_bytes": 416,
+      "purpose": "actual three-index access orientation"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array3.hh",
+      "start_line": 628,
+      "end_line": 714,
+      "sha256": "f310a9d2e3afc6121c3e4e9d289ab19b8b8e26ffd2d26b1cee949494303cfedf",
+      "size_bytes": 934,
+      "purpose": "actual three-index lower/upper bounds"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "start_line": 15,
+      "end_line": 20,
+      "sha256": "7050eef3d114dd41588d434a4c851d28792226692df3226f5f87a4972d968436",
+      "size_bytes": 149,
+      "purpose": "object representation copy only"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "start_line": 208,
+      "end_line": 224,
+      "sha256": "bdc2c56dd11b703618536d983fa8822b872ea9e8f54ec2d3205e5af16014144a",
+      "size_bytes": 642,
+      "purpose": "inherited actual vector/matrix bounds"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "start_line": 377,
+      "end_line": 419,
+      "sha256": "f9177921cbe2ffc842e952c8b6857dec860e9ad6fc44853f6d4604070b6fdcef",
+      "size_bytes": 2420,
+      "purpose": "actual retained assembly and member context"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "start_line": 738,
+      "end_line": 749,
+      "sha256": "ee74b06d6c1aded8ae989c3ac0ed4e9ab34efb957479479e36271eda48b724bb",
+      "size_bytes": 683,
+      "purpose": "real preceding exponential/inverse returns"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "start_line": 951,
+      "end_line": 973,
+      "sha256": "eabd3d948450c6a9eca5c735e0ed8d083e003cc60278ffca77bc349c2c613d30",
+      "size_bytes": 1566,
+      "purpose": "real preceding Gamma caller return and context"
+    }
+  ],
+  "original_additions_diff": {
+    "path": ".runtime/porting/CTF-08/native-observer-prep-01/Construction.ctf08.cc.from-original.diff",
+    "sha256": "7a20fc630aec2b56d5174680ce42bf0681722da850f76ec7a5615a5cd1fbd0f3",
+    "size_bytes": 8441,
+    "line_count": 196
+  },
+  "declared_addition_ledger": {
+    "path": ".runtime/porting/CTF-08/native-observer-prep-01/additions.json",
+    "sha256": "c76ada49273704f7f90c4bd262476387d8bcd4768ecc45b948f1129e8dedf31e",
+    "size_bytes": 5610,
+    "line_count": 118
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-08/native-observer-prep-01/README.md",
+    "sha256": "b994ab33fe948c603e4deb7ed1b4dc4a19d0a11071f43b55b1d2db700381b004",
+    "size_bytes": 6620,
+    "line_count": 96
+  },
+  "authoring_sources": [
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/prepare_sources.py",
+      "sha256": "13e2fda3c3c273c311c8efcd52aac45142f728bbee535c8083e662de4db4d1a9",
+      "size_bytes": 12096,
+      "line_count": 158
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/header_additions.txt",
+      "sha256": "22f76ce6871159c7e6015ce45dc5edf9b7f94e270a7cd65e91c0727bc2b57329",
+      "size_bytes": 3443,
+      "line_count": 93
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/function_declarations.txt",
+      "sha256": "a9f7c0b36f7d29cfd496da81e7ce5ae749e416cd2b8c51e94937530d978084bb",
+      "size_bytes": 677,
+      "line_count": 8
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/implementation_additions.txt",
+      "sha256": "bedeee6d2aa093ba76d25fc1cdc350a2ff08426c299373de24afeb7cd3f84613",
+      "size_bytes": 17647,
+      "line_count": 311
+    }
+  ],
+  "new_callback_sites": [
+    {
+      "stage": "Entry",
+      "after_original_line": 1592,
+      "owners": [
+        "AExp",
+        "IdenMatrix",
+        "Gamma1",
+        "Gamma2",
+        "CMat2",
+        "DMat2",
+        "context"
+      ]
+    },
+    {
+      "stage": "PrivateFinal",
+      "after_original_line": 1902,
+      "before_original_deallocation_line": 1903,
+      "owners": [
+        "mutated Gamma1",
+        "s0(3,4)",
+        "s(3,4,rcmax)",
+        "e(rcmax)",
+        "NumCTFTerms",
+        "PhiR0",
+        "Rnew",
+        "Rold",
+        "initialized inum",
+        "initialized CTFConvrg"
+      ]
+    },
+    {
+      "stage": "SourceReturn",
+      "after_original_line": 894,
+      "owners": [
+        "mutated Gamma1",
+        "s0",
+        "s",
+        "e",
+        "NumCTFTerms",
+        "actual caller context"
+      ]
+    }
+  ],
+  "record_contract": {
+    "independent_ledgers": true,
+    "stages": [
+      "Entry",
+      "PrivateFinal",
+      "SourceReturn"
+    ],
+    "stage_count": 3,
+    "failure_kinds": [
+      "IdentityMismatch",
+      "AssociationFailure",
+      "OrderFailure",
+      "MatrixShape",
+      "CopyException",
+      "LedgerAppendException"
+    ],
+    "typed_failure_count": 6,
+    "all_actual_visits_retained_without_cap": true,
+    "actual_ordinals_not_expected_counts": true,
+    "actual_preceding_Gamma_return_same_construction_assembly_context_required": true,
+    "both_actual_prior_method_returns_required": true,
+    "previous08_actual_return_required_before_next_entry": true,
+    "partial_per_owner_availability": true,
+    "s_and_e_independent_copies": true,
+    "duplicate_callback_counts_failure_and_omission": true,
+    "default_slots_are_not_values": true,
+    "initialized_controls_only_at_PrivateFinal": true,
+    "unassigned_locals_never_read": [
+      "avg",
+      "rat",
+      "trace",
+      "SurfNodeFac"
+    ],
+    "actual_allocated_bounds_required": true,
+    "observed_matrix_slots_maximum": 5,
+    "copy": "memcpy binary64; two-index i1 outer/i2 inner; s j outer/k middle/term inner",
+    "scientific_floating_point_operations": false,
+    "NumCTFTerms_does_not_truncate_allocated_history": true,
+    "caller_return_only_real894": true,
+    "process_fault_snapshots_not_durable": true
+  },
+  "prospective_pairing": {
+    "first_assembly_and08_invocation_ordinal": 1,
+    "selected": "existing1D/no-source/nonreverse",
+    "initial619_and_actual_attempt_context_distinct": true,
+    "later_actual_visits": "context/unpaired/noPASS",
+    "profiles_or_input_selection_frozen": false,
+    "retry_driver_public19_SI_EIO_SUR_or_whole_CTF_claimed": false
+  },
+  "restoration": {
+    "original": {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    "restored_sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+    "exact_original_bytes": true,
+    "original_removed_lines": 0,
+    "all_additions_including_include": 25,
+    "old_callback_count": 21,
+    "new_callback_count": 3,
+    "old_header_body_exact_after_removing_new_additions_and_names": true,
+    "old_implementation_exact_after_removing_new_append_and_names": true,
+    "old_whole_TU_exact_after_removing_three_calls_and_names": true
+  },
+  "checks": {
+    "exact_three_before_copies": true,
+    "exact_three_predecessor_diffs": true,
+    "exact_original_additions_diff": true,
+    "authoring_python_AST_only": true,
+    "reviewed_source_imports_or_execution": false,
+    "Cpp_or_scientific_formula_evaluation": false,
+    "target_build_test_Cargo_formatter_engine_Git": false,
+    "canonical_edits": false,
+    "scientific_weather_binary_payload_reads": false,
+    "helper_freezer_QA_comparer_or_new_framework_added": false,
+    "scientific_PASS_or_gates_claimed": false
+  },
+  "authorship_limits": "Raw authored07 passive/transports and some earlier Rust CTF owners; Header authored pure/public07 and08; Base independent peer. This output-only proposal is not independent formula or scientific-output certification."
+}

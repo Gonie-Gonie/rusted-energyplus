@@ -1,0 +1,62 @@
+{
+  "schema": "ctf08-source-scope-amendment.v1",
+  "created_utc": "2026-10-10T20:41:21.818710+00:00",
+  "cards": [
+    "CTF-08"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF08_build_or_engine_execution_performed": false,
+  "native_observer": {
+    "path": ".runtime/porting/CTF-08/native-helper-prep-01/manifest.json",
+    "sha256": "652a1d9cf1341d7a424575119d6339cb7b344cbc9b3a6f3e189d3ed4b2cf8cbf",
+    "size_bytes": 26873
+  },
+  "passive_observer": {
+    "path": ".runtime/porting/CTF-08/native-observer-prep-01/manifest.json",
+    "sha256": "75c82f69c1c28036b9b83f68d8125ab5db636dd3b1e819d1a5ad130f8047990c",
+    "size_bytes": 18329
+  },
+  "final_coefficient_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-08/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "7c5ebcba0bc887166a930671080350133317623efe340fd8bea82e1bb5be92d9",
+    "size_bytes": 26108
+  },
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-08/scope-amendment-01/before-plan.json",
+      "sha256": "89c48f416714183bdd67236cc1fe5d402ed6ce4d137e7f243f884435564eee83",
+      "size_bytes": 750588
+    },
+    {
+      "path": ".runtime/porting/CTF-08/scope-amendment-01/before-CTF-08.md",
+      "sha256": "6c9297e026ab13700514170dfada762a2551afec73115387bdd7a6904dee3cb1",
+      "size_bytes": 2703
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "a48e6b6f98758769e475d09182bd0acf84b63c61701bcc391aceeaff41afdc31",
+      "size_bytes": 688947
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-08.md",
+      "sha256": "e514fc5065e99b0b9560601338d58e08743d15eb5e02de4e581e7ce4b5e66f93",
+      "size_bytes": 4252
+    }
+  ],
+  "recorder_role": "real-CTF-08-check-only",
+  "scope_only_no_numerical_PASS": true
+}
