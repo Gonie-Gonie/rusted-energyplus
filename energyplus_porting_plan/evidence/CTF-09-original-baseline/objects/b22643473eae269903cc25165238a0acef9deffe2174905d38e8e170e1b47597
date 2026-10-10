@@ -1,0 +1,3 @@
+Program Version,,
+   ** Severe  ** InitConductionTransferFunctions: Material too thick for CTF calculation
+   **   ~~~   ** material name = THICK_above

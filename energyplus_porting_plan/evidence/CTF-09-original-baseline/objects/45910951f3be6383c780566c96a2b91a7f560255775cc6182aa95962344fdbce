@@ -1,0 +1,59 @@
+{
+  "schema": "ctf09-unchanged08-legacy04-input-transport-custody.v1",
+  "created_utc": "2026-10-10T22:16:07.463289+00:00",
+  "source_request": {
+    "path": ".runtime/porting/CTF-08/existing-production-inputs-02/request.json",
+    "sha256": "6bec909e1b81eda68e8082dc327b45401539cf2251ab04db2263b7daebfbd747",
+    "size_bytes": 35763
+  },
+  "actual_fresh_request": {
+    "path": ".runtime/porting/CTF-09/existing-production-inputs-01/request.json",
+    "sha256": "b45078d33dc38306ef1aa24b77d28bd6ff75115e15b7d4c907028c27f1d5ab5f",
+    "size_bytes": 35763
+  },
+  "actual_original_DataQA_before_any_Rust_baseline": {
+    "unit": {
+      "path": ".runtime/porting/CTF-09/original-data-review-01/review.json",
+      "sha256": "d9ba16bf2345b1f32e8c8c9475452b8eb04df66299a1d7dc3beb6899054b89c1",
+      "size_bytes": 54610
+    },
+    "production": {
+      "path": ".runtime/porting/CTF-09/original-production-data-review-01/review.json",
+      "sha256": "e348788d893e36e71e1367e3c0d261b769f1b7838fa056b7b9466369bfe0521a",
+      "size_bytes": 97066
+    }
+  },
+  "actual_current08_source_manifest": {
+    "path": ".runtime/porting/CTF-08/applied-final-source-02/manifest.json",
+    "sha256": "0a68da81100d51953baae319237195f6218ae234365429523eaf2aa9fceedb95",
+    "size_bytes": 25886
+  },
+  "fresh09_Native_admission_is_documentary_only_not_a_legacy04_operand": {
+    "unit": {
+      "path": ".runtime/porting/CTF-09/frozen-packet-01/native-admission-contract.json",
+      "sha256": "a1fd61826281959ec0709d75ea5b56d3984a9c7aaef8d1682eb0e1c4ed3da4d9",
+      "size_bytes": 48723
+    },
+    "production": {
+      "path": ".runtime/porting/CTF-09/production-frozen-packet-01/native-admission-contract.json",
+      "sha256": "4f96b629e9c60f37d775c3c1c1bd43d2e9bf59665f6bc435a3969266aca66b3a",
+      "size_bytes": 49575
+    }
+  },
+  "old04_request_and_admission_operands_unchanged": true,
+  "all15_rows_and_conversion_refs_and45_scope_unchanged": true,
+  "only_five_current08_API_hashes_refreshed": [
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs"
+  ],
+  "no09_Rust_math_applied": true,
+  "numerical_PASS_claimed": false,
+  "per_invocation_Cargo_configuration": {
+    "profile.dev.debug": 0,
+    "build.incremental": false,
+    "scope": "Real recorded CLI configuration, no canonical manifest/source edit; optimization level and arithmetic source remain existing dev defaults."
+  }
+}

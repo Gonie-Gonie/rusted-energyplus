@@ -1,0 +1,17 @@
+Program Version,,
+   ** Severe  ** CTF calculation convergence problem for Construction="construction-1".
+   **   ~~~   ** ...with Materials (outside layer to inside)
+   **   ~~~   ** (outside)="THICK_equal"
+   **   ~~~   ** The Construction report will be produced. This will show more details on Constructions and their materials.
+   **   ~~~   ** Attempts will be made to complete the CTF process but the report may be incomplete.
+   **   ~~~   ** Constructs reported after this construction may appear to have all 0 CTFs.
+   **   ~~~   ** The potential causes of this problem are related to the input for the construction
+   **   ~~~   ** listed in the severe error above.  The CTF calculate routine is unable to come up
+   **   ~~~   ** with a series of CTF terms that have a reasonable time step and this indicates an
+   **   ~~~   ** error.  Check the definition of this construction and the materials that make up
+   **   ~~~   ** the construction.  Very thin, highly conductive materials may cause problems.
+   **   ~~~   ** This may be avoided by ignoring the presence of those materials since they probably
+   **   ~~~   ** do not effect the heat transfer characteristics of the construction.  Highly
+   **   ~~~   ** conductive or highly resistive layers that are alternated with high mass layers
+   **   ~~~   ** may also result in problems.  After confirming that the input is correct and
+   **   ~~~   ** realistic, the user should contact the EnergyPlus support team.

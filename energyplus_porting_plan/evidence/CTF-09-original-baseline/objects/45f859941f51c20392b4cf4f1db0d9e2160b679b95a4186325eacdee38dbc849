@@ -1,0 +1,15 @@
+-- Using CCACHE
+-- C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ccache.exe found and enabled
+-- Adding -fdiagnostics-color=always
+-- JsonCpp Version: 1.9.3
+-- Using CCACHE
+-- C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ccache.exe found and enabled
+-- Module support is disabled.
+-- Version: 8.0.1
+-- Build type: RelWithDebInfo
+-- CXX_STANDARD: 20
+-- Required features: cxx_variadic_templates
+-- Using Win32 for window creation
+-- Configuring done (3.7s)
+-- Generating done (1.1s)
+-- Build files have been written to: C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0

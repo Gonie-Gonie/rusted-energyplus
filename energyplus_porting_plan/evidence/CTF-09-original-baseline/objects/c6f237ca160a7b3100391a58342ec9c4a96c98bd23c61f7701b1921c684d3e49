@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\tools\porting\derive_native_helper.py", line 241, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\tools\porting\derive_native_helper.py", line 147, in main
+    require(not out.exists() and out.parent.is_dir() and not original.is_relative_to(out), "Fresh output directory required")
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\tools\porting\derive_native_helper.py", line 32, in require
+    raise ValueError(message)
+ValueError: Fresh output directory required

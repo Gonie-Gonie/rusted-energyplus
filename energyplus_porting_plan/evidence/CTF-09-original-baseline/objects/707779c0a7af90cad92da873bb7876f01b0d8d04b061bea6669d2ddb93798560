@@ -1,0 +1,516 @@
+"""Actual private coefficient copies and provenance only; no coefficient evaluator."""
+
+POLICY = {'protocol': 'ctf08-private-final-coefficient-observation.v1', 'actual_method': 'ConstructionProps::calculateFinalCoefficients', 'actual_caller_line': 894, 'actual_method_source_lines': [1591, 1906], 'actual_stage_names': ['Entry', 'PrivateFinal', 'SourceReturn'], 'actual_capture_boundaries': {'Entry': 'after_original1592_before_local_initialization_or_Gamma1_mutation', 'PrivateFinal': 'after_original1902_before_private_workspace_deallocation1903_1905', 'SourceReturn': 'after_actual_caller894_before_convergence_and_retry903'}, 'entry_matrices': ['AExp', 'IdenMatrix', 'Gamma1', 'Gamma2'], 'entry_compressed_inputs': ['CMat', 'DMat'], 'private_final_matrices': ['Gamma1', 's0', 'PhiR0', 'Rnew', 'Rold'], 'return_matrices': ['Gamma1', 's0'], 'private_final_and_return_history': ['s', 'e', 'NumCTFTerms'], 'private_final_controls': ['inum', 'CTFConvrg'], 'private_controls_and_R_workspaces_available_at_SourceReturn': False, 'uninitialized_avg_rat_trace_SurfNodeFac_observed': False, 'matrix_shapes': {'AExp': 'actual_rcmax_by_rcmax', 'IdenMatrix': 'actual_rcmax_by_rcmax', 'Gamma1': 'actual_3_by_rcmax', 'Gamma2': 'actual_3_by_rcmax', 's0': [3, 4], 's': 'actual_3_by_4_by_rcmax', 'e': 'actual_rcmax', 'PhiR0': 'actual_rcmax_by_rcmax', 'Rnew': 'actual_rcmax_by_rcmax', 'Rold': 'actual_rcmax_by_rcmax', 'CMat': [2], 'DMat': [2]}, 'storage_order': 'source_i1_outer_i2_inner_row_first; s_j_outer_k_middle_term_inner', 'full_allocated_history_including_initialized_tails_retained': True, 'NumCTFTerms_does_not_truncate_storage': True, 'independent_s_e_and_CMat_DMat_availability': True, 'actual_caller_source_order': ['exponential884', 'inverse887', 'Gamma890', 'finalCoefficients894'], 'actual_matching_Gamma_return_precedes_entry': True, 'selected_invocation_ordinal': 1, 'selected_assembly_ordinal': 1, 'selected_Gamma_invocation_ordinal': 1, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'actual_source_produced_identity_required': True, 'actual_assembly_and_prior_method_context_association_required': True, 'actual_return_marker_required_for_return_claim': True, 'all_actual_visits_retained': True, 'later_Native_attempts_paired': False, 'later_Native_attempts_counted_as_PASS': False, 'Rust_retry_driver_available': False, 'uninvoked_counted_as_PASS': False, 'missing_selected_owner_on_one_or_both_sides_is_required_failure': True, 'observer_failure_or_omission_is_integrity_failure': True, 'values_identity_return_private_controls_or_retry_state_reconstructed': False, 'caller_convergence_retry_public_SI19_stores_or_complete_coefficient_handoff_certified': False, 'discrete_fields_exact': ['NumCTFTerms', 'inum', 'CTFConvrg']}
+SELECTION = {'actual_assembly_ordinal': 1, 'actual_exponential_invocation_ordinal': 1, 'actual_inverse_invocation_ordinal': 1, 'association': 'same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history', 'actual_order': ['assembly728', 'exponential884', 'inverse887', 'Gamma890', 'finalCoefficients894'], 'later_actual_visits': 'all retained unpaired context/noPASS', 'no_initial_dt_equals_TimeStepZone_assertion': True, 'no_Rust_retry_driver_claim': True, 'stopped_or_uninvoked': 'unavailable/noPASS, real source or OS outcome retained separately', 'actual_Gamma_invocation_ordinal': 1, 'actual_final_coefficient_invocation_ordinal': 1}
+
+STAGES = ["Entry", "PrivateFinal", "SourceReturn"]
+FAILURES = ["IdentityMismatch", "AssociationFailure", "OrderFailure", "MatrixShape", "CopyException", "LedgerAppendException"]
+OWNERS = {"Entry": ["AExp", "IdenMatrix", "Gamma1", "Gamma2"],
+          "PrivateFinal": ["Gamma1", "s0", "PhiR0", "Rnew", "Rold"], "SourceReturn": ["Gamma1", "s0"]}
+
+
+def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    counts["coefficient_whole_call_records"] += 1
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked whole call cannot fabricate coefficient observations")
+        counts["coefficient_uninvoked_whole_call_records"] += 1
+        return
+    observed = operation["observations"]
+    ledger = observed["FinalCoefficients"]
+    need(isinstance(ledger, dict) and set(ledger) == {"protocol", "method", "actual_invocation_count", "actual_retained_invocation_count",
+         "actual_stage_callback_counts", "stage_records_omitted", "stage_ledger", "observer_failure", "method_copy_integrity_failed", "failure_event_counts",
+         "first_failure", "last_failure", "invocations", "no_actual_entry_observed", "record_cap", "deduplicated", "truncated", "unreached_counted_as_PASS",
+         "later_attempts_counted_as_PASS", "private_values_controls_identity_or_return_reconstructed", "old_checkpoint_matrix_05_06_Gamma_counters_include_final_callbacks"},
+         "Complete actual private coefficient ledger required")
+    need(ledger["protocol"] == POLICY["protocol"] and ledger["method"] == "FinalCoefficients" and ledger["record_cap"] is None,
+         "Actual private coefficient protocol/cap differs")
+    for name in ["deduplicated", "truncated", "unreached_counted_as_PASS", "later_attempts_counted_as_PASS", "private_values_controls_identity_or_return_reconstructed",
+                 "old_checkpoint_matrix_05_06_Gamma_counters_include_final_callbacks"]:
+        need(ledger[name] is False, "Actual coefficient visits cannot be dropped, reconstructed or counted as PASS")
+    for name in ["observer_failure", "method_copy_integrity_failed", "no_actual_entry_observed"]:
+        need(type(ledger[name]) is bool, "Typed actual coefficient flag required")
+    for name in ["actual_invocation_count", "actual_retained_invocation_count"]:
+        need(type(ledger[name]) is int and ledger[name] >= 0, "Typed actual coefficient count required")
+    callbacks, omitted = ledger["actual_stage_callback_counts"], ledger["stage_records_omitted"]
+    need(all(isinstance(v, list) and len(v) == 3 and all(type(n) is int and n >= 0 for n in v) for v in [callbacks, omitted]),
+         "Three typed coefficient stage/omission counts required")
+    need(ledger["actual_invocation_count"] == callbacks[0] and ledger["no_actual_entry_observed"] is (callbacks[0] == 0) and
+         isinstance(ledger["invocations"], list) and ledger["actual_retained_invocation_count"] == len(ledger["invocations"]) and
+         ledger["stage_ledger"] == [{"stage": stage, "actual_callback_count": callbacks[i], "records_omitted": omitted[i]} for i, stage in enumerate(STAGES)],
+         "Actual coefficient entry/retained/stage ledger differs")
+    event_counts = []
+    need(isinstance(ledger["failure_event_counts"], list) and len(ledger["failure_event_counts"]) == 6, "Six actual coefficient failure counters required")
+    for kind, row in zip(FAILURES, ledger["failure_event_counts"]):
+        need(isinstance(row, dict) and set(row) == {"kind", "actual_event_count"} and row["kind"] == kind and type(row["actual_event_count"]) is int and
+             row["actual_event_count"] >= 0, "Typed coefficient failure count differs")
+        event_counts.append(row["actual_event_count"])
+    need(ledger["observer_failure"] is bool(sum(event_counts)), "Coefficient observer failure/count differs")
+    for name in ["first_failure", "last_failure"]:
+        event = ledger[name]
+        if not sum(event_counts):
+            need(event is None, "No coefficient failure can be invented")
+        else:
+            need(isinstance(event, dict) and set(event) == {"invocation_ordinal", "assembly_ordinal", "stage", "kind"} and
+                 event["stage"] in STAGES and event["kind"] in FAILURES and type(event["invocation_ordinal"]) is int and
+                 0 <= event["invocation_ordinal"] <= callbacks[0] and type(event["assembly_ordinal"]) is int and
+                 0 <= event["assembly_ordinal"] <= observed["MatrixAssembly"]["actual_matrix_attempt_callback_count"] and
+                 event_counts[FAILURES.index(event["kind"])] > 0, "Coefficient failure association differs")
+    if sum(event_counts):
+        need(ledger["first_failure"]["invocation_ordinal"] <= ledger["last_failure"]["invocation_ordinal"], "Coefficient first/last failure order differs")
+    assemblies = {r["observed_attempt_ordinal"]: r for r in observed["MatrixAssembly"]["attempts"]}
+    predecessors = {name: {r["observed_invocation_ordinal"]: r for r in observed[name]["invocations"]}
+                    for name in ["Exponential", "Inverse", "Gamma"]}
+    retained, actual_sum, flag_sum, ordinals = [0] * 3, [0] * 3, [0] * 6, []
+    failed = ledger["observer_failure"] or any(omitted) or callbacks[0] != len(ledger["invocations"])
+    for record in ledger["invocations"]:
+        need(isinstance(record, dict) and set(record) == {"observed_invocation_ordinal", "observed_assembly_ordinal", "association_available", "failure_kinds",
+             "actual_stage_callback_counts", *STAGES, "counted_as_PASS"}, "Exact coefficient invocation record required")
+        ordinal, assembly_ordinal = record["observed_invocation_ordinal"], record["observed_assembly_ordinal"]
+        need(type(ordinal) is int and 1 <= ordinal <= callbacks[0] and (not ordinals or ordinal > ordinals[-1]) and type(assembly_ordinal) is int and
+             0 <= assembly_ordinal <= observed["MatrixAssembly"]["actual_matrix_attempt_callback_count"] and
+             type(record["association_available"]) is bool and record["counted_as_PASS"] is False, "Actual coefficient ordinal/association differs")
+        ordinals.append(ordinal)
+        if ordinal != len(ordinals) or ordinal != assembly_ordinal or not record["association_available"]:
+            failed = True
+        need(isinstance(record["failure_kinds"], list) and len(record["failure_kinds"]) == 6, "Six per-coefficient failure flags required")
+        for i, (kind, row) in enumerate(zip(FAILURES, record["failure_kinds"])):
+            need(isinstance(row, dict) and set(row) == {"kind", "failed"} and row["kind"] == kind and type(row["failed"]) is bool,
+                 "Actual coefficient failure flag differs")
+            flag_sum[i] += int(row["failed"])
+            failed = failed or row["failed"]
+        actual = record["actual_stage_callback_counts"]
+        need(isinstance(actual, list) and len(actual) == 3 and all(type(n) is int and n >= 0 for n in actual), "Typed actual per-coefficient stage counts required")
+        assembly, reached = assemblies.get(assembly_ordinal), []
+        for i, stage in enumerate(STAGES):
+            value = record[stage]
+            need(isinstance(value, dict) and set(value) == {"reached", "available", "snapshot", "unavailable_reason", "counted_as_PASS"} and
+                 type(value["reached"]) is bool and type(value["available"]) is bool and value["counted_as_PASS"] is False,
+                 "Exact coefficient value-stage required")
+            reached.append(int(value["reached"]))
+            if not value["reached"]:
+                need(value["available"] is False and value["snapshot"] is None and
+                     value["unavailable_reason"] == "actual_stage_callback_not_retained_or_not_reached", "Unreached coefficient stage must remain absent")
+                continue
+            snapshot = value["snapshot"]
+            need(isinstance(snapshot, dict) and set(snapshot) == {"context_available", "context", "matrices_available", "observed_matrix_count", "matrices",
+                 "CMat_available", "DMat_available", "CMat_actual_bounds", "DMat_actual_bounds", "CMat", "DMat", "history_available", "s_available", "e_available",
+                 "s_actual_bounds", "e_actual_bounds", "s", "e", "NumCTFTerms", "controls", "caller_context_available", "actual_return_site_caller_context"},
+                 "Exact actual coefficient snapshot fields required")
+            for name in ["context_available", "matrices_available", "CMat_available", "DMat_available", "s_available", "e_available", "history_available",
+                         "caller_context_available"]:
+                need(type(snapshot[name]) is bool, "Typed actual coefficient availability required")
+            need(type(snapshot["observed_matrix_count"]) is int and 0 <= snapshot["observed_matrix_count"] <= 5 and
+                 isinstance(snapshot["matrices"], list) and len(snapshot["matrices"]) == snapshot["observed_matrix_count"] and
+                 snapshot["context_available"] is (snapshot["observed_matrix_count"] != 0), "Actual coefficient partial matrix context differs")
+            expected_available = snapshot["matrices_available"] and (
+                snapshot["CMat_available"] and snapshot["DMat_available"] if stage == "Entry" else
+                snapshot["history_available"] and snapshot["NumCTFTerms"] is not None) and (
+                stage != "PrivateFinal" or snapshot["controls"] is not None) and (
+                stage != "SourceReturn" or snapshot["caller_context_available"] and
+                snapshot["actual_return_site_caller_context"] is not None and
+                snapshot["actual_return_site_caller_context"]["TimeStepZone"] is not None)
+            need(value["available"] is expected_available and value["unavailable_reason"] ==
+                 (None if expected_available else "required_private_final_owner_copy_unavailable"), "Actual coefficient stage availability differs")
+            if not snapshot["context_available"]:
+                need(snapshot["context"] is None and value["available"] is False and not snapshot["matrices"], "Identity-failed coefficient cannot fabricate context")
+                need(all(snapshot[name] is False for name in ["matrices_available", "CMat_available", "DMat_available", "history_available", "s_available", "e_available",
+                     "caller_context_available"]) and all(snapshot[name] is None for name in ["CMat_actual_bounds", "DMat_actual_bounds", "CMat", "DMat", "s_actual_bounds",
+                     "e_actual_bounds", "s", "e", "NumCTFTerms", "controls", "actual_return_site_caller_context"]), "Identity-failed coefficient cannot invent optional copies")
+                failed = True
+                continue
+            context = snapshot["context"]
+            need(isinstance(context, dict) and set(context) == {"IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp",
+                 "CTFTimeStep", "NumHistories", "NumOfPerpendNodes", "assembly_context_available", "earlier_checked_assembly_context",
+                 "assembly_context_is_fresh_method_stack_context"}, "Exact coefficient context required")
+            for name in ["IsUsedCTF", "SourceSinkPresent", "assembly_context_available"]:
+                need(type(context[name]) is bool, "Typed coefficient context flag required")
+            for name in ["SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories", "NumOfPerpendNodes"]:
+                need(type(context[name]) is int, "Typed coefficient context integer required")
+            scalar(context["CTFTimeStep"])
+            need(context["assembly_context_is_fresh_method_stack_context"] is False, "Earlier assembly context cannot be relabeled fresh coefficient locals")
+            if context["assembly_context_available"]:
+                earlier = context["earlier_checked_assembly_context"]
+                need(isinstance(earlier, dict) and set(earlier) == {"ErrorsFound", "DoCTFErrorReport", "TimeStepZone"} and
+                     type(earlier["ErrorsFound"]) is bool and type(earlier["DoCTFErrorReport"]) is bool and assembly is not None and assembly["available"],
+                     "Actual coefficient assembly/caller association required")
+                scalar(earlier["TimeStepZone"])
+                source = assembly["snapshot"]
+                for name in ["IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+                    need(context[name] == source[name], "Coefficient actual assembly context handoff differs")
+                need(context["CTFTimeStep"]["value_bits"] == source["CTFTimeStep"]["value_bits"] and
+                     earlier["TimeStepZone"]["value_bits"] == source["TimeStepZone"]["value_bits"] and earlier["ErrorsFound"] is source["ErrorsFound"] and
+                     earlier["DoCTFErrorReport"] is source["DoCTFErrorReport"], "Coefficient assembly scalar/flag handoff differs")
+            else:
+                need(context["earlier_checked_assembly_context"] is None, "Unavailable assembly context cannot fabricate values")
+                failed = True
+            need([r["owner"] for r in snapshot["matrices"]] == OWNERS[stage], "Actual coefficient owner slots differ")
+            complete, n = True, context["rcmax"]
+            for copy in snapshot["matrices"]:
+                need(isinstance(copy, dict) and set(copy) == {"owner", "actual_bounds", "copy_available", "values"} and
+                     type(copy["copy_available"]) is bool, "Actual coefficient matrix copy fields required")
+                bounds = copy["actual_bounds"]
+                need(bounds is None or isinstance(bounds, dict) and set(bounds) == {"lower1", "upper1", "lower2", "upper2", "size"} and
+                     all(type(v) is int for v in bounds.values()), "Exact Objexx coefficient matrix bounds required")
+                if not copy["copy_available"]:
+                    need(copy["values"] is None, "Failed coefficient copy must remain null; sibling copies retained")
+                    complete, failed = False, True
+                    continue
+                rows, columns = (3, n) if copy["owner"] in ["Gamma1", "Gamma2"] else (3, 4) if copy["owner"] == "s0" else (n, n)
+                need(n >= 1 and bounds == {"lower1": 1, "upper1": rows, "lower2": 1, "upper2": columns, "size": rows * columns} and
+                     isinstance(copy["values"], list) and len(copy["values"]) == rows * columns, "Actual coefficient matrix shape differs")
+                for field in copy["values"]:
+                    scalar(field)
+                if stage == "Entry" and context["assembly_context_available"]:
+                    if copy["owner"] == "IdenMatrix":
+                        actual_values = assembly["snapshot"]["matrices"]["IdenMatrix"]
+                    else:
+                        name = "Exponential" if copy["owner"] == "AExp" else "Gamma"
+                        preceding = predecessors[name].get(ordinal)
+                        need(preceding is not None and preceding["SourceReturn"]["available"] and
+                             preceding["observed_assembly_ordinal"] == assembly_ordinal, "Coefficient input requires actual matching predecessor return")
+                        actual_values = next(r["values"] for r in preceding["SourceReturn"]["snapshot"]["matrices"] if r["owner"] == copy["owner"])
+                    need([v["value_bits"] for v in copy["values"]] == [v["value_bits"] for v in actual_values], "Actual predecessor-to-coefficient handoff differs")
+                if stage == "SourceReturn":
+                    prior = record["PrivateFinal"]
+                    need(prior["available"] and [v["value_bits"] for v in copy["values"]] ==
+                         [v["value_bits"] for v in next(r["values"] for r in prior["snapshot"]["matrices"] if r["owner"] == copy["owner"])],
+                         "Actual private-final-to-caller matrix handoff differs")
+            need(snapshot["matrices_available"] is complete, "Coefficient matrix aggregate availability differs from individual copies")
+            for name in ["CMat", "DMat"]:
+                bounds = snapshot[name + "_actual_bounds"]
+                need(bounds is None or isinstance(bounds, dict) and set(bounds) == {"lower", "upper", "size"} and
+                     all(type(v) is int for v in bounds.values()), "Actual coefficient vector bounds required")
+                if stage == "Entry":
+                    if snapshot[name + "_available"]:
+                        need(bounds == {"lower": 1, "upper": 2, "size": 2} and isinstance(snapshot[name], list) and len(snapshot[name]) == 2,
+                             "Actual coefficient CMat/DMat2 shape differs")
+                        for field in snapshot[name]:
+                            scalar(field)
+                        if context["assembly_context_available"]:
+                            need([v["value_bits"] for v in snapshot[name]] ==
+                                 [v["value_bits"] for v in assembly["snapshot"]["matrices"][name]], "Actual CMat/DMat handoff differs")
+                    else:
+                        need(snapshot[name] is None, "Unavailable CMat/DMat cannot fabricate values")
+                        failed = True
+                else:
+                    need(snapshot[name + "_available"] is False and snapshot[name] is None and bounds is None,
+                         "CMat/DMat are not observed outside actual entry")
+            for name, dimensions in [("s", 3), ("e", 1)]:
+                bounds = snapshot[name + "_actual_bounds"]
+                keys = {"lower1", "upper1", "lower2", "upper2", "lower3", "upper3", "size"} if dimensions == 3 else {"lower", "upper", "size"}
+                need(bounds is None or isinstance(bounds, dict) and set(bounds) == keys and all(type(v) is int for v in bounds.values()),
+                     "Actual coefficient history bounds required")
+                if stage == "Entry":
+                    need(snapshot[name + "_available"] is False and snapshot[name] is None and bounds is None,
+                         "Entry cannot fabricate not-yet-assigned history")
+                elif snapshot[name + "_available"]:
+                    expected = {"lower1": 1, "upper1": 3, "lower2": 1, "upper2": 4, "lower3": 1, "upper3": n, "size": 12 * n} if dimensions == 3 else {
+                        "lower": 1, "upper": n, "size": n}
+                    need(n >= 1 and bounds == expected and isinstance(snapshot[name], list) and len(snapshot[name]) == expected["size"],
+                         "All actual rcmax history slots must be retained")
+                    for field in snapshot[name]:
+                        scalar(field)
+                    if stage == "SourceReturn":
+                        prior = record["PrivateFinal"]["snapshot"]
+                        need(record["PrivateFinal"]["available"] and prior[name + "_available"] and
+                             [v["value_bits"] for v in snapshot[name]] == [v["value_bits"] for v in prior[name]], "Actual history-to-caller handoff differs")
+                else:
+                    need(snapshot[name] is None, "Failed history copy must remain independently unavailable")
+                    failed = True
+            need(snapshot["history_available"] is (snapshot["s_available"] and snapshot["e_available"]), "Independent actual s/e aggregate availability differs")
+            if stage == "Entry":
+                need(snapshot["NumCTFTerms"] is None,
+                     "Entry cannot relabel stale public NumCTFTerms as selected output")
+            else:
+                need(type(snapshot["NumCTFTerms"]) is int, "Actual assigned NumCTFTerms required")
+                if stage == "SourceReturn":
+                    need(snapshot["NumCTFTerms"] == record["PrivateFinal"]["snapshot"]["NumCTFTerms"], "Actual assigned term count handoff differs")
+            if stage == "PrivateFinal":
+                need(isinstance(snapshot["controls"], dict) and set(snapshot["controls"]) == {"inum", "CTFConvrg"} and
+                     type(snapshot["controls"]["inum"]) is int and type(snapshot["controls"]["CTFConvrg"]) is bool,
+                     "Only actual initialized private controls may be observed")
+            else:
+                need(snapshot["controls"] is None,
+                     "Private controls are unavailable before assignment and after private lifetime")
+            caller = snapshot["actual_return_site_caller_context"]
+            if stage == "SourceReturn":
+                need(snapshot["caller_context_available"] is True and isinstance(caller, dict) and set(caller) == {"ErrorsFound", "DoCTFErrorReport", "TimeStepZone"} and
+                     type(caller["ErrorsFound"]) is bool and type(caller["DoCTFErrorReport"]) is bool, "Actual coefficient caller return marker required")
+                scalar(caller["TimeStepZone"])
+                if context["assembly_context_available"]:
+                    need(caller == context["earlier_checked_assembly_context"], "Actual coefficient return caller differs")
+            else:
+                need(snapshot["caller_context_available"] is False and caller is None, "Coefficient return cannot be inferred before caller site")
+            if not value["available"]:
+                failed = True
+        for i in range(3):
+            retained[i] += reached[i]
+            actual_sum[i] += actual[i]
+            need(actual[i] >= reached[i], "Coefficient callback count cannot omit retained stage")
+        if actual != reached:
+            failed = True
+        need(all(not reached[i] or all(reached[:i]) for i in range(1, 3)), "Actual coefficient stage order differs")
+        if operation["call_outcome"]["status"] == "source_returned":
+            need(all(reached), "Returned whole call with coefficient entry requires complete actual coefficient return")
+        if ordinal > 1:
+            counts["coefficient_later_unpaired_invocation_count"] += 1
+        elif record["association_available"] and assembly_ordinal == 1 and assembly is not None and assembly["available"] and \
+                assembly["snapshot"]["SourceSinkPresent"] is False and assembly["snapshot"]["SolutionDimensions"] == 1:
+            counts["coefficient_selected_first_invocation_count"] += 1
+        counts["coefficient_actual_return_marker_count"] += reached[2]
+    need(all(callbacks[i] == retained[i] + omitted[i] and actual_sum[i] <= callbacks[i] for i in range(3)) and
+         all(flag_sum[i] <= event_counts[i] for i in range(6)), "All coefficient visits/failures require exact retained-or-omitted accounting")
+    failed = bool(failed or callbacks != retained)
+    need(ledger["method_copy_integrity_failed"] is failed, "Actual coefficient integrity summary differs")
+    if failed:
+        integrity.append(label + "/FinalCoefficients/required-observation-integrity-failed")
+    prior_gamma = observed["Gamma"]
+    if not (failed or prior_gamma["method_copy_integrity_failed"]):
+        need(callbacks[0] <= prior_gamma["actual_stage_callback_counts"][4] and
+             prior_gamma["actual_invocation_count"] <= callbacks[2] + 1, "Actual Gamma-before-coefficient return order differs")
+        if operation["call_outcome"]["status"] == "source_returned":
+            need(callbacks[0] == callbacks[2] == prior_gamma["actual_invocation_count"], "Normally returned whole call requires each actual Gamma-to-coefficient visit")
+        for record in ledger["invocations"]:
+            for name in ["Exponential", "Inverse", "Gamma"]:
+                preceding = predecessors[name].get(record["observed_invocation_ordinal"])
+                need(preceding is not None and preceding["SourceReturn"]["reached"] and
+                     preceding["observed_assembly_ordinal"] == record["observed_assembly_ordinal"], "Actual coefficient entry requires all matching prior returns")
+    counts["coefficient_actual_invocation_count"] += callbacks[0]
+    counts["coefficient_actual_retained_invocation_count"] += len(ledger["invocations"])
+    for i, stage in enumerate(STAGES):
+        counts["coefficient_stage_" + stage] += callbacks[i]
+        counts["coefficient_omitted_" + stage] += omitted[i]
+    for i, kind in enumerate(FAILURES):
+        counts["coefficient_failure_" + kind] += event_counts[i]
+    counts["coefficient_method_copy_integrity_failed"] = bool(counts["coefficient_method_copy_integrity_failed"] or failed)
+
+
+def summary(result, counts, need):
+    expected = {"actual_invocation_count": counts["coefficient_actual_invocation_count"],
+        "actual_retained_invocation_count": counts["coefficient_actual_retained_invocation_count"],
+        "actual_stage_callback_counts": [counts["coefficient_stage_" + stage] for stage in STAGES],
+        "stage_records_omitted": [counts["coefficient_omitted_" + stage] for stage in STAGES],
+        "failure_event_counts": [counts["coefficient_failure_" + kind] for kind in FAILURES],
+        "method_copy_integrity_failed": bool(counts["coefficient_method_copy_integrity_failed"]),
+        "complete_method_return_parity_claimed": False, "numerical_PASS_claimed": False}
+    total = result["actual_final_coefficient_observation_counts"]
+    need(isinstance(total, dict) and set(total) == set(expected) and total == expected, "Global coefficient totals differ from all actual records")
+    for key in ["actual_invocation_count", "actual_retained_invocation_count"]:
+        need(type(total[key]) is int, "Typed global coefficient count required")
+    for key, size in [("actual_stage_callback_counts", 3), ("stage_records_omitted", 3), ("failure_event_counts", 6)]:
+        need(isinstance(total[key], list) and len(total[key]) == size and all(type(n) is int and n >= 0 for n in total[key]),
+             "Typed global coefficient count array required")
+    for key in ["method_copy_integrity_failed", "complete_method_return_parity_claimed", "numerical_PASS_claimed"]:
+        need(type(total[key]) is bool, "Typed global coefficient flag required")
+    return {"actual_final_coefficient_observation_counts": expected, **{key: counts[key] for key in ["coefficient_whole_call_records",
+            "coefficient_uninvoked_whole_call_records", "coefficient_selected_first_invocation_count", "coefficient_later_unpaired_invocation_count",
+            "coefficient_actual_return_marker_count"]}}
+
+
+def packet(freeze, request, admission, projection, tolerances, need):
+    for owner in [request, admission, projection, tolerances]:
+        need(owner["ctf08_final_coefficient_observation_policy"] == POLICY, "Exact frozen private coefficient policy required")
+    inventory = projection["method_state_pairing_and_availability"]
+    need(inventory["ctf08_final_coefficient_observation_policy"] == POLICY and inventory["ctf08_method_selection"] == SELECTION,
+         "Separate exact first private coefficient selection required; inherited Gamma selector unchanged")
+    need(tolerances["ctf08_discrete_exact"] == inventory["ctf08_discrete_exact"] == ["NumCTFTerms", "inum", "CTFConvrg",
+         "actual owner/bounds/order/context/callback/omission/failure/availability", "all allocated history slots without NumCTFTerms truncation"],
+         "Exact private coefficient discrete/count/class/shape obligations required")
+    rows = tolerances["ctf08_final_coefficient_profiles"]
+    need(isinstance(rows, list) and [row["variable"] for row in rows] == ["s0", "s", "e", "mutated_Gamma1", "PhiR0", "Rnew", "Rold"],
+         "Seven separate private coefficient profiles required")
+    for row, shape in zip(rows, [[3, 4], "actual_3_by_4_by_rcmax", "actual_rcmax", "actual_3_by_rcmax",
+                               "actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax"]):
+        need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+             row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and row["required_shape"] == shape,
+             "Exact zero/class/shape/signedzero private coefficient profile differs")
+
+
+def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane, *, historical_prior_07=None):
+    from datetime import datetime
+    from pathlib import Path
+    authority, need = freeze["source_authorities"], m.require
+    counts = {"unit": {"model_cases": 39, "calculateTransferFunction": 42}, "production": {"model_cases": 15, "loader_phase_records": 195}}
+
+    def check(ref, name, prior_to):
+        command = recorded(ref, prior_to)
+        need(command["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", name] and
+             m.contained(command["stderr"]["path"]).stat().st_size == 0, "Real card check0/empty stderr required")
+
+    if historical_prior_07 is None:
+        need(set(authority["current_cards"]) == {"CTF-08"} and authority["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only",
+             "Current08 scope role differs")
+        amendment = m.load(authority["actual_scope_amendment"])
+        need(amendment["schema"] == "ctf08-source-scope-amendment.v1" and amendment["cards"] == ["CTF-08"] and
+             amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
+             amendment["strict_profiles_settled_before_outputs"] is True and amendment["actual_CTF08_build_or_engine_execution_performed"] is False and
+             amendment["requested_counts"] == counts, "Actual pre-output08 amendment required")
+        for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
+                            ("final_coefficient_policy_source_inventory", authority["final_coefficient_policy_source_inventory"])]:
+            same(amendment[key], target); m.bind(target)
+        before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
+        need(len(before) == len(after) == 2 and len({r["path"] for r in before}) == len({r["path"] for r in after}) == 2 and
+             before == authority["historical_scope_documents"] and after == authority["current_scope_documents"], "Current08 raw document identities differ")
+        card = m.bind(authority["current_cards"]["CTF-08"])
+        historical = next(r for r in passive["source_refs"] if r["path"] == card["path"])
+        need(card["path"] == "energyplus_porting_plan/cards/CTF-08.md" and card in after and m.identity("energyplus_porting_plan/plan.json") in after and
+             any(r["sha256"] == historical["sha256"] and r["size_bytes"] == historical["size_bytes"] for r in before),
+             "Current08 plan/card or historical before copy differs")
+        check(authority["actual_scope_amendment_execution"], "CTF-08", frozen_started)
+    prior = historical_prior_07 if historical_prior_07 is not None else authority["historical_prior_07_authority"]
+    prior_ref, execution_ref = prior["prior_07_freeze"], prior["prior_07_freeze_execution"]
+    old07 = m.load(prior_ref); command07 = recorded(execution_ref, frozen_started)
+    prefix = "ctf07-" + ("production-" if lane == "production" else "")
+    need(old07["schema"] == prefix + "frozen-packet.v1" and old07["lane"] == lane and
+         old07["status"] == "frozen-inherited-input-and-fresh-CTF07-Gamma-policy-before-helper" and old07["frozen_before_this_CTF07_helper_execution"] is True and
+         old07["requested_counts"] == freeze["requested_counts"] and old07["scientific_operands_evaluated"] is False and old07["numerical_PASS_claimed"] is False and
+         m.load(command07["stdout"]) == old07 and m.bind(command07["stderr"])["size_bytes"] == 0,
+         "Real same-lane prior07 input-only freeze/full stdout required")
+    finished = datetime.fromisoformat(old07["finished_utc"])
+    need(finished.tzinfo is not None and finished <= datetime.fromisoformat(frozen_started), "Prior07 freeze must precede08")
+    writer_ref = prior["prior_07_writer_manifest"]
+    need(writer_ref["sha256"] == "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02", "Exact prior07 writer authority required")
+    same(old07["source_preparation_approval"]["source_manifest"], writer_ref)
+    own = [m.bind(row) for row in m.load(writer_ref)["own_sources"]]
+    need(len(own) == len(old07["executed_writer_sources"]) == 2 and old07["source_preparation_approval"]["approved_writer_sha256"] == own[0]["sha256"] and
+         [m.bind(row) for row in old07["source_preparation_approval"]["reviewed_sources"]] == own, "Prior07 approved own2 identity differs")
+    for declared, archive in zip(own, old07["executed_writer_sources"]):
+        need(archive["historical_path"] == declared["path"] and m.bind(archive["archive"])["sha256"] == declared["sha256"], "Prior07 writer owner/archive differs")
+    argv = command07["command"]
+    need(len(argv) == 31 and Path(argv[0]).name.lower() in ["python", "python.exe"] and argv[1:4] == ["-X", "utf8", "-B"] and
+         m.contained(argv[4]) == m.contained(own[0]["path"]), "Actual prior07 writer command differs")
+    flags = dict(zip(argv[5::2], argv[6::2]))
+    need(len(flags) == 13 and set(flags) == {"--lane", "--approved-source-sha256", "--source-manifest", "--native-source-manifest", "--current-card-07",
+         "--actual-scope-amendment", "--actual-scope-amendment-execution", "--prior-06-freeze", "--prior-06-freeze-execution",
+         "--prior-05-06-scope-amendment", "--prior-scope-check-05", "--prior-scope-check-06" , "--output-dir"} and flags["--lane"] == lane and
+         flags["--approved-source-sha256"] == own[0]["sha256"] and m.contained(flags["--output-dir"], existing=False) == m.contained(prior_ref["path"]).parent,
+         "Actual prior07 flags/output differs")
+    old_authority07 = old07["source_authorities"]
+    ancestor = prior["historical_prior_05_06_authority"]
+    need(ancestor == old_authority07["prior_05_06_authority"] and
+         old_authority07["actual_scope_amendment_execution_role"] == "real-CTF-07-check-only; prior05/06-authorities-separate",
+         "Historical07 and nested05/06 authority differs")
+    for key, ref in [("source-manifest", writer_ref), ("native-source-manifest", old_authority07["native_source_manifest"]),
+                     ("actual-scope-amendment", prior["prior_07_scope_amendment"]), ("actual-scope-amendment-execution", prior["prior_07_scope_check_execution"]),
+                     ("prior-06-freeze", ancestor["prior_06_freeze"]), ("prior-06-freeze-execution", ancestor["prior_06_freeze_execution"]),
+                     ("prior-05-06-scope-amendment", ancestor["prior_05_06_scope_amendment"]),
+                     ("prior-scope-check-05", ancestor["prior_scope_checks"]["CTF-05"]), ("prior-scope-check-06", ancestor["prior_scope_checks"]["CTF-06"])]:
+        same(m.argument(flags["--" + key]), ref)
+    same(old_authority07["actual_scope_amendment"], prior["prior_07_scope_amendment"])
+    same(old_authority07["actual_scope_amendment_execution"], prior["prior_07_scope_check_execution"])
+    historical07 = m.load(prior["prior_07_scope_amendment"])
+    need(historical07["schema"] == "ctf07-source-scope-amendment.v1" and historical07["cards"] == ["CTF-07"] and historical07["scope_review_passed"] is True and
+         historical07["all_other_gates_pending"] is True and historical07["strict_profiles_settled_before_outputs"] is True and
+         historical07["actual_CTF07_build_or_engine_execution_performed"] is False and historical07["requested_counts"] == counts,
+         "Authentic historical07 amendment required")
+    for key, target in [("native_observer", old_authority07["native_source_manifest"]), ("passive_observer", old_authority07["passive_observer"]),
+                        ("gamma_policy_source_inventory", old_authority07["gamma_policy_source_inventory"])]:
+        same(historical07[key], target); m.bind(target)
+    before07 = [m.bind(row) for row in historical07["before_documents"]]
+    after07 = historical07["after_documents"]  # Historical after identities, never rebind live07 documents.
+    need(len(before07) == len(after07) == 2 and before07 == old_authority07["historical_scope_documents"] == prior["historical_before_document_archives"] and
+         after07 == old_authority07["current_scope_documents"] and {row["path"] for row in after07} ==
+         {"energyplus_porting_plan/plan.json", "energyplus_porting_plan/cards/CTF-07.md"} and prior["historical_after_document_identities"] ==
+         [{"historical_path": row["path"], "sha256": row["sha256"], "size_bytes": row["size_bytes"]} for row in after07],
+         "Historical07 raw document identities differ")
+    historical_card = old_authority07["current_cards"]["CTF-07"]
+    need(historical_card in after07 and flags["--current-card-07"] == historical_card["path"] + "#" + historical_card["sha256"],
+         "Historical07 card argument differs")
+    check(prior["prior_07_scope_check_execution"], "CTF-07", command07["started_utc"])
+    for archived in prior["available_prior_frozen_document_archives"]:
+        need(any(row["historical_path"] == archived["historical_path"] and row["archive"] == archived["archive"] for row in old07["reviewed_source_archives"]),
+             "Historical07 document archive was not in its actual freeze")
+        m.bind(archived["archive"])
+    need(all(any(row["historical_path"] == ref["path"] and row["archive"]["sha256"] == ref["sha256"]
+                 for row in prior["available_prior_frozen_document_archives"]) for ref in before07 + after07),
+         "All historical07 document identities require their actual frozen archives")
+    old07_request = m.load(old07["helper_request"])
+    need(old07_request["model_cases"] == request["model_cases"] and old07_request["requested_counts"] == request["requested_counts"] and
+         old07_request["all_45_guard_refs"] == request["all_45_guard_refs"] and prior["prior07_numerical_PASS_inferred"] is False,
+         "Literal same-input prior07 ancestry required; numerical PASS cannot be inferred")
+    old07_tolerances, new_tolerances = m.load(old07["contracts"]["tolerances"]), m.load(freeze["contracts"]["tolerances"])
+    for key in ["ctf03_initial_observation_policy", "ctf04_matrix_observation_policy", "ctf03_initial_profiles", "arithmetic_profiles_by_variable",
+                "ctf06_exponential_observation_policy", "ctf05_inverse_observation_policy", "ctf06_exponential_profiles", "ctf05_inverse_profiles",
+                "ctf07_gamma_observation_policy", "ctf07_gamma_profiles"]:
+        need(old07_tolerances[key] == new_tolerances[key], "Inherited prior07 policies/profiles must remain literal")
+    same(old07["contracts"]["source"], prior["prior_07_source_contract"])
+    need(m.load(prior["prior_07_source_contract"])["ctf07_selected_primary_ranges"] == prior["prior_07_selected_primary_ranges"], "Inherited07 ranges differ")
+    need(m.load(prior["prior_07_source_contract"])["source_authorities"] == old_authority07 and old07_request["prior_05_06_authority"] == ancestor,
+         "Actual prior07 receipt/request/source nested authority differs")
+    prior_ref, execution_ref = ancestor["prior_06_freeze"], ancestor["prior_06_freeze_execution"]
+    old = m.load(prior_ref); command = recorded(execution_ref, command07["started_utc"])
+    prefix = "ctf06-" + ("production-" if lane == "production" else "")
+    need(old["schema"] == prefix + "frozen-packet.v1" and old["lane"] == lane and
+         old["status"] == "frozen-inherited-input-and-fresh-combined-CTF05-CTF06-policy-before-helper" and
+         old["frozen_before_this_CTF06_helper_execution"] is True and old["requested_counts"] == old07["requested_counts"] and
+         old["scientific_operands_evaluated"] is False and old["numerical_PASS_claimed"] is False and
+         m.load(command["stdout"]) == old and m.bind(command["stderr"])["size_bytes"] == 0,
+         "Real same-lane prior06 input-only freeze/full stdout required")
+    finished = datetime.fromisoformat(old["finished_utc"])
+    need(finished.tzinfo is not None and finished <= datetime.fromisoformat(command07["started_utc"]), "Prior06 freeze must precede07")
+    writer_ref = ancestor["prior_06_writer_manifest"]
+    need(writer_ref["sha256"] == "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca", "Exact prior06 writer authority required")
+    same(old["source_preparation_approval"]["source_manifest"], writer_ref)
+    own = [m.bind(r) for r in m.load(writer_ref)["own_sources"]]
+    need(len(own) == len(old["executed_writer_sources"]) == 2 and
+         old["source_preparation_approval"]["approved_writer_sha256"] == own[0]["sha256"] and
+         [m.bind(r) for r in old["source_preparation_approval"]["reviewed_sources"]] == own, "Prior06 approved own2 identity differs")
+    for declared, archive in zip(own, old["executed_writer_sources"]):
+        need(archive["historical_path"] == declared["path"] and m.bind(archive["archive"])["sha256"] == declared["sha256"], "Prior executed writer owner/archive differs")
+    argv = command["command"]
+    need(len(argv) == 25 and Path(argv[0]).name.lower() in ["python", "python.exe"] and argv[1:4] == ["-X", "utf8", "-B"] and
+         m.contained(argv[4]) == m.contained(own[0]["path"]), "Actual prior06 writer command differs")
+    flags = dict(zip(argv[5::2], argv[6::2]))
+    need(set(flags) == {"--lane", "--approved-source-sha256", "--source-manifest", "--native-source-manifest", "--current-card-05", "--current-card-06",
+         "--actual-scope-amendment", "--actual-scope-amendment-execution-05", "--actual-scope-amendment-execution-06", "--output-dir"} and
+         flags["--lane"] == lane and flags["--approved-source-sha256"] == own[0]["sha256"] and
+         m.contained(flags["--output-dir"], existing=False) == m.contained(prior_ref["path"]).parent, "Actual prior06 flags/output differs")
+    old_authority = old["source_authorities"]
+    checks = ancestor["prior_scope_checks"]
+    need(set(checks) == {"CTF-05", "CTF-06"} and checks == old_authority["actual_scope_amendment_executions"] and
+         old_authority["actual_scope_amendment_execution_role"] == "real-CTF-06-check-only; both-required-checks-in-executions-mapping",
+         "Both historical05/06 checks with literal singular06 role required")
+    same(old_authority["actual_scope_amendment_execution"], checks["CTF-06"])
+    same(old_authority["actual_scope_amendment"], ancestor["prior_05_06_scope_amendment"])
+    for key, ref in [("source-manifest", writer_ref), ("native-source-manifest", old_authority["native_source_manifest"]),
+                     ("actual-scope-amendment", ancestor["prior_05_06_scope_amendment"]),
+                     ("actual-scope-amendment-execution-05", checks["CTF-05"]), ("actual-scope-amendment-execution-06", checks["CTF-06"])]:
+        same(m.argument(flags["--" + key]), ref)
+    historical_amendment = m.load(ancestor["prior_05_06_scope_amendment"])
+    need(historical_amendment["schema"] == "ctf05-ctf06-source-scope-amendment.v1" and historical_amendment["cards"] == ["CTF-05", "CTF-06"] and
+         historical_amendment["scope_review_passed"] is True and historical_amendment["all_other_gates_pending"] is True and
+         historical_amendment["strict_profiles_settled_before_outputs"] is True and
+         historical_amendment["actual_CTF05_or_CTF06_build_or_engine_execution_performed"] is False and
+         historical_amendment["requested_counts"] == counts, "Authentic historical05/06 amendment required")
+    for key, target in [("native_observer", old_authority["native_source_manifest"]), ("passive_observer", old_authority["passive_observer"]),
+                        ("method_policy_source_inventory", old_authority["method_policy_source_inventory"])]:
+        same(historical_amendment[key], target); m.bind(target)
+    need(old_authority["method_policy_source_inventory"]["sha256"] == "3649c701e9a9b2c719ef9fe0ff733d56d1d48fb76915c1f294bba3479f246541", "Exact historical06 policy required")
+    old_before = [m.bind(r) for r in historical_amendment["before_documents"]]
+    old_after = historical_amendment["after_documents"]  # Historical identities: never bind these live paths.
+    need(len(old_before) == len(old_after) == 3 and old_before == old_authority["historical_scope_documents"] == ancestor["historical_before_document_archives"] and
+         old_after == old_authority["current_scope_documents"] and
+         {r["path"] for r in old_after} == {"energyplus_porting_plan/plan.json", "energyplus_porting_plan/cards/CTF-05.md", "energyplus_porting_plan/cards/CTF-06.md"} and
+         ancestor["historical_after_document_identities"] == [{"historical_path": r["path"], "sha256": r["sha256"], "size_bytes": r["size_bytes"]} for r in old_after],
+         "Historical raw document identities differ")
+    for name, ref in checks.items():
+        card = old_authority["current_cards"][name]
+        need(card in old_after and flags["--current-card-" + name[-2:]] == card["path"] + "#" + card["sha256"], "Historical card argument differs")
+        check(ref, name, command["started_utc"])
+    for archived in ancestor["available_prior_frozen_document_archives"]:
+        need(any(r["historical_path"] == archived["historical_path"] and r["archive"] == archived["archive"] for r in old["reviewed_source_archives"]),
+             "Historical document archive was not in prior actual freeze")
+        m.bind(archived["archive"])
+    old_request = m.load(old["helper_request"])
+    need(old_request["model_cases"] == old07_request["model_cases"] and old_request["requested_counts"] == old07_request["requested_counts"] and
+         old_request["all_45_guard_refs"] == old07_request["all_45_guard_refs"] and ancestor["prior06_numerical_PASS_inferred"] is False,
+         "Literal same-input prior06 ancestry required; numerical PASS cannot be inferred")
+    old_tolerances, new_tolerances = m.load(old["contracts"]["tolerances"]), m.load(old07["contracts"]["tolerances"])
+    for key in ["ctf03_initial_observation_policy", "ctf04_matrix_observation_policy", "ctf03_initial_profiles", "arithmetic_profiles_by_variable",
+                "ctf06_exponential_observation_policy", "ctf05_inverse_observation_policy", "ctf06_exponential_profiles", "ctf05_inverse_profiles"]:
+        need(old_tolerances[key] == new_tolerances[key], "Inherited prior06 policies/profiles must remain literal")
+    same(old["contracts"]["source"], ancestor["prior_06_source_contract"])
+    need(m.load(ancestor["prior_06_source_contract"])["ctf06_selected_primary_ranges"] == ancestor["prior_06_selected_primary_ranges"], "Inherited06 ranges differ")
+    for owner in [request, admission, projection]:
+        for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "actual_scope_amendment_execution_role", "current_cards", "historical_prior_07_authority"]:
+            need(owner[key] == authority[key], "Current08 and historical prior07 packet authority differs")

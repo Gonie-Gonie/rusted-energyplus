@@ -1,0 +1,29 @@
+--- .runtime/porting/CTF-08/original-data-review-prep-02/initial_shape.py
++++ .runtime/porting/CTF-09/original-data-review-prep-01/initial_shape.py
+@@ -23,7 +23,7 @@
+ 
+ def packet(freeze, request, admission, projection, tolerances, inherited_tolerances, need):
+     for item in [freeze, request, admission, projection, tolerances]:
+-        need(item["frozen_before_this_CTF08_helper_execution"] is True and item["expected_values_supplied"] is False and
++        need(item["frozen_before_this_CTF09_helper_execution"] is True and item["expected_values_supplied"] is False and
+              item["expected_exits_supplied"] is False and item["scientific_execution_performed"] is False,
+              "Fresh input-only initial-state policy differs")
+     for item in [request, admission, projection, tolerances]:
+@@ -40,7 +40,7 @@
+          len(tolerances["ctf01_preprocessing_profiles"]) == 18 and
+          tolerances["tolerance_changes_after_output_inspection_permitted"] is False,
+          "Inherited18 context must remain separate and unchanged")
+-    need(freeze["inherited_CTF01_CTF06_or_CTF07_freeze_claimed_as_fresh_CTF08_freeze"] is False,
++    need(freeze["inherited_CTF01_through_CTF08_freeze_claimed_as_fresh_CTF09_freeze"] is False,
+          "Historical CTF01 freeze cannot replace this initial-observation freeze")
+ 
+     matrix_packet(freeze, request, admission, projection, tolerances, need)
+@@ -121,7 +121,7 @@
+ 
+ 
+ MATRIX_POLICY = {'protocol': 'ctf04-matrix-assembly.v1', 'phase': 'after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt', 'selection': 'first_actual_post728_visit_in_selected_no_source_1D_context', 'selected_attempt_ordinal': 1, 'later_Native_attempts_paired': False, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'Rust_retry_driver_available': False, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'matrix_fields': ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat'], 'storage_order': 'source_i1_outer_i2_inner_row_first', 'matrix_shapes': {'AMat': 'actual_rcmax_by_rcmax', 'IdenMatrix': 'actual_rcmax_by_rcmax', 'BMat': 3, 'CMat': 2, 'DMat': 2}, 'actual_source_produced_identity_required': True, 'attempt_identity': 'one_based_actual_callback_visit_within_bound_whole_call', 'actual_current_retry_state_fields': ['CTFTimeStep', 'NumHistories', 'TimeStepZone'], 'actual_converted_and_initial_handoff_retained': True, 'missing_attempt_or_copy_integrity_failure_is_required_failure': True, 'unreached_counted_as_PASS': False, 'retry_driver_or_matrix_answers_reconstructed': False}
+-RETENTION_INTENT = {'schema': 'ctf08-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF08-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
++RETENTION_INTENT = {'schema': 'ctf09-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF09-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+ MATRIX_VARIABLES = ["AMat", "IdenMatrix", "BMat", "CMat", "DMat", "assembly_CTFTimeStep", "caller_TimeStepZone"]
+ MATRIX_SHAPES = ["actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", [3], [2], [2], "scalar", "scalar"]
+ FAILURES = ["IdentityMismatch", "OrderFailure", "ActivePrefixShape", "MatrixShape", "CopyException", "LedgerAppendException"]

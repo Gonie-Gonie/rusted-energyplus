@@ -1,0 +1,24 @@
+--- .runtime/porting/CTF-09/original-data-review-prep-01/retry_shape.py
++++ .runtime/porting/CTF-09/original-data-review-prep-02/retry_shape.py
+@@ -116,7 +116,10 @@
+         need(isinstance(failure, dict) and set(failure) == {"site", "actual_callback_ordinal", "pre_assignment_ordinal", "post_assembly_ordinal", "kind"} and
+              failure["site"] in ["PreAssignment", "CallerEvent", "Diagnostic"] and failure["kind"] in FAILURES and
+              failure_counts[FAILURES.index(failure["kind"])] > 0, "Actual retry failure association required")
+-        for name in ["actual_callback_ordinal", "pre_assignment_ordinal", "post_assembly_ordinal"]: integer(failure[name])
++        site_counter = {"PreAssignment": "actual_pre_assignment_count", "CallerEvent": "actual_caller_event_count", "Diagnostic": "actual_diagnostic_count"}[failure["site"]]
++        integer(failure["actual_callback_ordinal"], 0, ledger[site_counter])
++        integer(failure["pre_assignment_ordinal"], 0, ledger["actual_pre_assignment_count"])
++        integer(failure["post_assembly_ordinal"], 0, observations["MatrixAssembly"]["actual_matrix_attempt_callback_count"])
+     failed = ledger["observer_failure"] or ledger["counter_overflow"] or ledger["first_failure"] is not None or ledger["last_failure"] is not None or any(failure_counts)
+     failed = failed or ledger["pre_assignment_records_omitted"] != 0 or ledger["diagnostic_records_omitted"] != 0 or any(ledger["caller_records_omitted"])
+     failed = failed or any(ledger[actual] != ledger[retained] for actual, retained in [
+@@ -258,7 +261,8 @@
+         if match:
+             need(operation["diagnostic_message_begin"] <= position < operation["diagnostic_message_end"], "Actual diagnostic escapes bound whole-call slice")
+         preceding = row["preceding_caller_event_ordinal"]
+-        if preceding in event_by_ordinal:
++        if preceding is not None:
++            need(preceding in event_by_ordinal, "Actual preceding diagnostic event must be retained")
+             event = event_by_ordinal[preceding]
+             need(event["observed_pre_assignment_ordinal"] <= row["observed_pre_assignment_ordinal"] and
+                  event["observed_assembly_ordinal"] <= row["observed_post_assembly_callback_count"], "Actual preceding diagnostic association exceeds current counters")

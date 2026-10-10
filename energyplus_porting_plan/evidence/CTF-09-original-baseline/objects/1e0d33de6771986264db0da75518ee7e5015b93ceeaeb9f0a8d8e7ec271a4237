@@ -1,0 +1,73 @@
+{
+  "schema": "ctf09-original-data-review-source-draft-checkpoint.v1",
+  "status": "DRAFT-NOT-SOURCE-READY-NOT-EXECUTED-NOT-APPROVED",
+  "reason": "Root priority switched to CTF08 retirement source preparation",
+  "own_draft_sources": [
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/coefficient_shape.py",
+      "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+      "size_bytes": 50650,
+      "line_count": 516
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/gamma_shape.py",
+      "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+      "size_bytes": 34636,
+      "line_count": 316
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/initial_shape.py",
+      "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+      "size_bytes": 26626,
+      "line_count": 309
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/method_shape.py",
+      "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+      "size_bytes": 30929,
+      "line_count": 284
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/packet_io.py",
+      "sha256": "dafe5c098bd6548574eb3d3870229483c197f7a16aa274e9c3bbea716451a934",
+      "size_bytes": 4665,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/production_shape.py",
+      "sha256": "68cb01f05febe4528f31a376ffb5916ea80a499b7ee1160a27a028a9185e5a9e",
+      "size_bytes": 21974,
+      "line_count": 249
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/retry_shape.py",
+      "sha256": "e47b7550d61ab1d7d5b2ddbb7793ce33472d1936274e8dffc1e6e4755dca11a8",
+      "size_bytes": 40709,
+      "line_count": 360
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/review_production.py",
+      "sha256": "4f9c3281abf8aab0de95285c9ee86e5fa7afbb9b1c66f0107cefcc341bb9b032",
+      "size_bytes": 32496,
+      "line_count": 343
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/review_unit.py",
+      "sha256": "ba88e17db58dc1406f474fd79ca5a0ea939eeb4d0a766121f14025479f21cfd1",
+      "size_bytes": 29829,
+      "line_count": 321
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-01/unit_shape.py",
+      "sha256": "77736457bb13f70b62bed722a291520e9b1c2a190096c12eed499897a5a1feab",
+      "size_bytes": 20438,
+      "line_count": 234
+    }
+  ],
+  "remaining": [
+    "Full source protocol alignment and bootstrap pin recheck",
+    "New retry validator source review against all actual producer partial/failure routes",
+    "README/diffs/manifest and independent full peer"
+  ],
+  "target_imported_or_executed": false
+}

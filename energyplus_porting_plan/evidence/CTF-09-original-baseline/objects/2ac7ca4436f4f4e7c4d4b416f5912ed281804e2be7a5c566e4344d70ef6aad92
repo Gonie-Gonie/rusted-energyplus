@@ -1,0 +1,2 @@
+{"review": {"path": ".runtime/porting/CTF-09/native-unit-build-review-01/review.json", "sha256": "5048992d97a01bca5e099b6ec2bfc78101fa909591e3881b45260dd4d93fb6d4", "size_bytes": 2977}, "status": "pass-exact-retained-PE-runtime-and-actual-build-identity"}
+{"receipt": {"path": ".runtime/porting/CTF-09/native-unit-build-review-command-01/receipt.json", "sha256": "61ddbf14d1bc5224f8ee7f005c6eee9acb709feb2547cebf0c3c9ae221c72e9c"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

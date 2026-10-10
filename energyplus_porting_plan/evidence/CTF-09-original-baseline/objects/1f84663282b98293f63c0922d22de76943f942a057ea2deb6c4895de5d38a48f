@@ -1,0 +1,64 @@
+# CTF09 factual Original DataQA source hold
+
+This is the existing independent Original data/provenance reader adapted from accepted CTF08 DataQA02. It adds one structural retry-ledger module. It does not execute an engine, calculate CTF values, compare numerical values, or certify a card gate.
+
+The ten Python source files are held, unexecuted. Root supplies actual Native recorder/result, freeze/recorder, build/compile recorder, and independent PE review/recorder references at execution. Root and another author must fully review this source before use.
+
+## Runtime interface
+
+Use review_unit.py or review_production.py with these explicit arguments:
+
+- --approved-source-sha256 (that lane's actual reviewed main SHA)
+- --approved-build-review-source-sha256 (held PE09 reader 5d89146327cb503a774510c1fc6333b56e1436aca4664360127c1575544c51b1)
+- --native-execution path#SHA
+- --results path#SHA (or an absent file path for an actual unavailable process ledger)
+- --freeze-receipt path#SHA
+- --freeze-execution path#SHA
+- --build path#SHA
+- --build-execution path#SHA
+- --build-review path#SHA
+- --build-review-execution path#SHA
+- --output-dir a fresh contained CTF09 directory
+
+The result filename is ctf09-helper-results.json for unit and ctf09-production-helper-results.json for production. Every source dependency is SHA-checked before stdlib module loading. Eight executed source archives are emitted per lane: main, lane shape, initial, method, Gamma, coefficient, retry, and I/O. No project module is imported.
+
+The report schemas are ctf09-independent-original-data-review.v1 and ctf09-production-independent-original-data-review.v1. Statuses retain the accepted factual data/provenance-before-Rust protocol. Rust_baseline_released requires a real Native exit0, complete validated ledger, and zero observation-integrity failures. A valid complete exit2 ledger retains its actual source counts and failures but cannot release Rust. OS/spawn/no complete valid result leaves counts unknown; no fabricated source outcomes.
+
+## Preserved lanes and source custody
+
+Literal inherited unit39/model42 calls and production15/model195 setup-phase obligations, dynamic actual Construct calls, fixed ordered45 guards, existing integer/class/shape/bit DTO checks, diagnostics, constructor/init/fatal/not-invoked ledger, and old first-only selected policies remain separate. No Native attempt count, dt/history, material value, branch result, or scientific answer is supplied to Rust.
+
+Native8 per lane is taken from held helper b4e15e09; the passive source is 4934fe49. The held writer is 4009f6c7 and PE reader inventory f64af568. Actual configure/compile/derive/provider/core/protected counts remain runtime metadata: old rows plus6, typed protected-count agreement, registered643 and actual present+absent643. No future output identities or success are guessed.
+
+Current CTF09 scope authenticates a real ctf09-source-scope-amendment.v1, retry_policy_source_inventory, current card/plan, one real CTF09 check recorder, and role real-CTF-09-check-only. The real same-lane historical08 freeze/argv25/own2/source/scope/check/document archives are separately authenticated; its nested historical07 and05/06 authority is retained literally. Historical after-document identities are validated through authentic archives, never rebound to later live documents. The pre-amendment card09 source identity is explicitly archived here; it is not a future current-card hash.
+
+The fresh retry policy and eight zero/class/shape/signed-zero profiles are literal copies from the held helper projection. The inherited first-only matrix7/initial3/preprocessing18, method06seven/05two, Gamma3 and private08seven profiles remain unchanged separate handoffs. The reader has no tolerance tuning or comparison evaluator.
+
+## Actual retry integrity
+
+retry_shape validates every actual retained PreAssignment, CallerEvent and Diagnostic record, including all attempts and partial source outcomes. It does not evaluate stability predicates, derive dt/history updates, reconstruct identity/matrix buffers, or produce expected arrays.
+
+- Active prefix fields dl/rk/rho/cp/lr/ResLayer/Nodes/dx and actual AMat/Iden row-first storage/bounds plus copied BMat3 are admitted only under their independent actual availability. Required reached absence, copied-shape failure, wrong context, omission, duplicate/order failure or observer failure blocks release.
+- The first pre-assignment is bound to actual initial619 and PostConversion copies; each reached post728 assembly retains the same layer prefix and identity. Later pre-assignments bind the previous actual unconverged LoopTail and its copied context. There is no assertion that initial CTFTimeStep equals TimeStepZone.
+- All nine source caller-event kinds retain actual ordinal/attempt/context and the source collector's event grammar. Actual assigned sums exist only at AssignedSums. Ratios remain null because the source does not own ratio variables. Caller association requires the actual matching final-method SourceReturn; no return is inferred from a value buffer.
+- Six failure-kind counters, first/last associations, attempted/retained/omitted counts, record flags and global summaries are validated. Count balances allow explicitly typed counter-overflow failures to remain failures rather than silently rebuilding a ledger.
+- Diagnostics join their real occupied global message index/level/text and whole-call slice after the unchanged successful push. A preceding event is temporal context only, including a previous attempt when that is the actual recorded predecessor. No causal branch classification or text-to-Rust numerical pairing is inferred.
+- LoopExit remains distinct from whole-call return, public SI19 stores, retry completion in Rust, coefficients or surface handoff. Unreached/uninvoked/partial owners are never PASS.
+
+New report fields are reviewed_retry_observation_policy, reviewed_retry_attempt_selection, reviewed_retry_policy_contract, complete_actual_retry_records and retry_loop_exit_certifies_whole_return_or_SI_store:false. actual_observation_counts.actual_retry_observation_counts is derived from actual records and checked against Native RetryTotals. It preserves actual per-kind/failure/omission counts, not guessed future counts.
+
+## Source correspondence and preparation boundary
+
+before/ holds byte-exact accepted08 DataQA02 source/manifest/README. Ten exact source differences are supplied (the retry module is new). Gamma is byte-exact08; initial/matrix review, method packet/review/summary, Gamma functions, coefficient packet/review/summary and I/O functions retain their accepted ASTs. Current packet flag/retention/root and historical scope routing changes are explicit. Both main bootstrap pins and all eight per-lane source inventories are final held identities.
+
+Scientific observations have the inherited prospective physical bound1GiB; small metadata remains16MB. Production result_ref reuse is limited to the actual result path and retains the accepted bound fix. Binary identities come from actual build/PE metadata; this reader does not reopen binary payloads. Fixed45 guard descriptors are inherited input metadata; no weather payload was opened during preparation.
+
+Preparation used source text, source/input/custody metadata, exact byte hashes/diffs and Python AST parsing only. No authored reader/project module was imported or executed. No scientific results, binary/weather payloads, engines, tests, builds, Cargo, formatters, Git or canonical changes occurred. The historical draft checkpoint records an earlier interrupted WIP and is not a current source authority.
+
+Base authored passive/pure04, pure05, helper08 and freezer09. Header authored passive/helper09 and earlier validators. This hold reviews integration/structural custody and does not independently certify the author's scientific formulas or future output equality. Root and another author's source review remain required.
+
+## Fresh02 structural-only repair
+
+Immutable held01 remains the full-review predecessor. Fresh02 changes only retry_shape.review and the two main RETRY_SHA pins. Every non-null diagnostic preceding_caller_event_ordinal must identify its actual retained caller record. Actual first/last failure callback ordinals are bounded by their declared site counter, and pre/post association ordinals by actual pre-assignment/matrix counters. Genuine zero failure ordinals before an increment remain admitted. No observation, profile, arithmetic, availability, count policy, scientific comparison, scope or release rule was relaxed.
+
+All seven other source files are byte-exact01. before-01/ preserves all ten source files plus README/manifest; the three narrow from-01 diffs are separate from regenerated full CTF08 correspondence. No authored module or target was imported or executed, and no scientific/binary/weather payload was read.

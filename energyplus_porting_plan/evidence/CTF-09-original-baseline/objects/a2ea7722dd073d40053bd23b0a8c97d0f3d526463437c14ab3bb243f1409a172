@@ -1,0 +1,1525 @@
+{
+  "schema": "ctf09-actual-rebuildable-cargo-example-cache-move.v1",
+  "observed_utc": "2026-10-10T22:11:56.479321+00:00",
+  "Root_authored_record_not_command_recorder": true,
+  "source_directory": "target/debug/examples",
+  "actual_destination": "C:\\Users\\GONIEG~1\\AppData\\Local\\Temp\\rusted-energyplus-rebuildable-examples-20261011",
+  "moved_directory_exists": true,
+  "source_directory_absent": true,
+  "actual_file_inventory_without_content_hashes": [
+    {
+      "relative_to_moved_directory": "clk01_calendar-43071a730f332fb5.d",
+      "size_bytes": 364
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-43071a730f332fb5.exe",
+      "size_bytes": 7218232
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-7368d12701d10732.d",
+      "size_bytes": 364
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-7368d12701d10732.exe",
+      "size_bytes": 475158618
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-a02771279ff5ced0.d",
+      "size_bytes": 499
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-bdc2ebe26474c28c.d",
+      "size_bytes": 364
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-bdc2ebe26474c28c.exe",
+      "size_bytes": 477718426
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar-ee06df989c9667eb.d",
+      "size_bytes": 369
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar.d",
+      "size_bytes": 332013
+    },
+    {
+      "relative_to_moved_directory": "clk01_calendar.exe",
+      "size_bytes": 477718426
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-03b250febab3a7cd.d",
+      "size_bytes": 494
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-03b250febab3a7cd.exe",
+      "size_bytes": 464807937
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-19c8b765afa4a230.d",
+      "size_bytes": 494
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-19c8b765afa4a230.exe",
+      "size_bytes": 7218236
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-4efd687a8ff83c36.d",
+      "size_bytes": 494
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-4efd687a8ff83c36.exe",
+      "size_bytes": 476793541
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-8640e050165e2c6d.d",
+      "size_bytes": 628
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe-b30a329130b1ac2f.d",
+      "size_bytes": 499
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe.d",
+      "size_bytes": 332021
+    },
+    {
+      "relative_to_moved_directory": "clk02_legacy_probe.exe",
+      "size_bytes": 476793541
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-4ecac38cce013407.d",
+      "size_bytes": 1648
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-4ecac38cce013407.exe",
+      "size_bytes": 7218229
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-536dc4ad08d7a34c.d",
+      "size_bytes": 1648
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-536dc4ad08d7a34c.exe",
+      "size_bytes": 478034698
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-61ad79b1fe7a1b64.d",
+      "size_bytes": 1653
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-7a082949e6e56b63.d",
+      "size_bytes": 1782
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-83cd9fe20a0c3790.d",
+      "size_bytes": 1648
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-83cd9fe20a0c3790.exe",
+      "size_bytes": 480214006
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe-bb29614bd76f7991.d",
+      "size_bytes": 1653
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe.d",
+      "size_bytes": 332786
+    },
+    {
+      "relative_to_moved_directory": "clk02_probe.exe",
+      "size_bytes": 478034698
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-0f6fa10bfe4f103f.d",
+      "size_bytes": 1479
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-75d8b0f2c6e8c67e.d",
+      "size_bytes": 1474
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-75d8b0f2c6e8c67e.exe",
+      "size_bytes": 480298646
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-7d7d8f93713aaadf.d",
+      "size_bytes": 1608
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-9204c0f3abe4be30.d",
+      "size_bytes": 1474
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-9204c0f3abe4be30.exe",
+      "size_bytes": 479527653
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-a07318316b5dfdec.d",
+      "size_bytes": 1608
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-a1b986fdd2baa922.d",
+      "size_bytes": 1474
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe-a1b986fdd2baa922.exe",
+      "size_bytes": 7218239
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe.d",
+      "size_bytes": 332595
+    },
+    {
+      "relative_to_moved_directory": "clk03_candidate_probe.exe",
+      "size_bytes": 479527653
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-1c63289a1ad32635.d",
+      "size_bytes": 666
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-1c63289a1ad32635.exe",
+      "size_bytes": 477578343
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-5f27040136b4a17a.d",
+      "size_bytes": 671
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-668c100dc771ded1.d",
+      "size_bytes": 671
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-81d64c70e097e38c.d",
+      "size_bytes": 666
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-81d64c70e097e38c.exe",
+      "size_bytes": 479766336
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-a257ae4c9c0ddb7b.d",
+      "size_bytes": 800
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-b46d80eda8f52eef.d",
+      "size_bytes": 666
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe-b46d80eda8f52eef.exe",
+      "size_bytes": 7218236
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe.d",
+      "size_bytes": 332133
+    },
+    {
+      "relative_to_moved_directory": "clk03_legacy_probe.exe",
+      "size_bytes": 477578343
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-062bb1249f92b564.d",
+      "size_bytes": 2189
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-062bb1249f92b564.exe",
+      "size_bytes": 479511545
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-8287a09c29dea20b.d",
+      "size_bytes": 2323
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-8b495b5ecec0b777.d",
+      "size_bytes": 2189
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-8b495b5ecec0b777.exe",
+      "size_bytes": 7218239
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-b665f766171439e5.d",
+      "size_bytes": 2194
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-c938bfc08343ca91.d",
+      "size_bytes": 2189
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe-c938bfc08343ca91.exe",
+      "size_bytes": 481109469
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe.d",
+      "size_bytes": 332943
+    },
+    {
+      "relative_to_moved_directory": "clk04_candidate_probe.exe",
+      "size_bytes": 479511545
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-3622cf59b15ed1e3.d",
+      "size_bytes": 2138
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-3622cf59b15ed1e3.exe",
+      "size_bytes": 480191893
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-737e92316a543242.d",
+      "size_bytes": 2138
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-737e92316a543242.exe",
+      "size_bytes": 7218236
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-8206fabf1be590a1.d",
+      "size_bytes": 2138
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-8206fabf1be590a1.exe",
+      "size_bytes": 479417278
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-af9ee18c9a8f5b6b.d",
+      "size_bytes": 2272
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe-d1edd7cc87d677db.d",
+      "size_bytes": 2143
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe.d",
+      "size_bytes": 332925
+    },
+    {
+      "relative_to_moved_directory": "clk04_legacy_probe.exe",
+      "size_bytes": 479417278
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-b4e5ee81ef27af6a.d",
+      "size_bytes": 2197
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-b7b842430f99a373.d",
+      "size_bytes": 2192
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-b7b842430f99a373.exe",
+      "size_bytes": 7218239
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-c0d701d2a1b6774b.d",
+      "size_bytes": 2192
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-c0d701d2a1b6774b.exe",
+      "size_bytes": 479715563
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-d6ad76be2e5bd269.d",
+      "size_bytes": 2192
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-d6ad76be2e5bd269.exe",
+      "size_bytes": 482584291
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe-d6df4ce03fcdd086.d",
+      "size_bytes": 2326
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe.d",
+      "size_bytes": 332944
+    },
+    {
+      "relative_to_moved_directory": "clk05_candidate_probe.exe",
+      "size_bytes": 479715563
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-309926391fee720f.d",
+      "size_bytes": 2195
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-5a976075d3b74710.d",
+      "size_bytes": 2190
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-5a976075d3b74710.exe",
+      "size_bytes": 481456293
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-7376d83803d95edd.d",
+      "size_bytes": 2324
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-92ba32bfa9e2dd30.d",
+      "size_bytes": 2190
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-92ba32bfa9e2dd30.exe",
+      "size_bytes": 479708602
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-f447c14285dbdf11.d",
+      "size_bytes": 2190
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer-f447c14285dbdf11.exe",
+      "size_bytes": 7218241
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer.d",
+      "size_bytes": 332944
+    },
+    {
+      "relative_to_moved_directory": "clk05_existing_observer.exe",
+      "size_bytes": 479708602
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-10dd62c13b9644b1.d",
+      "size_bytes": 2376
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-10dd62c13b9644b1.exe",
+      "size_bytes": 481694698
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-5b17a0a7fc8f94f6.d",
+      "size_bytes": 2381
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-64159c5c49130923.d",
+      "size_bytes": 2376
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-64159c5c49130923.exe",
+      "size_bytes": 7218239
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-aa485ab1ba4e23d5.d",
+      "size_bytes": 2376
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-aa485ab1ba4e23d5.exe",
+      "size_bytes": 480425831
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe-c7292011c2f423a8.d",
+      "size_bytes": 2510
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe.d",
+      "size_bytes": 333060
+    },
+    {
+      "relative_to_moved_directory": "clk06_candidate_probe.exe",
+      "size_bytes": 480425831
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-193f9d385c928d63.d",
+      "size_bytes": 2379
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-1b5d93fe1cdd7224.d",
+      "size_bytes": 2374
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-1b5d93fe1cdd7224.exe",
+      "size_bytes": 7218241
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-6b569a96ba6a7f5d.d",
+      "size_bytes": 2374
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-6b569a96ba6a7f5d.exe",
+      "size_bytes": 483285058
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-74f33662058bb641.d",
+      "size_bytes": 2374
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-74f33662058bb641.exe",
+      "size_bytes": 480416842
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer-8a1fa6636344fc95.d",
+      "size_bytes": 2508
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer.d",
+      "size_bytes": 333060
+    },
+    {
+      "relative_to_moved_directory": "clk06_existing_observer.exe",
+      "size_bytes": 480416842
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-1ee21032b59e154b.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-767ecfd60860df84.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-a4e97c5817987c24.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-a4e97c5817987c24.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-f231e9d940e5c03e.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-f7809318393bfa30.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-f7809318393bfa30.exe",
+      "size_bytes": 505539195
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-fb266109863f8b60.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer-fb266109863f8b60.exe",
+      "size_bytes": 508346035
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer.d",
+      "size_bytes": 450024
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_production_observer.exe",
+      "size_bytes": 505539195
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-01e6ff4707442a54.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-1dd0f42e67a0fb73.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-1dd0f42e67a0fb73.exe",
+      "size_bytes": 480678344
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-62c7220234f40742.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-62c7220234f40742.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-7d570085abac7182.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-e6c25d9bdb4f3b67.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer-e6c25d9bdb4f3b67.exe",
+      "size_bytes": 477870100
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer.d",
+      "size_bytes": 449878
+    },
+    {
+      "relative_to_moved_directory": "ctf01_candidate_unit_observer.exe",
+      "size_bytes": 477870100
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-3c179312dca42179.d",
+      "size_bytes": 910
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-3c179312dca42179.exe",
+      "size_bytes": 510930662
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-401f26f1f2ca2124.d",
+      "size_bytes": 915
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-422287ec29efa75d.d",
+      "size_bytes": 910
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-422287ec29efa75d.exe",
+      "size_bytes": 7218241
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-b085d2aeca163c6e.d",
+      "size_bytes": 1044
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-f3a23c5b316445be.d",
+      "size_bytes": 910
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer-f3a23c5b316445be.exe",
+      "size_bytes": 504431889
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer.d",
+      "size_bytes": 449860
+    },
+    {
+      "relative_to_moved_directory": "ctf01_existing_observer.exe",
+      "size_bytes": 504431889
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-0f02d2da12a6d54c.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-0f02d2da12a6d54c.exe",
+      "size_bytes": 505795130
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-10b37d0ef61be9a5.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-1620b75bbc9c5d49.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-1620b75bbc9c5d49.exe",
+      "size_bytes": 505365846
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-1ab0b0e3176754ad.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-1ab0b0e3176754ad.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer-3c820494bba35595.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer.d",
+      "size_bytes": 450024
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_production_observer.exe",
+      "size_bytes": 505365846
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-63f4a4e20d2f367b.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-63f4a4e20d2f367b.exe",
+      "size_bytes": 477588285
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-67fee4ee4f63bf58.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-73f9e899812052ee.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-73f9e899812052ee.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-b1bbbae233820c0a.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-f2d0f675cdebc6f2.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer-f2d0f675cdebc6f2.exe",
+      "size_bytes": 478017189
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer.d",
+      "size_bytes": 449878
+    },
+    {
+      "relative_to_moved_directory": "ctf02_candidate_unit_observer.exe",
+      "size_bytes": 477588285
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer-70ec63fe75d5e951.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer-70ec63fe75d5e951.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer-cb4a84a4a5b6c5a2.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer-cb4a84a4a5b6c5a2.exe",
+      "size_bytes": 504855043
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer-cf17f36d9204f6c3.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer-fce8929e9f1295ae.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer.d",
+      "size_bytes": 450271
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_production_observer.exe",
+      "size_bytes": 504855043
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer-18cae3f0c3b2200e.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer-9c2c6f1eab15f05a.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer-d79d0118ad6ebab6.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer-d79d0118ad6ebab6.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer-e9afaf77cd8883d8.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer-e9afaf77cd8883d8.exe",
+      "size_bytes": 477379442
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer.d",
+      "size_bytes": 450125
+    },
+    {
+      "relative_to_moved_directory": "ctf03_candidate_unit_observer.exe",
+      "size_bytes": 477379442
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer-381750706dfaaa87.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer-381750706dfaaa87.exe",
+      "size_bytes": 511138720
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer-4ae8665e5a1d0b60.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer-74cd38865e9cdb1a.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer-74cd38865e9cdb1a.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer-ce8f73d2921a7d45.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer.d",
+      "size_bytes": 451495
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_production_observer.exe",
+      "size_bytes": 511138720
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer-050d10f30b26ba94.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer-050d10f30b26ba94.exe",
+      "size_bytes": 482052396
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer-13fb85cb372f6a68.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer-c5b4bcac3b5f9847.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer-c5b4bcac3b5f9847.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer-fd5625c5f79f172a.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer.d",
+      "size_bytes": 450377
+    },
+    {
+      "relative_to_moved_directory": "ctf04_candidate_unit_observer.exe",
+      "size_bytes": 482052396
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer-1e5d500e4bf794da.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer-1e5d500e4bf794da.exe",
+      "size_bytes": 514912446
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer-3429d726b1b61cf3.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer-cd187f5159cbaead.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer-cd187f5159cbaead.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer-e0b828bdbcec1646.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer.d",
+      "size_bytes": 451137
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_production_observer.exe",
+      "size_bytes": 514912446
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer-06e18092a7a89e14.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer-3c25b6babb617091.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer-3c25b6babb617091.exe",
+      "size_bytes": 487204310
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer-c397ce4e00083abc.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer-c397ce4e00083abc.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer-d787f4f5d686d7a1.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer.d",
+      "size_bytes": 450991
+    },
+    {
+      "relative_to_moved_directory": "ctf06_candidate_unit_observer.exe",
+      "size_bytes": 487204310
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer-11c33751528112e9.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer-11c33751528112e9.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer-826469672124e0b1.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer-8793b79965efb3ab.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer-8793b79965efb3ab.exe",
+      "size_bytes": 511700385
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer-f33c05e928bdaca8.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer.d",
+      "size_bytes": 451495
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_production_observer.exe",
+      "size_bytes": 511700385
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer-669a35ec5596facb.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer-9ea6c57485075828.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer-d1be9e521703c108.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer-d1be9e521703c108.exe",
+      "size_bytes": 483902270
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer-e09a424962110a66.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer-e09a424962110a66.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer.d",
+      "size_bytes": 451349
+    },
+    {
+      "relative_to_moved_directory": "ctf07_candidate_unit_observer.exe",
+      "size_bytes": 483902270
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer-080816902a64ab95.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer-080816902a64ab95.exe",
+      "size_bytes": 7218765
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer-66cd59f228ed2cc4.d",
+      "size_bytes": 1360
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer-69d64756f96177e1.d",
+      "size_bytes": 1231
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer-71c4a33c9a7060fc.d",
+      "size_bytes": 1226
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer-71c4a33c9a7060fc.exe",
+      "size_bytes": 510592723
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer.d",
+      "size_bytes": 451885
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_production_observer.exe",
+      "size_bytes": 510592723
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer-4e69296e2fd1bb45.d",
+      "size_bytes": 1092
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer-91fd0cb117159f0d.d",
+      "size_bytes": 963
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer-9e016e085fb48faa.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer-9e016e085fb48faa.exe",
+      "size_bytes": 482686609
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer-be353ac4e93b2afe.d",
+      "size_bytes": 958
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer-be353ac4e93b2afe.exe",
+      "size_bytes": 7218247
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer.d",
+      "size_bytes": 451739
+    },
+    {
+      "relative_to_moved_directory": "ctf08_candidate_unit_observer.exe",
+      "size_bytes": 482686609
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-2bc636c8d818b62a.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-2bc636c8d818b62a.exe",
+      "size_bytes": 7218230
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-329edad4e6864087.d",
+      "size_bytes": 489
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-7fb0b74bb4e83fe2.d",
+      "size_bytes": 359
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-a89f91983f1692db.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-a89f91983f1692db.exe",
+      "size_bytes": 476273213
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-bfb76846a43f3917.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples-bfb76846a43f3917.exe",
+      "size_bytes": 477313654
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples.d",
+      "size_bytes": 332009
+    },
+    {
+      "relative_to_moved_directory": "geo02_tuples.exe",
+      "size_bytes": 477313654
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-0d202ff7c90d455a.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-0d202ff7c90d455a.exe",
+      "size_bytes": 7218230
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-3071dccff0fbb186.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-3071dccff0fbb186.exe",
+      "size_bytes": 471118438
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-53fac2fbce03c613.d",
+      "size_bytes": 489
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-d531e2fd2136eac9.d",
+      "size_bytes": 359
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-eb2962615898694f.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples-eb2962615898694f.exe",
+      "size_bytes": 479097246
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples.d",
+      "size_bytes": 332009
+    },
+    {
+      "relative_to_moved_directory": "geo03_tuples.exe",
+      "size_bytes": 479097246
+    },
+    {
+      "relative_to_moved_directory": "libclk01_calendar-a02771279ff5ced0.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk01_calendar-ee06df989c9667eb.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk02_legacy_probe-8640e050165e2c6d.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk02_legacy_probe-b30a329130b1ac2f.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk02_probe-61ad79b1fe7a1b64.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk02_probe-7a082949e6e56b63.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk02_probe-bb29614bd76f7991.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk03_candidate_probe-0f6fa10bfe4f103f.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk03_candidate_probe-7d7d8f93713aaadf.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk03_candidate_probe-a07318316b5dfdec.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk03_legacy_probe-5f27040136b4a17a.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk03_legacy_probe-668c100dc771ded1.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk03_legacy_probe-a257ae4c9c0ddb7b.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk04_candidate_probe-8287a09c29dea20b.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk04_candidate_probe-b665f766171439e5.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk04_legacy_probe-af9ee18c9a8f5b6b.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk04_legacy_probe-d1edd7cc87d677db.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk05_candidate_probe-b4e5ee81ef27af6a.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk05_candidate_probe-d6df4ce03fcdd086.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk05_existing_observer-309926391fee720f.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk05_existing_observer-7376d83803d95edd.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk06_candidate_probe-5b17a0a7fc8f94f6.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk06_candidate_probe-c7292011c2f423a8.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk06_existing_observer-193f9d385c928d63.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libclk06_existing_observer-8a1fa6636344fc95.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_candidate_production_observer-1ee21032b59e154b.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_candidate_production_observer-767ecfd60860df84.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_candidate_production_observer-f231e9d940e5c03e.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_candidate_unit_observer-01e6ff4707442a54.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_candidate_unit_observer-7d570085abac7182.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_existing_observer-401f26f1f2ca2124.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf01_existing_observer-b085d2aeca163c6e.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf02_candidate_production_observer-10b37d0ef61be9a5.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf02_candidate_production_observer-3c820494bba35595.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf02_candidate_unit_observer-67fee4ee4f63bf58.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf02_candidate_unit_observer-b1bbbae233820c0a.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf03_candidate_production_observer-cf17f36d9204f6c3.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf03_candidate_production_observer-fce8929e9f1295ae.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf03_candidate_unit_observer-18cae3f0c3b2200e.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf03_candidate_unit_observer-9c2c6f1eab15f05a.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf04_candidate_production_observer-4ae8665e5a1d0b60.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf04_candidate_production_observer-ce8f73d2921a7d45.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf04_candidate_unit_observer-13fb85cb372f6a68.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf04_candidate_unit_observer-fd5625c5f79f172a.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf06_candidate_production_observer-3429d726b1b61cf3.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf06_candidate_production_observer-e0b828bdbcec1646.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf06_candidate_unit_observer-06e18092a7a89e14.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf06_candidate_unit_observer-d787f4f5d686d7a1.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf07_candidate_production_observer-826469672124e0b1.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf07_candidate_production_observer-f33c05e928bdaca8.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf07_candidate_unit_observer-669a35ec5596facb.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf07_candidate_unit_observer-9ea6c57485075828.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf08_candidate_production_observer-66cd59f228ed2cc4.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf08_candidate_production_observer-69d64756f96177e1.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf08_candidate_unit_observer-4e69296e2fd1bb45.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libctf08_candidate_unit_observer-91fd0cb117159f0d.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libgeo02_tuples-329edad4e6864087.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libgeo02_tuples-7fb0b74bb4e83fe2.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libgeo03_tuples-53fac2fbce03c613.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libgeo03_tuples-d531e2fd2136eac9.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libpsy01_tuples-14c4c57bf42c00c3.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libpsy01_tuples-183e010fbdf3c892.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libpsy01_tuples-7a50c2cf1b150b2e.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libpsy02_tuples-17bfea87ecf52f39.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libpsy02_tuples-9189d6c53e28ea1d.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libsch01_existing_observer-7bdca30ddae0cc30.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libsch01_existing_observer-84fb654bf596a8c6.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libzon01_tuples-0f602836f0eb8858.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "libzon01_tuples-1b5e7afc2297bab4.rmeta",
+      "size_bytes": 0
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-14c4c57bf42c00c3.d",
+      "size_bytes": 489
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-183e010fbdf3c892.d",
+      "size_bytes": 359
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-4870a69aecf7ae51.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-4870a69aecf7ae51.exe",
+      "size_bytes": 476365412
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-709a3ceee384e2ae.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-709a3ceee384e2ae.exe",
+      "size_bytes": 484221494
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-7a50c2cf1b150b2e.d",
+      "size_bytes": 489
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-a4384d175cf7820f.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-a4384d175cf7820f.exe",
+      "size_bytes": 478758979
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-ecff5fbc6f95d36b.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples-ecff5fbc6f95d36b.exe",
+      "size_bytes": 477635046
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples.d",
+      "size_bytes": 332009
+    },
+    {
+      "relative_to_moved_directory": "psy01_tuples.exe",
+      "size_bytes": 477635046
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-17bfea87ecf52f39.d",
+      "size_bytes": 489
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-65bdb0155ae7caaf.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-65bdb0155ae7caaf.exe",
+      "size_bytes": 477398131
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-9189d6c53e28ea1d.d",
+      "size_bytes": 359
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-9b88dd1aac67a0c0.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-9b88dd1aac67a0c0.exe",
+      "size_bytes": 7218230
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-a0ceac8cd59230da.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples-a0ceac8cd59230da.exe",
+      "size_bytes": 475360169
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples.d",
+      "size_bytes": 332009
+    },
+    {
+      "relative_to_moved_directory": "psy02_tuples.exe",
+      "size_bytes": 477398131
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-5d0ed85ac9b5eabc.d",
+      "size_bytes": 1426
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-5d0ed85ac9b5eabc.exe",
+      "size_bytes": 505663007
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-7bdca30ddae0cc30.d",
+      "size_bytes": 1431
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-84fb654bf596a8c6.d",
+      "size_bytes": 1560
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-93e926bb3e7460d5.d",
+      "size_bytes": 1426
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-93e926bb3e7460d5.exe",
+      "size_bytes": 506948422
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-b4a8925c2559712f.d",
+      "size_bytes": 1426
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer-b4a8925c2559712f.exe",
+      "size_bytes": 7218241
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer.d",
+      "size_bytes": 450196
+    },
+    {
+      "relative_to_moved_directory": "sch01_existing_observer.exe",
+      "size_bytes": 506948422
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-0f602836f0eb8858.d",
+      "size_bytes": 489
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-1b5e7afc2297bab4.d",
+      "size_bytes": 359
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-584280f099cd516f.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-584280f099cd516f.exe",
+      "size_bytes": 476926590
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-6f9d3bae6aee3232.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-6f9d3bae6aee3232.exe",
+      "size_bytes": 7218230
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-d59b5fff44f8a4a7.d",
+      "size_bytes": 354
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples-d59b5fff44f8a4a7.exe",
+      "size_bytes": 464945181
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples.d",
+      "size_bytes": 332009
+    },
+    {
+      "relative_to_moved_directory": "zon01_tuples.exe",
+      "size_bytes": 476926590
+    }
+  ],
+  "directory_entry_bytes": 43026301088,
+  "physical_disk_bytes_reclaimed_by_move": 0,
+  "same_volume_move_only": true,
+  "automatic_approval_review_rejected_prior_leaf_exe_deletion": true,
+  "automatic_review_reason_returned": "blocked by policy; no specific reason supplied",
+  "user_pre_authorized_fallback": "move undeletable temporary files and report path for manual deletion",
+  "manual_deletion_requested_asynchronously": true,
+  "Native44protected_and631core_and12absences_untouched": true,
+  "historical_Cargo_target_artifact_paths_not_rebound_to_live_paths": true,
+  "tracked_source_and_scientific_observation_files_moved": false
+}

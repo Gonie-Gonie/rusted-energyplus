@@ -1,0 +1,123 @@
+{
+  "schema": "ctf09-production-native-build.v1",
+  "target": "ctf09_production_helper",
+  "status": "pass-actual-3TU-link-and-preservation",
+  "authorship": "Root assembled real configure/compile/derive and map records. Before SHA inventory explicitly reuses genuine immediately preceding08 final retirement guard with no intervening protected/core mutation. Root freshly hashed all44 protected artifacts and631 core objects after build;12 absences unchanged. All703 previous compile rows literal in relative order,6 actual new rows. No engine or scientific claim.",
+  "observed_utc": "2026-10-10T22:09:32.895144+00:00",
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-09/native-build-01/production/derivation/derived-helper.exe",
+    "sha256": "9da76699aec0540a2a9f1c7565837ecdb80654f1cd3bfd1df66f06c40aa5cac0"
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf09_production_helper.exe",
+    "sha256": "00119c18cca3a2df3874508d2655d1f802b59f62c7c4c5abe7116b76de4af692",
+    "size_bytes": 1304803868
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf09-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF09-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_production_helper.cpp",
+      "sha256": "c5d526dc14417c7f622db02adacb1314368d2de0f161a28f12dc5c2ec37b96a6",
+      "size_bytes": 20926,
+      "line_count": 256
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_production_fields.hh",
+      "sha256": "9fee74b518e9184ee3d43db9f506195361030cc24eec48a8b0cc3ecc45af2e9e",
+      "size_bytes": 9327,
+      "line_count": 124
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_production_admission.hh",
+      "sha256": "f67e05d63e20cf6def0e332f277368c048202f483182654f74c12892bf7aea4b",
+      "size_bytes": 16729,
+      "line_count": 183
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-observer-prep-01/Construction.ctf09.cc",
+      "sha256": "9edd303402a8e34c0f7bbd8e4e026b99ef669dac55b2c12acf5c372e324ab813",
+      "size_bytes": 115391,
+      "line_count": 2163
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-observer-prep-01/ctf09_observer.hh",
+      "sha256": "9af12db96c09fb8c93d8dfa3e4e9e19c9be56a8fb8032151f3f90da38fbc7ce1",
+      "size_bytes": 26575,
+      "line_count": 678
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-observer-prep-01/ctf09_observer.cc",
+      "sha256": "d7a2f1d003927dbe97f08fe97856c9e1fc1c7a9c0e1f8b93652c559687dac986",
+      "size_bytes": 83750,
+      "line_count": 1588
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_observation_fields.hh",
+      "sha256": "63cfebeb5bcf806fbd745edfd761af8911000b243b5acfe0f15a50e520717173",
+      "size_bytes": 82493,
+      "line_count": 1016
+    }
+  ],
+  "configure_execution": {
+    "path": ".runtime/porting/CTF-09/native-configure-command-01/receipt.json",
+    "sha256": "2c0f75d3614bbd1a215968a7e2879184ff94de75af1a43bceda719c0c2b46b32",
+    "size_bytes": 7100
+  },
+  "compile_execution": {
+    "path": ".runtime/porting/CTF-09/native-compile-command-01/receipt.json",
+    "sha256": "7e0cdf12e9e4ae5478f6de0ed6d08fc5b3a2ee37d4853f828f980735a3110340",
+    "size_bytes": 2949
+  },
+  "derivation_execution": {
+    "path": ".runtime/porting/CTF-09/native-production-derive-command-01/receipt.json",
+    "sha256": "f7f59a4dba76dbb0eb8fcadf1519ca23ec01369b4371ed57d615c0c8785754a5",
+    "size_bytes": 3236
+  },
+  "prior_unit_derivation_setup_failure_preserved": {
+    "path": ".runtime/porting/CTF-09/native-unit-derive-command-01/receipt.json",
+    "sha256": "afd58b681cdc85e1766a5ad33ec042f09a0e99c7aea1a31abfef55d3cba625d9",
+    "size_bytes": 3213
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-09/native-build-01/production/derivation/receipt.json",
+    "sha256": "48d12501c87ab2f7c0b7cc5ec6edb7cff57ebb24b482bbb77bac64147d132e20",
+    "size_bytes": 12825
+  },
+  "preservation": {
+    "path": ".runtime/porting/CTF-09/native-build-01/production/preservation-after.json",
+    "sha256": "bb5a4d88f665ebca5caabd5021f4420c008ea22cdf14416acd96666d82b9dd56",
+    "size_bytes": 165357
+  },
+  "core_before_check": {
+    "path": ".runtime/porting/CTF-01/native-core-before-check-command-01/receipt.json",
+    "sha256": "e1da6904b99a635a16994406919608fa7284f19276d8d3a45eb4f3df8c807702",
+    "size_bytes": 3019
+  },
+  "previous_compile_rows": 703,
+  "current_compile_rows": 709,
+  "core_registered": 643,
+  "core_present": 631,
+  "core_absent": 12,
+  "all_previous_compile_commands_unchanged": true,
+  "protected_artifacts_and_present_core_objects_unchanged": true,
+  "link_provider_verified": true,
+  "scientific_execution_certified": false,
+  "gates_updated": false,
+  "protected_ref_count": 44
+}

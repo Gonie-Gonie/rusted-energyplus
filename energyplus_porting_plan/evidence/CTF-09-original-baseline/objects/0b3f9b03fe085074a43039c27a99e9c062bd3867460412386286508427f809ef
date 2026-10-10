@@ -1,0 +1,12 @@
+--- .runtime/porting/CTF-09/original-data-review-prep-01/README.md
++++ .runtime/porting/CTF-09/original-data-review-prep-02/README.md
+@@ -56,3 +56,9 @@
+ Preparation used source text, source/input/custody metadata, exact byte hashes/diffs and Python AST parsing only. No authored reader/project module was imported or executed. No scientific results, binary/weather payloads, engines, tests, builds, Cargo, formatters, Git or canonical changes occurred. The historical draft checkpoint records an earlier interrupted WIP and is not a current source authority.
+ 
+ Base authored passive/pure04, pure05, helper08 and freezer09. Header authored passive/helper09 and earlier validators. This hold reviews integration/structural custody and does not independently certify the author's scientific formulas or future output equality. Root and another author's source review remain required.
++
++## Fresh02 structural-only repair
++
++Immutable held01 remains the full-review predecessor. Fresh02 changes only retry_shape.review and the two main RETRY_SHA pins. Every non-null diagnostic preceding_caller_event_ordinal must identify its actual retained caller record. Actual first/last failure callback ordinals are bounded by their declared site counter, and pre/post association ordinals by actual pre-assignment/matrix counters. Genuine zero failure ordinals before an increment remain admitted. No observation, profile, arithmetic, availability, count policy, scientific comparison, scope or release rule was relaxed.
++
++All seven other source files are byte-exact01. before-01/ preserves all ten source files plus README/manifest; the three narrow from-01 diffs are separate from regenerated full CTF08 correspondence. No authored module or target was imported or executed, and no scientific/binary/weather payload was read.

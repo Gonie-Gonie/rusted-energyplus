@@ -1,0 +1,245 @@
+0",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 1.0,
+                      "value_bits": "3ff0000000000000",
+                      "value_class": "finite"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 0.0,
+                      "value_bits": "0000000000000000",
+                      "value_class": "positive_zero"
+                    },
+                    {
+                      "value": 1.0,
+                      "value_bits": "3ff0000000000000",
+                      "value_class": "finite"
+                    }
+                  ]
+                },
+                "matrices_available": true,
+                "rcmax": 5,
+                "storage_order": "source_i1_outer_i2_inner_row_first"
+              },
+              "unavailable_reason": null
+            },
+            "state_vector_index": 0
+          }
+        ],
+        "external_CTF_rows_supplied_to_initializer": false,
+        "later_Native_attempts_counted_as_PASS": false,
+        "later_Native_attempts_paired": false,
+        "numerical_PASS_claimed": false,
+        "observer_reverse_classifier_duplicated": false,
+        "only_first_Rust_assembly_invocation_owned": true,
+        "owner_available": true,
+        "preprocessing_initial_or_assembly_reexecuted_by_observer": false,
+        "retry_driver_available": false
+      },
+      "typed_owners": {
+        "actual_timestep_number_of_timesteps_per_hour": 4,
+        "constructions": [
+          {
+            "actual_surface_associations": [
+              {
+                "surface_id": 0,
+                "surface_name": "WALL X0"
+              },
+              {
+                "surface_id": 1,
+                "surface_name": "WALL X1"
+              },
+              {
+                "surface_id": 2,
+                "surface_name": "WALL Y0"
+              },
+              {
+                "surface_id": 3,
+                "surface_name": "WALL Y1"
+              },
+              {
+                "surface_id": 4,
+                "surface_name": "FLOOR"
+              },
+              {
+                "surface_id": 5,
+                "surface_name": "ROOF"
+              }
+            ],
+            "declared_layer_ids": [
+              0
+            ],
+            "effective_layer_ids": [
+              0
+            ],
+            "id": 0,
+            "internal_heat_source_declaration": "None",
+            "kind": "Opaque",
+            "model_vector_index": 0,
+            "name": "WALL",
+            "outside_layer_id": 0
+          }
+        ],
+        "materials": [
+          {
+            "id": 0,
+            "model_vector_index": 0,
+            "name": "MASS LAYER",
+            "payload": {
+              "actual_selected_ROnly_mapping": false,
+              "fields": {
+                "Conductivity": {
+                  "value": 1.4,
+                  "value_bits": "3ff6666666666666",
+                  "value_class": "finite"
+                },
+                "Density": {
+                  "value": 2200.0,
+                  "value_bits": "40a1300000000000",
+                  "value_class": "finite"
+                },
+                "SpecHeat": {
+                  "value": 900.0,
+                  "value_bits": "408c200000000000",
+                  "value_class": "finite"
+                },
+                "Thickness": {
+                  "value": 0.1,
+                  "value_bits": "3fb999999999999a",
+                  "value_class": "finite"
+                }
+              },
+              "kind": "Regular",
+              "stored_Resistance": {
+                "owner_available": true,
+                "value": {
+                  "value": 0.07142857142857144,
+                  "value_bits": "3fb2492492492493",
+                  "value_class": "finite"
+                }
+              }
+            }
+          }
+        ],
+        "surfaces": [
+          {
+            "construction_id": 0,
+            "id": 0,
+            "model_vector_index": 0,
+            "name": "WALL X0"
+          },
+          {
+            "construction_id": 0,
+            "id": 1,
+            "model_vector_index": 1,
+            "name": "WALL X1"
+          },
+          {
+            "construction_id": 0,
+            "id": 2,
+            "model_vector_index": 2,
+            "name": "WALL Y0"
+          },
+          {
+            "construction_id": 0,
+            "id": 3,
+            "model_vector_index": 3,
+            "name": "WALL Y1"
+          },
+          {
+            "construction_id": 0,
+            "id": 4,
+            "model_vector_index": 4,
+            "name": "FLOOR"
+          },
+          {
+            "construction_id": 0,
+            "id": 5,
+            "model_vector_index": 5,
+            "name": "ROOF"
+          }
+        ]
+      }
+    }
+  ],
+  "native_admission_contract": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/native-admission-contract.json",
+    "sha256": "3ac81641ebafa3e819bbc5099d4a00deb189aa682c0c3a0dc0f897f4dae1ed26",
+    "size_bytes": 15390
+  },
+  "native_helper_request": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/helper-request.json",
+    "sha256": "7338544b7ba51670eaed436caf66caf191c2307c2016b881e940bd2732d53ff4",
+    "size_bytes": 25159
+  },
+  "numerical_PASS_claimed": false,
+  "observations_copied_from_actual_initialized_owner": true,
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/ctf04_candidate_production_observer.rs",
+      "sha256": "ef81c00d36c32669f7cda47c4d33a818cfee554e5a184b844a8f47d1c14c59be",
+      "size_bytes": 15762
+    },
+    {
+      "path": "crates/ep_run/examples/ctf04_candidate_production_support/fields.rs",
+      "sha256": "1177c3fdd45cd18545df15ef82c632d9d036f6783d03c0bae06b4ed5507f5306",
+      "size_bytes": 11309
+    },
+    {
+      "path": "crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs",
+      "sha256": "06dfc34c1180f56e474dd2fafef22fb77ce5ef835fb97981f59f7eedd27d1e1e",
+      "size_bytes": 14299
+    }
+  ],
+  "preprocessing_reexecuted_by_observer": false,
+  "projection": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/projection.json",
+    "sha256": "781aa0322dfb51d0c01cbc2bd7f3692c7acd0645ad985edbce6b6e28a5da4565",
+    "size_bytes": 27548
+  },
+  "same_original_IDF_order_overlay_used": true,
+  "schema": "ctf04-candidate-production-observer-results.v1",
+  "scientific_comparison_performed": false
+}
+{"receipt": {"path": ".runtime/porting/CTF-09/existing-production-command-01/receipt.json", "sha256": "4a50b8d0760a7639a11572cf0d398071e1acca0992b6f565a7e9bd66b307be21"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
