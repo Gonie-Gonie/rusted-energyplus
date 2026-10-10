@@ -96,3 +96,10 @@ Reviewed14 Rust source files applied after genuine OriginalQA and unchanged base
 Inherited preprocessing/initial handoff copies remain separate metrics. Native unit later16 attempts remain retained unpaired/noPASS. Unavailable contexts54 unit/18 production were not counted as PASS. Focused13 and full workspace4,679 tests passed (0failed/0ignored;39 workspace binaries); Clippy and fmt passed. Both genuine candidate executions and strict comparisons ended0 with unchanged captured source bytes. Evidence: `evidence/CTF-04-unit/summary.json`.
 
 Only the selected first-assembly unit gate is passed. Fixed6 CLI after this application, retry/whole coefficient handoff, integration/production gates and predecessor completion remain pending.
+
+
+## Actual fixed-six production CLI after selected assembly port
+
+Fresh actual ep_cli/eplus-rs Cargo build followed selected04 comparisons and quality. A24/A72/B-NOLIMIT/B-FLOW/B-CAPACITY/B-BOTH all ended0 with the same captured source bytes and Cargo binary. Compatibility/partial-deny/full-trace flags, no hours override/oracle comparison, all45 input guards and source-order matches are verified. Fixture-demand-injection is actual null for both A runs and false for four B runs; null is not reinterpreted as a boolean observation.
+
+Evidence: `evidence/CTF-04-production-cli/summary.json`. This verifies actual CLI execution after this application; it does not certify whole CTF coefficient/retry handoff or complete integration/production gates. The earlier selected-unit summary retains its historical pre-CLI flag literally.
