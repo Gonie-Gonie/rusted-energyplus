@@ -10,6 +10,7 @@ pub mod air_manager;
 pub mod algorithm;
 pub mod convection;
 pub mod ctf;
+pub mod ctf_first_assembly_owner;
 pub mod ctf_initial_owner;
 pub(crate) mod id_slot_index;
 pub mod initialization;

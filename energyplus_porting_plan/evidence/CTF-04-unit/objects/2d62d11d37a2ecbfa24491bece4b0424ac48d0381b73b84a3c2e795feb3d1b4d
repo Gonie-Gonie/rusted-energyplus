@@ -1,0 +1,64 @@
+{
+  "own_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_unit.py",
+        "sha256": "a6c5fd62687ee82e8419b679b367376c21c1b22bf66b7196cab7b876e7e8ee7b",
+        "size_bytes": 69510,
+        "line_count": 779
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/before/compare_unit.py",
+        "sha256": "56c6291eedf03e4f104ff6d5c74d6fd85047f4156ea154c71fbea8e2e8c41349",
+        "size_bytes": 42966,
+        "line_count": 505
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_unit.py.from-CTF03.diff",
+        "sha256": "da2187ef80896768743acdcf0b4e135beb8654ccc4a10b9c4b3252dc93549fb6",
+        "size_bytes": 46354,
+        "line_count": 472
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_production.py",
+        "sha256": "a2a0b3da8ac53a070e7d61e6e0abee6239efd29c21a7ee0e6e76f319e5884835",
+        "size_bytes": 83417,
+        "line_count": 908
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/before/compare_production.py",
+        "sha256": "e22f1c47abca3a7d5192dbbfb2ad9753bbbed045cad051b1a3ca91aee98d6afc",
+        "size_bytes": 55486,
+        "line_count": 617
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_production.py.from-CTF03.diff",
+        "sha256": "956cb9b25479770931f4d6e235f6de2a4df236cdd3a37029ce7f82db55fb03bd",
+        "size_bytes": 49006,
+        "line_count": 469
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/packet_io.py",
+        "sha256": "17fd25e2b7adce28565d4c76522df8f1f0187ec4a2aa45bb3893f2124f41979d",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/before/packet_io.py",
+        "sha256": "15b0f4f384b705c160f67d97bfe391fa0ae6de18b1d4d5e014cbce59eaf83960",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/packet_io.py.from-CTF03.diff",
+        "sha256": "e29346585ee81ed26bfdc2c1919aa0e8f5e39f4713623907d754aa053f12176a",
+        "size_bytes": 302,
+        "line_count": 11
+      }
+    }
+  ]
+}

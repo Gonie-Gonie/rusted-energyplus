@@ -59,7 +59,7 @@ CTF-05~08에 오차·차원·단위 그대로 전달
 ## 종료 체크
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -87,3 +87,12 @@ Both genuine CTF04 Native helpers and independent Original DataQA completed with
 The fresh unchanged Rust baseline returned on all15 same authentic converted input-only models and exposed21 existing CTF03 owners. Exact nine new04 source paths are absent from disk/captured source snapshot. The first-assembly gap is structural unavailability; numerical mismatch count is null. Two unpublished derived summary field mistakes were corrected against actual producer manifests/owner arrays, with both earlier summaries retained; actual inputs/build/execution/results were unchanged. Reviewed candidate remains unapplied.
 
 Evidence: `evidence/CTF-04-original-baseline/summary.json` and selected content-addressed manifest. Binary/map payloads and full transitive replay closure are not included. No numerical or remaining-gate PASS is claimed.
+
+
+## Actual selected first assembly comparisons
+
+Reviewed14 Rust source files applied after genuine OriginalQA and unchanged baseline; Rustfmt2024 only, no post-format arithmetic amendments. Fresh actual Cargo build followed all quality checks. Unit25 first owners:39,475 primary numeric and90,388 discrete comparisons, zero mismatches. Fixed15 initialized loader first owners:885 primary numeric and5,401 discrete comparisons, zero mismatches. All7 separate frozen profiles have max absolute error0/RMSE0/nonfinite errors0. Shape, class, signed-zero, integer/ID/order/caller and first-attempt stamps are exact.
+
+Inherited preprocessing/initial handoff copies remain separate metrics. Native unit later16 attempts remain retained unpaired/noPASS. Unavailable contexts54 unit/18 production were not counted as PASS. Focused13 and full workspace4,679 tests passed (0failed/0ignored;39 workspace binaries); Clippy and fmt passed. Both genuine candidate executions and strict comparisons ended0 with unchanged captured source bytes. Evidence: `evidence/CTF-04-unit/summary.json`.
+
+Only the selected first-assembly unit gate is passed. Fixed6 CLI after this application, retry/whole coefficient handoff, integration/production gates and predecessor completion remain pending.

@@ -9739,11 +9739,11 @@
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Root FULL and other-author FULL source reviews accepted. Actual04 Native build, independent PE, both genuine helpers and both Original DataQA completed with exit0 before fresh unchanged03 Rust production baseline. Unit first25 + later16 retained; fixed15 production first15. Reviewed Rust04 candidate remains unapplied; numerical/integration/production gates pending.",
+      "source_boundary_note": "Reviewed04 first assembly/ingress/observers applied. Actual OriginalQA preceded unchanged baseline then candidate. Actual selected unit25 and fixed15 loader owners have zero mismatches in all7 exact arithmetic profiles; Native unit later16 retained unpaired/noPASS. Focused13 and workspace4679 tests, Clippy and fmt passed. Integration/production and predecessor completion remain pending.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -10019,6 +10019,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-04-original-baseline/summary.json",
         "sha256": "409495684466235b8402de9637de6797546872759674ae192953dc0a3502fc0b",
         "size_bytes": 8561
+      },
+      "actual_candidate_unit_and_loader_comparisons": {
+        "path": "energyplus_porting_plan/evidence/CTF-04-unit/summary.json",
+        "sha256": "22457d82c7dd09efb9b13c9a558b89f487e1b0ca6369da78d3a3d25a4ca87d9d",
+        "size_bytes": 8934
       }
     },
     {

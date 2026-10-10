@@ -1,0 +1,62 @@
+--- .runtime/porting/CTF-04/cache-ingress-prep-01/new/ctf_first_assembly_owner.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs
+@@ -62,22 +62,37 @@
+         if initial.construction_id != preprocessing.construction_id {
+             return Err(Unavailable::ConstructionIdentityMismatch);
+         }
+-        let nodal = initial.result.as_ref()
++        let nodal = initial
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::InitialUnavailable(*reason))?;
+-        let phases = preprocessing.result.as_ref()
++        let phases = preprocessing
++            .result
++            .as_ref()
+             .map_err(|error| Unavailable::PreprocessingScope(*error))?;
+-        if phases.skipped_unused || phases.errors_found
++        if phases.skipped_unused
++            || phases.errors_found
+             || initial.context.is_used_ctf != preprocessing.is_used_ctf
+         {
+             return Err(Unavailable::PreprocessingRouteMismatch);
+         }
+-        let converted = phases.after_conversion.as_ref()
++        let converted = phases
++            .after_conversion
++            .as_ref()
+             .ok_or(Unavailable::PostConversionUnavailable)?;
+         if nodal.time_step_zone_hours.to_bits() != initial.time_step_zone_hours.to_bits() {
+             return Err(Unavailable::CallerTimeStepMismatch);
+         }
+-        let nodes = nodal.active.iter().map(|layer| layer.nodes).collect::<Vec<_>>();
+-        let dx = nodal.active.iter().map(|layer| layer.dx).collect::<Vec<_>>();
++        let nodes = nodal
++            .active
++            .iter()
++            .map(|layer| layer.nodes)
++            .collect::<Vec<_>>();
++        let dx = nodal
++            .active
++            .iter()
++            .map(|layer| layer.dx)
++            .collect::<Vec<_>>();
+         assemble_1d_ctf_state_space(
+             CtfAssemblyInput {
+                 layers: &converted.active.layers,
+@@ -97,9 +112,13 @@
+                 ctf_time_step: nodal.initial_ctf_time_step_hours,
+                 num_histories: nodal.initial_num_histories,
+             },
+-        ).map_err(Unavailable::AssemblyScope)
++        )
++        .map_err(Unavailable::AssemblyScope)
+     })();
+-    ConstructionCtfFirstAssembly { construction_id: initial.construction_id, result }
++    ConstructionCtfFirstAssembly {
++        construction_id: initial.construction_id,
++        result,
++    }
+ }
+ 
+ #[cfg(test)]

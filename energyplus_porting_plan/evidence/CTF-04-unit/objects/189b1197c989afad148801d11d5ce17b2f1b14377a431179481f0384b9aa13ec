@@ -1,0 +1,90 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime\\porting\\CTF-04\\comparer-prep-01\\compare_production.py",
+    "--approved-source-sha256",
+    "a2a0b3da8ac53a070e7d61e6e0abee6239efd29c21a7ee0e6e76f319e5884835",
+    "--original-data-review",
+    ".runtime/porting/CTF-04/original-production-data-review-01/review.json#32d62d812e380cca7f0b7058b0689d24780af049daabe9a9e6ab8fdfab14a746",
+    "--original-data-review-execution",
+    ".runtime/porting/CTF-04/original-production-data-review-command-01/receipt.json#7487c09c17d26bd7de5bf3dfe77474562543e1c727fa2e1a104b0821625cc73f",
+    "--Rust-build-execution",
+    ".runtime/porting/CTF-04/candidate-build-command-01/receipt.json#34ac0324c34fbfe80d5aeab03557ef157b8b3a1caa925e5b9e4163ad16a3ed77",
+    "--Rust-execution",
+    ".runtime/porting/CTF-04/candidate-production-command-01/receipt.json#c3e63b94c54ef82a3bf301376b8b581cec83acffca16f21f9c6ab8d32c6ef8a2",
+    "--Rust-results",
+    ".runtime/porting/CTF-04/candidate-production-command-01/stdout.log#598b70fad02265bd0e200d1af7eb8e8c2ff6be90ac26a1180490771882d5cfc5",
+    "--conversion-ledger",
+    ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json#3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+    "--conversion-execution",
+    ".runtime/porting/SCH-01/conversion-command-01/receipt.json#3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+    "--output-dir",
+    ".runtime\\porting\\CTF-04\\production-comparison-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T16:23:15.932298+00:00",
+  "finished_utc": "2026-10-10T16:23:18.185271+00:00",
+  "elapsed_seconds": 2.2531253999914043,
+  "repository_before": {
+    "head": "3fbab1deb8701c9f9c41a6ee94e7ea41b85cb50b",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_support/\u0000?? crates/ep_run/examples/ctf04_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/\u0000"
+  },
+  "repository_after": {
+    "head": "3fbab1deb8701c9f9c41a6ee94e7ea41b85cb50b",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_support/\u0000?? crates/ep_run/examples/ctf04_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/3a/3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d",
+    "sha256": "3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-04/production-comparison-command-01/stdout.log",
+    "sha256": "d986eeb436b8cd9efae9c614a3a7910f9584b89e5920d57125f49445860b4d59"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-04/production-comparison-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T16:23:18.185271+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

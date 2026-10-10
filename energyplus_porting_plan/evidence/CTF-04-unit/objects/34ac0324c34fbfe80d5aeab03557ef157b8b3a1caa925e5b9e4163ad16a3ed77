@@ -1,0 +1,154 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "-p",
+    "ep_run",
+    "--example",
+    "ctf04_candidate_unit_observer",
+    "--example",
+    "ctf04_candidate_production_observer",
+    "--message-format=json-render-diagnostics"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T16:21:40.128704+00:00",
+  "finished_utc": "2026-10-10T16:22:11.584755+00:00",
+  "elapsed_seconds": 31.455705400003353,
+  "repository_before": {
+    "head": "3fbab1deb8701c9f9c41a6ee94e7ea41b85cb50b",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_support/\u0000?? crates/ep_run/examples/ctf04_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/\u0000"
+  },
+  "repository_after": {
+    "head": "3fbab1deb8701c9f9c41a6ee94e7ea41b85cb50b",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_production_support/\u0000?? crates/ep_run/examples/ctf04_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf04_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/3a/3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d",
+    "sha256": "3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-04/candidate-build-command-01/stdout.log",
+    "sha256": "156b60e8a12cb5df756a0706607b45ce98ddb61edeb33de4b3d895d1098a813c"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-04/candidate-build-command-01/stderr.log",
+    "sha256": "e542ca2a78fb13d807fc7b2b41f1583f3bada36d3ab3a8276fe39900d4600643"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": true,
+    "captured_utc": "2026-10-10T16:22:11.584755+00:00",
+    "status": "pass",
+    "rows": [
+      {
+        "cargo_message": {
+          "reason": "compiler-artifact",
+          "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+          "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+          "target": {
+            "kind": [
+              "example"
+            ],
+            "crate_types": [
+              "bin"
+            ],
+            "name": "ctf04_candidate_unit_observer",
+            "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\ctf04_candidate_unit_observer.rs",
+            "edition": "2024",
+            "doc": false,
+            "doctest": false,
+            "test": false
+          },
+          "profile": {
+            "opt_level": "0",
+            "debuginfo": 2,
+            "debug_assertions": true,
+            "overflow_checks": true,
+            "test": false
+          },
+          "features": [],
+          "filenames": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf04_candidate_unit_observer.exe"
+          ],
+          "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf04_candidate_unit_observer.exe",
+          "fresh": false
+        },
+        "executable": {
+          "historical_path": "target/debug/examples/ctf04_candidate_unit_observer.exe",
+          "sha256": "11eeb0565042502b986cb8708beffb0d77dceba34913cc62e84756668bbcfcc6"
+        }
+      },
+      {
+        "cargo_message": {
+          "reason": "compiler-artifact",
+          "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+          "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+          "target": {
+            "kind": [
+              "example"
+            ],
+            "crate_types": [
+              "bin"
+            ],
+            "name": "ctf04_candidate_production_observer",
+            "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\ctf04_candidate_production_observer.rs",
+            "edition": "2024",
+            "doc": false,
+            "doctest": false,
+            "test": false
+          },
+          "profile": {
+            "opt_level": "0",
+            "debuginfo": 2,
+            "debug_assertions": true,
+            "overflow_checks": true,
+            "test": false
+          },
+          "features": [],
+          "filenames": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf04_candidate_production_observer.exe"
+          ],
+          "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf04_candidate_production_observer.exe",
+          "fresh": false
+        },
+        "executable": {
+          "historical_path": "target/debug/examples/ctf04_candidate_production_observer.exe",
+          "sha256": "143f930ea099d582f504cc1168b75cf247640c0db4703e2a5b7c6dbfa794a89e"
+        }
+      }
+    ],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

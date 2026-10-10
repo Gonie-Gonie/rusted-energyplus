@@ -1,0 +1,70 @@
+--- .runtime/porting/CTF-04/candidate-observer-prep-01/production_unit_fields.rs
++++ crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs
+@@ -1,13 +1,13 @@
+ //! Pure copies of actual public preprocessing return owners; no CTF arithmetic.
++use ep_runtime::heat_balance::ctf_first_assembly_owner::{
++    ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable,
++};
+ use ep_runtime::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, CtfInitialUnavailable,
+ };
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing,
+     CtfLayerScopeError,
+-};
+-use ep_runtime::heat_balance::ctf_first_assembly_owner::{
+-    ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable,
+ };
+ use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyObservation;
+ use serde_json::{Value, json};
+@@ -167,20 +167,34 @@
+         Err(reason) => {
+             let route = match reason {
+                 CtfFirstAssemblyUnavailable::InitialUnavailable(_) => "InitialUnavailable",
+-                CtfFirstAssemblyUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstAssemblyUnavailable::ConstructionIdentityMismatch => {
++                    "ConstructionIdentityMismatch"
++                }
+                 CtfFirstAssemblyUnavailable::PreprocessingScope(_) => "PreprocessingScope",
+-                CtfFirstAssemblyUnavailable::PreprocessingRouteMismatch => "PreprocessingRouteMismatch",
+-                CtfFirstAssemblyUnavailable::PostConversionUnavailable => "PostConversionUnavailable",
++                CtfFirstAssemblyUnavailable::PreprocessingRouteMismatch => {
++                    "PreprocessingRouteMismatch"
++                }
++                CtfFirstAssemblyUnavailable::PostConversionUnavailable => {
++                    "PostConversionUnavailable"
++                }
+                 CtfFirstAssemblyUnavailable::CallerTimeStepMismatch => "CallerTimeStepMismatch",
+                 CtfFirstAssemblyUnavailable::AssemblyScope(_) => "AssemblyScope",
+             };
+             (false, route, Some(format!("{reason:?}")), Value::Null)
+         }
+-        Ok(CtfAssemblyObservation::Unavailable(reason)) =>
+-            (false, "AssemblyUnavailable", Some(format!("{reason:?}")), Value::Null),
++        Ok(CtfAssemblyObservation::Unavailable(reason)) => (
++            false,
++            "AssemblyUnavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
++        ),
+         Ok(CtfAssemblyObservation::Assembled(actual)) => {
+             let values = |source: &[f64]| source.iter().copied().map(scalar).collect::<Vec<_>>();
+-            (true, "FirstAssemblyReturned", None, json!({
++            (
++                true,
++                "FirstAssemblyReturned",
++                None,
++                json!({
+                 "LayersInConstruct":actual.layers.len(),
+                 "NumResLayers":converted.map(|owner|owner.active.num_res_layers),
+                 "ErrorsFound":phases.map(|owner|owner.errors_found),
+@@ -207,7 +221,8 @@
+                     "AMat":values(&actual.a_mat),"IdenMatrix":values(&actual.iden_matrix),
+                     "BMat":values(&actual.b_mat),"CMat":values(&actual.c_mat),"DMat":values(&actual.d_mat)},
+                 "storage_order":"source_i1_outer_i2_inner_row_first",
+-                "Native_Objexx_bounds_not_Rust_owner":true}))
++                "Native_Objexx_bounds_not_Rust_owner":true}),
++            )
+         }
+     };
+     json!({"protocol":"ctf04-matrix-assembly.v1","owner_available":available,

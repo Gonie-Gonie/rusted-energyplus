@@ -1,0 +1,18 @@
+
+running 13 tests
+test heat_balance::ctf_first_assembly_owner::tests::absent_or_error_converted_owners_are_not_default_matrices ... ok
+test heat_balance::ctf_first_assembly_owner::tests::actual_initial_shape_error_is_retained_without_saturating_or_replacing_it ... ok
+test heat_balance::ctf_first_assembly_owner::tests::first_assembly_borrows_the_same_initial_and_converted_owners ... ok
+test heat_balance::ctf_first_assembly_owner::tests::stale_identity_and_caller_bits_cannot_bind_an_unrelated_prefix ... ok
+test heat_balance::ctf_first_assembly_owner::tests::unavailable_initial_routes_remain_distinct_without_an_assembly_owner ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::ieee_arithmetic_class_is_returned_in_the_actual_owner ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::one_node_interior_resistance_advances_two_consecutive_interfaces ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::out_of_scope_and_misaligned_owners_fail_without_a_matrix ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::retry_metadata_never_replaces_or_recomputes_the_nodal_owner ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::single_layer_keeps_source_orientation_boundary_mass_and_compressed_shapes ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::two_mass_layers_use_half_capacitances_and_keep_literal_stack_direction ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::unavailable_routes_have_no_synthetic_matrix_or_input_access ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::predictor_term_assembly_rejects_invalid_inputs_and_overflow ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 3030 filtered out; finished in 0.01s
+

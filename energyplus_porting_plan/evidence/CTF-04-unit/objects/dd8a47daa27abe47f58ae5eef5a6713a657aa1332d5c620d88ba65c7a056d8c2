@@ -1,0 +1,126 @@
+//! First selected CTF assembly from existing initial and preprocessing owners.
+
+use super::ctf_initial_owner::{ConstructionCtfInitialDiscretization, CtfInitialUnavailable};
+use super::surface_manager::ctf_layer_preprocessing::{
+    ConstructionCtfLayerPreprocessing, CtfLayerScopeError,
+};
+use super::surface_manager::ctf_state_space_assembly::{
+    CtfAssemblyContext, CtfAssemblyInput, CtfAssemblyObservation, CtfAssemblyRoute,
+    CtfAssemblyScopeError, assemble_1d_ctf_state_space,
+};
+use ep_model::ConstructionId;
+
+/// An actual unavailable prerequisite or inconsistent owner association.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfFirstAssemblyUnavailable {
+    /// The existing initial owner retained this actual unselected/scope route.
+    InitialUnavailable(CtfInitialUnavailable),
+    /// The supplied owners do not refer to the same original construction.
+    ConstructionIdentityMismatch,
+    /// The existing preprocessing Result has no converted owner.
+    PreprocessingScope(CtfLayerScopeError),
+    /// A successful initial owner cannot consume an unused/error prefix.
+    PreprocessingRouteMismatch,
+    /// The actual same-owner converted prefix is unavailable.
+    PostConversionUnavailable,
+    /// The initial wrapper and its Result do not retain the same caller bits.
+    CallerTimeStepMismatch,
+    /// The accepted pure assembly rejected its actual scope/shape inputs.
+    AssemblyScope(CtfAssemblyScopeError),
+}
+
+impl std::fmt::Display for CtfFirstAssemblyUnavailable {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "first CTF assembly owner unavailable: {self:?}")
+    }
+}
+
+impl std::error::Error for CtfFirstAssemblyUnavailable {}
+
+/// Actual first assembly only; no retry or final-coefficient state is inferred.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionCtfFirstAssembly {
+    /// Original typed construction ID, separate from merged layer positions.
+    pub construction_id: ConstructionId,
+    /// A reached first assembly or a truthful unavailable prerequisite.
+    pub result: Result<CtfAssemblyObservation, CtfFirstAssemblyUnavailable>,
+}
+
+/// Assemble once from the same actual initial Result and converted prefix.
+///
+/// The two inputs must be the owners paired by construction initialization.
+/// No node, spacing, timestep, reverse route or preprocessing is recomputed.
+/// Ordinal one records this actual Rust invocation only; there is no retry
+/// driver and no claim that Native executed an identical number of attempts.
+pub fn initialize_construction_ctf_first_assembly(
+    initial: &ConstructionCtfInitialDiscretization,
+    preprocessing: &ConstructionCtfLayerPreprocessing,
+) -> ConstructionCtfFirstAssembly {
+    use CtfFirstAssemblyUnavailable as Unavailable;
+
+    let result = (|| {
+        if initial.construction_id != preprocessing.construction_id {
+            return Err(Unavailable::ConstructionIdentityMismatch);
+        }
+        let nodal = initial
+            .result
+            .as_ref()
+            .map_err(|reason| Unavailable::InitialUnavailable(*reason))?;
+        let phases = preprocessing
+            .result
+            .as_ref()
+            .map_err(|error| Unavailable::PreprocessingScope(*error))?;
+        if phases.skipped_unused
+            || phases.errors_found
+            || initial.context.is_used_ctf != preprocessing.is_used_ctf
+        {
+            return Err(Unavailable::PreprocessingRouteMismatch);
+        }
+        let converted = phases
+            .after_conversion
+            .as_ref()
+            .ok_or(Unavailable::PostConversionUnavailable)?;
+        if nodal.time_step_zone_hours.to_bits() != initial.time_step_zone_hours.to_bits() {
+            return Err(Unavailable::CallerTimeStepMismatch);
+        }
+        let nodes = nodal
+            .active
+            .iter()
+            .map(|layer| layer.nodes)
+            .collect::<Vec<_>>();
+        let dx = nodal
+            .active
+            .iter()
+            .map(|layer| layer.dx)
+            .collect::<Vec<_>>();
+        assemble_1d_ctf_state_space(
+            CtfAssemblyInput {
+                layers: &converted.active.layers,
+                nodes: &nodes,
+                dx: &dx,
+                rcmax: nodal.rcmax,
+            },
+            CtfAssemblyContext {
+                construction_id: initial.construction_id,
+                route: CtfAssemblyRoute::Assemble,
+                solution_dimensions: initial.context.solution_dimensions,
+                source_sink_present: initial.context.source_sink_present,
+                node_source: nodal.node_source,
+                node_user_temp: nodal.node_user_temp,
+                attempt_ordinal: 1,
+                time_step_zone: initial.time_step_zone_hours,
+                ctf_time_step: nodal.initial_ctf_time_step_hours,
+                num_histories: nodal.initial_num_histories,
+            },
+        )
+        .map_err(Unavailable::AssemblyScope)
+    })();
+    ConstructionCtfFirstAssembly {
+        construction_id: initial.construction_id,
+        result,
+    }
+}
+
+#[cfg(test)]
+#[path = "ctf_first_assembly_owner_tests.rs"]
+mod tests;

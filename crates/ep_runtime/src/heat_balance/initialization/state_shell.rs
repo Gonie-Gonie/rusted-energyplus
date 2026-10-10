@@ -21,6 +21,7 @@ pub(super) fn finish_heat_balance_state(
         construction_ctf01_layers: construction_thermal_data.layer_preprocessing(),
         construction_ctf02_coefficients: construction_thermal_data.all_resistive_coefficients(),
         construction_ctf03_initial: construction_thermal_data.initial_discretizations(),
+        construction_ctf04_first_assembly: construction_thermal_data.first_assemblies(),
         construction_cache_build_wall_seconds: construction_thermal_data.build_wall_seconds,
         construction_cache_entry_count: construction_thermal_data.len(),
         construction_cache_no_mass_count: construction_thermal_data.no_mass_construction_ids.len(),

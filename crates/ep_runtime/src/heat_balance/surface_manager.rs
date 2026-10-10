@@ -8,6 +8,7 @@ mod construction_cache;
 pub mod ctf_all_resistive;
 pub mod ctf_initial_discretization;
 pub mod ctf_layer_preprocessing;
+pub mod ctf_state_space_assembly;
 
 pub use construction_cache::ConstructionCtfCoefficientSource;
 pub(crate) use construction_cache::{ConstructionThermalDataCache, surface_thermal_properties};

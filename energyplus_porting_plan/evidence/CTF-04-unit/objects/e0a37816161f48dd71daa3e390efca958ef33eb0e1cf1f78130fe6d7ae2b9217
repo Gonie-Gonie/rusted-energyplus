@@ -1,0 +1,363 @@
+{
+  "schema": "ctf04-reviewed-rust-application.v1",
+  "applied_utc": "2026-10-10T16:11:20.670976+00:00",
+  "accepted_preparations": [
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-04/manifest.json",
+      "sha256": "d156fd37a226cb959234e61aeea30664410008797d61bdd080e1f6d0667c6b29",
+      "size_bytes": 28506
+    },
+    {
+      "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/manifest.json",
+      "sha256": "7cb278fcb90240a3b5ed5a528eb0b18e558127b94a915b28e1e1ae04bdcfafbf",
+      "size_bytes": 12803
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/manifest.json",
+      "sha256": "a674e90108e2aeb80e087b3b976546766953e3475fc79b4bb5e76921a5eae8d8",
+      "size_bytes": 24594
+    }
+  ],
+  "changes": [
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/rust-assembly-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "71dbf39a1320d7c6b5fabe57cf11b811fa139919f54fab2551fd5f2ad6591b09",
+        "size_bytes": 5995,
+        "line_count": 172
+      },
+      "new_owner": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "cf81697afc5150582510e8a7585a2e5bd0d94246bcc2d81e179725e987c94adb",
+        "size_bytes": 5961
+      },
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "71dbf39a1320d7c6b5fabe57cf11b811fa139919f54fab2551fd5f2ad6591b09",
+        "size_bytes": 5995
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__surface_manager.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/rust-assembly-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+        "sha256": "220a3e0e05df12e9dba9a9fa82c84ebfec9d3818f506605d567274995e4cf823",
+        "size_bytes": 10257,
+        "line_count": 259
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+        "sha256": "65ec2a19c1721ab3a685a7e24e9b95d67d3ff910fe17976a76405ea32c155c73",
+        "size_bytes": 10624
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__surface_manager__ctf_state_space_assembly.rs.rustfmt.diff",
+        "sha256": "e252117081de4e6baca0e1c638a0f81229e525adce569cfb95fb4d02c4f594b4",
+        "size_bytes": 3757
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/tests.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/rust-assembly-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/tests.rs",
+        "sha256": "ca186221338babce9b35eca8c9c6740089db64c5fb66f55fd05c38a3018aad5e",
+        "size_bytes": 7296,
+        "line_count": 192
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/tests.rs",
+        "sha256": "0a3d752f4f969c7537b7b326c46c542478a2df76a89e81529f0045b2d41428b0",
+        "size_bytes": 8010
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__surface_manager__ctf_state_space_assembly__tests.rs.rustfmt.diff",
+        "sha256": "bbd3dd45c83dbaf2ca73d849fc11be3c20ce55dea38dc93654c9fc308814c4f3",
+        "size_bytes": 4705
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/new/ctf_first_assembly_owner.rs",
+        "sha256": "18f6233560923d8d8502e51ca5bda48387bcc2106bfd3470990f4be37cb00e39",
+        "size_bytes": 4943,
+        "line_count": 107
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+        "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+        "size_bytes": 5167
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__ctf_first_assembly_owner.rs.rustfmt.diff",
+        "sha256": "964daec18f264e296c30d61f254d826309e57f72069a14247c94df15afb525b1",
+        "size_bytes": 2442
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/new/ctf_first_assembly_owner_tests.rs",
+        "sha256": "61ae4e93c784d182f60b63616ec65429f9969b2ba6c56a386c69ef0af556a994",
+        "size_bytes": 6484,
+        "line_count": 138
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs",
+        "sha256": "a4bd1c94164c67d18672b085b2f572447567bb2b88425235aedf550ddc0b1bdd",
+        "size_bytes": 7083
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__ctf_first_assembly_owner_tests.rs.rustfmt.diff",
+        "sha256": "6eba581d50c3cda925086ba49dcbdf31f455f4d296ef861d74926a9f17ec3f77",
+        "size_bytes": 9228
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/proposed/mod.rs",
+        "sha256": "8f5ba2d3e51b9110f341c84c25809e795fd161e2f38f90e64be977c92e861e35",
+        "size_bytes": 1405,
+        "line_count": 60
+      },
+      "new_owner": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "43692d0c2a3024dddf4e8d0c2d8360d5b83a9e4a3e99bec328792ff194ef8240",
+        "size_bytes": 1371
+      },
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "8f5ba2d3e51b9110f341c84c25809e795fd161e2f38f90e64be977c92e861e35",
+        "size_bytes": 1405
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__mod.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/proposed/construction_cache.rs",
+        "sha256": "fe36dd1edc8cf7e5814e5670e8863acfe4b564ae7ad1cacca7e8061583f45e19",
+        "size_bytes": 18619,
+        "line_count": 478
+      },
+      "new_owner": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "a352c69a38d798681c911501a65a887bcf41ae6daf542091ef8af0af38ed2dd7",
+        "size_bytes": 17992
+      },
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "fe36dd1edc8cf7e5814e5670e8863acfe4b564ae7ad1cacca7e8061583f45e19",
+        "size_bytes": 18619
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__surface_manager__construction_cache.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/state.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/proposed/state.rs",
+        "sha256": "ff21abe72b3615b6666755b05563ead119dd966630d9efa37c8c3886ac4b2a38",
+        "size_bytes": 46853,
+        "line_count": 1022
+      },
+      "new_owner": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "b4d6258ec4bb84889bbccd114bb8b24231aa2aaaf20dbffbd4ca76c982d5d050",
+        "size_bytes": 46643
+      },
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "ff21abe72b3615b6666755b05563ead119dd966630d9efa37c8c3886ac4b2a38",
+        "size_bytes": 46853
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__state.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/proposed/state_shell.rs",
+        "sha256": "47062689d1133de673671781f76b4082c8c921930e24c0944a431bdf6f3b2608",
+        "size_bytes": 2152,
+        "line_count": 42
+      },
+      "new_owner": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "9c1de487ef0f13d54cdff6c640d13b60e6b47218b97258a842317a3a14425b0b",
+        "size_bytes": 2063
+      },
+      "actual_after_rustfmt": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "47062689d1133de673671781f76b4082c8c921930e24c0944a431bdf6f3b2608",
+        "size_bytes": 2152
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_runtime__src__heat_balance__initialization__state_shell.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_run/examples/ctf04_candidate_unit_observer.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/ctf04_candidate_unit_observer.rs",
+        "sha256": "4e5fe3d7f998b195adbc85036d7ea2cf121bdbbbada59584962f8c6ac4d0efc4",
+        "size_bytes": 17901,
+        "line_count": 411
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_run/examples/ctf04_candidate_unit_observer.rs",
+        "sha256": "3c90c9aff387dff89946501d92a14f6d4608acba21c3cd489284d4a7d10ee483",
+        "size_bytes": 17901
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_run__examples__ctf04_candidate_unit_observer.rs.rustfmt.diff",
+        "sha256": "4b6a2939b3c85e56096e05f5421e4df92a9382b34bf434c8830c9fd2c917f750",
+        "size_bytes": 735
+      }
+    },
+    {
+      "target": "crates/ep_run/examples/ctf04_candidate_unit_support/fields.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/unit_fields.rs",
+        "sha256": "8ac2f5f7a5b55c80a33e74b0763e0e4b5ab9c7eb44c3fa301e2994a2d9cca88a",
+        "size_bytes": 14056,
+        "line_count": 249
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_run/examples/ctf04_candidate_unit_support/fields.rs",
+        "sha256": "06dfc34c1180f56e474dd2fafef22fb77ce5ef835fb97981f59f7eedd27d1e1e",
+        "size_bytes": 14299
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_run__examples__ctf04_candidate_unit_support__fields.rs.rustfmt.diff",
+        "sha256": "66778c3015d9ec30dbcae7e1100fcb82f3f96b702fa17c6005e617d96f754ee2",
+        "size_bytes": 3693
+      }
+    },
+    {
+      "target": "crates/ep_run/examples/ctf04_candidate_production_observer.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/ctf04_candidate_production_observer.rs",
+        "sha256": "ef81c00d36c32669f7cda47c4d33a818cfee554e5a184b844a8f47d1c14c59be",
+        "size_bytes": 15762,
+        "line_count": 383
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_run/examples/ctf04_candidate_production_observer.rs",
+        "sha256": "ef81c00d36c32669f7cda47c4d33a818cfee554e5a184b844a8f47d1c14c59be",
+        "size_bytes": 15762
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_run__examples__ctf04_candidate_production_observer.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_run/examples/ctf04_candidate_production_support/fields.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/production_fields.rs",
+        "sha256": "1177c3fdd45cd18545df15ef82c632d9d036f6783d03c0bae06b4ed5507f5306",
+        "size_bytes": 11309,
+        "line_count": 166
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_run/examples/ctf04_candidate_production_support/fields.rs",
+        "sha256": "1177c3fdd45cd18545df15ef82c632d9d036f6783d03c0bae06b4ed5507f5306",
+        "size_bytes": 11309
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_run__examples__ctf04_candidate_production_support__fields.rs.rustfmt.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "target": "crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/production_unit_fields.rs",
+        "sha256": "8ac2f5f7a5b55c80a33e74b0763e0e4b5ab9c7eb44c3fa301e2994a2d9cca88a",
+        "size_bytes": 14056,
+        "line_count": 249
+      },
+      "new_owner": true,
+      "actual_before": null,
+      "actual_after_rustfmt": {
+        "path": "crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs",
+        "sha256": "06dfc34c1180f56e474dd2fafef22fb77ce5ef835fb97981f59f7eedd27d1e1e",
+        "size_bytes": 14299
+      },
+      "rustfmt_diff": {
+        "path": ".runtime/porting/CTF-04/rust-application-01/crates__ep_run__examples__ctf04_candidate_production_support__unit_fields.rs.rustfmt.diff",
+        "sha256": "4ce5b5f8c0550b28f2be8827a28725d8318b66c38068a66a708e135aafa750d2",
+        "size_bytes": 3715
+      }
+    }
+  ],
+  "rustfmt_command": [
+    "rustfmt",
+    "--edition",
+    "2024",
+    "--config",
+    "skip_children=true",
+    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly/tests.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner_tests.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+    "crates/ep_run/examples/ctf04_candidate_unit_observer.rs",
+    "crates/ep_run/examples/ctf04_candidate_unit_support/fields.rs",
+    "crates/ep_run/examples/ctf04_candidate_production_observer.rs",
+    "crates/ep_run/examples/ctf04_candidate_production_support/fields.rs",
+    "crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs"
+  ],
+  "actual_rustfmt_exit_code": 0,
+  "Root_FULL_and_other_author_FULL_preceded_application": true,
+  "both_Original_DataQA_and_unchanged_Rust_baseline_preceded_application": true,
+  "scientific_execution_performed_by_this_application": false,
+  "gates_updated": false
+}

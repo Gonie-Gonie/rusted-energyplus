@@ -1,0 +1,102 @@
+--- .runtime/porting/CTF-04/rust-assembly-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs
+@@ -162,9 +162,7 @@
+         return Err(CtfAssemblyScopeError::ActivePrefixShape);
+     }
+     for (index, &nodes) in input.nodes.iter().enumerate() {
+-        let interior_resistance = index > 0
+-            && index + 1 < count
+-            && input.layers[index].res_layer;
++        let interior_resistance = index > 0 && index + 1 < count && input.layers[index].res_layer;
+         let valid = if interior_resistance {
+             nodes == 1
+         } else {
+@@ -207,7 +205,13 @@
+             cap = (layers[layer].rho * layers[layer].cp * dx[layer]
+                 + layers[layer + 1].rho * layers[layer + 1].cp * dx[layer + 1])
+                 * 0.5;
+-            write_a(&mut a_mat, rcmax, node - 1, node, layers[layer].rk / dx[layer] / cap);
++            write_a(
++                &mut a_mat,
++                rcmax,
++                node - 1,
++                node,
++                layers[layer].rk / dx[layer] / cap,
++            );
+             write_a(
+                 &mut a_mat,
+                 rcmax,
+@@ -215,14 +219,26 @@
+                 node,
+                 -1.0 * (layers[layer].rk / dx[layer] + layers[layer + 1].rk / dx[layer + 1]) / cap,
+             );
+-            write_a(&mut a_mat, rcmax, node + 1, node, layers[layer + 1].rk / dx[layer + 1] / cap);
++            write_a(
++                &mut a_mat,
++                rcmax,
++                node + 1,
++                node,
++                layers[layer + 1].rk / dx[layer + 1] / cap,
++            );
+             node_in_layer = 0;
+             layer += 1;
+         } else {
+             cap = layers[layer].rho * layers[layer].cp * dx[layer];
+             dxtmp = 1.0 / dx[layer] / cap;
+             write_a(&mut a_mat, rcmax, node - 1, node, layers[layer].rk * dxtmp);
+-            write_a(&mut a_mat, rcmax, node, node, -2.0 * layers[layer].rk * dxtmp);
++            write_a(
++                &mut a_mat,
++                rcmax,
++                node,
++                node,
++                -2.0 * layers[layer].rk * dxtmp,
++            );
+             write_a(&mut a_mat, rcmax, node + 1, node, layers[layer].rk * dxtmp);
+         }
+         node_in_layer += 1;
+@@ -232,23 +248,31 @@
+     cap = layers[last].rho * layers[last].cp * dx[last];
+     cap *= 1.5;
+     dxtmp = 1.0 / dx[last] / cap;
+-    write_a(&mut a_mat, rcmax, rcmax, rcmax, -2.0 * layers[last].rk * dxtmp);
++    write_a(
++        &mut a_mat,
++        rcmax,
++        rcmax,
++        rcmax,
++        -2.0 * layers[last].rk * dxtmp,
++    );
+     write_a(&mut a_mat, rcmax, rcmax - 1, rcmax, layers[last].rk * dxtmp);
+     b_mat[1] = layers[last].rk * dxtmp;
+     let c_mat = [-layers[0].rk / dx[0], layers[last].rk / dx[last]];
+     let d_mat = [layers[0].rk / dx[0], -layers[last].rk / dx[last]];
+-    Ok(CtfAssemblyObservation::Assembled(Box::new(CtfStateSpaceAssembly {
+-        context,
+-        layers: layers.to_vec(),
+-        nodes: input.nodes.to_vec(),
+-        dx: dx.to_vec(),
+-        rcmax: source_rcmax,
+-        a_mat,
+-        iden_matrix,
+-        b_mat,
+-        c_mat,
+-        d_mat,
+-    })))
++    Ok(CtfAssemblyObservation::Assembled(Box::new(
++        CtfStateSpaceAssembly {
++            context,
++            layers: layers.to_vec(),
++            nodes: input.nodes.to_vec(),
++            dx: dx.to_vec(),
++            rcmax: source_rcmax,
++            a_mat,
++            iden_matrix,
++            b_mat,
++            c_mat,
++            d_mat,
++        },
++    )))
+ }
+ 
+ fn write_a(values: &mut [f64], rcmax: usize, i1: usize, i2: usize, value: f64) {

@@ -1,0 +1,587 @@
+{
+  "schema": "ctf04-comparer-source-inventory.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "own_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_unit.py",
+        "sha256": "a6c5fd62687ee82e8419b679b367376c21c1b22bf66b7196cab7b876e7e8ee7b",
+        "size_bytes": 69510,
+        "line_count": 779
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/before/compare_unit.py",
+        "sha256": "56c6291eedf03e4f104ff6d5c74d6fd85047f4156ea154c71fbea8e2e8c41349",
+        "size_bytes": 42966,
+        "line_count": 505
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_unit.py.from-CTF03.diff",
+        "sha256": "da2187ef80896768743acdcf0b4e135beb8654ccc4a10b9c4b3252dc93549fb6",
+        "size_bytes": 46354,
+        "line_count": 472
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_production.py",
+        "sha256": "a2a0b3da8ac53a070e7d61e6e0abee6239efd29c21a7ee0e6e76f319e5884835",
+        "size_bytes": 83417,
+        "line_count": 908
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/before/compare_production.py",
+        "sha256": "e22f1c47abca3a7d5192dbbfb2ad9753bbbed045cad051b1a3ca91aee98d6afc",
+        "size_bytes": 55486,
+        "line_count": 617
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/compare_production.py.from-CTF03.diff",
+        "sha256": "956cb9b25479770931f4d6e235f6de2a4df236cdd3a37029ce7f82db55fb03bd",
+        "size_bytes": 49006,
+        "line_count": 469
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/packet_io.py",
+        "sha256": "17fd25e2b7adce28565d4c76522df8f1f0187ec4a2aa45bb3893f2124f41979d",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/before/packet_io.py",
+        "sha256": "15b0f4f384b705c160f67d97bfe391fa0ae6de18b1d4d5e014cbce59eaf83960",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-04/comparer-prep-01/packet_io.py.from-CTF03.diff",
+        "sha256": "e29346585ee81ed26bfdc2c1919aa0e8f5e39f4713623907d754aa053f12176a",
+        "size_bytes": 302,
+        "line_count": 11
+      }
+    }
+  ],
+  "source_preparation_bindings": [
+    {
+      "path": ".runtime/porting/CTF-03/comparer-prep-02/manifest.json",
+      "sha256": "53f1119518a8d7ee1390bab044873f380ff199b8c34649b5da793b2a49ea3733",
+      "size_bytes": 11007,
+      "line_count": 278
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/manifest.json",
+      "sha256": "a674e90108e2aeb80e087b3b976546766953e3475fc79b4bb5e76921a5eae8d8",
+      "size_bytes": 24594,
+      "line_count": 593
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/manifest.json",
+      "sha256": "4ba423a03f851a459ceb0cd246a0d44e09d8c67f7d21b2a3329c67b7a27520b0",
+      "size_bytes": 33884,
+      "line_count": 853
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/manifest.json",
+      "sha256": "3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+      "size_bytes": 21447,
+      "line_count": 564
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/manifest.json",
+      "sha256": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+      "size_bytes": 13066,
+      "line_count": 344
+    },
+    {
+      "path": ".runtime/porting/CTF-04/input-writer-prep-01/manifest.json",
+      "sha256": "bec235e41fbebd22ff2ced292a0167b19788623fe7763b0fe6ae6e9bed9a03ec",
+      "size_bytes": 28131,
+      "line_count": 723
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-build-review-prep-01/manifest.json",
+      "sha256": "1e618aeb8ba003f758c4948a538d77abe876dd70923e83d74010be856247a8c7",
+      "size_bytes": 4333,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/manifest.json",
+      "sha256": "7cb278fcb90240a3b5ed5a528eb0b18e558127b94a915b28e1e1ae04bdcfafbf",
+      "size_bytes": 12803,
+      "line_count": 336
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-04/manifest.json",
+      "sha256": "d156fd37a226cb959234e61aeea30664410008797d61bdd080e1f6d0667c6b29",
+      "size_bytes": 28506,
+      "line_count": 697
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_observation_fields.hh",
+      "sha256": "507a951402865ef66f3cde54e573b1e29af44eaec8108c42d51c1e9e12069456",
+      "size_bytes": 11863,
+      "line_count": 168
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "ba436b467ac7918f4f6da606e85efc93d559cdf590781bfb9a2b4264e8cadd6f",
+      "size_bytes": 7065,
+      "line_count": 233
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/ctf04_candidate_unit_observer.rs",
+      "sha256": "4e5fe3d7f998b195adbc85036d7ea2cf121bdbbbada59584962f8c6ac4d0efc4",
+      "size_bytes": 17901,
+      "line_count": 411
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/unit_fields.rs",
+      "sha256": "8ac2f5f7a5b55c80a33e74b0763e0e4b5ab9c7eb44c3fa301e2994a2d9cca88a",
+      "size_bytes": 14056,
+      "line_count": 249
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/ctf04_candidate_production_observer.rs",
+      "sha256": "ef81c00d36c32669f7cda47c4d33a818cfee554e5a184b844a8f47d1c14c59be",
+      "size_bytes": 15762,
+      "line_count": 383
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/production_fields.rs",
+      "sha256": "1177c3fdd45cd18545df15ef82c632d9d036f6783d03c0bae06b4ed5507f5306",
+      "size_bytes": 11309,
+      "line_count": 166
+    },
+    {
+      "path": ".runtime/porting/CTF-04/candidate-observer-prep-01/production_unit_fields.rs",
+      "sha256": "8ac2f5f7a5b55c80a33e74b0763e0e4b5ab9c7eb44c3fa301e2994a2d9cca88a",
+      "size_bytes": 14056,
+      "line_count": 249
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/review_unit.py",
+      "sha256": "c78648563b34b2fc9c69f59b0fda9be89c79e9ee4dd7e7228baaf861d91c60b6",
+      "size_bytes": 25367,
+      "line_count": 277
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/review_production.py",
+      "sha256": "116ba70a8c3fb36e3e5e725d622cf289f20fe792f2315550e30be080c39b4baf",
+      "size_bytes": 27996,
+      "line_count": 299
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/unit_shape.py",
+      "sha256": "a23177a01d0c6374a56d2b6bda595d39204e0dad8d24f1d22287fcc4538af456",
+      "size_bytes": 19352,
+      "line_count": 228
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/production_shape.py",
+      "sha256": "8cfcb4b86b28dba415b15fedd13f659fb6dce3108b2b11a435d11c6257a445f2",
+      "size_bytes": 20956,
+      "line_count": 243
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/initial_shape.py",
+      "sha256": "e27836a5d798dbbf540f63b56a298e7b9bc64d64df5bfd87e64dd8d9c3565a85",
+      "size_bytes": 26612,
+      "line_count": 309
+    },
+    {
+      "path": ".runtime/porting/CTF-04/original-data-review-prep-01/packet_io.py",
+      "sha256": "17fd25e2b7adce28565d4c76522df8f1f0187ec4a2aa45bb3893f2124f41979d",
+      "size_bytes": 3892,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/CTF-04/cache-ingress-prep-01/new/ctf_first_assembly_owner.rs",
+      "sha256": "18f6233560923d8d8502e51ca5bda48387bcc2106bfd3470990f4be37cb00e39",
+      "size_bytes": 4943,
+      "line_count": 107
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-04/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "220a3e0e05df12e9dba9a9fa82c84ebfec9d3818f506605d567274995e4cf823",
+      "size_bytes": 10257,
+      "line_count": 259
+    }
+  ],
+  "runtime_observer_API_paths": {
+    "unit": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/ids.rs",
+      "crates/ep_runtime/Cargo.toml",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs"
+    ],
+    "production": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_raw_model/src/lib.rs",
+      "crates/ep_raw_model/src/idf_order.rs",
+      "crates/ep_compiler/src/lib.rs",
+      "crates/ep_compiler/src/compiler.rs",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/model.rs",
+      "crates/ep_model/src/objects/materials.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_model/src/objects/building.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_compiler/src/compiler/surface_space.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs"
+    ]
+  },
+  "runtime_observer_API_counts": {
+    "unit": 14,
+    "production": 27
+  },
+  "runtime_observer_source_counts": {
+    "unit": 2,
+    "production": 3
+  },
+  "selected_primary_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 146,
+      "last_line": 175,
+      "sha256": "7525a698a5c3f9f7d64beaed5bacd94f2798fd9904aa1860ff667bdf2b028c65",
+      "size_bytes": 1610
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 307,
+      "last_line": 316,
+      "sha256": "e72b991a881f17dfc1b946cf9efe611827978378c87381f119f7fdbd115b4a37",
+      "size_bytes": 209
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 405,
+      "last_line": 489,
+      "sha256": "87316e8038ff3ea1ba8500350cddeab26fe64c58eab17efc708f512d2c6e5e2b",
+      "size_bytes": 3901
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 490,
+      "last_line": 619,
+      "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+      "size_bytes": 6450
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 638,
+      "last_line": 729,
+      "sha256": "ae07cc5ff16250b2db3de22e53ae31689dd94809e2a795e001815c199ac9d93a",
+      "size_bytes": 5349
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 875,
+      "last_line": 980,
+      "sha256": "a008ec6bc24bf0968029661030b92c083224a7468f38301ec356a29f2154ed14",
+      "size_bytes": 7402
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1079,
+      "last_line": 1103,
+      "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+      "size_bytes": 580
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1177,
+      "last_line": 1190,
+      "sha256": "22fbdbabf14a6af2678b024406d378a68c32c45267aef0eb82c682a0bf5f805a",
+      "size_bytes": 427
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1399,
+      "last_line": 1410,
+      "sha256": "79fa97bff3736518491fafc1e5c1637b1b5adce60102ffd7a918d6148c815ccc",
+      "size_bytes": 465
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 67,
+      "last_line": 69,
+      "sha256": "e7388e3e84e7d3ce55bf1ddf20fc8ea63053244b5f02597721ba248f2a668c8c",
+      "size_bytes": 282
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 138,
+      "last_line": 145,
+      "sha256": "08fa78c55501638f2b9fa3b20a5876c89fdfd766d508d65361b809884d69e3fe",
+      "size_bytes": 678
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 159,
+      "last_line": 188,
+      "sha256": "fe59fe9bdbaf600c42be0f1a8b8f06eca3371846e6e72b1484f2fe211676ef83",
+      "size_bytes": 2587
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 260,
+      "last_line": 260,
+      "sha256": "b3d39a2771edc981981be9f49fe45a20c8ba1c67c72b13fcff60857f9dfb1312",
+      "size_bytes": 122
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 304,
+      "last_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 748,
+      "last_line": 753,
+      "sha256": "f6c8c9be47a705ea76bfab9fdb52a37f1a49b7d3e3d113156b67c91670963917",
+      "size_bytes": 76
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 812,
+      "last_line": 817,
+      "sha256": "5f3297e5bbb1ddd61de701f31b947aafffe17324b0814fcd8070f0fe8b00028b",
+      "size_bytes": 69
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 608,
+      "last_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 859,
+      "last_line": 927,
+      "sha256": "eebaa61277d0d3176c308cde597304ff7983b20a94329ce7c86a6ce579601924",
+      "size_bytes": 759
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 516,
+      "last_line": 522,
+      "sha256": "ce0073600743adcfb95c613e58fef50f2670c299fabf925bd10f5680201a256c",
+      "size_bytes": 131
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 643,
+      "last_line": 672,
+      "sha256": "70e87f13a042091dd46a3d30176a9e2d54d1d6ac0887473c3e94a6577d3269c9",
+      "size_bytes": 598
+    }
+  ],
+  "actual_matrix_policy": {
+    "protocol": "ctf04-matrix-assembly.v1",
+    "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+    "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+    "selected_attempt_ordinal": 1,
+    "later_Native_attempts_paired": false,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "Rust_retry_driver_available": false,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "matrix_fields": [
+      "AMat",
+      "IdenMatrix",
+      "BMat",
+      "CMat",
+      "DMat"
+    ],
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "matrix_shapes": {
+      "AMat": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "BMat": 3,
+      "CMat": 2,
+      "DMat": 2
+    },
+    "actual_source_produced_identity_required": true,
+    "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+    "actual_current_retry_state_fields": [
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_converted_and_initial_handoff_retained": true,
+    "missing_attempt_or_copy_integrity_failure_is_required_failure": true,
+    "unreached_counted_as_PASS": false,
+    "retry_driver_or_matrix_answers_reconstructed": false
+  },
+  "fresh_numeric_profiles": [
+    {
+      "variable": "AMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "IdenMatrix",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "BMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        3
+      ]
+    },
+    {
+      "variable": "CMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        2
+      ]
+    },
+    {
+      "variable": "DMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        2
+      ]
+    },
+    {
+      "variable": "assembly_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "inherited_initial_profiles": [
+    {
+      "variable": "dx",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_LayersInConstruct_active_prefix"
+    },
+    {
+      "variable": "initial_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "inherited_preprocessing_profile_count": 18,
+  "input_obligations": {
+    "unit_models": 39,
+    "unit_whole_calls": 42,
+    "production_models": 15,
+    "production_loader_phase_records": 195,
+    "ordered_guard_refs": 45,
+    "actual_production_construction_calls_derived": true
+  },
+  "source_checks": {
+    "Comparison_number_AST_byte_semantics_unchanged": true,
+    "initial_storage_AST_unchanged_except_separate_handoff_call": true,
+    "both_lane_matrix_and_packet_functions_AST_identical": true,
+    "before_copies_byte_exact": true,
+    "all_three_generated_diffs_exact": true,
+    "all_three_sources_AST_parsed_not_imported": true,
+    "selected_first_ordinal": 1,
+    "later_actual_attempts_preserved_unpaired_noPASS": true,
+    "new_framework_or_execution_stage": false
+  },
+  "own_preparation_source": {
+    "path": ".runtime/porting/CTF-04/prepare_comparer_sources.py",
+    "sha256": "8f85d6463bb68a0a5e5def683b8486b2e9df8b002638b28a360cff7cfce30e71",
+    "size_bytes": 35364,
+    "line_count": 398
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-04/comparer-prep-01/README.md",
+    "sha256": "39d82a30596259b47609dde46c19a1c42a00b664b81f6a1a130df44cff1b8771",
+    "size_bytes": 5380,
+    "line_count": 84
+  },
+  "target_imported_or_executed": false,
+  "scientific_weather_or_binary_payloads_read": false,
+  "canonical_sources_written": false,
+  "new_QA_execution_stage": false,
+  "numerical_comparisons_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored earlier Native/QA/initial glue; Raw pure04/ingress/observers and Base passive04. This source hold is not independent own-formula certification."
+}
