@@ -1,0 +1,27 @@
+--- before-03/coefficient_compare.py
++++ coefficient_compare.py
+@@ -9,12 +9,13 @@
+                 "AttemptContextMismatch", "DimensionMismatch", "FinalCoefficientScope", "FinalCoefficientRouteUnavailable"]
+ 
+ 
+-def validate_all(c, native, qa, coefficients):
++def validate_all(c, native, qa, coefficients, *, production=False):
+     """Authenticate all actual private visits/counts before selected numeric pairing."""
+     counts, integrity = Counter(), []
+     for model in native["model_cases"]:
+         for operation in model["operations"]:
+-            coefficients.review(operation, None, c.need, c.dto, counts, integrity, model["id"] + "/" + operation["id"])
++            label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])
++            coefficients.review(operation, None, c.need, c.dto, counts, integrity, label)
+     totals = coefficients.summary(native, counts, c.need)
+     for key, value in totals.items():
+         c.exact("DataQA_all_private_coefficient_counts/" + key, qa["actual_observation_counts"][key], value)
+@@ -174,7 +175,7 @@
+             c.absence(path + "/required_initialized_private_coefficient_owners", left["loader_ready"], False, True,
+                       "required actual typed construction/private08 owner ledger unavailable")
+             for operation in left["operations"]:
+-                records.append(pair_operation(c, path + "/" + operation["id"], operation, None,None,None,None,None,None,pairing))
++                records.append(pair_operation(c, path + "/" + str(operation["actual_construction_index"]), operation, None,None,None,None,None,None,pairing))
+             continue
+         c.need(selected.get("actual_CTF06_then_CTF05_then_CTF07_then_CTF08_order_is_producer_owned") is True and
+                selected.get("only_first_Rust_method_invocation_owned") is True and selected.get("Native_whole_solver_flags_unpaired") is True and

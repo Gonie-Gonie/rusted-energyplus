@@ -1,0 +1,70 @@
+"""Author ignored metadata-only correction without importing reviewed modules."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = OUT.with_name("comparer-prep-02")
+OLD_SHA = "2aef47bcd2da51fbaacc34aecbe9bb1174eba2ddbce461a8f02f43a2ab41263a"
+
+
+def identity(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(),
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def write(path, source):
+    path.write_text(source, encoding="utf-8", newline="\n")
+
+
+def main():
+    assert not (OUT / "manifest.json").exists()
+    assert identity(OLD / "manifest.json")["sha256"] == OLD_SHA
+    old = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+    names = [Path(row["path"]).name for row in old["own_sources"]]
+    before = OUT / "before"
+    before.mkdir(exist_ok=False)
+    for name in names + ["README.md", "manifest.json"]:
+        (before / name).write_bytes((OLD / name).read_bytes())
+    for name in names:
+        assert identity(OLD / name) == next(row for row in old["own_sources"] if Path(row["path"]).name == name)
+        (OUT / name).write_bytes((OLD / name).read_bytes())
+        ast.parse((OUT / name).read_text(encoding="utf-8"))
+    readme = (OLD / "README.md").read_text(encoding="utf-8")
+    old_text = "Its six\nactual executed QA source archives"
+    new_text = "Its seven\nactual executed QA source archives"
+    assert readme.count(old_text) == 1
+    write(OUT / "README.md", readme.replace(old_text, new_text, 1))
+    diff = OUT / "README.md.from-02.diff"
+    write(diff, "".join(difflib.unified_diff(readme.splitlines(True),
+          (OUT / "README.md").read_text(encoding="utf-8").splitlines(True),
+          fromfile="before/README.md", tofile="README.md")))
+    manifest = copy.deepcopy(old)
+    manifest["own_sources"] = [identity(OUT / name) for name in names]
+    manifest["before_sources"] = [identity(path) for path in sorted(before.iterdir())]
+    manifest["exact_diffs"] = [identity(diff)]
+    manifest["source_and_protocol_bindings"].append(identity(OLD / "manifest.json"))
+    manifest["exact_QA_structural_copies"] = [identity(OUT / name) for name in
+                                               ["method_shape.py", "gamma_shape.py", "coefficient_shape.py"]]
+    manifest["README"] = identity(OUT / "README.md")
+    manifest["authoring_source"] = identity(Path(__file__).resolve())
+    manifest["fresh03_metadata_only_correction"] = {
+        "predecessor": identity(OLD / "manifest.json"),
+        "README_exact_replacement": {"before": old_text, "after": new_text},
+        "all_nine_executable_files_byte_identical02": True,
+        "current_DataQA_source_identity_unchanged": True,
+        "all_comparison_policies_and_logic_unchanged": True,
+        "old_holds_preserved": True, "actual_comparisons_performed": False}
+    write(OUT / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=True) + "\n")
+    print(json.dumps({"manifest": identity(OUT / "manifest.json"),
+                      "README": manifest["README"], "exact_diff": identity(diff)}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

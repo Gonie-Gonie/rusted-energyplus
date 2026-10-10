@@ -1,0 +1,65 @@
+# CTF08 first private final-coefficients owner proposal
+
+SOURCE ONLY, immutable held source; unapplied, unformatted and unexecuted. This package adds one public wrapper, nine focused routing tests and
+one declaration-only parent proposal. It activates no cache, driver or retry and
+adds no Native helper/QA/comparer stage or new proof framework.
+
+The API is initialize_construction_ctf_first_final_coefficients(&assembly,
+&methods, &gammas), where the arguments are the actual public first-assembly,
+ordered exponential/inverse and Gamma owners of one construction. Source caller
+Construction.cc884/887/890/894 orders those four methods. This wrapper invokes only
+the held pure08 calculate_selected_ctf_final_coefficients, exactly once on success.
+It does not invoke or recalculate any prior method and does not create identity,
+Gamma, timestep, histories, default arrays or a substitute coefficient state.
+
+Actual assembly and all wrapper construction IDs must match. The original context
+must be ordinal1, 1D/no-source with both actual reset node selectors zero. Each
+actual exponential/inverse/Gamma Result is examined, preserving real errors,
+unselected routes and inverse non-invocation as distinct typed stops. The invoked
+inverse owner ID and its real ordered assembly-context Option must remain present
+and associated. Every same-attempt context field is checked; TimeStepZone and
+CTFTimeStep compare to_bits, retaining signed zeros and NaN payload distinctions.
+Neither timestep is required to equal the other. Actual predecessor rcmax values
+must match the assembly. The pure08 owner checks only its actual input shapes and
+selected scope; this wrapper adds no finite, duration, area, conditioning or
+numerical-value guards.
+
+On success, original assembly IdenMatrix/CMat2/DMat2, actual exponential AExp and
+actual Gamma1/Gamma2 are borrowed directly. AInv is only a prior return/context
+prerequisite and is not a new08 operand; original AMat/BMat and Gamma ATemp are
+not read by08. Logical ID/context/shape checks cannot manufacture causality: the
+caller must retain and supply these actual same owners rather than reconstructed
+records. No Native answers, observations, fixture files or numeric report values
+enter this API. The wrapper never reevaluates a predecessor to authenticate it.
+
+The output retains original construction_id and the exact held pure08 Result:
+private full s0(3,4), s(3,4,rcmax), e, mutated Gamma1 copy, assigned NumCTFTerms,
+method-local CTFConvrg/inum and final PhiR0/Rnew/Rold before source deallocation.
+All three borrowed inputs remain unchanged. This private method result is not
+caller convergence or final public SI coefficient storage. Caller894-982 retry
+and steady summation checks, stores1030-1074, UValue1077, EIO and SUR handoff remain
+separate pending scope. Public 19-slot arrays and whole CTF completion are unclaimed.
+
+The nine unexecuted tests construct literal normalized-layer/Nodes/dx operands,
+invoke actual accepted04,06,05,07 APIs in order and test this routing boundary.
+They check private result shapes and unchanged prerequisites, actual assembly
+stops, ordered method errors/non-invocation, Gamma errors/unselected routes,
+wrapper/invoked IDs, later attempts/unsupported context, float-bit context and
+missing ordered context, precursor dimensions and missing borrowed buffer shapes.
+Their intentional mutations exercise typed invalid-association routes only; no
+mutated invalid owner is treated as a valid observed production execution.
+No expected Native answers or new numerical tolerances are introduced.
+
+The parent before is the actual current06 heat_balance/mod.rs. The proposal adds
+only pub mod ctf_first_final_coefficients_owner;. Accepted pure/public07 and pure08
+remain separate future dependencies, and the surface-manager pure08 declaration
+is not duplicated here. Root must compose/rebase these declarations against actual
+07 before eventual application. Historical accepted owners remain immutable.
+
+Exact source/parent before/diffs, actual source identities and selected ranges are
+listed in manifest.json. Source hashes and JSON metadata/diff checks are the only
+performed checks; no Rust target AST/import, formatter, Cargo/test/build/engine,
+scientific/weather/binary payload read, canonical change or Git action occurred.
+Root plus another author must fully review before future application/execution.
+Header authored pure/public07 and pure08; acceptance of this source wrapper is a
+routing/integration review and never an independent own-formula science certificate.

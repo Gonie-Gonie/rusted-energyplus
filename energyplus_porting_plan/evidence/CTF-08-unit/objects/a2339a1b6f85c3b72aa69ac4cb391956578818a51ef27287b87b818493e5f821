@@ -1,0 +1,11 @@
+--- before/README.md
++++ README.md
+@@ -105,7 +105,7 @@
+ DATAQA_SOURCE_INVENTORY literals to genuine held QA08 prep02 61c3efd7.
+ That reader repairs the inherited initial.packet current08 protocol keys and
+ both PE source manifest paths;
+-the comparer does not copy initial_shape or invoke initial.packet. Its six
++the comparer does not copy initial_shape or invoke initial.packet. Its seven
+ actual executed QA source archives are authenticated from the new inventory.
+ Method/Gamma/coefficient validators and all seven comparer supports are exact01;
+ all numeric/availability/profile/owner/selection/transport functions are AST

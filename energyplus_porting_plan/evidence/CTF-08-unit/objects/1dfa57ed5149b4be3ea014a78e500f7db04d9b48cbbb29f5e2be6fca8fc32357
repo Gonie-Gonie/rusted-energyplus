@@ -1,0 +1,85 @@
+--- prep04/manifest.json
++++ prep05/manifest.json
+@@ -758,16 +758,10 @@
+     }
+   ],
+   "README": {
+-    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/README.md",
+-    "sha256": "6de8674d77fc4d1ddb8dd444fb761ed2d4e500e49d75305f9896c697b24eadd1",
+-    "size_bytes": 4083,
+-    "line_count": 63
+-  },
+-  "README_from_03_diff": {
+-    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/README.md.from-03.diff",
+-    "sha256": "045bd62476f11c6e35b929bff85b9f8ac77ee8d22d04308ec6aed1879462b306",
+-    "size_bytes": 10500,
+-    "line_count": 154
++    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-05/README.md",
++    "sha256": "95a770ddbf2ced815516821c02b43f8ad87ef617bf837dc23e5151a2599b82ee",
++    "size_bytes": 1252,
++    "line_count": 19
+   },
+   "public_API": {
+     "wrapper": "initialize_construction_ctf_first_matrix_with_final_coefficients",
+@@ -798,13 +792,12 @@
+     "no_retry_or_Native_flags_or_expected_values_injected": true
+   },
+   "tests_proposed_not_executed": {
+-    "count": 5,
++    "count": 4,
+     "topics": [
+       "reached same-owner/context chain with separate private result",
+       "actual exponential error/inverse non-invocation/later typed stops",
+       "ordered unavailable construction owners without arrays",
+-      "later attempt rejection without caller mutation",
+-      "private boundary-shape error after reached predecessors"
++      "later attempt rejection without caller mutation"
+     ]
+   },
+   "numeric_profiles_or_math_bodies_changed": false,
+@@ -819,5 +812,44 @@
+     "Cargo_build_test_formatter_engine_or_Git_invoked": false,
+     "scientific_weather_or_binary_payload_read": false
+   },
+-  "authorship_limits": "Base authored prior routing, some assembly/inverse and observer glue; this is prospective integration/custody preparation, not independent own-formula/output certification."
++  "authorship_limits": "Base authored prior routing, some assembly/inverse and observer glue; this is prospective integration/custody preparation, not independent own-formula/output certification.",
++  "predecessor04_source_explanation": {
++    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/README.md",
++    "sha256": "6de8674d77fc4d1ddb8dd444fb761ed2d4e500e49d75305f9896c697b24eadd1",
++    "size_bytes": 4083,
++    "line_count": 63
++  },
++  "fresh05_metadata_only_correction": {
++    "predecessor_manifest": {
++      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/manifest.json",
++      "sha256": "6cb5c2654f87c2cf49b8c3c6a23c9a2509ded84a8d62a9871d828774ea536a3c",
++      "size_bytes": 40494,
++      "line_count": 823
++    },
++    "before_manifest_archive": {
++      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-05/before-metadata/prep04-manifest.json",
++      "sha256": "6cb5c2654f87c2cf49b8c3c6a23c9a2509ded84a8d62a9871d828774ea536a3c",
++      "size_bytes": 40494,
++      "line_count": 823
++    },
++    "before_README_archive": {
++      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-05/before-metadata/prep04-README.md",
++      "sha256": "6de8674d77fc4d1ddb8dd444fb761ed2d4e500e49d75305f9896c697b24eadd1",
++      "size_bytes": 4083,
++      "line_count": 63
++    },
++    "all_seven_Rust_sources_remain_direct_immutable_prep04_bindings": true,
++    "all_five_actual07_before_archives_remain_direct_immutable_prep04_bindings": true,
++    "removed_topic": "private boundary-shape error after reached predecessors",
++    "prior_descriptive_count": 5,
++    "actual_source_test_count": 4,
++    "source_body_or_exact_source_diff_changed": false,
++    "target_tests_executed": false
++  },
++  "predecessor04_README_from_03_diff": {
++    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-04/README.md.from-03.diff",
++    "sha256": "045bd62476f11c6e35b929bff85b9f8ac77ee8d22d04308ec6aed1879462b306",
++    "size_bytes": 10500,
++    "line_count": 154
++  }
+ }

@@ -1,0 +1,77 @@
+# CTF08 selected final-coefficient method source proposal
+
+SOURCE ONLY, unapplied, unformatted and unexecuted. This holds one pure numerical
+method, nine focused source-derived tests and one declaration-only parent proposal.
+No Native helper, freezer, QA/comparer stage, cache ingress, retry driver or public
+coefficient handoff is implemented. Root owns future review, application and runs.
+
+The exact complete Original method is Construction.cc1591-1906. It has no direct
+scientific helper calls; std::abs, literal arithmetic and Objexx owner operations
+are used. Constant::rTinyValue is numeric_limits<Real64>::epsilon() at
+DataGlobalConstants.hh608, with Real64=double at api/TypeDefs.h52. Its literal
+ConvrgLim is1.0e-13. Array declarations/constructor allocation are Construction.hh
+304-344; caller allocation638-657 creates e(rcmax), Gamma3-by-rcmax and s3-by-4-by-rcmax.
+Source caller884/887/890/894 orders exponential, inverse, Gamma and final coefficients.
+
+Actual same-attempt07 Gamma1/Gamma2,06 AExp and04 IdenMatrix/CMat2/DMat2 plus rcmax
+and CtfAssemblyContext are sufficient inputs. The pure function borrows those
+owners, returns a new changed method owner, and preserves original inputs/context.
+It neither reconstructs identity nor evaluates a prior method. Native answers are
+not operands. A later public ingress must authenticate identity, actual predecessor
+returns and exact same-attempt context before borrowing those real Rust owners.
+
+Typed unavailable routes return no arrays. Internal-source, perpendicular, stale
+node-selector, zero invocation ordinal and invalid positive-i32/buffer shapes are
+explicit scope errors. No finite, zero timestep, conditioning or numerical-value
+guard is added. This pure scope guard is not an actual Native outcome classifier.
+
+The selected method zeros every s0(3-by-4), s(3-by-4-by-rcmax) and e(rcmax) slot,
+copies actual IdenMatrix into Rnew, initializes PhiR0/Rold, and subtracts Gamma2 from
+Gamma1 in source i/j order. It preserves literal s0 assignments, signed cross-term
+symmetry divisions, and the while loop's ir/ic/is order and unusual index orientation.
+PhiR0(ic,ir) accumulates AExp(is,ir)*Rnew(ic,is). Both strict epsilon guards remain
+nested (with a narrowly documented collapsible-if lint exception). Rold/Rnew copy and diagonal update order, S accumulation parentheses, the
+e(1)==0 shortcut, strict abs(e(inum)/e(1))<1e-13 cutoff and post-check increment
+are retained. The unconverged terminal rcmax trace/product and left-associative
+CMat*Rnew*Gamma1 operations are separate and unchanged. No matrix library, transpose,
+summation regrouping, finite clamp or replacement of zero-divide/NaN behavior is used.
+
+The output is private s0/s/e, mutated Gamma1, NumCTFTerms, the method's initialized
+CTFConvrg/inum controls and final PhiR0/Rnew/Rold before1903-1905 deallocation.
+Storage is explicit row-first logical indexing, including all three rows/four
+channels/full term dimension and initialized tails. Unassigned avg/rat or an
+invented final19-coefficient state is never returned. Source Gamma2 remains borrowed
+unchanged. CTFTimeStep/TimeStepZone/history are retained from actual context, not set.
+
+Caller894-982 performs term-count and summation stability checks and timestep/history
+retries (CTF09). Caller1030-1074 later converts/stores public SI coefficient arrays,
+and1079-1103 destroys work owners. This pure08 method does not certify those steps,
+the19-slot public arrays, final timestep/convergence, reverse reuse or SUR consumers.
+The card's full integration and gate obligations remain pending. There is no current
+actual typed Rust s0/s/e/NumCTFTerms owner on the massive path; existing legacy and
+all-resistive coefficients are separate compatibility paths, never substitute inputs.
+
+A practical future genuine Native observation can extend the accepted whole-method
+adapter with entry after1592, private state before1903 and real caller return after894.
+It must copy actual AExp/Iden/Gamma/CMat/DMat and s0/s/e/Gamma1/R workspaces/counts,
+retain all real visits, and associate actual first method visit with the same07 return
+and first assembly/initial619. Later real retries remain observed unpaired context
+until an actual Rust driver exists. Public return storage alone cannot substitute
+for these destroyed private workspaces. No such callback/helper is authored here.
+
+The nine unexecuted tests cover hand-derived single-node/terminal state and signed
+symmetry, e1 zero termination/full tails, nonsymmetric owner orientation, both strict
+epsilon boundaries, cutoff routes, multiplication grouping, zero-divide NaN, signed
+zeros and typed unavailable/shape stops. Literal unit matrices test the algorithm;
+they are not production inputs, observed Native values or frozen expected outputs.
+No test has been compiled or executed; Root and another author must fully review
+the source before future application. No tolerance is chosen after outputs.
+
+The parent before copy is actual current06 source; accepted07 remains a separate
+future source package. The sole proposed declaration requires a narrow later rebase
+if07 is applied first. No existing parent body is modified. Source hashes, exact
+new-file/parent diffs and selected full Original ranges are in manifest.json.
+No project import, formatter, Cargo/test/build/engine/Git operation or scientific,
+weather/binary payload read occurred. No QA/proof framework or execution stage is
+added. Header authored pure/publicGamma and earlier adapters; this proposal makes
+no independent own-formula or numerical PASS claim.

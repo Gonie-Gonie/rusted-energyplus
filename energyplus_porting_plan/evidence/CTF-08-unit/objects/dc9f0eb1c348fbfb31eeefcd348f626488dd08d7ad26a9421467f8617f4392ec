@@ -1,0 +1,47 @@
+--- .runtime/porting/CTF-08/applied-source-01/crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs
+@@ -183,10 +183,12 @@
+         }
+         for j in 1..=3 {
+             for is2 in 1..=n {
+-                s[h(j, 1, term)] += input.c_mat[0] *
+-                    (rold[m(is2, 1)] * gamma1[g(j, is2)] + rnew[m(is2, 1)] * input.gamma2[g(j, is2)]);
+-                s[h(j, 2, term)] += input.c_mat[1] *
+-                    (rold[m(is2, n)] * gamma1[g(j, is2)] + rnew[m(is2, n)] * input.gamma2[g(j, is2)]);
++                s[h(j, 1, term)] += input.c_mat[0]
++                    * (rold[m(is2, 1)] * gamma1[g(j, is2)]
++                        + rnew[m(is2, 1)] * input.gamma2[g(j, is2)]);
++                s[h(j, 2, term)] += input.c_mat[1]
++                    * (rold[m(is2, n)] * gamma1[g(j, is2)]
++                        + rnew[m(is2, n)] * input.gamma2[g(j, is2)]);
+             }
+             if j != 3 {
+                 s[h(j, j, term)] += e[term - 1] * input.d_mat[j - 1];
+@@ -232,11 +234,22 @@
+             s[h(1, 2, n)] *= avg / s[h(1, 2, n)].abs();
+         }
+     }
+-    Ok(CtfFinalCoefficientObservation::Coefficients(Box::new(CtfFinalCoefficients {
+-        context, rcmax: input.rcmax, gamma1_minus_gamma2: gamma1,
+-        s0, s, e, num_ctf_terms, history_loop_converged: converged,
+-        next_history_term: inum, phi_r0, rnew, rold,
+-    })))
++    Ok(CtfFinalCoefficientObservation::Coefficients(Box::new(
++        CtfFinalCoefficients {
++            context,
++            rcmax: input.rcmax,
++            gamma1_minus_gamma2: gamma1,
++            s0,
++            s,
++            e,
++            num_ctf_terms,
++            history_loop_converged: converged,
++            next_history_term: inum,
++            phi_r0,
++            rnew,
++            rold,
++        },
++    )))
+ }
+ 
+ #[cfg(test)]

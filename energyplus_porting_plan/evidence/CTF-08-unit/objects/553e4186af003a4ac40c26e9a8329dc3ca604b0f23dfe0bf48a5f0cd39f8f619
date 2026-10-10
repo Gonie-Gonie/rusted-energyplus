@@ -1,0 +1,10 @@
+--- .runtime/porting/CTF-08/applied-source-01/crates/ep_run/examples/ctf08_candidate_production_support/fields.rs
++++ crates/ep_run/examples/ctf08_candidate_production_support/fields.rs
+@@ -160,7 +160,6 @@
+         "Native_whole_solver_flags_unpaired":true,"public_SI19_coefficients_observed":false,
+         "numerical_PASS_claimed":false})
+ }
+-
+ 
+ pub(super) fn typed(model: &TypedModel) -> Value {
+     let materials = model.materials.iter().enumerate().map(|(index,material)| {

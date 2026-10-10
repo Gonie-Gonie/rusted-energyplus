@@ -1,0 +1,119 @@
+--- .runtime/porting/CTF-08/applied-source-01/crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs
+@@ -4,7 +4,9 @@
+ use super::ctf_first_exponential_owner::CtfFirstExponentialUnavailable;
+ use super::ctf_first_gamma_owner::{ConstructionCtfFirstGammas, CtfFirstGammasUnavailable};
+ use super::ctf_first_inverse_owner::CtfFirstInverseUnavailable;
+-use super::ctf_first_matrix_owner::{ConstructionCtfFirstMatrixFunctions, PriorExponentialUnavailable};
++use super::ctf_first_matrix_owner::{
++    ConstructionCtfFirstMatrixFunctions, PriorExponentialUnavailable,
++};
+ use super::surface_manager::ctf_exponential_matrix::CtfExponentialObservation;
+ use super::surface_manager::ctf_final_coefficients::{
+     CtfFinalCoefficientInput, CtfFinalCoefficientObservation, CtfFinalCoefficientScopeError,
+@@ -51,7 +53,10 @@
+ 
+ impl std::fmt::Display for CtfFirstFinalCoefficientsUnavailable {
+     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+-        write!(formatter, "first private CTF final coefficients unavailable: {self:?}")
++        write!(
++            formatter,
++            "first private CTF final coefficients unavailable: {self:?}"
++        )
+     }
+ }
+ 
+@@ -82,7 +87,9 @@
+     use CtfFirstFinalCoefficientsUnavailable as Unavailable;
+ 
+     let result = (|| {
+-        let observed = assembly.result.as_ref()
++        let observed = assembly
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::FirstAssemblyUnavailable(*reason))?;
+         let actual = match observed {
+             CtfAssemblyObservation::Unavailable(reason) => {
+@@ -109,7 +116,10 @@
+         {
+             return Err(Unavailable::AssemblyContext);
+         }
+-        let exponential = methods.exponential.result.as_ref()
++        let exponential = methods
++            .exponential
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::ExponentialUnavailable(*reason))?;
+         let exponential = match exponential {
+             CtfExponentialObservation::Unavailable(reason) => {
+@@ -117,14 +127,21 @@
+             }
+             CtfExponentialObservation::Exponential(actual) => actual,
+         };
+-        let invoked_inverse = methods.inverse.result.as_ref()
++        let invoked_inverse = methods
++            .inverse
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::InverseNotInvoked(*reason))?;
+         if invoked_inverse.construction_id != assembly.construction_id {
+             return Err(Unavailable::ConstructionIdentityMismatch);
+         }
+-        let inverse = invoked_inverse.result.as_ref()
++        let inverse = invoked_inverse
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::InverseUnavailable(*reason))?;
+-        let gamma = gammas.result.as_ref()
++        let gamma = gammas
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::GammasUnavailable(*reason))?;
+         let gamma = match gamma {
+             CtfGammaObservation::Unavailable(reason) => {
+@@ -135,7 +152,9 @@
+         if !same_attempt_context(context, exponential.context)
+             || !same_attempt_context(context, inverse.context)
+             || !same_attempt_context(context, gamma.context)
+-            || !methods.inverse.assembly_context
++            || !methods
++                .inverse
++                .assembly_context
+                 .is_some_and(|prior| same_attempt_context(context, prior))
+         {
+             return Err(Unavailable::AttemptContextMismatch);
+@@ -146,17 +165,24 @@
+         {
+             return Err(Unavailable::DimensionMismatch);
+         }
+-        calculate_selected_ctf_final_coefficients(CtfFinalCoefficientInput {
+-            rcmax: actual.rcmax,
+-            a_exp: &exponential.a_exp,
+-            iden_matrix: &actual.iden_matrix,
+-            gamma1: &gamma.gamma1,
+-            gamma2: &gamma.gamma2,
+-            c_mat: &actual.c_mat,
+-            d_mat: &actual.d_mat,
+-        }, context).map_err(Unavailable::FinalCoefficientScope)
++        calculate_selected_ctf_final_coefficients(
++            CtfFinalCoefficientInput {
++                rcmax: actual.rcmax,
++                a_exp: &exponential.a_exp,
++                iden_matrix: &actual.iden_matrix,
++                gamma1: &gamma.gamma1,
++                gamma2: &gamma.gamma2,
++                c_mat: &actual.c_mat,
++                d_mat: &actual.d_mat,
++            },
++            context,
++        )
++        .map_err(Unavailable::FinalCoefficientScope)
+     })();
+-    ConstructionCtfFirstFinalCoefficients { construction_id: assembly.construction_id, result }
++    ConstructionCtfFirstFinalCoefficients {
++        construction_id: assembly.construction_id,
++        result,
++    }
+ }
+ 
+ fn same_attempt_context(left: CtfAssemblyContext, right: CtfAssemblyContext) -> bool {

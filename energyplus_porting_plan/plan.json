@@ -10908,7 +10908,7 @@
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
@@ -11088,7 +11088,17 @@
           "range_size_bytes": 6313,
           "reason": "actual entry/privatefinal/return lifetimes"
         }
-      ]
+      ],
+      "actual_Original_and_unchanged_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-original-baseline/summary.json",
+        "sha256": "82abbff77a5a8e67db7010aa95e638dbb59ad4d3206f7b820ca08908947837c4",
+        "size_bytes": 18681
+      },
+      "actual_candidate_unit_and_loader_comparisons": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-unit/summary.json",
+        "sha256": "34d56467ea204a9edfcf9617ed616ef35bb5aa27cc9cf4d6cdfa14f9e38aa398",
+        "size_bytes": 18635
+      }
     },
     {
       "id": "CTF-09",

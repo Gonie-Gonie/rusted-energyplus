@@ -1,0 +1,10 @@
+--- actual07/crates/ep_runtime/src/heat_balance/surface_manager.rs
++++ proposed08/crates/ep_runtime/src/heat_balance/surface_manager.rs
+@@ -7,6 +7,7 @@
+ mod construction_cache;
+ pub mod ctf_all_resistive;
+ pub mod ctf_exponential_matrix;
++pub mod ctf_final_coefficients;
+ pub mod ctf_gamma_matrix;
+ pub mod ctf_initial_discretization;
+ pub mod ctf_inverse_matrix;

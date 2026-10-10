@@ -1,0 +1,149 @@
+--- crates/ep_run/examples/ctf07_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf08_candidate_production_observer.rs
+@@ -1,11 +1,11 @@
+ //! Actual candidate public fixed-CON loader/compiler/initialization owners only.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf07_candidate_production_support/fields.rs"]
++#[path = "ctf08_candidate_production_support/fields.rs"]
+ mod fields;
+ // Exact accepted serializer copy includes unit-only helpers and path constants.
+ #[allow(dead_code)]
+-#[path = "ctf07_candidate_production_support/unit_fields.rs"]
++#[path = "ctf08_candidate_production_support/unit_fields.rs"]
+ mod unit_fields;
+ 
+ use ep_model::SimulationModel;
+@@ -110,7 +110,8 @@
+         "selected_CTF04_owners":fields::ctf04_unavailable(),
+         "selected_CTF06_owners":fields::ctf06_unavailable(),
+         "selected_CTF05_owners":fields::ctf05_unavailable(),
+-        "selected_CTF07_owners":fields::ctf07_unavailable(),"Native_or_expected_values_read":false});
++        "selected_CTF07_owners":fields::ctf07_unavailable(),
++        "selected_CTF08_owners":fields::ctf08_unavailable(),"Native_or_expected_values_read":false});
+     if row["conversion_available"] == false {
+         return Ok(out);
+     }
+@@ -149,6 +150,7 @@
+             out["selected_CTF06_owners"] = fields::ctf06_selected(&state);
+             out["selected_CTF05_owners"] = fields::ctf05_selected(&state);
+             out["selected_CTF07_owners"] = fields::ctf07_selected(&state);
++            out["selected_CTF08_owners"] = fields::ctf08_selected(&state);
+         }
+         Err(error) => {
+             out["initialization"] = json!({"invoked":true,"status":"source-error-returned",
+@@ -218,7 +220,7 @@
+         ],
+     )?;
+     require(
+-        request["schema"] == "ctf07-candidate-production-observer-request.v1"
++        request["schema"] == "ctf08-candidate-production-observer-request.v1"
+             && request["frozen_before_execution"] == true
+             && request["expected_values_supplied"] == false
+             && request["Native_results_supplied"] == false
+@@ -264,9 +266,9 @@
+     let (_, admission_bytes) = bound(&root, &request["native_admission_contract"])?;
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     require(
+-        native["schema"] == "ctf07-production-helper-cases.v1"
+-            && admission["schema"] == "ctf07-production-native-admission-contract.v1"
+-            && native["frozen_before_this_CTF07_helper_execution"] == true
++        native["schema"] == "ctf08-production-helper-cases.v1"
++            && admission["schema"] == "ctf08-production-native-admission-contract.v1"
++            && native["frozen_before_this_CTF08_helper_execution"] == true
+             && native["expected_values_supplied"] == false
+             && native["expected_exits_supplied"] == false
+             && native["scientific_execution_performed"] == false
+@@ -276,7 +278,7 @@
+             && admission["requested_counts"] == native["requested_counts"]
+             && native["requested_counts"] == json!({"model_cases":15,"loader_phase_records":195})
+             && native["fixed_scope"] == request["fixed_scope"],
+-        "actual frozen CTF07 production packet differs",
++        "actual frozen CTF08 production packet differs",
+     )?;
+     let mut bindings = vec![
+         request["fixed_scope"].clone(),
+@@ -295,30 +297,47 @@
+         bindings.push(native[key].clone());
+     }
+     require(
+-        native["actual_scope_amendment_execution_role"]
+-            == "real-CTF-07-check-only; prior05/06-authorities-separate"
+-            && admission["actual_scope_amendment_execution_role"]
+-                == native["actual_scope_amendment_execution_role"]
+-            && admission["prior_05_06_authority"] == native["prior_05_06_authority"]
++        native["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only"
++            && admission["actual_scope_amendment_execution_role"] == native["actual_scope_amendment_execution_role"]
++            && admission["historical_prior_07_authority"] == native["historical_prior_07_authority"]
+             && admission["current_cards"] == native["current_cards"],
+-        "current07 authority role or separate historical prior05/06 authority differs",
+-    )?;
+-    bindings.push(native["current_cards"]["CTF-07"].clone());
+-    let prior = &native["prior_05_06_authority"];
++        "current08 authority or separate historical prior07 authority differs",
++    )?;
++    bindings.push(native["current_cards"]["CTF-08"].clone());
++    let prior = &native["historical_prior_07_authority"];
++    require(prior["prior07_numerical_PASS_inferred"] == false,
++        "historical prior07 authority must infer no numerical PASS")?;
++    for key in ["prior_07_freeze", "prior_07_freeze_execution", "prior_07_writer_manifest",
++        "prior_07_source_contract", "prior_07_scope_amendment", "prior_07_scope_check_execution"] {
++        bindings.push(prior[key].clone());
++    }
++    let (_, historical_source_bytes) = bound(&root, &prior["prior_07_source_contract"])?;
++    let historical_source: Value = serde_json::from_slice(&historical_source_bytes)?;
++    require(prior["prior_07_selected_primary_ranges"] == historical_source["ctf07_selected_primary_ranges"]
++        && prior["historical_prior_05_06_authority"] == historical_source["source_authorities"]["prior_05_06_authority"],
++        "historical prior07 ranges or nested prior05/06 literal ancestry differs")?;
++    for binding in rows(&prior["historical_before_document_archives"])? {
++        bindings.push(binding.clone());
++    }
++    for binding in rows(&prior["available_prior_frozen_document_archives"])? {
++        bindings.push(binding["archive"].clone());
++    }
++    let nested = &prior["historical_prior_05_06_authority"];
+     for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+         "prior_06_writer_manifest", "prior_06_source_contract"] {
+-        bindings.push(prior[key].clone());
++        bindings.push(nested[key].clone());
+     }
+     for card in ["CTF-05", "CTF-06"] {
+-        bindings.push(prior["prior_scope_checks"][card].clone());
+-    }
+-    for binding in rows(&prior["historical_before_document_archives"])? {
++        bindings.push(nested["prior_scope_checks"][card].clone());
++    }
++    for binding in rows(&nested["historical_before_document_archives"])? {
+         bindings.push(binding.clone());
+     }
+-    for binding in rows(&prior["available_prior_frozen_document_archives"])? {
++    for binding in rows(&nested["available_prior_frozen_document_archives"])? {
+         bindings.push(binding["archive"].clone());
+     }
+-    // Historical after-doc identities are documentary, never current07 live bindings.
++    // Historical selected-range SHAs and after-doc identities are documentary;
++    // bind their authentic source contract/available archives, never live docs.
+     let native_cases = rows(&native["model_cases"])?;
+     require(
+         native_cases.len() == cases.len() && rows(&native["all_45_guard_refs"])?.len() == 45,
+@@ -392,7 +411,7 @@
+     println!(
+         "{}",
+         serde_json::to_string_pretty(
+-            &json!({"schema":"ctf07-candidate-production-observer-results.v1",
++            &json!({"schema":"ctf08-candidate-production-observer-results.v1",
+         "actual_request":{"path":request_path,"sha256":digest::sha256(&original)},
+         "native_helper_request":request["native_helper_request"],"native_admission_contract":request["native_admission_contract"],
+         "contracts":admission["contracts"],"projection":admission["projection"],
+@@ -401,9 +420,10 @@
+         "ctf06_exponential_observation_policy":native["ctf06_exponential_observation_policy"],
+         "ctf05_inverse_observation_policy":native["ctf05_inverse_observation_policy"],
+         "ctf07_gamma_observation_policy":native["ctf07_gamma_observation_policy"],
++        "ctf08_final_coefficient_observation_policy":native["ctf08_final_coefficient_observation_policy"],
+         "actual_scope_amendment":native["actual_scope_amendment"],
+         "actual_scope_amendment_execution":native["actual_scope_amendment_execution"],
+-        "prior_05_06_authority":native["prior_05_06_authority"],"current_cards":native["current_cards"],
++        "historical_prior_07_authority":native["historical_prior_07_authority"],"current_cards":native["current_cards"],
+         "actual_scope_amendment_execution_role":native["actual_scope_amendment_execution_role"],
+         "Rust_retry_driver_available":false,"later_Native_attempts_paired":false,
+         "later_Native_attempts_counted_as_PASS":false,

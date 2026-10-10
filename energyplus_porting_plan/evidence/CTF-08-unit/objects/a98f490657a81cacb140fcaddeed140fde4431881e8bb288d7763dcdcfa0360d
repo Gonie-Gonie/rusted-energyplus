@@ -1,0 +1,205 @@
+"""Pair actual private first08 owners; no coefficient or return evaluator."""
+from collections import Counter
+
+NAMES = ["s0", "s", "e", "mutated_Gamma1", "PhiR0", "Rnew", "Rold"]
+VARIABLES = ["CTF08." + name for name in NAMES]
+ERROR_ROUTES = ["FirstAssemblyUnavailable", "AssemblyRouteUnavailable", "ExponentialUnavailable",
+                "ExponentialRouteUnavailable", "InverseNotInvoked", "InverseUnavailable", "GammasUnavailable",
+                "GammasRouteUnavailable", "ConstructionIdentityMismatch", "NotFirstAttempt", "AssemblyContext",
+                "AttemptContextMismatch", "DimensionMismatch", "FinalCoefficientScope", "FinalCoefficientRouteUnavailable"]
+
+
+def validate_all(c, native, qa, coefficients):
+    """Authenticate all actual private visits/counts before selected numeric pairing."""
+    counts, integrity = Counter(), []
+    for model in native["model_cases"]:
+        for operation in model["operations"]:
+            coefficients.review(operation, None, c.need, c.dto, counts, integrity, model["id"] + "/" + operation["id"])
+    totals = coefficients.summary(native, counts, c.need)
+    for key, value in totals.items():
+        c.exact("DataQA_all_private_coefficient_counts/" + key, qa["actual_observation_counts"][key], value)
+        c.need(qa["actual_observation_counts"][key] == value,
+               "Actual DataQA all-visit private coefficient count proof required before pairing")
+    c.need(not integrity, "Any private coefficient copy/order/association/omission/failure prevents pairing")
+    return totals
+
+
+def rust_route(c, path, row, construction_id):
+    if not isinstance(row, dict):
+        c.absence(path + "/Rust_route_record", True, False, True, "required actual private08 public Result ledger absent")
+        return None
+    c.need(row.get("protocol") == "ctf08-first-private-coefficients.v1" and
+           row.get("actual_public_API") == "initialize_construction_ctf_first_final_coefficients" and
+           row.get("actual_public_API_invoked") is True and type(row.get("owner_available")) is bool and
+           type(row.get("selected_first_private_coefficient_operands")) is bool and
+           row.get("only_first_Rust_method_invocation_owned") is True and row.get("counted_as_PASS") is False and
+           all(row.get(key) is False for key in ["retry_driver_available", "later_Native_method_visits_paired",
+               "later_Native_method_visits_counted_as_PASS", "Native_stage_callback_or_return_counts_inferred",
+               "observer_coefficient_or_workspace_arithmetic_performed", "public_SI19_coefficients_or_caller_retry_state_observed"]),
+           "Actual first-only private08 Result without reconstructed returns/workspaces required")
+    c.exact(path + "/construction_id", construction_id, row.get("construction_id"))
+    c.exact(path + "/selection_copy", row["owner_available"], row["selected_first_private_coefficient_operands"])
+    if row["owner_available"]:
+        c.need(row.get("actual_source_route") == "FirstPrivateCoefficientsReturned" and row.get("unavailable_reason") is None and
+               isinstance(row.get("snapshot"), dict), "Actual reached private coefficient owner required")
+    else:
+        c.need(row.get("actual_source_route") in ERROR_ROUTES and row.get("snapshot") is None and
+               isinstance(row.get("unavailable_reason"), str) and row["unavailable_reason"],
+               "Actual typed private08 stop must retain reason and null owner")
+    return row
+
+
+def pair_operation(c, path, operation, row, assembly, exponential, inverse, gammas, construction_id, pairing):
+    rust = rust_route(c, path + "/CTF08", row, construction_id)
+    record = {"path": path, "actual_source_invoked": operation["actual_source_invoked"],
+              "actual_native_whole_outcome_context_only": operation["call_outcome"],
+              "selected_operands_paired": False, "all_later_actual_visits_paired": False, "counted_as_PASS": False}
+    if not operation["actual_source_invoked"]:
+        c.absence(path + "/FinalCoefficients", False, bool(rust and rust["owner_available"]), False,
+                  "whole source uninvoked after real stop; no private method invocation or return inferred/noPASS")
+        return record
+    observed = operation["observations"]
+    ledger = observed["FinalCoefficients"]; visits = ledger["invocations"]
+    record.update({key: ledger[key] for key in ["actual_invocation_count", "actual_retained_invocation_count",
+        "actual_stage_callback_counts", "stage_records_omitted", "failure_event_counts", "first_failure", "last_failure"]})
+    record["actual_visits"] = [{"observed_invocation_ordinal": visit["observed_invocation_ordinal"],
+        "observed_assembly_ordinal": visit["observed_assembly_ordinal"], "actual_stage_callback_counts": visit["actual_stage_callback_counts"],
+        "actual_source_return_marker_reached": visit["SourceReturn"]["reached"], "paired": False,
+        "later_context_only": visit["observed_invocation_ordinal"] > 1, "counted_as_PASS": False} for visit in visits]
+    attempts = observed["MatrixAssembly"]["attempts"]
+    native_assembly = attempts[0] if attempts and attempts[0]["observed_attempt_ordinal"] == 1 else None
+    native_selected = bool(native_assembly and native_assembly["available"] and
+        native_assembly["snapshot"]["SourceSinkPresent"] is False and native_assembly["snapshot"]["SolutionDimensions"] == 1)
+    rust_selected = isinstance(assembly, dict) and assembly.get("owner_available") is True
+    first = visits[0] if visits and visits[0]["observed_invocation_ordinal"] == 1 else None
+    if not (native_selected or rust_selected or bool(rust and rust["owner_available"])):
+        c.absence(path + "/FinalCoefficients", False, bool(rust and rust["owner_available"]), False,
+                  "actual first assembly unselected/unreached; private08 route remains unavailable/noPASS")
+        return record
+    native_available = bool(native_selected and first and first["association_available"] and first["observed_assembly_ordinal"] == 1 and
+        all(first[stage]["reached"] and first[stage]["available"] for stage in ["Entry", "PrivateFinal", "SourceReturn"]))
+    rust_available = bool(rust and rust["owner_available"])
+    if not native_available or not rust_available:
+        c.absence(path + "/FinalCoefficients", native_available, rust_available, True,
+                  "required selected private08 owner absent on one or both sides; later visits cannot replace first1/noPASS")
+        return record
+    c.need(rust_selected and all(isinstance(prior, dict) and prior.get("owner_available") is True for prior in [exponential, inverse, gammas])
+           and inverse.get("actual_public_API_invoked") is True,
+           "Selected private08 requires same actual first assembly and successful ordered06/05/07 owners")
+    for label, prior in [("exponential", exponential), ("inverse", inverse), ("Gamma", gammas)]:
+        c.exact(path + "/FinalCoefficients/same_" + label + "_owner_available", True, rust.get("same_" + label + "_owner_available"))
+        c.exact(path + "/FinalCoefficients/same_" + label + "_construction_id", construction_id, rust.get("same_" + label + "_construction_id"))
+        c.exact(path + "/FinalCoefficients/actual_" + label + "_construction_id", construction_id, prior.get("construction_id"))
+    c.exact(path + "/FinalCoefficients/same_inverse_public_API_invoked", inverse["actual_public_API_invoked"], rust.get("same_inverse_public_API_invoked"))
+    snapshot = rust["snapshot"]
+    c.need(type(snapshot.get("rcmax")) is int and snapshot["rcmax"] > 0 and isinstance(snapshot.get("context"), dict) and
+           snapshot.get("square_storage_order") == pairing.ORDER and snapshot.get("Gamma_storage_order") == "source_j_outer_i_inner_row_first" and
+           snapshot.get("s0_storage_order") == "source_j_outer_k_inner" and snapshot.get("s_storage_order") == "source_j_outer_k_middle_term_inner" and
+           snapshot.get("private_method_final_owner_only") is True and snapshot.get("Native_SourceReturn_workspace_inferred") is False,
+           "Actual private-final shape/layout/context without synthetic Native return buffers required")
+    n = snapshot["rcmax"]
+    for stage in ["Entry", "PrivateFinal", "SourceReturn"]:
+        context = first[stage]["snapshot"]["context"]
+        c.exact(path + "/FinalCoefficients/" + stage + "/rcmax", context["rcmax"], n)
+        pairing.context(c, path + "/FinalCoefficients/" + stage + "/context", context, snapshot["context"], construction_id,
+                        observed["InitialDiscretization"])
+    predecessors = {name: observed[name]["invocations"][0] for name in ["Exponential", "Inverse", "Gamma"]}
+    c.need(all(visit["observed_invocation_ordinal"] == visit["observed_assembly_ordinal"] == 1 and
+               visit["SourceReturn"]["reached"] and visit["SourceReturn"]["available"] for visit in predecessors.values()),
+           "Actual ordered06 then05 then07 caller returns must precede first08 entry")
+    pairing.original_handoff(c, path + "/FinalCoefficients/original_first_assembly", rust, assembly,
+        pairing.matrix_map(c, predecessors["Exponential"]["Entry"]), construction_id)
+    entry = pairing.matrix_map(c, first["Entry"])
+    source_assembly = assembly["snapshot"]
+    for name in ["CMat", "DMat"]:
+        pairing.values(c, path + "/FinalCoefficients/entry_" + name, first["Entry"]["snapshot"][name], source_assembly["matrices"][name], 2)
+    pairing.values(c, path + "/FinalCoefficients/entry_IdenMatrix", entry["IdenMatrix"], source_assembly["matrices"]["IdenMatrix"], n*n)
+    pairing.values(c, path + "/FinalCoefficients/entry_AExp", entry["AExp"], exponential["snapshot"]["matrices"]["AExp"], n*n)
+    pairing.values(c, path + "/FinalCoefficients/actual_exponential_return_AExp", entry["AExp"],
+        pairing.matrix_map(c, predecessors["Exponential"]["SourceReturn"])["AExp"], n*n)
+    for name in ["Gamma1", "Gamma2"]:
+        pairing.values(c, path + "/FinalCoefficients/entry_" + name, entry[name], gammas["snapshot"]["matrices"][name], 3*n)
+        pairing.values(c, path + "/FinalCoefficients/actual_Gamma_return_" + name, entry[name],
+            pairing.matrix_map(c, predecessors["Gamma"]["SourceReturn"])[name], 3*n)
+    matrices, counts, shapes = [snapshot.get(key) for key in ["matrices", "actual_matrix_value_counts", "actual_matrix_shapes"]]
+    owners = ["s0", "s", "e", "Gamma1", "PhiR0", "Rnew", "Rold"]
+    c.need(all(isinstance(value, dict) and set(value) == set(owners) for value in [matrices, counts, shapes]),
+           "All seven actual private08 owners and exact count/shape metadata required")
+    private = first["PrivateFinal"]["snapshot"]
+    final_matrices = pairing.matrix_map(c, first["PrivateFinal"])
+    returned = first["SourceReturn"]["snapshot"]
+    return_matrices = pairing.matrix_map(c, first["SourceReturn"])
+    for name, profile in zip(owners, NAMES):
+        shape = [3,4] if name == "s0" else [3,4,n] if name == "s" else [n] if name == "e" else [3,n] if name == "Gamma1" else [n,n]
+        size = 12 if name == "s0" else 12*n if name == "s" else n if name == "e" else 3*n if name == "Gamma1" else n*n
+        c.need(type(counts[name]) is int and isinstance(shapes[name], list) and all(type(v) is int for v in shapes[name]),
+               "Typed copied private08 shape/count required")
+        c.exact(path + "/FinalCoefficients/" + name + "/shape", shape, shapes[name])
+        c.exact(path + "/FinalCoefficients/" + name + "/count", size, counts[name])
+        actual = private[name] if name in ["s", "e"] else final_matrices[name]
+        pairing.values(c, path + "/FinalCoefficients/" + name, actual, matrices[name], size, "CTF08." + profile)
+        if name in ["Gamma1", "s0", "s", "e"]:
+            actual_return = returned[name] if name in ["s", "e"] else return_matrices[name]
+            pairing.values(c, path + "/FinalCoefficients/real_return_handoff/" + name, actual, actual_return, size)
+    c.need(type(snapshot.get("NumCTFTerms")) is int and isinstance(snapshot.get("controls"), dict) and
+           set(snapshot["controls"]) == {"inum","CTFConvrg"} and type(snapshot["controls"]["inum"]) is int and
+           type(snapshot["controls"]["CTFConvrg"]) is bool, "Actual initialized private method controls required")
+    c.exact(path + "/FinalCoefficients/NumCTFTerms", private["NumCTFTerms"], snapshot["NumCTFTerms"])
+    c.exact(path + "/FinalCoefficients/real_return_NumCTFTerms", private["NumCTFTerms"], returned["NumCTFTerms"])
+    for name in ["inum", "CTFConvrg"]:
+        c.exact(path + "/FinalCoefficients/controls/" + name, private["controls"][name], snapshot["controls"][name])
+    record["selected_operands_paired"] = True
+    record["actual_visits"][0]["paired"] = True
+    c.counts["coefficient_selected_first_owner_pairs"] += 1
+    return record
+
+
+def compare_unit(c, native, rust, request, pairing):
+    records = []
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        for index, (declared, operation, observed) in enumerate(zip(expected["operations"], left["operations"], right["operations"])):
+            records.append(pair_operation(c, expected["id"] + "/" + declared["id"], operation,
+                observed.get("CTF08_first_private_coefficients"), observed.get("CTF04_first_assembly"),
+                observed.get("CTF06_first_exponential"), observed.get("CTF05_first_inverse"), observed.get("CTF07_first_gammas"), index, pairing))
+    return records
+
+
+def compare_production(c, native, rust, request, pairing, normalized, owner_map):
+    records = []
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        path = expected["id"]; typed = right.get("typed_owners")
+        constructions = typed.get("constructions") if isinstance(typed, dict) else None
+        selected = right.get("selected_CTF08_owners")
+        if not isinstance(constructions, list) or not isinstance(selected, dict) or selected.get("owner_available") is not True:
+            c.absence(path + "/required_initialized_private_coefficient_owners", left["loader_ready"], False, True,
+                      "required actual typed construction/private08 owner ledger unavailable")
+            for operation in left["operations"]:
+                records.append(pair_operation(c, path + "/" + operation["id"], operation, None,None,None,None,None,None,pairing))
+            continue
+        c.need(selected.get("actual_CTF06_then_CTF05_then_CTF07_then_CTF08_order_is_producer_owned") is True and
+               selected.get("only_first_Rust_method_invocation_owned") is True and selected.get("Native_whole_solver_flags_unpaired") is True and
+               all(selected.get(key) is False for key in ["predecessor_or_private_coefficient_owners_reexecuted_by_observer",
+                   "retry_driver_available","later_Native_method_visits_paired","later_Native_method_visits_counted_as_PASS",
+                   "public_SI19_coefficients_observed","numerical_PASS_claimed"]),
+               "Actual borrowed ordered first-only initialized private08 owners required")
+        ids = [row["id"] for row in constructions]; by_name = owner_map(constructions,"name",c)
+        rows = selected.get("construction_first_private_coefficients")
+        c.need(isinstance(rows,list) and len({row["construction_id"] for row in rows}) == len(rows) and type(selected.get("actual_owner_count")) is int,
+               "Unique ordered actual private08 owner IDs/count required")
+        c.exact(path + "/FinalCoefficients/owner_order", ids, [row["construction_id"] for row in rows])
+        c.exact(path + "/FinalCoefficients/owner_count", len(rows), selected["actual_owner_count"])
+        for index,row in enumerate(rows): c.exact(path + "/FinalCoefficients/state_vector_index/" + str(index),index,row["state_vector_index"])
+        private = {row["construction_id"]:row["result"] for row in rows}
+        matches = {}
+        for card,field in [("CTF04","construction_first_assembly"),("CTF06","construction_first_exponential"),
+                           ("CTF05","construction_first_inverse"),("CTF07","construction_first_gammas")]:
+            owner = right.get("selected_" + card + "_owners")
+            prior = owner.get(field,[]) if isinstance(owner,dict) else []
+            c.need(isinstance(prior,list) and len({row["construction_id"] for row in prior}) == len(prior), "Unique actual predecessor owner association required")
+            matches[card] = {row["construction_id"]:row["result"] for row in prior}
+        for operation in left["operations"]:
+            name = normalized(operation["actual_construction_Name"],c); construction = by_name.get(name)
+            cid = construction["id"] if construction else None
+            records.append(pair_operation(c,path + "/" + name,operation,private.get(cid),matches["CTF04"].get(cid),
+                matches["CTF06"].get(cid),matches["CTF05"].get(cid),matches["CTF07"].get(cid),cid,pairing))
+    return records

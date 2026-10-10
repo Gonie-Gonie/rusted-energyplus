@@ -1,0 +1,13 @@
+--- accepted03/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ rebased04/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -17,9 +17,7 @@
+ use crate::heat_balance::ctf_first_final_coefficients_ingress::initialize_construction_ctf_first_matrix_with_final_coefficients;
+ use crate::heat_balance::ctf_first_final_coefficients_owner::ConstructionCtfFirstFinalCoefficients;
+ use crate::heat_balance::ctf_first_gamma_owner::ConstructionCtfFirstGammas;
+-use crate::heat_balance::ctf_first_matrix_owner::{
+-    ConstructionCtfFirstInverseAfterExponential,
+-};
++use crate::heat_balance::ctf_first_matrix_owner::ConstructionCtfFirstInverseAfterExponential;
+ use crate::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+ };

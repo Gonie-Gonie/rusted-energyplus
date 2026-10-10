@@ -1,0 +1,142 @@
+--- .runtime/porting/CTF-08/applied-source-01/crates/ep_run/examples/ctf08_candidate_unit_support/fields.rs
++++ crates/ep_run/examples/ctf08_candidate_unit_support/fields.rs
+@@ -11,6 +11,9 @@
+ use ep_runtime::heat_balance::ctf_first_inverse_owner::CtfFirstInverseUnavailable;
+ use ep_runtime::heat_balance::surface_manager::ctf_gamma_matrix::CtfGammaObservation;
+ 
++use ep_runtime::heat_balance::ctf_first_final_coefficients_owner::{
++    ConstructionCtfFirstFinalCoefficients, CtfFirstFinalCoefficientsUnavailable,
++};
+ use ep_runtime::heat_balance::ctf_first_matrix_owner::{
+     ConstructionCtfFirstInverseAfterExponential, PriorExponentialUnavailable,
+ };
+@@ -18,16 +21,13 @@
+     ConstructionCtfInitialDiscretization, CtfInitialUnavailable,
+ };
+ use ep_runtime::heat_balance::surface_manager::ctf_exponential_matrix::CtfExponentialObservation;
++use ep_runtime::heat_balance::surface_manager::ctf_final_coefficients::CtfFinalCoefficientObservation;
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing,
+     CtfLayerScopeError,
+ };
+ use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyContext;
+ use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyObservation;
+-use ep_runtime::heat_balance::ctf_first_final_coefficients_owner::{
+-    ConstructionCtfFirstFinalCoefficients, CtfFirstFinalCoefficientsUnavailable,
+-};
+-use ep_runtime::heat_balance::surface_manager::ctf_final_coefficients::CtfFinalCoefficientObservation;
+ use serde_json::{Value, json};
+ 
+ pub(super) fn scalar(value: f64) -> Value {
+@@ -413,13 +413,21 @@
+     let (available, route, reason, snapshot) = match &source.result {
+         Err(reason) => {
+             let route = match reason {
+-                CtfFirstGammasUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+-                CtfFirstGammasUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
++                CtfFirstGammasUnavailable::FirstAssemblyUnavailable(_) => {
++                    "FirstAssemblyUnavailable"
++                }
++                CtfFirstGammasUnavailable::AssemblyRouteUnavailable(_) => {
++                    "AssemblyRouteUnavailable"
++                }
+                 CtfFirstGammasUnavailable::ExponentialUnavailable(_) => "ExponentialUnavailable",
+-                CtfFirstGammasUnavailable::ExponentialRouteUnavailable(_) => "ExponentialRouteUnavailable",
++                CtfFirstGammasUnavailable::ExponentialRouteUnavailable(_) => {
++                    "ExponentialRouteUnavailable"
++                }
+                 CtfFirstGammasUnavailable::InverseNotInvoked(_) => "InverseNotInvoked",
+                 CtfFirstGammasUnavailable::InverseUnavailable(_) => "InverseUnavailable",
+-                CtfFirstGammasUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstGammasUnavailable::ConstructionIdentityMismatch => {
++                    "ConstructionIdentityMismatch"
++                }
+                 CtfFirstGammasUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                 CtfFirstGammasUnavailable::AssemblyContext => "AssemblyContext",
+                 CtfFirstGammasUnavailable::AttemptContextMismatch => "AttemptContextMismatch",
+@@ -429,10 +437,15 @@
+             (false, route, Some(format!("{reason:?}")), Value::Null)
+         }
+         Ok(CtfGammaObservation::Unavailable(reason)) => (
+-            false, "GammaRouteUnavailable", Some(format!("{reason:?}")), Value::Null,
++            false,
++            "GammaRouteUnavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
+         ),
+         Ok(CtfGammaObservation::Gamma(actual)) => (
+-            true, "FirstGammaReturned", None,
++            true,
++            "FirstGammaReturned",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "matrices":{"ATemp":matrix_values(&actual.a_temp),
+                     "Gamma1":matrix_values(&actual.gamma1),"Gamma2":matrix_values(&actual.gamma2)},
+@@ -472,28 +485,49 @@
+     let (available, route, reason, snapshot) = match &source.result {
+         Err(reason) => {
+             let route = match reason {
+-                CtfFirstFinalCoefficientsUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+-                CtfFirstFinalCoefficientsUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
+-                CtfFirstFinalCoefficientsUnavailable::ExponentialUnavailable(_) => "ExponentialUnavailable",
+-                CtfFirstFinalCoefficientsUnavailable::ExponentialRouteUnavailable(_) => "ExponentialRouteUnavailable",
++                CtfFirstFinalCoefficientsUnavailable::FirstAssemblyUnavailable(_) => {
++                    "FirstAssemblyUnavailable"
++                }
++                CtfFirstFinalCoefficientsUnavailable::AssemblyRouteUnavailable(_) => {
++                    "AssemblyRouteUnavailable"
++                }
++                CtfFirstFinalCoefficientsUnavailable::ExponentialUnavailable(_) => {
++                    "ExponentialUnavailable"
++                }
++                CtfFirstFinalCoefficientsUnavailable::ExponentialRouteUnavailable(_) => {
++                    "ExponentialRouteUnavailable"
++                }
+                 CtfFirstFinalCoefficientsUnavailable::InverseNotInvoked(_) => "InverseNotInvoked",
+                 CtfFirstFinalCoefficientsUnavailable::InverseUnavailable(_) => "InverseUnavailable",
+                 CtfFirstFinalCoefficientsUnavailable::GammasUnavailable(_) => "GammasUnavailable",
+-                CtfFirstFinalCoefficientsUnavailable::GammasRouteUnavailable(_) => "GammasRouteUnavailable",
+-                CtfFirstFinalCoefficientsUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstFinalCoefficientsUnavailable::GammasRouteUnavailable(_) => {
++                    "GammasRouteUnavailable"
++                }
++                CtfFirstFinalCoefficientsUnavailable::ConstructionIdentityMismatch => {
++                    "ConstructionIdentityMismatch"
++                }
+                 CtfFirstFinalCoefficientsUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                 CtfFirstFinalCoefficientsUnavailable::AssemblyContext => "AssemblyContext",
+-                CtfFirstFinalCoefficientsUnavailable::AttemptContextMismatch => "AttemptContextMismatch",
++                CtfFirstFinalCoefficientsUnavailable::AttemptContextMismatch => {
++                    "AttemptContextMismatch"
++                }
+                 CtfFirstFinalCoefficientsUnavailable::DimensionMismatch => "DimensionMismatch",
+-                CtfFirstFinalCoefficientsUnavailable::FinalCoefficientScope(_) => "FinalCoefficientScope",
++                CtfFirstFinalCoefficientsUnavailable::FinalCoefficientScope(_) => {
++                    "FinalCoefficientScope"
++                }
+             };
+             (false, route, Some(format!("{reason:?}")), Value::Null)
+         }
+         Ok(CtfFinalCoefficientObservation::Unavailable(reason)) => (
+-            false, "FinalCoefficientRouteUnavailable", Some(format!("{reason:?}")), Value::Null,
++            false,
++            "FinalCoefficientRouteUnavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
+         ),
+         Ok(CtfFinalCoefficientObservation::Coefficients(actual)) => (
+-            true, "FirstPrivateCoefficientsReturned", None,
++            true,
++            "FirstPrivateCoefficientsReturned",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "NumCTFTerms":actual.num_ctf_terms,
+                 "controls":{"inum":actual.next_history_term,"CTFConvrg":actual.history_loop_converged},
+@@ -532,7 +566,6 @@
+         "observer_coefficient_or_workspace_arithmetic_performed":false,
+         "public_SI19_coefficients_or_caller_retry_state_observed":false,"counted_as_PASS":false})
+ }
+-
+ 
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+     "crates/ep_run/examples/ctf08_candidate_unit_observer.rs",

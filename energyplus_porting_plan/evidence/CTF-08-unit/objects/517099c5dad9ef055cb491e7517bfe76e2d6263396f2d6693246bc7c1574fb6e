@@ -1,0 +1,12 @@
+--- actual07/crates/ep_runtime/src/heat_balance/state.rs
++++ proposed08/crates/ep_runtime/src/heat_balance/state.rs
+@@ -77,6 +77,9 @@
+     /// Actual first CTF07 return or typed prerequisite stop; no final CTF state is inferred.
+     pub construction_ctf07_first_gammas:
+         Vec<super::ctf_first_gamma_owner::ConstructionCtfFirstGammas>,
++    /// Actual private first CTF08 return; public SI coefficient stores and retry remain separate.
++    pub construction_ctf08_first_private_coefficients:
++        Vec<super::ctf_first_final_coefficients_owner::ConstructionCtfFirstFinalCoefficients>,
+     /// Construction coefficient cache build time in seconds.
+     pub construction_cache_build_wall_seconds: f64,
+     /// Number of construction cache entries.

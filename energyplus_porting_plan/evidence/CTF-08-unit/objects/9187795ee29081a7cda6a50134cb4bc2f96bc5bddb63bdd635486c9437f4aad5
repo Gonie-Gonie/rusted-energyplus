@@ -1,0 +1,26 @@
+--- before-03/compare_production.py
++++ compare_production.py
+@@ -10,10 +10,10 @@
+ import struct
+ 
+ PREP = Path(__file__).resolve().parent
+-COEFFICIENT_PAIR_SHA = 'a98f490657a81cacb140fcaddeed140fde4431881e8bb288d7763dcdcfa0360d'
++COEFFICIENT_PAIR_SHA = '3424a22b80dbf5ee3b04ed7d2e4974d7b1cdd6deb267f3ea6a8ab81ba370b0de'
+ COEFFICIENT_SHAPE_SHA = '9c32c62094cf6a08fa3680291b2dc9d6678231f6892a25ceced33e4a4604e1ef'
+ COEFFICIENT_VARIABLES = ["CTF08." + name for name in ["s0", "s", "e", "mutated_Gamma1", "PhiR0", "Rnew", "Rold"]]
+-GAMMA_PAIR_SHA = 'd7247e69758553507c48cd92cae83a5f5914a2bc27851eb587206d5ecbc8c346'
++GAMMA_PAIR_SHA = '56f2c6aa8d4c344f955b161cb63fbd2f01214f3b2d4ddbe4be8fc73f60cc7995'
+ GAMMA_SHAPE_SHA = '45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101'
+ GAMMA_VARIABLES = ["CTF07.Gamma1", "CTF07.Gamma2", "CTF07.ATemp"]
+ PAIR_SHA = '5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97'
+@@ -934,8 +934,8 @@
+     m.require(rust["ctf08_final_coefficient_observation_policy"] == native["CTF08_final_coefficient_observation_policy"] == coefficients.POLICY,
+               "Actual private coefficient source policy differs from frozen packet")
+     comparison = Comparison(m.require)
+-    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma)
+-    actual_coefficient_counts = coefficient_pairing.validate_all(comparison,native,qa,coefficients)
++    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma,production=True)
++    actual_coefficient_counts = coefficient_pairing.validate_all(comparison,native,qa,coefficients,production=True)
+     ledger = compare_models(native, rust, request, comparison)
+     initial_ledger=compare_initial_models(native,rust,request,comparison)
+     matrix_ledger=compare_matrix_models(native,rust,request,comparison); matrix_count_proof(comparison,qa)

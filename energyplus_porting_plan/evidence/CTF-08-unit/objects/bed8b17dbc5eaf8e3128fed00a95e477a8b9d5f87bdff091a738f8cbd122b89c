@@ -1,0 +1,71 @@
+pub(super) fn first_private_coefficients(
+    source: &ConstructionCtfFirstFinalCoefficients,
+    assembly: Option<&ConstructionCtfFirstAssembly>,
+    exponential: Option<&ConstructionCtfFirstExponential>,
+    inverse: Option<&ConstructionCtfFirstInverseAfterExponential>,
+    gammas: Option<&ConstructionCtfFirstGammas>,
+) -> Value {
+    let (available, route, reason, snapshot) = match &source.result {
+        Err(reason) => {
+            let route = match reason {
+                CtfFirstFinalCoefficientsUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::ExponentialUnavailable(_) => "ExponentialUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::ExponentialRouteUnavailable(_) => "ExponentialRouteUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::InverseNotInvoked(_) => "InverseNotInvoked",
+                CtfFirstFinalCoefficientsUnavailable::InverseUnavailable(_) => "InverseUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::GammasUnavailable(_) => "GammasUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::GammasRouteUnavailable(_) => "GammasRouteUnavailable",
+                CtfFirstFinalCoefficientsUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
+                CtfFirstFinalCoefficientsUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                CtfFirstFinalCoefficientsUnavailable::AssemblyContext => "AssemblyContext",
+                CtfFirstFinalCoefficientsUnavailable::AttemptContextMismatch => "AttemptContextMismatch",
+                CtfFirstFinalCoefficientsUnavailable::DimensionMismatch => "DimensionMismatch",
+                CtfFirstFinalCoefficientsUnavailable::FinalCoefficientScope(_) => "FinalCoefficientScope",
+            };
+            (false, route, Some(format!("{reason:?}")), Value::Null)
+        }
+        Ok(CtfFinalCoefficientObservation::Unavailable(reason)) => (
+            false, "FinalCoefficientRouteUnavailable", Some(format!("{reason:?}")), Value::Null,
+        ),
+        Ok(CtfFinalCoefficientObservation::Coefficients(actual)) => (
+            true, "FirstPrivateCoefficientsReturned", None,
+            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                "NumCTFTerms":actual.num_ctf_terms,
+                "controls":{"inum":actual.next_history_term,"CTFConvrg":actual.history_loop_converged},
+                "matrices":{"s0":matrix_values(&actual.s0),"s":matrix_values(&actual.s),
+                    "e":matrix_values(&actual.e),"Gamma1":matrix_values(&actual.gamma1_minus_gamma2),
+                    "PhiR0":matrix_values(&actual.phi_r0),"Rnew":matrix_values(&actual.rnew),
+                    "Rold":matrix_values(&actual.rold)},
+                "actual_matrix_value_counts":{"s0":actual.s0.len(),"s":actual.s.len(),"e":actual.e.len(),
+                    "Gamma1":actual.gamma1_minus_gamma2.len(),"PhiR0":actual.phi_r0.len(),
+                    "Rnew":actual.rnew.len(),"Rold":actual.rold.len()},
+                "actual_matrix_shapes":{"s0":[3,4],"s":[3,4,actual.rcmax],"e":[actual.rcmax],
+                    "Gamma1":[3,actual.rcmax],"PhiR0":[actual.rcmax,actual.rcmax],
+                    "Rnew":[actual.rcmax,actual.rcmax],"Rold":[actual.rcmax,actual.rcmax]},
+                "square_storage_order":"source_i1_outer_i2_inner_row_first",
+                "Gamma_storage_order":"source_j_outer_i_inner_row_first",
+                "s0_storage_order":"source_j_outer_k_inner",
+                "s_storage_order":"source_j_outer_k_middle_term_inner",
+                "private_method_final_owner_only":true,"Native_SourceReturn_workspace_inferred":false}),
+        ),
+    };
+    json!({"protocol":"ctf08-first-private-coefficients.v1","construction_id":source.construction_id.0,
+        "owner_available":available,"selected_first_private_coefficient_operands":available,
+        "actual_source_route":route,"unavailable_reason":reason,"snapshot":snapshot,
+        "actual_public_API":"initialize_construction_ctf_first_final_coefficients",
+        "actual_public_API_invoked":true,"original_first_assembly":original_assembly(assembly),
+        "same_exponential_owner_available":exponential.is_some(),
+        "same_exponential_construction_id":exponential.map(|owner|owner.construction_id.0),
+        "same_inverse_owner_available":inverse.is_some(),
+        "same_inverse_construction_id":inverse.map(|owner|owner.construction_id.0),
+        "same_inverse_public_API_invoked":inverse.map(|owner|owner.result.is_ok()),
+        "same_Gamma_owner_available":gammas.is_some(),
+        "same_Gamma_construction_id":gammas.map(|owner|owner.construction_id.0),
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_stage_callback_or_return_counts_inferred":false,
+        "observer_coefficient_or_workspace_arithmetic_performed":false,
+        "public_SI19_coefficients_or_caller_retry_state_observed":false,"counted_as_PASS":false})
+}
+

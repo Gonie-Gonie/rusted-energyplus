@@ -1,0 +1,269 @@
+"""Emit ignored source proposals; never import or execute the comparer/engines."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-07/comparer-prep-01"
+QA = ROOT / ".runtime/porting/CTF-08/original-data-review-prep-01"
+OBS = ROOT / ".runtime/porting/CTF-08/rust-observer-prep-01"
+QA_MANIFEST_SHA = "a2ecb14a4218e052a6e0c2b28dba4172c15c8dcac6eb93c1c1d9ccbee8dc15aa"
+
+
+def identity(path):
+    path = Path(path); data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def literal(source, name):
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+            return ast.literal_eval(node.value)
+    raise ValueError(name)
+
+
+def replace_assignment(source, name, value):
+    rows = source.splitlines(True)
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+            rows[node.lineno-1:node.end_lineno] = [name + " = " + repr(value) + "\n"]
+            return "".join(rows)
+    raise ValueError(name)
+
+
+def function(source, name):
+    rows = source.splitlines(True)
+    node = next(node for node in ast.parse(source).body if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name == name)
+    return "".join(rows[node.lineno-1:node.end_lineno])
+
+
+def replace_once(source, old, new):
+    assert source.count(old) == 1, (old, source.count(old))
+    return source.replace(old, new, 1)
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def main():
+    assert identity(OLD / "manifest.json")["sha256"] == "d1babf7b41154e9a36dfb311417942859cf5e27081c0e6a58175d7677e18556f"
+    assert identity(QA / "manifest.json")["sha256"] == QA_MANIFEST_SHA
+    assert identity(OBS / "manifest.json")["sha256"] == "be4d116741d7b524d7ec093ceaac3954599c8222dec0cac621a437d6a858bc09"
+    predecessor = json.loads((OLD / "manifest.json").read_text())
+    for ref in predecessor["own_sources"]:
+        assert identity(ROOT / ref["path"])["sha256"] == ref["sha256"]
+    before = OUT / "before"; before.mkdir(exist_ok=False)
+    for filename in ["compare_unit.py", "compare_production.py", "packet_io.py", "method_compare.py",
+                     "method_shape.py", "gamma_compare.py", "gamma_shape.py", "README.md", "manifest.json"]:
+        (before / filename).write_bytes((OLD / filename).read_bytes())
+    for filename in ["method_shape.py", "gamma_shape.py", "coefficient_shape.py"]:
+        (OUT / filename).write_bytes((QA / filename).read_bytes())
+    (OUT / "gamma_compare.py").write_bytes((OLD / "gamma_compare.py").read_bytes())
+    write(OUT / "packet_io.py", replace_once((OLD / "packet_io.py").read_text(), '.runtime/porting/CTF-07', '.runtime/porting/CTF-08'))
+    pair = replace_once((OLD / "method_compare.py").read_text(),
+                        '"initialize_construction_ctf_first_matrix_with_gammas"',
+                        '"initialize_construction_ctf_first_matrix_with_final_coefficients"')
+    write(OUT / "method_compare.py", pair)
+    observer = json.loads((OBS / "manifest.json").read_text())
+    inventories = {key: identity(ROOT / path) for key,path in {
+        "reviewed_native_source_inventory": ".runtime/porting/CTF-08/native-helper-prep-01/manifest.json",
+        "reviewed_passive_source_inventory": ".runtime/porting/CTF-08/native-observer-prep-01/manifest.json",
+        "reviewed_freezer_source_inventory": ".runtime/porting/CTF-08/input-writer-prep-01/manifest.json",
+        "reviewed_PE_source_inventory": ".runtime/porting/CTF-08/native-build-review-prep-01/manifest.json"}.items()}
+    for lane in ["unit", "production"]:
+        filename = "compare_" + lane + ".py"
+        source = (OLD / filename).read_text()
+        for name,value in {"PAIR_SHA": identity(OUT / "method_compare.py")["sha256"],
+            "METHOD_SHA": identity(OUT / "method_shape.py")["sha256"],
+            "GAMMA_SHAPE_SHA": identity(OUT / "gamma_shape.py")["sha256"],
+            "IO_SHA": identity(OUT / "packet_io.py")["sha256"],
+            "DATAQA_SOURCE_INVENTORY": identity(QA / "manifest.json"), "SOURCE_INVENTORIES": inventories,
+            "OBSERVER_PATHS": [row["canonical_install_path"] for row in observer["own_source_rows"] if
+                ("production" in row["canonical_install_path"]) == (lane == "production")],
+            "API_PATHS": observer["API_paths"][lane]}.items():
+            source = replace_assignment(source, name, value)
+        retention = literal(source, "RETENTION_INTENT")
+        retention["schema"] = "ctf08-debug-original-retention-intent.v1"
+        retention["scope"] = "new-CTF08-linked-originals-only"
+        source = replace_assignment(source, "RETENTION_INTENT", retention)
+        source = replace_once(source, "PREP = Path(__file__).resolve().parent", "PREP = Path(__file__).resolve().parent\n" +
+            "COEFFICIENT_PAIR_SHA = " + repr(identity(OUT / "coefficient_compare.py")["sha256"]) + "\n" +
+            "COEFFICIENT_SHAPE_SHA = " + repr(identity(OUT / "coefficient_shape.py")["sha256"]) + "\n" +
+            'COEFFICIENT_VARIABLES = ["CTF08." + name for name in ["s0", "s", "e", "mutated_Gamma1", "PhiR0", "Rnew", "Rold"]]')
+        source = replace_once(source, "for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES}",
+                              "for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES}")
+        packet = function(source, "packet_policy"); original_packet = packet
+        packet = packet.replace("lane, methods, gamma):", "lane, methods, gamma, coefficients):")
+        packet = packet.replace('prefix = "ctf07-"', 'prefix = "ctf08-"')
+        packet = packet.replace("frozen_before_this_CTF07_helper_execution", "frozen_before_this_CTF08_helper_execution")
+        packet = packet.replace("frozen-inherited-input-and-fresh-CTF07-Gamma-policy-before-helper", "frozen-inherited-input-and-fresh-CTF08-private-final-policy-before-helper")
+        packet = packet.replace("Genuine input-only CTF07 request with literal prior05/06 authority required", "Genuine input-only CTF08 request with separate historical07 authority required")
+        packet = packet.replace("Actual successful fresh CTF07 freeze/full stdout required", "Actual successful fresh CTF08 freeze/full stdout required")
+        packet = packet.replace('"method_shape.py", "gamma_shape.py", "packet_io.py"', '"method_shape.py", "gamma_shape.py", "coefficient_shape.py", "packet_io.py"')
+        packet = packet.replace('== 6, "Exact accepted DataQA lane six-source closure required"', '== 7, "Exact accepted DataQA lane seven-source closure required"')
+        packet = packet.replace('len(by_owner) == 6', 'len(by_owner) == 7')
+        packet = replace_once(packet, "    gamma.packet(freeze, request, admission, projection, policy, m.require)",
+            "    gamma.packet(freeze, request, admission, projection, policy, m.require)\n    coefficients.packet(freeze, request, admission, projection, policy, m.require)")
+        packet = replace_once(packet, "    gamma.scope(m, same, preceding, freeze, request, admission, projection,", "    coefficients.scope(m, same, preceding, freeze, request, admission, projection,")
+        packet = packet.replace('{"assembly": 1, "exponential": 1, "inverse": 1, "Gamma": 1}', '{"assembly": 1, "exponential": 1, "inverse": 1, "Gamma": 1, "FinalCoefficients": 1}')
+        packet = packet.replace('"prior_05_06_authority"', '"historical_prior_07_authority"')
+        packet = packet.replace("Actual DataQA current07 and historical05/06 provenance differs", "Actual DataQA current08 and separately historical07 provenance differs")
+        packet = replace_once(packet, "    return profiles,inherited,initial_policy,initial_profiles",
+            '    same(qa["reviewed_final_coefficient_policy_contract"], qa["reviewed_contracts"]["tolerances"])\n' +
+            '    m.require(qa["reviewed_final_coefficient_observation_policy"] == coefficients.POLICY and\n' +
+            '              qa["complete_actual_final_coefficient_records"] is True and qa["selected_final_coefficient_invocation_ordinal"] == 1,\n' +
+            '              "Actual complete reviewed private coefficient ledger and frozen policy required")\n' +
+            "    return profiles,inherited,initial_policy,initial_profiles")
+        source = replace_once(source, original_packet, packet)
+        run = function(source, "run"); original_run = run
+        for old,new in [("ctf07_unit_io", "ctf08_unit_io"),("ctf07_production_io", "ctf08_production_io"),
+            ("ctf07_method_pairing", "ctf08_method_pairing"),("ctf07_method_structure", "ctf08_method_structure"),
+            ("ctf07_Gamma_structure", "ctf08_Gamma_structure"),("ctf07_Gamma_pairing", "ctf08_Gamma_pairing"),
+            ("ctf07-independent-original-data-review.v1", "ctf08-independent-original-data-review.v1"),
+            ("ctf07-production-independent-original-data-review.v1", "ctf08-production-independent-original-data-review.v1"),
+            ("ctf07-helper-results.v1", "ctf08-helper-results.v1"),("ctf07-production-helper-results.v1", "ctf08-production-helper-results.v1"),
+            ("ctf07-candidate-", "ctf08-candidate-"),("ctf07_candidate_", "ctf08_candidate_"),
+            ("ctf07-unit-comparison.v1", "ctf08-unit-comparison.v1"),("ctf07-production-comparison.v1", "ctf08-production-comparison.v1"),
+            ("pass-selected-first-Gammas", "pass-selected-first-private-final-coefficients"),
+            ("fail-selected-first-Gammas", "fail-selected-first-private-final-coefficients"),
+            ("pass-selected-loader-to-first-Gammas", "pass-selected-loader-to-first-private-final-coefficients"),
+            ("fail-selected-loader-to-first-Gammas", "fail-selected-loader-to-first-private-final-coefficients")]:
+            run = run.replace(old,new)
+        run = replace_once(run, '    gamma_pairing = boot("ctf08_Gamma_pairing", "gamma_compare.py", GAMMA_PAIR_SHA)',
+            '    gamma_pairing = boot("ctf08_Gamma_pairing", "gamma_compare.py", GAMMA_PAIR_SHA)\n' +
+            '    coefficients = boot("ctf08_private_coefficients_structure", "coefficient_shape.py", COEFFICIENT_SHAPE_SHA)\n' +
+            '    coefficient_pairing = boot("ctf08_private_coefficients_pairing", "coefficient_compare.py", COEFFICIENT_PAIR_SHA)')
+        run = replace_once(run, '"' + lane + '",methods,gamma)', '"' + lane + '",methods,gamma,coefficients)')
+        run = run.replace('"prior_05_06_authority"', '"historical_prior_07_authority"')
+        run = run.replace("Actual Rust current07 and separate historical05/06 provenance differs", "Actual Rust current08 and separately historical07 provenance differs")
+        run = replace_once(run, "    comparison = Comparison(m.require)",
+            '    m.require(rust["ctf08_final_coefficient_observation_policy"] == native["CTF08_final_coefficient_observation_policy"] == coefficients.POLICY,\n' +
+            '              "Actual private coefficient source policy differs from frozen packet")\n' +
+            "    comparison = Comparison(m.require)")
+        run = replace_once(run, "    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma)",
+            "    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma)\n" +
+            "    actual_coefficient_counts = coefficient_pairing.validate_all(comparison,native,qa,coefficients)")
+        call = "coefficient_pairing.compare_unit(comparison,native,rust,request,pairing)" if lane == "unit" else "coefficient_pairing.compare_production(comparison,native,rust,request,pairing,normalized,owners)"
+        run = replace_once(run, "    result = comparison.report()", "    coefficient_ledger = " + call + "\n    result = comparison.report()")
+        needle = 'result["method_handoff_metrics"] = {key: result["metrics"].pop(key) for key in METHOD_VARIABLES}'
+        run = replace_once(run, needle, needle + ('\n    ' if lane == 'unit' else '; ') + 'result["Gamma_handoff_metrics"] = {key: result["metrics"].pop(key) for key in GAMMA_VARIABLES}')
+        run = replace_once(run, 'PREP / "gamma_compare.py", PREP / "gamma_shape.py"]',
+            'PREP / "gamma_compare.py", PREP / "gamma_shape.py", PREP / "coefficient_compare.py", PREP / "coefficient_shape.py"]')
+        run = replace_once(run, '"frozen_numeric_profiles": {"CTF07": policy["ctf07_gamma_profiles"]}',
+            '"frozen_numeric_profiles": {"CTF08": policy["ctf08_final_coefficient_profiles"]}, "inherited_Gamma_handoff_profiles": policy["ctf07_gamma_profiles"]')
+        run = replace_once(run, '"selected_method_invocation_ordinals":gamma.SELECTION,',
+            '"selected_method_invocation_ordinals":coefficients.SELECTION,\n' +
+            '               "reviewed_final_coefficient_observation_policy":coefficients.POLICY,\n' +
+            '               "actual_final_coefficient_owner_ledger":coefficient_ledger,"actual_final_coefficient_observation_counts":actual_coefficient_counts,')
+        run = run.replace('"complete_CTF07_PASS_claimed": False', '"complete_CTF07_PASS_claimed": False, "complete_CTF08_PASS_claimed": False')
+        run = run.replace('selected_fixed15_first_Gammas_PASS_claimed', 'selected_fixed15_first_private_final_coefficients_PASS_claimed')
+        run = run.replace('Raw adapted accepted06 comparers and authored Native07 observation/helper/freezer and some prior pure06/assembly glue; Base authored Rust observers and Header pure/publicGamma and factual DataQA.',
+            'Raw adapted accepted07 comparers and authored Native08 passive observation and Rust08 observers plus some prior pure06/assembly glue; Base authored Native08 helper/freezer and Header pure/public08 and factual DataQA.')
+        source = replace_once(source, original_run, run)
+        ast.parse(source)
+        write(OUT / filename, source)
+    own_names = ["compare_unit.py", "compare_production.py", "packet_io.py", "method_compare.py", "method_shape.py",
+                 "gamma_compare.py", "gamma_shape.py", "coefficient_compare.py", "coefficient_shape.py"]
+    diffs = []
+    unchanged = []
+    for name in own_names:
+        old = (before / name).read_text() if (before / name).exists() else ""
+        new = (OUT / name).read_text()
+        diff = "".join(difflib.unified_diff(old.splitlines(True), new.splitlines(True),
+            fromfile="accepted07/" + name if old else "/dev/null", tofile="proposed08/" + name))
+        if diff:
+            target = OUT / (name + ".from-07.diff" if old else name + ".new.diff")
+            write(target, diff); diffs.append(identity(target))
+        else:
+            unchanged.append(name)
+    ast_checks = []
+    for lane in ["unit", "production"]:
+        old = ast.parse((OLD / ("compare_" + lane + ".py")).read_text())
+        new = ast.parse((OUT / ("compare_" + lane + ".py")).read_text())
+        old_nodes = {node.name: node for node in old.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+        new_nodes = {node.name: node for node in new.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+        functions = []
+        for name,node in old_nodes.items():
+            if name in ["run", "packet_policy", "Comparison"]: continue
+            assert ast.dump(node, include_attributes=False) == ast.dump(new_nodes[name], include_attributes=False), (lane,name)
+            functions.append(name)
+        a = {node.name: node for node in old_nodes["Comparison"].body if isinstance(node, ast.FunctionDef)}
+        b = {node.name: node for node in new_nodes["Comparison"].body if isinstance(node, ast.FunctionDef)}
+        methods = []
+        for name,node in a.items():
+            if name == "__init__": continue
+            assert ast.dump(node, include_attributes=False) == ast.dump(b[name], include_attributes=False), (lane,name)
+            methods.append(name)
+        ast_checks.append({"lane":lane,"unchanged_top_level_functions":functions,"unchanged_Comparison_methods":methods,
+            "Comparison_number_body_exact_accepted07":True,"Comparison_init_only_adds_seven_metric_keys":True})
+    assert (OUT / "gamma_compare.py").read_bytes() == (OLD / "gamma_compare.py").read_bytes()
+    for name in ["method_shape.py", "gamma_shape.py", "coefficient_shape.py"]:
+        assert (OUT / name).read_bytes() == (QA / name).read_bytes()
+    for name in own_names: ast.parse((OUT / name).read_bytes())
+    dependencies = [identity(OLD / "manifest.json"), identity(OBS / "manifest.json"), identity(QA / "manifest.json"), *inventories.values()]
+    dependencies += [row["source"] for row in observer["own_source_rows"]]
+    qa_manifest = json.loads((QA / "manifest.json").read_text())
+    dependencies += qa_manifest["own_sources"]
+    for path in [".runtime/porting/CTF-08/native-helper-prep-01/ctf08_observation_fields.hh",
+        ".runtime/porting/CTF-08/native-helper-prep-01/input-policy-proposal.json",
+        ".runtime/porting/CTF-08/native-helper-prep-01/projection-policy-proposal.json",
+        ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh",
+        ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+        ".runtime/porting/CTF-08/native-observer-prep-01/Construction.ctf08.cc",
+        ".runtime/porting/CTF-08/input-writer-prep-01/freeze_packet.py",
+        ".runtime/porting/CTF-08/native-build-review-prep-01/review_build.py",
+        ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/manifest.json",
+        ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-03/manifest.json",
+        "tools/porting/record_command.py",
+        ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh"]:
+        dependencies.append(identity(ROOT / path))
+    for ref in dependencies:
+        assert identity(ROOT / ref["path"]) == ref
+    dependencies = list({row["path"]:row for row in dependencies}.values())
+    ranges = []
+    original = ROOT / ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc"
+    for first,last,purpose in [(638,660,"actual allocations of identity/Gamma/history owners"),
+        (875,936,"actual ordered caller returns and later excluded retry"),
+        (1591,1638,"actual final entry and initialized local boundary"),
+        (1639,1715,"actual Gamma mutation/s0/initialized controls"),
+        (1716,1830,"actual full history storage"),(1831,1906,"actual final private storage/cleanup")]:
+        data=b"".join(original.read_bytes().splitlines(True)[first-1:last])
+        ranges.append({"path":original.relative_to(ROOT).as_posix(),"start_line":first,"end_line":last,
+            "sha256":hashlib.sha256(data).hexdigest(),"size_bytes":len(data),"purpose":purpose})
+    manifest = {"schema":"ctf08-comparer-source-preparation.v1","status":"SOURCE-READY-HELD-unexecuted",
+        "own_sources":[identity(OUT/name) for name in own_names],
+        "before_sources":[identity(path) for path in sorted(before.iterdir())],
+        "exact_diffs":diffs,"byte_identical_predecessor_files":unchanged,
+        "README":identity(OUT/"README.md"),"authoring_source":identity(Path(__file__)),
+        "source_and_protocol_bindings":dependencies,"primary_source_ranges":ranges,
+        "accepted07_correspondence":ast_checks,"exact_QA_structural_copies":[identity(OUT/name) for name in ["method_shape.py","gamma_shape.py","coefficient_shape.py"]],
+        "own_lane_archive_counts":{"unit":8,"production":8},
+        "runtime_Rust_source_closure":{"unit":{"own":2,"API":25},"production":{"own":3,"API":38},
+            "full_actual_Cargo_snapshot_required":True,"future_formatted_SHA_values_supplied_at_runtime":True},
+        "primary_metric_names":["CTF08."+name for name in ["s0","s","e","mutated_Gamma1","PhiR0","Rnew","Rold"]],
+        "primary_policy":{"atol":0.0,"rtol":0.0,"class_exact":True,"shape_exact":True,"signed_zero_exact":True,
+            "required_one_or_both_absence_fails":True,"required_nonfinite_has_no_PASS":True},
+        "inherited_separate_handoffs":{"preprocessing":18,"initial":3,"assembly":7,"exponential":7,"inverse":2,"Gamma":3},
+        "selection":{"actual_invocation_ordinal":1,"actual_assembly_ordinal":1,"actual_initial619_association":True,
+            "all_actual_visits_integrity_validated":True,"later_actual_visits_unpaired_noPASS":True,
+            "private_R_or_controls_reconstructed_at_SourceReturn":False,"retry_driver_claimed":False},
+        "current_scope_execution_role":"real-CTF-08-check-only","historical_authority_key":"historical_prior_07_authority",
+        "historical_after_document_identities_rebound_to_live_files":False,
+        "observation_physical_bound_bytes":1024*1024*1024,"metadata_bound_unchanged":True,
+        "future_runtime_refs_or_success_counts_guessed":False,"project_or_comparer_imported":False,
+        "scientific_or_binary_or_weather_payloads_read":False,"target_build_test_engine_executed":False,
+        "canonical_files_changed":False,"new_QA_framework":False,"numerical_PASS_claimed":False,
+        "authorship_limits":"Raw authored new pairing/transport and prior Native08 passive/Rust08 observer and some pure06/assembly sources. Header authored pure/public08 and DataQA; Base authored Native08 helper/freezer. Independent source/provenance review remains required; no own-formula scientific certificate."}
+    write(OUT/"manifest.json",json.dumps(manifest,indent=2)+"\n")
+    print("Ignored source proposals written; no reviewed module imported or executed.")
+
+
+if __name__ == "__main__":
+    main()

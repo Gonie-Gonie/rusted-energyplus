@@ -1,0 +1,12 @@
+--- .runtime/porting/CTF-08/applied-source-01/crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs
+@@ -2,8 +2,7 @@
+ 
+ use super::ctf_first_assembly_owner::ConstructionCtfFirstAssembly;
+ use super::ctf_first_final_coefficients_owner::{
+-    ConstructionCtfFirstFinalCoefficients,
+-    initialize_construction_ctf_first_final_coefficients,
++    ConstructionCtfFirstFinalCoefficients, initialize_construction_ctf_first_final_coefficients,
+ };
+ use super::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;
+ use super::ctf_first_gamma_owner::ConstructionCtfFirstGammas;

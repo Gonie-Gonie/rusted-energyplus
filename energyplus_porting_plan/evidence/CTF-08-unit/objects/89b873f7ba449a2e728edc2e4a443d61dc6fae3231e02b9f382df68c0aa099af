@@ -1,0 +1,99 @@
+# CTF08 actual first private final coefficient comparison source
+
+This is an unexecuted source proposal adapting the accepted CTF07 strict
+comparison stage. Root must approve the exact source and an independent author
+must review it before execution. No scientific output or executable payload was
+read while preparing these sources.
+
+The unit lane uses the same literal member inputs, ordered constructions,
+caller context and operations as the authentic frozen unit39/42 packet. The
+production lane uses the same fixed15 original IDF inputs, actual six conversion
+proofs per case, ordinary compiler/initializer and ordered construction owners.
+No Native result, expected arrays, solver flags or retry operands enter Rust.
+
+The two direct entry points retain the existing CLI:
+
+```
+python -X utf8 -B <prep>/compare_unit.py \
+  --approved-source-sha256 <actual-reviewed-source-SHA> \
+  --original-data-review <actual-ref-path#SHA> \
+  --original-data-review-execution <actual-recorder-path#SHA> \
+  --Rust-build-execution <actual-Cargo-recorder-path#SHA> \
+  --Rust-execution <actual-Rust-recorder-path#SHA> \
+  --Rust-results <actual-result-path#SHA> --output-dir <fresh-contained-dir>
+
+python -X utf8 -B <prep>/compare_production.py \
+  --approved-source-sha256 <actual-reviewed-source-SHA> \
+  --original-data-review <actual-ref-path#SHA> \
+  --original-data-review-execution <actual-recorder-path#SHA> \
+  --Rust-build-execution <actual-Cargo-recorder-path#SHA> \
+  --Rust-execution <actual-Rust-recorder-path#SHA> \
+  --Rust-results <actual-result-path#SHA> \
+  --conversion-ledger <actual-input-conversion-ledger-path#SHA> \
+  --conversion-execution <actual-converter-recorder-path#SHA> \
+  --output-dir <fresh-contained-dir>
+```
+
+The accepted `Comparison.number` body and all older owner pairing arithmetic
+remain unchanged. The seven new primary profiles are CTF08.s0, CTF08.s,
+CTF08.e, CTF08.mutated_Gamma1, CTF08.PhiR0, CTF08.Rnew and CTF08.Rold.
+Each uses the prospectively frozen zero absolute/relative tolerance and exact
+class, shape and signed-zero policy. Required nonfinite observations receive no
+numerical PASS. Required selected absence on one or both sides is failure.
+
+The 18 preprocessing profiles, initial3, assembly7, exponential7/inverse2 and
+Gamma3 remain separately named handoffs. They cannot substitute for the new
+private owner. `Gamma1` is the actual Native matrix name at the private stage;
+the profile label `mutated_Gamma1` distinguishes this owner from its earlier
+Gamma-stage predecessor. No formula is evaluated by the comparer.
+
+Before any pairing, the exact held OriginalDataQA structural validator checks
+all real private method visits, ordered stage counts, actual matrix bounds and
+copy masks, failures, omissions, context/assembly associations and global
+counts. The successful actual QA report must agree with those totals. Old
+method and Gamma ledgers are checked by their accepted validators too.
+
+Only FinalCoefficients invocation1 associated with assembly1 and genuine
+initial619 is paired. Its actual Entry, PrivateFinal and SourceReturn must be
+available. Entry binds actual CMat/DMat, original identity, AExp and preceding
+Gamma1/Gamma2. All actual preceding exp884, inverse887 and Gamma890 returns
+must be present and associated before final894. Rust supplies actual stored
+first-assembly, exponential, inverse, Gamma and private Result owners, preserving
+construction identity and context bits. Neither initial dt equals caller dt
+nor a retry driver is asserted.
+
+The seven numerical comparisons use the actual PrivateFinal owners. Shape is
+3x4 for s0, 3x4xrcmax for the full allocated s buffer, rcmax for e, 3xrcmax for
+Gamma1, and rcmax squared for the three R workspaces. Row/axis storage order is
+authenticated. Actual initialized inum, CTFConvrg and NumCTFTerms compare exactly.
+SourceReturn checks only its genuine Gamma1/s0/s/e/NumCTFTerms handoff. Private
+R workspaces and controls are never fabricated at return. All later visits are
+retained as observed unpaired context and counted as no PASS.
+
+Current08 scope/check/card authority is independent of the literal historical
+prior07 authority. The current singular role is real-CTF-08-check-only. The six
+genuine prior07 refs, typed literal selected byte ranges, authentic before and
+available frozen document archives, historical after-document descriptors and
+literal nested prior05/06 ancestry are authenticated by the exact held QA scope
+reader. Historical after descriptors are not rebound to current live documents.
+No prior numerical PASS is inferred from documentary authority.
+
+The actual Cargo artifact and whole source snapshot must bind unit own2/API25
+or production own3/API38, including current future formatted source identities.
+Runtime arguments supply actual proof refs; no future hashes, successful exits,
+result counts or outcome arrays are authored here. The actual Rust binary is
+rehashed at execution by the existing comparison mechanism. Native binary
+identity is supplied through genuine OriginalDataQA/PE provenance.
+
+Only observation files use the prospective 1GiB physical bound; small metadata,
+source and duplicate/nonfinite JSON guards remain inherited. Each lane archives
+its eight actually executed reader sources. Full JSON stdout and comparison.json
+truthfully retain actual mismatches and unavailable observations. Selected
+comparison success does not certify retries, complete CTF08, SI19 storage,
+surface integration, downstream cards or whole Native method flags.
+
+Raw authored Native08 passive observations and Rust08 observer transport and
+some earlier pure06/assembly sources. Base authored Native08 helper/freezer;
+Header authored pure/public08 and structural OriginalDataQA. Independent source
+review and future genuine observations remain necessary; this proposal does
+not independently certify any author's own formulas.

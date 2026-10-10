@@ -1,0 +1,10 @@
+--- actual07/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs
++++ proposed08/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs
+@@ -25,6 +25,7 @@
+         construction_ctf06_first_exponential: construction_thermal_data.first_exponentials(),
+         construction_ctf05_first_inverse: construction_thermal_data.first_inverses(),
+         construction_ctf07_first_gammas: construction_thermal_data.first_gammas(),
++        construction_ctf08_first_private_coefficients: construction_thermal_data.first_private_coefficients(),
+         construction_cache_build_wall_seconds: construction_thermal_data.build_wall_seconds,
+         construction_cache_entry_count: construction_thermal_data.len(),
+         construction_cache_no_mass_count: construction_thermal_data.no_mass_construction_ids.len(),

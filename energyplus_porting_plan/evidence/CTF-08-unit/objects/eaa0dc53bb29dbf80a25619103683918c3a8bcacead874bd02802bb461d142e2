@@ -1,0 +1,371 @@
+{
+  "schema": "ctf08-first-final-coefficients-owner-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unapplied-unformatted-unexecuted",
+  "own_source_rows": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/new/ctf_first_final_coefficients_owner.rs",
+        "sha256": "587d5d64c98f38990781066ee265f40c1708c2ac655cd0dba3a46384d1feeb62",
+        "size_bytes": 8815,
+        "line_count": 177
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/ctf_first_final_coefficients_owner.rs.addition.diff",
+        "sha256": "5b028532e4ed97e76fc9fa632eb7d5a4b504abea1d44598b0af8d049782945be",
+        "size_bytes": 9101,
+        "line_count": 180
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/new/ctf_first_final_coefficients_owner_tests.rs",
+        "sha256": "9d47e7517080cc179aa997b6c567b9efb3edcde1650624e526c5886f40b96f72",
+        "size_bytes": 12877,
+        "line_count": 242
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner_tests.rs",
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/ctf_first_final_coefficients_owner_tests.rs.addition.diff",
+        "sha256": "f9b0d894c7f5fbe36ebddaaea1cd4c4de7276c01c629a234d4125414da90c2c5",
+        "size_bytes": 13234,
+        "line_count": 245
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/proposed/mod.rs",
+        "sha256": "b0ffc60fb73950e8e005ba6f0cb5e7754e22fa7555ac27c51abf3f5a89b974f2",
+        "size_bytes": 1551,
+        "line_count": 64
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "before_source": {
+        "historical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "archive": {
+          "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/before/mod.rs",
+          "sha256": "5bccb2d4d7cca8669fdd97b8863b37b5f38699e7aee8c274923746b286e15127",
+          "size_bytes": 1507,
+          "line_count": 63
+        }
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/mod.rs.from-current.diff",
+        "sha256": "4e29339d3d9004fbd3014b6fb202e244044b3af505835b5fe04cf38ac93638df",
+        "size_bytes": 337,
+        "line_count": 10
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-08.md",
+      "sha256": "6c9297e026ab13700514170dfada762a2551afec73115387bdd7a6904dee3cb1",
+      "size_bytes": 2703,
+      "line_count": 70
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/manifest.json",
+      "sha256": "728984104d79c9ba9e7cc9fdf90a0287d54bf8f64e1145f5d1fbe8cce2dd4fe0",
+      "size_bytes": 15354,
+      "line_count": 380
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs",
+      "sha256": "aa2e45908e291436ec654699020759f37909b358104aef478224c16e3e3ec4d4",
+      "size_bytes": 10163,
+      "line_count": 244
+    },
+    {
+      "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/manifest.json",
+      "sha256": "a476232b84a8c29cdc2ed029440c10b2cf419f13574a0d208f821ad4ab716614",
+      "size_bytes": 10961,
+      "line_count": 272
+    },
+    {
+      "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/new/ctf_first_gamma_owner.rs",
+      "sha256": "54ca9ca807a02fdf7e8921ba9489b11e8c902b740d4a25c8d705ab98e5345e71",
+      "size_bytes": 7406,
+      "line_count": 155
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/manifest.json",
+      "sha256": "cf220cd8e8aebaea9b9c5b2c9b53df3240c089bb929ffd6223ba23a38bb2e9eb",
+      "size_bytes": 11442,
+      "line_count": 290
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/new/ctf_gamma_matrix.rs",
+      "sha256": "f173d96bf44e94d1e871df210a6d75af32c4fbf7771760504042b95f9e1dc7e0",
+      "size_bytes": 6371,
+      "line_count": 152
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+      "size_bytes": 5167,
+      "line_count": 126
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "sha256": "a6f1d30c0c8228d943a660f33c6dc853f36001bf0f8e42d0a01d4d918ad01b5b",
+      "size_bytes": 4259,
+      "line_count": 102
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "sha256": "e4e50e38d21ea1b7fa1537a440dbfcdf53c5b876050987b5f247cc6b160f63a4",
+      "size_bytes": 4612,
+      "line_count": 110
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "sha256": "218c2f5ee11581437f48d56a7a1a90e4e7af832d42854e09c8753a8198f859ff",
+      "size_bytes": 4152,
+      "line_count": 95
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "sha256": "0d5b57ec2c0b60111cdc29d94288d38d6abce78a95b4f9bbb155624babe558e5",
+      "size_bytes": 5605,
+      "line_count": 136
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "65ec2a19c1721ab3a685a7e24e9b95d67d3ff910fe17976a76405ea32c155c73",
+      "size_bytes": 10624,
+      "line_count": 283
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "sha256": "32765ebea79d230319352d39de6fabf099a7c15a3c294456810c58bc1e21cc73",
+      "size_bytes": 9825,
+      "line_count": 264
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "sha256": "3676c27ee3a0c0f9e2540e1df028c6df4305e14d80b49d65e37a7f6be5d123a8",
+      "size_bytes": 3628,
+      "line_count": 104
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747,
+      "line_count": 316
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1591,
+      "end_line": 1906,
+      "sha256": "e1bb975a9b50ae7bdbca34fabd94dc2f1bc23b3e13cf9537f743c4d14d3530ee",
+      "size_bytes": 15474,
+      "purpose": "whole selected private method; unchanged held pure08 dependency"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 877,
+      "end_line": 897,
+      "sha256": "2a4340df4aa75c26830f60a0bdc0b5de7fda75908b97e0eac1b468c95c62aeac",
+      "size_bytes": 1244,
+      "purpose": "actual exponential884/inverse887/Gamma890/final894 ordered handoff"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 344,
+      "sha256": "b8e186183e8f5665c0164d4a8e8da880b18ad96fa6dc52019660d12b90c95458",
+      "size_bytes": 2539,
+      "purpose": "actual square/Gamma/boundary/s0/s/e declarations and public method"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "start_line": 1,
+      "end_line": 150,
+      "sha256": "c093ecfed97fb6aa12bda06a2947edad275082373acd517465b69e211774b699",
+      "size_bytes": 6224,
+      "purpose": "shared actual context/layout/route and assembly owner"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "start_line": 1,
+      "end_line": 126,
+      "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+      "size_bytes": 5167,
+      "purpose": "actual first assembly public Result/error owner and source association"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "start_line": 1,
+      "end_line": 95,
+      "sha256": "218c2f5ee11581437f48d56a7a1a90e4e7af832d42854e09c8753a8198f859ff",
+      "size_bytes": 4152,
+      "purpose": "actual ordered06/05 invocation/noninvocation/context Option"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/new/ctf_first_gamma_owner.rs",
+      "start_line": 1,
+      "end_line": 155,
+      "sha256": "54ca9ca807a02fdf7e8921ba9489b11e8c902b740d4a25c8d705ab98e5345e71",
+      "size_bytes": 7406,
+      "purpose": "accepted same-attempt07 public Result/error association and float-bit context convention"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/new/ctf_gamma_matrix.rs",
+      "start_line": 1,
+      "end_line": 152,
+      "sha256": "f173d96bf44e94d1e871df210a6d75af32c4fbf7771760504042b95f9e1dc7e0",
+      "size_bytes": 6371,
+      "purpose": "actual Gamma1/Gamma2 result types; no precursor reevaluation"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/rust-final-coefficients-prep-01/new/ctf_final_coefficients.rs",
+      "start_line": 1,
+      "end_line": 244,
+      "sha256": "aa2e45908e291436ec654699020759f37909b358104aef478224c16e3e3ec4d4",
+      "size_bytes": 10163,
+      "purpose": "unchanged selected pure08 API/output/input shape contracts"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/before/mod.rs",
+      "start_line": 1,
+      "end_line": 63,
+      "sha256": "5bccb2d4d7cca8669fdd97b8863b37b5f38699e7aee8c274923746b286e15127",
+      "size_bytes": 1507,
+      "purpose": "actual current06 parent before declaration-only proposal"
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-08/first-final-coefficients-owner-prep-01/README.md",
+    "sha256": "0a91ca0ac3fedc1978f0eb6f9d38896cc023a44d4ad9315eff59ae3040225c31",
+    "size_bytes": 4554,
+    "line_count": 65
+  },
+  "public_API": "initialize_construction_ctf_first_final_coefficients(&ConstructionCtfFirstAssembly, &ConstructionCtfFirstMatrixFunctions, &ConstructionCtfFirstGammas) -> ConstructionCtfFirstFinalCoefficients",
+  "source_contract": {
+    "source_order": [
+      884,
+      887,
+      890,
+      894
+    ],
+    "selected": "actual first assembly ordinal1, 1D/no-source, reset node selectors",
+    "borrowed_selected_operands": [
+      "actual Gamma1/Gamma2",
+      "actual AExp",
+      "actual original IdenMatrix",
+      "actual CMat2/DMat2",
+      "actual rcmax/context"
+    ],
+    "prerequisite_only_not_new08_operands": [
+      "actual inverse API return/context/dimension",
+      "original AMat",
+      "original BMat",
+      "Gamma ATemp"
+    ],
+    "actual_same_owner_return_caller_obligation": true,
+    "wrapper_ID_checks": [
+      "assembly",
+      "assembly.context",
+      "exponential wrapper",
+      "ordered inverse wrapper",
+      "invoked inverse wrapper",
+      "Gamma wrapper"
+    ],
+    "same_attempt_context_fields": [
+      "construction_id",
+      "route",
+      "solution_dimensions",
+      "source_sink_present",
+      "node_source",
+      "node_user_temp",
+      "attempt_ordinal",
+      "TimeStepZone bits",
+      "CTFTimeStep bits",
+      "NumHistories"
+    ],
+    "predecessor_dimension_checks": [
+      "assembly.rcmax==exponential.rcmax",
+      "assembly.rcmax==inverse.rcmax",
+      "assembly.rcmax==Gamma.rcmax"
+    ],
+    "prerequisite_stops_preserved": [
+      "assembly error/route",
+      "exponential error/route",
+      "inverse actual non-invocation",
+      "invoked inverse error",
+      "Gamma error/route"
+    ],
+    "preceding_method_calls_or_recomputation": false,
+    "identity_or_default_arrays_generated": false,
+    "caller_timestep_equals_CTF_timestep_required": false,
+    "finite_or_value_conditioning_added": false,
+    "pure08_invocations_on_success": 1,
+    "private_result_boundary": "full s0/s/e/mutated Gamma1/assigned controls/final local R workspaces only",
+    "public19_SI_stores_retry_stability_coefficient_cache_or_SUR_handoff_claimed": false
+  },
+  "activation": {
+    "cache_state_or_driver_wiring": false,
+    "parent_declaration_only": true,
+    "before_is_actual_current06": true,
+    "accepted07_and_pure08_dependency_parent_rebase_required": true,
+    "new_native_QA_or_proof_stage": false,
+    "actual_execution_refs": null
+  },
+  "tests": {
+    "authored": 9,
+    "executed": false,
+    "actual_accepted04_06_05_07_calls_from_literal_unit_inputs": true,
+    "Native_answers_or_production_fixtures": false,
+    "coverage": [
+      "borrowed private result and unchanged inputs",
+      "actual assembly unavailable routes",
+      "ordered method error/non-invocation",
+      "Gamma error/unselected route",
+      "wrapper and invoked IDs",
+      "first-only and supported scope",
+      "bit context/absent ordered context",
+      "actual dimensions",
+      "missing actual input buffers"
+    ]
+  },
+  "checks": {
+    "actual_before_parent_exact": true,
+    "new_canonical_files_absent": true,
+    "declaration_only_parent_change": true,
+    "generated_diffs3_exact": true,
+    "metadata_JSON_only_no_Rust_AST_import_compile_format_or_test": true
+  },
+  "authorship_limits": "Header authored pure/public07 and pure08. Root plus another author must fully peer this routing/integration source; no independent own-formula scientific certificate.",
+  "project_or_target_imports_or_execution": false,
+  "scientific_weather_or_binary_payloads_read": false,
+  "canonical_or_Git_modified": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

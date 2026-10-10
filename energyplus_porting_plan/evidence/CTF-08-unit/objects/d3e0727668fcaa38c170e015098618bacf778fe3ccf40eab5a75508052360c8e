@@ -1,0 +1,214 @@
+"""Author ignored Rust source text/metadata only; no target/project imports."""
+import ast
+import difflib
+import hashlib
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-07/rust-observer-prep-01"
+INGRESS = ROOT / ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-03"
+ADDITIONAL_APIS = [
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+]
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def checked(binding):
+    path = ROOT / binding["path"]
+    actual = ref(path)
+    for key in ("sha256", "size_bytes", "line_count"):
+        if key in binding:
+            assert actual[key] == binding[key], (path, key)
+    return path
+
+
+def once(source, old, new):
+    assert source.count(old) == 1, (old, source.count(old))
+    return source.replace(old, new, 1)
+
+
+def namespace(source):
+    for old, new in [
+        ("ctf07_candidate_", "ctf08_candidate_"), ("ctf07-candidate-", "ctf08-candidate-"),
+        ("ctf07-helper-cases.v1", "ctf08-helper-cases.v1"),
+        ("ctf07-native-admission-contract.v1", "ctf08-native-admission-contract.v1"),
+        ("ctf07-production-helper-cases.v1", "ctf08-production-helper-cases.v1"),
+        ("ctf07-production-native-admission-contract.v1", "ctf08-production-native-admission-contract.v1"),
+        ("frozen_before_this_CTF07_helper_execution", "frozen_before_this_CTF08_helper_execution"),
+        ("actual frozen CTF07 production packet differs", "actual frozen CTF08 production packet differs"),
+    ]:
+        source = source.replace(old, new)
+    return source
+
+
+def write(path, source):
+    path.write_text(source, encoding="utf-8", newline="\n")
+
+
+def api_paths(source):
+    start = source.index("pub(super) const API_PATHS")
+    return re.findall(r'"(crates/[^"\n]+)"', source[start:source.index("];", start)])
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Held source preparations are immutable"
+    old_manifest = ref(OLD / "manifest.json")
+    assert old_manifest["sha256"] == "6c42933342062d9fa985134705a252e3acce6eb660726ac0a6d17dfe8a01628c"
+    old = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+    assert ref(INGRESS / "manifest.json")["sha256"] == "1524cd0b24617e59d22c8291ba1ea6485fd0cb618e443793a12f8ca8962a4ade"
+    ingress = json.loads((INGRESS / "manifest.json").read_text(encoding="utf-8"))
+    sources = {}
+    installs = {}
+    old_rows = {}
+    for row in old["own_source_rows"]:
+        path = checked(row["source"])
+        name = path.name.replace("ctf07_candidate_", "ctf08_candidate_")
+        sources[name] = namespace(path.read_text(encoding="utf-8"))
+        installs[name] = row["canonical_install_path"].replace("ctf07_candidate_", "ctf08_candidate_")
+        old_rows[name] = row
+    unit_name = "ctf08_candidate_unit_observer.rs"
+    unit = sources[unit_name]
+    unit = once(unit,
+        "use ep_runtime::heat_balance::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;",
+        "use ep_runtime::heat_balance::ctf_first_final_coefficients_ingress::initialize_construction_ctf_first_matrix_with_final_coefficients;")
+    unit = unit.replace("first_with_gammas", "first_with_private")
+    unit = once(unit,
+        "let first_with_private = initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);",
+        "let first_with_private = initialize_construction_ctf_first_matrix_with_final_coefficients(&first_assembly);")
+    unit = once(unit, '            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_with_gammas",',
+        '            "CTF08_first_private_coefficients":fields::first_private_coefficients(&first_with_private.final_coefficients,\n'
+        '                Some(&first_assembly),Some(&first_functions.exponential),Some(&first_functions.inverse),\n'
+        '                Some(&first_with_private.gammas)),\n'
+        '            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_with_final_coefficients",')
+    sources[unit_name] = unit
+    fields = sources["unit_fields.rs"]
+    fields = once(fields, "use serde_json::{Value, json};",
+        "use ep_runtime::heat_balance::ctf_first_final_coefficients_owner::{\n"
+        "    ConstructionCtfFirstFinalCoefficients, CtfFirstFinalCoefficientsUnavailable,\n};\n"
+        "use ep_runtime::heat_balance::surface_manager::ctf_final_coefficients::CtfFinalCoefficientObservation;\n"
+        "use serde_json::{Value, json};")
+    fields = once(fields, "pub(super) const OBSERVER_PATHS", (OUT / "private_fields.rs.txt").read_text() + "\npub(super) const OBSERVER_PATHS")
+    append = ''.join('    "' + path + '",\n' for path in ADDITIONAL_APIS)
+    at = fields.index("];", fields.index("pub(super) const API_PATHS"))
+    fields = fields[:at] + append + fields[at:]
+    sources["unit_fields.rs"] = fields
+    sources["production_unit_fields.rs"] = fields
+    prod_name = "ctf08_candidate_production_observer.rs"
+    production = sources[prod_name]
+    production = once(production, '        "selected_CTF07_owners":fields::ctf07_unavailable(),"Native_or_expected_values_read":false});',
+        '        "selected_CTF07_owners":fields::ctf07_unavailable(),\n'
+        '        "selected_CTF08_owners":fields::ctf08_unavailable(),"Native_or_expected_values_read":false});')
+    production = once(production, '            out["selected_CTF07_owners"] = fields::ctf07_selected(&state);',
+        '            out["selected_CTF07_owners"] = fields::ctf07_selected(&state);\n'
+        '            out["selected_CTF08_owners"] = fields::ctf08_selected(&state);')
+    sources[prod_name] = production
+    prodfields = sources["production_fields.rs"]
+    prodfields = once(prodfields, "pub(super) fn typed(", (OUT / "production_private_fields.rs.txt").read_text() + "\npub(super) fn typed(")
+    at = prodfields.index("];", prodfields.index("pub(super) const API_PATHS"))
+    sources["production_fields.rs"] = prodfields[:at] + append + prodfields[at:]
+    # Exact prospective authority/policy protocol is supplied by the separately
+    # held Native08/freezer source. This own snippet only transforms source text.
+    authority = (OUT / "authority_protocol.json").read_text(encoding="utf-8")
+    protocol = json.loads(authority)
+    for name, value_name in [(unit_name, "request"), (prod_name, "native")]:
+        source = sources[name]
+        start = source.index('    require(\n        ' + value_name + '["actual_scope_amendment_execution_role"]')
+        stop_marker = '    bindings.extend(rows(&request["all_45_guard_refs"])' if value_name == "request" else '    let native_cases = rows(&native["model_cases"])?;'
+        end = source.index(stop_marker, start)
+        source = source[:start] + (OUT / "authority_bindings.rs.txt").read_text().replace("VALUE", value_name) + source[end:]
+        source = once(source,
+            '"prior_05_06_authority":' + value_name + '["prior_05_06_authority"],"current_cards":' + value_name + '["current_cards"],',
+            '"historical_prior_07_authority":' + value_name + '["historical_prior_07_authority"],"current_cards":' + value_name + '["current_cards"],')
+        policy_key = protocol["policy_key"]
+        existing = '"ctf07_gamma_observation_policy":' + value_name + '["ctf07_gamma_observation_policy"],'
+        source = once(source, existing, existing + '\n        "' + policy_key + '":' + value_name + '["' + policy_key + '"],')
+        sources[name] = source
+    (OUT / "before").mkdir(exist_ok=False)
+    for name in ["README.md", "manifest.json"]:
+        (OUT / "before" / name).write_bytes((OLD / name).read_bytes())
+    own = []
+    for name, source in sources.items():
+        row = old_rows[name]
+        before = checked(row["source"])
+        (OUT / "before" / name).write_bytes(before.read_bytes())
+        write(OUT / name, source)
+        diff = ''.join(difflib.unified_diff(before.read_text().splitlines(keepends=True), source.splitlines(keepends=True),
+            fromfile=row["canonical_install_path"], tofile=installs[name]))
+        diff_path = OUT / (name + ".from-held07.diff")
+        write(diff_path, diff)
+        own.append({"source": ref(OUT / name), "canonical_install_path": installs[name],
+            "accepted07_before": {"historical_path": row["canonical_install_path"], "source": row["source"], "archive": ref(OUT / "before" / name)},
+            "exact_diff": ref(diff_path)})
+    assert (OUT / "unit_fields.rs").read_bytes() == (OUT / "production_unit_fields.rs").read_bytes()
+    paths = {"unit": api_paths(sources["unit_fields.rs"]), "production": api_paths(sources["production_fields.rs"])}
+    assert len(paths["unit"]) == len(set(paths["unit"])) == 25
+    assert len(paths["production"]) == len(set(paths["production"])) == 38
+    prospective = {row["canonical_path"]: row["proposed"] for row in ingress["changes"]}
+    prospective.update({row["canonical_path"]: row["source"] for row in ingress["new_owners"]})
+    prospective.update({row["canonical_path"]: row["literal_unchanged_held_source"] for row in ingress["future08_installations_unchanged_held_bodies"]})
+    old_api = {row["canonical_path"]: row for row in old["API_source_identities"]}
+    api = []
+    for canonical in dict.fromkeys(paths["unit"] + paths["production"]):
+        row = {"canonical_path": canonical, "runtime_formatted_Cargo_source_capture_required": True}
+        if canonical in old_api:
+            row["accepted07_dependency_evidence"] = old_api[canonical]
+        if canonical in prospective:
+            row["prospective_accepted08_source"] = ref(checked(prospective[canonical]))
+        assert len(row) > 2, canonical
+        api.append(row)
+    ranges = []
+    def span(path, first, last, purpose):
+        raw = path.read_bytes().splitlines(keepends=True)
+        assert 1 <= first <= last <= len(raw)
+        data = b''.join(raw[first-1:last])
+        ranges.append({"path": path.relative_to(ROOT).as_posix(), "start_line": first, "end_line": last,
+            "sha256": hashlib.sha256(data).hexdigest(), "size_bytes": len(data), "purpose": purpose})
+    original = ROOT / ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc"
+    for first, last, purpose in [(490,619,"actual initial state distinct from retry"),(877,897,"actual06 then05 then07 then08 caller order"),
+        (898,982,"later retry state remains unpaired"),(1030,1077,"public SI stores excluded"),(1591,1906,"actual private08 initialized owner/lifetime")]:
+        span(original, first, last, purpose)
+    for canonical in ADDITIONAL_APIS + ["crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+            "crates/ep_runtime/src/heat_balance/state.rs","crates/ep_runtime/src/heat_balance/initialization/state_shell.rs"]:
+        path = checked(prospective[canonical]); span(path, 1, len(path.read_bytes().splitlines()), "accepted prospective08 producer/API only")
+    ast.parse(Path(__file__).read_text())
+    manifest = {"schema":"ctf08-rust-observer-source-preparation.v1","status":"SOURCE-READY-HELD-unexecuted",
+        "own_source_rows":own,"observer_source_counts":{"unit":2,"production":3},"API_paths":paths,
+        "API_source_counts":{"unit":25,"production":38},"API_source_identities":api,
+        "accepted07_observer_manifest":old_manifest,"accepted08_ingress_manifest":ref(INGRESS/"manifest.json"),
+        "accepted07_archived_metadata":[ref(OUT/"before"/name) for name in ["README.md","manifest.json"]],
+        "actual07_parents_and_formatted_identities_pending_rebase":True,
+        "literal_accepted_dependency_manifests":[ref(checked(row)) for row in protocol["held_dependency_manifests"]] + ingress["literal_accepted08_dependencies"],
+        "own_preparation_source":ref(Path(__file__)),"own_source_text_snippets":[ref(OUT/name) for name in ["private_fields.rs.txt","production_private_fields.rs.txt","authority_bindings.rs.txt","authority_protocol.json"]],
+        "README":ref(OUT/"README.md"),"source_ranges":ranges,
+        "runtime_interfaces":{"unit_argv":["request_path","request_sha256","admission_path","admission_sha256","runtime_sources_path"],
+            "unit_sources_schema":"ctf08-candidate-unit-runtime-source-bindings.v1","unit_result_schema":"ctf08-candidate-unit-observer-results.v1",
+            "production_argv":["wrapper_request_path","wrapper_request_sha256"],"production_request_schema":"ctf08-candidate-production-observer-request.v1",
+            "production_result_schema":"ctf08-candidate-production-observer-results.v1"},
+        "new_observation":{"unit_operation_field":"CTF08_first_private_coefficients","production_field":"selected_CTF08_owners",
+            "production_owner":"construction_ctf08_first_private_coefficients","protocol":"ctf08-first-private-coefficients.v1",
+            "actual_matrices":["s0","s","e","Gamma1","PhiR0","Rnew","Rold"],"controls":["NumCTFTerms","inum","CTFConvrg"],
+            "Native_return_workspaces_synthesized":False,"private_final_owner_only":True,"new_profiles_or_expected_values_authored":False},
+        "scope_authority":protocol["scope_authority"],
+        "unchanged_input_counts":{"unit_models":39,"unit_operations":42,"production_models":15,"production_loader_phase_records":195,"fixed_guard_refs":45},
+        "integrity":{"source_before5_exact_accepted07":True,"exact_five_diffs_generated":True,"unit_serializer_and_production_copy_byte_identical":True,
+            "Python_AST_only":True,"required_missing_owners_never_defaulted_or_PASS":True,"runtime_final_formatted_hashes_not_guessed":True},
+        "preparation_boundary":{"project_imports_or_targets_executed":False,"Cargo_tests_builds_formatters_engines_run":False,
+            "scientific_weather_or_binary_payloads_read":False,"mutable_canonical_source_read_or_written":False,"new_QA_framework_or_execution_stage":False,
+            "numerical_PASS_claimed":False,"gates_updated":False},
+        "authorship_limits":"Raw authored Native08 capture and earlier pure06/transport glue; this copies independently authored accepted private08 result, not independent own-formula/output certification. Root and another author must review before activation."}
+    write(OUT/"manifest.json", json.dumps(manifest,indent=2)+"\n")
+    print(json.dumps({"manifest":ref(OUT/"manifest.json"),"own_sources":len(own),"targets_imported_or_executed":False}))
+
+
+if __name__ == "__main__":
+    main()

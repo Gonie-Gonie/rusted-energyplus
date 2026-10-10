@@ -1,0 +1,142 @@
+--- prep05/manifest.json
++++ prep06/manifest.json
+@@ -418,10 +418,10 @@
+     {
+       "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+       "source": {
+-        "path": ".runtime/porting/CTF-07/applied-final-source-01/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+-        "sha256": "28b57503291f99a75621ac38e14d54511c3e8e104e71fed03fcd7a433d2ed375",
+-        "size_bytes": 6371,
+-        "line_count": 152
++        "path": ".runtime/porting/CTF-07/applied-final-source-02/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++        "sha256": "ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3",
++        "size_bytes": 6499,
++        "line_count": 156
+       },
+       "literal_preformat_authority": {
+         "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/new/ctf_gamma_matrix.rs",
+@@ -435,7 +435,7 @@
+         "size_bytes": 784,
+         "line_count": 13
+       },
+-      "claim": "actual07 archive identity only; Root quality/comparisons are separate pending prerequisites"
++      "claim": "actual07 reviewed lint archive identity; exact_Root_format_delta describes only historical formatter01, and Root quality/comparisons remain separate pending prerequisites"
+     },
+     {
+       "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix_tests.rs",
+@@ -597,12 +597,12 @@
+     },
+     {
+       "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+-      "binding_role": "unchanged-actual07-formatted-owner-or-test",
+-      "source": {
+-        "path": ".runtime/porting/CTF-07/applied-final-source-01/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+-        "sha256": "28b57503291f99a75621ac38e14d54511c3e8e104e71fed03fcd7a433d2ed375",
+-        "size_bytes": 6371,
+-        "line_count": 152
++      "binding_role": "actual07-reviewed-scoped-lint-owner-with-unchanged-math-and-API",
++      "source": {
++        "path": ".runtime/porting/CTF-07/applied-final-source-02/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++        "sha256": "ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3",
++        "size_bytes": 6499,
++        "line_count": 156
+       }
+     },
+     {
+@@ -758,10 +758,10 @@
+     }
+   ],
+   "README": {
+-    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-05/README.md",
+-    "sha256": "95a770ddbf2ced815516821c02b43f8ad87ef617bf837dc23e5151a2599b82ee",
+-    "size_bytes": 1252,
+-    "line_count": 19
++    "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-06/README.md",
++    "sha256": "26f9eeed161d394e329777eca465624f1f5e4f4125072d7840316234871dce0a",
++    "size_bytes": 1836,
++    "line_count": 28
+   },
+   "public_API": {
+     "wrapper": "initialize_construction_ctf_first_matrix_with_final_coefficients",
+@@ -851,5 +851,81 @@
+     "sha256": "045bd62476f11c6e35b929bff85b9f8ac77ee8d22d04308ec6aed1879462b306",
+     "size_bytes": 10500,
+     "line_count": 154
++  },
++  "actual07_current_reviewed_source_authority": {
++    "path": ".runtime/porting/CTF-07/applied-final-source-02/manifest.json",
++    "sha256": "c67e440187bc3731d667d8bb79970c80ef82f9e37c26eac3dda4fc66c116414b",
++    "size_bytes": 23046,
++    "line_count": 470
++  },
++  "actual07_formatted_source_authority_role": "historical formatter01 only; five before-parent archives are also byte-exact members of current reviewed final02",
++  "fresh06_metadata_only_reviewed07_source_binding": {
++    "predecessor_manifest": {
++      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-05/manifest.json",
++      "sha256": "9cdb62660484558ec24119df991a2d51763efa0bb8f15d975874a5685c8c481d",
++      "size_bytes": 42036,
++      "line_count": 855
++    },
++    "before_manifest_archive": {
++      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-06/before-metadata/prep05-manifest.json",
++      "sha256": "9cdb62660484558ec24119df991a2d51763efa0bb8f15d975874a5685c8c481d",
++      "size_bytes": 42036,
++      "line_count": 855
++    },
++    "before_README_archive": {
++      "path": ".runtime/porting/CTF-08/combined-first-final-coefficients-ingress-prep-06/before-metadata/prep05-README.md",
++      "sha256": "95a770ddbf2ced815516821c02b43f8ad87ef617bf837dc23e5151a2599b82ee",
++      "size_bytes": 1252,
++      "line_count": 19
++    },
++    "current_reviewed_source_manifest": {
++      "path": ".runtime/porting/CTF-07/applied-final-source-02/manifest.json",
++      "sha256": "c67e440187bc3731d667d8bb79970c80ef82f9e37c26eac3dda4fc66c116414b",
++      "size_bytes": 23046,
++      "line_count": 470
++    },
++    "historical_formatter01_manifest": {
++      "path": ".runtime/porting/CTF-07/applied-final-source-01/manifest.json",
++      "sha256": "344ed7b311e745f4556378655a90fff602cb4a178b44d7d88c927af0ccfe424f",
++      "size_bytes": 23341,
++      "line_count": 473
++    },
++    "reviewed_lint_source_preparation": {
++      "path": ".runtime/porting/CTF-07/lint-amendment-prep-01/manifest.json",
++      "sha256": "a79f7cb070c6cff248c0b55bc7dad460e12a5dbade0be0c6a475fbf9b6f491db",
++      "size_bytes": 15754,
++      "line_count": 354
++    },
++    "exact_scoped_lint_delta": {
++      "path": ".runtime/porting/CTF-07/lint-amendment-prep-01/ctf_gamma_matrix.rs.diff",
++      "sha256": "39ef7b30b01e424e1ca69b9250e6dceb030911db6dfb5108084ad4702d787c10",
++      "size_bytes": 532,
++      "line_count": 13
++    },
++    "historical_Gamma_before_lint": {
++      "path": ".runtime/porting/CTF-07/applied-final-source-01/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++      "sha256": "28b57503291f99a75621ac38e14d54511c3e8e104e71fed03fcd7a433d2ed375",
++      "size_bytes": 6371,
++      "line_count": 152
++    },
++    "current_reviewed_Gamma_after_lint": {
++      "path": ".runtime/porting/CTF-07/applied-final-source-02/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++      "sha256": "ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3",
++      "size_bytes": 6499,
++      "line_count": 156
++    },
++    "affected_metadata_rows": [
++      "preserved_actual07_formatted_owners[2].source",
++      "future_observer_affected_API_owner_bindings[9].source"
++    ],
++    "other15_actual07_final_source_descriptors_byte_identical_formatter01": true,
++    "five_held_before_parents_members_of_both_actual07_manifests": true,
++    "all_seven_held_Rust_body_descriptors_unchanged": true,
++    "all_five_before_parent_archives_and_source_diffs_unchanged": true,
++    "pure_public08_installation_dependencies_unchanged": true,
++    "historical_preformat_and_formatter_delta_refs_retained": true,
++    "lint_delta_is_not_formatter_or_math_change": true,
++    "actual07_final_quality_and_Cargo_snapshot_pending_not_PASS": true,
++    "target_or_scientific_execution_performed": false
+   }
+ }

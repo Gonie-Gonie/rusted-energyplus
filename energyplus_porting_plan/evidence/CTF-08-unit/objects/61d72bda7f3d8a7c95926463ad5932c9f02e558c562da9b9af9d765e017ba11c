@@ -1,0 +1,188 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients_tests.rs
+@@ -0,0 +1,185 @@
++use super::*;
++use ep_model::ConstructionId;
++
++fn context() -> CtfAssemblyContext {
++    CtfAssemblyContext {
++        construction_id: ConstructionId(8), route: CtfAssemblyRoute::Assemble,
++        solution_dimensions: 1, source_sink_present: false, node_source: 0,
++        node_user_temp: 0, attempt_ordinal: 1, time_step_zone: 0.25,
++        ctf_time_step: 0.5, num_histories: 2,
++    }
++}
++fn reached(input: CtfFinalCoefficientInput<'_>) -> Result<CtfFinalCoefficients, String> {
++    match calculate_selected_ctf_final_coefficients(input, context()).map_err(|e| format!("{e:?}"))? {
++        CtfFinalCoefficientObservation::Coefficients(result) => Ok(*result),
++        CtfFinalCoefficientObservation::Unavailable(reason) => Err(format!("unexpected route: {reason:?}")),
++    }
++}
++fn bits(values: &[f64]) -> Vec<u64> { values.iter().map(|v| v.to_bits()).collect() }
++
++#[test]
++fn single_node_terminal_term_preserves_actual_r0_and_signed_symmetry() -> Result<(), String> {
++    // Hand arithmetic for the method only; these are not Native observations.
++    let gamma1 = [5.0, 7.0, 0.0];
++    let gamma2 = [2.0, 4.0, 0.0];
++    let before = (bits(&gamma1), bits(&gamma2));
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 1, a_exp: &[3.0], iden_matrix: &[2.0], gamma1: &gamma1,
++        gamma2: &gamma2, c_mat: &[2.0, -2.0], d_mat: &[11.0, 13.0],
++    })?;
++    assert_eq!(bits(&actual.gamma1_minus_gamma2), bits(&[3.0, 3.0, 0.0]));
++    assert_eq!(bits(&actual.s0), bits(&[15.0, -6.0, 0.0, 0.0, 6.0, 5.0, 0.0, 0.0, 0.0, -0.0, 0.0, 0.0]));
++    assert_eq!(bits(&actual.s), bits(&[-54.0, -12.0, 0.0, 0.0, 12.0, -90.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]));
++    assert_eq!(bits(&actual.e), bits(&[-6.0]));
++    assert_eq!(bits(&actual.rnew), bits(&[2.0]));
++    assert_eq!(bits(&actual.rold), bits(&[0.0]));
++    assert_eq!(bits(&actual.phi_r0), bits(&[0.0]));
++    assert_eq!(actual.num_ctf_terms, 1);
++    assert!(!actual.history_loop_converged);
++    assert_eq!(actual.next_history_term, 1);
++    assert_eq!(actual.context, context());
++    assert_eq!((bits(&gamma1), bits(&gamma2)), before);
++    Ok(())
++}
++
++#[test]
++fn zero_first_e_stops_after_one_history_and_retains_full_initialized_tail() -> Result<(), String> {
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 2, a_exp: &[0.0; 4], iden_matrix: &[1.0, 0.0, 0.0, 1.0],
++        gamma1: &[1.0, 2.0, 3.0, 4.0, 0.0, 0.0], gamma2: &[0.0; 6],
++        c_mat: &[1.0, -1.0], d_mat: &[0.0; 2],
++    })?;
++    assert_eq!(actual.num_ctf_terms, 1);
++    assert!(actual.history_loop_converged);
++    assert_eq!(actual.next_history_term, 2);
++    assert_eq!(bits(&actual.e), bits(&[-0.0, 0.0]));
++    assert_eq!(actual.s.len(), 24);
++    assert_eq!(actual.s[0].to_bits(), 1.0_f64.to_bits());
++    assert_eq!(actual.s[2].to_bits(), (-2.5_f64).to_bits());
++    assert_eq!(actual.s[8].to_bits(), 2.5_f64.to_bits());
++    assert_eq!(actual.s[10].to_bits(), (-4.0_f64).to_bits());
++    assert!(actual.s.iter().skip(1).step_by(2).all(|v| v.to_bits() == 0.0_f64.to_bits()));
++    Ok(())
++}
++
++#[test]
++fn nonsymmetric_phi_indices_and_terminal_trace_keep_source_orientation() -> Result<(), String> {
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 2, a_exp: &[2.0, 3.0, 5.0, 7.0], iden_matrix: &[11.0, 13.0, 17.0, 19.0],
++        gamma1: &[0.0; 6], gamma2: &[0.0; 6], c_mat: &[0.0; 2], d_mat: &[0.0; 2],
++    })?;
++    assert_eq!(bits(&actual.phi_r0), bits(&[87.0, 124.0, 129.0, 184.0]));
++    assert_eq!(bits(&actual.rold), bits(&[11.0, 13.0, 17.0, 19.0]));
++    assert_eq!(bits(&actual.rnew), bits(&[-184.0, 124.0, 129.0, -87.0]));
++    assert_eq!(bits(&actual.e), bits(&[-271.0, -15.0]));
++    assert_eq!(actual.num_ctf_terms, 2);
++    assert!(!actual.history_loop_converged);
++    Ok(())
++}
++
++#[test]
++fn both_underflow_guards_are_strict_double_epsilon_checks() -> Result<(), String> {
++    let eps = f64::EPSILON;
++    for (a, r0) in [(1.0, eps), (eps, 1.0)] {
++        let actual = reached(CtfFinalCoefficientInput {
++            rcmax: 2, a_exp: &[a, 0.0, 0.0, 0.0], iden_matrix: &[r0, 0.0, 0.0, 0.0],
++            gamma1: &[0.0; 6], gamma2: &[0.0; 6], c_mat: &[0.0; 2], d_mat: &[0.0; 2],
++        })?;
++        assert_eq!(bits(&actual.phi_r0), bits(&[0.0; 4]));
++        assert_eq!(actual.e[0].to_bits(), (-0.0_f64).to_bits());
++        assert!(actual.history_loop_converged);
++    }
++    let next = f64::from_bits(eps.to_bits() + 1);
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 2, a_exp: &[next, 0.0, 0.0, 0.0], iden_matrix: &[1.0, 0.0, 0.0, 0.0],
++        gamma1: &[0.0; 6], gamma2: &[0.0; 6], c_mat: &[0.0; 2], d_mat: &[0.0; 2],
++    })?;
++    assert_eq!(actual.phi_r0[0].to_bits(), next.to_bits());
++    assert_eq!(actual.e[0].to_bits(), (-next).to_bits());
++    Ok(())
++}
++
++#[test]
++fn small_ratio_cuts_off_before_n_but_larger_ratio_reaches_terminal_n() -> Result<(), String> {
++    // Exact binary powers lie on opposite sides of the literal1e-13 cutoff.
++    for (exponent, terms, converged) in [(44_u64, 2, true), (43, 3, false)] {
++        let small = f64::from_bits((1023 - exponent) << 52);
++        let actual = reached(CtfFinalCoefficientInput {
++            rcmax: 3, a_exp: &[1.0, 0.0, 0.0, 0.0, small, 0.0, 0.0, 0.0, 0.0],
++            iden_matrix: &[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
++            gamma1: &[0.0; 9], gamma2: &[0.0; 9], c_mat: &[0.0; 2], d_mat: &[0.0; 2],
++        })?;
++        assert_eq!(actual.num_ctf_terms, terms);
++        assert_eq!(actual.history_loop_converged, converged);
++        assert_eq!(actual.next_history_term, 3);
++    }
++    Ok(())
++}
++
++#[test]
++fn terminal_three_factor_product_is_not_regrouped() -> Result<(), String> {
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 1, a_exp: &[0.0], iden_matrix: &[1.0e308],
++        gamma1: &[2.0, 2.0, 0.0], gamma2: &[0.0; 3],
++        c_mat: &[0.5, 0.5], d_mat: &[0.0; 2],
++    })?;
++    assert_eq!(actual.s[0].to_bits(), 1.0e308_f64.to_bits());
++    assert!(actual.s[0].is_finite());
++    Ok(())
++}
++
++#[test]
++fn zero_cross_symmetry_division_preserves_nan_instead_of_defensive_zero() -> Result<(), String> {
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 1, a_exp: &[0.0], iden_matrix: &[1.0],
++        gamma1: &[0.0; 3], gamma2: &[0.0, 2.0, 0.0],
++        c_mat: &[1.0; 2], d_mat: &[0.0; 2],
++    })?;
++    assert!(actual.s0[1].is_nan());
++    assert_eq!(actual.s0[4].to_bits(), 1.0_f64.to_bits());
++    Ok(())
++}
++
++#[test]
++fn equal_zero_cross_magnitudes_preserve_opposite_signed_zero() -> Result<(), String> {
++    let actual = reached(CtfFinalCoefficientInput {
++        rcmax: 1, a_exp: &[0.0], iden_matrix: &[1.0],
++        gamma1: &[0.0; 3], gamma2: &[0.0; 3], c_mat: &[1.0, -1.0], d_mat: &[0.0; 2],
++    })?;
++    assert_eq!(actual.s0[1].to_bits(), (-0.0_f64).to_bits());
++    assert_eq!(actual.s0[4].to_bits(), 0.0_f64.to_bits());
++    assert_eq!(actual.e[0].to_bits(), (-0.0_f64).to_bits());
++    Ok(())
++}
++
++#[test]
++fn unsupported_routes_and_invalid_actual_shapes_do_not_publish_workspaces() {
++    let empty = CtfFinalCoefficientInput { rcmax: 0, a_exp: &[], iden_matrix: &[],
++        gamma1: &[], gamma2: &[], c_mat: &[], d_mat: &[] };
++    let mut caller = context();
++    caller.route = CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::AllResistive);
++    assert_eq!(calculate_selected_ctf_final_coefficients(empty, caller),
++        Ok(CtfFinalCoefficientObservation::Unavailable(CtfAssemblyUnavailable::AllResistive)));
++    assert_eq!(calculate_selected_ctf_final_coefficients(empty, context()),
++        Err(CtfFinalCoefficientScopeError::Dimension(0)));
++    for (edit, expected) in [
++        (0, CtfFinalCoefficientScopeError::InternalSource),
++        (1, CtfFinalCoefficientScopeError::UnsupportedDimensions(2)),
++        (2, CtfFinalCoefficientScopeError::SourceNodeState),
++        (3, CtfFinalCoefficientScopeError::SourceNodeState),
++        (4, CtfFinalCoefficientScopeError::AttemptOrdinal),
++    ] {
++        let mut caller = context();
++        match edit { 0 => caller.source_sink_present = true, 1 => caller.solution_dimensions = 2,
++            2 => caller.node_source = 1, 3 => caller.node_user_temp = 1, _ => caller.attempt_ordinal = 0 }
++        assert_eq!(calculate_selected_ctf_final_coefficients(empty, caller), Err(expected));
++    }
++    let one = CtfFinalCoefficientInput { rcmax: 1, a_exp: &[1.0], iden_matrix: &[1.0],
++        gamma1: &[0.0; 3], gamma2: &[0.0; 3], c_mat: &[1.0; 2], d_mat: &[0.0; 2] };
++    assert_eq!(calculate_selected_ctf_final_coefficients(CtfFinalCoefficientInput { a_exp: &[], ..one }, context()),
++        Err(CtfFinalCoefficientScopeError::MatrixShape));
++    assert_eq!(calculate_selected_ctf_final_coefficients(CtfFinalCoefficientInput { gamma2: &[], ..one }, context()),
++        Err(CtfFinalCoefficientScopeError::GammaShape));
++    assert_eq!(calculate_selected_ctf_final_coefficients(CtfFinalCoefficientInput { c_mat: &[], ..one }, context()),
++        Err(CtfFinalCoefficientScopeError::BoundaryShape));
++}

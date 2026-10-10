@@ -1,0 +1,26 @@
+--- before-03/gamma_compare.py
++++ gamma_compare.py
+@@ -9,12 +9,12 @@
+                 "AttemptContextMismatch", "DimensionMismatch", "GammaScope", "GammaRouteUnavailable"]
+ 
+ 
+-def validate_all(c, native, qa, methods, gamma):
++def validate_all(c, native, qa, methods, gamma, *, production=False):
+     """Authenticate every real visit/count/integrity ledger before any Gamma pair."""
+     counts, integrity = Counter(), []
+     for model in native["model_cases"]:
+         for operation in model["operations"]:
+-            label = model["id"] + "/" + operation["id"]
++            label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])
+             methods.review(operation, None, c.need, c.dto, counts, integrity, label)
+             gamma.review(operation, None, c.need, c.dto, counts, integrity, label)
+     method_totals = methods.summary(native, counts, c.need)
+@@ -157,7 +157,7 @@
+             c.absence(path + "/required_initialized_Gamma_owners", left["loader_ready"], False, True,
+                       "required actual typed construction/Gamma owner ledger unavailable")
+             for operation in left["operations"]:
+-                records.append(pair_operation(c, path + "/" + operation["id"], operation, None, None, None, None, None, pairing))
++                records.append(pair_operation(c, path + "/" + str(operation["actual_construction_index"]), operation, None, None, None, None, None, pairing))
+             continue
+         c.need(selected.get("actual_CTF06_then_CTF05_then_CTF07_order_is_producer_owned") is True and
+                selected.get("only_first_Rust_method_invocation_owned") is True and selected.get("Native_whole_solver_flags_unpaired") is True and

@@ -1,0 +1,851 @@
+"""Compare actual selected preprocessing owners; no layer evaluator or engine."""
+import argparse
+from collections import Counter
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import math
+from pathlib import Path
+import struct
+
+PREP = Path(__file__).resolve().parent
+COEFFICIENT_PAIR_SHA = 'a98f490657a81cacb140fcaddeed140fde4431881e8bb288d7763dcdcfa0360d'
+COEFFICIENT_SHAPE_SHA = '9c32c62094cf6a08fa3680291b2dc9d6678231f6892a25ceced33e4a4604e1ef'
+COEFFICIENT_VARIABLES = ["CTF08." + name for name in ["s0", "s", "e", "mutated_Gamma1", "PhiR0", "Rnew", "Rold"]]
+GAMMA_PAIR_SHA = 'd7247e69758553507c48cd92cae83a5f5914a2bc27851eb587206d5ecbc8c346'
+GAMMA_SHAPE_SHA = '45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101'
+GAMMA_VARIABLES = ["CTF07.Gamma1", "CTF07.Gamma2", "CTF07.ATemp"]
+PAIR_SHA = '5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97'
+METHOD_SHA = 'e4515854300e3aea1fa26c75b23121afe5c6cf6eff936357786c45f46a0320ab'
+METHOD_VARIABLES = ['CTF06.AExp', 'CTF06.final_AMat1', 'CTF06.final_AMato', 'CTF06.final_AMatN', 'CTF06.AMatRowNormMax', 'CTF06.fact', 'CTF06.CheckVal', 'CTF05.AInv', 'CTF05.final_AMat1']
+IO_SHA = 'dde2f4ce6d767be2432ff20df5199f3bc8db70d7a11a4404aa8f5629614a6e80'
+PHASES = ["PostLoad", "PostMerge", "PostConversion"]
+PREFIX_VARIABLES = [phase + "." + name for phase in PHASES for name in ["dl", "rk", "rho", "cp", "lr"]] + [
+    "PostConversion.dyn", "PostConversion.rs", "PostConversion.cnd"]
+INITIAL_VARIABLES = ['dx', 'initial_CTFTimeStep', 'caller_TimeStepZone']
+VARIABLES = ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat', 'assembly_CTFTimeStep', 'caller_TimeStepZone']
+INITIAL_POLICY = {'protocol': 'ctf03-initial-discretization.v1', 'phase': 'after_original_Construction_cc619_before_matrix_allocation_and_retry', 'selection': 'actual_initial_callback_reached_and_intact_active_prefix', 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'active_layer_fields': ['Nodes', 'dx'], 'integer_fields': ['LayersInConstruct', 'NumResLayers', 'rcmax', 'NodeSource', 'NodeUserTemp', 'NumHistories'], 'scalar_fields': ['CTFTimeStep', 'TimeStepZone'], 'initial_state_distinct_from_whole_return_and_retry_state': True, 'PostConversion_layer_handoff_retained': True, 'PostConversion_handoff_fields': ['LayersInConstruct', 'NumResLayers', 'dl', 'rk', 'rho', 'cp', 'lr', 'ResLayer'], 'capacitance_factors_are_actual_rho_and_cp_not_recomputed_products': True, 'required_reached_fields_absent_is_integrity_failure': True, 'unreached_counted_as_PASS': False, 'branch_or_numeric_answers_reconstructed': False}
+MATRIX_POLICY = {'protocol': 'ctf04-matrix-assembly.v1', 'phase': 'after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt', 'selection': 'first_actual_post728_visit_in_selected_no_source_1D_context', 'selected_attempt_ordinal': 1, 'later_Native_attempts_paired': False, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'Rust_retry_driver_available': False, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'matrix_fields': ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat'], 'storage_order': 'source_i1_outer_i2_inner_row_first', 'matrix_shapes': {'AMat': 'actual_rcmax_by_rcmax', 'IdenMatrix': 'actual_rcmax_by_rcmax', 'BMat': 3, 'CMat': 2, 'DMat': 2}, 'actual_source_produced_identity_required': True, 'attempt_identity': 'one_based_actual_callback_visit_within_bound_whole_call', 'actual_current_retry_state_fields': ['CTFTimeStep', 'NumHistories', 'TimeStepZone'], 'actual_converted_and_initial_handoff_retained': True, 'missing_attempt_or_copy_integrity_failure_is_required_failure': True, 'unreached_counted_as_PASS': False, 'retry_driver_or_matrix_answers_reconstructed': False}
+RETENTION_INTENT = {'schema': 'ctf08-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF08-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+MATRIX_SHAPES = ['actual_rcmax_by_rcmax', 'actual_rcmax_by_rcmax', [3], [2], [2], 'scalar', 'scalar']
+MATRIX_FIELDS = ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat']
+MATRIX_FIXED_SHAPES = {'BMat': 3, 'CMat': 2, 'DMat': 2}
+FAILURE_KINDS = ['IdentityMismatch', 'OrderFailure', 'ActivePrefixShape', 'MatrixShape', 'CopyException', 'LedgerAppendException']
+DATAQA_SOURCE_INVENTORY = {'path': '.runtime/porting/CTF-08/original-data-review-prep-02/manifest.json', 'sha256': '61c3efd7170fb04ab08a924591e5a5d38afb4d9ad08eadb0693ea0ed81d6a24e', 'size_bytes': 63705, 'line_count': 1604}
+SOURCE_INVENTORIES = {'reviewed_native_source_inventory': {'path': '.runtime/porting/CTF-08/native-helper-prep-01/manifest.json', 'sha256': '652a1d9cf1341d7a424575119d6339cb7b344cbc9b3a6f3e189d3ed4b2cf8cbf', 'size_bytes': 26873, 'line_count': 680}, 'reviewed_passive_source_inventory': {'path': '.runtime/porting/CTF-08/native-observer-prep-01/manifest.json', 'sha256': '75c82f69c1c28036b9b83f68d8125ab5db636dd3b1e819d1a5ad130f8047990c', 'size_bytes': 18329, 'line_count': 483}, 'reviewed_freezer_source_inventory': {'path': '.runtime/porting/CTF-08/input-writer-prep-01/manifest.json', 'sha256': '3993734262efffcb725b5bd248c4144d2cda69d093653ffc480dc645fd8584dc', 'size_bytes': 31720, 'line_count': 781}, 'reviewed_PE_source_inventory': {'path': '.runtime/porting/CTF-08/native-build-review-prep-01/manifest.json', 'sha256': '56585de4265b28d25b557503a73992fcb411ce643da007045cdb8576211f0b1d', 'size_bytes': 5823, 'line_count': 150}}
+
+OBSERVER_PATHS = ['crates/ep_run/examples/ctf08_candidate_unit_observer.rs', 'crates/ep_run/examples/ctf08_candidate_unit_support/fields.rs']
+API_PATHS = ['crates/ep_run/Cargo.toml', 'crates/ep_model/src/lib.rs', 'crates/ep_model/src/ids.rs', 'crates/ep_runtime/Cargo.toml', 'crates/ep_runtime/src/lib.rs', 'crates/ep_runtime/src/heat_balance/mod.rs', 'crates/ep_runtime/src/heat_balance/surface_manager.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs', 'crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs', 'crates/ep_model/src/objects/construction.rs', 'crates/ep_runtime/examples/clk02_probe_support/digest.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs']
+
+
+class Comparison:
+    def __init__(self, need):
+        self.need = need
+        self.counts = Counter()
+        self.samples = []
+        self.unavailable = []
+        self.metrics = {key: {"count": 0, "maximum_absolute_error": 0.0, "norm": 0.0,
+                              "nonfinite_error_count": 0} for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES}
+
+    def failure(self, path, category, native, rust):
+        self.counts["mismatches"] += 1
+        self.counts[category] += 1
+        if len(self.samples) < 1000:
+            self.samples.append({"path": path, "category": category, "Native": native, "Rust": rust})
+
+    def exact(self, path, native, rust):
+        self.counts["discrete_comparisons"] += 1
+        if type(native) is not type(rust) or native != rust:
+            self.failure(path, "discrete_mismatches", native, rust)
+
+    def absence(self, path, native_available, rust_available, required, reason):
+        self.unavailable.append({"path": path, "Native_available": native_available, "Rust_available": rust_available,
+                                 "required": required, "reason": reason, "counted_as_PASS": False})
+        if required:
+            self.failure(path, "availability_failures", native_available, rust_available)
+
+    def dto(self, row):
+        self.need(isinstance(row, dict) and set(row) == {"value", "value_bits", "value_class"}, "Actual complete binary64 DTO required")
+        bits = row["value_bits"]
+        self.need(isinstance(bits, str) and len(bits) == 16 and all(c in "0123456789abcdef" for c in bits), "Actual binary64 bits required")
+        word = int(bits, 16)
+        value = struct.unpack(">d", word.to_bytes(8, "big"))[0]
+        kind = "nan" if math.isnan(value) else ("negative_infinity" if word >> 63 else "positive_infinity") if math.isinf(value) else (
+            "negative_zero" if word >> 63 else "positive_zero") if value == 0 else "finite"
+        self.need(row["value_class"] == kind, "Actual binary64 class differs from its bits")
+        if math.isfinite(value):
+            self.need(type(row["value"]) in (int, float) and struct.pack(">d", float(row["value"])).hex() == bits,
+                      "Actual JSON scalar differs from its bits")
+        else:
+            self.need(row["value"] is None, "Observed nonfinite must retain bits/class and null JSON decimal")
+        return value
+
+    def number(self, path, profile, native, rust):
+        left, right = self.dto(native), self.dto(rust)
+        self.exact(path + "/class", native["value_class"], rust["value_class"])
+        self.exact(path + "/bits", native["value_bits"], rust["value_bits"])
+        if not (math.isfinite(left) and math.isfinite(right)):
+            self.absence(path, True, True, True, "actual nonfinite remains available; frozen policy supplies no nonfinite numerical PASS")
+            return
+        metric = self.metrics[profile]
+        error = abs(left - right)
+        metric["count"] += 1
+        self.counts["numeric_comparisons"] += 1
+        if not math.isfinite(error):
+            metric["nonfinite_error_count"] += 1
+        else:
+            metric["maximum_absolute_error"] = max(metric["maximum_absolute_error"], error)
+            metric["norm"] = math.hypot(metric["norm"], error)
+        if error != 0.0:
+            self.failure(path, "numeric_mismatches", native, rust)
+
+    def handoff(self, path, profile, native, rust):
+        # Inherited preprocessing copies are a separate handoff, not CTF04 metrics.
+        self.need(profile in PREFIX_VARIABLES, "Inherited18 handoff profile required")
+        left, right = self.dto(native), self.dto(rust)
+        self.exact(path + "/class", native["value_class"], rust["value_class"])
+        self.exact(path + "/bits", native["value_bits"], rust["value_bits"])
+        self.counts["preprocessing_handoff_scalar_copies"] += 1
+        if not (math.isfinite(left) and math.isfinite(right)):
+            self.absence(path, True, True, True, "inherited required nonfinite handoff has no numerical PASS")
+
+    def initial_handoff(self, path, profile, native, rust):
+        # Actual inherited initial3 copies, separate from seven CTF04 metrics.
+        self.need(profile in INITIAL_VARIABLES, "Inherited initial3 handoff profile required")
+        left, right = self.dto(native), self.dto(rust)
+        self.exact(path + "/class", native["value_class"], rust["value_class"])
+        self.exact(path + "/bits", native["value_bits"], rust["value_bits"])
+        self.counts["initial_handoff_scalar_copies"] += 1
+        if not (math.isfinite(left) and math.isfinite(right)):
+            self.absence(path, True, True, True, "required inherited initial nonfinite handoff has no numerical PASS")
+
+    def report(self):
+        metrics = {}
+        for key, metric in self.metrics.items():
+            available = metric["count"] > 0 and metric["nonfinite_error_count"] == 0 and math.isfinite(metric["norm"])
+            if metric["count"] == 0:
+                self.absence("metrics/" + key, False, False, True, "no finite actual observations for this frozen profile")
+            metrics[key] = {"count": metric["count"], "finite_metric_available": available,
+                            "maximum_absolute_error": metric["maximum_absolute_error"] if available else None,
+                            "RMSE": metric["norm"] / math.sqrt(metric["count"]) if available else None,
+                            "nonfinite_error_count": metric["nonfinite_error_count"]}
+        return {"numeric_comparisons": self.counts["numeric_comparisons"], "discrete_comparisons": self.counts["discrete_comparisons"],
+                "mismatch_count": self.counts["mismatches"], "mismatch_categories": dict(self.counts), "metrics": metrics,
+                "mismatch_samples": self.samples, "mismatch_samples_omitted": max(0, self.counts["mismatches"] - len(self.samples)),
+                "unavailable_observations": self.unavailable, "unavailable_counted_as_PASS": False}
+
+
+def compare_models(native, rust, request, c):
+    c.need(len(native["model_cases"]) == len(rust["model_cases"]) == len(request["model_cases"]), "Exact complete model ledger required")
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        path = expected["id"]
+        for key in ["id", "lane"]:
+            c.exact(path + "/" + key, expected[key], left[key]); c.exact(path + "/Rust/" + key, expected[key], right[key])
+        c.exact(path + "/declared_caller", left["declared_caller"], right["declared_caller"])
+        c.exact(path + "/declared_constructions", expected["constructions"], right["declared_constructions"])
+        c.need(len(right["materials"]) == len(expected["materials"]), "Exact actual typed material association required")
+        for index, (declared, copied) in enumerate(zip(expected["materials"], right["materials"])):
+            actual = copied["actual_typed_input"]
+            c.exact(path + "/material/logical_id", declared["id"], copied["logical_id"])
+            c.exact(path + "/material/name", declared["Name"], copied["declared_name"])
+            c.exact(path + "/material/actual_typed_id", index, actual["material_id"])
+            for key in ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]:
+                c.dto(actual[key]); c.exact(path + "/material/" + declared["id"] + "/" + key, declared[key]["bits"], actual[key]["value_bits"])
+            c.exact(path + "/material/" + declared["id"] + "/ROnly", declared["ROnly"], actual["ROnly"])
+        association = {material["id"]: index for index, material in enumerate(expected["materials"])}
+        c.need(len(left["operations"]) == len(right["operations"]) == len(expected["operations"]), "Exact complete ordered call ledger required")
+        for declared, construction, n, r in zip(expected["operations"], expected["constructions"], left["operations"], right["operations"]):
+            op = path + "/" + declared["id"]
+            c.exact(op + "/id", declared["id"], n["id"]); c.exact(op + "/Rust/id", declared["id"], r["id"])
+            c.exact(op + "/logical_construction_id", n["logical_construction_id"], r["logical_construction_id"])
+            c.exact(op + "/native_operation_kind", n["kind"], r["declared_native_operation_kind"])
+            c.exact(op + "/Rust/API", "preprocess_ctf_layers", r["actual_Rust_API"])
+            c.exact(op + "/original_membership", construction["layer_material_ids"], r["original_layer_membership"])
+            c.exact(op + "/actual_typed_membership", [association[x] for x in construction["layer_material_ids"]], r["actual_layer_material_ids"])
+            c.need(type(n["actual_source_invoked"]) is bool and type(r["actual_source_invoked"]) is bool, "Typed actual invocation availability required")
+            if not n["actual_source_invoked"]:
+                c.need(n.get("observations") is None,"Uninvoked Native whole call cannot invent checkpoints")
+                c.absence(op,False,r["actual_source_invoked"],False,"actual Native whole-source stop leaves this call unknown/noPASS")
+                continue
+            if not r["actual_source_invoked"]:
+                c.absence(op,True,False,True,"required independently invoked Rust preprocessing absent")
+                continue
+            c.exact(op + "/selected_ErrorsFound_before", n["before"]["ErrorsFound"], r["selected_ErrorsFound_before"])
+            if r["result"]["status"] != "source-returned":
+                c.need(r["result"]["status"] == "scope-error-returned" and r["result"]["observations"] is None, "Actual Rust return/scope-error ledger required")
+                c.absence(op + "/Rust_return_owner", True, False, True, "actual Rust scope error has no selected return owner")
+                continue
+            if n.get("observations") is None:
+                c.absence(op+"/preprocessing_handoff",False,True,False,"actual Native whole-call stop leaves checkpoints unknown/noPASS")
+                continue
+            for phase in PHASES:
+                a, b = n["observations"][phase], r["result"]["observations"][phase]
+                for item in [a, b]:
+                    c.need(type(item["reached"]) is bool and type(item["available"]) is bool, "Typed actual phase availability required")
+                    c.need(item["reached"] or (not item["available"] and item["snapshot"] is None), "Unreached phase cannot contain an owner")
+                c.exact(op + "/" + phase + "/reached", a["reached"], b["reached"])
+                if not a["reached"] and not b["reached"]:
+                    c.absence(op + "/" + phase, False, False, False, "both actual phases unreached; no comparisons or PASS")
+                    continue
+                if not a["available"] or not b["available"]:
+                    c.absence(op + "/" + phase, a["available"], b["available"], True, "required reached phase owner absent")
+                    continue
+                x, y = a["snapshot"], b["snapshot"]
+                for key in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "ErrorsFound", "active_prefix_available"]:
+                    c.exact(op + "/" + phase + "/" + key, x[key], y[key])
+                c.need(type(y["LayersInConstruct"]) is int and 1 <= y["LayersInConstruct"] <= 11 and
+                       y["copied_layer_count"] == y["LayersInConstruct"] == len(y["active_prefix"]), "Actual Rust active-prefix shape required")
+                if len(x["active_prefix"]) != len(y["active_prefix"]):
+                    c.absence(op + "/" + phase + "/active_prefix_shape", True, True, True, "actual active-prefix shapes differ")
+                    continue
+                for index, (nl, rl) in enumerate(zip(x["active_prefix"], y["active_prefix"])):
+                    c.exact(op + "/" + phase + "/" + str(index) + "/ResLayer", nl["ResLayer"], rl["ResLayer"])
+                    for key in ["dl", "rk", "rho", "cp", "lr"]:
+                        c.handoff(op + "/" + phase + "/" + str(index) + "/" + key, phase + "." + key, nl[key], rl[key])
+                for key in ["dyn", "rs", "cnd"]:
+                    if phase == "PostConversion":
+                        c.handoff(op + "/" + phase + "/" + key, phase + "." + key, x[key], y[key])
+                    else:
+                        c.need(x[key] is None and y[key] is None, "Preconversion scalar must remain unavailable")
+
+
+def initial_storage(c, path, operation, rust, preprocessing, caller, construction_id, context):
+    """Compare actual copied initial owners; no route or discretization evaluator."""
+    if not isinstance(rust, dict):
+        c.absence(path + "/Rust_route_record", True, False, True, "required actual Rust Result route record absent")
+        return False
+    c.need(rust.get("protocol") == "ctf03-initial-discretization.v1" and
+           type(rust.get("owner_available")) is bool and type(rust.get("selected_initial_operands")) is bool and
+           rust.get("counted_as_PASS") is False and rust.get("initial_state_distinct_from_retry_and_whole_return") is True and
+           rust.get("observer_nodal_or_route_arithmetic_performed") is False and
+           rust.get("Native_whole_method_flags_or_callback_reachability_inferred") is False,
+           "Actual initial Result protocol and honest copy boundary required")
+    available = rust["owner_available"]
+    c.exact(path + "/Rust_Result_selection", available, rust["selected_initial_operands"])
+    c.exact(path + "/construction_id", construction_id, rust.get("construction_id"))
+    c.exact(path + "/same_preprocessing_construction_id", construction_id, rust.get("same_preprocessing_construction_id"))
+    routes = ["PreprocessingScope", "UnusedConstruction", "PreprocessingErrorReturn", "PostConversionUnavailable",
+              "AllResistiveBranch", "ReverseConstruction", "InitialScope"]
+    if available:
+        c.need(rust.get("actual_source_route") == "InitialOwnerReturned" and rust.get("unavailable_reason") is None and
+               rust.get("actual_reverse_construction_id") is None and isinstance(rust.get("snapshot"), dict),
+               "Actual successful initial Result fields required")
+    else:
+        c.need(rust.get("actual_source_route") in routes and isinstance(rust.get("unavailable_reason"),str) and
+               rust["unavailable_reason"] and rust.get("snapshot") is None,
+               "Actual unavailable route must retain reason/null/noPASS")
+        if rust["actual_source_route"] == "ReverseConstruction":
+            c.need(type(rust.get("actual_reverse_construction_id")) is int and rust["actual_reverse_construction_id"] >= 0,
+                   "Actual prior reverse owner ID required; no reverse coefficients inferred")
+        else:
+            c.need(rust.get("actual_reverse_construction_id") is None, "Nonreverse route cannot invent reverse owner")
+    c.need(type(operation.get("actual_source_invoked")) is bool, "Actual Native invocation flag required")
+    if not operation["actual_source_invoked"]:
+        c.need(operation.get("observations") is None, "Uninvoked Native call cannot have invented checkpoints")
+        c.absence(path,False,available,False,"whole source stopped before this call; initial observations unknown/noPASS")
+        return False
+    observed = operation.get("observations")
+    c.need(isinstance(observed,dict) and observed.get("observer_failure") is False,
+           "Actual Native initial observations require an intact source capture")
+    native = observed.get("InitialDiscretization")
+    c.need(isinstance(native,dict) and type(native.get("reached")) is bool and type(native.get("available")) is bool,
+           "Actual Native initial callback record required")
+    for name in ["is_used_ctf", "errors_found", "source_sink_present", "solution_dimensions"]:
+        c.exact(path + "/context/" + name, context[name], rust.get("actual_context",{}).get(name))
+    selected_context = context["source_sink_present"] is False and context["solution_dimensions"] == 1
+    native_available = native["reached"] and native["available"] and selected_context
+    c.exact(path + "/actual_initial_selection", native_available, available)
+    required = native_available or available
+    if not required:
+        c.need(not native["reached"] or not selected_context,
+               "Reached required initial prefix cannot disappear behind optional absence")
+        c.absence(path,False,False,False,"actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS")
+        return False
+    if not native_available or not available:
+        c.absence(path,native_available,available,True,"required selected initial owner missing on one or both sides")
+        return False
+    left, right = native.get("snapshot"),rust.get("snapshot")
+    if not isinstance(left,dict) or not isinstance(right,dict):
+        c.absence(path+"/snapshot",isinstance(left,dict),isinstance(right,dict),True,"required reached initial snapshot absent")
+        return False
+    c.need(rust.get("same_preprocessing_owner_available") is True and
+           rust.get("same_post_conversion_handoff_available") is True and isinstance(preprocessing,dict) and
+           preprocessing.get("status") == "source-returned", "Same actual preceding preprocessing owner required")
+    converted = preprocessing.get("observations",{}).get("PostConversion",{})
+    c.need(converted.get("reached") is True and converted.get("available") is True and
+           isinstance(converted.get("snapshot"),dict), "Selected initial owner needs its actual converted handoff")
+    prefix = converted["snapshot"]
+    for name in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+        a,b=left.get(name),right.get(name)
+        if type(a) is not int or type(b) is not int:
+            c.absence(path+"/"+name,type(a) is int,type(b) is int,True,"required actual initial integer absent")
+        else:
+            c.exact(path+"/"+name,a,b)
+    for name in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "ErrorsFound"]:
+        c.exact(path+"/same_converted_handoff/"+name,prefix.get(name),right.get(name))
+    for name in ["ErrorsFound", "active_prefix_available"]:
+        if type(left.get(name)) is not bool or type(right.get(name)) is not bool:
+            c.absence(path+"/"+name,type(left.get(name)) is bool,type(right.get(name)) is bool,True,"required actual initial flag absent")
+        else:
+            c.exact(path+"/"+name,left[name],right[name])
+    a,b=left.get("active_prefix"),right.get("active_prefix")
+    shape_a=isinstance(a,list) and type(left.get("LayersInConstruct")) is int and 1 <= left["LayersInConstruct"] <= 11 and len(a)==left["LayersInConstruct"]==left.get("copied_layer_count")
+    shape_b=isinstance(b,list) and type(right.get("LayersInConstruct")) is int and 1 <= right["LayersInConstruct"] <= 11 and len(b)==right["LayersInConstruct"]==right.get("copied_layer_count")
+    if not shape_a or not shape_b or len(a)!=len(b):
+        c.absence(path+"/active_prefix_shape",shape_a,shape_b,True,"both exact actual active-prefix shapes required")
+        return False
+    for index,(x,y) in enumerate(zip(a,b)):
+        p=path+"/active_prefix/"+str(index)
+        c.need(isinstance(x,dict) and isinstance(y,dict) and set(x)==set(y)=={"Nodes","dx"},"Actual Nodes/dx row shape required")
+        if type(x.get("Nodes")) is not int or type(y.get("Nodes")) is not int:
+            c.absence(p+"/Nodes",type(x.get("Nodes")) is int,type(y.get("Nodes")) is int,True,"required actual Nodes absent")
+        else: c.exact(p+"/Nodes",x["Nodes"],y["Nodes"])
+        if x.get("dx") is None or y.get("dx") is None:
+            c.absence(p+"/dx",x.get("dx") is not None,y.get("dx") is not None,True,"required actual dx absent")
+        else: c.initial_handoff(p+"/dx","dx",x["dx"],y["dx"])
+    for key,profile in [("CTFTimeStep","initial_CTFTimeStep"),("TimeStepZone","caller_TimeStepZone")]:
+        if left.get(key) is None or right.get(key) is None:
+            c.absence(path+"/"+key,left.get(key) is not None,right.get(key) is not None,True,"required actual initial scalar absent")
+        else: c.initial_handoff(path+"/"+key,profile,left[key],right[key])
+    for key in ["TimeStepZone"]:
+        for label,value in [("Native",left.get(key)),("Rust",right.get(key)),("wrapper",rust.get("actual_wrapper_TimeStepZone"))]:
+            if value is None or caller is None:
+                c.absence(path+"/caller/"+label,value is not None,caller is not None,True,"required actual caller copy absent")
+            else:
+                c.dto(value);c.dto(caller);c.exact(path+"/caller/"+label+"/bits",caller["value_bits"],value["value_bits"])
+    return True
+
+
+def packet_policy(m, qa, request, policy, same, recorded, lane, methods, gamma, coefficients):
+    prefix = "ctf08-" + ("production-" if lane == "production" else "")
+    m.require(request["schema"] == prefix + "helper-cases.v1" and
+              request["frozen_before_this_CTF08_helper_execution"] is True and
+              request["expected_values_supplied"] is False and request["expected_exits_supplied"] is False and
+              request["scientific_execution_performed"] is False, "Genuine input-only CTF08 request with separate historical07 authority required")
+    freeze, execution = m.load(qa["actual_packet_freeze"]), recorded(qa["actual_packet_freeze_execution"])
+    m.require(freeze["schema"] == prefix + "frozen-packet.v1" and freeze["lane"] == lane and
+              freeze["status"] == "frozen-inherited-input-and-fresh-CTF08-private-final-policy-before-helper" and
+              m.load(execution["stdout"]) == freeze and m.contained(execution["stderr"]["path"]).stat().st_size == 0,
+              "Actual successful fresh CTF08 freeze/full stdout required")
+    for key, binding in [("helper_request",qa["reviewed_request"]),("native_admission_contract",qa["reviewed_native_admission_contract"]),
+                         ("projection",qa["reviewed_projection"])]: same(freeze[key],binding)
+    for key in ["source","cases","tolerances"]: same(freeze["contracts"][key],qa["reviewed_contracts"][key])
+    admission, projection, cases, source = [m.load(binding) for binding in [qa["reviewed_native_admission_contract"],
+        qa["reviewed_projection"],qa["reviewed_contracts"]["cases"],qa["reviewed_contracts"]["source"]]]
+    m.require(admission["schema"] == prefix + "native-admission-contract.v1" and
+              projection["schema"] == prefix + "observation-projection.v1" and
+              cases["schema"] == prefix + "cases-contract.v1" and source["schema"] == prefix + "source-contract.v1" and
+              policy["schema"] == prefix + "tolerances-contract.v1", "Actual six-DAG schemas differ")
+    for owner in [admission,projection,cases]: same(owner["helper_request"],qa["reviewed_request"])
+    for owner in [admission,projection]:
+        for key in ["source","cases","tolerances"]: same(owner["contracts"][key],qa["reviewed_contracts"][key])
+    for key in ["source","tolerances"]: same(cases[key],qa["reviewed_contracts"][key])
+    same(qa["reviewed_initial_policy_contract"],qa["reviewed_contracts"]["tolerances"])
+    initial_policy=qa["reviewed_initial_observation_policy"]
+    m.require(initial_policy == INITIAL_POLICY == request["ctf03_initial_observation_policy"] ==
+              admission["ctf03_initial_observation_policy"] == policy["ctf03_initial_observation_policy"] ==
+              projection["ctf03_initial_observation_policy"], "Exact reviewed source-defined initial policy required")
+    initial_profiles=policy["ctf03_initial_profiles"]
+    m.require([row["variable"] for row in initial_profiles]==INITIAL_VARIABLES and all(
+        type(row["atol"]) is float and type(row["rtol"]) is float and row["atol"]==row["rtol"]==0.0 and
+        row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+        row["required_shape"]==("actual_LayersInConstruct_active_prefix" if index==0 else "scalar")
+        for index,row in enumerate(initial_profiles)), "Three frozen initial zero/class/shape/signedzero profiles required")
+    inherited = policy["ctf01_preprocessing_profiles"]
+    prior = m.load(policy["inherited_ctf01_tolerances"])
+    m.require(inherited == prior["arithmetic_profiles_by_variable"] and [r["variable"] for r in inherited] == PREFIX_VARIABLES and
+              all(r["atol"] == r["rtol"] == 0.0 and r["class_exact"] is True and r["shape_exact"] is True for r in inherited),
+              "Unchanged inherited18 handoff profiles required separately")
+    m.require(freeze["requested_counts"] == request["requested_counts"] == admission["requested_counts"] ==
+              cases["requested_counts"] == qa["requested_counts"], "Actual packet/count associations differ")
+    scope = m.load(request["fixed_scope"])
+    guards = [row[key] for row in scope["cases"] for key in ["input","weather","metadata"]]
+    m.require(len(scope["cases"]) == 15 and len(guards) == 45 and guards == request["all_45_guard_refs"] ==
+              admission["all_45_guard_refs"] == freeze["all_45_guard_refs"], "Exact fixed15 ordered45 guards required")
+    for binding in guards: m.bind(binding)
+    for key in ["actual_scope_amendment","actual_scope_amendment_execution"]:
+        m.require(request[key] == admission[key] == projection[key], "Actual pre-output scope pair differs"); m.bind(request[key])
+    m.require(len(admission["native_source_files"]) == 8, "Exact lane Native8 source inventory required")
+    for binding in admission["native_source_files"]: m.bind(binding)
+    same(qa["reviewed_matrix_policy_contract"], qa["reviewed_contracts"]["tolerances"])
+    m.require(qa["reviewed_matrix_observation_policy"] == MATRIX_POLICY == request["ctf04_matrix_observation_policy"] ==
+              admission["ctf04_matrix_observation_policy"] == projection["ctf04_matrix_observation_policy"] ==
+              policy["ctf04_matrix_observation_policy"], "Exact frozen first-attempt matrix policy required")
+    profiles = policy["arithmetic_profiles_by_variable"]
+    m.require([row["variable"] for row in profiles] == VARIABLES and all(
+        type(row["atol"]) is float and type(row["rtol"]) is float and row["atol"] == row["rtol"] == 0.0 and
+        row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+        row["required_shape"] == MATRIX_SHAPES[index] for index,row in enumerate(profiles)), "Seven inherited assembly zero/class/shape/signedzero profiles required")
+    pairing = projection["method_state_pairing_and_availability"]
+    m.require(pairing["ctf04_matrix_observation_policy"] == MATRIX_POLICY and pairing["all_actual_Native_attempt_records_retained"] is True and
+              pairing["later_Native_attempts_are_context_only_noPASS"] is True and pairing["Native_retry_dt_history_or_attempt_counts_supplied_to_Rust"] is False and
+              pairing["retry_driver_certified"] is False, "All visits retained; only first selected; no Native retry operand injection")
+    for owner in [freeze, request, admission, projection]:
+        m.require(owner["linked_original_retention_intent"] == RETENTION_INTENT, "Prospective linked Original retention intent differs")
+    m.require(qa["linked_original_retention_intent"] == RETENTION_INTENT and qa["selected_matrix_attempt_ordinal"] == 1 and
+              qa["later_attempts_observed_unpaired_noPASS"] is True and qa["complete_actual_matrix_records"] is True,
+              "Actual reviewed first-only observation scope and custody required")
+    for key, expected in SOURCE_INVENTORIES.items():
+        same(qa[key], expected); m.bind(expected)
+    source_inventory = m.load(DATAQA_SOURCE_INVENTORY)
+    expected_readers = [row for row in source_inventory["own_sources"] if Path(row["path"]).name in
+        (["review_unit.py", "unit_shape.py", "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "packet_io.py"] if lane == "unit" else
+         ["review_production.py", "production_shape.py", "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "packet_io.py"])]
+    m.require(len(expected_readers) == len(qa["executed_reader_sources"]) == 7, "Exact accepted DataQA lane seven-source closure required")
+    by_owner = {row["historical_path"]: row["archive"] for row in qa["executed_reader_sources"]}
+    m.require(len(by_owner) == 7, "No duplicate DataQA source owner")
+    for source_ref in expected_readers:
+        m.require(source_ref["path"] in by_owner and source_ref["sha256"] == by_owner[source_ref["path"]]["sha256"],
+                  "Actual DataQA executed archive differs from accepted source inventory")
+    methods.packet(freeze, request, admission, projection, policy, m.require)
+    gamma.packet(freeze, request, admission, projection, policy, m.require)
+    coefficients.packet(freeze, request, admission, projection, policy, m.require)
+    def preceding(ref, before):
+        command = recorded(ref)
+        m.require(datetime.fromisoformat(command["finished_utc"].replace("Z", "+00:00")) <=
+                  datetime.fromisoformat(before.replace("Z", "+00:00")), "Both scope checks must precede actual freeze")
+        return command
+    coefficients.scope(m, same, preceding, freeze, request, admission, projection,
+                m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane)
+    same(qa["reviewed_method_policy_contract"], qa["reviewed_contracts"]["tolerances"])
+    m.require(qa["reviewed_method_observation_policies"] == methods.POLICIES and
+              qa["selected_method_invocation_ordinals"] == {"assembly": 1, "exponential": 1, "inverse": 1, "Gamma": 1, "FinalCoefficients": 1} and
+              qa["later_actual_method_visits_observed_unpaired_noPASS"] is True and qa["actual_method_counts_unknown"] is False and
+              qa["scientific_observation_physical_bound_bytes"] == 1024 * 1024 * 1024, "Actual complete first-method scope and bounds required")
+    for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "historical_prior_07_authority",
+                "actual_scope_amendment_execution_role", "current_cards"]:
+        m.require(qa[key] == freeze["source_authorities"][key], "Actual DataQA current08 and separately historical07 provenance differs")
+    m.require(qa["reviewed_Gamma_observation_policy"] == gamma.POLICY and qa["complete_actual_Gamma_records"] is True,
+              "Actual complete reviewed Gamma ledger and frozen policy required")
+    same(qa["reviewed_final_coefficient_policy_contract"], qa["reviewed_contracts"]["tolerances"])
+    m.require(qa["reviewed_final_coefficient_observation_policy"] == coefficients.POLICY and
+              qa["complete_actual_final_coefficient_records"] is True and qa["selected_final_coefficient_invocation_ordinal"] == 1,
+              "Actual complete reviewed private coefficient ledger and frozen policy required")
+    return profiles,inherited,initial_policy,initial_profiles
+
+
+def compare_initial_models(native, rust, request, c):
+    ledger=[]
+    for expected,n,r in zip(request["model_cases"],native["model_cases"],rust["model_cases"]):
+        used=[index for index,row in enumerate(expected["constructions"]) if row["IsUsedCTF"] is True]
+        for index,(declared,construction,left,right) in enumerate(zip(expected["operations"],expected["constructions"],n["operations"],r["operations"])):
+            path=expected["id"]+"/"+declared["id"]+"/CTF03"
+            c.exact(path+"/actual_API","initialize_construction_ctf_initial",right["actual_Rust_CTF03_API"])
+            c.exact(path+"/actual_API_invoked",True,right["actual_Rust_CTF03_API_invoked"])
+            c.exact(path+"/construction_id",index,right["actual_construction_id"])
+            c.exact(path+"/ordered_prior_ids",list(range(index)),right["actual_ordered_prior_construction_ids"])
+            c.exact(path+"/used_ids",used,right["actual_used_construction_ids"])
+            c.need(right["preprocessing_reexecuted_for_initial_owner"] is False and
+                   right["observer_reverse_classifier_duplicated"] is False,"Actual same-prefix source-owned route required")
+            c.dto(right["actual_caller_TimeStepZone"])
+            c.exact(path+"/literal_caller_bits",expected["caller"]["TimeStepZone"]["bits"],right["actual_caller_TimeStepZone"]["value_bits"])
+            context=None
+            if left["actual_source_invoked"]:
+                c.need(isinstance(left.get("before"),dict),"Actual invoked Native before owner required")
+                context={"is_used_ctf":construction["IsUsedCTF"],"errors_found":left["before"]["ErrorsFound"],
+                         "source_sink_present":construction["SourceSinkPresent"],"solution_dimensions":construction["SolutionDimensions"]}
+            paired=initial_storage(c,path,left,right.get("CTF03_initial"),right["result"],right["actual_caller_TimeStepZone"],index,context)
+            c.exact(path+"/initial_owner_availability_copy",right["CTF03_initial"]["owner_available"],right["actual_initial_discretization_owner_available"])
+            ledger.append({"model_id":expected["id"],"operation_id":declared["id"],
+                "Native_initial_capture":left.get("observations",{}).get("InitialDiscretization") if left.get("observations") else None,
+                "Rust_initial_Result":right.get("CTF03_initial"),"selected_operands_paired":paired,
+                "Native_whole_outcome_context_only":left["call_outcome"],"unselected_or_unknown_counted_as_PASS":False})
+    return ledger
+
+
+
+def first_assembly_storage(c, path, operation, rust, initial, preprocessing, caller, construction_id):
+    """Compare only actual ordinal-one owners; later Native visits are unpaired."""
+    if not isinstance(rust, dict):
+        c.absence(path + "/Rust_route_record", True, False, True, "required actual first-assembly Result absent")
+        return {"selected_operands_paired": False, "actual_Native_attempts": [], "counted_as_PASS": False}
+    c.need(rust.get("protocol") == MATRIX_POLICY["protocol"] and type(rust.get("owner_available")) is bool and
+           type(rust.get("selected_first_assembly_operands")) is bool and rust.get("counted_as_PASS") is False and
+           rust.get("only_first_Rust_assembly_invocation_owned") is True and
+           all(rust.get(key) is False for key in ["later_Native_attempts_available_in_Rust", "later_Native_attempts_counted_as_PASS",
+               "retry_driver_available", "Native_retry_state_or_counts_supplied_to_Rust",
+               "observer_matrix_identity_or_route_arithmetic_performed", "Native_whole_method_outcome_or_flags_inferred"]),
+           "Actual first-assembly Result and no-retry copy boundary required")
+    available = rust["owner_available"]
+    c.exact(path + "/Rust_selection_copy", available, rust["selected_first_assembly_operands"])
+    for key in ["construction_id", "same_initial_construction_id", "same_preprocessing_construction_id"]:
+        c.exact(path + "/" + key, construction_id, rust.get(key))
+    if available:
+        c.need(rust.get("actual_source_route") == "FirstAssemblyReturned" and rust.get("unavailable_reason") is None and
+               isinstance(rust.get("snapshot"), dict), "Actual successful first-assembly Result required")
+    else:
+        c.need(rust.get("actual_source_route") in ["InitialUnavailable", "ConstructionIdentityMismatch", "PreprocessingScope",
+               "PreprocessingRouteMismatch", "PostConversionUnavailable", "CallerTimeStepMismatch", "AssemblyScope", "AssemblyUnavailable"] and
+               isinstance(rust.get("unavailable_reason"), str) and rust["unavailable_reason"] and rust.get("snapshot") is None,
+               "Actual unavailable Result must retain route/reason/null/noPASS")
+    record = {"selected_operands_paired": False, "Rust_first_assembly_Result": rust,
+              "actual_Native_attempts": [], "later_Native_attempts_paired": False, "counted_as_PASS": False}
+    c.need(type(operation.get("actual_source_invoked")) is bool, "Actual Native invocation flag required")
+    if not operation["actual_source_invoked"]:
+        c.need(operation.get("observations") is None, "Uninvoked source cannot invent matrix visits")
+        c.absence(path, False, available, False, "whole Native source stopped before this call; no matrix observations/noPASS")
+        c.counts["Native_matrix_uninvoked_whole_calls"] += 1
+        return record
+    observed = operation.get("observations")
+    c.need(isinstance(observed, dict) and observed.get("observer_failure") is False,
+           "Intact actual Native capture required")
+    ledger = observed.get("MatrixAssembly")
+    c.need(isinstance(ledger, dict) and ledger.get("protocol") == MATRIX_POLICY["protocol"] and
+           ledger.get("matrix_observer_failure") is False and ledger.get("matrix_copy_integrity_failed") is False and
+           ledger.get("unreached_counted_as_PASS") is False and ledger.get("matrix_or_identity_or_retry_state_reconstructed") is False and
+           ledger.get("old_checkpoint_counters_include_matrix_callbacks") is False,
+           "Intact actual all-attempt matrix ledger required")
+    for key in ["actual_matrix_attempt_callback_count", "actual_retained_attempt_count", "matrix_attempt_records_omitted"]:
+        c.need(type(ledger.get(key)) is int and ledger[key] >= 0, "Typed actual matrix counts required")
+    attempts = ledger.get("attempts")
+    callbacks = ledger["actual_matrix_attempt_callback_count"]
+    c.need(isinstance(attempts, list) and callbacks == ledger["actual_retained_attempt_count"] == len(attempts) and
+           ledger["matrix_attempt_records_omitted"] == 0 and ledger.get("no_callback_reached") is (callbacks == 0),
+           "All actual visits retained; missing/omitted visits cannot be optional")
+    failures = ledger.get("matrix_failure_event_counts")
+    c.need(isinstance(failures, list) and [row.get("kind") for row in failures] == FAILURE_KINDS and
+           all(type(row.get("actual_event_count")) is int and row["actual_event_count"] == 0 for row in failures) and
+           ledger.get("first_matrix_failure") is None and ledger.get("last_matrix_failure") is None,
+           "Every actual copy/order/shape/identity/append failure is required failure")
+    c.counts["Native_actual_matrix_attempt_callback_count"] += callbacks
+    c.counts["Native_actual_retained_matrix_attempt_count"] += len(attempts)
+    for ordinal, attempt in enumerate(attempts, 1):
+        c.need(attempt.get("observed_attempt_ordinal") == ordinal and type(attempt.get("observed_attempt_ordinal")) is int and
+               attempt.get("reached") is True and attempt.get("available") is True and attempt.get("unavailable_reason") is None,
+               "Actual visits must retain ordinal coverage and available intact copies")
+        flags = attempt.get("failure_kinds")
+        c.need(isinstance(flags, list) and [row.get("kind") for row in flags] == FAILURE_KINDS and
+               all(row.get("failed") is False for row in flags), "Actual per-visit failure ledger must be intact")
+        snapshot = attempt.get("snapshot")
+        c.need(isinstance(snapshot, dict) and snapshot.get("active_prefix_available") is True and snapshot.get("matrices_available") is True,
+               "Every retained actual attempt needs its copied prefix and matrices")
+        n = snapshot.get("rcmax"); layers = snapshot.get("active_prefix")
+        c.need(type(n) is int and n > 0 and isinstance(layers, list) and type(snapshot.get("LayersInConstruct")) is int and
+               1 <= snapshot["LayersInConstruct"] <= 11 and len(layers) == snapshot["LayersInConstruct"] == snapshot.get("copied_layer_count"),
+               "Actual retained active-prefix/rcmax shape required")
+        bounds, matrices = snapshot.get("actual_bounds"), snapshot.get("matrices")
+        c.need(isinstance(bounds, dict) and isinstance(matrices, dict) and set(matrices) == set(MATRIX_FIELDS),
+               "All actual source-owned matrix fields required")
+        for key in MATRIX_FIELDS:
+            size = n * n if key in ["AMat", "IdenMatrix"] else MATRIX_FIXED_SHAPES[key]
+            bound = bounds.get(key)
+            expected_bound = {"lower1": 1, "upper1": n, "lower2": 1, "upper2": n, "size": size} if key in ["AMat", "IdenMatrix"] else {"lower": 1, "upper": size, "size": size}
+            c.need(isinstance(bound, dict) and bound == expected_bound and all(type(value) is int for value in bound.values()) and
+                   isinstance(matrices[key], list) and len(matrices[key]) == size, "Actual copied matrix bounds/shape differ")
+            for value in matrices[key]: c.dto(value)  # No matrix/identity evaluation, including unpaired later visits.
+        for layer in layers:
+            c.need(type(layer.get("Nodes")) is int and type(layer.get("ResLayer")) is bool, "Actual discrete layer copies required")
+            for key in ["dl", "rk", "rho", "cp", "lr", "dx"]: c.dto(layer[key])
+        for key in ["CTFTimeStep", "TimeStepZone"]: c.dto(snapshot[key])
+        c.need(type(snapshot.get("NumHistories")) is int and type(snapshot.get("SourceSinkPresent")) is bool and
+               type(snapshot.get("SolutionDimensions")) is int, "Actual attempt stamp/context required")
+        selected = ordinal == 1 and snapshot["SourceSinkPresent"] is False and snapshot["SolutionDimensions"] == 1
+        record["actual_Native_attempts"].append({"observed_attempt_ordinal": ordinal, "selected_first_visit": selected,
+            "actual_CTFTimeStep": snapshot["CTFTimeStep"], "actual_NumHistories": snapshot["NumHistories"],
+            "actual_TimeStepZone": snapshot["TimeStepZone"], "selected_operands_paired": False,
+            "later_attempt_context_only": ordinal > 1, "counted_as_PASS": False})
+        if ordinal > 1: c.counts["Native_later_matrix_attempts_unpaired"] += 1
+    first = attempts[0] if attempts else None
+    native_available = first is not None and first["snapshot"]["SourceSinkPresent"] is False and first["snapshot"]["SolutionDimensions"] == 1
+    c.exact(path + "/selected_first_owner_availability", native_available, available)
+    required = native_available or available
+    if not required:
+        c.absence(path, False, False, False, "actual first matrix visit unselected/unreached and explicit Rust unavailable; no numeric PASS")
+        c.counts["matrix_unselected_or_unreached_whole_calls"] += 1
+        return record
+    if not native_available or not available:
+        c.absence(path, native_available, available, True, "required first matrix owner missing; later visits cannot replace ordinal1")
+        return record
+    left, right = first["snapshot"], rust["snapshot"]
+    c.need(isinstance(initial, dict) and initial.get("owner_available") is True and isinstance(initial.get("snapshot"), dict) and
+           isinstance(preprocessing, dict) and preprocessing.get("status") == "source-returned" and
+           all(rust.get(key) is True for key in ["same_initial_owner_available", "same_preprocessing_owner_available", "same_post_conversion_handoff_available"]),
+           "Selected assembly must borrow the same actual initial and preprocessing owners")
+    initial_owner = initial["snapshot"]
+    converted = preprocessing.get("observations", {}).get("PostConversion", {})
+    c.need(converted.get("available") is True and isinstance(converted.get("snapshot"), dict), "Actual same converted prefix required")
+    converted = converted["snapshot"]
+    c.need(right.get("storage_order") == MATRIX_POLICY["storage_order"] and right.get("Native_Objexx_bounds_not_Rust_owner") is True,
+           "Actual Rust row-first storage without fabricated Native Objexx bounds required")
+    c.exact(path + "/attempt_ordinal", 1, right.get("attempt_ordinal"))
+    c.exact(path + "/actual_context_construction_id", construction_id, right.get("actual_context_construction_id"))
+    c.exact(path + "/actual_route", "Assemble", right.get("actual_route"))
+    for key in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+        a, b = left.get(key), right.get(key)
+        if type(a) is not int or type(b) is not int:
+            c.absence(path + "/" + key, type(a) is int, type(b) is int, True, "required actual assembly integer absent")
+        else: c.exact(path + "/" + key, a, b)
+    for key in ["ErrorsFound", "IsUsedCTF", "SourceSinkPresent", "active_prefix_available", "matrices_available"]:
+        a, b = left.get(key), right.get(key)
+        if type(a) is not bool or type(b) is not bool:
+            c.absence(path + "/" + key, type(a) is bool, type(b) is bool, True, "required actual assembly flag absent")
+        else: c.exact(path + "/" + key, a, b)
+    c.exact(path + "/SolutionDimensions", left["SolutionDimensions"], right.get("SolutionDimensions"))
+    for key in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "ErrorsFound"]:
+        c.exact(path + "/same_converted/" + key, converted.get(key), right.get(key))
+    for key in ["rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+        c.exact(path + "/same_initial/" + key, initial_owner.get(key), right.get(key))
+    for label, owner in [("Native_initial619", observed["InitialDiscretization"]["snapshot"]), ("Rust_initial", initial_owner)]:
+        c.exact(path + "/" + label + "/NumHistories", owner.get("NumHistories"), left["NumHistories"] if label.startswith("Native") else right.get("NumHistories"))
+        c.initial_handoff(path + "/" + label + "/CTFTimeStep", "initial_CTFTimeStep", owner["CTFTimeStep"], left["CTFTimeStep"] if label.startswith("Native") else right["CTFTimeStep"])
+    a, b = left["active_prefix"], right.get("active_prefix")
+    shape = isinstance(b, list) and type(right.get("LayersInConstruct")) is int and len(b) == right["LayersInConstruct"] == right.get("copied_layer_count") == right.get("actual_nodes_count") == right.get("actual_dx_count")
+    if not shape or len(a) != len(b):
+        c.absence(path + "/active_prefix_shape", True, shape, True, "required same actual matrix active-prefix shapes absent/different")
+        return record
+    if not isinstance(initial_owner.get("active_prefix"), list) or not isinstance(converted.get("active_prefix"), list) or len(initial_owner["active_prefix"]) != len(b) or len(converted["active_prefix"]) != len(b):
+        c.absence(path + "/same_handoff_shape", True, False, True, "required same actual initial/converted handoff shape differs")
+        return record
+    for index, (x, y) in enumerate(zip(a, b)):
+        p = path + "/active_prefix/" + str(index)
+        if not isinstance(y, dict):
+            c.absence(p, True, False, True, "required actual Rust layer copy absent"); continue
+        for key in ["Nodes", "ResLayer"]:
+            c.exact(p + "/" + key, x[key], y.get(key))
+        c.exact(p + "/same_initial_Nodes", initial_owner["active_prefix"][index]["Nodes"], y.get("Nodes"))
+        for key in ["dl", "rk", "rho", "cp", "lr"]:
+            if y.get(key) is None: c.absence(p + "/" + key, True, False, True, "required actual converted scalar absent")
+            else:
+                c.handoff(p + "/" + key, "PostConversion." + key, x[key], y[key])
+                c.handoff(p + "/same_converted/" + key, "PostConversion." + key, converted["active_prefix"][index][key], y[key])
+        if y.get("dx") is None: c.absence(p + "/dx", True, False, True, "required actual dx absent")
+        else:
+            c.initial_handoff(p + "/dx", "dx", x["dx"], y["dx"])
+            c.initial_handoff(p + "/same_initial_dx", "dx", initial_owner["active_prefix"][index]["dx"], y["dx"])
+    matrices = right.get("matrices")
+    for key in MATRIX_FIELDS:
+        expected_size = left["rcmax"] * left["rcmax"] if key in ["AMat", "IdenMatrix"] else MATRIX_FIXED_SHAPES[key]
+        values = matrices.get(key) if isinstance(matrices, dict) else None
+        if not isinstance(values, list) or len(values) != expected_size:
+            c.absence(path + "/matrices/" + key + "/shape", True, isinstance(values, list), True, "required exact actual matrix shape absent/different")
+            continue
+        for index, (x, y) in enumerate(zip(left["matrices"][key], values)):
+            if x is None or y is None: c.absence(path + "/matrices/" + key + "/" + str(index), x is not None, y is not None, True, "required actual matrix scalar absent")
+            else: c.number(path + "/matrices/" + key + "/" + str(index), key, x, y)
+    for key, profile in [("CTFTimeStep", "assembly_CTFTimeStep"), ("TimeStepZone", "caller_TimeStepZone")]:
+        if right.get(key) is None: c.absence(path + "/" + key, True, False, True, "required first-attempt scalar absent")
+        else: c.number(path + "/" + key, profile, left[key], right[key])
+    for label, owner in [("Native", left), ("Rust", right)]:
+        if caller is None or owner.get("TimeStepZone") is None:
+            c.absence(path + "/caller/" + label, caller is not None, owner.get("TimeStepZone") is not None, True, "required actual caller copy absent")
+        else: c.initial_handoff(path + "/caller/" + label, "caller_TimeStepZone", caller, owner["TimeStepZone"])
+    record["selected_operands_paired"] = True
+    record["actual_Native_attempts"][0]["selected_operands_paired"] = True
+    c.counts["matrix_selected_first_owner_pairs"] += 1
+    return record
+
+
+def matrix_count_proof(c, qa):
+    counts = qa["actual_observation_counts"]
+    for key, actual in [("actual_matrix_attempt_callback_count", "Native_actual_matrix_attempt_callback_count"),
+                        ("actual_retained_matrix_attempt_count", "Native_actual_retained_matrix_attempt_count"),
+                        ("matrix_later_unpaired_attempt_count", "Native_later_matrix_attempts_unpaired"),
+                        ("matrix_uninvoked_whole_call_count", "Native_matrix_uninvoked_whole_calls")]:
+        c.exact("actual_DataQA_count/" + key, counts[key], c.counts[actual])
+    c.need(qa["complete_actual_matrix_records"] is True and counts["matrix_attempt_records_omitted"] == 0 and
+           counts["matrix_failure_event_count"] == 0 and all(qa["actual_matrix_failure_event_counts"][key] == 0 for key in FAILURE_KINDS),
+           "Actual DataQA all-attempt integrity/count proof required")
+
+
+def compare_matrix_models(native, rust, request, c):
+    ledger = []
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        for index, (declared, operation, observed) in enumerate(zip(expected["operations"], left["operations"], right["operations"])):
+            path = expected["id"] + "/" + declared["id"] + "/CTF04"
+            c.exact(path + "/actual_API", "initialize_construction_ctf_first_assembly", observed.get("actual_Rust_CTF04_API"))
+            c.exact(path + "/actual_API_invoked", True, observed.get("actual_Rust_CTF04_API_invoked"))
+            c.need(observed.get("preprocessing_or_initial_reexecuted_for_assembly_owner") is False,
+                   "Actual same two-owner API call required")
+            record = first_assembly_storage(c, path, operation, observed.get("CTF04_first_assembly"),
+                observed.get("CTF03_initial"), observed.get("result"), observed.get("actual_caller_TimeStepZone"), index)
+            record.update({"model_id": expected["id"], "operation_id": declared["id"], "actual_native_whole_outcome_context_only": operation["call_outcome"]})
+            ledger.append(record)
+    return ledger
+
+
+def run(args):
+    path = PREP / "packet_io.py"
+    if hashlib.sha256(path.read_bytes()).hexdigest() != IO_SHA:
+        raise ValueError("Reviewed stdlib byte helper differs before import")
+    spec = importlib.util.spec_from_file_location("ctf08_unit_io", path)
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    own = m.bind(m.identity(__file__)); m.bind(m.identity(path))
+    m.require(Path.cwd().resolve() == m.ROOT and own["sha256"] == args.approved_source_sha256, "Root-reviewed source and repository cwd required")
+    started = datetime.now(timezone.utc).isoformat()
+    def boot(name, filename, expected):
+        source = PREP / filename
+        m.require(hashlib.sha256(source.read_bytes()).hexdigest() == expected, "Reviewed comparer support differs before import")
+        m.bind(m.identity(source))
+        module_spec = importlib.util.spec_from_file_location(name, source)
+        module = importlib.util.module_from_spec(module_spec); module_spec.loader.exec_module(module)
+        return module
+    pairing = boot("ctf08_method_pairing", "method_compare.py", PAIR_SHA)
+    methods = boot("ctf08_method_structure", "method_shape.py", METHOD_SHA)
+    gamma = boot("ctf08_Gamma_structure", "gamma_shape.py", GAMMA_SHAPE_SHA)
+    gamma_pairing = boot("ctf08_Gamma_pairing", "gamma_compare.py", GAMMA_PAIR_SHA)
+    coefficients = boot("ctf08_private_coefficients_structure", "coefficient_shape.py", COEFFICIENT_SHAPE_SHA)
+    coefficient_pairing = boot("ctf08_private_coefficients_pairing", "coefficient_compare.py", COEFFICIENT_PAIR_SHA)
+
+    def same(a, b):
+        m.require(m.contained(a["path"], existing=False) == m.contained(b["path"], existing=False) and a["sha256"] == b["sha256"], "Actual direct identities differ")
+
+    def instant(text):
+        value = datetime.fromisoformat(text.replace("Z", "+00:00")); m.require(value.tzinfo is not None, "Aware actual UTC required"); return value
+
+    def recorded(ref, observation_stdout=False):
+        record = m.load(ref)
+        m.require(record["schema"] == "recorded-porting-command.v1" and type(record["exit_code"]) is int and record["exit_code"] == 0 and
+                  record["launch_error"] is None and record["source_bytes_match_before_and_after"] is True and Path(record["cwd"]).resolve() == m.ROOT,
+                  "Actual successful source-preserving repository command required")
+        m.require(instant(record["started_utc"]) <= instant(record["finished_utc"]) <= instant(started), "Actual preceding command interval required")
+        for key in ["stdout", "stderr"]:
+            (m.bind_observation if observation_stdout and key == "stdout" else m.bind)(record[key])
+        m.require(record["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Actual recorder owner differs")
+        m.bind(record["executed_launcher"]["archive"])
+        return record
+
+    refs = {name: m.argument(getattr(args, name.replace("-", "_")), observation=(name == "Rust-results")) for name in [
+        "original-data-review", "original-data-review-execution", "Rust-build-execution", "Rust-execution", "Rust-results"]}
+    qa, qc = m.load(refs["original-data-review"]), recorded(refs["original-data-review-execution"])
+    m.require(qa["schema"] == "ctf08-independent-original-data-review.v1" and qa["status"] == "pass-actual-original-data-and-provenance-before-Rust"
+              and qa["Rust_baseline_released"] is True and qa["complete_requested_record_ledger_validated"] is True and
+              qa["actual_native_process_exit_code"] == 0 and qa["actual_native_launch_error"] is None and not qa["observation_integrity_failures"] and
+              qa["numerical_PASS_claimed"] is False and m.load(qc["stdout"]) == qa, "Genuine preceding Original DataQA0/full stdout required")
+    for row in qa["executed_reader_sources"]: m.bind(row["archive"])
+    first = qa["executed_reader_sources"][0]
+    m.require(m.contained(qc["stderr"]["path"]).stat().st_size == 0, "Actual DataQA stderr must be empty")
+    m.require(qc["command"][:4] == ["python","-X","utf8","-B"] and len(qc["command"]) > 4 and
+              m.contained(qc["command"][4]) == m.contained(first["historical_path"]), "Actual DataQA Python/source argv differs")
+    m.require(any(m.contained(value, existing=False) == m.contained(first["historical_path"], existing=False)
+                  for value in qc["command"] if value.endswith("review_unit.py")), "Actual DataQA source command differs")
+    m.require("--approved-source-sha256" in qc["command"] and qc["command"][qc["command"].index("--approved-source-sha256") + 1] == first["archive"]["sha256"], "Actual DataQA approved source differs")
+    def observations(binding):
+        actual = m.bind_observation(binding)
+        return json.loads(m.contained(actual["path"]).read_text(encoding="utf-8"), object_pairs_hook=m.unique_object,
+                          parse_constant=lambda value: m.require(False,"Nonfinite JSON literal: " + value))
+    request = m.load(qa["reviewed_request"]); native = observations(qa["reviewed_results"]); rust = observations(refs["Rust-results"])
+    policy = m.load(qa["reviewed_contracts"]["tolerances"])
+    profiles,inherited,initial_policy,initial_profiles = packet_policy(m,qa,request,policy,same,recorded,"unit",methods,gamma,coefficients)
+    m.require(native["schema"] == "ctf08-helper-results.v1" and native["complete_requested_record_ledger"] is True, "Complete actual Native unit ledger required")
+    m.require(rust["schema"] == "ctf08-candidate-unit-observer-results.v1" and rust["all_bound_inputs_and_sources_unchanged"] is True and
+              rust["numerical_PASS_claimed"] is False and rust["Native_result_or_expected_values_read"] is False, "Actual candidate-only source results required")
+    for key, binding in [("actual_request", qa["reviewed_request"]), ("actual_native_admission", qa["reviewed_native_admission_contract"]), ("projection", qa["reviewed_projection"])]: same(rust[key], binding)
+    for key in ["source", "cases", "tolerances"]: same(rust["contracts"][key], qa["reviewed_contracts"][key])
+    build, executed = recorded(refs["Rust-build-execution"]), recorded(refs["Rust-execution"], observation_stdout=True)
+    m.require(instant(qc["finished_utc"]) <= instant(build["started_utc"]) and instant(build["finished_utc"]) <= instant(executed["started_utc"]), "OriginalDataQA must precede actual Cargo then Rust execution")
+    m.require(observations(executed["stdout"]) == rust and m.contained(executed["stderr"]["path"]).stat().st_size == 0, "Actual Rust full stdout and empty stderr required")
+    capture = build["cargo_compiler_artifacts_capture"]
+    m.require(build["command"][:2] == ["cargo", "build"] and capture["requested"] is True and capture["status"] == "pass" and capture["error"] is None, "Actual Cargo compiler-artifact capture required")
+    m.require(instant(build["finished_utc"]) <= instant(capture["captured_utc"]) <= instant(executed["started_utc"]), "Actual captured artifact must precede Rust execution")
+    rows = [row for row in capture["rows"] if row["cargo_message"]["target"]["name"] == "ctf08_candidate_unit_observer" and "example" in row["cargo_message"]["target"]["kind"]]
+    m.require(len(rows) == 1, "Unique actual candidate example artifact required")
+    artifact = rows[0]; binary = artifact["executable"]
+    binary_path = m.contained(binary["historical_path"])
+    def binary_sha():
+        digest = hashlib.sha256()
+        with binary_path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""): digest.update(block)
+        return digest.hexdigest()
+    m.require(binary_sha() == binary["sha256"] and len(executed["command"]) == 6 and
+              m.contained(executed["command"][0]) == binary_path, "Actual executed Rust binary differs from Cargo artifact")
+    same(build["source_snapshot"], executed["source_snapshot"])
+    snapshot = m.load(build["source_snapshot"])
+    m.require(snapshot["schema"] == "rust-command-source-snapshot.v1" and snapshot["bytes_normalized"] is False, "Actual full Cargo/Rust source capture required")
+    available = {row["historical_path"]: row["archive"] for row in snapshot["files"]}
+    m.require(len(available) == len(snapshot["files"]), "Complete source snapshot must not contain duplicate owners")
+    inventory = m.load(rust["runtime_source_bindings"])
+    m.require(inventory == rust["authenticated_source_inventory"] and inventory["schema"] == "ctf08-candidate-unit-runtime-source-bindings.v1", "Actual runtime source inventory differs")
+    for key, paths in [("observer_sources", OBSERVER_PATHS), ("actual_public_API_sources", API_PATHS)]:
+        m.require([row["path"] for row in inventory[key]] == paths, "Actual source inventory paths/order differ")
+        for binding in inventory[key]:
+            m.bind(binding); m.bind(available[binding["path"]])
+            m.require(binding["sha256"] == available[binding["path"]]["sha256"], "Actual compiled/captured source bytes differ from observer source binding")
+    m.require(m.contained(artifact["cargo_message"]["target"]["src_path"]) == m.contained(OBSERVER_PATHS[0]), "Actual Cargo target source differs")
+    m.require(m.contained(artifact["cargo_message"]["manifest_path"]) == m.contained(API_PATHS[0]), "Actual Cargo package manifest differs")
+    for value, binding in zip([executed["command"][1],executed["command"][3],executed["command"][5]], [qa["reviewed_request"], qa["reviewed_native_admission_contract"], rust["runtime_source_bindings"]]):
+        m.require(m.contained(value) == m.contained(binding["path"]), "Actual Rust input-only argv differs")
+    m.require(executed["command"][2] == qa["reviewed_request"]["sha256"] and
+              executed["command"][4] == qa["reviewed_native_admission_contract"]["sha256"], "Actual runtime input SHA arguments differ")
+    calls = sum(len(row["operations"]) for row in request["model_cases"])
+    m.require(type(rust["actual_Rust_preprocess_invocations"]) is int and rust["actual_Rust_preprocess_invocations"] == calls and
+              rust["requested_counts"] == request["requested_counts"] == qa["requested_counts"], "Actual candidate call/count ledger differs")
+    m.require(rust["ctf03_initial_observation_policy"] == initial_policy and native["CTF03_initial_observation_policy"] == initial_policy,
+              "Observed policy differs from actual frozen QA")
+    actual_calls=sum(op["actual_Rust_CTF03_API_invoked"] is True for model in rust["model_cases"] for op in model["operations"])
+    m.require(type(rust["actual_Rust_CTF03_API_invocations"]) is int and rust["actual_Rust_CTF03_API_invocations"] == actual_calls,
+              "Actual CTF03 invocation count differs")
+    m.require(rust["ctf04_matrix_observation_policy"] == native["CTF04_matrix_observation_policy"] == MATRIX_POLICY and
+              rust["Rust_retry_driver_available"] is False and rust["later_Native_attempts_paired"] is False and
+              rust["later_Native_attempts_counted_as_PASS"] is False, "Actual frozen first-only matrix policy required")
+    actual_assembly_calls=sum(op.get("actual_Rust_CTF04_API_invoked") is True for model in rust["model_cases"] for op in model["operations"])
+    m.require(type(rust["actual_Rust_CTF04_API_invocations"]) is int and rust["actual_Rust_CTF04_API_invocations"] == actual_assembly_calls == calls,
+              "Actual first-assembly API invocation count differs")
+    for key, expected in methods.POLICIES.items():
+        native_key = "CTF06_exponential_observation_policy" if key.startswith("ctf06") else "CTF05_inverse_observation_policy"
+        m.require(rust[key] == native[native_key] == expected, "Actual method policy differs from frozen source policy")
+    for key in ["actual_scope_amendment", "actual_scope_amendment_execution"]: same(rust[key], request[key])
+    for key in ["historical_prior_07_authority", "actual_scope_amendment_execution_role", "current_cards"]:
+        m.require(rust[key] == request[key], "Actual Rust current08 and separately historical07 provenance differs")
+    m.require(rust["ctf07_gamma_observation_policy"] == native["CTF07_gamma_observation_policy"] == gamma.POLICY,
+              "Actual Gamma source policy differs from frozen packet")
+    m.require(rust["ctf08_final_coefficient_observation_policy"] == native["CTF08_final_coefficient_observation_policy"] == coefficients.POLICY,
+              "Actual private coefficient source policy differs from frozen packet")
+    comparison = Comparison(m.require)
+    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma)
+    actual_coefficient_counts = coefficient_pairing.validate_all(comparison,native,qa,coefficients)
+    compare_models(native, rust, request, comparison)
+    initial_ledger=compare_initial_models(native,rust,request,comparison)
+    matrix_ledger=compare_matrix_models(native,rust,request,comparison); matrix_count_proof(comparison,qa)
+    method_ledger, actual_method_counts = pairing.compare_unit(comparison,native,rust,request,qa,methods)
+    gamma_ledger = gamma_pairing.compare_unit(comparison,native,rust,request,pairing)
+    coefficient_ledger = coefficient_pairing.compare_unit(comparison,native,rust,request,pairing)
+    result = comparison.report()
+    result["assembly_handoff_metrics"] = {key: result["metrics"].pop(key) for key in VARIABLES}
+    result["method_handoff_metrics"] = {key: result["metrics"].pop(key) for key in METHOD_VARIABLES}
+    result["Gamma_handoff_metrics"] = {key: result["metrics"].pop(key) for key in GAMMA_VARIABLES}
+    passed = result["mismatch_count"] == 0
+    m.recheck(); m.require(binary_sha() == binary["sha256"], "Actual Rust binary changed during comparison")
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh contained unit comparison output required")
+    output.mkdir(parents=True, exist_ok=False)
+    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate([Path(__file__), PREP / "packet_io.py", PREP / "method_compare.py", PREP / "method_shape.py", PREP / "gamma_compare.py", PREP / "gamma_shape.py", PREP / "coefficient_compare.py", PREP / "coefficient_shape.py"])]
+    report = {"schema": "ctf08-unit-comparison.v1", "status": "pass-selected-first-private-final-coefficients" if passed else "fail-selected-first-private-final-coefficients",
+              "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(), "reviewed_Original_data_review": refs["original-data-review"],
+              "reviewed_Original_data_review_execution": refs["original-data-review-execution"], "reviewed_Native_results": qa["reviewed_results"],
+              "reviewed_Native_execution": qa["reviewed_native_execution"], "reviewed_request": qa["reviewed_request"], "reviewed_projection": qa["reviewed_projection"],
+              "reviewed_contracts": qa["reviewed_contracts"], "Rust_results": refs["Rust-results"], "Rust_execution": refs["Rust-execution"],
+              "Rust_build_execution": refs["Rust-build-execution"], "actual_Rust_binary": binary, "actual_source_snapshot": build["source_snapshot"],
+              "actual_source_inventory": inventory, "requested_counts": request["requested_counts"], "inherited_assembly_handoff_profiles": profiles, "frozen_numeric_profiles": {"CTF08": policy["ctf08_final_coefficient_profiles"]}, "inherited_Gamma_handoff_profiles": policy["ctf07_gamma_profiles"], "inherited_method_handoff_profiles": {"CTF06": policy["ctf06_exponential_profiles"], "CTF05": policy["ctf05_inverse_profiles"]}, "inherited_preprocessing_handoff_profiles": inherited,
+              "reviewed_initial_observation_policy":initial_policy,"actual_initial_owner_ledger":initial_ledger,
+              "inherited_initial_handoff_profiles":initial_profiles,"reviewed_matrix_observation_policy":MATRIX_POLICY,
+              "actual_matrix_owner_ledger":matrix_ledger,"actual_method_owner_ledger":method_ledger,"actual_method_observation_counts":actual_method_counts,
+               "reviewed_method_observation_policies":methods.POLICIES,"selected_method_invocation_ordinals":coefficients.SELECTION,
+               "reviewed_final_coefficient_observation_policy":coefficients.POLICY,
+               "actual_final_coefficient_owner_ledger":coefficient_ledger,"actual_final_coefficient_observation_counts":actual_coefficient_counts,
+               "reviewed_Gamma_observation_policy":gamma.POLICY,"actual_Gamma_owner_ledger":gamma_ledger,"actual_Gamma_observation_counts":actual_gamma_counts,
+               "all_later_Native_method_visits_unpaired_noPASS":True,"historical_prior_07_authority":qa["historical_prior_07_authority"],
+               "actual_scope_amendment_execution_role":qa["actual_scope_amendment_execution_role"],"actual_scope_amendment":qa["actual_scope_amendment"],
+               "actual_scope_amendment_execution":qa["actual_scope_amendment_execution"],"current_cards":qa["current_cards"],"all_later_Native_attempts_unpaired_noPASS":True,
+              "Rust_retry_driver_available":False,"linked_original_retention_intent":RETENTION_INTENT,
+              "actual_Native_observation_counts": qa["actual_observation_counts"], "actual_Rust_preprocess_invocations": rust["actual_Rust_preprocess_invocations"],
+              "Native_whole_method_outcome_context_only": [{"model_id": model["id"], "operations": [
+                  {"id": operation["id"], "actual_source_invoked": operation["actual_source_invoked"], "call_outcome": operation["call_outcome"]}
+                  for operation in model["operations"]]} for model in native["model_cases"]],
+              "comparison": result, "executed_reader_sources": sources, "executed_reader_source_archive": sources[0]["archive"],
+              "selected_unit_PASS_claimed": passed, "complete_CTF04_PASS_claimed": False, "complete_CTF05_PASS_claimed": False, "complete_CTF06_PASS_claimed": False, "complete_CTF07_PASS_claimed": False, "complete_CTF08_PASS_claimed": False, "production_fixed15_loader_lane_certified": False,
+              "Native_whole_method_outcomes_DoCTFErrorReport_and_massive_coefficients_paired": False, "CTF04_through_CTF10_certified": False,
+              "Native_flags_injected_into_Rust_or_missing_phases_masked": False, "scientific_engine_or_layer_evaluator_invoked": False,
+              "Rust_binary_payload_rehashed": True, "Native_binary_payloads_read_or_rehashed": False,
+              "declared_caller_and_construction_metadata_not_claimed_as_additional_Rust_owner_fields": True,
+              "gates_updated": False, "authorship_limits": "Raw adapted accepted07 comparers and authored Native08 passive observation and Rust08 observers plus some prior pure06/assembly glue; Base authored Native08 helper/freezer and Header pure/public08 and factual DataQA. This comparison is not independent certification of own formulas."}
+    m.recheck(); m.emit(output / "comparison.json", report); m.recheck()
+    print(json.dumps(report, allow_nan=False, indent=2))
+    return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ["approved-source-sha256", "original-data-review", "original-data-review-execution", "Rust-build-execution", "Rust-execution", "Rust-results", "output-dir"]:
+        parser.add_argument("--" + name, required=True)
+    raise SystemExit(run(parser.parse_args()))

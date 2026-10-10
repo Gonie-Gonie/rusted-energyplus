@@ -1,0 +1,26 @@
+{
+  "policy_key": "ctf08_final_coefficient_observation_policy",
+  "scope_authority": {
+    "current_role": "real-CTF-08-check-only",
+    "historical_key": "historical_prior_07_authority",
+    "nested_literal_key": "historical_prior_05_06_authority",
+    "prior_selected_ranges_are_literal_descriptors_not_full_file_refs": true,
+    "historical_after_live_doc_bindings_replayed": false,
+    "future_scope_or_freeze_outcomes_authored": false,
+    "contract_origin": "Root prospective current08 role and Base settled historical07 freezer field protocol before any08 execution"
+  },
+  "held_dependency_manifests": [
+    {
+      "path": ".runtime/porting/CTF-08/native-helper-prep-01/manifest.json",
+      "sha256": "652a1d9cf1341d7a424575119d6339cb7b344cbc9b3a6f3e189d3ed4b2cf8cbf"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/manifest.json",
+      "sha256": "75c82f69c1c28036b9b83f68d8125ab5db636dd3b1e819d1a5ad130f8047990c"
+    },
+    {
+      "path": ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json",
+      "sha256": "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+--- .runtime/porting/CTF-08/applied-source-01/crates/ep_run/examples/ctf08_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf08_candidate_production_observer.rs
+@@ -298,24 +298,38 @@
+     }
+     require(
+         native["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only"
+-            && admission["actual_scope_amendment_execution_role"] == native["actual_scope_amendment_execution_role"]
+-            && admission["historical_prior_07_authority"] == native["historical_prior_07_authority"]
++            && admission["actual_scope_amendment_execution_role"]
++                == native["actual_scope_amendment_execution_role"]
++            && admission["historical_prior_07_authority"]
++                == native["historical_prior_07_authority"]
+             && admission["current_cards"] == native["current_cards"],
+         "current08 authority or separate historical prior07 authority differs",
+     )?;
+     bindings.push(native["current_cards"]["CTF-08"].clone());
+     let prior = &native["historical_prior_07_authority"];
+-    require(prior["prior07_numerical_PASS_inferred"] == false,
+-        "historical prior07 authority must infer no numerical PASS")?;
+-    for key in ["prior_07_freeze", "prior_07_freeze_execution", "prior_07_writer_manifest",
+-        "prior_07_source_contract", "prior_07_scope_amendment", "prior_07_scope_check_execution"] {
++    require(
++        prior["prior07_numerical_PASS_inferred"] == false,
++        "historical prior07 authority must infer no numerical PASS",
++    )?;
++    for key in [
++        "prior_07_freeze",
++        "prior_07_freeze_execution",
++        "prior_07_writer_manifest",
++        "prior_07_source_contract",
++        "prior_07_scope_amendment",
++        "prior_07_scope_check_execution",
++    ] {
+         bindings.push(prior[key].clone());
+     }
+     let (_, historical_source_bytes) = bound(&root, &prior["prior_07_source_contract"])?;
+     let historical_source: Value = serde_json::from_slice(&historical_source_bytes)?;
+-    require(prior["prior_07_selected_primary_ranges"] == historical_source["ctf07_selected_primary_ranges"]
+-        && prior["historical_prior_05_06_authority"] == historical_source["source_authorities"]["prior_05_06_authority"],
+-        "historical prior07 ranges or nested prior05/06 literal ancestry differs")?;
++    require(
++        prior["prior_07_selected_primary_ranges"]
++            == historical_source["ctf07_selected_primary_ranges"]
++            && prior["historical_prior_05_06_authority"]
++                == historical_source["source_authorities"]["prior_05_06_authority"],
++        "historical prior07 ranges or nested prior05/06 literal ancestry differs",
++    )?;
+     for binding in rows(&prior["historical_before_document_archives"])? {
+         bindings.push(binding.clone());
+     }
+@@ -323,8 +337,13 @@
+         bindings.push(binding["archive"].clone());
+     }
+     let nested = &prior["historical_prior_05_06_authority"];
+-    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+-        "prior_06_writer_manifest", "prior_06_source_contract"] {
++    for key in [
++        "prior_06_freeze",
++        "prior_06_freeze_execution",
++        "prior_05_06_scope_amendment",
++        "prior_06_writer_manifest",
++        "prior_06_source_contract",
++    ] {
+         bindings.push(nested[key].clone());
+     }
+     for card in ["CTF-05", "CTF-06"] {

@@ -1,0 +1,82 @@
+--- prep04/README.md
++++ prep05/README.md
+@@ -1,63 +1,19 @@
+-# CTF08 ingress rebased onto actual formatted CTF07 source
++# CTF08 ingress fresh05 metadata correction
+ 
+-SOURCE ONLY, unapplied, unformatted and unexecuted. Fresh04 preserves accepted
+-final03 and uses Root's immutable actual07 formatted source manifest
+-`344ed7b311e745f4556378655a90fff602cb4a178b44d7d88c927af0ccfe424f`.
+-No mutable canonical source or target payload is read to perform this rebase.
+-The actual07 source quality, numerical comparisons and card gates are separate
+-pending prerequisites; this source identity does not imply their PASS.
++SOURCE ONLY, unapplied, unformatted and unexecuted. Fresh05 preserves immutable
++prep04 and corrects only its inherited `tests_proposed_not_executed` description:
++count4 and four actual routing topics. The removed impossible fifth fixture was
++already absent from accepted final03 and prep04; their real test file is142 lines.
++No test, wrapper, production parent, arithmetic, profile or policy body changes.
+ 
+-The five `before-actual07` archives are exact actual final07 parent bytes from
+-that manifest. Four equal the earlier prospective07 before bytes. The cache
+-parent differs only by Root's real rustfmt collapse of the inverse-owner import.
+-Fresh04 preserves that formatting and reapplies only the accepted08 additions.
+-Every parent has an exact actual07-to08 unified diff and an accepted03-to04
+-correspondence diff. The four latter differences are empty; the cache difference
+-is solely that inherited07 formatting. There is no new arithmetic, control,
+-selection, error, iteration, order, shape or availability change.
++All seven held Rust source descriptors and five actual07 before-parent archives
++continue to reference the authentic immutable prep04 files directly. This is a
++metadata-only successor, not a fabricated copy or new compiled-source identity.
++The prep04 README/source ranges, exact diffs, actual07 archive bindings and API
++source identities remain binding documentary authorities, retained separately.
+ 
+-The new combined wrapper49 and its four routing tests142 are byte-identical
+-accepted final03. The four pure/public08 module/test installation dependencies
+-are also literal unchanged held sources, explicitly distinct from actual07
+-source. Their future installation and formatted08 source identities are not
+-claimed here. Earlier immutable01/02/03, including documentary fixture repairs,
+-remain untouched.
+-
+-The accepted ordinary constructor loop still obtains the same actual first
+-assembly. Combined08 invokes combined07 once (actual06 then conditional05 then
+-public07), then public08 once on that original assembly and those actual returned
+-owners. Inverse keeps the original AMat/Iden, never AExp. Errors and genuine
+-non-invocations remain separate typed owners; the public08 boundary decides
+-whether its private arithmetic can run. No predecessor is reevaluated and no
+-available result, identity, Gamma, retry state or caller flag is synthesized.
+-
+-Five bounded parent increments retain all old vectors and append the ordered
+-private08 vector/getter and state copy. The pure/public declarations and new
+-combined wrapper are explicit. The full existing cache tail beginning
+-`fn construction_thermal_data(` remains byte-identical actual07 and accepted03:
+-material membership, R/C handling, EIO overrides, steady/all-resistive fallback,
+-public SI19 coefficients, source enum and coefficient-cache hash are unchanged.
+-The original07 Gamma owner is not mutated by the private08 result copy.
+-
+-The manifest lists each affected canonical owner and its authentic proposed,
+-held-dependency or actual07 archive identity for future observer closure binding.
+-These are source preparation inputs, not compiled-current identities. Root must
+-apply only after the real prerequisite release/fresh baseline/strict comparison,
+-then bind final formatted08 sources and the full observer API25/38 closure to
+-genuine future Cargo/build/run source snapshots. An authentic actual07 full
+-Cargo snapshot was not supplied for this rebase and is not guessed.
+-
+-Original Construction.cc884/887/890/894 order and private1591-1906 lifetime are
+-retained as exact primary ranges. Caller retry/stability, public SI stores,
+-UValue/EIO and complete downstream coefficient handoff remain outside this
+-first-private-method ingress. All numeric profiles and comparison masks remain
+-unchanged. No execution count, outcome, future hash or overall card PASS is
+-invented.
+-
+-Verification uses stdlib bytes, SHA256, sizes, line counts and exact diffs only.
+-No Rust target/parser/import, Cargo/build/test/formatter/engine, scientific or
+-weather or binary payload read, canonical edit or Git action is performed.
+-Root and another author review this immutable held source before any activation;
+-no new QA/proof/execution framework or approval stage is added. Base authored
+-prior routing and some earlier matrix/inverse glue, so this is source integration
+-preparation, not independent formula/output certification.
++Actual07 quality/comparison prerequisites remain separate from source identity;
++future08 application requires Root release and fresh formatted Cargo/source
++capture. No target/import/build/test/formatter/engine, scientific/weather/binary
++payload read, canonical edit or Git action is performed. Raw independently found
++the stale inherited topic/count during source review; no result informed this fix.

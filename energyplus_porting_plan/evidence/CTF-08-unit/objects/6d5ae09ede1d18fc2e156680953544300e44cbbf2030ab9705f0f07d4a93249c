@@ -1,0 +1,42 @@
+    require(
+        VALUE["actual_scope_amendment_execution_role"] == "real-CTF-08-check-only"
+            && admission["actual_scope_amendment_execution_role"] == VALUE["actual_scope_amendment_execution_role"]
+            && admission["historical_prior_07_authority"] == VALUE["historical_prior_07_authority"]
+            && admission["current_cards"] == VALUE["current_cards"],
+        "current08 authority or separate historical prior07 authority differs",
+    )?;
+    bindings.push(VALUE["current_cards"]["CTF-08"].clone());
+    let prior = &VALUE["historical_prior_07_authority"];
+    require(prior["prior07_numerical_PASS_inferred"] == false,
+        "historical prior07 authority must infer no numerical PASS")?;
+    for key in ["prior_07_freeze", "prior_07_freeze_execution", "prior_07_writer_manifest",
+        "prior_07_source_contract", "prior_07_scope_amendment", "prior_07_scope_check_execution"] {
+        bindings.push(prior[key].clone());
+    }
+    let (_, historical_source_bytes) = bound(&root, &prior["prior_07_source_contract"])?;
+    let historical_source: Value = serde_json::from_slice(&historical_source_bytes)?;
+    require(prior["prior_07_selected_primary_ranges"] == historical_source["ctf07_selected_primary_ranges"]
+        && prior["historical_prior_05_06_authority"] == historical_source["source_authorities"]["prior_05_06_authority"],
+        "historical prior07 ranges or nested prior05/06 literal ancestry differs")?;
+    for binding in rows(&prior["historical_before_document_archives"])? {
+        bindings.push(binding.clone());
+    }
+    for binding in rows(&prior["available_prior_frozen_document_archives"])? {
+        bindings.push(binding["archive"].clone());
+    }
+    let nested = &prior["historical_prior_05_06_authority"];
+    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+        "prior_06_writer_manifest", "prior_06_source_contract"] {
+        bindings.push(nested[key].clone());
+    }
+    for card in ["CTF-05", "CTF-06"] {
+        bindings.push(nested["prior_scope_checks"][card].clone());
+    }
+    for binding in rows(&nested["historical_before_document_archives"])? {
+        bindings.push(binding.clone());
+    }
+    for binding in rows(&nested["available_prior_frozen_document_archives"])? {
+        bindings.push(binding["archive"].clone());
+    }
+    // Historical selected-range SHAs and after-doc identities are documentary;
+    // bind their authentic source contract/available archives, never live docs.

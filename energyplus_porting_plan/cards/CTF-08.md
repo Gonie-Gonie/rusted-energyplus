@@ -59,7 +59,7 @@ EIO 제공 계수를 사용하지 않고 SUR-02~07 구동
 ## 종료 체크
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -78,3 +78,11 @@ Seven new primary owners are s0, full allocated s/e including initialized tails,
 All real later visits, omissions, independent copy masks and six failure kinds must be retained and validated; later observations receive no PASS. R workspaces/private controls are unavailable at return and are not reconstructed. Same literal39 unit models/42 whole calls and original15 production models/195 loader phases/45 input guards are retained. No identity from prior07 frozen docs is rebound to live current docs.
 
 Whole retry orchestration, final public SI19 stores and SUR/cache handoff remain pending; this selected scope establishes no unit, integration, production or complete-card PASS. The two new08 linked Originals are retained through PE and real helper review, then require separate precise actual retirement.
+
+## Actual selected first private coefficient comparison
+
+Same frozen inputs and strict zero profiles: unit numeric248178/discrete1574736, fixed15 loader numeric6510/discrete46896, all mismatch0. Seven primary full private owners have max absolute error/RMSE0, including initialized tails, exact class/shape/signed zero and integer/control state. Selected first owners25/15; Native later16 unit visits remain retained and unpaired. Unavailable122/42 records receive no PASS.
+
+Actual Cargo clippy/fmt checks0; focused132 and workspace4748 tests passed with0 failed/ignored. All actual candidate/quality/comparison recorders bind Source761312a84eda41f616c5002808815011dcb6b46fb48c1ee6c1697cbdcb43fe6c. Full scientific bytes, source/commands and real OriginalDataQA baseline are preserved in evidence/CTF-08-unit/{manifest,summary}.json.
+
+Only the selected unit gate passes. Whole retry, final public SI19 stores, SUR/cache connection and integration/production/full-card gates remain pending. Fixed6 CLI and precise Original retirement will be recorded separately.

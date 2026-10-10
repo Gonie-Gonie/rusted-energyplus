@@ -1,0 +1,130 @@
+"""Narrow source-only production diagnostic routing repair; no target imports."""
+from pathlib import Path
+import ast
+import copy
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = Path(__file__).resolve().parent
+OLD = PREP.parent / "comparer-prep-03"
+NAMES = ["compare_unit.py", "compare_production.py", "packet_io.py", "method_compare.py",
+         "method_shape.py", "gamma_compare.py", "gamma_shape.py", "coefficient_compare.py", "coefficient_shape.py"]
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(),
+                size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+def replace_once(text, old, new):
+    assert text.count(old) == 1, old
+    return text.replace(old, new)
+
+def main():
+    assert not (PREP / "manifest.json").exists()
+    before = PREP / "before-03"
+    before.mkdir(exist_ok=True)
+    for name in NAMES + ["manifest.json", "README.md"]:
+        (before / name).write_bytes((OLD / name).read_bytes())
+    for name in NAMES:
+        (PREP / name).write_bytes((OLD / name).read_bytes())
+    gamma = (PREP / "gamma_compare.py").read_text(encoding="utf-8")
+    gamma = replace_once(gamma, "def validate_all(c, native, qa, methods, gamma):",
+                        "def validate_all(c, native, qa, methods, gamma, *, production=False):")
+    gamma = replace_once(gamma, 'label = model["id"] + "/" + operation["id"]',
+                        'label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])')
+    gamma = replace_once(gamma, 'pair_operation(c, path + "/" + operation["id"], operation, None, None, None, None, None, pairing)',
+                        'pair_operation(c, path + "/" + str(operation["actual_construction_index"]), operation, None, None, None, None, None, pairing)')
+    (PREP / "gamma_compare.py").write_text(gamma, encoding="utf-8", newline="\n")
+    coefficient = (PREP / "coefficient_compare.py").read_text(encoding="utf-8")
+    coefficient = replace_once(coefficient, "def validate_all(c, native, qa, coefficients):",
+                              "def validate_all(c, native, qa, coefficients, *, production=False):")
+    coefficient = replace_once(coefficient,
+        '            coefficients.review(operation, None, c.need, c.dto, counts, integrity, model["id"] + "/" + operation["id"])',
+        '            label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])\n'
+        '            coefficients.review(operation, None, c.need, c.dto, counts, integrity, label)')
+    coefficient = replace_once(coefficient, 'pair_operation(c, path + "/" + operation["id"], operation, None,None,None,None,None,None,pairing)',
+                              'pair_operation(c, path + "/" + str(operation["actual_construction_index"]), operation, None,None,None,None,None,None,pairing)')
+    (PREP / "coefficient_compare.py").write_text(coefficient, encoding="utf-8", newline="\n")
+    for name in ["compare_unit.py", "compare_production.py"]:
+        text = (PREP / name).read_text(encoding="utf-8")
+        for support, pin in [("gamma_compare.py", "GAMMA_PAIR_SHA"), ("coefficient_compare.py", "COEFFICIENT_PAIR_SHA")]:
+            text = replace_once(text, pin+" = '"+ref(OLD/support)["sha256"]+"'",
+                                pin+" = '"+ref(PREP/support)["sha256"]+"'")
+        if name == "compare_production.py":
+            text = replace_once(text, "gamma_pairing.validate_all(comparison,native,qa,methods,gamma)",
+                                "gamma_pairing.validate_all(comparison,native,qa,methods,gamma,production=True)")
+            text = replace_once(text, "coefficient_pairing.validate_all(comparison,native,qa,coefficients)",
+                                "coefficient_pairing.validate_all(comparison,native,qa,coefficients,production=True)")
+        (PREP / name).write_text(text, encoding="utf-8", newline="\n")
+    addition = """
+
+## Fresh04 explicit production diagnostic labels
+
+SOURCE ONLY, unexecuted. This preserves immutable03 and repairs the unit-only
+operation.id used by shared Gamma and private-coefficient all-visit validation
+and their production missing-owner diagnostic branches. The genuine production
+helper emits actual_construction_index. Both validators now accept keyword-only
+production=False; unit callers retain declared operation.id and only production
+main passes production=True. Production labels use str(actual_construction_index).
+Both main Gamma/coefficient support SHA pins authenticate these new local bodies.
+
+Only diagnostic paths and explicit lane routing change. No actual operation,
+count, shape, scalar, profile, owner, first-only association, required-absence,
+nonfinite or pairing criterion changes. Comparison.number and all numeric methods,
+pair_operation functions and structural validators remain exact accepted03 AST.
+The five other supports and final DataQA02 61c3efd7 inventory remain byte-exact03.
+Old scientific operands and attempts are not read, changed or relabeled here.
+
+Before-03 holds all nine executable bodies plus manifest/README; four exact source
+diffs and this README delta expose the entire repair. Source authoring only uses
+stdlib byte/SHA/diff/AST checks, without reviewed target imports or execution.
+Root and independent narrow source review precede any actual comparison rerun.
+No new QA framework, mathematical evaluator, policy amendment or outcome is made.
+"""
+    (PREP / "README.md").write_text((OLD / "README.md").read_text(encoding="utf-8")+addition,
+                                   encoding="utf-8", newline="\n")
+    diffs = []
+    for name in ["gamma_compare.py", "coefficient_compare.py", "compare_unit.py", "compare_production.py", "README.md"]:
+        raw = "".join(difflib.unified_diff((before/name).read_text(encoding="utf-8").splitlines(keepends=True),
+                  (PREP/name).read_text(encoding="utf-8").splitlines(keepends=True), fromfile="before-03/"+name, tofile=name))
+        path = PREP / (name+".from-03.diff")
+        path.write_text(raw, encoding="utf-8", newline="\n")
+        diffs.append(ref(path))
+    m = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+    m["own_sources"] = [ref(PREP/name) for name in NAMES]
+    m["before_sources"] = [ref(before/name) for name in NAMES+["manifest.json","README.md"]]
+    m["exact_diffs"] = diffs
+    m["byte_identical_predecessor_files"] = [name for name in NAMES if (PREP/name).read_bytes() == (OLD/name).read_bytes()]
+    m["README"] = ref(PREP/"README.md")
+    m["authoring_source"] = ref(Path(__file__))
+    m["fresh04_production_diagnostic_routing"] = dict(
+        predecessor=ref(OLD/"manifest.json"), keyword_only_production_default=False,
+        production_validators_explicit_True=True,
+        production_diagnostic_owner_key="actual_construction_index", unit_diagnostic_owner_key="id",
+        actual_production_source=ref(ROOT/".runtime/porting/CTF-08/native-helper-prep-01/ctf08_production_helper.cpp"),
+        changed_supports=["gamma_compare.py","coefficient_compare.py"],
+        changed_main_SHA_pins=["GAMMA_PAIR_SHA","COEFFICIENT_PAIR_SHA"],
+        five_other_supports_byte_exact03=True, QA02_inventory_unchanged=True,
+        Comparison_and_pair_operation_AST_unchanged=True,
+        numeric_policy_or_owner_availability_or_count_logic_changed=False,
+        actual_scientific_outputs_read=False, actual_comparisons_executed=False)
+    for name in NAMES:
+        ast.parse((PREP/name).read_text(encoding="utf-8"))
+        old_tree = ast.parse((OLD/name).read_text(encoding="utf-8"))
+        tree = ast.parse((PREP/name).read_text(encoding="utf-8"))
+        old_functions = {node.name:node for node in old_tree.body if isinstance(node,(ast.FunctionDef,ast.ClassDef))}
+        for node in tree.body:
+            if isinstance(node,(ast.FunctionDef,ast.ClassDef)):
+                if name in ["gamma_compare.py","coefficient_compare.py"] and node.name in ["validate_all","compare_production"]:continue
+                if name == "compare_production.py" and node.name == "run":continue
+                assert ast.dump(node)==ast.dump(old_functions[node.name]),(name,node.name)
+    ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    (PREP/"manifest.json").write_text(json.dumps(m,indent=2)+"\n",encoding="utf-8",newline="\n")
+    print(json.dumps(dict(manifest=ref(PREP/"manifest.json"),changed_sources=[ref(PREP/name) for name in
+        ["gamma_compare.py","coefficient_compare.py","compare_unit.py","compare_production.py"]],
+        other_supports_exact=5, target_imports_or_execution=False)))
+
+if __name__ == "__main__":
+    main()

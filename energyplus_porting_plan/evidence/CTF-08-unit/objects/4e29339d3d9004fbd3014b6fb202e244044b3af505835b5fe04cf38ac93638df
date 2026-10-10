@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/mod.rs
++++ crates/ep_runtime/src/heat_balance/mod.rs
+@@ -12,6 +12,7 @@
+ pub mod ctf;
+ pub mod ctf_first_assembly_owner;
+ pub mod ctf_first_exponential_owner;
++pub mod ctf_first_final_coefficients_owner;
+ pub mod ctf_first_inverse_owner;
+ pub mod ctf_first_matrix_owner;
+ pub mod ctf_initial_owner;

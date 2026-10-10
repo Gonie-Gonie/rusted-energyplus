@@ -1,0 +1,52 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs
+@@ -0,0 +1,49 @@
++//! Ordered first exponential, inverse, Gamma, then private coefficients only.
++
++use super::ctf_first_assembly_owner::ConstructionCtfFirstAssembly;
++use super::ctf_first_final_coefficients_owner::{
++    ConstructionCtfFirstFinalCoefficients,
++    initialize_construction_ctf_first_final_coefficients,
++};
++use super::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;
++use super::ctf_first_gamma_owner::ConstructionCtfFirstGammas;
++use super::ctf_first_matrix_owner::ConstructionCtfFirstMatrixFunctions;
++
++/// Separate actual predecessor outcomes and the private first08 method result.
++#[derive(Clone, Debug, PartialEq)]
++pub struct ConstructionCtfFirstMatrixWithFinalCoefficients {
++    /// Actual ordered06 then05 outcomes, including inverse non-invocation.
++    pub methods: ConstructionCtfFirstMatrixFunctions,
++    /// Actual public07 return, retained unchanged by the private08 method.
++    pub gammas: ConstructionCtfFirstGammas,
++    /// Actual public08 return or typed prerequisite stop, never public SI stores.
++    pub final_coefficients: ConstructionCtfFirstFinalCoefficients,
++}
++
++/// Call combined07 once, then public08 once on those same actual first owners.
++///
++/// Construction.cc884/887/890/894 orders the four selected method boundaries.
++/// Public08 alone decides whether its arithmetic can run after actual previous
++/// outcomes, including errors and non-invocation. This wrapper neither replays
++/// a predecessor nor constructs an available result from an unavailable one.
++/// Private08 owns its mutated Gamma1 copy; the original07 owner is not changed.
++/// No caller retry, public SI19 coefficient store or downstream handoff is added.
++pub fn initialize_construction_ctf_first_matrix_with_final_coefficients(
++    assembly: &ConstructionCtfFirstAssembly,
++) -> ConstructionCtfFirstMatrixWithFinalCoefficients {
++    let previous = initialize_construction_ctf_first_matrix_with_gammas(assembly);
++    let final_coefficients = initialize_construction_ctf_first_final_coefficients(
++        assembly,
++        &previous.methods,
++        &previous.gammas,
++    );
++    ConstructionCtfFirstMatrixWithFinalCoefficients {
++        methods: previous.methods,
++        gammas: previous.gammas,
++        final_coefficients,
++    }
++}
++
++#[cfg(test)]
++#[path = "ctf_first_final_coefficients_ingress_tests.rs"]
++mod tests;

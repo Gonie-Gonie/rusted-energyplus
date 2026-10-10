@@ -1,0 +1,53 @@
+--- crates/ep_run/examples/ctf07_candidate_production_support/fields.rs
++++ crates/ep_run/examples/ctf08_candidate_production_support/fields.rs
+@@ -133,6 +133,34 @@
+         "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+         "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+ }
++
++pub(super) fn ctf08_unavailable() -> Value {
++    json!({"owner_available":false,"construction_first_private_coefficients":null,
++        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
++}
++pub(super) fn ctf08_selected(source: &HeatBalanceState) -> Value {
++    json!({"owner_available":true,"construction_first_private_coefficients":source.construction_ctf08_first_private_coefficients.iter()
++        .enumerate().map(|(index,actual)| {
++            let assembly = source.construction_ctf04_first_assembly.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            let exponential = source.construction_ctf06_first_exponential.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            let inverse = source.construction_ctf05_first_inverse.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            let gammas = source.construction_ctf07_first_gammas.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
++                "result":unit_fields::first_private_coefficients(actual,assembly,exponential,inverse,gammas)})
++        }).collect::<Vec<_>>(),
++        "actual_owner_count":source.construction_ctf08_first_private_coefficients.len(),
++        "predecessor_or_private_coefficient_owners_reexecuted_by_observer":false,
++        "actual_CTF06_then_CTF05_then_CTF07_then_CTF08_order_is_producer_owned":true,
++        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
++        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
++        "Native_whole_solver_flags_unpaired":true,"public_SI19_coefficients_observed":false,
++        "numerical_PASS_claimed":false})
++}
++
+ 
+ pub(super) fn typed(model: &TypedModel) -> Value {
+     let materials = model.materials.iter().enumerate().map(|(index,material)| {
+@@ -230,9 +258,12 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf07_candidate_production_observer.rs",
+-    "crates/ep_run/examples/ctf07_candidate_production_support/fields.rs",
+-    "crates/ep_run/examples/ctf07_candidate_production_support/unit_fields.rs",
++    "crates/ep_run/examples/ctf08_candidate_production_observer.rs",
++    "crates/ep_run/examples/ctf08_candidate_production_support/fields.rs",
++    "crates/ep_run/examples/ctf08_candidate_production_support/unit_fields.rs",
+ ];
