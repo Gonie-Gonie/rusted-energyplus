@@ -1,0 +1,68 @@
+--- a/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ b/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -10,6 +10,9 @@
+ use super::{ConstructionCacheInvalidationToken, ConstructionThermalData};
+ use crate::RuntimeError;
+ use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
++use crate::heat_balance::ctf_first_assembly_owner::{
++    ConstructionCtfFirstAssembly, initialize_construction_ctf_first_assembly,
++};
+ use crate::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+ };
+@@ -49,6 +52,7 @@
+ pub(crate) struct ConstructionThermalDataCache {
+     entries: Vec<ConstructionThermalData>,
+     initial_discretizations: Vec<ConstructionCtfInitialDiscretization>,
++    first_assemblies: Vec<ConstructionCtfFirstAssembly>,
+     construction_slots: TypedIdSlotIndex,
+     entry_index_by_construction_slot: Vec<Option<usize>>,
+     pub(crate) no_mass_construction_ids: Vec<ConstructionId>,
+@@ -74,6 +78,7 @@
+                 .count(),
+         );
+         let mut initial_discretizations = Vec::with_capacity(entries.capacity());
++        let mut first_assemblies = Vec::with_capacity(entries.capacity());
+         let time_step_zone_hours = 1.0 / f64::from(model.timestep.number_of_timesteps_per_hour);
+         let mut no_mass_construction_ids = Vec::new();
+         let mut massive_ctf_construction_ids = Vec::new();
+@@ -115,14 +120,19 @@
+                 ctf_coefficients_by_construction,
+                 context,
+             )?;
+-            initial_discretizations.push(initialize_construction_ctf_initial(
++            let initial = initialize_construction_ctf_initial(
+                 construction,
+                 &model.constructions[..construction_index],
+                 &used_ctf_constructions,
+                 &entry.ctf01_layer_preprocessing,
+                 context,
+                 time_step_zone_hours,
++            );
++            first_assemblies.push(initialize_construction_ctf_first_assembly(
++                &initial,
++                &entry.ctf01_layer_preprocessing,
+             ));
++            initial_discretizations.push(initial);
+             if let Ok(preprocessing) = &entry.ctf01_layer_preprocessing.result {
+                 preprocessing_errors_found = preprocessing.errors_found;
+             }
+@@ -148,6 +158,7 @@
+         Ok(Self {
+             entries,
+             initial_discretizations,
++            first_assemblies,
+             construction_slots,
+             entry_index_by_construction_slot,
+             no_mass_construction_ids,
+@@ -173,6 +184,10 @@
+ 
+     pub(crate) fn initial_discretizations(&self) -> Vec<ConstructionCtfInitialDiscretization> {
+         self.initial_discretizations.clone()
++    }
++
++    pub(crate) fn first_assemblies(&self) -> Vec<ConstructionCtfFirstAssembly> {
++        self.first_assemblies.clone()
+     }
+ 
+     pub(crate) fn len(&self) -> usize {

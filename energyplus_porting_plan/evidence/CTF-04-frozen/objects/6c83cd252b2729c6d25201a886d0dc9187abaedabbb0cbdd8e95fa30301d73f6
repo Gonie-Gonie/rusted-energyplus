@@ -1,0 +1,35 @@
+--- .runtime/porting/CTF-03/original-data-review-prep-01/unit_shape.py
++++ .runtime/porting/CTF-04/original-data-review-prep-01/unit_shape.py
+@@ -162,13 +162,14 @@
+             integer(begin, previous_end, len(diagnostics["messages"])); integer(end, begin, len(diagnostics["messages"])); previous_end = end
+             initial_count = initial.review(operation, operation["after"], need, scalar, counts, integrity,
+                           model["id"] + "/" + operation["id"])
++            initial.matrix_review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
+             observed = operation["observations"]
+             if not invoked:
+                 need(observed is None, "Uninvoked source has fabricated phase observations"); continue
+             for flag in ["observer_failure", "binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]:
+                 boolean(observed[flag])
+                 if observed[flag]: integrity.append(model["id"] + "/" + operation["id"] + "/" + flag)
+-            need(observed["observer_failure"] is any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]), "Observer aggregate flag differs")
++            need(observed["observer_failure"] is (any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]) or observed["MatrixAssembly"]["matrix_copy_integrity_failed"]), "Observer aggregate flag differs")
+             need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must not become operands")
+             actual_total, missing_prior = initial_count, False
+             for phase in PHASES:
+@@ -211,6 +212,7 @@
+          counts["initial_available_owner_count"] == counts["initial_selected_1D_owner_count"] + counts["initial_unselected_context_count"], "Actual initial ledger counts differ")
+     need(counts["initial_reached_phase_records"] + counts["initial_unreached_phase_records"] == counts["actual_operation_invocations"],
+          "Every actual invocation requires its genuine initial reached/unreached record")
++    initial.matrix_summary(result, counts, need)
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Global observer integrity summary differs")
+     for key in ["actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count"]:
+@@ -220,7 +222,7 @@
+     need(result["actual_operation_invocations"] == counts["actual_operation_invocations"] and result["actual_operations_skipped"] == counts["actual_operations_skipped"] and
+          result["actual_source_function_counts"] == {"calculateTransferFunction": counts["actual_operation_invocations"]} and
+          result["actual_source_status_counts"] == dict(statuses) and result["actual_phase_callback_count"] == counts["actual_phase_callback_count"], "Reported actual counts differ from genuine records")
+-    return {**{name: counts[name] for name in initial.COUNTS}, **{key: counts[key] for key in ["model_cases", "operation_records", "actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count", "unreached_phase_records", "scalar_DTO_visits", "snapshot_visits"]},
++    return {**{name: counts[name] for name in initial.COUNTS + initial.MATRIX_COUNTS}, **{key: counts[key] for key in ["model_cases", "operation_records", "actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count", "unreached_phase_records", "scalar_DTO_visits", "snapshot_visits"]},
+             "actual_source_function_counts": {"calculateTransferFunction": counts["actual_operation_invocations"]},
+             "actual_source_status_counts": dict(statuses), "actual_constructor_status_counts": dict(ctor_statuses),
+             "actual_initialization_status_counts": dict(init_statuses), "actual_phase_callback_counts": {**{phase: phases[phase] for phase in PHASES}, "InitialDiscretization": counts["initial_reached_phase_records"]}}, integrity

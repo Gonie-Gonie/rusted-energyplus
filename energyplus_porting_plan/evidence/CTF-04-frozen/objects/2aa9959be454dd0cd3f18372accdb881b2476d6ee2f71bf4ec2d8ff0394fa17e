@@ -1,0 +1,68 @@
+{
+  "schema": "ctf04-source-scope-amendment.v1",
+  "card": "CTF-04",
+  "created_utc": "2026-10-10T15:42:11.696067+00:00",
+  "purpose": "Root actual selected first-assembly source scope/profiles before any CTF04 build/helper/candidate output; recorder validates documents only.",
+  "native_observer": {
+    "path": ".runtime/porting/CTF-04/native-helper-prep-01/manifest.json",
+    "sha256": "3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+    "size_bytes": 21447
+  },
+  "matrix_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-04/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "ba436b467ac7918f4f6da606e85efc93d559cdf590781bfb9a2b4264e8cadd6f",
+    "size_bytes": 7065
+  },
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF04_build_or_engine_execution_performed": false,
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-04/scope-amendment-01/before-card.md",
+      "sha256": "c0385740126b62a5cda2021e59b99707a9d818a683a402d4a07c11c7493c6a75",
+      "size_bytes": 2679
+    },
+    {
+      "path": ".runtime/porting/CTF-04/scope-amendment-01/before-plan.json",
+      "sha256": "0f2a1d1c1123996711b89704feebd7b422a6282b0c0f1d3c5192fb4d71436e9f",
+      "size_bytes": 631728
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-04.md",
+      "sha256": "2501981de9ec447b09a59d1101e92faf5c7ada5aff3b43c3482f4845af426cd1",
+      "size_bytes": 4937
+    },
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "225229aae54a3c1bbdf6a95a82db8ccc058cd716eea04053bd6468cee6430f39",
+      "size_bytes": 644412
+    }
+  ],
+  "immutable_after_document_copies": [
+    {
+      "path": ".runtime/porting/CTF-04/scope-amendment-01/after-card.md",
+      "sha256": "2501981de9ec447b09a59d1101e92faf5c7ada5aff3b43c3482f4845af426cd1",
+      "size_bytes": 4937
+    },
+    {
+      "path": ".runtime/porting/CTF-04/scope-amendment-01/after-plan.json",
+      "sha256": "225229aae54a3c1bbdf6a95a82db8ccc058cd716eea04053bd6468cee6430f39",
+      "size_bytes": 644412
+    }
+  ],
+  "Rust_CTF04_candidate_applied": false,
+  "numerical_PASS_claimed": false
+}

@@ -1,0 +1,120 @@
+// Fixed-CON15 raw inputs only; no literal member seeds or expected outcomes.
+#ifndef CTF04_PRODUCTION_ADMISSION_HH
+#define CTF04_PRODUCTION_ADMISSION_HH
+#include "ctf01_reference_metadata.hh"
+#include "ctf04_observation_fields.hh"
+#include <set>
+
+namespace Ctf01 {
+inline json production_loader_order()
+{
+    return {"InputProcessor::processInput", "SimulationManager::PostIPProcessing", "EnergyPlusData::init_constant_state", "EnergyPlusData::init_state",
+        "OutputReportPredefined::SetPredefinedTables", "HeatBalanceManager::SetPreConstructionInputParameters",
+        "OutputProcessor::SetupTimePointers(Zone)", "OutputProcessor::SetupTimePointers(System)",
+        "HeatBalanceManager::GetProjectControlData", "HeatBalanceManager::GetSiteAtmosphereData",
+        "Material::GetMaterialData", "HeatBalanceManager::GetConstructData", "HeatBalanceManager::GetBuildingData"};
+}
+struct ProductionPacket { json request, admission, contracts, requested_counts; fs::path projection_path; };
+inline ProductionPacket admit_production(fs::path const &root, fs::path const &request_path, fs::path const &admission_path)
+{
+    ProductionPacket packet; packet.request = read_json(request_path); packet.admission = read_json(admission_path);
+    auto const &request = packet.request; auto const &admission = packet.admission;
+    require(request.at("schema") == "ctf04-production-helper-cases.v1" && admission.at("schema") == "ctf04-production-native-admission-contract.v1" &&
+        request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" && admission.at("energyplus_commit") == request.at("energyplus_commit"),
+        "Wrong pinned production source/schema");
+    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_CTF04_helper_execution") == true &&
+        value->at("expected_values_supplied") == false && value->at("expected_exits_supplied") == false &&
+        value->at("scientific_execution_performed") == false, "Production input-only freeze required");
+    for (auto const *key : {"actual_scope_amendment", "actual_scope_amendment_execution"}) {
+        require(request.at(key) == admission.at(key), "Scope authority differs"); bound_path(root, request.at(key));
+    }
+    require(bound_path(root, admission.at("helper_request")) == fs::weakly_canonical(request_path) &&
+        request.at("fixed_scope") == admission.at("fixed_scope") && request.at("all_45_guard_refs") == admission.at("all_45_guard_refs") &&
+        request.at("fixed_scope").at("sha256") == "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+        "Exact inherited scope/request binding required");
+    auto const scope = read_json(bound_path(root, request.at("fixed_scope"))); json guards = json::array();
+    require(scope.at("cases").is_array() && scope.at("cases").size() == 15, "Actual fixed15 scope required");
+    for (auto const &row : scope.at("cases")) for (auto const *key : {"input", "weather", "metadata"}) guards.push_back(row.at(key));
+    require(guards.size() == 45 && guards == request.at("all_45_guard_refs"), "Exact ordered 45 CON guards required");
+    for (auto const &row : guards) bound_path(root, row);
+    require(request.at("loader_phase_order") == production_loader_order() && admission.at("loader_phase_order") == production_loader_order(),
+        "Only the declared whole public loader sequence is admitted");
+    require(request.at("contracts").is_object() && request.at("contracts").size() == 2 &&
+        admission.at("contracts").is_object() && admission.at("contracts").size() == 3 &&
+        request.at("contracts").at("source") == admission.at("contracts").at("source") &&
+        request.at("contracts").at("tolerances") == admission.at("contracts").at("tolerances"), "One-way production contracts differ");
+    packet.contracts = json::object();
+    for (auto const *key : {"source", "cases", "tolerances"}) {
+        auto const path = bound_path(root, admission.at("contracts").at(key)); auto const value = read_json(path);
+        require(value.at("schema") == std::string("ctf04-production-") + key + "-contract.v1" &&
+            value.at("frozen_before_this_CTF04_helper_execution") == true, "Production contract schema/freeze differs");
+        if (std::string(key) == "source") {
+            require(value.at("energyplus_commit") == request.at("energyplus_commit"), "Original source identity differs");
+            for (auto const &row : value.at("source_files")) {
+                json binding = row; binding["path"] = (fs::path(".reference/energyplus-src/26.1.0") / row.at("path").get<std::string>()).generic_string();
+                auto const actual = bound_path(root, binding);
+                auto const inside = actual.lexically_relative(fs::weakly_canonical(root / ".reference/energyplus-src/26.1.0"));
+                require(!inside.empty() && *inside.begin() != "..", "Pinned source escapes original tree");
+            }
+        }
+        if (std::string(key) == "cases") require(value.at("helper_request") == admission.at("helper_request") &&
+            value.at("source") == admission.at("contracts").at("source") && value.at("tolerances") == admission.at("contracts").at("tolerances") &&
+            value.at("fixed_CON_scope") == request.at("fixed_scope") && value.at("all_45_guard_refs") == guards, "Production case DAG differs");
+        packet.contracts[key] = file_ref(path);
+    }
+    require(admission.at("native_source_files").is_array() && admission.at("native_source_files").size() == 8, "Exact helper4/metadata1/observer3 sources required");
+    std::set<std::string> names;
+    for (auto const &row : admission.at("native_source_files")) require(names.insert(bound_path(root, row).filename().string()).second, "Duplicate Native source filename");
+    require(names == std::set<std::string>{"ctf04_production_helper.cpp", "ctf01_reference_metadata.hh", "ctf04_production_fields.hh",
+        "ctf04_production_admission.hh", "Construction.ctf04.cc", "ctf04_observer.hh", "ctf04_observer.cc", "ctf04_observation_fields.hh"}, "Production Native source inventory differs");
+    packet.projection_path = bound_path(root, admission.at("projection")); auto const projection = read_json(packet.projection_path);
+    require(projection.at("schema") == "ctf04-production-observation-projection.v1" &&
+        projection.at("frozen_before_this_CTF04_helper_execution") == true && projection.at("helper_request") == admission.at("helper_request") &&
+        projection.at("contracts") == admission.at("contracts") && projection.at("native_observation_policy") == request.at("observation_policy"),
+        "Production observation DAG differs");
+    require(request.at("ctf03_initial_observation_policy") == ctf03_initial_policy() &&
+        admission.at("ctf03_initial_observation_policy") == ctf03_initial_policy() &&
+        projection.at("ctf03_initial_observation_policy") == ctf03_initial_policy(),
+        "Frozen initial post-619 observation policy differs");
+    auto const tolerances = read_json(bound_path(root, admission.at("contracts").at("tolerances")));
+    require(tolerances.at("ctf03_initial_observation_policy") == ctf03_initial_policy(), "Initial-state tolerance scope differs");
+    std::array<char const *, 3> const variables{{"dx", "initial_CTFTimeStep", "caller_TimeStepZone"}};
+    auto const &profiles = tolerances.at("ctf03_initial_profiles");
+    require(profiles.is_array() && profiles.size() == variables.size(), "Three distinct initial-state profiles required");
+    for (std::size_t i = 0; i < variables.size(); ++i) {
+        auto const &profile = profiles.at(i);
+        require(profile.at("variable") == variables[i] && profile.at("atol") == 0.0 && profile.at("rtol") == 0.0 &&
+            profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true,
+            "Frozen exact initial-state profile differs");
+    }
+    for (auto const *owner : {&request, &admission, &projection, &tolerances})
+        require(owner->at("ctf04_matrix_observation_policy") == ctf04_matrix_policy(), "Frozen actual matrix-attempt policy differs");
+    std::array<char const *, 7> const matrix_variables{{"AMat", "IdenMatrix", "BMat", "CMat", "DMat", "assembly_CTFTimeStep", "caller_TimeStepZone"}};
+    json const matrix_shapes = {"actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", json::array({3}), json::array({2}), json::array({2}), "scalar", "scalar"};
+    auto const &matrix_profiles = tolerances.at("arithmetic_profiles_by_variable");
+    require(matrix_profiles.is_array() && matrix_profiles.size() == matrix_variables.size(), "Seven distinct matrix/caller profiles required");
+    for (std::size_t i = 0; i < matrix_variables.size(); ++i) {
+        auto const &profile = matrix_profiles.at(i);
+        require(profile.at("variable") == matrix_variables[i] && profile.at("atol") == 0.0 && profile.at("rtol") == 0.0 &&
+            profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true &&
+            profile.at("required_shape") == matrix_shapes.at(i), "Frozen exact actual matrix profile differs");
+    }
+    auto const &models = request.at("model_cases"); require(models.is_array() && models.size() == 15, "All and only fixed15 models required");
+    for (std::size_t i = 0; i < models.size(); ++i) {
+        auto const &row = models.at(i); auto const &selected = scope.at("cases").at(i);
+        require(row.is_object() && row.size() == 4 && row.at("lane") == "fixed-CON15-production-loader" &&
+            row.at("id") == selected.at("id") && row.at("input") == selected.at("input"), "Actual scope order/input identity must be retained");
+        identifier(row.at("id")); bound_path(root, row.at("input")); auto const &caller = row.at("caller");
+        require(caller.is_object() && caller.size() == 4 && caller.at("TimeStepsInHour").is_number_integer() &&
+            caller.at("MinutesInTimeStep").is_number_integer() && caller.at("TimeStepsInHour") == 4 && caller.at("MinutesInTimeStep") == 15 &&
+            std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZone"))) == UINT64_C(0x3fd0000000000000) &&
+            std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZoneSec"))) == UINT64_C(0x408c200000000000),
+            "Exact declared fixed-CON timestep required; helper must observe source-produced fields rather than overwrite them");
+    }
+    packet.requested_counts = {{"model_cases", models.size()}, {"loader_phase_records", models.size() * production_loader_order().size()}};
+    require(request.at("requested_counts") == packet.requested_counts && admission.at("requested_counts") == packet.requested_counts,
+        "Input-only requested model/loader ledger counts differ");
+    return packet;
+}
+} // namespace Ctf01
+#endif

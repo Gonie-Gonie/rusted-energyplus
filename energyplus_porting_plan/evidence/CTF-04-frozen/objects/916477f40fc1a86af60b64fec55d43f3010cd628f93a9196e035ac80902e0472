@@ -1,0 +1,41 @@
+--- .runtime/porting/CTF-03/native-build-review-prep-01/review_build.py
++++ .runtime/porting/CTF-04/native-build-review-prep-01/review_build.py
+@@ -1,4 +1,4 @@
+-"""Independent actual CTF03 build/PE inspection; no engine is invoked."""
++"""Independent actual CTF04 build/PE inspection; no engine is invoked."""
+ from pathlib import Path
+ import argparse
+ import datetime
+@@ -44,11 +44,13 @@
+ assert separator and len(build_sha) == 64 and all(c in '0123456789abcdef' for c in build_sha)
+ build_path = bound({'path': build_name, 'sha256': build_sha})
+ build = json.loads(build_path.read_text(encoding='utf-8'))
+-prefix = 'ctf03' if args.lane == 'unit' else 'ctf03-production'
+-target = 'ctf03_' + args.lane + '_helper'
++prefix = 'ctf04' if args.lane == 'unit' else 'ctf04-production'
++target = 'ctf04_' + args.lane + '_helper'
+ assert build['schema'] == prefix + '-native-build.v1'
+ assert build['target'] == target
+ assert build['status'] == 'pass-actual-3TU-link-and-preservation'
++RETENTION_INTENT = {'schema': 'ctf04-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF04-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
++assert build['linked_original_retention_intent'] == RETENTION_INTENT
+ for key in ('configure_execution', 'compile_execution', 'derivation_execution'):
+     receipt = json.loads(bound(build[key]).read_text(encoding='utf-8'))
+     assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after']
+@@ -68,7 +70,7 @@
+     bound(binding)
+ preservation = json.loads(bound(build['preservation']).read_text(encoding='utf-8'))
+ assert preservation['selected_core_Construction_object_hits'] == 0
+-assert 'Construction.ctf03.cc.obj' in preservation['derived_provider']['section_provider']['text']
++assert 'Construction.ctf04.cc.obj' in preservation['derived_provider']['section_provider']['text']
+ assert len(preservation['present_objects']) == build['core_present']
+ assert len(preservation['protected_refs']) == build['protected_ref_count']
+ assert all(preservation[key] == build[key] for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered'))
+@@ -99,6 +101,7 @@
+           'actual_protected_ref_count': build['protected_ref_count'],
+           'build': ref(build_path), 'helper_binary': build['helper_binary'],
+           'linked_original': build['linked_original'], 'validated_derivative': build['validated_derivative'],
++          'linked_original_retention_intent': RETENTION_INTENT,
+           'native_pe_source': ref(reader), 'executed_reader': ref(Path(__file__).resolve()),
+           'maps': maps, 'retained_runtime_exact': True,
+           'engine_invoked': False, 'scientific_execution_certified': False, 'gates_updated': False}

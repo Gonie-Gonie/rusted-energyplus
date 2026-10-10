@@ -1,0 +1,120 @@
+{
+  "schema": "ctf04-native-build-review-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-04/native-build-review-prep-01/review_build.py",
+      "sha256": "131c021d256db2a5d493508ceae63f9555947f9052c47ed30cb0a562a3e2a392",
+      "size_bytes": 6214,
+      "line_count": 109
+    }
+  ],
+  "before_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-03/native-build-review-prep-01/review_build.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-build-review-prep-01/before/review_build.py",
+        "sha256": "df5d445612f3cd76555c42a37efa4994bbcea4fd09eb2ef75c867ac75b6adef0",
+        "size_bytes": 5613,
+        "line_count": 106
+      }
+    }
+  ],
+  "exact_source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-04/native-build-review-prep-01/review_build.py.from-ctf03.diff",
+      "sha256": "916477f40fc1a86af60b64fec55d43f3010cd628f93a9196e035ac80902e0472",
+      "size_bytes": 3021,
+      "line_count": 41
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-04/native-build-review-prep-01/README.md",
+    "sha256": "814c1f595bb932a692c3e0b717bd12fed39f4b6321e5d8242197ac8f77dafbb2",
+    "size_bytes": 2949,
+    "line_count": 46
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-03/native-build-review-prep-01/manifest.json",
+      "sha256": "d88e6dc335b9ac262701b48e743c05eb7936f27d67aaa003274007e314d1902e",
+      "size_bytes": 3279,
+      "line_count": 97
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/manifest.json",
+      "sha256": "3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+      "size_bytes": 21447,
+      "line_count": 564
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/manifest.json",
+      "sha256": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+      "size_bytes": 13066,
+      "line_count": 344
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_reference.cmake",
+      "sha256": "9ae728e892c0d5ad13c1343df3ad300ff60ae8b1beec84539d7417cb84d73315",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-04/input-writer-prep-01/manifest.json",
+      "sha256": "bec235e41fbebd22ff2ced292a0167b19788623fe7763b0fe6ae6e9bed9a03ec",
+      "size_bytes": 28131,
+      "line_count": 723
+    }
+  ],
+  "runtime_build_protocol": {
+    "schemas": [
+      "ctf04-native-build.v1",
+      "ctf04-production-native-build.v1"
+    ],
+    "status": "pass-actual-3TU-link-and-preservation",
+    "targets": [
+      "ctf04_unit_helper",
+      "ctf04_production_helper"
+    ],
+    "new_compile_rows_source_obligation": 6,
+    "actual_previous_compile_rows": null,
+    "actual_current_compile_rows": null,
+    "actual_protected_ref_count": null,
+    "core_preservation": {
+      "registered": 643,
+      "present": 631,
+      "absent": 12
+    },
+    "native_source_files_each_lane": 8,
+    "linked_original_retention_intent": {
+      "schema": "ctf04-debug-original-retention-intent.v1",
+      "role": "prospective-debug-original",
+      "scope": "new-CTF04-linked-originals-only",
+      "actual_file_identity_required": true,
+      "both_original_and_helper_verified_before_execution": true,
+      "retain_through_PE_validation_and_current_helper_execution": true,
+      "removal_requires_separate_Root_authorized_actual_retention_record": true,
+      "earlier_live_refs_reinterpreted": false,
+      "deletion_performed": false
+    }
+  },
+  "checks": {
+    "AST_parse_only": true,
+    "before_raw_bytes_exact": true,
+    "exact_diff_generated": true,
+    "retention_intent_literal_exact_freezer": true,
+    "no_fixed_future_protected_count": true
+  },
+  "authorship_limits": "Author of prior Native helper, CTF03 ingress and CTF04 identity amendment; source/provenance glue, no independent own-formula certificate.",
+  "project_imports_or_targets_executed": false,
+  "actual_binary_or_scientific_result_payloads_read": false,
+  "canonical_files_changed": false,
+  "new_QA_framework": false,
+  "numerical_PASS_claimed": false
+}

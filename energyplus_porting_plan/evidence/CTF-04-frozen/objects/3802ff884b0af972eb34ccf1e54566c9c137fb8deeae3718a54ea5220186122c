@@ -1,0 +1,68 @@
+# CTF04 inherited-input and first-assembly policy freezer source
+
+SOURCE ONLY, HELD unexecuted. This adapts the accepted CTF03 writer217/IO99
+using exact before copies and source diffs. Root alone approves source bytes,
+records the existing input-freeze stage, and invokes the genuine Native helper.
+No additional QA/proof framework, target import or engine invocation is added.
+The adjacent SHA-authenticated packet_io is the only runtime dynamic import;
+its source changes only the contained output root from CTF03 to CTF04.
+
+Exact CTF01 input-only operands persist: unit39 models/42 whole calls, and
+production15 IDFs/13 lifecycle phases/195 records. Production whole CTF calls
+remain actual/dynamic. Literal members/order/callers/bits, Original7|21 source
+refs/ranges, fixed CON15 and ordered45 guards are preserved. No classification,
+Resistance calculation, expected output or expected source outcome is emitted.
+
+The held CTF04 Native helper manifest3ff67 binds source8 per lane and accepted
+passive observer58ce. Its policy proposals are authenticated directly. Fresh
+seven zero atol/rtol/class/shape/signedzero profiles cover AMat, IdenMatrix,
+BMat3, CMat2, DMat2, assembly_CTFTimeStep and caller_TimeStepZone. Initial03
+three profiles and preprocessing01 eighteen profiles remain separate unchanged
+context. Actual converted/Nodes/dx/count/selectors handoff is retained.
+
+All actual Native matrix visits are retained in observed order. Numerical
+selection is only the first actual no-source 1D assembly visit/ordinal1, with
+strict association to the actual initial619 timestep/history/owner. Later visits
+are unpaired/context/noPASS until a genuine Rust retry driver exists. Native
+retry dt/history/counts are never supplied as Rust operands. Actual IdenMatrix
+is required; no identity, matrix, timestep or retry evaluator exists here.
+
+CLI, all required:
+--lane unit|production
+--approved-source-sha256 <approved freeze_packet.py SHA>
+--source-manifest <this manifest path#SHA>
+--native-source-manifest <held CTF04 helper manifest path#SHA>
+--current-card <actual current CTF-04.md path#SHA>
+--actual-scope-amendment <actual amendment path#SHA>
+--actual-scope-amendment-execution <actual validation recorder path#SHA>
+--output-dir <fresh directory under .runtime/porting/CTF-04>
+
+Actual scope schema ctf04-source-scope-amendment.v1/card CTF-04 must bind
+native_observer to the held helper manifest and matrix_policy_source_inventory
+to its projection-policy-proposal.json. Requested counts are unit39/42 and
+production15/195. scope_review_passed/all_other_gates_pending and
+strict_profiles_settled_before_outputs=true;
+actual_CTF04_build_or_engine_execution_performed=false. Actual before/after
+document archives establish historical-card/current-card correspondence. The
+real source-preserving check_plan.py --check --card CTF-04 recorder must exit0
+with empty stderr. No future scope/current-card/recorder digest is fabricated.
+
+Fresh source/tolerances -> request -> cases -> projection -> admission -> receipt
+is one-way. Flag frozen_before_this_CTF04_helper_execution applies to this new
+freeze; inherited CTF01 chronology is never relabelled. Lowercase policy fields
+ctf03_initial_observation_policy and ctf04_matrix_observation_policy are retained
+as distinct owners. Receipt archives actual writer/helper and reviewed bytes,
+uses aware UTC, full typed JSON stdout, and source before/after rechecks.
+
+Fresh request/admission/projection/receipt carry linked_original_retention_intent:
+schema ctf04-debug-original-retention-intent.v1, role prospective-debug-original,
+scope new-CTF04-linked-originals-only. Actual identity and verification of both
+new linked Original/helper before execution remain required; retain through PE
+and current execution. Any later removal requires a separate Root-authorized
+actual retention record using the existing lifecycle. Earlier live refs are not
+reinterpreted. This source does not delete files, perform registry admission or
+assert that any future linked file exists. No retirement is performed here.
+
+Author previously wrote Native helper/CTF03 ingress/CTF04 identity glue. Root
+and another author review this source/provenance adaptation; it does not provide
+independent own-formula or numerical certification. All science/gate flags false.

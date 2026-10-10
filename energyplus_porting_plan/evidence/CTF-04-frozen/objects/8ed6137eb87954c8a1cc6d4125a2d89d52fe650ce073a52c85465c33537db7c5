@@ -1,0 +1,77 @@
+# CTF-04 passive per-attempt matrix observation proposal
+
+SOURCE-READY source only. This extends held CTF03 observer39eb and adds one
+passive call immediately after original Construction.cc728, inside the actual
+one-dimensional branch and its existing retry loop. No scientific statement,
+branch, arithmetic, allocation, helper call or retry condition is changed.
+Removing the new call and restoring the include returns held03 byte-exactly;
+removing all five passive calls/include returns pinned Original d85937 exactly.
+
+The old three preprocessing Snapshots, separate initial619 owner, four phase
+counts, their callback bodies and existing binding mechanism are unchanged.
+Matrix visits have separate ordered records/counters, not a fifth old phase.
+The actual counter increments once per visit to the sole post728 callsite for
+the bound whole construction call. No count is inferred from timestep/history.
+The future helper associates that binding with its actual model/lane, whole-call
+ordinal, construction array index/name and original LayerPoint membership.
+The Capture pointers are identity checks, never serialized IDs or operands.
+
+MatrixAttemptSnapshot copies actual ErrorsFound/DoCTFErrorReport, IsUsedCTF,
+SourceSinkPresent/SolutionDimensions/TotLayers, local LayersInConstruct and
+NumResLayers, rcmax, reset NodeSource/NodeUserTemp, current CTFTimeStep bits,
+NumHistories, and actual caller TimeStepZone bits. Its active prefix separately
+copies dl/rk/rho/cp/lr/ResLayer and Nodes/dx. It invents no merged material IDs,
+capacitance, conductance, node count, identity, zero entries or other arithmetic.
+Only the actual copied local prefix is observed; the fixed-array tail is never
+an operand. Nonselected source/sink context, if reached at this 1D site, remains
+captured context, not certification of the pure selected no-source algorithm.
+
+The actual AMat and IdenMatrix owners must have allocated bounds1..rcmax for
+both dimensions and exact rcmax*rcmax storage. Their complete values are copied
+i1 outer/i2 inner, with actual i2-contiguous orientation: flat offset
+(i1-1)*rcmax+(i2-1). Every zero/nonfinite/signed-zero object representation is
+copied by memcpy; no class conversion or off-band/identity synthesis occurs.
+BMat(3), CMat(2), DMat(2) retain their genuine compressed shapes and values.
+Actual allocated bounds/size are observed separately; null means unallocated.
+Dimensions and shape arithmetic are metadata checks, not scientific evaluation.
+
+Construction638-648 allocates/zeros AMat and creates Iden once, before657.
+B/CD are allocated3/2/2 by the actual constructor330-332; their values become
+initialized only through the reached assembly661-728. The callback reads them
+at that final assignment. Each retry reuses actual AMat/Iden and rewrites the
+selected assembly, not fresh inferred buffers. Nodes/dx/rcmax were produced
+once before initial619. Retry908-936 changes current timestep/history only.
+No later returned timestep replaces the initial snapshot or an earlier visit.
+AMat/Iden are deallocated1082-1089; copies are made while real owners/local
+arrays are alive, then retained independently for future serialization.
+
+The callback is noexcept and never writes scientific state, performs floating
+arithmetic, invokes an engine/helper or does I/O. Unlike the old fixed snapshots,
+observation-only vectors allocate to retain every actual visit without an
+invented attempt bound. Any allocation/copy exception is caught. A failed
+record append increments matrix_attempt_records_omitted; its actual ordinal is
+also retained in typed first/last failure metadata. All retained records carry
+their true visit ordinal, so any missing ordinal in1..actual_callback_count is
+an explicit missing whole record, never a skipped optional event. Copy failure
+clears partial dynamic buffers and keeps matrices_available false.
+
+Identity/order/prefix/shape/copy/append failures set matrix_observer_failure,
+increment typed failure-event counters and retain first/last failure association.
+Per-record failure_kinds preserves every detected category on retained records.
+Any such failure is required observation-integrity FAIL in future helpers/QA,
+not an optional unavailable event or numerical PASS. Helpers must fail before
+comparison if totals, retained ordinals, omitted count, copied shapes or these
+flags disagree. A reached missing matrix on either/both sides fails. No fixed
+attempt cap, silent truncation, fallback values or relaxed numeric policy exists.
+Unreached unused/loading-error/allR/reverse routes remain distinct unavailable
+context; a completed assembly visit does not prove later Exp/Inverse returned.
+
+This package adds no helper, serializer, input cases, numeric freeze, QA/proof
+framework, execution stage or canonical change. Future helpers must compile
+the matching fresh TU/header/implementation together, not mix Capture layouts
+or link an earlier observer implementation. Source policy still requires Root
+approval and full other-author review before any build/first observation.
+I authored the held pure CTF04 algorithm; this package does not independently
+certify that algorithm or any scientific output. Root and an other-author peer
+must review these passive boundaries. All card gates and future execution facts
+remain pending; no outputs/results/weather/binaries were read here.

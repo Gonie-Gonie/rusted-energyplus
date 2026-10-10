@@ -1,0 +1,74 @@
+--- crates/ep_run/examples/ctf03_candidate_unit_observer.rs
++++ crates/ep_run/examples/ctf04_candidate_unit_observer.rs
+@@ -1,11 +1,12 @@
+ //! Actual explicit-member preprocessing and source-owned initial CTF03 route; no solver answers.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf03_candidate_unit_support/fields.rs"]
++#[path = "ctf04_candidate_unit_support/fields.rs"]
+ mod fields;
+ 
+ use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
+ use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
++use ep_runtime::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+ };
+@@ -81,7 +82,7 @@
+ }
+ fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+     require(
+-        inventory["schema"] == "ctf03-candidate-unit-runtime-source-bindings.v1"
++        inventory["schema"] == "ctf04-candidate-unit-runtime-source-bindings.v1"
+             && inventory
+                 .as_object()
+                 .is_some_and(|object| object.len() == 3),
+@@ -219,6 +220,7 @@
+             context,
+             time_step_zone,
+         );
++        let first_assembly = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
+         if let Ok(actual) = &preprocessing.result {
+             selected_errors = actual.errors_found;
+         }
+@@ -228,6 +230,9 @@
+             "selected_ErrorsFound_after":selected_errors,"actual_layer_material_ids":layers.iter().map(|v|v.material_id.0).collect::<Vec<_>>(),
+             "original_layer_membership":declaration["layer_material_ids"],"result":fields::result(&preprocessing.result),
+             "CTF03_initial":fields::initial(&initial,Some(&preprocessing)),
++            "CTF04_first_assembly":fields::first_assembly(&first_assembly,Some(&initial),Some(&preprocessing)),
++            "actual_Rust_CTF04_API":"initialize_construction_ctf_first_assembly","actual_Rust_CTF04_API_invoked":true,
++            "preprocessing_or_initial_reexecuted_for_assembly_owner":false,
+             "actual_Rust_CTF03_API":"initialize_construction_ctf_initial","actual_Rust_CTF03_API_invoked":true,
+             "actual_initial_discretization_owner_available":initial.result.is_ok(),
+             "actual_construction_id":construction.id.0,
+@@ -307,9 +312,9 @@
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     let sources: Value = serde_json::from_slice(&sources_bytes)?;
+     require(
+-        request["schema"] == "ctf03-helper-cases.v1"
+-            && admission["schema"] == "ctf03-native-admission-contract.v1"
+-            && request["frozen_before_this_CTF03_helper_execution"] == true
++        request["schema"] == "ctf04-helper-cases.v1"
++            && admission["schema"] == "ctf04-native-admission-contract.v1"
++            && request["frozen_before_this_CTF04_helper_execution"] == true
+             && request["expected_values_supplied"] == false
+             && request["expected_exits_supplied"] == false
+             && request["scientific_execution_performed"] == false,
+@@ -385,13 +390,16 @@
+     )?;
+     println!(
+         "{}",
+-        serde_json::to_string_pretty(&json!({"schema":"ctf03-candidate-unit-observer-results.v1",
++        serde_json::to_string_pretty(&json!({"schema":"ctf04-candidate-unit-observer-results.v1",
+         "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admission_bytes)},
+         "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+         "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+         "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],
+         "runtime_source_bindings":{"path":sources_path,"sha256":digest::sha256(&sources_bytes)},"authenticated_source_inventory":sources,
+         "ctf03_initial_observation_policy":request["ctf03_initial_observation_policy"],
++        "ctf04_matrix_observation_policy":request["ctf04_matrix_observation_policy"],
++        "actual_Rust_CTF04_API_invocations":calls,"Rust_retry_driver_available":false,
++        "later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,
+         "actual_Rust_preprocess_invocations":calls,"actual_Rust_CTF03_API_invocations":initial_calls,
+         "model_cases":models,"all_bound_inputs_and_sources_unchanged":true,
+         "shared_flag_scope":"selected preprocessing ErrorsFound only; no whole Native solver carry injected",

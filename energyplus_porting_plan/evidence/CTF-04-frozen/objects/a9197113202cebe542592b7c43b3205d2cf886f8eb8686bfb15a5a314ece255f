@@ -1,0 +1,51 @@
+"""Author ignored source proposals only; never invoke project or Native code."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+PREP = ROOT / ".runtime/porting/CTF-04/native-helper-prep-01"
+BEFORE = ROOT / ".runtime/porting/CTF-03/native-helper-prep-01"
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.encode("utf-8"))
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def initial_forks():
+    for lane in ["unit", "production"]:
+        for suffix in ["helper.cpp", "fields.hh", "admission.hh"]:
+            name = f"ctf03_{lane}_{suffix}"
+            source = (BEFORE / name).read_bytes()
+            (PREP / "before").mkdir(parents=True, exist_ok=True)
+            (PREP / "before" / name).write_bytes(source)
+            text = source.decode().replace("ctf03_", "ctf04_").replace("ctf03-", "ctf04-")
+            text = text.replace("CTF03_", "CTF04_").replace("CTF-03", "CTF-04")
+            text = text.replace("ctf04_initial_fields.hh", "ctf04_observation_fields.hh")
+            text = text.replace("ctf04_initial_policy", "ctf03_initial_policy")
+            text = text.replace("ctf04_initial_observation_policy", "ctf03_initial_observation_policy")
+            text = text.replace("CTF04_initial_observation_policy", "CTF03_initial_observation_policy")
+            write(PREP / name.replace("ctf03_", "ctf04_"), text)
+    old = BEFORE / "ctf03_initial_fields.hh"
+    (PREP / "before" / old.name).write_bytes(old.read_bytes())
+    shared = old.read_text(encoding="utf-8").replace("CTF03_INITIAL_FIELDS_HH", "CTF04_OBSERVATION_FIELDS_HH")
+    shared = shared.replace('"ctf03_observer.hh"', '"ctf04_observer.hh"')
+    write(PREP / "ctf04_observation_fields.hh", shared)
+    old = BEFORE / "ctf03_reference.cmake"
+    (PREP / "before" / old.name).write_bytes(old.read_bytes())
+    cmake = old.read_text(encoding="utf-8").replace("ctf03", "ctf04").replace("CTF03", "CTF04")
+    cmake = cmake.replace(".runtime/porting/CTF-02/native-observer-prep-01/ctf02_reference.cmake",
+                          ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake")
+    write(PREP / "ctf04_reference.cmake", cmake)
+
+
+if __name__ == "__main__":
+    initial_forks()

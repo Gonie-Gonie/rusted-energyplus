@@ -1,0 +1,101 @@
+--- crates/ep_run/examples/ctf03_candidate_unit_support/fields.rs
++++ crates/ep_run/examples/ctf04_candidate_unit_support/fields.rs
+@@ -6,6 +6,10 @@
+     ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing,
+     CtfLayerScopeError,
+ };
++use ep_runtime::heat_balance::ctf_first_assembly_owner::{
++    ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable,
++};
++use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyObservation;
+ use serde_json::{Value, json};
+ 
+ pub(super) fn scalar(value: f64) -> Value {
+@@ -152,9 +156,78 @@
+         "Native_whole_method_flags_or_callback_reachability_inferred":false,"counted_as_PASS":false})
+ }
+ 
++pub(super) fn first_assembly(
++    source: &ConstructionCtfFirstAssembly,
++    initial: Option<&ConstructionCtfInitialDiscretization>,
++    preprocessing: Option<&ConstructionCtfLayerPreprocessing>,
++) -> Value {
++    let phases = preprocessing.and_then(|owner| owner.result.as_ref().ok());
++    let converted = phases.and_then(|owner| owner.after_conversion.as_ref());
++    let (available, route, reason, snapshot) = match &source.result {
++        Err(reason) => {
++            let route = match reason {
++                CtfFirstAssemblyUnavailable::InitialUnavailable(_) => "InitialUnavailable",
++                CtfFirstAssemblyUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstAssemblyUnavailable::PreprocessingScope(_) => "PreprocessingScope",
++                CtfFirstAssemblyUnavailable::PreprocessingRouteMismatch => "PreprocessingRouteMismatch",
++                CtfFirstAssemblyUnavailable::PostConversionUnavailable => "PostConversionUnavailable",
++                CtfFirstAssemblyUnavailable::CallerTimeStepMismatch => "CallerTimeStepMismatch",
++                CtfFirstAssemblyUnavailable::AssemblyScope(_) => "AssemblyScope",
++            };
++            (false, route, Some(format!("{reason:?}")), Value::Null)
++        }
++        Ok(CtfAssemblyObservation::Unavailable(reason)) =>
++            (false, "AssemblyUnavailable", Some(format!("{reason:?}")), Value::Null),
++        Ok(CtfAssemblyObservation::Assembled(actual)) => {
++            let values = |source: &[f64]| source.iter().copied().map(scalar).collect::<Vec<_>>();
++            (true, "FirstAssemblyReturned", None, json!({
++                "LayersInConstruct":actual.layers.len(),
++                "NumResLayers":converted.map(|owner|owner.active.num_res_layers),
++                "ErrorsFound":phases.map(|owner|owner.errors_found),
++                "DoCTFErrorReport":null,"DoCTFErrorReport_paired":false,
++                "IsUsedCTF":initial.map(|owner|owner.context.is_used_ctf),
++                "SourceSinkPresent":actual.context.source_sink_present,
++                "SolutionDimensions":actual.context.solution_dimensions,
++                "active_prefix_available":true,"copied_layer_count":actual.layers.len(),
++                "active_prefix":actual.layers.iter().enumerate().map(|(index,layer)|json!({
++                    "dl":scalar(layer.dl),"rk":scalar(layer.rk),"rho":scalar(layer.rho),
++                    "cp":scalar(layer.cp),"lr":scalar(layer.lr),"ResLayer":layer.res_layer,
++                    "Nodes":actual.nodes.get(index).copied(),
++                    "dx":actual.dx.get(index).copied().map(scalar)})).collect::<Vec<_>>(),
++                "actual_nodes_count":actual.nodes.len(),"actual_dx_count":actual.dx.len(),
++                "rcmax":actual.rcmax,"NodeSource":actual.context.node_source,
++                "NodeUserTemp":actual.context.node_user_temp,
++                "CTFTimeStep":scalar(actual.context.ctf_time_step),
++                "NumHistories":actual.context.num_histories,
++                "TimeStepZone":scalar(actual.context.time_step_zone),
++                "attempt_ordinal":actual.context.attempt_ordinal,
++                "actual_context_construction_id":actual.context.construction_id.0,
++                "actual_route":format!("{:?}",actual.context.route),
++                "matrices_available":true,"matrices":{
++                    "AMat":values(&actual.a_mat),"IdenMatrix":values(&actual.iden_matrix),
++                    "BMat":values(&actual.b_mat),"CMat":values(&actual.c_mat),"DMat":values(&actual.d_mat)},
++                "storage_order":"source_i1_outer_i2_inner_row_first",
++                "Native_Objexx_bounds_not_Rust_owner":true}))
++        }
++    };
++    json!({"protocol":"ctf04-matrix-assembly.v1","owner_available":available,
++        "selected_first_assembly_operands":available,"actual_source_route":route,
++        "unavailable_reason":reason,"snapshot":snapshot,"construction_id":source.construction_id.0,
++        "same_initial_owner_available":initial.is_some(),
++        "same_initial_construction_id":initial.map(|owner|owner.construction_id.0),
++        "same_preprocessing_owner_available":preprocessing.is_some(),
++        "same_preprocessing_construction_id":preprocessing.map(|owner|owner.construction_id.0),
++        "same_post_conversion_handoff_available":converted.is_some(),
++        "only_first_Rust_assembly_invocation_owned":true,
++        "later_Native_attempts_available_in_Rust":false,"later_Native_attempts_counted_as_PASS":false,
++        "retry_driver_available":false,"Native_retry_state_or_counts_supplied_to_Rust":false,
++        "observer_matrix_identity_or_route_arithmetic_performed":false,
++        "Native_whole_method_outcome_or_flags_inferred":false,"counted_as_PASS":false})
++}
++
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf03_candidate_unit_observer.rs",
+-    "crates/ep_run/examples/ctf03_candidate_unit_support/fields.rs",
++    "crates/ep_run/examples/ctf04_candidate_unit_observer.rs",
++    "crates/ep_run/examples/ctf04_candidate_unit_support/fields.rs",
+ ];
+ // Exact path inventory; approved formatted SHAs are runtime operands and must
+ // also match Root's actual Cargo source capture before results are admitted.
+@@ -171,4 +244,6 @@
+     "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+     "crates/ep_model/src/objects/construction.rs",
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+ ];

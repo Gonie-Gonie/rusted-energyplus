@@ -1,0 +1,189 @@
+"""Author ignored proposal/diffs and bounded source metadata, without targets."""
+from pathlib import Path
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+PURE = ROOT / ".runtime/porting/CTF-04/rust-assembly-prep-03"
+assert not (OUT / "manifest.json").exists(), "Held source package is immutable"
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def replace_once(text, before, after):
+    assert text.count(before) == 1, before
+    return text.replace(before, after, 1)
+
+
+def delta(owner, before, after):
+    return "".join(difflib.unified_diff(before.splitlines(True), after.splitlines(True),
+        fromfile="a/" + owner if before else "/dev/null", tofile="b/" + owner))
+
+
+assert ref(PURE / "manifest.json")["sha256"] == "f1dfa92dd3c3ea255977be83c77df985832dcac7686d3589931334d6672eb622"
+changes = []
+for name in ["ctf_first_assembly_owner.rs", "ctf_first_assembly_owner_tests.rs"]:
+    owner = "crates/ep_runtime/src/heat_balance/" + name
+    assert not (ROOT / owner).exists()
+    source = OUT / "new" / name
+    diff = OUT / (name + ".new.diff")
+    diff.write_text(delta(owner, "", source.read_text()), encoding="utf-8", newline="\n")
+    changes.append({"owner": owner, "new_owner": True, "before": None,
+                    "proposed": ref(source), "exact_diff": ref(diff)})
+
+owners = [
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+]
+for owner in owners:
+    target = ROOT / owner
+    before = target.read_text(encoding="utf-8")
+    after = before
+    if owner.endswith("/mod.rs"):
+        after = replace_once(after, "pub mod ctf_initial_owner;", "pub mod ctf_first_assembly_owner;\npub mod ctf_initial_owner;")
+    elif owner.endswith("/construction_cache.rs"):
+        after = replace_once(after, "use crate::heat_balance::ctf_initial_owner::{", '''use crate::heat_balance::ctf_first_assembly_owner::{
+    ConstructionCtfFirstAssembly, initialize_construction_ctf_first_assembly,
+};
+use crate::heat_balance::ctf_initial_owner::{''')
+        after = replace_once(after, "    initial_discretizations: Vec<ConstructionCtfInitialDiscretization>,", "    initial_discretizations: Vec<ConstructionCtfInitialDiscretization>,\n    first_assemblies: Vec<ConstructionCtfFirstAssembly>,")
+        after = replace_once(after, "        let mut initial_discretizations = Vec::with_capacity(entries.capacity());", "        let mut initial_discretizations = Vec::with_capacity(entries.capacity());\n        let mut first_assemblies = Vec::with_capacity(entries.capacity());")
+        after = replace_once(after, '''            initial_discretizations.push(initialize_construction_ctf_initial(
+                construction,
+                &model.constructions[..construction_index],
+                &used_ctf_constructions,
+                &entry.ctf01_layer_preprocessing,
+                context,
+                time_step_zone_hours,
+            ));''', '''            let initial = initialize_construction_ctf_initial(
+                construction,
+                &model.constructions[..construction_index],
+                &used_ctf_constructions,
+                &entry.ctf01_layer_preprocessing,
+                context,
+                time_step_zone_hours,
+            );
+            first_assemblies.push(initialize_construction_ctf_first_assembly(
+                &initial,
+                &entry.ctf01_layer_preprocessing,
+            ));
+            initial_discretizations.push(initial);''')
+        after = replace_once(after, "            initial_discretizations,", "            initial_discretizations,\n            first_assemblies,")
+        after = replace_once(after, '''    pub(crate) fn initial_discretizations(&self) -> Vec<ConstructionCtfInitialDiscretization> {
+        self.initial_discretizations.clone()
+    }''', '''    pub(crate) fn initial_discretizations(&self) -> Vec<ConstructionCtfInitialDiscretization> {
+        self.initial_discretizations.clone()
+    }
+
+    pub(crate) fn first_assemblies(&self) -> Vec<ConstructionCtfFirstAssembly> {
+        self.first_assemblies.clone()
+    }''')
+    elif owner.endswith("/state.rs"):
+        after = replace_once(after, '''    pub construction_ctf03_initial:
+        Vec<super::ctf_initial_owner::ConstructionCtfInitialDiscretization>,''', '''    pub construction_ctf03_initial:
+        Vec<super::ctf_initial_owner::ConstructionCtfInitialDiscretization>,
+    /// Actual first CTF04 assembly owners; no retries or final coefficients are inferred.
+    pub construction_ctf04_first_assembly:
+        Vec<super::ctf_first_assembly_owner::ConstructionCtfFirstAssembly>,''')
+    else:
+        after = replace_once(after, "        construction_ctf03_initial: construction_thermal_data.initial_discretizations(),", "        construction_ctf03_initial: construction_thermal_data.initial_discretizations(),\n        construction_ctf04_first_assembly: construction_thermal_data.first_assemblies(),")
+    archive = OUT / "before" / Path(owner).name
+    proposed = OUT / "proposed" / Path(owner).name
+    archive.parent.mkdir(exist_ok=True)
+    proposed.parent.mkdir(exist_ok=True)
+    archive.write_bytes(target.read_bytes())
+    proposed.write_text(after, encoding="utf-8", newline="\n")
+    diff = OUT / (Path(owner).name + ".diff")
+    diff.write_text(delta(owner, before, after), encoding="utf-8", newline="\n")
+    changes.append({"owner": owner, "new_owner": False, "current_before": ref(target),
+                    "before": ref(archive), "proposed": ref(proposed), "exact_diff": ref(diff)})
+
+source_names = owners + [
+    "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+    "crates/ep_model/src/ids.rs",
+    "crates/ep_model/src/objects/construction.rs",
+    ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+    "energyplus_porting_plan/cards/CTF-04.md",
+]
+source_inventory = [ref(ROOT / name) for name in source_names]
+ranges = []
+for name, first, last in [
+    (source_names[10], 313, 315), (source_names[10], 404, 487),
+    (source_names[10], 490, 619), (source_names[10], 638, 729),
+    (source_names[10], 875, 936),
+    (source_names[4], 1, len((ROOT / source_names[4]).read_bytes().splitlines())),
+    (source_names[5], 1, len((ROOT / source_names[5]).read_bytes().splitlines())),
+    (source_names[6], 72, 137), (source_names[1], 95, 136),
+    (source_names[9], 372, 446),
+]:
+    body = b"".join((ROOT / name).read_bytes().splitlines(keepends=True)[first - 1:last])
+    ranges.append({"path": name, "first_line": first, "last_line": last,
+                   "sha256": hashlib.sha256(body).hexdigest(), "size_bytes": len(body)})
+
+readme = '''# CTF04 first-assembly owner/cache ingress
+
+SOURCE-READY HELD, unapplied/unexecuted. Two new sources and four bounded owner
+deltas implement the reviewed first-only two-owner API plan. The accepted pure
+assembly259/tests192/identity producer are dependencies, not rewritten here.
+The separately held parent rebase adds that module; this package does not touch
+surface_manager.rs. Old source packages stay immutable.
+
+initialize_construction_ctf_first_assembly borrows the actual CTF03 initial
+Result and its same construction CTF01 preprocessing owner. IDs and caller bits
+must match. Existing InitialUnavailable routes are copied distinctly. Missing/
+scope-error converted state, contradictory selected prefix flags, or actual
+pure assembly shape/scope errors yield explicit errors without default matrices.
+The adapter copies Nodes/dx into temporary slices, borrows converted layers, and
+copies rcmax/selectors/caller/initial CTF timestep/history; it does no node,
+spacing, reverse, resistance or timestep calculation. It never consumes Native
+answers, later whole-return flags or retry metadata.
+
+For a selected owner the accepted pure assembler is actually invoked once, with
+ordinal1. Result retains actual AMat/identity/compressed B3/C2/D2 and classes.
+This is not a Native attempt-count or retry-driver claim. Native may execute
+multiple real attempts; only its first is eligible to pair until a genuine
+CTF05-08 driver exists. All later attempts must remain observed, unpaired/noPASS.
+
+Production constructs the owner immediately after its existing initial owner
+using the same entry.ctf01_layer_preprocessing and stores an ordered parallel
+Vec. HeatBalanceState.construction_ctf04_first_assembly copies that genuine
+cache vector. CTF01/02 entries, CTF03 values, coefficient/hash arithmetic, EIO
+precedence and existing massive fallback are unchanged. No whole pipeline or
+surface coefficient consumer is rewritten. Future observers copy this owner;
+they do not call assembly on production inputs themselves.
+
+Five focused tests are proposed, not executed: same-owner readonly handoff with
+caller distinct from initial CTF timestep; seven distinct unavailable initial
+routes; stale ID/caller rejection; absent/error prefix; actual shape-error
+propagation. They contain no expected Native matrix fixture or new tolerance.
+
+Manifest/source ranges bind actual current owners, the accepted pure04 package
+and pinned Native branch/caller order. Source preparation only uses stdlib
+files/hashes/diffs. No project import, Cargo/compiler/formatter/engine/Git,
+scientific/weather/binary read, canonical edit or new QA stage occurred. Root
+alone applies/formats/tests/executes after genuine prerequisites and source peer.
+'''
+(OUT / "README.md").write_text(readme, encoding="utf-8", newline="\n")
+manifest = {"schema": "ctf04-first-assembly-cache-ingress-source.v1", "status": "SOURCE-READY-HELD",
+    "changes": changes, "source_inventory": source_inventory, "source_ranges": ranges,
+    "accepted_pure_assembly": ref(PURE / "manifest.json"),
+    "accepted_pure_module": ref(ROOT / json.loads((PURE / "manifest.json").read_text())["changes"][1]["proposed"]["path"]),
+    "accepted_two_owner_plan": ref(PURE / "ingress-plan.md"),
+    "README": ref(OUT / "README.md"), "preparation_source": ref(Path(__file__).resolve()),
+    "tests_proposed_not_executed": 5, "only_first_actual_Rust_assembly_invocation": True,
+    "retry_driver_or_coefficients_claimed": False, "Native_expected_answers_supplied": False,
+    "canonical_sources_written": False, "targets_imported_or_executed": False,
+    "scientific_weather_or_binary_payloads_read": False, "new_QA_execution_stage": False}
+(OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"manifest": ref(OUT / "manifest.json"), "changes": changes}, indent=2))

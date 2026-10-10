@@ -1,0 +1,42 @@
+# CTF04 first-assembly owner/cache ingress
+
+SOURCE-READY HELD, unapplied/unexecuted. Two new sources and four bounded owner
+deltas implement the reviewed first-only two-owner API plan. The accepted pure
+assembly259/tests192/identity producer are dependencies, not rewritten here.
+The separately held parent rebase adds that module; this package does not touch
+surface_manager.rs. Old source packages stay immutable.
+
+initialize_construction_ctf_first_assembly borrows the actual CTF03 initial
+Result and its same construction CTF01 preprocessing owner. IDs and caller bits
+must match. Existing InitialUnavailable routes are copied distinctly. Missing/
+scope-error converted state, contradictory selected prefix flags, or actual
+pure assembly shape/scope errors yield explicit errors without default matrices.
+The adapter copies Nodes/dx into temporary slices, borrows converted layers, and
+copies rcmax/selectors/caller/initial CTF timestep/history; it does no node,
+spacing, reverse, resistance or timestep calculation. It never consumes Native
+answers, later whole-return flags or retry metadata.
+
+For a selected owner the accepted pure assembler is actually invoked once, with
+ordinal1. Result retains actual AMat/identity/compressed B3/C2/D2 and classes.
+This is not a Native attempt-count or retry-driver claim. Native may execute
+multiple real attempts; only its first is eligible to pair until a genuine
+CTF05-08 driver exists. All later attempts must remain observed, unpaired/noPASS.
+
+Production constructs the owner immediately after its existing initial owner
+using the same entry.ctf01_layer_preprocessing and stores an ordered parallel
+Vec. HeatBalanceState.construction_ctf04_first_assembly copies that genuine
+cache vector. CTF01/02 entries, CTF03 values, coefficient/hash arithmetic, EIO
+precedence and existing massive fallback are unchanged. No whole pipeline or
+surface coefficient consumer is rewritten. Future observers copy this owner;
+they do not call assembly on production inputs themselves.
+
+Five focused tests are proposed, not executed: same-owner readonly handoff with
+caller distinct from initial CTF timestep; seven distinct unavailable initial
+routes; stale ID/caller rejection; absent/error prefix; actual shape-error
+propagation. They contain no expected Native matrix fixture or new tolerance.
+
+Manifest/source ranges bind actual current owners, the accepted pure04 package
+and pinned Native branch/caller order. Source preparation only uses stdlib
+files/hashes/diffs. No project import, Cargo/compiler/formatter/engine/Git,
+scientific/weather/binary read, canonical edit or new QA stage occurred. Root
+alone applies/formats/tests/executes after genuine prerequisites and source peer.

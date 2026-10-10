@@ -1,0 +1,46 @@
+--- crates/ep_run/examples/ctf03_candidate_production_support/fields.rs
++++ crates/ep_run/examples/ctf04_candidate_production_support/fields.rs
+@@ -48,6 +48,28 @@
+         "initial_state_distinct_from_retry_and_whole_return":true,
+         "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+ }
++pub(super) fn ctf04_unavailable() -> Value {
++    json!({"owner_available":false,"construction_first_assembly":null,
++        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
++}
++pub(super) fn ctf04_selected(source: &HeatBalanceState) -> Value {
++    json!({"owner_available":true,"construction_first_assembly":source.construction_ctf04_first_assembly.iter()
++        .enumerate().map(|(index,actual)| {
++            let initial = source.construction_ctf03_initial.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            let preprocessing = source.construction_ctf01_layers.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
++                "result":unit_fields::first_assembly(actual,initial,preprocessing)})
++        }).collect::<Vec<_>>(),
++        "actual_owner_count":source.construction_ctf04_first_assembly.len(),
++        "preprocessing_initial_or_assembly_reexecuted_by_observer":false,
++        "observer_reverse_classifier_duplicated":false,"external_CTF_rows_supplied_to_initializer":false,
++        "only_first_Rust_assembly_invocation_owned":true,"retry_driver_available":false,
++        "later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,
++        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
++}
++
+ pub(super) fn typed(model: &TypedModel) -> Value {
+     let materials = model.materials.iter().enumerate().map(|(index,material)| {
+         let payload = match material.definition {
+@@ -134,9 +156,11 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+     "crates/ep_compiler/src/compiler/surface_space.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf03_candidate_production_observer.rs",
+-    "crates/ep_run/examples/ctf03_candidate_production_support/fields.rs",
+-    "crates/ep_run/examples/ctf03_candidate_production_support/unit_fields.rs",
++    "crates/ep_run/examples/ctf04_candidate_production_observer.rs",
++    "crates/ep_run/examples/ctf04_candidate_production_support/fields.rs",
++    "crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs",
+ ];

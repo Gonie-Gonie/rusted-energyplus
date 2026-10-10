@@ -1,0 +1,16 @@
+--- .runtime/porting/CTF-04/rust-assembly-prep-03/README.md
++++ .runtime/porting/CTF-04/rust-assembly-prep-04/README.md
+@@ -23,3 +23,13 @@
+ was imported; no Cargo/build/compiler/formatter/engine/Git command, scientific
+ or binary payload read, canonical edit, comparison or new QA stage occurred.
+ Root alone applies, formats, checks and executes after genuine prerequisites.
++
++## Metadata-only preparation04
++
++Preparation03 remains immutable. Root's two reviewed function-level Clippy
++attributes changed only the current CTF03 pure/route source metadata. Those
++two current identities and full-source ranges are refreshed here; their exact
++pre-attribute bytes are authenticated against Root's lint-amendment before
++archives and retained locally. The parent172, assembly259, tests192, all three
++source diffs and ingress-plan46 remain byte-identical03. No body, arithmetic,
++test, identity producer, policy or declared source change is introduced.

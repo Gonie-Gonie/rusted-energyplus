@@ -1,0 +1,46 @@
+# CTF04 actual Native build and PE review source
+
+SOURCE ONLY, HELD unexecuted. This adapts the accepted CTF03 reader106 to the
+fresh CTF04 unit/production targets, preserving the existing actual build/PE
+stage. Root alone executes it and reads binaries. No engine call, expected
+scientific value, extra QA/proof execution framework or deletion is introduced.
+
+CLI remains eleven argv: python -X utf8 -B review_build.py --lane
+unit|production --build <actual-build-manifest-path#SHA> --output-dir <freshdir>.
+Schemas are ctf04[-production]-native-build.v1 and corresponding
+independent-build-PE-review.v1. Targets ctf04_unit_helper and
+ctf04_production_helper require pass-actual-3TU-link-and-preservation.
+Actual configure/compile/derive receipts must be source-preserving exit0.
+
+Both new targets each add helper/full derived Construction/observer objects,
+so current compile rows equal actual previous rows plus6. Actual before/current
+and protected_ref_count are typed runtime facts, never guessed future counts.
+Core registrations643/present631/absent12 remain the genuine preservation
+obligation. The actual preservation inventory must match those counts and all
+protected refs. Previous targets/options/core objects remain preserved.
+
+Native8 source refs are hashed. Actual map evidence must show original archive
+Construction selected hits0 and derived provider Construction.ctf04.cc.obj.
+The same native_pe primitive independently inspects the actual linked Original
+and derivative, compares runtime identity, and authenticates their actual maps
+against derivation output. Both actual binary identities are checked before
+engine execution; prospective retention intent never substitutes for a file.
+
+Root build metadata must carry linked_original_retention_intent identical to
+the new freezer: schema ctf04-debug-original-retention-intent.v1, role
+prospective-debug-original, scope new-CTF04-linked-originals-only, identity and
+both-file verification required, retain through PE/current helper execution,
+removal only by separate Root-authorized actual retention record, earlier live
+refs reinterpreted=false/deletion_performed=false. The report copies this intent
+beside the actual linked_original ref. It does not remove anything, reinterpret
+historical refs, create a registry, or claim that later deletion has occurred.
+
+Output stays compact stdout {review:<actual report ref>,status:<actual status>}.
+Report contains actual build/binaries/derivative/maps/native_pe/reader identity,
+typed actual inventory counts and engine_invoked/scientific_execution_certified
+false. Later DataQA authenticates approved reader bytes/argv/stdout; no extra
+binary reading is delegated to its structural result review.
+
+Before copy/exact source diff are preserved. Source review here is metadata
+glue, with prior helper/ingress/identity authorship disclosed; no own-science
+certificate. All actual build/PE/linked Original refs remain runtime supplied.

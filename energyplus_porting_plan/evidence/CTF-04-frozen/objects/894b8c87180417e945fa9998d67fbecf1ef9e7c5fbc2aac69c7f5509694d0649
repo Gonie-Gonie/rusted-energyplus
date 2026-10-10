@@ -1,0 +1,88 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime\\porting\\CTF-04\\input-writer-prep-01\\freeze_packet.py",
+    "--lane",
+    "production",
+    "--approved-source-sha256",
+    "5c9cec34e915bd9be9dc5abf82c5801a71345aae14c34811d0ec8fb28439c961",
+    "--source-manifest",
+    ".runtime/porting/CTF-04/input-writer-prep-01/manifest.json#bec235e41fbebd22ff2ced292a0167b19788623fe7763b0fe6ae6e9bed9a03ec",
+    "--native-source-manifest",
+    ".runtime/porting/CTF-04/native-helper-prep-01/manifest.json#3ff67aa44a00c2529b98a6e4c62d4b1288830010c45ef5da9e996d11c4772815",
+    "--current-card",
+    "energyplus_porting_plan/cards/CTF-04.md#2501981de9ec447b09a59d1101e92faf5c7ada5aff3b43c3482f4845af426cd1",
+    "--actual-scope-amendment",
+    ".runtime/porting/CTF-04/scope-amendment-01/amendment.json#2aa9959be454dd0cd3f18372accdb881b2476d6ee2f71bf4ec2d8ff0394fa17e",
+    "--actual-scope-amendment-execution",
+    ".runtime/porting/CTF-04/scope-amendment-check-command-01/receipt.json#19799f16ef504d110c676469bb424689c4b71dd6612574d21c5344dd62b5ebf3",
+    "--output-dir",
+    ".runtime\\porting\\CTF-04\\production-frozen-packet-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T15:44:11.543719+00:00",
+  "finished_utc": "2026-10-10T15:44:12.502433+00:00",
+  "elapsed_seconds": 0.9584083000081591,
+  "repository_before": {
+    "head": "3a4adb2434b0e0dddfb6a6798fb8f03c71f18060",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CTF-04.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "repository_after": {
+    "head": "3a4adb2434b0e0dddfb6a6798fb8f03c71f18060",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M energyplus_porting_plan/cards/CTF-04.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/eb/eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+    "sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-04/production-input-freeze-command-01/stdout.log",
+    "sha256": "46edc952846e3f3bf02732ccf369d1fa92d244851a163a067ba9027f86b87149"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-04/production-input-freeze-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T15:44:12.502433+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

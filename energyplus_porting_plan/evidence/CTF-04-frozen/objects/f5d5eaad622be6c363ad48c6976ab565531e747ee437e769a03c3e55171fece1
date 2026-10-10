@@ -1,0 +1,21 @@
+--- .runtime/porting/CTF-04/native-observer-prep-01/before/Construction.ctf03.cc
++++ .runtime/porting/CTF-04/native-observer-prep-01/Construction.ctf04.cc
+@@ -53,7 +53,7 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/OutputReportPredefined.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
+-#include "ctf03_observer.hh"
++#include "ctf04_observer.hh"
+ 
+ namespace EnergyPlus::Construction {
+ 
+@@ -736,6 +736,9 @@
+                     this->CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct);  // of all other
+                     this->DMat(1) = rk(1) / dx(1);                                  // matrices for the state
+                     this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method
++                    EnergyPlus::CTF01Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
++                                                                       LayersInConstruct, NumResLayers, dl, rk, rho, cp,
++                                                                       lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+                 } else { // 2-D solution requested (assign matrices appropriately)
+ 

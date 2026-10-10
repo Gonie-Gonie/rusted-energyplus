@@ -1,0 +1,564 @@
+{
+  "schema": "ctf04-native-matrix-helper-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-not-frozen-not-built-not-executed",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_observation_fields.hh",
+      "sha256": "507a951402865ef66f3cde54e573b1e29af44eaec8108c42d51c1e9e12069456",
+      "size_bytes": 11863,
+      "line_count": 168
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_helper.cpp",
+      "sha256": "f4c0ca173b039803ec0535d26beccdf82a4dbc9d4728e6147a49c5ddbea03dd7",
+      "size_bytes": 16404,
+      "line_count": 221
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_fields.hh",
+      "sha256": "6e9d6b4011cee853d228b874236c078881238ae879c9e61e7f243b614722212a",
+      "size_bytes": 5998,
+      "line_count": 85
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_admission.hh",
+      "sha256": "0dfa3c0b801a8742b223d794038edcb369d0c27341084c67b3066143a80798f0",
+      "size_bytes": 13384,
+      "line_count": 148
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_helper.cpp",
+      "sha256": "eb38fba33725985cc40b5bf1ad885454715d5cd9c72f08cf1b32214f20e58c70",
+      "size_bytes": 19169,
+      "line_count": 240
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_fields.hh",
+      "sha256": "1bfa185e61b1a12d8d583f7946cabc6b4f23d30147e13a76842fb61855f358ff",
+      "size_bytes": 8613,
+      "line_count": 119
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_admission.hh",
+      "sha256": "3d8b643399c680ff42deae59c62871063501d6964d67513635684d1ace02eea8",
+      "size_bytes": 10816,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_reference.cmake",
+      "sha256": "9ae728e892c0d5ad13c1343df3ad300ff60ae8b1beec84539d7417cb84d73315",
+      "size_bytes": 2297,
+      "line_count": 37
+    }
+  ],
+  "before_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_initial_fields.hh",
+        "sha256": "7c51b35aeda525a1f6c7fb5d0a99ccc170f39ddf8c7b10a28b36f15986a42c33",
+        "size_bytes": 3112,
+        "line_count": 49
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_initial_fields.hh",
+        "sha256": "7c51b35aeda525a1f6c7fb5d0a99ccc170f39ddf8c7b10a28b36f15986a42c33",
+        "size_bytes": 3112,
+        "line_count": 49
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_unit_helper.cpp",
+        "sha256": "6e2cc32abebc8b4cb8d0cb19aba611f23ff00baf93689b712a1bfe2d8e8e8549",
+        "size_bytes": 15625,
+        "line_count": 215
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_unit_helper.cpp",
+        "sha256": "6e2cc32abebc8b4cb8d0cb19aba611f23ff00baf93689b712a1bfe2d8e8e8549",
+        "size_bytes": 15625,
+        "line_count": 215
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_unit_fields.hh",
+        "sha256": "309e1fbe07fa690e8f4d0bab1528138efd5066e8df2ebea6cf89e9cc389a8bd5",
+        "size_bytes": 5901,
+        "line_count": 84
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_unit_fields.hh",
+        "sha256": "309e1fbe07fa690e8f4d0bab1528138efd5066e8df2ebea6cf89e9cc389a8bd5",
+        "size_bytes": 5901,
+        "line_count": 84
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_unit_admission.hh",
+        "sha256": "61af5e1d0b6a73a46915954c7d18760bdc99c3ea26078feae3bbb347d9779589",
+        "size_bytes": 12141,
+        "line_count": 136
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_unit_admission.hh",
+        "sha256": "61af5e1d0b6a73a46915954c7d18760bdc99c3ea26078feae3bbb347d9779589",
+        "size_bytes": 12141,
+        "line_count": 136
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_production_helper.cpp",
+        "sha256": "9351d80e9a930f4bdb16e1592c2dc86b5c42da32396a65265a74de769134d3a6",
+        "size_bytes": 18354,
+        "line_count": 232
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_production_helper.cpp",
+        "sha256": "9351d80e9a930f4bdb16e1592c2dc86b5c42da32396a65265a74de769134d3a6",
+        "size_bytes": 18354,
+        "line_count": 232
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_production_fields.hh",
+        "sha256": "468e1cd6a310df0df3b6316d9c65f600df375d481f428ee3e1e6882f60380eab",
+        "size_bytes": 8516,
+        "line_count": 118
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_production_fields.hh",
+        "sha256": "468e1cd6a310df0df3b6316d9c65f600df375d481f428ee3e1e6882f60380eab",
+        "size_bytes": 8516,
+        "line_count": 118
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_production_admission.hh",
+        "sha256": "e7ed52e0f8f63ba0628556cac3eacb61fedfd69a3c2c170a1923188f7a6f8ba3",
+        "size_bytes": 9580,
+        "line_count": 108
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_production_admission.hh",
+        "sha256": "e7ed52e0f8f63ba0628556cac3eacb61fedfd69a3c2c170a1923188f7a6f8ba3",
+        "size_bytes": 9580,
+        "line_count": 108
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake",
+        "sha256": "a218b2a8545b2726a2f0df963387cf334280477652eecc191e9abc160ee91ca0",
+        "size_bytes": 2299,
+        "line_count": 37
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/before/ctf03_reference.cmake",
+        "sha256": "a218b2a8545b2726a2f0df963387cf334280477652eecc191e9abc160ee91ca0",
+        "size_bytes": 2299,
+        "line_count": 37
+      }
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_observation_fields.hh.from-ctf03.diff",
+      "sha256": "22dc31f594283e2bbd70ee0b4b92d7488dd50f74c2c9d95e17144ad91ab72233",
+      "size_bytes": 9688,
+      "line_count": 139
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_helper.cpp.from-ctf03.diff",
+      "sha256": "c3811ae2c4c6896ecfd234ca262d23c099e67e77301b06fe5ff131f873aa9877",
+      "size_bytes": 5231,
+      "line_count": 65
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_fields.hh.from-ctf03.diff",
+      "sha256": "ec598ea80125a6afa50cecdb9780691ad5aa2c06c99325144a1355eafc102092",
+      "size_bytes": 1774,
+      "line_count": 31
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_admission.hh.from-ctf03.diff",
+      "sha256": "ee7ae96c89d71c3a0bb6f7eb73c7d46a135f5e023a889b735baa548f546e5757",
+      "size_bytes": 6980,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_helper.cpp.from-ctf03.diff",
+      "sha256": "f08006f5b0f98c75a712d04f8d0e0c2211279710c634eb673eeb1fdae5dc21ae",
+      "size_bytes": 6108,
+      "line_count": 67
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_fields.hh.from-ctf03.diff",
+      "sha256": "d83b9abcad444828e2433c56c48e6f2b125b17c2a16567ba0eb67d81faea4834",
+      "size_bytes": 1810,
+      "line_count": 31
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_admission.hh.from-ctf03.diff",
+      "sha256": "b194c61f038ef2cfe5c87c11e454d0a53af861d269d9917b223b49fb591e5305",
+      "size_bytes": 7212,
+      "line_count": 81
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_reference.cmake.from-ctf03.diff",
+      "sha256": "79a57ef4725da3171afc4798d50171cb2fe6c13829536002edde97a7bdf49dcc",
+      "size_bytes": 4415,
+      "line_count": 66
+    }
+  ],
+  "native_source_files_by_lane": {
+    "unit": [
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_helper.cpp",
+        "sha256": "f4c0ca173b039803ec0535d26beccdf82a4dbc9d4728e6147a49c5ddbea03dd7",
+        "size_bytes": 16404,
+        "line_count": 221
+      },
+      {
+        "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434,
+        "line_count": 147
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_fields.hh",
+        "sha256": "6e9d6b4011cee853d228b874236c078881238ae879c9e61e7f243b614722212a",
+        "size_bytes": 5998,
+        "line_count": 85
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_unit_admission.hh",
+        "sha256": "0dfa3c0b801a8742b223d794038edcb369d0c27341084c67b3066143a80798f0",
+        "size_bytes": 13384,
+        "line_count": 148
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-observer-prep-01/Construction.ctf04.cc",
+        "sha256": "9aacacbdb506c8460a404e8dd8bc1d8a311e28199a5346463dff81efc31253d8",
+        "size_bytes": 111430,
+        "line_count": 2128
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.hh",
+        "sha256": "4c085e27ca9468116a79a58fdd602620cf0b608cd6e30fce2c7cdd78357f315a",
+        "size_bytes": 8597,
+        "line_count": 243
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.cc",
+        "sha256": "1c96fbf50b1c857564bc5f53b1126a1a520abf46987526b1e1c3634ea0927fb7",
+        "size_bytes": 16100,
+        "line_count": 353
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_observation_fields.hh",
+        "sha256": "507a951402865ef66f3cde54e573b1e29af44eaec8108c42d51c1e9e12069456",
+        "size_bytes": 11863,
+        "line_count": 168
+      }
+    ],
+    "production": [
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_helper.cpp",
+        "sha256": "eb38fba33725985cc40b5bf1ad885454715d5cd9c72f08cf1b32214f20e58c70",
+        "size_bytes": 19169,
+        "line_count": 240
+      },
+      {
+        "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434,
+        "line_count": 147
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_fields.hh",
+        "sha256": "1bfa185e61b1a12d8d583f7946cabc6b4f23d30147e13a76842fb61855f358ff",
+        "size_bytes": 8613,
+        "line_count": 119
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_production_admission.hh",
+        "sha256": "3d8b643399c680ff42deae59c62871063501d6964d67513635684d1ace02eea8",
+        "size_bytes": 10816,
+        "line_count": 120
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-observer-prep-01/Construction.ctf04.cc",
+        "sha256": "9aacacbdb506c8460a404e8dd8bc1d8a311e28199a5346463dff81efc31253d8",
+        "size_bytes": 111430,
+        "line_count": 2128
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.hh",
+        "sha256": "4c085e27ca9468116a79a58fdd602620cf0b608cd6e30fce2c7cdd78357f315a",
+        "size_bytes": 8597,
+        "line_count": 243
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.cc",
+        "sha256": "1c96fbf50b1c857564bc5f53b1126a1a520abf46987526b1e1c3634ea0927fb7",
+        "size_bytes": 16100,
+        "line_count": 353
+      },
+      {
+        "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_observation_fields.hh",
+        "sha256": "507a951402865ef66f3cde54e573b1e29af44eaec8108c42d51c1e9e12069456",
+        "size_bytes": 11863,
+        "line_count": 168
+      }
+    ]
+  },
+  "source_authorities": [
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/manifest.json",
+      "sha256": "34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322",
+      "size_bytes": 35224,
+      "line_count": 875
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/manifest.json",
+      "sha256": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+      "size_bytes": 13066,
+      "line_count": 344
+    },
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake",
+      "sha256": "a218b2a8545b2726a2f0df963387cf334280477652eecc191e9abc160ee91ca0",
+      "size_bytes": 2299,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "line_count": 147
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-04.md",
+      "sha256": "c0385740126b62a5cda2021e59b99707a9d818a683a402d4a07c11c7493c6a75",
+      "size_bytes": 2679,
+      "line_count": 70
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+      "size_bytes": 15325,
+      "line_count": 418
+    }
+  ],
+  "inherited_input_only_requests": [
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+      "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+      "size_bytes": 103619,
+      "line_count": 4007
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/helper-request.json",
+      "sha256": "400beabb42dceafc0db6e0a7f3ebaf14bb54bb9e037b8c8777043e74233e301d",
+      "size_bytes": 22703,
+      "line_count": 599
+    }
+  ],
+  "selected_primary_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 146,
+      "last_line": 175,
+      "sha256": "7525a698a5c3f9f7d64beaed5bacd94f2798fd9904aa1860ff667bdf2b028c65",
+      "size_bytes": 1610
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 307,
+      "last_line": 316,
+      "sha256": "e72b991a881f17dfc1b946cf9efe611827978378c87381f119f7fdbd115b4a37",
+      "size_bytes": 209
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 405,
+      "last_line": 489,
+      "sha256": "87316e8038ff3ea1ba8500350cddeab26fe64c58eab17efc708f512d2c6e5e2b",
+      "size_bytes": 3901
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 490,
+      "last_line": 619,
+      "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+      "size_bytes": 6450
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 638,
+      "last_line": 729,
+      "sha256": "ae07cc5ff16250b2db3de22e53ae31689dd94809e2a795e001815c199ac9d93a",
+      "size_bytes": 5349
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 875,
+      "last_line": 980,
+      "sha256": "a008ec6bc24bf0968029661030b92c083224a7468f38301ec356a29f2154ed14",
+      "size_bytes": 7402
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1079,
+      "last_line": 1103,
+      "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+      "size_bytes": 580
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1177,
+      "last_line": 1190,
+      "sha256": "22fbdbabf14a6af2678b024406d378a68c32c45267aef0eb82c682a0bf5f805a",
+      "size_bytes": 427
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1399,
+      "last_line": 1410,
+      "sha256": "79fa97bff3736518491fafc1e5c1637b1b5adce60102ffd7a918d6148c815ccc",
+      "size_bytes": 465
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 67,
+      "last_line": 69,
+      "sha256": "e7388e3e84e7d3ce55bf1ddf20fc8ea63053244b5f02597721ba248f2a668c8c",
+      "size_bytes": 282
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 138,
+      "last_line": 145,
+      "sha256": "08fa78c55501638f2b9fa3b20a5876c89fdfd766d508d65361b809884d69e3fe",
+      "size_bytes": 678
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 159,
+      "last_line": 188,
+      "sha256": "fe59fe9bdbaf600c42be0f1a8b8f06eca3371846e6e72b1484f2fe211676ef83",
+      "size_bytes": 2587
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 260,
+      "last_line": 260,
+      "sha256": "b3d39a2771edc981981be9f49fe45a20c8ba1c67c72b13fcff60857f9dfb1312",
+      "size_bytes": 122
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 304,
+      "last_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 748,
+      "last_line": 753,
+      "sha256": "f6c8c9be47a705ea76bfab9fdb52a37f1a49b7d3e3d113156b67c91670963917",
+      "size_bytes": 76
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 812,
+      "last_line": 817,
+      "sha256": "5f3297e5bbb1ddd61de701f31b947aafffe17324b0814fcd8070f0fe8b00028b",
+      "size_bytes": 69
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 608,
+      "last_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 859,
+      "last_line": 927,
+      "sha256": "eebaa61277d0d3176c308cde597304ff7983b20a94329ce7c86a6ce579601924",
+      "size_bytes": 759
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 516,
+      "last_line": 522,
+      "sha256": "ce0073600743adcfb95c613e58fef50f2670c299fabf925bd10f5680201a256c",
+      "size_bytes": 131
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 643,
+      "last_line": 672,
+      "sha256": "70e87f13a042091dd46a3d30176a9e2d54d1d6ac0887473c3e94a6577d3269c9",
+      "size_bytes": 598
+    }
+  ],
+  "policy_proposals": [
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/input-policy-proposal.json",
+      "sha256": "f092e871f67fdb1cf80028ca6d93cf46a1fdfb1f2424ae61fd257886e5b1d2c7",
+      "size_bytes": 13276,
+      "line_count": 320
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "ba436b467ac7918f4f6da606e85efc93d559cdf590781bfb9a2b4264e8cadd6f",
+      "size_bytes": 7065,
+      "line_count": 233
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-04/native-helper-prep-01/README.md",
+    "sha256": "ece2d8ac3cbde50b69a8bc214e2f821d6797b3303ed0cbf9f8aa5f552d21f932",
+    "size_bytes": 4935,
+    "line_count": 72
+  },
+  "inventory_writer_source": {
+    "path": ".runtime/porting/CTF-04/native-helper-prep-01/finalize_sources.py",
+    "sha256": "a4420557ec1a4a4ce2a1d1c8318ace76838fd7d2aece9cbabc9fc46af6198153",
+    "size_bytes": 10996,
+    "line_count": 138
+  },
+  "input_obligations": {
+    "unit_models": 39,
+    "unit_whole_calls": 42,
+    "production_models": 15,
+    "production_loader_records": 195,
+    "production_whole_calls": "dynamic actual Construct owners",
+    "attempt_counts": "actual reached callback records, no expected counts"
+  },
+  "pending_actual_refs": {
+    "CTF04_scope_amendment": null,
+    "CTF04_scope_amendment_execution": null,
+    "unit_freeze": null,
+    "production_freeze": null
+  },
+  "source_only": true,
+  "target_or_project_imported_or_executed": false,
+  "scientific_or_weather_or_binary_payloads_read": false,
+  "canonical_or_Git_modified": false,
+  "new_QA_framework_or_execution_stage": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "authorship_limitations": "Author owns earlier Native transport, CTF03 ingress and CTF04 identity amendment; other-author full source review required, no independent own-formula science certificate."
+}

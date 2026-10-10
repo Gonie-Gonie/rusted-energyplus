@@ -1,0 +1,48 @@
+{
+  "schema": "ctf04-selected-first-assembly-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-04-frozen/manifest.json",
+    "sha256": "c5e6c3087426590cd9811733e1cedddabe4b46673731443e15fca40f107ad61d",
+    "size_bytes": 116437
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-04/scope-amendment-01/amendment.json",
+    "sha256": "2aa9959be454dd0cd3f18372accdb881b2476d6ee2f71bf4ec2d8ff0394fa17e",
+    "size_bytes": 2427
+  },
+  "actual_scope_validation": {
+    "path": ".runtime/porting/CTF-04/scope-amendment-check-command-01/receipt.json",
+    "sha256": "19799f16ef504d110c676469bb424689c4b71dd6612574d21c5344dd62b5ebf3",
+    "size_bytes": 3026
+  },
+  "actual_unit_freeze": {
+    "path": ".runtime/porting/CTF-04/frozen-packet-01/freeze-receipt.json",
+    "sha256": "039cdc4c77b024892e796ae0303069fa7af5895e603eb67105b92f76e5478cbd",
+    "size_bytes": 22570
+  },
+  "actual_unit_freeze_execution": {
+    "path": ".runtime/porting/CTF-04/input-freeze-command-01/receipt.json",
+    "sha256": "fa3f27f7f773b0fecf28dcaf77f4972ad0b774e17500248b69bd6bdc6da04372",
+    "size_bytes": 4005
+  },
+  "actual_production_freeze": {
+    "path": ".runtime/porting/CTF-04/production-frozen-packet-01/freeze-receipt.json",
+    "sha256": "fc22562e79e7575a2691c263a531b0ef78fe3f7a7ba72431413e8ddfa91dfb4b",
+    "size_bytes": 28057
+  },
+  "actual_production_freeze_execution": {
+    "path": ".runtime/porting/CTF-04/production-input-freeze-command-01/receipt.json",
+    "sha256": "894b8c87180417e945fa9998d67fbecf1ef9e7c5fbc2aac69c7f5509694d0649",
+    "size_bytes": 4044
+  },
+  "Root_FULL_and_other_author_FULL_source_reviews_preceded_execution": true,
+  "existing_accepted_predecessor_bodies_authenticated_by_exact_before_and_new_deltas": true,
+  "selected_actual_attempt_ordinal": 1,
+  "all_later_Native_attempts_retained_unpaired_noPASS": true,
+  "seven_matrix_profiles_zero_and_class_shape_signedzero_exact": true,
+  "initial3_and_preprocessing18_unchanged_separate": true,
+  "actual_CTF04_configure_compile_helpers_executed": false,
+  "actual_Rust_CTF04_candidate_applied_or_executed": false,
+  "numerical_PASS_claimed": false,
+  "scope_only_passed_other_three_gates_pending": true
+}

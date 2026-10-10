@@ -1,0 +1,92 @@
+# CTF04 factual Original data and custody review source
+
+SOURCE ONLY, HELD unexecuted. The six accepted CTF03 DataQA modules are adapted
+within the existing per-lane OriginalDataQA stage. Root alone approves source
+bytes, supplies real runtime refs, invokes these readers, and reads results.
+No new SourceQA/proof/engine stage, formula evaluator or numerical PASS is added.
+Before copies and exact six source diffs preserve the complete accepted source.
+
+Own sources: review_unit.py, review_production.py, unit_shape.py,
+production_shape.py, initial_shape.py and packet_io.py. The shared pure
+initial_shape retains the genuine initial619 validator and adds matrix packet,
+record and summary checks. Dependencies are SHA-checked before stdlib module
+import. packet_io105 retains accepted verbatim-drive normalization and changes
+only the contained output root to CTF04. No project module is imported.
+
+CLI remains the actual existing reader command:
+python -X utf8 -B review_unit.py|review_production.py
+--approved-source-sha256 <approved actual reader SHA>
+--approved-build-review-source-sha256 <held CTF04 PE reader SHA>
+--native-execution <actual Native argc5 recorder path#SHA>
+--results <actual result path#SHA; absent path permitted for genuine no result>
+--freeze-receipt <actual lane freeze receipt path#SHA>
+--freeze-execution <actual freeze recorder path#SHA>
+--build <actual lane build manifest path#SHA>
+--build-execution <actual compile recorder path#SHA>
+--build-review <actual independent PE review path#SHA>
+--build-review-execution <actual PE recorder path#SHA>
+--output-dir <fresh directory under .runtime/porting/CTF-04>
+
+Pinned authorities are Native helper3ff67/passive58ce/freezerbec235/PE1e618.
+Eight actual lane source refs must equal compiled source refs. The actual
+freezer writer SHA, own2 archives, exact21-argv command and full typed stdout
+are authenticated. Its actual scope/card/amendment/validation recorder args
+are bound, and its source-approved fresh policy precedes actual compilation.
+The real PE argv11/lane/build/output and compact {review,status} stdout remain
+exact. Native argc5, chronology, cwd, recorder source and source guards remain.
+All future runtime refs are supplied; this prep creates no future digest.
+
+Unit exact39/42 literal members/order/callers/bits and production fixed15 IDFs,
+ordered45 guards, source-produced caller and13 lifecycle/195 records persist.
+Construction counts remain actual/dynamic. Original7|21 source refs and selected
+ranges are preserved. Constructor/loader/source stops retain actual reasons,
+null observations and unknown obligations, never synthetic Native records.
+Original whole-call outcomes, later retry/solver flags and coefficients are
+context only. Actual diagnostic sinks/files and all source-created production
+text files remain inventoried. New helper schemas are ctf04[-production]-*.
+
+Old four callback records, counts and validation remain distinct. Observer
+aggregate now matches actual helper04: old failure flags OR matrix copy
+integrity failure. MatrixAssembly is a separate ordered visit ledger, never
+included in old callback totals. It validates actual callbacks/retained/omitted,
+six named failure counters/per-record flags/first-last events, bounded unique
+ordinals, copy availability and combined integrity. Any omitted/copy/bounds/
+identity/order/append failure prevents DataQA release; missing first visit is
+never replaced by a later one. An actual uninvoked/unreached visit stays absent,
+explicit unknown/excluded/noPASS, without inferred invocation or branch result.
+
+Each actual matrix snapshot retains actual construction/caller/context, converted
+active prefix plus Nodes/dx, source rcmax/selectors, current dt/history and bounds.
+Available AMat/IdenMatrix require actual1..rcmax square bounds and row-first flat
+vectors of rcmax squared elements; B/C/D require actual1..3/2/2 storage. Every
+scalar DTO is checked against its own class/bits/decimal serialization. Actual
+Iden entries are never generated or checked against a synthetic identity.
+No matrix/node/timestep/Resistance arithmetic or expected arrays are computed.
+
+Native copied handoffs require exact actual converted/initial prefix association.
+First actual ordinal1 must copy actual initial619 dt/history, same construction
+and caller. Later actual attempts are retained intact and explicitly unpaired,
+with no retry-state parity or Native retry operands supplied to Rust. Seven
+fresh zero/class/shape/signedzero profiles remain distinct from unchanged
+initial3 and preprocessing18 context. None is retuned from outputs.
+
+Actual build/provider/core/protected receipts and independent Original/derived
+PE map identities are reused; DataQA does not rehash binary payloads. Prospective
+debug-Original retention intent must match freeze/build/PE metadata and is copied
+beside the actual linked Original ref. It removes nothing and never reinterprets
+earlier live refs. Both actual files are verified by the existing PE stage before
+execution. Any later deletion needs its separate authorized actual lifecycle record.
+
+Result parsing uses the unchanged64MB physical bound (unit now follows the same
+production full-result parser instead of the16MB small-metadata loader). Exceeding
+the bound fails honestly; no records are silently capped or omitted. Release
+requires an actual complete ledger, no observer integrity failure and successful
+Native transport; production additionally requires actual loaders available.
+The report includes dynamic observed-only matrix counts/failure kinds, all direct
+custody/source refs, own executed archives, aware UTC and full typed JSON stdout.
+All comparison counts are null and numerical_PASS_claimed=false.
+
+Author wrote prior Native helper/CTF03 ingress/CTF04 identity glue; Base authored
+passive04 and earlier factual03 glue. Other-author review is of source/protocol,
+not independent own-formula certification. No target import/build/result/binary/
+weather payload read, canonical edit or Git action occurred during preparation.

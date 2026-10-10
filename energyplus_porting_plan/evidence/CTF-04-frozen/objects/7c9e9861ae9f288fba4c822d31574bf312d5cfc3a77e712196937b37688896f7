@@ -1,0 +1,138 @@
+--- .runtime/porting/CTF-04/native-observer-prep-01/before/ctf03_observer.hh
++++ .runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.hh
+@@ -1,14 +1,16 @@
+ // Output-only observations of actual Construction.cc local storage.
+-#ifndef CTF03_OBSERVER_HH_INCLUDED
+-#define CTF03_OBSERVER_HH_INCLUDED
++#ifndef CTF04_OBSERVER_HH_INCLUDED
++#define CTF04_OBSERVER_HH_INCLUDED
+ 
+ #include <EnergyPlus/Construction.hh>
+ #include <ObjexxFCL/Array1D.hh>
++#include <ObjexxFCL/Array2D.hh>
+ 
+ #include <array>
+ #include <cstddef>
+ #include <cstdint>
+ #include <optional>
++#include <vector>
+ 
+ namespace EnergyPlus::CTF01Observation {
+ 
+@@ -79,6 +81,84 @@
+     Binary64Copy TimeStepZone;
+ };
+ 
++// Matrix storage is observed during one actual selected 1D loop occurrence.
++enum class MatrixAttemptFailureKind : std::size_t
++{
++    IdentityMismatch = 0,
++    OrderFailure = 1,
++    ActivePrefixShape = 2,
++    MatrixShape = 3,
++    CopyException = 4,
++    LedgerAppendException = 5
++};
++
++struct MatrixAttemptFailure
++{
++    std::size_t observed_attempt_ordinal = 0;
++    MatrixAttemptFailureKind kind = MatrixAttemptFailureKind::IdentityMismatch;
++};
++
++struct Array1Bounds
++{
++    int lower = 0;
++    int upper = 0;
++    std::size_t size = 0;
++};
++
++struct Array2Bounds
++{
++    int lower1 = 0;
++    int upper1 = 0;
++    int lower2 = 0;
++    int upper2 = 0;
++    std::size_t size = 0;
++};
++
++struct MatrixLayerSnapshot
++{
++    LayerSnapshot converted;
++    int Nodes = 0;
++    Binary64Copy dx;
++};
++
++struct MatrixAttemptSnapshot
++{
++    // One-based visit to the sole post-728 callsite within the bound whole call.
++    std::size_t observed_attempt_ordinal = 0;
++    bool reached = false;
++    bool active_prefix_available = false;
++    bool matrices_available = false;
++    std::array<bool, 6> failure_kinds{};
++    bool ErrorsFound = false;
++    bool DoCTFErrorReport = false;
++    bool IsUsedCTF = false;
++    bool SourceSinkPresent = false;
++    int SolutionDimensions = 0;
++    int TotLayers = 0;
++    int LayersInConstruct = 0;
++    int NumResLayers = 0;
++    int rcmax = 0;
++    int NodeSource = 0;
++    int NodeUserTemp = 0;
++    Binary64Copy CTFTimeStep;
++    int NumHistories = 0;
++    Binary64Copy TimeStepZone;
++    std::size_t copied_layer_count = 0;
++    std::array<MatrixLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
++    // Null bounds mean the real owner was not allocated, not zero dimensions.
++    std::optional<Array2Bounds> AMat_bounds;
++    std::optional<Array2Bounds> IdenMatrix_bounds;
++    std::optional<Array1Bounds> BMat_bounds;
++    std::optional<Array1Bounds> CMat_bounds;
++    std::optional<Array1Bounds> DMat_bounds;
++    // Source i1 outer, i2 inner: i2 is contiguous. No identity/zero synthesis.
++    std::vector<Binary64Copy> AMat;
++    std::vector<Binary64Copy> IdenMatrix;
++    std::array<Binary64Copy, 3> BMat{};
++    std::array<Binary64Copy, 2> CMat{};
++    std::array<Binary64Copy, 2> DMat{};
++};
++
+ struct Capture
+ {
+     // Internal identity checks only. A future helper supplies its real owner ID.
+@@ -93,6 +173,14 @@
+     bool duplicate_phase = false;
+     bool phase_order_invalid = false;
+     bool active_prefix_invalid = false;
++    // These counters are separate; the old four checkpoint counters are intact.
++    std::size_t actual_matrix_attempt_callback_count = 0;
++    std::vector<MatrixAttemptSnapshot> matrix_attempts;
++    std::size_t matrix_attempt_records_omitted = 0;
++    bool matrix_observer_failure = false;
++    std::array<std::size_t, 6> matrix_failure_event_counts{};
++    std::optional<MatrixAttemptFailure> first_matrix_failure;
++    std::optional<MatrixAttemptFailure> last_matrix_failure;
+ };
+ 
+ // A helper binds its explicit actual state/array element before one genuine call.
+@@ -140,6 +228,16 @@
+                                  Array1D_int const &Nodes, Array1D<Real64> const &dx,
+                                  Real64 const &TimeStepZone) noexcept;
+ 
++void post_matrix_assembly(EnergyPlusData const &state,
++                          Construction::ConstructionProps const &construction,
++                          bool ErrorsFound, bool DoCTFErrorReport,
++                          int LayersInConstruct, int NumResLayers,
++                          Array1D<Real64> const &dl, Array1D<Real64> const &rk,
++                          Array1D<Real64> const &rho, Array1D<Real64> const &cp,
++                          Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
++                          Array1D_int const &Nodes, Array1D<Real64> const &dx,
++                          Real64 const &TimeStepZone) noexcept;
++
+ } // namespace EnergyPlus::CTF01Observation
+ 
+ #endif

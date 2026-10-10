@@ -1,0 +1,175 @@
+--- .runtime/porting/CTF-04/native-observer-prep-01/before/ctf03_observer.cc
++++ .runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.cc
+@@ -1,5 +1,5 @@
+-// No engine calls, floating-point arithmetic, allocation, I/O or scientific writes.
+-#include "ctf03_observer.hh"
++// Output-only copies; observation allocation exceptions never reach the engine.
++#include "ctf04_observer.hh"
+ 
+ #include <cstring>
+ #include <limits>
+@@ -190,4 +190,164 @@
+     snapshot.active_prefix_available = true;
+ }
+ 
++namespace {
++
++void matrix_failure(Capture &capture, MatrixAttemptSnapshot *snapshot,
++                    std::size_t ordinal, MatrixAttemptFailureKind kind) noexcept
++{
++    capture.matrix_observer_failure = true;
++    std::size_t const index = static_cast<std::size_t>(kind);
++    ++capture.matrix_failure_event_counts[index];
++    if (snapshot != nullptr) snapshot->failure_kinds[index] = true;
++    MatrixAttemptFailure const failure{ordinal, kind};
++    if (!capture.first_matrix_failure) capture.first_matrix_failure = failure;
++    capture.last_matrix_failure = failure;
++}
++
++std::optional<Array1Bounds> array_bounds(Array1D<Real64> const &values) noexcept
++{
++    if (!values.allocated()) return std::nullopt;
++    return Array1Bounds{values.l(), values.u(), values.size()};
++}
++
++std::optional<Array2Bounds> array_bounds(Array2D<Real64> const &values) noexcept
++{
++    if (!values.allocated()) return std::nullopt;
++    return Array2Bounds{values.l1(), values.u1(), values.l2(), values.u2(), values.size()};
++}
++
++bool exact_vector(std::optional<Array1Bounds> const &bounds, int count) noexcept
++{
++    return bounds && bounds->lower == 1 && bounds->upper == count &&
++           bounds->size == static_cast<std::size_t>(count);
++}
++
++bool exact_square(std::optional<Array2Bounds> const &bounds, int count,
++                  std::size_t elements) noexcept
++{
++    return bounds && bounds->lower1 == 1 && bounds->upper1 == count &&
++           bounds->lower2 == 1 && bounds->upper2 == count && bounds->size == elements;
++}
++
++} // namespace
++
++void post_matrix_assembly(EnergyPlusData const &state,
++                          Construction::ConstructionProps const &construction,
++                          bool ErrorsFound, bool DoCTFErrorReport,
++                          int LayersInConstruct, int NumResLayers,
++                          Array1D<Real64> const &dl, Array1D<Real64> const &rk,
++                          Array1D<Real64> const &rho, Array1D<Real64> const &cp,
++                          Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
++                          Array1D_int const &Nodes, Array1D<Real64> const &dx,
++                          Real64 const &TimeStepZone) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    std::size_t const ordinal = ++capture->actual_matrix_attempt_callback_count;
++    if (capture->bound_state != &state || capture->bound_construction != &construction) {
++        ++capture->matrix_attempt_records_omitted;
++        matrix_failure(*capture, nullptr, ordinal, MatrixAttemptFailureKind::IdentityMismatch);
++        return;
++    }
++    // Keep the visit identity even if dynamic record storage cannot be obtained.
++    try {
++        capture->matrix_attempts.emplace_back();
++    } catch (...) {
++        ++capture->matrix_attempt_records_omitted;
++        matrix_failure(*capture, nullptr, ordinal, MatrixAttemptFailureKind::LedgerAppendException);
++        return;
++    }
++    MatrixAttemptSnapshot &snapshot = capture->matrix_attempts.back();
++    snapshot.observed_attempt_ordinal = ordinal;
++    snapshot.reached = true;
++    if (capture->actual_callback_count != 4 ||
++        !capture->initial_discretization.reached ||
++        capture->actual_phase_callback_counts != std::array<std::size_t, 4>{1, 1, 1, 1}) {
++        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::OrderFailure);
++    }
++    snapshot.ErrorsFound = ErrorsFound;
++    snapshot.DoCTFErrorReport = DoCTFErrorReport;
++    snapshot.IsUsedCTF = construction.IsUsedCTF;
++    snapshot.SourceSinkPresent = construction.SourceSinkPresent;
++    snapshot.SolutionDimensions = construction.SolutionDimensions;
++    snapshot.TotLayers = construction.TotLayers;
++    snapshot.LayersInConstruct = LayersInConstruct;
++    snapshot.NumResLayers = NumResLayers;
++    snapshot.rcmax = construction.rcmax;
++    snapshot.NodeSource = construction.NodeSource;
++    snapshot.NodeUserTemp = construction.NodeUserTemp;
++    snapshot.CTFTimeStep = copy_bits(construction.CTFTimeStep);
++    snapshot.NumHistories = construction.NumHistories;
++    snapshot.TimeStepZone = copy_bits(TimeStepZone);
++    snapshot.AMat_bounds = array_bounds(construction.AMat);
++    snapshot.IdenMatrix_bounds = array_bounds(construction.IdenMatrix);
++    snapshot.BMat_bounds = array_bounds(construction.BMat);
++    snapshot.CMat_bounds = array_bounds(construction.CMat);
++    snapshot.DMat_bounds = array_bounds(construction.DMat);
++    if (LayersInConstruct < 1 || LayersInConstruct > Construction::MaxLayersInConstruct ||
++        NumResLayers < 0 || NumResLayers > LayersInConstruct ||
++        !covers_prefix(dl, LayersInConstruct) || !covers_prefix(rk, LayersInConstruct) ||
++        !covers_prefix(rho, LayersInConstruct) || !covers_prefix(cp, LayersInConstruct) ||
++        !covers_prefix(lr, LayersInConstruct) || !covers_prefix(ResLayer, LayersInConstruct) ||
++        !covers_prefix(Nodes, LayersInConstruct) || !covers_prefix(dx, LayersInConstruct)) {
++        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::ActivePrefixShape);
++        return;
++    }
++    for (int layer = 1; layer <= LayersInConstruct; ++layer) {
++        MatrixLayerSnapshot &copy = snapshot.active_prefix[static_cast<std::size_t>(layer - 1)];
++        copy.converted.dl = copy_bits(dl(layer));
++        copy.converted.rk = copy_bits(rk(layer));
++        copy.converted.rho = copy_bits(rho(layer));
++        copy.converted.cp = copy_bits(cp(layer));
++        copy.converted.lr = copy_bits(lr(layer));
++        copy.converted.ResLayer = ResLayer(layer);
++        copy.Nodes = Nodes(layer);
++        copy.dx = copy_bits(dx(layer));
++    }
++    snapshot.copied_layer_count = static_cast<std::size_t>(LayersInConstruct);
++    snapshot.active_prefix_available = true;
++    if (construction.SolutionDimensions != 1 || construction.rcmax < 1) {
++        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
++        return;
++    }
++    std::size_t const count = static_cast<std::size_t>(construction.rcmax);
++    if (count > std::numeric_limits<std::size_t>::max() / count) {
++        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
++        return;
++    }
++    std::size_t const elements = count * count;
++    if (!exact_square(snapshot.AMat_bounds, construction.rcmax, elements) ||
++        !exact_square(snapshot.IdenMatrix_bounds, construction.rcmax, elements) ||
++        !exact_vector(snapshot.BMat_bounds, 3) || !exact_vector(snapshot.CMat_bounds, 2) ||
++        !exact_vector(snapshot.DMat_bounds, 2)) {
++        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
++        return;
++    }
++    try {
++        snapshot.AMat.reserve(elements);
++        snapshot.IdenMatrix.reserve(elements);
++        for (int i1 = 1; i1 <= construction.rcmax; ++i1) {
++            for (int i2 = 1; i2 <= construction.rcmax; ++i2) {
++                snapshot.AMat.push_back(copy_bits(construction.AMat(i1, i2)));
++                snapshot.IdenMatrix.push_back(copy_bits(construction.IdenMatrix(i1, i2)));
++            }
++        }
++        for (int i = 1; i <= 3; ++i) snapshot.BMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.BMat(i));
++        for (int i = 1; i <= 2; ++i) {
++            snapshot.CMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.CMat(i));
++            snapshot.DMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.DMat(i));
++        }
++        if (snapshot.AMat.size() != elements || snapshot.IdenMatrix.size() != elements) {
++            matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
++            return;
++        }
++        snapshot.matrices_available = true;
++    } catch (...) {
++        // Partial dynamic buffers remain unavailable, and no exception reaches Native.
++        snapshot.AMat.clear();
++        snapshot.IdenMatrix.clear();
++        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::CopyException);
++    }
++}
++
+ } // namespace EnergyPlus::CTF01Observation

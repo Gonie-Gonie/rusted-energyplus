@@ -1,0 +1,46 @@
+# First CTF04 assembly ingress proposal
+
+SOURCE ONLY. This is an API/owner plan for Header's future reviewed proposal,
+not an implemented cache owner, retry driver, comparison, or gate result.
+
+Reuse the actual current ConstructionCtfInitialDiscretization and the exact
+ConstructionCtfLayerPreprocessing that fed it. A small public initializer may
+take only references to these two existing owners and return an ordered
+ConstructionCtfFirstAssembly { construction_id, result } owner. Its Result
+must preserve explicit InitialUnavailable(CtfInitialUnavailable), missing
+PostConversion, association/caller-owner mismatch, and AssemblyScope errors.
+The existing InitialUnavailable route must remain distinct; no fake matrix
+or default context is supplied for unused/error/allR/reverse/scope stops.
+
+Only an actual initial.result Ok with the same construction ID and genuine
+preprocessing.result/after_conversion may invoke the accepted pure assembly.
+Borrow converted.active.layers. Copy Nodes/dx from initial.active into local
+temporary slices without arithmetic. Copy rcmax, NodeSource, NodeUserTemp,
+initial_ctf_time_step_hours and initial_num_histories from that same Result.
+Use the same initial wrapper's real context and time_step_zone_hours; require
+the initial result's caller copy to match, without deriving a replacement.
+No node placement, spacing, resistance, reverse classification or timestep
+selection is repeated by the adapter.
+
+The selected adapter actually calls assemble_1d_ctf_state_space once with
+route Assemble and attempt_ordinal 1. This ordinal records that real first
+Rust assembly invocation, not evidence of a Native or Rust retry loop. The
+accepted pure function initializes actual AMat/IdenMatrix and compressed
+B3/C2/D2 using unchanged source arithmetic. Nonfinite returned arithmetic
+retains its real class; missing and nonfinite owners are different concepts.
+
+Production cache integration should construct the new owner immediately after
+its existing initial owner, using the same entry.ctf01_layer_preprocessing,
+then retain an ordered parallel Vec and expose it through HeatBalanceState.
+The existing CTF01 preprocessing, CTF02 coefficient storage/cache hash and
+CTF03 initial owner are unchanged. Unit observations call the same adapter
+on genuine literal-derived typed owners; production observations borrow the
+actual ordinary initialized cache owner. Observers never assemble matrices.
+
+All actual Native assembly attempts must remain separately observed. Only
+the first may be paired with this actual Rust owner until the genuine CTF05-08
+solver/retry driver exists. Never inject later Native CTFTimeStep/NumHistories
+into Rust or relabel a final whole-return snapshot as initial state. This API
+does not call exponential/inverse/Gamma/final coefficients or modify old
+massive fallback behavior. Header/Root settle the concrete typed API before
+source implementation; no additional QA execution stage is introduced.

@@ -1,0 +1,105 @@
+"""Refresh source-only context metadata after two reviewed CTF03 lint attributes."""
+from pathlib import Path
+import copy
+import difflib
+import hashlib
+import json
+import shutil
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-04/rust-assembly-prep-03"
+LINT = ROOT / ".runtime/porting/CTF-03/lint-amendment-01"
+assert not (OUT / "manifest.json").exists(), "Held version is immutable"
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+assert ref(OLD / "manifest.json")["sha256"] == "f1dfa92dd3c3ea255977be83c77df985832dcac7686d3589931334d6672eb622"
+old = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+fresh = copy.deepcopy(old)
+for name in ["before", "proposed", "historical"]:
+    shutil.copytree(OLD / name, OUT / name)
+for source in OLD.iterdir():
+    if source.is_file() and source.suffix in [".diff", ".md"]:
+        (OUT / source.name).write_bytes(source.read_bytes())
+
+old_prefix = OLD.relative_to(ROOT).as_posix() + "/"
+new_prefix = OUT.relative_to(ROOT).as_posix() + "/"
+def rebind(value):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "path" and isinstance(child, str) and child.startswith(old_prefix):
+                value[key] = new_prefix + child[len(old_prefix):]
+            else:
+                rebind(child)
+    elif isinstance(value, list):
+        for child in value:
+            rebind(child)
+rebind(fresh)
+
+changed = {}
+for index, row in enumerate(fresh["source_inventory"]):
+    current = ref(ROOT / row["path"])
+    if current != row:
+        name = Path(row["path"]).name
+        assert name in ["ctf_initial_discretization.rs", "ctf_initial_owner.rs"]
+        archive = LINT / "before" / name
+        assert ref(archive)["sha256"] == row["sha256"]
+        local = OUT / "historical" / row["path"]
+        local.parent.mkdir(parents=True, exist_ok=True)
+        local.write_bytes(archive.read_bytes())
+        changed[row["path"]] = (row, ref(local))
+        fresh["source_inventory"][index] = current
+        fresh["historical_dependency_refresh"].append({
+            "historical_path": row["path"], "accepted_historical": row,
+            "historical_archive": ref(local), "current": current,
+            "source_change": "reviewed function-level Clippy allowance only; body/test/policy unchanged",
+            "actual_attribute_diff": ref(LINT / (name + ".diff")),
+        })
+assert len(changed) == 2
+for row in fresh["read_source_ranges"]:
+    if row["path"] in changed:
+        previous = copy.deepcopy(row)
+        row["accepted_historical_range"] = previous
+        row["historical_source_archive"] = changed[row["path"]][1]
+        assert row["start_line"] == 1
+        row["end_line"] = len((ROOT / row["path"]).read_bytes().splitlines())
+        body = b"".join((ROOT / row["path"]).read_bytes().splitlines(keepends=True)[:row["end_line"]])
+        row["sha256"] = hashlib.sha256(body).hexdigest()
+        row["size_bytes"] = len(body)
+
+readme = (OUT / "README.md").read_text(encoding="utf-8") + '''
+## Metadata-only preparation04
+
+Preparation03 remains immutable. Root's two reviewed function-level Clippy
+attributes changed only the current CTF03 pure/route source metadata. Those
+two current identities and full-source ranges are refreshed here; their exact
+pre-attribute bytes are authenticated against Root's lint-amendment before
+archives and retained locally. The parent172, assembly259, tests192, all three
+source diffs and ingress-plan46 remain byte-identical03. No body, arithmetic,
+test, identity producer, policy or declared source change is introduced.
+'''
+(OUT / "README.md").write_text(readme, encoding="utf-8", newline="\n")
+readme_delta = "".join(difflib.unified_diff((OLD / "README.md").read_text().splitlines(True), readme.splitlines(True),
+    fromfile=old_prefix + "README.md", tofile=new_prefix + "README.md"))
+(OUT / "README.md.from-03.diff").write_text(readme_delta, encoding="utf-8", newline="\n")
+fresh["readme"] = ref(OUT / "README.md")
+fresh["readme_from_03_diff"] = ref(OUT / "README.md.from-03.diff")
+fresh["predecessor_preparation"] = ref(OLD / "manifest.json")
+fresh["accepted_CTF03_application_before_attributes"] = fresh.pop("current_CTF03_application")
+fresh["actual_CTF03_function_attribute_diffs"] = [
+    ref(LINT / "ctf_initial_discretization.rs.diff"), ref(LINT / "ctf_initial_owner.rs.diff")]
+fresh["predecessor_preparation_source"] = ref(OLD / "prepare_rebase.py")
+fresh["own_preparation_source"] = ref(Path(__file__).resolve())
+fresh["first_assembly_ingress_proposal_not_canonical"] = ref(ROOT / ".runtime/porting/CTF-04/cache-ingress-prep-01/manifest.json")
+fresh["metadata_only_refresh04"] = {"changed_current_source_identities": 2,
+    "parent_module_tests_and_source_diffs_byte_identical03": True,
+    "new_Rust_code_or_math_policy_change": False}
+(OUT / "manifest.json").write_text(json.dumps(fresh, indent=2) + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"manifest": ref(OUT / "manifest.json"),
+                  "changed_context_sources": [ref(ROOT / name) for name in changed]}, indent=2))

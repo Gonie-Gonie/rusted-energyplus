@@ -1,0 +1,491 @@
+"""Source-only construction of the passive CTF04 proposal; no project imports."""
+from pathlib import Path
+import datetime
+import difflib
+import hashlib
+import json
+
+ROOT = Path.cwd()
+PREP = ROOT / '.runtime/porting/CTF-04/native-observer-prep-01'
+OLD = ROOT / '.runtime/porting/CTF-03/native-observer-prep-01'
+ORIGINAL = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(),
+            'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def put(name, text):
+    path = PREP / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.encode('utf-8'))
+    return path
+
+
+def once(text, before, after):
+    assert text.count(before) == 1
+    return text.replace(before, after, 1)
+
+
+assert ref(OLD / 'manifest.json')['sha256'] == '39eb205fc3eaecff3e9135b4e799f3ffc2fa38d80bdf0d62f79396f7630cd22e'
+assert ref(ORIGINAL)['sha256'] == 'd85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695'
+assert not (PREP / 'manifest.json').exists()
+
+types = r'''// Matrix storage is observed during one actual selected 1D loop occurrence.
+enum class MatrixAttemptFailureKind : std::size_t
+{
+    IdentityMismatch = 0,
+    OrderFailure = 1,
+    ActivePrefixShape = 2,
+    MatrixShape = 3,
+    CopyException = 4,
+    LedgerAppendException = 5
+};
+
+struct MatrixAttemptFailure
+{
+    std::size_t observed_attempt_ordinal = 0;
+    MatrixAttemptFailureKind kind = MatrixAttemptFailureKind::IdentityMismatch;
+};
+
+struct Array1Bounds
+{
+    int lower = 0;
+    int upper = 0;
+    std::size_t size = 0;
+};
+
+struct Array2Bounds
+{
+    int lower1 = 0;
+    int upper1 = 0;
+    int lower2 = 0;
+    int upper2 = 0;
+    std::size_t size = 0;
+};
+
+struct MatrixLayerSnapshot
+{
+    LayerSnapshot converted;
+    int Nodes = 0;
+    Binary64Copy dx;
+};
+
+struct MatrixAttemptSnapshot
+{
+    // One-based visit to the sole post-728 callsite within the bound whole call.
+    std::size_t observed_attempt_ordinal = 0;
+    bool reached = false;
+    bool active_prefix_available = false;
+    bool matrices_available = false;
+    std::array<bool, 6> failure_kinds{};
+    bool ErrorsFound = false;
+    bool DoCTFErrorReport = false;
+    bool IsUsedCTF = false;
+    bool SourceSinkPresent = false;
+    int SolutionDimensions = 0;
+    int TotLayers = 0;
+    int LayersInConstruct = 0;
+    int NumResLayers = 0;
+    int rcmax = 0;
+    int NodeSource = 0;
+    int NodeUserTemp = 0;
+    Binary64Copy CTFTimeStep;
+    int NumHistories = 0;
+    Binary64Copy TimeStepZone;
+    std::size_t copied_layer_count = 0;
+    std::array<MatrixLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    // Null bounds mean the real owner was not allocated, not zero dimensions.
+    std::optional<Array2Bounds> AMat_bounds;
+    std::optional<Array2Bounds> IdenMatrix_bounds;
+    std::optional<Array1Bounds> BMat_bounds;
+    std::optional<Array1Bounds> CMat_bounds;
+    std::optional<Array1Bounds> DMat_bounds;
+    // Source i1 outer, i2 inner: i2 is contiguous. No identity/zero synthesis.
+    std::vector<Binary64Copy> AMat;
+    std::vector<Binary64Copy> IdenMatrix;
+    std::array<Binary64Copy, 3> BMat{};
+    std::array<Binary64Copy, 2> CMat{};
+    std::array<Binary64Copy, 2> DMat{};
+};
+
+'''
+
+capture_fields = r'''    // These counters are separate; the old four checkpoint counters are intact.
+    std::size_t actual_matrix_attempt_callback_count = 0;
+    std::vector<MatrixAttemptSnapshot> matrix_attempts;
+    std::size_t matrix_attempt_records_omitted = 0;
+    bool matrix_observer_failure = false;
+    std::array<std::size_t, 6> matrix_failure_event_counts{};
+    std::optional<MatrixAttemptFailure> first_matrix_failure;
+    std::optional<MatrixAttemptFailure> last_matrix_failure;
+'''
+
+declaration = r'''void post_matrix_assembly(EnergyPlusData const &state,
+                          Construction::ConstructionProps const &construction,
+                          bool ErrorsFound, bool DoCTFErrorReport,
+                          int LayersInConstruct, int NumResLayers,
+                          Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                          Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                          Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                          Array1D_int const &Nodes, Array1D<Real64> const &dx,
+                          Real64 const &TimeStepZone) noexcept;
+
+'''
+
+implementation = r'''namespace {
+
+void matrix_failure(Capture &capture, MatrixAttemptSnapshot *snapshot,
+                    std::size_t ordinal, MatrixAttemptFailureKind kind) noexcept
+{
+    capture.matrix_observer_failure = true;
+    std::size_t const index = static_cast<std::size_t>(kind);
+    ++capture.matrix_failure_event_counts[index];
+    if (snapshot != nullptr) snapshot->failure_kinds[index] = true;
+    MatrixAttemptFailure const failure{ordinal, kind};
+    if (!capture.first_matrix_failure) capture.first_matrix_failure = failure;
+    capture.last_matrix_failure = failure;
+}
+
+std::optional<Array1Bounds> array_bounds(Array1D<Real64> const &values) noexcept
+{
+    if (!values.allocated()) return std::nullopt;
+    return Array1Bounds{values.l(), values.u(), values.size()};
+}
+
+std::optional<Array2Bounds> array_bounds(Array2D<Real64> const &values) noexcept
+{
+    if (!values.allocated()) return std::nullopt;
+    return Array2Bounds{values.l1(), values.u1(), values.l2(), values.u2(), values.size()};
+}
+
+bool exact_vector(std::optional<Array1Bounds> const &bounds, int count) noexcept
+{
+    return bounds && bounds->lower == 1 && bounds->upper == count &&
+           bounds->size == static_cast<std::size_t>(count);
+}
+
+bool exact_square(std::optional<Array2Bounds> const &bounds, int count,
+                  std::size_t elements) noexcept
+{
+    return bounds && bounds->lower1 == 1 && bounds->upper1 == count &&
+           bounds->lower2 == 1 && bounds->upper2 == count && bounds->size == elements;
+}
+
+} // namespace
+
+void post_matrix_assembly(EnergyPlusData const &state,
+                          Construction::ConstructionProps const &construction,
+                          bool ErrorsFound, bool DoCTFErrorReport,
+                          int LayersInConstruct, int NumResLayers,
+                          Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                          Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                          Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                          Array1D_int const &Nodes, Array1D<Real64> const &dx,
+                          Real64 const &TimeStepZone) noexcept
+{
+    Capture *capture = active_capture;
+    if (capture == nullptr) return;
+    std::size_t const ordinal = ++capture->actual_matrix_attempt_callback_count;
+    if (capture->bound_state != &state || capture->bound_construction != &construction) {
+        ++capture->matrix_attempt_records_omitted;
+        matrix_failure(*capture, nullptr, ordinal, MatrixAttemptFailureKind::IdentityMismatch);
+        return;
+    }
+    // Keep the visit identity even if dynamic record storage cannot be obtained.
+    try {
+        capture->matrix_attempts.emplace_back();
+    } catch (...) {
+        ++capture->matrix_attempt_records_omitted;
+        matrix_failure(*capture, nullptr, ordinal, MatrixAttemptFailureKind::LedgerAppendException);
+        return;
+    }
+    MatrixAttemptSnapshot &snapshot = capture->matrix_attempts.back();
+    snapshot.observed_attempt_ordinal = ordinal;
+    snapshot.reached = true;
+    if (capture->actual_callback_count != 4 ||
+        !capture->initial_discretization.reached ||
+        capture->actual_phase_callback_counts != std::array<std::size_t, 4>{1, 1, 1, 1}) {
+        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::OrderFailure);
+    }
+    snapshot.ErrorsFound = ErrorsFound;
+    snapshot.DoCTFErrorReport = DoCTFErrorReport;
+    snapshot.IsUsedCTF = construction.IsUsedCTF;
+    snapshot.SourceSinkPresent = construction.SourceSinkPresent;
+    snapshot.SolutionDimensions = construction.SolutionDimensions;
+    snapshot.TotLayers = construction.TotLayers;
+    snapshot.LayersInConstruct = LayersInConstruct;
+    snapshot.NumResLayers = NumResLayers;
+    snapshot.rcmax = construction.rcmax;
+    snapshot.NodeSource = construction.NodeSource;
+    snapshot.NodeUserTemp = construction.NodeUserTemp;
+    snapshot.CTFTimeStep = copy_bits(construction.CTFTimeStep);
+    snapshot.NumHistories = construction.NumHistories;
+    snapshot.TimeStepZone = copy_bits(TimeStepZone);
+    snapshot.AMat_bounds = array_bounds(construction.AMat);
+    snapshot.IdenMatrix_bounds = array_bounds(construction.IdenMatrix);
+    snapshot.BMat_bounds = array_bounds(construction.BMat);
+    snapshot.CMat_bounds = array_bounds(construction.CMat);
+    snapshot.DMat_bounds = array_bounds(construction.DMat);
+    if (LayersInConstruct < 1 || LayersInConstruct > Construction::MaxLayersInConstruct ||
+        NumResLayers < 0 || NumResLayers > LayersInConstruct ||
+        !covers_prefix(dl, LayersInConstruct) || !covers_prefix(rk, LayersInConstruct) ||
+        !covers_prefix(rho, LayersInConstruct) || !covers_prefix(cp, LayersInConstruct) ||
+        !covers_prefix(lr, LayersInConstruct) || !covers_prefix(ResLayer, LayersInConstruct) ||
+        !covers_prefix(Nodes, LayersInConstruct) || !covers_prefix(dx, LayersInConstruct)) {
+        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::ActivePrefixShape);
+        return;
+    }
+    for (int layer = 1; layer <= LayersInConstruct; ++layer) {
+        MatrixLayerSnapshot &copy = snapshot.active_prefix[static_cast<std::size_t>(layer - 1)];
+        copy.converted.dl = copy_bits(dl(layer));
+        copy.converted.rk = copy_bits(rk(layer));
+        copy.converted.rho = copy_bits(rho(layer));
+        copy.converted.cp = copy_bits(cp(layer));
+        copy.converted.lr = copy_bits(lr(layer));
+        copy.converted.ResLayer = ResLayer(layer);
+        copy.Nodes = Nodes(layer);
+        copy.dx = copy_bits(dx(layer));
+    }
+    snapshot.copied_layer_count = static_cast<std::size_t>(LayersInConstruct);
+    snapshot.active_prefix_available = true;
+    if (construction.SolutionDimensions != 1 || construction.rcmax < 1) {
+        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
+        return;
+    }
+    std::size_t const count = static_cast<std::size_t>(construction.rcmax);
+    if (count > std::numeric_limits<std::size_t>::max() / count) {
+        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
+        return;
+    }
+    std::size_t const elements = count * count;
+    if (!exact_square(snapshot.AMat_bounds, construction.rcmax, elements) ||
+        !exact_square(snapshot.IdenMatrix_bounds, construction.rcmax, elements) ||
+        !exact_vector(snapshot.BMat_bounds, 3) || !exact_vector(snapshot.CMat_bounds, 2) ||
+        !exact_vector(snapshot.DMat_bounds, 2)) {
+        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
+        return;
+    }
+    try {
+        snapshot.AMat.reserve(elements);
+        snapshot.IdenMatrix.reserve(elements);
+        for (int i1 = 1; i1 <= construction.rcmax; ++i1) {
+            for (int i2 = 1; i2 <= construction.rcmax; ++i2) {
+                snapshot.AMat.push_back(copy_bits(construction.AMat(i1, i2)));
+                snapshot.IdenMatrix.push_back(copy_bits(construction.IdenMatrix(i1, i2)));
+            }
+        }
+        for (int i = 1; i <= 3; ++i) snapshot.BMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.BMat(i));
+        for (int i = 1; i <= 2; ++i) {
+            snapshot.CMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.CMat(i));
+            snapshot.DMat[static_cast<std::size_t>(i - 1)] = copy_bits(construction.DMat(i));
+        }
+        if (snapshot.AMat.size() != elements || snapshot.IdenMatrix.size() != elements) {
+            matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::MatrixShape);
+            return;
+        }
+        snapshot.matrices_available = true;
+    } catch (...) {
+        // Partial dynamic buffers remain unavailable, and no exception reaches Native.
+        snapshot.AMat.clear();
+        snapshot.IdenMatrix.clear();
+        matrix_failure(*capture, &snapshot, ordinal, MatrixAttemptFailureKind::CopyException);
+    }
+}
+
+'''
+
+call = '''                    EnergyPlus::CTF01Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
+                                                                       LayersInConstruct, NumResLayers, dl, rk, rho, cp,
+                                                                       lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);
+'''
+
+old_hh = (OLD / 'ctf03_observer.hh').read_text(encoding='utf-8')
+old_cc = (OLD / 'ctf03_observer.cc').read_text(encoding='utf-8')
+old_tu = (OLD / 'Construction.ctf03.cc').read_text(encoding='utf-8')
+hh = old_hh.replace('CTF03_OBSERVER_HH_INCLUDED', 'CTF04_OBSERVER_HH_INCLUDED')
+hh = once(hh, '#include <ObjexxFCL/Array1D.hh>\n', '#include <ObjexxFCL/Array1D.hh>\n#include <ObjexxFCL/Array2D.hh>\n')
+hh = once(hh, '#include <optional>\n', '#include <optional>\n#include <vector>\n')
+hh = once(hh, 'struct Capture\n', types + 'struct Capture\n')
+hh = once(hh, '    bool active_prefix_invalid = false;\n', '    bool active_prefix_invalid = false;\n' + capture_fields)
+hh = once(hh, '} // namespace EnergyPlus::CTF01Observation\n', declaration + '} // namespace EnergyPlus::CTF01Observation\n')
+cc = once(old_cc, '#include "ctf03_observer.hh"', '#include "ctf04_observer.hh"')
+cc = once(cc, '// No engine calls, floating-point arithmetic, allocation, I/O or scientific writes.\n',
+          '// Output-only copies; observation allocation exceptions never reach the engine.\n')
+cc = once(cc, '} // namespace EnergyPlus::CTF01Observation\n', implementation + '} // namespace EnergyPlus::CTF01Observation\n')
+tu = once(old_tu, '#include "ctf03_observer.hh"', '#include "ctf04_observer.hh"')
+anchor = '                    this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method\n'
+tu = once(tu, anchor, anchor + call)
+
+sources = []
+for old_name, new_name, old_text, new_text in [
+    ('ctf03_observer.hh', 'ctf04_observer.hh', old_hh, hh),
+    ('ctf03_observer.cc', 'ctf04_observer.cc', old_cc, cc),
+    ('Construction.ctf03.cc', 'Construction.ctf04.cc', old_tu, tu),
+]:
+    before = put('before/' + old_name, old_text)
+    proposed = put(new_name, new_text)
+    diff = put(new_name + '.from-ctf03.diff', ''.join(difflib.unified_diff(
+        old_text.splitlines(keepends=True), new_text.splitlines(keepends=True),
+        fromfile=before.relative_to(ROOT).as_posix(), tofile=proposed.relative_to(ROOT).as_posix())))
+    assert before.read_bytes() == (OLD / old_name).read_bytes()
+    sources.append({'predecessor': ref(OLD / old_name), 'before': ref(before),
+                    'source': ref(proposed), 'diff': ref(diff)})
+
+# Exactly invert our TU additions and the accepted four old callbacks.
+assert tu.replace('#include "ctf04_observer.hh"', '#include "ctf03_observer.hh"').replace(call, '') == old_tu
+restored = tu.replace('#include "ctf04_observer.hh"\n', '').replace(call, '')
+for name in ['post_load', 'post_merge', 'post_conversion', 'post_initial_discretization']:
+    begin = restored.index('    EnergyPlus::CTF01Observation::' + name) if name != 'post_initial_discretization' else restored.index('            EnergyPlus::CTF01Observation::' + name)
+    end = restored.index(';\n', begin) + 2
+    if name == 'post_initial_discretization':
+        assert restored[end:end+1] == '\n'
+        end += 1  # This blank line was part of the accepted03 insertion.
+    restored = restored[:begin] + restored[end:]
+assert restored.encode() == ORIGINAL.read_bytes()
+assert cc.replace(implementation, '').replace('#include "ctf04_observer.hh"', '#include "ctf03_observer.hh"').replace(
+    '// Output-only copies; observation allocation exceptions never reach the engine.\n',
+    '// No engine calls, floating-point arithmetic, allocation, I/O or scientific writes.\n') == old_cc
+
+readme = '''# CTF-04 passive per-attempt matrix observation proposal
+
+SOURCE-READY source only. This extends held CTF03 observer39eb and adds one
+passive call immediately after original Construction.cc728, inside the actual
+one-dimensional branch and its existing retry loop. No scientific statement,
+branch, arithmetic, allocation, helper call or retry condition is changed.
+Removing the new call and restoring the include returns held03 byte-exactly;
+removing all five passive calls/include returns pinned Original d85937 exactly.
+
+The old three preprocessing Snapshots, separate initial619 owner, four phase
+counts, their callback bodies and existing binding mechanism are unchanged.
+Matrix visits have separate ordered records/counters, not a fifth old phase.
+The actual counter increments once per visit to the sole post728 callsite for
+the bound whole construction call. No count is inferred from timestep/history.
+The future helper associates that binding with its actual model/lane, whole-call
+ordinal, construction array index/name and original LayerPoint membership.
+The Capture pointers are identity checks, never serialized IDs or operands.
+
+MatrixAttemptSnapshot copies actual ErrorsFound/DoCTFErrorReport, IsUsedCTF,
+SourceSinkPresent/SolutionDimensions/TotLayers, local LayersInConstruct and
+NumResLayers, rcmax, reset NodeSource/NodeUserTemp, current CTFTimeStep bits,
+NumHistories, and actual caller TimeStepZone bits. Its active prefix separately
+copies dl/rk/rho/cp/lr/ResLayer and Nodes/dx. It invents no merged material IDs,
+capacitance, conductance, node count, identity, zero entries or other arithmetic.
+Only the actual copied local prefix is observed; the fixed-array tail is never
+an operand. Nonselected source/sink context, if reached at this 1D site, remains
+captured context, not certification of the pure selected no-source algorithm.
+
+The actual AMat and IdenMatrix owners must have allocated bounds1..rcmax for
+both dimensions and exact rcmax*rcmax storage. Their complete values are copied
+i1 outer/i2 inner, with actual i2-contiguous orientation: flat offset
+(i1-1)*rcmax+(i2-1). Every zero/nonfinite/signed-zero object representation is
+copied by memcpy; no class conversion or off-band/identity synthesis occurs.
+BMat(3), CMat(2), DMat(2) retain their genuine compressed shapes and values.
+Actual allocated bounds/size are observed separately; null means unallocated.
+Dimensions and shape arithmetic are metadata checks, not scientific evaluation.
+
+Construction638-648 allocates/zeros AMat and creates Iden once, before657.
+B/CD are allocated3/2/2 by the actual constructor330-332; their values become
+initialized only through the reached assembly661-728. The callback reads them
+at that final assignment. Each retry reuses actual AMat/Iden and rewrites the
+selected assembly, not fresh inferred buffers. Nodes/dx/rcmax were produced
+once before initial619. Retry908-936 changes current timestep/history only.
+No later returned timestep replaces the initial snapshot or an earlier visit.
+AMat/Iden are deallocated1082-1089; copies are made while real owners/local
+arrays are alive, then retained independently for future serialization.
+
+The callback is noexcept and never writes scientific state, performs floating
+arithmetic, invokes an engine/helper or does I/O. Unlike the old fixed snapshots,
+observation-only vectors allocate to retain every actual visit without an
+invented attempt bound. Any allocation/copy exception is caught. A failed
+record append increments matrix_attempt_records_omitted; its actual ordinal is
+also retained in typed first/last failure metadata. All retained records carry
+their true visit ordinal, so any missing ordinal in1..actual_callback_count is
+an explicit missing whole record, never a skipped optional event. Copy failure
+clears partial dynamic buffers and keeps matrices_available false.
+
+Identity/order/prefix/shape/copy/append failures set matrix_observer_failure,
+increment typed failure-event counters and retain first/last failure association.
+Per-record failure_kinds preserves every detected category on retained records.
+Any such failure is required observation-integrity FAIL in future helpers/QA,
+not an optional unavailable event or numerical PASS. Helpers must fail before
+comparison if totals, retained ordinals, omitted count, copied shapes or these
+flags disagree. A reached missing matrix on either/both sides fails. No fixed
+attempt cap, silent truncation, fallback values or relaxed numeric policy exists.
+Unreached unused/loading-error/allR/reverse routes remain distinct unavailable
+context; a completed assembly visit does not prove later Exp/Inverse returned.
+
+This package adds no helper, serializer, input cases, numeric freeze, QA/proof
+framework, execution stage or canonical change. Future helpers must compile
+the matching fresh TU/header/implementation together, not mix Capture layouts
+or link an earlier observer implementation. Source policy still requires Root
+approval and full other-author review before any build/first observation.
+I authored the held pure CTF04 algorithm; this package does not independently
+certify that algorithm or any scientific output. Root and an other-author peer
+must review these passive boundaries. All card gates and future execution facts
+remain pending; no outputs/results/weather/binaries were read here.
+'''
+put('README.md', readme)
+
+primary = [
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc', [(146,175),(307,316),(405,489),(490,619),(638,729),(875,980),(1079,1103),(1177,1190),(1399,1410)]),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh', [(67,69),(138,145),(159,188),(260,260),(304,342)]),
+    ('.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh', [(748,753),(812,817)]),
+    ('.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh', [(608,627),(859,927)]),
+    ('.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh', [(516,522),(643,672)]),
+]
+inventory = [ref(ROOT / name) for name, _ in primary]
+ranges = []
+for name, spans in primary:
+    lines = (ROOT / name).read_bytes().splitlines(keepends=True)
+    for first,last in spans:
+        data = b''.join(lines[first-1:last])
+        ranges.append({'path':name,'first_line':first,'last_line':last,
+                       'sha256':hashlib.sha256(data).hexdigest(),'size_bytes':len(data)})
+authorities = [ref(ROOT / path) for path in [
+    '.runtime/porting/CTF-03/native-observer-prep-01/manifest.json',
+    '.runtime/porting/CTF-04/native-observation-readiness-prep-01/manifest.json',
+    '.runtime/porting/CTF-04/native-observation-readiness-prep-01/readiness.md',
+    '.runtime/porting/CTF-04/rust-assembly-prep-02/manifest.json',
+    '.runtime/porting/CTF-04/rust-assembly-prep-02/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs',
+]]
+manifest = {
+    'schema':'ctf04-passive-native-matrix-source-preparation.v1',
+    'status':'SOURCE-READY-HELD-unapplied-unexecuted',
+    'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'source_files':sources, 'readme':ref(PREP/'README.md'),
+    'preparation_source':ref(PREP/'prepare.py'),
+    'primary_source_inventory':inventory, 'selected_primary_ranges':ranges,
+    'accepted_source_authorities':authorities,
+    'source_checks':{
+        'before_copies_byte_exact':True,'three_regenerated_diffs_exact':True,
+        'inverse_new_TU_changes_restore_accepted_CTF03':True,
+        'inverse_all_five_calls_and_include_restore_Original':True,
+        'old_four_callback_implementation_bodies_byte_exact':True,
+        'old_three_phases_and_initial_owner_unchanged':True,
+        'old_four_checkpoint_counters_unchanged':True,
+        'new_call_after_original_line':728,
+        'source_arithmetic_or_branch_modification':False,
+    },
+    'capture_contract':{
+        'association':'bound actual whole call plus one-based observed post728 visit ordinal',
+        'matrices':['AMat','IdenMatrix','BMat','CMat','DMat'],
+        'layout':'actual i1 outer/i2 inner; i2 contiguous',
+        'compressed_shapes':{'BMat':3,'CMat':2,'DMat':2},
+        'initial619_and_retry_attempt_records_distinct':True,
+        'identity_synthesized':False,'attempt_bound_invented':False,
+        'observer_failure_blocks_required_integrity_release':True,
+        'new_helper_or_serializer_or_numeric_policy':False,
+    },
+    'authorship_limit':'Author also authored pure CTF04; this is not independent formula/output certification. Root and other-author source review required.',
+    'source_only':True,'canonical_modified':False,'scientific_execution_performed':False,
+    'project_or_target_imported_or_executed':False,
+    'Cargo_formatter_build_engine_or_Git_invoked':False,
+    'scientific_weather_or_binary_payloads_read':False,
+    'new_QA_or_proof_execution_stage':False,'gates_updated':False,
+}
+put('manifest.json', json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'manifest':ref(PREP/'manifest.json'),'own_sources':[row['source'] for row in sources]}))

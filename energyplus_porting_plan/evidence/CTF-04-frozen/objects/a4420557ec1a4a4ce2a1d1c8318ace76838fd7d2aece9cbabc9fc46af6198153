@@ -1,0 +1,138 @@
+"""Write source-only inventory/proposals. No project imports or executions."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+PREP = ROOT / ".runtime/porting/CTF-04/native-helper-prep-01"
+PRIOR = ROOT / ".runtime/porting/CTF-03/native-helper-prep-01"
+OBSERVER = ROOT / ".runtime/porting/CTF-04/native-observer-prep-01"
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def put(path, value):
+    text = value if isinstance(value, str) else json.dumps(value, indent=2, ensure_ascii=True) + "\n"
+    path.write_bytes(text.encode("utf-8"))
+
+
+def main():
+    assert ref(OBSERVER / "manifest.json")["sha256"] == "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3"
+    old = json.loads((PRIOR / "manifest.json").read_bytes())
+    assert ref(PRIOR / "manifest.json")["sha256"] == "34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322"
+    policy = {
+        "protocol": "ctf04-matrix-assembly.v1",
+        "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+        "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+        "selected_attempt_ordinal": 1, "later_Native_attempts_paired": False,
+        "selected_first_attempt_uses_actual_initial619_dt_and_history": True, "Rust_retry_driver_available": False,
+        "required_owner_context": {"SourceSinkPresent": False, "SolutionDimensions": 1},
+        "matrix_fields": ["AMat", "IdenMatrix", "BMat", "CMat", "DMat"],
+        "storage_order": "source_i1_outer_i2_inner_row_first",
+        "matrix_shapes": {"AMat": "actual_rcmax_by_rcmax", "IdenMatrix": "actual_rcmax_by_rcmax", "BMat": 3, "CMat": 2, "DMat": 2},
+        "actual_source_produced_identity_required": True,
+        "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+        "actual_current_retry_state_fields": ["CTFTimeStep", "NumHistories", "TimeStepZone"],
+        "actual_converted_and_initial_handoff_retained": True,
+        "missing_attempt_or_copy_integrity_failure_is_required_failure": True,
+        "unreached_counted_as_PASS": False, "retry_driver_or_matrix_answers_reconstructed": False,
+    }
+    prior_projection = json.loads((PRIOR / "projection-policy-proposal.json").read_bytes())
+    input_policy = json.loads((PRIOR / "input-policy-proposal.json").read_bytes())
+    input_policy.update({
+        "schema": "ctf04-before-output-input-policy-source-proposal.v1",
+        "ctf04_matrix_observation_policy": policy,
+        "one_way_packet_DAG": {
+            "request": "contracts source/tolerances, exact inherited model rows, unchanged initial policy and fresh matrix policy",
+            "cases": "source/tolerances/request/fixedscope/45guard refs",
+            "projection": "request/contracts/unchanged preprocessing and initial policies/fresh matrix policy",
+            "admission": "request/projection/contracts/actual scope pair/native8/matrix policy",
+            "receipt": "actual executed writer and emitted refs only; no admission backref",
+        },
+        "required_before_first_CTF04_observation": [
+            "actual CTF04 card/scope amendment and validation recorder", "Root source approval and other-author full source peer",
+            "fresh per-lane input/projection/tolerance packet", "actual freeze before helper invocation",
+            "actual helper build/linkmap/PE identity",
+        ],
+        "prospective_runtime_freeze_flag": "frozen_before_this_CTF04_helper_execution",
+        "chronology_disclosure": "Exact CTF01 literal inputs persist. Fresh CTF04 capture/criteria must be frozen before the first CTF04 helper observation; no inherited freeze is relabelled.",
+        "pending_actual_refs": {"CTF04_scope_amendment": None, "CTF04_scope_amendment_execution": None, "unit_freeze": None, "production_freeze": None},
+        "source_or_tolerance_changes_after_CTF04_outputs_for_PASS": False,
+    })
+    for key in ["required_before_first_CTF03_observation", "source_or_tolerance_changes_after_CTF03_outputs_for_PASS"]:
+        input_policy.pop(key, None)
+    put(PREP / "input-policy-proposal.json", input_policy)
+    variables = ["AMat", "IdenMatrix", "BMat", "CMat", "DMat", "assembly_CTFTimeStep", "caller_TimeStepZone"]
+    shapes = ["actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", [3], [2], [2], "scalar", "scalar"]
+    projection = {
+        "schema": "ctf04-matrix-assembly-projection-source-proposal.v1", "status": "SOURCE-PROPOSAL-not-yet-frozen",
+        "ctf04_matrix_observation_policy": policy,
+        "ctf03_initial_observation_policy": prior_projection["ctf03_initial_observation_policy"],
+        "ctf03_initial_profiles": prior_projection["arithmetic_profiles_by_variable"],
+        "inherited_preprocessing_policy": prior_projection["inherited_preprocessing_policy"],
+        "preprocessing_and_initial_profiles_changed": False,
+        "arithmetic_profiles_by_variable": [
+            {"variable": v, "atol": 0.0, "rtol": 0.0, "class_exact": True, "shape_exact": True, "signed_zero_exact": True, "required_shape": shape}
+            for v, shape in zip(variables, shapes)
+        ],
+        "selected_owner_identity": ["same case/whole-call/construction index/name and actual original member or IDF input",
+            "actual callback visit ordinal1 within that binding; no inferred timestep-derived attempt identity",
+            "actual SourceSinkPresent=false and SolutionDimensions=1 context; retain other reached context unpaired"],
+        "actual_handoff_fields": ["dl", "rk", "rho", "cp", "lr", "ResLayer", "Nodes", "dx", "LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp"],
+        "discrete_exact": ["owner/order/membership/call/attempt association", "actual bounds/counts/shapes/availability/integrity/ordinal coverage",
+            "integer Nodes/counts/selectors/NumHistories", "binary64 class/signedzero/copied input bits"],
+        "availability": {"reached_required_one_or_both_missing": "FAIL; no numerical PASS",
+            "observer_copy_shape_order_identity_or_append_failure": "required integrity FAIL, never optional absence",
+            "unreached": "explicit unavailable/excluded; zero comparisons and noPASS",
+            "later_source_fatal_exception_or_OS_failure": "retain actual completed captures if structured; separate actual outcome; no invented missing observation or source invocation"},
+        "nonfinite_policy": "retain bits/class/actual availability; required nonfinite numeric operands fail availability, never numerical PASS",
+        "all_actual_Native_attempt_records_retained": True, "later_Native_attempts_are_context_only_noPASS": True,
+        "Native_retry_dt_history_or_attempt_counts_supplied_to_Rust": False,
+        "retry_driver_certified": False, "later_inverse_exponential_Gammas_coefficients_or_surface_handoff_paired": False,
+        "identity_or_matrix_answers_reconstructed": False, "expected_values_supplied": False,
+        "scientific_execution_performed": False, "numerical_PASS_claimed": False, "gates_updated": False,
+    }
+    put(PREP / "projection-policy-proposal.json", projection)
+    sources, before, diffs = [], [], []
+    mapping = [("ctf03_initial_fields.hh", "ctf04_observation_fields.hh")]
+    mapping += [(f"ctf03_{lane}_{suffix}", f"ctf04_{lane}_{suffix}") for lane in ["unit", "production"] for suffix in ["helper.cpp", "fields.hh", "admission.hh"]]
+    mapping.append(("ctf03_reference.cmake", "ctf04_reference.cmake"))
+    for previous, current in mapping:
+        a, b = PREP / "before" / previous, PREP / current
+        assert a.read_bytes() == (PRIOR / previous).read_bytes()
+        diff = ''.join(difflib.unified_diff(a.read_text(encoding="utf-8").splitlines(True), b.read_text(encoding="utf-8").splitlines(True),
+                                           fromfile=a.relative_to(ROOT).as_posix(), tofile=b.relative_to(ROOT).as_posix()))
+        target = PREP / (current + ".from-ctf03.diff"); put(target, diff)
+        sources.append(ref(b)); before.append({"source": ref(PRIOR / previous), "archive": ref(a)}); diffs.append(ref(target))
+    metadata = ROOT / ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh"
+    lanes = {lane: [ref(PREP / f"ctf04_{lane}_helper.cpp"), ref(metadata), ref(PREP / f"ctf04_{lane}_fields.hh"),
+        ref(PREP / f"ctf04_{lane}_admission.hh"), ref(OBSERVER / "Construction.ctf04.cc"), ref(OBSERVER / "ctf04_observer.hh"),
+        ref(OBSERVER / "ctf04_observer.cc"), ref(PREP / "ctf04_observation_fields.hh")] for lane in ["unit", "production"]}
+    manifest = {"schema": "ctf04-native-matrix-helper-source-preparation.v1", "status": "SOURCE-READY-HELD-not-frozen-not-built-not-executed",
+        "energyplus_commit": old["energyplus_commit"], "own_sources": sources, "before_sources": before, "exact_diffs": diffs,
+        "native_source_files_by_lane": lanes,
+        "source_authorities": [ref(PRIOR / "manifest.json"), ref(OBSERVER / "manifest.json"), ref(PRIOR / "ctf03_reference.cmake"), ref(metadata),
+            ref(ROOT / "energyplus_porting_plan/cards/CTF-04.md"), ref(ROOT / "energyplus_porting_plan/contracts/scope.json")],
+        "inherited_input_only_requests": [ref(ROOT / input_policy[lane]["inherited_input_only_request"]["path"]) for lane in ["unit_lane", "production_lane"]],
+        "selected_primary_ranges": json.loads((OBSERVER / "manifest.json").read_bytes())["selected_primary_ranges"],
+        "policy_proposals": [ref(PREP / "input-policy-proposal.json"), ref(PREP / "projection-policy-proposal.json")],
+        "README": ref(PREP / "README.md"), "inventory_writer_source": ref(Path(__file__).resolve()),
+        "input_obligations": {"unit_models": 39, "unit_whole_calls": 42, "production_models": 15, "production_loader_records": 195,
+                              "production_whole_calls": "dynamic actual Construct owners", "attempt_counts": "actual reached callback records, no expected counts"},
+        "pending_actual_refs": input_policy["pending_actual_refs"],
+        "source_only": True, "target_or_project_imported_or_executed": False, "scientific_or_weather_or_binary_payloads_read": False,
+        "canonical_or_Git_modified": False, "new_QA_framework_or_execution_stage": False, "scientific_execution_performed": False,
+        "numerical_PASS_claimed": False, "gates_updated": False,
+        "authorship_limitations": "Author owns earlier Native transport, CTF03 ingress and CTF04 identity amendment; other-author full source review required, no independent own-formula science certificate."}
+    put(PREP / "manifest.json", manifest)
+    print(json.dumps({"manifest": ref(PREP / "manifest.json"), "own_lines": sum(x["line_count"] for x in sources),
+                      "diff_lines": sum(x["line_count"] for x in diffs)}))
+
+
+if __name__ == "__main__":
+    main()

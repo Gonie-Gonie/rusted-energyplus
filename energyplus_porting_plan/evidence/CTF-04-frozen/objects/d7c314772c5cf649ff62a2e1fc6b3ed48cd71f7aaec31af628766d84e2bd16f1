@@ -1,0 +1,12 @@
+--- a/crates/ep_runtime/src/heat_balance/state.rs
++++ b/crates/ep_runtime/src/heat_balance/state.rs
+@@ -65,6 +65,9 @@
+     /// Actual ordered initial CTF03 owners; retry/final coefficient storage is separate.
+     pub construction_ctf03_initial:
+         Vec<super::ctf_initial_owner::ConstructionCtfInitialDiscretization>,
++    /// Actual first CTF04 assembly owners; no retries or final coefficients are inferred.
++    pub construction_ctf04_first_assembly:
++        Vec<super::ctf_first_assembly_owner::ConstructionCtfFirstAssembly>,
+     /// Construction coefficient cache build time in seconds.
+     pub construction_cache_build_wall_seconds: f64,
+     /// Number of construction cache entries.
