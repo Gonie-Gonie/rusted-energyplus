@@ -1,0 +1,37 @@
+--- .runtime/porting/CTF-06/original-data-review-prep-02/unit_shape.py
++++ .runtime/porting/CTF-07/original-data-review-prep-01/unit_shape.py
+@@ -8,7 +8,7 @@
+ MATERIAL_SCALARS = ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]
+ 
+ 
+-def review(result, request, need, bind, initial, methods):
++def review(result, request, need, bind, initial, methods, gamma):
+     counts = Counter()
+     statuses, ctor_statuses, init_statuses, phases = Counter(), Counter(), Counter(), Counter()
+     integrity = []
+@@ -164,6 +164,7 @@
+                           model["id"] + "/" + operation["id"])
+             initial.matrix_review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
+             methods.review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
++            gamma.review(operation, operation["after"], need, scalar, counts, integrity, model["id"] + "/" + operation["id"])
+             observed = operation["observations"]
+             if not invoked:
+                 need(observed is None, "Uninvoked source has fabricated phase observations"); continue
+@@ -171,7 +172,7 @@
+                 boolean(observed[flag])
+                 if observed[flag]: integrity.append(model["id"] + "/" + operation["id"] + "/" + flag)
+             need(observed["observer_failure"] is (any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]) or observed["MatrixAssembly"]["matrix_copy_integrity_failed"] or
+-                  observed["Exponential"]["method_copy_integrity_failed"] or observed["Inverse"]["method_copy_integrity_failed"]), "Observer aggregate flag differs")
++                  observed["Exponential"]["method_copy_integrity_failed"] or observed["Inverse"]["method_copy_integrity_failed"] or observed["Gamma"]["method_copy_integrity_failed"]), "Observer aggregate flag differs")
+             need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must not become operands")
+             actual_total, missing_prior = initial_count, False
+             for phase in PHASES:
+@@ -215,7 +216,7 @@
+     need(counts["initial_reached_phase_records"] + counts["initial_unreached_phase_records"] == counts["actual_operation_invocations"],
+          "Every actual invocation requires its genuine initial reached/unreached record")
+     initial.matrix_summary(result, counts, need)
+-    method_counts = methods.summary(result, counts, need)
++    method_counts = {**methods.summary(result, counts, need), **gamma.summary(result, counts, need)}
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Global observer integrity summary differs")
+     for key in ["actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count"]:

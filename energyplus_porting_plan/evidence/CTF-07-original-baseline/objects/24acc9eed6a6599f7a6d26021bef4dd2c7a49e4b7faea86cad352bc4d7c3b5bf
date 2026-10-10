@@ -1,0 +1,120 @@
+"""Contained stdlib input/source byte handling; no project imports or execution."""
+import hashlib
+import json
+import re
+import stat
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+CTF = ROOT / ".runtime/porting/CTF-07"
+TRACKED = {}
+OBSERVATIONS = {}
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def contained(value, existing=True):
+    raw_text = str(value)
+    if raw_text.startswith("\\\\?\\"):
+        match = re.fullmatch(r"\\\\\?\\([A-Za-z]:\\[^\r\n]*)", raw_text)
+        require(match is not None, "Only verbatim drive-absolute Windows paths are admitted")
+        raw_text = match.group(1)
+    require(not raw_text.startswith(("\\\\", "//", "\\??\\")), "UNC/device paths are not admitted")
+    raw = Path(raw_text)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    path = raw.resolve()
+    require(path != ROOT and path.is_relative_to(ROOT), "Repository-contained path required")
+    for entry in [raw, *raw.parents]:
+        if entry == ROOT:
+            break
+        if entry.exists():
+            info = entry.lstat()
+            require(not entry.is_symlink() and not getattr(info, "st_file_attributes", 0) & 0x400,
+                    "Reparse/symlink input or parent is not admitted")
+    if existing:
+        require(path.is_file() and stat.S_ISREG(path.stat().st_mode), "Regular input required")
+    return path
+
+
+def identity(value, max_bytes=64000000):
+    path = contained(value)
+    require(path.stat().st_size <= max_bytes, "Bounded input/source file required")
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(65536), b""):
+            digest.update(block)
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest.hexdigest(),
+            "size_bytes": path.stat().st_size}
+
+
+def bind(row):
+    require(isinstance(row, dict) and isinstance(row.get("path"), str), "Input path binding required")
+    require(re.fullmatch("[0-9a-f]{64}", row.get("sha256", "")), "Lowercase SHA256 required")
+    actual = identity(row["path"])
+    require(actual["sha256"] == row["sha256"], "Input/source SHA256 differs: " + row["path"])
+    for key in ["bytes", "size_bytes"]:
+        if key in row:
+            require(type(row[key]) is int and row[key] == actual["size_bytes"], "Input size differs")
+    TRACKED[actual["path"]] = actual
+    return actual
+
+
+def bind_observation(row):
+    require(isinstance(row, dict) and isinstance(row.get("path"), str) and
+            re.fullmatch("[0-9a-f]{64}", row.get("sha256", "")), "Actual observation path/SHA required")
+    actual = identity(row["path"], 1024 * 1024 * 1024)
+    require(actual["sha256"] == row["sha256"], "Actual observation SHA differs")
+    for key in ["bytes", "size_bytes"]:
+        if key in row: require(type(row[key]) is int and row[key] == actual["size_bytes"], "Actual observation size differs")
+    OBSERVATIONS[actual["path"]] = actual
+    return actual
+
+
+def argument(value):
+    name, separator, digest = value.rpartition("#")
+    require(separator and name, "Explicit path#SHA256 argument required")
+    return bind({"path": name, "sha256": digest})
+
+
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        require(key not in result, "Duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def load(row):
+    ref = bind(row)
+    require(ref["size_bytes"] <= 16000000, "Small source/input metadata required")
+    return json.loads(contained(ref["path"]).read_text(encoding="utf-8"),
+                      object_pairs_hook=unique_object,
+                      parse_constant=lambda value: require(False, "Nonfinite JSON literal: " + value))
+
+
+def emit(path, value):
+    path = contained(path, existing=False)
+    with path.open("xb") as handle:
+        handle.write((json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + "\n").encode("utf-8"))
+    return identity(path)
+
+
+def archive(row, directory, index):
+    ref = bind(row)
+    target = directory / (str(index).zfill(3) + "-" + Path(ref["path"]).name)
+    with target.open("xb") as handle:
+        handle.write(contained(ref["path"]).read_bytes())
+    copied = identity(target)
+    require(copied["sha256"] == ref["sha256"], "Source archive bytes differ")
+    return {"historical_path": ref["path"], "archive": copied}
+
+
+def recheck():
+    for ref in list(TRACKED.values()):
+        require(identity(ref["path"]) == ref, "Input/source changed during input freeze")
+
+    for ref in list(OBSERVATIONS.values()):
+        require(identity(ref["path"], 1024 * 1024 * 1024) == ref, "Actual observation changed during factual review")

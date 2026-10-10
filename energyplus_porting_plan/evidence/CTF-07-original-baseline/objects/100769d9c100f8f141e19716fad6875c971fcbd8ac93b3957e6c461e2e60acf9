@@ -1,0 +1,37 @@
+--- .runtime/porting/CTF-06/original-data-review-prep-02/production_shape.py
++++ .runtime/porting/CTF-07/original-data-review-prep-01/production_shape.py
+@@ -8,7 +8,7 @@
+ MATERIAL_SCALARS = ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]
+ 
+ 
+-def review(result, request, need, bind, initial, methods):
++def review(result, request, need, bind, initial, methods, gamma):
+     counts = Counter()
+     statuses, ctor_statuses, loader_statuses, phases, functions = (Counter() for _ in range(5))
+     integrity = []
+@@ -105,7 +105,7 @@
+             boolean(observed[flag])
+             if observed[flag]: integrity.append(label + "/" + flag)
+         need(observed["observer_failure"] is (any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]) or observed["MatrixAssembly"]["matrix_copy_integrity_failed"] or
+-                  observed["Exponential"]["method_copy_integrity_failed"] or observed["Inverse"]["method_copy_integrity_failed"]), "Observer aggregate flag differs")
++                  observed["Exponential"]["method_copy_integrity_failed"] or observed["Inverse"]["method_copy_integrity_failed"] or observed["Gamma"]["method_copy_integrity_failed"]), "Observer aggregate flag differs")
+         need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must remain excluded")
+         actual_total, missing_prior = initial_count, False
+         for phase in PHASES:
+@@ -198,6 +198,7 @@
+             initial_count = initial.review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
+             initial.matrix_review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
+             methods.review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
++            gamma.review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
+             statuses[operation["call_outcome"]["status"]] += 1
+             counts["operation_records"] += 1; counts["actual_CTF_invocations" if invoked else "actual_CTF_skipped_construct_rows"] += 1
+             begin, end = operation["diagnostic_message_begin"], operation["diagnostic_message_end"]
+@@ -233,7 +234,7 @@
+     need(counts["initial_reached_phase_records"] + counts["initial_unreached_phase_records"] == counts["actual_CTF_invocations"],
+          "Every actual invocation requires its genuine initial reached/unreached record")
+     initial.matrix_summary(result, counts, need)
+-    method_counts = methods.summary(result, counts, need)
++    method_counts = {**methods.summary(result, counts, need), **gamma.summary(result, counts, need)}
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Actual global observer integrity summary differs")
+     return {**method_counts, **{name: counts[name] for name in initial.COUNTS + initial.MATRIX_COUNTS}, **{name: counts[name] for name in ["model_cases", "loader_phase_records", "operation_records", "actual_CTF_invocations",

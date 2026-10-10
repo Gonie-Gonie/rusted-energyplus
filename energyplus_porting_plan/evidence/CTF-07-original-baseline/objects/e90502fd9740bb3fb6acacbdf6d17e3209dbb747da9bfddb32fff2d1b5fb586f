@@ -1,0 +1,304 @@
+"""Factual Original data/provenance review; no engine, CTF evaluator or numerical comparison."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+PREP = Path(__file__).resolve().parent
+IO_SHA = "24acc9eed6a6599f7a6d26021bef4dd2c7a49e4b7faea86cad352bc4d7c3b5bf"
+SHAPE_SHA = "35ea2bddfa2ffdb40f087396c524bec8e40963c3e337f64c916689813c83cd6f"
+INITIAL_SHA = "95ddfbdb06ead90e81a8ef0eba527266ea9066bd8bb2463e3f40b0c859cd9da0"
+METHOD_SHA = "310b9dbb84954c8050e19f6a8a7a377b01f2597d6eb6947ab6e8a42437906454"
+GAMMA_SHA = "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101"
+LANE = "unit"
+
+
+def boot(name, filename, digest):
+    path = PREP / filename
+    if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+        raise ValueError("Reviewed stdlib reader dependency differs before import")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def run(args):
+    m = boot("ctf07_data_io", "packet_io.py", IO_SHA)
+    shape = boot("ctf07_data_shape", "unit_shape.py", SHAPE_SHA)
+    initial = boot("ctf07_initial_shape", "initial_shape.py", INITIAL_SHA)
+    methods = boot("ctf07_method_shape", "method_shape.py", METHOD_SHA)
+    gamma = boot("ctf07_gamma_shape", "gamma_shape.py", GAMMA_SHA)
+    started = datetime.now(timezone.utc).isoformat()
+    m.require(m.identity(__file__)["sha256"] == args.approved_source_sha256, "Root-reviewed reader SHA required")
+    for path in [Path(__file__), PREP / "unit_shape.py", PREP / "initial_shape.py", PREP / "method_shape.py", PREP / "gamma_shape.py", PREP / "packet_io.py"]: m.bind(m.identity(path))
+    m.require(Path.cwd().resolve() == m.ROOT, "Recorded repository cwd required")
+
+    def same(left, right):
+        for row in [left, right]:
+            m.require(re.fullmatch("[0-9a-f]{64}", row["sha256"]), "Actual reference SHA required")
+        m.require(m.contained(left["path"], existing=False) == m.contained(right["path"], existing=False) and
+                  left["sha256"] == right["sha256"], "Actual direct artifact identities differ")
+
+    def instant(text):
+        value = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        m.require(value.tzinfo is not None, "Aware actual UTC interval required")
+        return value
+
+    def recorded(ref, before=None, require_zero=True):
+        value = m.load(ref)
+        m.require(value["schema"] == "recorded-porting-command.v1" and type(value["exit_code"]) is int and
+                  value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == m.ROOT,
+                  "Genuine source-preserving repository recorder required")
+        if require_zero:
+            m.require(value["exit_code"] == 0 and value["launch_error"] is None, "Actual successful recorded command required")
+        m.require(instant(value["started_utc"]) <= instant(value["finished_utc"]), "Actual command interval differs")
+        if before is not None:
+            m.require(instant(value["finished_utc"]) <= instant(before), "Required preceding actual command is later")
+        for key in ["stdout", "stderr"]: m.bind(value[key])
+        m.require(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Actual recorder source owner differs")
+        m.bind(value["executed_launcher"]["archive"])
+        return value
+
+    names = ["native-execution", "results", "freeze-receipt", "freeze-execution", "build", "build-execution", "build-review", "build-review-execution"]
+    refs = {name: m.argument(getattr(args, name.replace("-", "_"))) for name in names if name != "results"}
+    native = recorded(refs["native-execution"], started, require_zero=False)
+    freeze = m.load(refs["freeze-receipt"])
+    frozen_command = recorded(refs["freeze-execution"], native["started_utc"])
+    m.require(m.load(frozen_command["stdout"]) == freeze and freeze["schema"] == "ctf07-frozen-packet.v1" and
+              freeze["status"] == "frozen-inherited-input-and-fresh-CTF07-Gamma-policy-before-helper" and
+              freeze["frozen_before_this_CTF07_helper_execution"] is True and freeze["numerical_PASS_claimed"] is False,
+              "Genuine input-only freeze0/full recorder stdout required")
+    approval = freeze["source_preparation_approval"]
+    m.require(approval["source_manifest"]["sha256"] == "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02", "Exact reviewed freezer manifest required")
+    approved_sources = [m.bind(row) for row in approval["reviewed_sources"]]
+    m.require(len(approved_sources) == len(freeze["executed_writer_sources"]) == 2 and
+              approved_sources[0]["sha256"] == approval["approved_writer_sha256"] ==
+              "e06755a97340e7445dcab7f74a2582fcd1be221dc2b43455f481419515ac62e1", "Exact approved fresh freezer identity required")
+    for declared, copied in zip(approved_sources, freeze["executed_writer_sources"]):
+        m.require(copied["historical_path"] == declared["path"] and
+                  m.bind(copied["archive"])["sha256"] == declared["sha256"], "Executed freezer source owner/archive differs")
+    m.require([m.bind(row) for row in m.load(approval["source_manifest"])["own_sources"]] == approved_sources, "Actual freezer approval inventory differs")
+    argv = frozen_command["command"]
+    m.require(len(argv) == 31 and Path(argv[0]).name.lower() in ["python", "python.exe"] and
+              argv[1:4] == ["-X", "utf8", "-B"] and m.contained(argv[4]) == m.contained(approved_sources[0]["path"]),
+              "Actual fresh freezer command/source differs")
+    tail = argv[5:]; flags = dict(zip(tail[::2], tail[1::2]))
+    m.require(len(flags) == 13 and set(flags) == {"--lane", "--approved-source-sha256", "--source-manifest", "--native-source-manifest", "--current-card-07",
+              "--actual-scope-amendment", "--actual-scope-amendment-execution", "--prior-06-freeze", "--prior-06-freeze-execution",
+              "--prior-05-06-scope-amendment", "--prior-scope-check-05", "--prior-scope-check-06", "--output-dir"} and
+              flags["--lane"] == LANE and flags["--approved-source-sha256"] == approval["approved_writer_sha256"], "Actual freezer flags differ")
+    authority = freeze["source_authorities"]; prior = authority["prior_05_06_authority"]
+    for flag, ref in [("source-manifest", approval["source_manifest"]), ("native-source-manifest", authority["native_source_manifest"]),
+                      ("current-card-07", authority["current_cards"]["CTF-07"]), ("actual-scope-amendment", authority["actual_scope_amendment"]),
+                      ("actual-scope-amendment-execution", authority["actual_scope_amendment_execution"]), ("prior-06-freeze", prior["prior_06_freeze"]),
+                      ("prior-06-freeze-execution", prior["prior_06_freeze_execution"]), ("prior-05-06-scope-amendment", prior["prior_05_06_scope_amendment"]),
+                      ("prior-scope-check-05", prior["prior_scope_checks"]["CTF-05"]), ("prior-scope-check-06", prior["prior_scope_checks"]["CTF-06"])]:
+        same(m.argument(flags["--" + flag]), ref)
+    m.require(m.contained(flags["--output-dir"], existing=False) == m.contained(freeze["helper_request"]["path"]).parent and
+              m.contained(frozen_command["stderr"]["path"]).stat().st_size == 0, "Actual freezer output/stderr differs")
+    request_ref, admission_ref, projection_ref = freeze["helper_request"], freeze["native_admission_contract"], freeze["projection"]
+    request, admission, projection = m.load(request_ref), m.load(admission_ref), m.load(projection_ref)
+    m.require(request["schema"] == "ctf07-helper-cases.v1" and admission["schema"] == "ctf07-native-admission-contract.v1" and
+              projection["schema"] == "ctf07-observation-projection.v1", "Actual frozen CTF packet schemas required")
+    same(admission["helper_request"], request_ref); same(admission["projection"], projection_ref); same(projection["helper_request"], request_ref)
+    m.require(set(request["contracts"]) == {"source", "tolerances"} and set(admission["contracts"]) == {"source", "cases", "tolerances"} and
+              admission["contracts"] == projection["contracts"] == freeze["contracts"] and
+              projection["native_observation_policy"] == request["observation_policy"], "Actual one-way contract policy differs")
+    contracts = {}
+    for key, ref in freeze["contracts"].items():
+        contract = m.load(ref)
+        m.require(contract["schema"] == "ctf07-" + key + "-contract.v1" and contract["frozen_before_this_CTF07_helper_execution"] is True, "Frozen contract differs")
+        contracts[key] = contract
+        if key in request["contracts"]: same(request["contracts"][key], ref)
+    source_manifest = m.load(freeze["source_authorities"]["native_source_manifest"])
+    m.require(source_manifest["schema"] == "ctf07-gamma-helper-source-preparation.v1" and
+              freeze["source_authorities"]["native_source_manifest"]["sha256"] ==
+              "67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c" and
+              admission["native_source_files"] == [m.bind(row) for row in source_manifest["native_source_inventory_per_lane"][LANE]], "Exact reviewed Native8 inventory required")
+    passive_ref = source_manifest["passive_observer_manifest"]
+    m.require(passive_ref["sha256"] == "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06", "Exact passive matrix observer required")
+    m.bind(passive_ref)
+    gamma.scope(m, same, recorded, freeze, request, admission, projection, m.load(passive_ref), frozen_command["started_utc"], LANE)
+    pe_inventory = m.bind({"path": ".runtime/porting/CTF-07/native-build-review-prep-01/manifest.json",
+                           "sha256": "b4d54ebe24bb15753d38d409e1729d2dd371310beacbec6a09b16b338387d816"})
+    for row in freeze["reviewed_source_archives"]: m.bind(row["archive"])
+    inherited = m.load(freeze["source_authorities"]["inherited_input_only_packet"]["request"])
+    m.require(request["model_cases"] == inherited["model_cases"] and request["requested_counts"] == inherited["requested_counts"] and
+              request["observation_policy"] == inherited["observation_policy"], "Inherited literal input/caller/order must remain exact")
+    if LANE == "production": m.require(request["loader_phase_order"] == inherited["loader_phase_order"], "Inherited lifecycle order differs")
+    same(contracts["tolerances"]["inherited_ctf01_tolerances"], freeze["source_authorities"]["inherited_input_only_packet"]["tolerances"])
+    initial.packet(freeze, request, admission, projection, contracts["tolerances"],
+                  m.load(contracts["tolerances"]["inherited_ctf01_tolerances"]), m.require)
+    methods.packet(freeze, request, admission, projection, contracts["tolerances"], m.require)
+    gamma.packet(freeze, request, admission, projection, contracts["tolerances"], m.require)
+    original_sources = contracts["source"]["source_files"]
+    m.require(len(original_sources) == (7 if LANE == "unit" else 21), "Actual inherited Original inventory differs")
+    for row in original_sources:
+        bound = m.bind({**row, "path": ".reference/energyplus-src/26.1.0/" + row["path"]})
+        lines = m.contained(bound["path"]).read_bytes().splitlines(True)
+        for selected in row.get("selected_ranges", []):
+            lo, hi = selected["start_line"], selected["end_line"]
+            m.require(type(lo) is int and type(hi) is int and 1 <= lo <= hi <= len(lines) and selected["bytes_normalized"] is False,
+                      "Actual inherited source range metadata differs")
+            data = b"".join(lines[lo - 1:hi])
+            m.require(hashlib.sha256(data).hexdigest() == selected["sha256"] and len(data) == selected["size_bytes"], "Actual inherited source range differs")
+
+    for row in request["all_45_guard_refs"]: m.bind(row)
+    m.require(len(request["all_45_guard_refs"]) == 45, "Exact inherited 45 guards required")
+    calls = sum(len(row["operations"]) for row in request["model_cases"])
+    m.require(request["requested_counts"] == {"model_cases": len(request["model_cases"]), "calculateTransferFunction": calls,
+                                             "total_operations": calls}, "Requested counts must derive from input arrays")
+    build, peer = m.load(refs["build"]), m.load(refs["build-review"])
+    compile_command = recorded(refs["build-execution"], native["started_utc"])
+    peer_command = recorded(refs["build-review-execution"], native["started_utc"])
+    m.require(build["schema"] == "ctf07-native-build.v1" and build["status"] == "pass-actual-3TU-link-and-preservation", "Actual build identity required")
+    for key in ["all_previous_compile_commands_unchanged", "protected_artifacts_and_present_core_objects_unchanged", "link_provider_verified"]:
+        m.require(build[key] is True, "Actual build preservation/provider evidence required")
+    for key in ["previous_compile_rows", "current_compile_rows", "core_registered", "core_present", "core_absent", "protected_ref_count"]:
+        m.require(type(build[key]) is int and build[key] >= 0, "Typed actual build inventory count required")
+    m.require(build["current_compile_rows"] == build["previous_compile_rows"] + 6 and build["core_registered"] == 643 and
+              build["core_present"] + build["core_absent"] == 643, "Actual registered/present/absent build inventory differs")
+    preservation = m.load(build["preservation"])
+    for key in ["all_protected_refs_unchanged", "all_present_core_objects_unchanged", "absent_registered_objects_still_absent", "all_previous_compile_commands_unchanged"]:
+        m.require(preservation[key] is True, "Actual protected/cache preservation differs")
+    m.require(isinstance(preservation["protected_refs"], list) and len(preservation["protected_refs"]) == build["protected_ref_count"] > 0 and
+              len(preservation["present_objects"]) == build["core_present"] and
+              len(preservation["absent_registered_object_paths"]) == build["core_absent"] and
+              all(preservation[key] == build[key] for key in ["previous_compile_rows", "current_compile_rows", "core_registered"]) and
+              preservation["selected_core_Construction_object_hits"] == 0 and
+              "native-observer-prep-02/Construction.ctf07.cc.obj" in preservation["derived_provider"]["section_provider"]["text"].replace("\\", "/"),
+              "Actual protected/core/provider metadata differs")
+    same(build["compile_execution"], refs["build-execution"])
+    for key in ["configure_execution", "derivation_execution"]: recorded(build[key], native["started_utc"])
+    m.bind(build["validated_derivative"])
+    m.require(peer["schema"] == "ctf07-independent-build-PE-review.v1" and
+              peer["status"] == "pass-exact-retained-PE-runtime-and-actual-build-identity" and peer["retained_runtime_exact"] is True,
+              "Actual independent build/PE review required")
+    m.require(build["target"] == peer["target"] == "ctf07_" + LANE + "_helper" and peer["lane"] == LANE and
+              peer["actual_previous_compile_rows"] == build["previous_compile_rows"] and
+              peer["actual_current_compile_rows"] == build["current_compile_rows"] and
+              peer["actual_protected_ref_count"] == build["protected_ref_count"], "Actual lane/target/PE inventory copy differs")
+    same(peer["build"], refs["build"])
+    peer_reader = m.bind(peer["executed_reader"])
+    m.require(peer_reader["sha256"] == args.approved_build_review_source_sha256 == "54b7d43e72ea1d1871520d6408ce088bdcfb71e69bc3f1041355648aef33d6d9" and
+              re.fullmatch("[0-9a-f]{64}", args.approved_build_review_source_sha256) and len(peer_command["command"]) == 11 and
+              Path(peer_command["command"][0]).name.lower() in ["python", "python.exe"] and
+              peer_command["command"][1:4] == ["-X", "utf8", "-B"] and
+              m.contained(peer_command["command"][4]) == m.contained(peer_reader["path"]) and
+              peer_command["command"][5:8] == ["--lane", LANE, "--build"] and
+              peer_command["command"][9] == "--output-dir", "Actual approved PE reader command/source differs")
+    same(m.argument(peer_command["command"][8]), refs["build"])
+    m.require(m.contained(peer_command["command"][10], existing=False) == m.contained(refs["build-review"]["path"]).parent,
+              "Actual approved PE output directory differs")
+    peer_stdout = m.load(peer_command["stdout"])
+    m.require(set(peer_stdout) == {"review", "status"} and peer_stdout["status"] == peer["status"], "Actual PE stdout must be its exact compact two-key summary")
+    same(peer_stdout["review"], refs["build-review"]); m.bind(peer_stdout["review"])
+    for key in ["helper_binary", "linked_original", "validated_derivative"]: same(peer[key], build[key])
+    m.bind(peer["native_pe_source"])
+    maps = {key: m.load(peer["maps"][key]) for key in ["original", "derived", "comparison"]}
+    for key, binary in [("original", "linked_original"), ("derived", "helper_binary")]:
+        m.require(maps[key]["sha256"] == build[binary]["sha256"] and type(maps[key]["size_bytes"]) is int and
+                  maps[key]["size_bytes"] > 0, "Actual PE map binary identity/size differs")
+    m.require(build["linked_original_retention_intent"] == peer["linked_original_retention_intent"] == freeze["linked_original_retention_intent"] == initial.RETENTION_INTENT, "Actual new linked Original custody/intent differs")
+    native_sources = admission["native_source_files"]
+    m.require(len(native_sources) == 8 and len(build["native_source_files"]) == 8, "Actual source8 required")
+    for declared, compiled in zip(native_sources, build["native_source_files"]): same(declared, compiled); m.bind(declared)
+    m.require(instant(frozen_command["finished_utc"]) <= instant(compile_command["started_utc"]), "Freeze must precede actual Native compilation")
+    result_name, separator, result_sha = args.results.rpartition("#")
+    if not separator: result_name, result_sha = args.results, None
+    m.require(result_sha is None or re.fullmatch("[0-9a-f]{64}", result_sha), "Explicit preserved result SHA required when a file exists")
+    result_path = m.contained(result_name, existing=False)
+    m.require(result_path.name == "ctf07-helper-results.json", "Genuine helper result filename required")
+    expected_argv = [m.contained(build["helper_binary"]["path"], existing=False), m.ROOT, m.contained(request_ref["path"]),
+                     m.contained(admission_ref["path"]), result_path.parent]
+    m.require(len(native["command"]) == 5 and [Path(value).resolve() for value in native["command"]] == expected_argv,
+              "Actual direct Native argc5 command differs")
+    counts, integrity, result_ref = None, [], None
+    complete = False
+    if result_path.is_file() and native["launch_error"] is None:
+        m.require(result_sha is not None, "Existing actual result requires its supplied SHA")
+        result_ref = m.bind_observation({"path": result_name, "sha256": result_sha})
+        # Use the prospectively fixed 1GiB scientific observation bound; small metadata stays16MB.
+        result = json.loads(result_path.read_text(encoding="utf-8"), object_pairs_hook=m.unique_object,
+                            parse_constant=lambda value: m.require(False, "Nonfinite JSON literal: " + value))
+        m.require(result["schema"] == "ctf07-helper-results.v1" and result["complete_requested_record_ledger"] is True and
+                  result["energyplus_commit"] == request["energyplus_commit"] and set(result["contracts"]) == set(freeze["contracts"]) and
+                  result["requested_counts"] == freeze["requested_counts"] == request["requested_counts"] == admission["requested_counts"],
+                  "Actual complete result ledger/source/count identities differ")
+        for key, ref in freeze["contracts"].items(): same(result["contracts"][key], ref)
+        for key, ref in [("actual_request", request_ref), ("native_admission_contract", admission_ref), ("observation_projection", projection_ref),
+                         ("actual_binary", build["helper_binary"])]: same(result[key], ref)
+        m.require(type(result["actual_binary"]["size_bytes"]) is int and result["actual_binary"]["size_bytes"] == maps["derived"]["size_bytes"], "Observed binary size differs from actual PE map")
+        for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "fixed_scope", "all_45_guard_refs", "native_source_files"]:
+            m.require(result[key] == (admission[key] if key == "native_source_files" else request[key]), "Actual source/scope/input binding differs")
+        for key in ["complete_all_phase_observations_claimed", "scientific_comparison_performed", "numerical_PASS_claimed", "gates_updated", "Material_loader_or_fixed15_production_certified", "CTF02_through_CTF10_certified"]:
+            m.require(result[key] is False, "Actual result scope exceeds selected source")
+        m.require(result["CTF03_initial_observation_policy"] == initial.POLICY and result["CTF04_matrix_observation_policy"] == initial.MATRIX_POLICY, "Actual initial/matrix output policies differ")
+        for key, expected in [("CTF06_exponential_observation_policy", methods.POLICIES["ctf06_exponential_observation_policy"]),
+                              ("CTF05_inverse_observation_policy", methods.POLICIES["ctf05_inverse_observation_policy"]),
+                              ("CTF07_gamma_observation_policy", gamma.POLICY),
+                              ("linked_original_retention_intent", methods.RETENTION_INTENT)]:
+            m.require(result[key] == expected, "Actual combined-method policy/custody output differs")
+        counts, integrity = shape.review(result, request, m.require, m.bind, initial, methods, gamma)
+        m.require(all(type(value) is int for value in result["requested_counts"].values()), "Typed actual requested count metadata required")
+        m.require(type(result["actual_helper_exit_code"]) is int and result["actual_helper_exit_code"] == (2 if integrity else 0), "Actual helper integrity exit differs")
+        actual_files = {path.resolve() for path in result_path.parent.rglob("*") if path.is_file()}
+        declared_files = {result_path}
+        for model in result["model_cases"]:
+            for ref in (model["source_diagnostics"]["logs"] or {}).values():
+                path = m.contained(ref["path"]); m.require(path.parent == result_path.parent, "Diagnostic log escapes actual output")
+                declared_files.add(path)
+        m.require(actual_files == declared_files, "Actual Native result/diagnostic file inventory differs")
+        complete = True
+    release = complete and not integrity and native["exit_code"] == 0 and native["launch_error"] is None
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh contained DataQA output required")
+    output.mkdir(parents=True, exist_ok=False)
+    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate([Path(__file__), PREP / "unit_shape.py", PREP / "initial_shape.py", PREP / "method_shape.py", PREP / "gamma_shape.py", PREP / "packet_io.py"])]
+    review = {"schema": "ctf07-independent-original-data-review.v1", "status": "pass-actual-original-data-and-provenance-before-Rust" if release else
+        "fail-original-process-or-observation-integrity-before-Rust", "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
+        "reviewed_results": result_ref, "reviewed_native_execution": refs["native-execution"], "reviewed_request": request_ref,
+        "reviewed_native_admission_contract": admission_ref, "reviewed_projection": projection_ref, "reviewed_contracts": freeze["contracts"],
+        "reviewed_build": refs["build"], "reviewed_build_execution": refs["build-execution"], "reviewed_build_review": refs["build-review"],
+        "reviewed_build_review_execution": refs["build-review-execution"], "actual_packet_freeze": refs["freeze-receipt"],
+        "actual_packet_freeze_execution": refs["freeze-execution"], "actual_native_process_exit_code": native["exit_code"],
+        "actual_native_launch_error": native["launch_error"], "complete_requested_record_ledger_validated": complete,
+        "reviewed_native_source_inventory": freeze["source_authorities"]["native_source_manifest"], "reviewed_passive_source_inventory": passive_ref,
+        "reviewed_freezer_source_inventory": approval["source_manifest"], "reviewed_PE_source_inventory": pe_inventory,
+        "actual_matrix_failure_event_counts": {name: counts["matrix_failure_" + name] for name in initial.FAILURES} if counts is not None else None,
+        "complete_actual_matrix_records": complete and counts["matrix_attempt_records_omitted"] == 0,
+        "reviewed_matrix_observation_policy": initial.MATRIX_POLICY, "reviewed_matrix_policy_contract": freeze["contracts"]["tolerances"],
+        "linked_original": build["linked_original"], "linked_original_retention_intent": initial.RETENTION_INTENT,
+        "selected_matrix_attempt_ordinal": 1, "later_attempts_observed_unpaired_noPASS": True,
+        "reviewed_initial_observation_policy": initial.POLICY, "reviewed_initial_policy_contract": freeze["contracts"]["tolerances"],
+        "reviewed_method_observation_policies": methods.POLICIES,
+        "reviewed_Gamma_observation_policy": gamma.POLICY, "complete_actual_Gamma_records": complete and not counts["actual_gamma_observation_counts"]["method_copy_integrity_failed"],
+        "reviewed_method_policy_contract": freeze["contracts"]["tolerances"],
+        "actual_scope_amendment": freeze["source_authorities"]["actual_scope_amendment"],
+        "actual_scope_amendment_execution": freeze["source_authorities"]["actual_scope_amendment_execution"],
+        "prior_05_06_authority": freeze["source_authorities"]["prior_05_06_authority"],
+        "actual_scope_amendment_execution_role": freeze["source_authorities"]["actual_scope_amendment_execution_role"],
+        "current_cards": freeze["source_authorities"]["current_cards"],
+        "selected_method_invocation_ordinals": {"assembly": 1, "exponential": 1, "inverse": 1, "Gamma": 1},
+        "later_actual_method_visits_observed_unpaired_noPASS": True,
+        "scientific_observation_physical_bound_bytes": 1024 * 1024 * 1024,
+        "actual_observation_counts": counts, "actual_method_counts_unknown": not complete, "observation_integrity_failures": integrity,
+        "Rust_baseline_released": release, "requested_counts": request["requested_counts"], "executed_reader_sources": sources,
+        "executed_reader_source_archive": sources[0]["archive"], "native_binary_payloads_rehashed_or_parsed": False,
+        "build_compile_recorder_authored_build_metadata_claimed": False, "scientific_values_recomputed_or_compared": False,
+        "numerical_comparison_count": None, "numerical_mismatch_count": None, "numerical_PASS_claimed": False,
+        "unreached_or_uninvoked_observation_counted_as_PASS": False, "scientific_execution_performed": False, "gates_updated": False,
+        "authorship_limits": "Header authored Native06 and pure/publicGamma; Raw authored passive/helper07. Reused factual06 validators are retained. This is factual observation/provenance validation, not an independent own-formula certificate; Root and other-author source review are required."}
+    m.recheck(); m.emit(output / "review.json", review); m.recheck()
+    print(json.dumps(review, allow_nan=False, indent=2))
+    return 0 if release else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ["approved-source-sha256", "approved-build-review-source-sha256", "native-execution", "results", "freeze-receipt", "freeze-execution", "build", "build-execution", "build-review", "build-review-execution", "output-dir"]:
+        parser.add_argument("--" + name, required=True)
+    raise SystemExit(run(parser.parse_args()))

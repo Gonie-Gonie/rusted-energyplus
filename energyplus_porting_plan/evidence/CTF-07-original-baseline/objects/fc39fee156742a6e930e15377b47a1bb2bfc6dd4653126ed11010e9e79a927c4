@@ -1,0 +1,70 @@
+{
+  "schema": "ctf07-existing-rust-baseline-gap.v1",
+  "created_utc": "2026-10-10T19:40:48.735732+00:00",
+  "actual_Original_unit_data_QA": {
+    "path": ".runtime/porting/CTF-07/original-data-review-02/review.json",
+    "sha256": "3f8f541bef17663dc65c41ef7a8b55117cac0492cc790eb96ef93110cdfdedfa",
+    "size_bytes": 29634
+  },
+  "actual_Original_production_data_QA": {
+    "path": ".runtime/porting/CTF-07/original-production-data-review-01/review.json",
+    "sha256": "d1958ccda4ef426659e0e5f429f9f6f4af1958a1109cac6ee61b48a78df02ca1",
+    "size_bytes": 71898
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-07/existing-production-build-command-01/receipt.json",
+    "sha256": "4a1d24b2c2b4bbca43b8cb1031be4c77f170e5063bfd9cf88604a92e71399000",
+    "size_bytes": 4371
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-07/existing-production-command-01/receipt.json",
+    "sha256": "ea5f031fde62c4cca7c1c48c57557e46ddb9b8c7073362a4df01a59d54a49c30",
+    "size_bytes": 2928
+  },
+  "actual_results": {
+    "path": ".runtime/porting/CTF-07/existing-production-command-01/stdout.log",
+    "sha256": "ade0588c057ecefe732e1b1ec9032a6d7ee4e288cc0ea4014276e1ffa91edacd",
+    "size_bytes": 857017
+  },
+  "unchanged_input_only_request": {
+    "path": ".runtime/porting/CTF-07/existing-production-inputs-01/request.json",
+    "sha256": "bdb314365ecf3800acaf8e840aedf04e2d46362a518f2ba2f74d494e930a131c",
+    "size_bytes": 35763
+  },
+  "inherited_request": {
+    "path": ".runtime/porting/CTF-06/existing-production-inputs-01/request.json",
+    "sha256": "dd111479c5e6f3a9185ea26d8e42b25c4b973e7a181bf09087fb1923c547644f",
+    "size_bytes": 35763
+  },
+  "actual_full_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/0e/0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483",
+    "sha256": "0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483"
+  },
+  "actual_full_Rust_source_file_count": 3819,
+  "actual_new_CTF07_source_paths_absent": [
+    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress_tests.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix_tests.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner_tests.rs",
+    "crates/ep_run/examples/ctf07_candidate_unit_observer.rs",
+    "crates/ep_run/examples/ctf07_candidate_unit_support/fields.rs",
+    "crates/ep_run/examples/ctf07_candidate_production_observer.rs",
+    "crates/ep_run/examples/ctf07_candidate_production_support/fields.rs",
+    "crates/ep_run/examples/ctf07_candidate_production_support/unit_fields.rs"
+  ],
+  "model_cases": 15,
+  "CTF04_owner_rows_total": 21,
+  "all15_initialization_source_returned": true,
+  "existing_stage": "ctf04_candidate_production_observer",
+  "current_initializer_includes_accepted06_exponential_and05_inverse_source": true,
+  "baseline_DTO_scope": "existing04 first matrix assembly owners only; no05/06 numeric observation or CTF07 Gamma output claim",
+  "input_payloads_and_existing04_native_request_admission_unchanged": true,
+  "only_request_change_from_previous_baseline": "actual current source identities in existing public API inventory",
+  "gap": "No actual07 Gamma source/API/observer installed yet. Same15 production initialization returns with actual06 whole source unchanged; existing04 owners are available, while07 Gamma result owner is absent. Full retry/final coefficients/SI19 and whole CTF remain unverified.",
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "Rust_candidate_applied": false,
+  "gates_updated": false
+}

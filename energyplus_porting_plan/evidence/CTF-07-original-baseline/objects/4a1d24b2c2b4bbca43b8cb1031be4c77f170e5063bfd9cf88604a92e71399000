@@ -1,0 +1,114 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "-p",
+    "ep_run",
+    "--example",
+    "ctf04_candidate_production_observer",
+    "--message-format=json-render-diagnostics"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T19:38:43.358131+00:00",
+  "finished_utc": "2026-10-10T19:38:55.861893+00:00",
+  "elapsed_seconds": 12.503438600018853,
+  "repository_before": {
+    "head": "94ef51cd3caca55467ee2f725fb0d03988fe1752",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "94ef51cd3caca55467ee2f725fb0d03988fe1752",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/0e/0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483",
+    "sha256": "0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-07/existing-production-build-command-01/stdout.log",
+    "sha256": "3501ec07fd5f24d2234df72acc77a363d0ae187d47e73dca43c44a0a9a9ebf60"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-07/existing-production-build-command-01/stderr.log",
+    "sha256": "7c4ac236f42653cc3aebdf788ea5d77eab42260c60322fdeedfef9766c57f9e1"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": true,
+    "captured_utc": "2026-10-10T19:38:55.861893+00:00",
+    "status": "pass",
+    "rows": [
+      {
+        "cargo_message": {
+          "reason": "compiler-artifact",
+          "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+          "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+          "target": {
+            "kind": [
+              "example"
+            ],
+            "crate_types": [
+              "bin"
+            ],
+            "name": "ctf04_candidate_production_observer",
+            "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\ctf04_candidate_production_observer.rs",
+            "edition": "2024",
+            "doc": false,
+            "doctest": false,
+            "test": false
+          },
+          "profile": {
+            "opt_level": "0",
+            "debuginfo": 2,
+            "debug_assertions": true,
+            "overflow_checks": true,
+            "test": false
+          },
+          "features": [],
+          "filenames": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf04_candidate_production_observer.exe"
+          ],
+          "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf04_candidate_production_observer.exe",
+          "fresh": false
+        },
+        "executable": {
+          "historical_path": "target/debug/examples/ctf04_candidate_production_observer.exe",
+          "sha256": "3f6c397d22c1a86a6ba9fcbe6a2b1c3595e9b22070063183aa7c7584ac550600"
+        }
+      }
+    ],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

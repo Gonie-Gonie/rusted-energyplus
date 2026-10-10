@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-07\original-data-review-prep-01\review_unit.py", line 304, in <module>
+    raise SystemExit(run(parser.parse_args()))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-07\original-data-review-prep-01\review_unit.py", line 133, in run
+    initial.packet(freeze, request, admission, projection, contracts["tolerances"],
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-07\original-data-review-prep-01\initial_shape.py", line 26, in packet
+    need(item["frozen_before_this_CTF06_helper_execution"] is True and item["expected_values_supplied"] is False and
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'frozen_before_this_CTF06_helper_execution'

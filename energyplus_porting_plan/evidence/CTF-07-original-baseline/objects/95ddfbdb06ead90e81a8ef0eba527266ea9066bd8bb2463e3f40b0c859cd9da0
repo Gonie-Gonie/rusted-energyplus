@@ -1,0 +1,309 @@
+"""Validate actual post-619 copies and their source handoff; no node evaluator."""
+
+VARIABLES = ["dx", "initial_CTFTimeStep", "caller_TimeStepZone"]
+COUNTS = ["initial_record_count", "initial_reached_phase_records", "initial_unreached_phase_records",
+          "initial_available_owner_count", "initial_unavailable_owner_count",
+          "initial_selected_1D_owner_count", "initial_unselected_context_count", "actual_initial_callback_count"]
+POLICY = {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {"SourceSinkPresent": False, "SolutionDimensions": 1},
+    "active_layer_fields": ["Nodes", "dx"],
+    "integer_fields": ["LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"],
+    "scalar_fields": ["CTFTimeStep", "TimeStepZone"],
+    "initial_state_distinct_from_whole_return_and_retry_state": True,
+    "PostConversion_layer_handoff_retained": True,
+    "PostConversion_handoff_fields": ["LayersInConstruct", "NumResLayers", "dl", "rk", "rho", "cp", "lr", "ResLayer"],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": True,
+    "required_reached_fields_absent_is_integrity_failure": True,
+    "unreached_counted_as_PASS": False, "branch_or_numeric_answers_reconstructed": False,
+}
+
+
+def packet(freeze, request, admission, projection, tolerances, inherited_tolerances, need):
+    for item in [freeze, request, admission, projection, tolerances]:
+        need(item["frozen_before_this_CTF06_helper_execution"] is True and item["expected_values_supplied"] is False and
+             item["expected_exits_supplied"] is False and item["scientific_execution_performed"] is False,
+             "Fresh input-only initial-state policy differs")
+    for item in [request, admission, projection, tolerances]:
+        need(item["ctf03_initial_observation_policy"] == POLICY, "Exact initial-state policy required")
+    profiles = tolerances["ctf03_initial_profiles"]
+    need(isinstance(profiles, list) and [row["variable"] for row in profiles] == VARIABLES,
+         "Three separate initial-state profiles required")
+    for index, row in enumerate(profiles):
+        need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+             row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+             row["required_shape"] == ("actual_LayersInConstruct_active_prefix" if index == 0 else "scalar"),
+             "Frozen initial zero/class/shape/signedzero profile differs")
+    need(tolerances["ctf01_preprocessing_profiles"] == inherited_tolerances["arithmetic_profiles_by_variable"] and
+         len(tolerances["ctf01_preprocessing_profiles"]) == 18 and
+         tolerances["tolerance_changes_after_output_inspection_permitted"] is False,
+         "Inherited18 context must remain separate and unchanged")
+    need(freeze["inherited_CTF01_freeze_claimed_as_fresh_CTF06_freeze"] is False,
+         "Historical CTF01 freeze cannot replace this initial-observation freeze")
+
+    matrix_packet(freeze, request, admission, projection, tolerances, need)
+
+def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    """Return the genuine fourth callback count, without inferring a branch."""
+    counts["initial_record_count"] += 1
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked source cannot have initial observations")
+        counts["initial_unavailable_owner_count"] += 1
+        return 0
+    observed = operation["observations"]
+    need(isinstance(observed, dict), "Invoked source requires actual observation ledger")
+    row = observed["InitialDiscretization"]
+    need(isinstance(row, dict) and set(row) == {"reached", "available", "unavailable_reason", "actual_phase_callback_count", "snapshot"},
+         "Exact initial callback record required")
+    need(type(row["reached"]) is bool and type(row["available"]) is bool and
+         type(row["actual_phase_callback_count"]) is int and row["actual_phase_callback_count"] >= 0,
+         "Typed initial availability/callback count required")
+    callbacks = row["actual_phase_callback_count"]
+    need((callbacks > 0) is row["reached"], "Initial callback count/reached flag differs")
+    if callbacks > 1: need(observed["duplicate_phase"] is True, "Duplicate initial callback lacks integrity flag")
+    counts["actual_initial_callback_count"] += callbacks
+    if not row["reached"]:
+        need(row["available"] is False and row["snapshot"] is None and row["unavailable_reason"] == "callback_not_reached",
+             "Unreached initial state must remain unavailable; no zero result")
+        counts["initial_unreached_phase_records"] += 1
+        counts["initial_unavailable_owner_count"] += 1
+        return callbacks
+    counts["initial_reached_phase_records"] += 1
+    state = row["snapshot"]
+    keys = set(POLICY["integer_fields"] + POLICY["scalar_fields"] +
+               ["ErrorsFound", "DoCTFErrorReport", "active_prefix_available", "copied_layer_count", "active_prefix"])
+    need(isinstance(state, dict) and set(state) == keys, "Reached initial state requires every actual captured field")
+    for name in POLICY["integer_fields"]: need(type(state[name]) is int, "Actual initial integer owner required")
+    for name in ["ErrorsFound", "DoCTFErrorReport", "active_prefix_available"]:
+        need(type(state[name]) is bool, "Actual initial flag owner required")
+    need(type(state["copied_layer_count"]) is int and 0 <= state["copied_layer_count"] <= 11 and
+         row["available"] is state["active_prefix_available"], "Actual initial prefix count/availability differs")
+    for name in POLICY["scalar_fields"]: scalar(state[name])
+    if not row["available"]:
+        need(row["unavailable_reason"] == "observer_active_prefix_invalid" and state["active_prefix"] is None and
+             observed["active_prefix_invalid"] is True, "Reached invalid prefix must retain its real integrity flag")
+        integrity.append(label + "/InitialDiscretization/required-prefix-absent")
+        counts["initial_unavailable_owner_count"] += 1
+        return callbacks
+    need(row["unavailable_reason"] is None and 1 <= state["LayersInConstruct"] <= 11 and
+         isinstance(state["active_prefix"], list) and
+         state["copied_layer_count"] == state["LayersInConstruct"] == len(state["active_prefix"]),
+         "Actual initial active-prefix shape differs")
+    for layer in state["active_prefix"]:
+        need(isinstance(layer, dict) and set(layer) == {"Nodes", "dx"} and type(layer["Nodes"]) is int,
+             "Actual integer Nodes and scalar dx fields required")
+        scalar(layer["dx"])
+    converted = observed["PostConversion"]
+    need(converted["reached"] is True or observed["phase_order_invalid"] is True,
+         "Initial state without actual preceding conversion needs an integrity flag")
+    if converted["reached"] and converted["available"]:
+        source = converted["snapshot"]
+        need(isinstance(source, dict) and source["LayersInConstruct"] == state["LayersInConstruct"] and
+             source["NumResLayers"] == state["NumResLayers"] and source["copied_layer_count"] == state["copied_layer_count"],
+             "Actual converted-layer prefix handoff differs from initial state")
+        for layer in source["active_prefix"]:
+            need(set(layer) == {"dl", "rk", "rho", "cp", "lr", "ResLayer"},
+                 "Actual thickness/conductivity/capacitance-factor handoff fields required")
+    else:
+        integrity.append(label + "/InitialDiscretization/required-converted-handoff-absent")
+    index = operation["actual_construction_index"]
+    need(isinstance(owner_snapshot, dict) and type(index) is int and 1 <= index <= len(owner_snapshot["constructions"]),
+         "Reached initial capture requires its actual construction owner")
+    owner = owner_snapshot["constructions"][index - 1]
+    need(state["TimeStepZone"]["value_bits"] == owner_snapshot["TimeStepZone"]["value_bits"],
+         "Actual caller timestep copy differs")
+    selected = not observed["observer_failure"] and owner["SourceSinkPresent"] is False and owner["SolutionDimensions"] == 1
+    counts["initial_available_owner_count"] += 1
+    counts["initial_selected_1D_owner_count" if selected else "initial_unselected_context_count"] += 1
+    return callbacks
+
+
+MATRIX_POLICY = {'protocol': 'ctf04-matrix-assembly.v1', 'phase': 'after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt', 'selection': 'first_actual_post728_visit_in_selected_no_source_1D_context', 'selected_attempt_ordinal': 1, 'later_Native_attempts_paired': False, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'Rust_retry_driver_available': False, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'matrix_fields': ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat'], 'storage_order': 'source_i1_outer_i2_inner_row_first', 'matrix_shapes': {'AMat': 'actual_rcmax_by_rcmax', 'IdenMatrix': 'actual_rcmax_by_rcmax', 'BMat': 3, 'CMat': 2, 'DMat': 2}, 'actual_source_produced_identity_required': True, 'attempt_identity': 'one_based_actual_callback_visit_within_bound_whole_call', 'actual_current_retry_state_fields': ['CTFTimeStep', 'NumHistories', 'TimeStepZone'], 'actual_converted_and_initial_handoff_retained': True, 'missing_attempt_or_copy_integrity_failure_is_required_failure': True, 'unreached_counted_as_PASS': False, 'retry_driver_or_matrix_answers_reconstructed': False}
+RETENTION_INTENT = {'schema': 'ctf07-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF07-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+MATRIX_VARIABLES = ["AMat", "IdenMatrix", "BMat", "CMat", "DMat", "assembly_CTFTimeStep", "caller_TimeStepZone"]
+MATRIX_SHAPES = ["actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", [3], [2], [2], "scalar", "scalar"]
+FAILURES = ["IdentityMismatch", "OrderFailure", "ActivePrefixShape", "MatrixShape", "CopyException", "LedgerAppendException"]
+MATRIX_COUNTS = ["matrix_whole_call_records", "matrix_uninvoked_whole_call_count", "matrix_unreached_whole_call_count",
+    "actual_matrix_attempt_callback_count", "actual_retained_matrix_attempt_count", "matrix_attempt_records_omitted",
+    "matrix_selected_first_attempt_count", "matrix_later_unpaired_attempt_count", "matrix_unselected_context_attempt_count",
+    "matrix_unavailable_attempt_count", "matrix_failure_event_count"] + ["matrix_failure_" + name for name in FAILURES]
+
+
+def matrix_packet(freeze, request, admission, projection, tolerances, need):
+    for item in [request, admission, projection, tolerances]:
+        need(item["ctf04_matrix_observation_policy"] == MATRIX_POLICY, "Exact frozen first-attempt matrix policy required")
+    profiles = tolerances["arithmetic_profiles_by_variable"]
+    need(isinstance(profiles, list) and [row["variable"] for row in profiles] == MATRIX_VARIABLES,
+         "Seven separate frozen matrix/caller profiles required")
+    for index, row in enumerate(profiles):
+        need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+             row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+             row["required_shape"] == MATRIX_SHAPES[index], "Frozen exact matrix profile differs")
+    pairing = projection["method_state_pairing_and_availability"]
+    need(pairing["ctf04_matrix_observation_policy"] == MATRIX_POLICY and
+         pairing["all_actual_Native_attempt_records_retained"] is True and
+         pairing["later_Native_attempts_are_context_only_noPASS"] is True and
+         pairing["Native_retry_dt_history_or_attempt_counts_supplied_to_Rust"] is False and
+         pairing["retry_driver_certified"] is False, "Actual attempts must remain intact; only first visit is selected")
+    for item in [freeze, request, admission, projection]:
+        need(item["linked_original_retention_intent"] == RETENTION_INTENT, "Prospective linked Original retention intent differs")
+
+
+def matrix_review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    """Validate actual copies/shape/association only, never assemble or evaluate matrices."""
+    counts["matrix_whole_call_records"] += 1
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked source cannot fabricate matrix visits")
+        counts["matrix_uninvoked_whole_call_count"] += 1
+        return
+    observed = operation["observations"]
+    ledger = observed["MatrixAssembly"]
+    need(isinstance(ledger, dict) and set(ledger) == {"protocol", "actual_matrix_attempt_callback_count",
+         "actual_retained_attempt_count", "matrix_attempt_records_omitted", "matrix_observer_failure", "matrix_copy_integrity_failed",
+         "matrix_failure_event_counts", "first_matrix_failure", "last_matrix_failure", "attempts", "no_callback_reached",
+         "unreached_counted_as_PASS", "matrix_or_identity_or_retry_state_reconstructed", "old_checkpoint_counters_include_matrix_callbacks"},
+         "Complete actual matrix-attempt ledger required")
+    need(ledger["protocol"] == MATRIX_POLICY["protocol"] and ledger["unreached_counted_as_PASS"] is False and
+         ledger["matrix_or_identity_or_retry_state_reconstructed"] is False and
+         ledger["old_checkpoint_counters_include_matrix_callbacks"] is False, "Actual matrix observation scope differs")
+    for key in ["actual_matrix_attempt_callback_count", "actual_retained_attempt_count", "matrix_attempt_records_omitted"]:
+        need(type(ledger[key]) is int and ledger[key] >= 0, "Typed actual matrix count required")
+    for key in ["matrix_observer_failure", "matrix_copy_integrity_failed", "no_callback_reached"]:
+        need(type(ledger[key]) is bool, "Typed actual matrix flag required")
+    callbacks, retained, omitted = [ledger[key] for key in ["actual_matrix_attempt_callback_count", "actual_retained_attempt_count", "matrix_attempt_records_omitted"]]
+    need(isinstance(ledger["attempts"], list) and retained == len(ledger["attempts"]) and callbacks == retained + omitted and
+         ledger["no_callback_reached"] is (callbacks == 0), "Actual callback/retained/omitted ledger differs")
+    for key, value in [("actual_matrix_attempt_callback_count", callbacks), ("actual_retained_matrix_attempt_count", retained), ("matrix_attempt_records_omitted", omitted)]:
+        counts[key] += value
+    if callbacks == 0: counts["matrix_unreached_whole_call_count"] += 1
+    events = ledger["matrix_failure_event_counts"]
+    need(isinstance(events, list) and len(events) == len(FAILURES), "Six actual failure-kind counters required")
+    event_counts = {}
+    for expected, item in zip(FAILURES, events):
+        need(isinstance(item, dict) and set(item) == {"kind", "actual_event_count"} and item["kind"] == expected and
+             type(item["actual_event_count"]) is int and item["actual_event_count"] >= 0, "Actual ordered failure-kind count differs")
+        event_counts[expected] = item["actual_event_count"]
+        counts["matrix_failure_" + expected] += item["actual_event_count"]
+    total_events = sum(event_counts.values()); counts["matrix_failure_event_count"] += total_events
+    need(ledger["matrix_observer_failure"] is (total_events > 0), "Actual observer failure flag/count differs")
+    record_failures = dict.fromkeys(FAILURES, 0); failure_ordinals = []; ordinals = []; rows = {}
+    local_failed = ledger["matrix_observer_failure"] or omitted != 0 or callbacks != retained
+    for attempt in ledger["attempts"]:
+        need(isinstance(attempt, dict) and set(attempt) == {"observed_attempt_ordinal", "reached", "available", "unavailable_reason", "failure_kinds", "snapshot"},
+             "Exact actual attempt record required")
+        ordinal = attempt["observed_attempt_ordinal"]
+        need(type(ordinal) is int and 1 <= ordinal <= callbacks and (not ordinals or ordinal > ordinals[-1]),
+             "Actual observed attempt ordinals must be bounded unique and ordered")
+        ordinals.append(ordinal); rows[ordinal] = attempt
+        need(attempt["reached"] is True and type(attempt["available"]) is bool, "Retained callback visit availability differs")
+        kinds = attempt["failure_kinds"]
+        need(isinstance(kinds, list) and len(kinds) == len(FAILURES), "All six per-attempt failure flags required")
+        failed = []
+        for expected, flag in zip(FAILURES, kinds):
+            need(isinstance(flag, dict) and set(flag) == {"kind", "failed"} and flag["kind"] == expected and type(flag["failed"]) is bool,
+                 "Actual per-attempt failure flag differs")
+            if flag["failed"]: failed.append(expected); record_failures[expected] += 1
+        order_failed = observed["actual_callback_count"] != 4 or not observed["InitialDiscretization"]["reached"] or any(
+            observed[phase]["actual_phase_callback_count"] != 1 for phase in ["PostLoad", "PostMerge", "PostConversion", "InitialDiscretization"])
+        need(("OrderFailure" in failed) is order_failed, "Matrix visit order failure differs from actual old-four checkpoint counts")
+        if failed: failure_ordinals.append(ordinal)
+        state = attempt["snapshot"]
+        need(isinstance(state, dict) and set(state) == {"ErrorsFound", "DoCTFErrorReport", "IsUsedCTF", "SourceSinkPresent",
+             "SolutionDimensions", "TotLayers", "LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp", "CTFTimeStep",
+             "NumHistories", "TimeStepZone", "active_prefix_available", "copied_layer_count", "active_prefix", "matrices_available", "matrices", "actual_bounds"},
+             "Actual matrix snapshot fields required")
+        for key in ["ErrorsFound", "DoCTFErrorReport", "IsUsedCTF", "SourceSinkPresent", "active_prefix_available", "matrices_available"]:
+            need(type(state[key]) is bool, "Actual matrix context flag required")
+        for key in ["SolutionDimensions", "TotLayers", "LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories", "copied_layer_count"]:
+            need(type(state[key]) is int, "Actual matrix integer owner required")
+        scalar(state["CTFTimeStep"]); scalar(state["TimeStepZone"])
+        available = state["active_prefix_available"] and state["matrices_available"] and not failed
+        need(attempt["available"] is bool(available) and attempt["unavailable_reason"] == (None if available else "required_matrix_observer_integrity_failure"),
+             "Actual matrix availability/reason differs")
+        if not available:
+            local_failed = True; counts["matrix_unavailable_attempt_count"] += 1
+        if not state["active_prefix_available"]:
+            need(state["active_prefix"] is None, "Unavailable active prefix cannot contain fallback operands")
+            local_failed = True
+        else:
+            prefix = state["active_prefix"]
+            need(1 <= state["LayersInConstruct"] <= 11 and 0 <= state["NumResLayers"] <= state["LayersInConstruct"] and
+                 isinstance(prefix, list) and len(prefix) == state["copied_layer_count"] == state["LayersInConstruct"],
+                 "Actual matrix active-prefix shape differs")
+            for layer in prefix:
+                need(isinstance(layer, dict) and set(layer) == {"dl", "rk", "rho", "cp", "lr", "ResLayer", "Nodes", "dx"} and
+                     type(layer["ResLayer"]) is bool and type(layer["Nodes"]) is int, "Exact actual matrix handoff layer required")
+                for field in ["dl", "rk", "rho", "cp", "lr", "dx"]: scalar(layer[field])
+            converted, initial = observed["PostConversion"], observed["InitialDiscretization"]
+            need(converted["reached"] and converted["available"] and initial["reached"] and initial["available"],
+                 "Matrix visit requires actual converted and initial owner copies")
+            earlier, first = converted["snapshot"], initial["snapshot"]
+            for key in ["LayersInConstruct", "NumResLayers", "copied_layer_count"]:
+                need(state[key] == earlier[key] == first[key], "Actual layer/count handoff differs")
+            for key in ["rcmax", "NodeSource", "NodeUserTemp"]: need(state[key] == first[key], "Actual initial selector handoff differs")
+            for copied, original, nodes in zip(prefix, earlier["active_prefix"], first["active_prefix"]):
+                need(copied["ResLayer"] is original["ResLayer"] and copied["Nodes"] == nodes["Nodes"], "Actual prefix discrete copy differs")
+                for key in ["dl", "rk", "rho", "cp", "lr"]:
+                    need(copied[key]["value_bits"] == original[key]["value_bits"], "Actual converted buffer bit-copy handoff differs")
+                need(copied["dx"]["value_bits"] == nodes["dx"]["value_bits"], "Actual initial dx bit-copy handoff differs")
+            if ordinal == 1:
+                need(state["CTFTimeStep"]["value_bits"] == first["CTFTimeStep"]["value_bits"] and state["NumHistories"] == first["NumHistories"],
+                     "First actual assembly must bind actual initial619 dt/history; later attempts cannot replace it")
+        bounds = state["actual_bounds"]
+        need(isinstance(bounds, dict) and set(bounds) == {"AMat", "IdenMatrix", "BMat", "CMat", "DMat"}, "Actual array bounds required")
+        for name, bound in bounds.items():
+            if bound is None: continue
+            keys = {"lower1", "upper1", "lower2", "upper2", "size"} if name in ["AMat", "IdenMatrix"] else {"lower", "upper", "size"}
+            need(isinstance(bound, dict) and set(bound) == keys and all(type(v) is int for v in bound.values()), "Typed actual bounds required")
+        if not state["matrices_available"]:
+            need(state["matrices"] is None, "Unavailable matrix buffers cannot contain reconstructed values")
+            local_failed = True
+        else:
+            matrices = state["matrices"]; n = state["rcmax"]
+            need(n >= 1 and isinstance(matrices, dict) and set(matrices) == set(bounds), "Actual matrix ownership/shape differs")
+            for name in ["AMat", "IdenMatrix"]:
+                need(bounds[name] == {"lower1": 1, "upper1": n, "lower2": 1, "upper2": n, "size": n * n} and
+                     isinstance(matrices[name], list) and len(matrices[name]) == n * n, "Actual rcmax-square row-first matrix shape differs")
+            for name, size in [("BMat", 3), ("CMat", 2), ("DMat", 2)]:
+                need(bounds[name] == {"lower": 1, "upper": size, "size": size} and isinstance(matrices[name], list) and len(matrices[name]) == size,
+                     "Actual B3/C2/D2 storage shape differs")
+            for values in matrices.values():
+                for value in values: scalar(value)
+        index = operation["actual_construction_index"]
+        need(isinstance(owner_snapshot, dict) and type(index) is int and 1 <= index <= len(owner_snapshot["constructions"]), "Actual matrix construction owner required")
+        owner = owner_snapshot["constructions"][index - 1]
+        for key in ["IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers"]:
+            need(state[key] == owner[key], "Actual matrix original construction association differs")
+        need(state["TimeStepZone"]["value_bits"] == owner_snapshot["TimeStepZone"]["value_bits"], "Actual matrix caller copy differs")
+        selected = available and state["SourceSinkPresent"] is False and state["SolutionDimensions"] == 1
+        if ordinal > 1: counts["matrix_later_unpaired_attempt_count"] += 1
+        elif selected: counts["matrix_selected_first_attempt_count"] += 1
+        elif available: counts["matrix_unselected_context_attempt_count"] += 1
+        if ordinal != len(ordinals): local_failed = True
+    missing = set(range(1, callbacks + 1)) - set(ordinals)
+    need(len(missing) == omitted and event_counts["IdentityMismatch"] + event_counts["LedgerAppendException"] == omitted,
+         "Missing actual visits must match explicit omitted/failure counters")
+    for kind in FAILURES:
+        need(event_counts[kind] == record_failures[kind] if kind not in ["IdentityMismatch", "LedgerAppendException"] else record_failures[kind] == 0,
+             "Actual failure counters differ from retained/omitted observations")
+    failed_ordinals = sorted(set(failure_ordinals) | missing)
+    for key, expected_ordinal in [("first_matrix_failure", failed_ordinals[0] if failed_ordinals else None),
+                                  ("last_matrix_failure", failed_ordinals[-1] if failed_ordinals else None)]:
+        event = ledger[key]
+        if expected_ordinal is None: need(event is None, "No failure event can be fabricated")
+        else:
+            need(isinstance(event, dict) and set(event) == {"observed_attempt_ordinal", "kind"} and event["observed_attempt_ordinal"] == expected_ordinal and
+                 event["kind"] in FAILURES and event_counts[event["kind"]] > 0, "Actual first/last failure event differs")
+            if expected_ordinal in missing: need(event["kind"] in ["IdentityMismatch", "LedgerAppendException"], "Omitted failure kind differs")
+            else: need(any(flag["kind"] == event["kind"] and flag["failed"] for flag in rows[expected_ordinal]["failure_kinds"]), "Failure event lacks actual retained flag")
+    need(ledger["matrix_copy_integrity_failed"] is bool(local_failed), "Actual matrix integrity aggregate differs")
+    if local_failed: integrity.append(label + "/MatrixAssembly/required-observation-integrity-failed")
+    if callbacks and 1 not in rows: integrity.append(label + "/MatrixAssembly/first-attempt-absent-not-replaced")
+
+
+def matrix_summary(result, counts, need):
+    for key in ["actual_matrix_attempt_callback_count", "actual_retained_matrix_attempt_count", "matrix_attempt_records_omitted"]:
+        need(type(result[key]) is int and result[key] == counts[key], "Global actual matrix counts differ from observed records")
+    need(result["complete_matrix_attempt_parity_claimed"] is False, "Later Native attempts cannot become Rust parity")

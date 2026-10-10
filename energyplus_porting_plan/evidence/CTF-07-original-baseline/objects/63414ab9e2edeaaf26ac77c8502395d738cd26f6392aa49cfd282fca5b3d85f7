@@ -1,0 +1,364 @@
+--- .runtime/porting/CTF-07/original-data-review-prep-01/manifest.json
++++ .runtime/porting/CTF-07/original-data-review-prep-02/manifest.json
+@@ -3,198 +3,207 @@
+   "status": "SOURCE-READY-HELD-unexecuted",
+   "own_sources": [
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_unit.py",
+-      "sha256": "e90502fd9740bb3fb6acacbdf6d17e3209dbb747da9bfddb32fff2d1b5fb586f",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/review_unit.py",
++      "sha256": "da61ce6e7c54777c11506a8c584ebb077dc8709139cd24567f395baea6e0e7d4",
+       "size_bytes": 28142,
+       "line_count": 304
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_production.py",
+-      "sha256": "b51a470972c0ccfe3b81b5d7ae653c4b08901d51eb8cfdf2b00db172fd070751",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/review_production.py",
++      "sha256": "73b00d45ed674d7673db8c454efda562cef421fb67dbc36af258e7de455383e8",
+       "size_bytes": 30809,
+       "line_count": 326
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/unit_shape.py",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/unit_shape.py",
+       "sha256": "35ea2bddfa2ffdb40f087396c524bec8e40963c3e337f64c916689813c83cd6f",
+       "size_bytes": 19925,
+       "line_count": 232
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/production_shape.py",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/production_shape.py",
+       "sha256": "7189ba8a44d2666dd1f38d519e51773a4bc06a14531e86e593865d76399185f8",
+       "size_bytes": 21487,
+       "line_count": 247
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/initial_shape.py",
+-      "sha256": "95ddfbdb06ead90e81a8ef0eba527266ea9066bd8bb2463e3f40b0c859cd9da0",
+-      "size_bytes": 26612,
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/initial_shape.py",
++      "sha256": "3d65ff7f9c9eab2c655dd108b623d0400eeb82836b886374c7f99c31ac5f18d3",
++      "size_bytes": 26621,
+       "line_count": 309
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/method_shape.py",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/method_shape.py",
+       "sha256": "310b9dbb84954c8050e19f6a8a7a377b01f2597d6eb6947ab6e8a42437906454",
+       "size_bytes": 30929,
+       "line_count": 284
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/packet_io.py",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/packet_io.py",
+       "sha256": "24acc9eed6a6599f7a6d26021bef4dd2c7a49e4b7faea86cad352bc4d7c3b5bf",
+       "size_bytes": 4665,
+       "line_count": 120
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/gamma_shape.py",
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/gamma_shape.py",
+       "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+       "size_bytes": 34636,
+       "line_count": 316
+     }
+   ],
+   "predecessor_manifest": {
+-    "path": ".runtime/porting/CTF-06/original-data-review-prep-02/manifest.json",
+-    "sha256": "b3a6782bbd01e50c650274fabde954f5e7b3ab169745aa3bddce267221a48e9c",
+-    "size_bytes": 35076,
+-    "line_count": 873
++    "path": ".runtime/porting/CTF-07/original-data-review-prep-01/manifest.json",
++    "sha256": "1374abf94ca8d1b80ae910b2f364c41f1ad5a8744ef7b4d10a14349d5d33877b",
++    "size_bytes": 48061,
++    "line_count": 1210
+   },
+   "before_sources": [
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/review_unit.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_unit.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/review_unit.py",
+-        "sha256": "21b0d20efb5f7426f02fe15df42454de2532e2051699a5a35da96928899aee22",
+-        "size_bytes": 27537,
+-        "line_count": 298
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/review_unit.py",
++        "sha256": "e90502fd9740bb3fb6acacbdf6d17e3209dbb747da9bfddb32fff2d1b5fb586f",
++        "size_bytes": 28142,
++        "line_count": 304
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/review_production.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_production.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/review_production.py",
+-        "sha256": "1d59111c64413215e82d6404788b78139902b829f4fe271a6e8d0501985edfe3",
+-        "size_bytes": 30204,
+-        "line_count": 320
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/review_production.py",
++        "sha256": "b51a470972c0ccfe3b81b5d7ae653c4b08901d51eb8cfdf2b00db172fd070751",
++        "size_bytes": 30809,
++        "line_count": 326
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/unit_shape.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/unit_shape.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/unit_shape.py",
+-        "sha256": "e229ed47ca1d223da10235f1d0df537a2eceacf5d16328ede783496cf3feb9f1",
+-        "size_bytes": 19696,
+-        "line_count": 231
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/unit_shape.py",
++        "sha256": "35ea2bddfa2ffdb40f087396c524bec8e40963c3e337f64c916689813c83cd6f",
++        "size_bytes": 19925,
++        "line_count": 232
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/production_shape.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/production_shape.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/production_shape.py",
+-        "sha256": "61ac60d3692b08173cb0a026fbb50b5d14fee2e41eada902f3d04eb620505394",
+-        "size_bytes": 21279,
+-        "line_count": 246
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/production_shape.py",
++        "sha256": "7189ba8a44d2666dd1f38d519e51773a4bc06a14531e86e593865d76399185f8",
++        "size_bytes": 21487,
++        "line_count": 247
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/initial_shape.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/initial_shape.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/initial_shape.py",
+-        "sha256": "37176acd2c470199865f0349ca6641bf562ff11fffaad8b096d63ae798dfaa13",
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/initial_shape.py",
++        "sha256": "95ddfbdb06ead90e81a8ef0eba527266ea9066bd8bb2463e3f40b0c859cd9da0",
+         "size_bytes": 26612,
+         "line_count": 309
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/method_shape.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/method_shape.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/method_shape.py",
+-        "sha256": "430d505024a9666edf53612c93b4a95564da67157ad05221098eedf434e7c8fd",
+-        "size_bytes": 34346,
+-        "line_count": 323
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/method_shape.py",
++        "sha256": "310b9dbb84954c8050e19f6a8a7a377b01f2597d6eb6947ab6e8a42437906454",
++        "size_bytes": 30929,
++        "line_count": 284
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/packet_io.py",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/packet_io.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/packet_io.py",
+-        "sha256": "9569fea37f7255363fb26ca503d5ee9612284eab2c0734a3e9b6d3043d00fe42",
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/packet_io.py",
++        "sha256": "24acc9eed6a6599f7a6d26021bef4dd2c7a49e4b7faea86cad352bc4d7c3b5bf",
+         "size_bytes": 4665,
+         "line_count": 120
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/README.md",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/gamma_shape.py",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/README.md",
+-        "sha256": "27f4338724eabec8155cacdd5f8fe527bafbf610084c035450842f10660bd8c1",
+-        "size_bytes": 6981,
+-        "line_count": 105
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/gamma_shape.py",
++        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
++        "size_bytes": 34636,
++        "line_count": 316
+       }
+     },
+     {
+-      "historical_path": ".runtime/porting/CTF-06/original-data-review-prep-02/manifest.json",
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/README.md",
+       "archive": {
+-        "path": ".runtime/porting/CTF-07/original-data-review-prep-01/before/manifest.json",
+-        "sha256": "b3a6782bbd01e50c650274fabde954f5e7b3ab169745aa3bddce267221a48e9c",
+-        "size_bytes": 35076,
+-        "line_count": 873
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/README.md",
++        "sha256": "4a9b853083927fcedd372898c12d2059d2a89b73a26df3af113c0b9ca335e30d",
++        "size_bytes": 5964,
++        "line_count": 89
++      }
++    },
++    {
++      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-01/manifest.json",
++      "archive": {
++        "path": ".runtime/porting/CTF-07/original-data-review-prep-02/before/manifest.json",
++        "sha256": "1374abf94ca8d1b80ae910b2f364c41f1ad5a8744ef7b4d10a14349d5d33877b",
++        "size_bytes": 48061,
++        "line_count": 1210
+       }
+     }
+   ],
+   "exact_source_diffs": [
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_unit.py.from-06.diff",
+-      "sha256": "8b373412a7f413d4612ef2c6df1902e017821369d94ef9203d319f6e6524b6ad",
+-      "size_bytes": 23383,
+-      "line_count": 237
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_production.py.from-06.diff",
+-      "sha256": "d46cb0b9d96fadef9af55546fd826dbe359675ed01a910094a84647c96e68749",
+-      "size_bytes": 24737,
+-      "line_count": 245
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/unit_shape.py.from-06.diff",
+-      "sha256": "1ab02f100ce1a18f203a89a930bf4f593d4eb4c7ffd30e1685485693913ef9e6",
+-      "size_bytes": 2927,
+-      "line_count": 37
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/production_shape.py.from-06.diff",
+-      "sha256": "100769d9c100f8f141e19716fad6875c971fcbd8ac93b3957e6c461e2e60acf9",
+-      "size_bytes": 3114,
+-      "line_count": 37
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/initial_shape.py.from-06.diff",
+-      "sha256": "b2b9d7c548ea71a9e0877064c3b7c0d616d95bd09a47f4e27a01c44030bf4a2b",
+-      "size_bytes": 2608,
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/review_unit.py.from-01.diff",
++      "sha256": "3d21ca1714602b30122177ff7852316e9e453410989ccce84160b562b16d3173",
++      "size_bytes": 699,
+       "line_count": 11
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/method_shape.py.from-06.diff",
+-      "sha256": "4dd34e60cf6c2a8b8fc419a74fac7492726366ea32c77ccf0f6ca6a308089a5b",
+-      "size_bytes": 9913,
+-      "line_count": 63
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/packet_io.py.from-06.diff",
+-      "sha256": "18563b7ddf9ae9a822b88ed0c6d6ee2090d8548e573f81ccca74a173eb45cdf9",
+-      "size_bytes": 343,
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/review_production.py.from-01.diff",
++      "sha256": "271885e8baebb6465ca818e98aada4c6f11c10db418a872754dcac3bf824e605",
++      "size_bytes": 717,
+       "line_count": 11
+     },
+     {
+-      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/gamma_shape.py.from-06.diff",
+-      "sha256": "d0f6fa6a2fc3f361e926fbf57ba3cdf450cc57334704191c46bc9def737fe2a4",
+-      "size_bytes": 35056,
+-      "line_count": 319
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/unit_shape.py.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/production_shape.py.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/initial_shape.py.from-01.diff",
++      "sha256": "59d6804749f2f3fbea3ff811085239fd9ffb26519bd981dae33140590af121b3",
++      "size_bytes": 1388,
++      "line_count": 20
++    },
++    {
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/method_shape.py.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/packet_io.py.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-07/original-data-review-prep-02/gamma_shape.py.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
+     }
+   ],
+   "README": {
+-    "path": ".runtime/porting/CTF-07/original-data-review-prep-01/README.md",
+-    "sha256": "4a9b853083927fcedd372898c12d2059d2a89b73a26df3af113c0b9ca335e30d",
+-    "size_bytes": 5964,
+-    "line_count": 89
++    "path": ".runtime/porting/CTF-07/original-data-review-prep-02/README.md",
++    "sha256": "7121254a444dd2fc59415b36699fe4af93ecef4b46c0cf2ca0d165923e186dcb",
++    "size_bytes": 6729,
++    "line_count": 100
+   },
+   "source_dependencies": [
+     {
+@@ -1163,7 +1172,27 @@
+     "numerical_values_evaluated_or_compared": false,
+     "numerical_PASS_claimed": false
+   },
+-  "source_correspondence": {
++  "authorship_limits": "Header authored Native06 and pure/publicGamma; Raw authored passive/helper07. Factual source/provenance validation is not independent own-formula scientific certification. Root full read and other-author full source peer required before Root actual execution.",
++  "scientific_weather_or_binary_payloads_read": false,
++  "target_modules_imported_or_executed": false,
++  "new_QA_or_proof_framework": false,
++  "canonical_files_updated": false,
++  "numerical_comparisons_performed": false,
++  "numerical_PASS_claimed": false,
++  "gates_updated": false,
++  "inherited_predecessor_manifest": {
++    "path": ".runtime/porting/CTF-06/original-data-review-prep-02/manifest.json",
++    "sha256": "b3a6782bbd01e50c650274fabde954f5e7b3ab169745aa3bddce267221a48e9c",
++    "size_bytes": 35076,
++    "line_count": 873
++  },
++  "README_delta": {
++    "path": ".runtime/porting/CTF-07/original-data-review-prep-02/README.md.from-01.diff",
++    "sha256": "84ee2b5b05e5b3828ebe436731f076faa4a395242f38ee2be2f14bf9253880a0",
++    "size_bytes": 2457,
++    "line_count": 35
++  },
++  "predecessor_source_correspondence": {
+     "initial_method_IO_function_AST_exact06": {
+       "initial_shape.py": [
+         "packet",
+@@ -1199,12 +1228,15 @@
+     "target_scripts_imported_or_executed": false,
+     "input_guard_descriptors_inherited_from_accepted06_metadata_without_weather_payload_reads": true
+   },
+-  "authorship_limits": "Header authored Native06 and pure/publicGamma; Raw authored passive/helper07. Factual source/provenance validation is not independent own-formula scientific certification. Root full read and other-author full source peer required before Root actual execution.",
+-  "scientific_weather_or_binary_payloads_read": false,
+-  "target_modules_imported_or_executed": false,
+-  "new_QA_or_proof_framework": false,
+-  "canonical_files_updated": false,
+-  "numerical_comparisons_performed": false,
+-  "numerical_PASS_claimed": false,
+-  "gates_updated": false
++  "source_correspondence": {
++    "initial_packet_only_two_current07_field_name_replacements": true,
++    "reader_changes_only_INITIAL_SHA_rebinding": true,
++    "other_five_source_bodies_byte_exact01": true,
++    "all_other_initial_function_AST_exact01": true,
++    "profiles_and_record_validation_unchanged": true,
++    "failed_predecessor_attempt_preserved_by_Root": true,
++    "before10_byte_exact01": true,
++    "all_eight_source_diffs_regenerated": true,
++    "all_eight_modules_AST_only_no_import": true
++  }
+ }

@@ -1,0 +1,838 @@
+{
+  "schema": "ctf07-independent-original-data-review.v1",
+  "status": "pass-actual-original-data-and-provenance-before-Rust",
+  "started_utc": "2026-10-10T19:37:48.039573+00:00",
+  "finished_utc": "2026-10-10T19:37:54.970672+00:00",
+  "reviewed_results": {
+    "path": ".runtime/porting/CTF-07/native-unit-output-01/ctf07-helper-results.json",
+    "sha256": "a3a74a80b1d7cf454003cd7de2fb436ffdfe63ccec0b1198389cb0fa9e678760",
+    "size_bytes": 151938304
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CTF-07/native-unit-command-01/receipt.json",
+    "sha256": "48ee41cb0b87e6da7c83ffd717fecc7e4fa457f1abcc1e550ba82d432c0f89da",
+    "size_bytes": 3178
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/helper-request.json",
+    "sha256": "381fa166e0a4e2aa5fdb1b410548a2df3b23e6225ff19aa5038449a6a8d026ba",
+    "size_bytes": 118929
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/native-admission-contract.json",
+    "sha256": "9ff90ff7978c0c36c4bd3f354020fede4c37439dc356474f949dd3f134abd1b7",
+    "size_bytes": 26945
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/projection.json",
+    "sha256": "3f8c6fa1692f1f1995e58eb1875814cac2d6dd841e3570fbdffe5d00c4e95db5",
+    "size_bytes": 59008
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-07/frozen-packet-01/source.json",
+      "sha256": "41432649766c1332df9d95c5527d0b081537ab0db5eea56ab15dc61df1fb21e0",
+      "size_bytes": 24430
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-07/frozen-packet-01/cases.json",
+      "sha256": "31dc4f8153f031b65376c77d3741156f09533411370371323a7bb8c73b122ddf",
+      "size_bytes": 9271
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-07/frozen-packet-01/tolerances.json",
+      "sha256": "1f86c2463ff98a1d930c69dd5edcd874164f38593fabb9a9431bdcd210d56f41",
+      "size_bytes": 18465
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CTF-07/native-build-01/unit/native-build.json",
+    "sha256": "4a9229ad19645f63608e2cf4b6b7fe012549356519ae0d9db05b618813fce7da",
+    "size_bytes": 5200
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-07/native-compile-command-01/receipt.json",
+    "sha256": "7336b115fa62c71807a353db1f58e155bdddccaf17b7161ae7a9c57cd89b1a4f",
+    "size_bytes": 2949
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-07/native-unit-build-review-01/review.json",
+    "sha256": "74e8b3388ea72f1df305c115a8d6a7f665740979696171af696e538af995de81",
+    "size_bytes": 3007
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-07/native-unit-build-review-command-01/receipt.json",
+    "sha256": "9a6462aa2228547bed84cd1fffb9730a31c2000230b8a8fedb0c16a9793b2ebc",
+    "size_bytes": 2971
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/freeze-receipt.json",
+    "sha256": "fb649258ccdfe96fa0bfa6496a8951d0e50821ed6be4c1031fed6ce265382245",
+    "size_bytes": 35050
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/CTF-07/freeze-command-01/receipt.json",
+    "sha256": "3a1d4ad80e33c2aaff7e0911b113af366a4ec6caf45ffd925fabfd45afb5f645",
+    "size_bytes": 4796
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": true,
+  "reviewed_native_source_inventory": {
+    "path": ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json",
+    "sha256": "67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c",
+    "size_bytes": 23178
+  },
+  "reviewed_passive_source_inventory": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+    "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+    "size_bytes": 18141,
+    "line_count": 451
+  },
+  "reviewed_freezer_source_inventory": {
+    "path": ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json",
+    "sha256": "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02",
+    "size_bytes": 22729
+  },
+  "reviewed_PE_source_inventory": {
+    "path": ".runtime/porting/CTF-07/native-build-review-prep-01/manifest.json",
+    "sha256": "b4d54ebe24bb15753d38d409e1729d2dd371310beacbec6a09b16b338387d816",
+    "size_bytes": 5443
+  },
+  "actual_matrix_failure_event_counts": {
+    "IdentityMismatch": 0,
+    "OrderFailure": 0,
+    "ActivePrefixShape": 0,
+    "MatrixShape": 0,
+    "CopyException": 0,
+    "LedgerAppendException": 0
+  },
+  "complete_actual_matrix_records": true,
+  "reviewed_matrix_observation_policy": {
+    "protocol": "ctf04-matrix-assembly.v1",
+    "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+    "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+    "selected_attempt_ordinal": 1,
+    "later_Native_attempts_paired": false,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "Rust_retry_driver_available": false,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "matrix_fields": [
+      "AMat",
+      "IdenMatrix",
+      "BMat",
+      "CMat",
+      "DMat"
+    ],
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "matrix_shapes": {
+      "AMat": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "BMat": 3,
+      "CMat": 2,
+      "DMat": 2
+    },
+    "actual_source_produced_identity_required": true,
+    "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+    "actual_current_retry_state_fields": [
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_converted_and_initial_handoff_retained": true,
+    "missing_attempt_or_copy_integrity_failure_is_required_failure": true,
+    "unreached_counted_as_PASS": false,
+    "retry_driver_or_matrix_answers_reconstructed": false
+  },
+  "reviewed_matrix_policy_contract": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/tolerances.json",
+    "sha256": "1f86c2463ff98a1d930c69dd5edcd874164f38593fabb9a9431bdcd210d56f41",
+    "size_bytes": 18465
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe",
+    "sha256": "52231b5ca6a1be36179c2ee489520539d6651c32630afcfa26bbbc3eab7c88de",
+    "size_bytes": 1300191163
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf07-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF07-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "selected_matrix_attempt_ordinal": 1,
+  "later_attempts_observed_unpaired_noPASS": true,
+  "reviewed_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "reviewed_initial_policy_contract": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/tolerances.json",
+    "sha256": "1f86c2463ff98a1d930c69dd5edcd874164f38593fabb9a9431bdcd210d56f41",
+    "size_bytes": 18465
+  },
+  "reviewed_method_observation_policies": {
+    "ctf06_exponential_observation_policy": {
+      "protocol": "ctf06-exponential-method-observation.v1",
+      "actual_method": "ConstructionProps::calculateExponentialMatrix",
+      "actual_caller_line": 884,
+      "actual_method_source_lines": [
+        1105,
+        1373
+      ],
+      "actual_stage_names": [
+        "Entry",
+        "InitializedInputs",
+        "ScalingControls",
+        "PowerControl",
+        "SquareControl",
+        "FinalWorkspace",
+        "SourceReturn"
+      ],
+      "input_matrices": [
+        "AMat",
+        "IdenMatrix"
+      ],
+      "initialized_matrices": [
+        "AMat1",
+        "AMato",
+        "AMatN",
+        "AExp"
+      ],
+      "scaled_matrices": [
+        "AMat1"
+      ],
+      "final_matrices": [
+        "AMat1",
+        "AMato",
+        "AMatN",
+        "AExp"
+      ],
+      "return_matrices": [
+        "AMat",
+        "IdenMatrix",
+        "AExp"
+      ],
+      "scalar_controls": [
+        "AMatRowNormMax",
+        "fact",
+        "CheckVal"
+      ],
+      "integer_controls": [
+        "k",
+        "l",
+        "final_i"
+      ],
+      "actual_power_controls": [
+        "i",
+        "SigFigLimit"
+      ],
+      "actual_square_controls": [
+        "isq",
+        "Backup"
+      ],
+      "scalar_controls_available_only_at_scaling_and_final": true,
+      "final_i_distinct_from_observed_control_event_count": true,
+      "selected_invocation_ordinal": 1,
+      "selected_assembly_ordinal": 1,
+      "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+      "required_owner_context": {
+        "SourceSinkPresent": false,
+        "SolutionDimensions": 1
+      },
+      "actual_source_produced_identity_required": true,
+      "storage_order": "source_i1_outer_i2_inner_row_first",
+      "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+      "actual_assembly_association_required": true,
+      "actual_method_return_marker_required_for_return_claim": true,
+      "all_actual_visits_and_control_events_retained": true,
+      "later_Native_attempts_paired": false,
+      "later_Native_attempts_counted_as_PASS": false,
+      "Rust_retry_driver_available": false,
+      "uninvoked_counted_as_PASS": false,
+      "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+      "observer_failure_or_omission_is_integrity_failure": true,
+      "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+    },
+    "ctf05_inverse_observation_policy": {
+      "protocol": "ctf05-inverse-method-observation.v1",
+      "actual_method": "ConstructionProps::calculateInverseMatrix",
+      "actual_caller_line": 887,
+      "actual_method_source_lines": [
+        1375,
+        1494
+      ],
+      "actual_stage_names": [
+        "Entry",
+        "InitializedInputs",
+        "ScalingControls",
+        "PowerControl",
+        "SquareControl",
+        "FinalWorkspace",
+        "SourceReturn"
+      ],
+      "input_matrices": [
+        "AMat",
+        "IdenMatrix"
+      ],
+      "initialized_matrices": [
+        "AMat1",
+        "AInv"
+      ],
+      "final_matrices": [
+        "AMat1",
+        "AInv"
+      ],
+      "return_matrices": [
+        "AMat",
+        "IdenMatrix",
+        "AInv"
+      ],
+      "actual_exponential_return_precedes_inverse_entry": true,
+      "inverse_inputs_are_original_AMat_and_IdenMatrix_not_AExp": true,
+      "selected_invocation_ordinal": 1,
+      "selected_assembly_ordinal": 1,
+      "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+      "required_owner_context": {
+        "SourceSinkPresent": false,
+        "SolutionDimensions": 1
+      },
+      "actual_source_produced_identity_required": true,
+      "storage_order": "source_i1_outer_i2_inner_row_first",
+      "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+      "actual_assembly_association_required": true,
+      "actual_method_return_marker_required_for_return_claim": true,
+      "all_actual_visits_and_control_events_retained": true,
+      "later_Native_attempts_paired": false,
+      "later_Native_attempts_counted_as_PASS": false,
+      "Rust_retry_driver_available": false,
+      "uninvoked_counted_as_PASS": false,
+      "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+      "observer_failure_or_omission_is_integrity_failure": true,
+      "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+    }
+  },
+  "reviewed_Gamma_observation_policy": {
+    "protocol": "ctf07-gamma-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateGammas",
+    "actual_caller_line": 890,
+    "actual_method_source_lines": [
+      1496,
+      1589
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "ATempReady",
+      "Gamma1Final",
+      "Gamma2Final",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AExp",
+      "IdenMatrix",
+      "AInv"
+    ],
+    "actual_input_BMat_shape": [
+      3
+    ],
+    "ATemp_ready_matrices": [
+      "ATemp"
+    ],
+    "Gamma1_final_matrices": [
+      "Gamma1"
+    ],
+    "Gamma2_final_matrices": [
+      "Gamma2"
+    ],
+    "return_matrices": [
+      "Gamma1",
+      "Gamma2"
+    ],
+    "matrix_shapes": {
+      "AExp": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "AInv": "actual_rcmax_by_rcmax",
+      "ATemp": "actual_rcmax_by_rcmax",
+      "Gamma1": "actual_3_by_rcmax",
+      "Gamma2": "actual_3_by_rcmax"
+    },
+    "actual_caller_source_order": [
+      "exponential884",
+      "inverse887",
+      "Gamma890"
+    ],
+    "actual_matching_exponential_and_inverse_returns_precede_Gamma_entry": true,
+    "actual_Gamma1_observed_before_ATemp_deallocation": true,
+    "actual_ATemp_assignment_observed_not_recomputed": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "NumOfPerpendNodes_for_unselected_2D_is_context_only": true,
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "Gamma_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "complete_actual_Gamma_records": true,
+  "reviewed_method_policy_contract": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/tolerances.json",
+    "sha256": "1f86c2463ff98a1d930c69dd5edcd874164f38593fabb9a9431bdcd210d56f41",
+    "size_bytes": 18465
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-07/scope-amendment-01/amendment.json",
+    "sha256": "05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423",
+    "size_bytes": 2098
+  },
+  "actual_scope_amendment_execution": {
+    "path": ".runtime/porting/CTF-07/scope-check-command-01/receipt.json",
+    "sha256": "9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8",
+    "size_bytes": 2874
+  },
+  "prior_05_06_authority": {
+    "prior_06_freeze": {
+      "path": ".runtime/porting/CTF-06/frozen-packet-01/freeze-receipt.json",
+      "sha256": "0fac594f1a432f764a43589f42c17dee58c7fa87614d7b0a09d17e7f182958b1",
+      "size_bytes": 25166
+    },
+    "prior_06_freeze_execution": {
+      "path": ".runtime/porting/CTF-06/freeze-command-01/receipt.json",
+      "sha256": "d584173df08aaec66f36a46ecc6b7eb635bc47e5d52b9812c55a60a84b5239c9",
+      "size_bytes": 4405
+    },
+    "prior_05_06_scope_amendment": {
+      "path": ".runtime/porting/CTF-06/scope-amendment-01/amendment.json",
+      "sha256": "88ac5d66085f22d0d502862a582539bfd82b61fb89abafc652494e05ba7381bd",
+      "size_bytes": 2533
+    },
+    "prior_scope_checks": {
+      "CTF-05": {
+        "path": ".runtime/porting/CTF-06/scope-check-05-command-01/receipt.json",
+        "sha256": "952c5bc0f8b5884c11629694065a21f3f2c6f156d91e16f4b01428d869894816",
+        "size_bytes": 3107
+      },
+      "CTF-06": {
+        "path": ".runtime/porting/CTF-06/scope-check-06-command-01/receipt.json",
+        "sha256": "d0dbdadc0e90dcde17d331227db7c19cda8e5640393c9018e56824f5d2ab6156",
+        "size_bytes": 3108
+      }
+    },
+    "prior_06_writer_manifest": {
+      "path": ".runtime/porting/CTF-06/input-writer-prep-01/manifest.json",
+      "sha256": "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca",
+      "size_bytes": 28566
+    },
+    "prior_06_source_contract": {
+      "path": ".runtime/porting/CTF-06/frozen-packet-01/source.json",
+      "sha256": "2ec1d9116d8ecc333feaed7ce6f7f5e0a0061411ecbca39e03601962e722e75c",
+      "size_bytes": 17178
+    },
+    "prior_06_selected_primary_ranges": [
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 59,
+        "last_line": 401,
+        "sha256": "4bb1dbc69381557180378d58b3614fd0524df51d294a9845e3e908ac90968d1c",
+        "size_bytes": 18217
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 405,
+        "last_line": 489,
+        "sha256": "87316e8038ff3ea1ba8500350cddeab26fe64c58eab17efc708f512d2c6e5e2b",
+        "size_bytes": 3901
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 490,
+        "last_line": 619,
+        "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+        "size_bytes": 6450
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 638,
+        "last_line": 648,
+        "sha256": "4b9fcfede15577faa9e30fc89058a3a67e4776939dea28aece1a5cee3bfb369d",
+        "size_bytes": 486
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 657,
+        "last_line": 729,
+        "sha256": "6e8f1b65bb10f8615b5b48f1e53449413e99b5c75e7ac777158b07ec5fb0133e",
+        "size_bytes": 4571
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 877,
+        "last_line": 890,
+        "sha256": "6e29649dbec28af3e25cfd8f03a84fed82e28f9a524202b44007faca5b01ab84",
+        "size_bytes": 862
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 1105,
+        "last_line": 1373,
+        "sha256": "e2f3f6b271807011ed343e44549bb90202e4c9bf9e0143cf99a1f01fd3c82bdd",
+        "size_bytes": 13237
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "first_line": 1375,
+        "last_line": 1494,
+        "sha256": "f1c13d8e66759602566fc1b4e2492e896198bd57a1b8e8399f70ea41434f5b01",
+        "size_bytes": 5093
+      }
+    ],
+    "historical_before_document_archives": [
+      {
+        "path": ".runtime/porting/CTF-06/scope-amendment-01/before-plan.json",
+        "sha256": "e23dac7d90bbc240f3520a969be588bc31f1f0f546c5f7e4f0a4e6a2196aee97",
+        "size_bytes": 645459
+      },
+      {
+        "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-05.md",
+        "sha256": "07feb3acadd06b6829fe7c2976a196fb859105c39a4c41259c67bdf021a9e9d1",
+        "size_bytes": 2627
+      },
+      {
+        "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-06.md",
+        "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+        "size_bytes": 2659
+      }
+    ],
+    "historical_after_document_identities": [
+      {
+        "historical_path": "energyplus_porting_plan/plan.json",
+        "sha256": "06e2b45fe874af1ebf1eab1211a3954ecfd5ce4dfb0fb086814f1754c0267320",
+        "size_bytes": 672068
+      },
+      {
+        "historical_path": "energyplus_porting_plan/cards/CTF-05.md",
+        "sha256": "c303a87b5f7133f6439206066323a788fe3a7ec31593fb0ce48978ce9eea87b2",
+        "size_bytes": 4378
+      },
+      {
+        "historical_path": "energyplus_porting_plan/cards/CTF-06.md",
+        "sha256": "ace8920255ea2b224ce6f9b67bc7fdfe8978406c1d15502abd2ee461944a6b27",
+        "size_bytes": 4571
+      }
+    ],
+    "available_prior_frozen_document_archives": [],
+    "documentary_limit": "Prior after identities retain historical meaning; only available authentic archives are byte-checked, never current07 plan/card replay",
+    "prior06_numerical_PASS_inferred": false
+  },
+  "actual_scope_amendment_execution_role": "real-CTF-07-check-only; prior05/06-authorities-separate",
+  "current_cards": {
+    "CTF-07": {
+      "path": "energyplus_porting_plan/cards/CTF-07.md",
+      "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+      "size_bytes": 4515
+    }
+  },
+  "selected_method_invocation_ordinals": {
+    "assembly": 1,
+    "exponential": 1,
+    "inverse": 1,
+    "Gamma": 1
+  },
+  "later_actual_method_visits_observed_unpaired_noPASS": true,
+  "scientific_observation_physical_bound_bytes": 1073741824,
+  "actual_observation_counts": {
+    "method_whole_call_records": 42,
+    "method_uninvoked_whole_call_records": 0,
+    "actual_exponential_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        41,
+        3154,
+        469,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_retained_power_control_count": 3154,
+      "actual_retained_square_control_count": 469,
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "exponential_selected_first_invocation_count": 25,
+    "exponential_later_unpaired_invocation_count": 16,
+    "exponential_actual_return_marker_count": 41,
+    "actual_inverse_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        0,
+        0,
+        0,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_retained_power_control_count": 0,
+      "actual_retained_square_control_count": 0,
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "inverse_selected_first_invocation_count": 25,
+    "inverse_later_unpaired_invocation_count": 16,
+    "inverse_actual_return_marker_count": 41,
+    "actual_gamma_observation_counts": {
+      "actual_invocation_count": 41,
+      "actual_retained_invocation_count": 41,
+      "actual_stage_callback_counts": [
+        41,
+        41,
+        41,
+        41,
+        41
+      ],
+      "stage_records_omitted": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failure_event_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "method_copy_integrity_failed": false,
+      "complete_method_return_parity_claimed": false,
+      "numerical_PASS_claimed": false
+    },
+    "gamma_whole_call_records": 42,
+    "gamma_uninvoked_whole_call_records": 0,
+    "gamma_selected_first_invocation_count": 25,
+    "gamma_later_unpaired_invocation_count": 16,
+    "gamma_actual_return_marker_count": 41,
+    "initial_record_count": 42,
+    "initial_reached_phase_records": 25,
+    "initial_unreached_phase_records": 17,
+    "initial_available_owner_count": 25,
+    "initial_unavailable_owner_count": 17,
+    "initial_selected_1D_owner_count": 25,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 25,
+    "matrix_whole_call_records": 42,
+    "matrix_uninvoked_whole_call_count": 0,
+    "matrix_unreached_whole_call_count": 17,
+    "actual_matrix_attempt_callback_count": 41,
+    "actual_retained_matrix_attempt_count": 41,
+    "matrix_attempt_records_omitted": 0,
+    "matrix_selected_first_attempt_count": 25,
+    "matrix_later_unpaired_attempt_count": 16,
+    "matrix_unselected_context_attempt_count": 0,
+    "matrix_unavailable_attempt_count": 0,
+    "matrix_failure_event_count": 0,
+    "matrix_failure_IdentityMismatch": 0,
+    "matrix_failure_OrderFailure": 0,
+    "matrix_failure_ActivePrefixShape": 0,
+    "matrix_failure_MatrixShape": 0,
+    "matrix_failure_CopyException": 0,
+    "matrix_failure_LedgerAppendException": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 131,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 1916960,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33,
+      "InitialDiscretization": 25
+    }
+  },
+  "actual_method_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-02/review_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/original-data-review-02/000-review_unit.py",
+        "sha256": "da61ce6e7c54777c11506a8c584ebb077dc8709139cd24567f395baea6e0e7d4",
+        "size_bytes": 28142
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-02/unit_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/original-data-review-02/001-unit_shape.py",
+        "sha256": "35ea2bddfa2ffdb40f087396c524bec8e40963c3e337f64c916689813c83cd6f",
+        "size_bytes": 19925
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-02/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/original-data-review-02/002-initial_shape.py",
+        "sha256": "3d65ff7f9c9eab2c655dd108b623d0400eeb82836b886374c7f99c31ac5f18d3",
+        "size_bytes": 26621
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-02/method_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/original-data-review-02/003-method_shape.py",
+        "sha256": "310b9dbb84954c8050e19f6a8a7a377b01f2597d6eb6947ab6e8a42437906454",
+        "size_bytes": 30929
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-02/gamma_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/original-data-review-02/004-gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/original-data-review-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/original-data-review-02/005-packet_io.py",
+        "sha256": "24acc9eed6a6599f7a6d26021bef4dd2c7a49e4b7faea86cad352bc4d7c3b5bf",
+        "size_bytes": 4665
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-07/original-data-review-02/000-review_unit.py",
+    "sha256": "da61ce6e7c54777c11506a8c584ebb077dc8709139cd24567f395baea6e0e7d4",
+    "size_bytes": 28142
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored Native06 and pure/publicGamma; Raw authored passive/helper07. Reused factual06 validators are retained. This is factual observation/provenance validation, not an independent own-formula certificate; Root and other-author source review are required."
+}

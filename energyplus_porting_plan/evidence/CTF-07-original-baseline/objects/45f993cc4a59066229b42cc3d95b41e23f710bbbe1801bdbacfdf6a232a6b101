@@ -1,0 +1,316 @@
+"""Actual Gamma ledger and packet provenance only; no Gamma evaluator."""
+from datetime import datetime
+from pathlib import Path
+
+POLICY = {'protocol': 'ctf07-gamma-method-observation.v1', 'actual_method': 'ConstructionProps::calculateGammas', 'actual_caller_line': 890, 'actual_method_source_lines': [1496, 1589], 'actual_stage_names': ['Entry', 'ATempReady', 'Gamma1Final', 'Gamma2Final', 'SourceReturn'], 'input_matrices': ['AExp', 'IdenMatrix', 'AInv'], 'actual_input_BMat_shape': [3], 'ATemp_ready_matrices': ['ATemp'], 'Gamma1_final_matrices': ['Gamma1'], 'Gamma2_final_matrices': ['Gamma2'], 'return_matrices': ['Gamma1', 'Gamma2'], 'matrix_shapes': {'AExp': 'actual_rcmax_by_rcmax', 'IdenMatrix': 'actual_rcmax_by_rcmax', 'AInv': 'actual_rcmax_by_rcmax', 'ATemp': 'actual_rcmax_by_rcmax', 'Gamma1': 'actual_3_by_rcmax', 'Gamma2': 'actual_3_by_rcmax'}, 'actual_caller_source_order': ['exponential884', 'inverse887', 'Gamma890'], 'actual_matching_exponential_and_inverse_returns_precede_Gamma_entry': True, 'actual_Gamma1_observed_before_ATemp_deallocation': True, 'actual_ATemp_assignment_observed_not_recomputed': True, 'selected_invocation_ordinal': 1, 'selected_assembly_ordinal': 1, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'NumOfPerpendNodes_for_unselected_2D_is_context_only': True, 'actual_source_produced_identity_required': True, 'storage_order': 'source_i1_outer_i2_inner_row_first', 'invocation_identity': 'one_based_actual_entry_visit_within_bound_whole_call', 'actual_assembly_association_required': True, 'actual_method_return_marker_required_for_return_claim': True, 'all_actual_visits_retained': True, 'later_Native_attempts_paired': False, 'later_Native_attempts_counted_as_PASS': False, 'Rust_retry_driver_available': False, 'uninvoked_counted_as_PASS': False, 'missing_selected_owner_on_one_or_both_sides_is_required_failure': True, 'observer_failure_or_omission_is_integrity_failure': True, 'Gamma_or_identity_or_return_or_retry_state_reconstructed': False}
+SELECTION = {'actual_assembly_ordinal': 1, 'actual_exponential_invocation_ordinal': 1, 'actual_inverse_invocation_ordinal': 1, 'association': 'same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history', 'actual_order': ['assembly728', 'exponential884', 'inverse887', 'Gamma890'], 'later_actual_visits': 'all retained unpaired context/noPASS', 'no_initial_dt_equals_TimeStepZone_assertion': True, 'no_Rust_retry_driver_claim': True, 'stopped_or_uninvoked': 'unavailable/noPASS, real source or OS outcome retained separately', 'actual_Gamma_invocation_ordinal': 1}
+COUNTS = {'unit': {'model_cases': 39, 'calculateTransferFunction': 42}, 'production': {'model_cases': 15, 'loader_phase_records': 195}}
+
+STAGES = ["Entry", "ATempReady", "Gamma1Final", "Gamma2Final", "SourceReturn"]
+FAILURES = ["IdentityMismatch", "AssociationFailure", "OrderFailure", "MatrixShape", "CopyException", "LedgerAppendException"]
+OWNERS = {"Entry": ["AExp", "IdenMatrix", "AInv"], "ATempReady": ["ATemp"],
+          "Gamma1Final": ["Gamma1"], "Gamma2Final": ["Gamma2"], "SourceReturn": ["Gamma1", "Gamma2"]}
+
+
+def packet(freeze, request, admission, projection, tolerances, need):
+    policy = POLICY
+    for owner in [request, admission, projection, tolerances]:
+        need(owner["ctf07_gamma_observation_policy"] == policy, "Exact frozen Gamma policy required")
+    inventory = projection["method_state_pairing_and_availability"]
+    need(inventory["ctf07_gamma_observation_policy"] == policy and inventory["method_selection"] == SELECTION,
+         "Exact first Gamma source selection required")
+    rows = tolerances["ctf07_gamma_profiles"]
+    need(isinstance(rows, list) and [r["variable"] for r in rows] == ["Gamma1", "Gamma2", "ATemp"], "Three separate Gamma profiles required")
+    for row, shape in zip(rows, ["actual_3_by_rcmax", "actual_3_by_rcmax", "actual_rcmax_by_rcmax"]):
+        need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+             row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+             row["required_shape"] == shape, "Exact zero/class/shape/signedzero Gamma profile differs")
+
+
+def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started, lane):
+    authority = freeze["source_authorities"]
+    need = m.require
+    need(set(authority["current_cards"]) == {"CTF-07"} and authority["actual_scope_amendment_execution_role"] ==
+         "real-CTF-07-check-only; prior05/06-authorities-separate", "Current07 scope role differs")
+    amendment = m.load(authority["actual_scope_amendment"])
+    need(amendment["schema"] == "ctf07-source-scope-amendment.v1" and amendment["cards"] == ["CTF-07"] and
+         amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
+         amendment["strict_profiles_settled_before_outputs"] is True and
+         amendment["actual_CTF07_build_or_engine_execution_performed"] is False and amendment["requested_counts"] == COUNTS,
+         "Actual pre-output07 amendment required")
+    for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
+                        ("gamma_policy_source_inventory", authority["gamma_policy_source_inventory"])]:
+        same(amendment[key], target); m.bind(target)
+    before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
+    need(len(before) == len(after) == 2 and len({r["path"] for r in before}) == len({r["path"] for r in after}) == 2 and
+         before == authority["historical_scope_documents"] and after == authority["current_scope_documents"], "Current07 raw document identities differ")
+    card = m.bind(authority["current_cards"]["CTF-07"])
+    historical = next(r for r in passive["source_refs"] if r["path"] == card["path"])
+    need(card["path"] == "energyplus_porting_plan/cards/CTF-07.md" and card in after and
+         m.identity("energyplus_porting_plan/plan.json") in after and any(r["sha256"] == historical["sha256"] and
+         r["size_bytes"] == historical["size_bytes"] for r in before), "Current07 plan/card or historical before copy differs")
+
+    def check(ref, name, prior_to):
+        command = recorded(ref, prior_to)
+        need(command["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", name] and
+             m.contained(command["stderr"]["path"]).stat().st_size == 0, "Real card check0/empty stderr required")
+
+    check(authority["actual_scope_amendment_execution"], "CTF-07", frozen_started)
+    prior = authority["prior_05_06_authority"]
+    prior_ref, execution_ref = prior["prior_06_freeze"], prior["prior_06_freeze_execution"]
+    old = m.load(prior_ref); command = recorded(execution_ref, frozen_started)
+    prefix = "ctf06-" + ("production-" if lane == "production" else "")
+    need(old["schema"] == prefix + "frozen-packet.v1" and old["lane"] == lane and
+         old["status"] == "frozen-inherited-input-and-fresh-combined-CTF05-CTF06-policy-before-helper" and
+         old["frozen_before_this_CTF06_helper_execution"] is True and old["requested_counts"] == freeze["requested_counts"] and
+         old["scientific_operands_evaluated"] is False and old["numerical_PASS_claimed"] is False and
+         m.load(command["stdout"]) == old and m.bind(command["stderr"])["size_bytes"] == 0,
+         "Real same-lane prior06 input-only freeze/full stdout required")
+    finished = datetime.fromisoformat(old["finished_utc"])
+    need(finished.tzinfo is not None and finished <= datetime.fromisoformat(frozen_started), "Prior06 freeze must precede07")
+    writer_ref = prior["prior_06_writer_manifest"]
+    need(writer_ref["sha256"] == "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca", "Exact prior06 writer authority required")
+    same(old["source_preparation_approval"]["source_manifest"], writer_ref)
+    own = [m.bind(r) for r in m.load(writer_ref)["own_sources"]]
+    need(len(own) == len(old["executed_writer_sources"]) == 2 and
+         old["source_preparation_approval"]["approved_writer_sha256"] == own[0]["sha256"] and
+         [m.bind(r) for r in old["source_preparation_approval"]["reviewed_sources"]] == own, "Prior06 approved own2 identity differs")
+    for declared, archive in zip(own, old["executed_writer_sources"]):
+        need(archive["historical_path"] == declared["path"] and m.bind(archive["archive"])["sha256"] == declared["sha256"], "Prior executed writer owner/archive differs")
+    argv = command["command"]
+    need(len(argv) == 25 and Path(argv[0]).name.lower() in ["python", "python.exe"] and argv[1:4] == ["-X", "utf8", "-B"] and
+         m.contained(argv[4]) == m.contained(own[0]["path"]), "Actual prior06 writer command differs")
+    flags = dict(zip(argv[5::2], argv[6::2]))
+    need(set(flags) == {"--lane", "--approved-source-sha256", "--source-manifest", "--native-source-manifest", "--current-card-05", "--current-card-06",
+         "--actual-scope-amendment", "--actual-scope-amendment-execution-05", "--actual-scope-amendment-execution-06", "--output-dir"} and
+         flags["--lane"] == lane and flags["--approved-source-sha256"] == own[0]["sha256"] and
+         m.contained(flags["--output-dir"], existing=False) == m.contained(prior_ref["path"]).parent, "Actual prior06 flags/output differs")
+    old_authority = old["source_authorities"]
+    checks = prior["prior_scope_checks"]
+    need(set(checks) == {"CTF-05", "CTF-06"} and checks == old_authority["actual_scope_amendment_executions"] and
+         old_authority["actual_scope_amendment_execution_role"] == "real-CTF-06-check-only; both-required-checks-in-executions-mapping",
+         "Both historical05/06 checks with literal singular06 role required")
+    same(old_authority["actual_scope_amendment_execution"], checks["CTF-06"])
+    same(old_authority["actual_scope_amendment"], prior["prior_05_06_scope_amendment"])
+    for key, ref in [("source-manifest", writer_ref), ("native-source-manifest", old_authority["native_source_manifest"]),
+                     ("actual-scope-amendment", prior["prior_05_06_scope_amendment"]),
+                     ("actual-scope-amendment-execution-05", checks["CTF-05"]), ("actual-scope-amendment-execution-06", checks["CTF-06"])]:
+        same(m.argument(flags["--" + key]), ref)
+    historical_amendment = m.load(prior["prior_05_06_scope_amendment"])
+    need(historical_amendment["schema"] == "ctf05-ctf06-source-scope-amendment.v1" and historical_amendment["cards"] == ["CTF-05", "CTF-06"] and
+         historical_amendment["scope_review_passed"] is True and historical_amendment["all_other_gates_pending"] is True and
+         historical_amendment["strict_profiles_settled_before_outputs"] is True and
+         historical_amendment["actual_CTF05_or_CTF06_build_or_engine_execution_performed"] is False and
+         historical_amendment["requested_counts"] == COUNTS, "Authentic historical05/06 amendment required")
+    for key, target in [("native_observer", old_authority["native_source_manifest"]), ("passive_observer", old_authority["passive_observer"]),
+                        ("method_policy_source_inventory", old_authority["method_policy_source_inventory"])]:
+        same(historical_amendment[key], target); m.bind(target)
+    need(old_authority["method_policy_source_inventory"]["sha256"] == "3649c701e9a9b2c719ef9fe0ff733d56d1d48fb76915c1f294bba3479f246541", "Exact historical06 policy required")
+    old_before = [m.bind(r) for r in historical_amendment["before_documents"]]
+    old_after = historical_amendment["after_documents"]  # Historical identities: never bind these live paths.
+    need(len(old_before) == len(old_after) == 3 and old_before == old_authority["historical_scope_documents"] == prior["historical_before_document_archives"] and
+         old_after == old_authority["current_scope_documents"] and
+         {r["path"] for r in old_after} == {"energyplus_porting_plan/plan.json", "energyplus_porting_plan/cards/CTF-05.md", "energyplus_porting_plan/cards/CTF-06.md"} and
+         prior["historical_after_document_identities"] == [{"historical_path": r["path"], "sha256": r["sha256"], "size_bytes": r["size_bytes"]} for r in old_after],
+         "Historical raw document identities differ")
+    for name, ref in checks.items():
+        card = old_authority["current_cards"][name]
+        need(card in old_after and flags["--current-card-" + name[-2:]] == card["path"] + "#" + card["sha256"], "Historical card argument differs")
+        check(ref, name, command["started_utc"])
+    for archived in prior["available_prior_frozen_document_archives"]:
+        need(any(r["historical_path"] == archived["historical_path"] and r["archive"] == archived["archive"] for r in old["reviewed_source_archives"]),
+             "Historical document archive was not in prior actual freeze")
+        m.bind(archived["archive"])
+    old_request = m.load(old["helper_request"])
+    need(old_request["model_cases"] == request["model_cases"] and old_request["requested_counts"] == request["requested_counts"] and
+         old_request["all_45_guard_refs"] == request["all_45_guard_refs"] and prior["prior06_numerical_PASS_inferred"] is False,
+         "Literal same-input prior06 ancestry required; numerical PASS cannot be inferred")
+    old_tolerances, new_tolerances = m.load(old["contracts"]["tolerances"]), m.load(freeze["contracts"]["tolerances"])
+    for key in ["ctf03_initial_observation_policy", "ctf04_matrix_observation_policy", "ctf03_initial_profiles", "arithmetic_profiles_by_variable",
+                "ctf06_exponential_observation_policy", "ctf05_inverse_observation_policy", "ctf06_exponential_profiles", "ctf05_inverse_profiles"]:
+        need(old_tolerances[key] == new_tolerances[key], "Inherited prior06 policies/profiles must remain literal")
+    same(old["contracts"]["source"], prior["prior_06_source_contract"])
+    need(m.load(prior["prior_06_source_contract"])["ctf06_selected_primary_ranges"] == prior["prior_06_selected_primary_ranges"], "Inherited06 ranges differ")
+    for owner in [request, admission, projection]:
+        for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "actual_scope_amendment_execution_role", "current_cards", "prior_05_06_authority"]:
+            need(owner[key] == authority[key], "Current07 and historical05/06 packet authority differs")
+
+
+def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    counts["gamma_whole_call_records"] += 1
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked whole call cannot fabricate Gamma observations")
+        counts["gamma_uninvoked_whole_call_records"] += 1
+        return
+    observed = operation["observations"]; ledger = observed["Gamma"]
+    need(isinstance(ledger, dict) and set(ledger) == {"protocol", "method", "actual_invocation_count", "actual_retained_invocation_count",
+         "actual_stage_callback_counts", "stage_records_omitted", "stage_ledger", "observer_failure", "method_copy_integrity_failed", "failure_event_counts",
+         "first_failure", "last_failure", "invocations", "no_actual_entry_observed", "record_cap", "deduplicated", "truncated", "unreached_counted_as_PASS",
+         "later_attempts_counted_as_PASS", "values_or_identity_or_return_reconstructed", "old_checkpoint_matrix_05_06_counters_include_Gamma_callbacks"}, "Complete actual Gamma ledger required")
+    need(ledger["protocol"] == POLICY["protocol"] and ledger["method"] == "Gamma" and ledger["record_cap"] is None, "Actual Gamma protocol/cap differs")
+    for name in ["deduplicated", "truncated", "unreached_counted_as_PASS", "later_attempts_counted_as_PASS", "values_or_identity_or_return_reconstructed",
+                 "old_checkpoint_matrix_05_06_counters_include_Gamma_callbacks"]:
+        need(ledger[name] is False, "Actual Gamma visits cannot be dropped/reconstructed or counted as PASS")
+    for name in ["observer_failure", "method_copy_integrity_failed", "no_actual_entry_observed"]: need(type(ledger[name]) is bool, "Typed Gamma flag required")
+    for name in ["actual_invocation_count", "actual_retained_invocation_count"]: need(type(ledger[name]) is int and ledger[name] >= 0, "Typed Gamma count required")
+    callbacks, omitted = ledger["actual_stage_callback_counts"], ledger["stage_records_omitted"]
+    need(all(isinstance(v, list) and len(v) == 5 and all(type(n) is int and n >= 0 for n in v) for v in [callbacks, omitted]), "Five typed Gamma stage/omission counts required")
+    need(ledger["actual_invocation_count"] == callbacks[0] and ledger["no_actual_entry_observed"] is (callbacks[0] == 0) and
+         isinstance(ledger["invocations"], list) and ledger["actual_retained_invocation_count"] == len(ledger["invocations"]) and
+         ledger["stage_ledger"] == [{"stage": stage, "actual_callback_count": callbacks[i], "records_omitted": omitted[i]} for i, stage in enumerate(STAGES)],
+         "Actual Gamma entry/retained/stage ledger differs")
+    event_counts = []
+    need(isinstance(ledger["failure_event_counts"], list) and len(ledger["failure_event_counts"]) == 6, "Six actual Gamma failure counters required")
+    for kind, row in zip(FAILURES, ledger["failure_event_counts"]):
+        need(isinstance(row, dict) and set(row) == {"kind", "actual_event_count"} and row["kind"] == kind and type(row["actual_event_count"]) is int and
+             row["actual_event_count"] >= 0, "Typed Gamma failure count differs")
+        event_counts.append(row["actual_event_count"])
+    need(ledger["observer_failure"] is bool(sum(event_counts)), "Gamma observer failure/count differs")
+    for name in ["first_failure", "last_failure"]:
+        event = ledger[name]
+        if not sum(event_counts): need(event is None, "No Gamma failure can be invented")
+        else:
+            need(isinstance(event, dict) and set(event) == {"invocation_ordinal", "assembly_ordinal", "stage", "kind"} and
+                 event["stage"] in STAGES and event["kind"] in FAILURES and type(event["invocation_ordinal"]) is int and 0 <= event["invocation_ordinal"] <= callbacks[0] and
+                 type(event["assembly_ordinal"]) is int and 0 <= event["assembly_ordinal"] <= observed["MatrixAssembly"]["actual_matrix_attempt_callback_count"] and
+                 event_counts[FAILURES.index(event["kind"])] > 0, "Gamma failure association differs")
+    if sum(event_counts): need(ledger["first_failure"]["invocation_ordinal"] <= ledger["last_failure"]["invocation_ordinal"], "Gamma first/last failure order differs")
+    assemblies = {r["observed_attempt_ordinal"]: r for r in observed["MatrixAssembly"]["attempts"]}
+    predecessors = {name: {r["observed_invocation_ordinal"]: r for r in observed[name]["invocations"]} for name in ["Exponential", "Inverse"]}
+    retained, actual_sum, flag_sum, ordinals = [0] * 5, [0] * 5, [0] * 6, []
+    failed = ledger["observer_failure"] or any(omitted) or callbacks[0] != len(ledger["invocations"])
+    for record in ledger["invocations"]:
+        need(isinstance(record, dict) and set(record) == {"observed_invocation_ordinal", "observed_assembly_ordinal", "association_available", "failure_kinds", "actual_stage_callback_counts", *STAGES, "counted_as_PASS"},
+             "Exact Gamma invocation record required")
+        ordinal, assembly_ordinal = record["observed_invocation_ordinal"], record["observed_assembly_ordinal"]
+        need(type(ordinal) is int and 1 <= ordinal <= callbacks[0] and (not ordinals or ordinal > ordinals[-1]) and type(assembly_ordinal) is int and
+             0 <= assembly_ordinal <= observed["MatrixAssembly"]["actual_matrix_attempt_callback_count"] and type(record["association_available"]) is bool and record["counted_as_PASS"] is False,
+             "Actual Gamma ordinal/association differs")
+        ordinals.append(ordinal)
+        if ordinal != len(ordinals) or ordinal != assembly_ordinal or not record["association_available"]: failed = True
+        need(isinstance(record["failure_kinds"], list) and len(record["failure_kinds"]) == 6, "Six per-Gamma failure flags required")
+        for i, (kind, row) in enumerate(zip(FAILURES, record["failure_kinds"])):
+            need(isinstance(row, dict) and set(row) == {"kind", "failed"} and row["kind"] == kind and type(row["failed"]) is bool, "Actual Gamma failure flag differs")
+            flag_sum[i] += int(row["failed"]); failed = failed or row["failed"]
+        actual = record["actual_stage_callback_counts"]
+        need(isinstance(actual, list) and len(actual) == 5 and all(type(n) is int and n >= 0 for n in actual), "Typed actual per-Gamma stage counts required")
+        assembly = assemblies.get(assembly_ordinal); reached = []
+        for i, stage in enumerate(STAGES):
+            value = record[stage]
+            need(isinstance(value, dict) and set(value) == {"reached", "available", "snapshot", "unavailable_reason", "counted_as_PASS"} and
+                 type(value["reached"]) is bool and type(value["available"]) is bool and value["counted_as_PASS"] is False, "Exact Gamma value-stage required")
+            reached.append(int(value["reached"]))
+            if not value["reached"]:
+                need(value["available"] is False and value["snapshot"] is None and value["unavailable_reason"] == "actual_stage_callback_not_retained_or_not_reached", "Unreached Gamma stage must remain absent")
+                continue
+            snapshot = value["snapshot"]
+            need(isinstance(snapshot, dict) and set(snapshot) == {"context_available", "context", "matrices_available", "observed_matrix_count", "matrices", "BMat_available", "BMat_actual_bounds", "BMat", "caller_context_available", "actual_return_site_caller_context"}, "Complete actual Gamma copy fields required")
+            for name in ["context_available", "matrices_available", "BMat_available", "caller_context_available"]: need(type(snapshot[name]) is bool, "Typed Gamma availability required")
+            need(type(snapshot["observed_matrix_count"]) is int and 0 <= snapshot["observed_matrix_count"] <= 3 and isinstance(snapshot["matrices"], list) and
+                 len(snapshot["matrices"]) == snapshot["observed_matrix_count"] and snapshot["context_available"] is (snapshot["observed_matrix_count"] != 0) and
+                 value["available"] is (snapshot["matrices_available"] and (stage != "Entry" or snapshot["BMat_available"])) and
+                 value["unavailable_reason"] == (None if value["available"] else "required_Gamma_owner_copy_unavailable"), "Actual Gamma partial availability differs")
+            if not snapshot["context_available"]:
+                need(snapshot["context"] is None and not value["available"] and not snapshot["matrices"], "Identity-failed Gamma cannot fabricate context")
+                failed = True; continue
+            context = snapshot["context"]
+            need(isinstance(context, dict) and set(context) == {"IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "CTFTimeStep", "NumHistories", "NumOfPerpendNodes", "assembly_context_available", "earlier_checked_assembly_context", "assembly_context_is_fresh_method_stack_context"}, "Exact Gamma context required")
+            for name in ["IsUsedCTF", "SourceSinkPresent", "assembly_context_available"]: need(type(context[name]) is bool, "Typed Gamma context flag required")
+            for name in ["SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories", "NumOfPerpendNodes"]: need(type(context[name]) is int, "Typed actual Gamma context integer required")
+            scalar(context["CTFTimeStep"])
+            need(context["assembly_context_is_fresh_method_stack_context"] is False, "Earlier assembly context cannot be relabeled fresh Gamma locals")
+            if context["assembly_context_available"]:
+                earlier = context["earlier_checked_assembly_context"]
+                need(isinstance(earlier, dict) and set(earlier) == {"ErrorsFound", "DoCTFErrorReport", "TimeStepZone"} and type(earlier["ErrorsFound"]) is bool and
+                     type(earlier["DoCTFErrorReport"]) is bool and assembly is not None and assembly["available"], "Actual Gamma assembly/caller association required")
+                scalar(earlier["TimeStepZone"]); source = assembly["snapshot"]
+                for name in ["IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+                    need(context[name] == source[name], "Gamma actual assembly context handoff differs")
+                need(context["CTFTimeStep"]["value_bits"] == source["CTFTimeStep"]["value_bits"] and earlier["TimeStepZone"]["value_bits"] == source["TimeStepZone"]["value_bits"] and
+                     earlier["ErrorsFound"] is source["ErrorsFound"] and earlier["DoCTFErrorReport"] is source["DoCTFErrorReport"], "Gamma assembly scalar/flag handoff differs")
+            else:
+                need(context["earlier_checked_assembly_context"] is None, "Unavailable assembly context cannot fabricate values"); failed = True
+            need([r["owner"] for r in snapshot["matrices"]] == OWNERS[stage], "Actual observed Gamma owner slots differ")
+            complete = True; n = context["rcmax"]
+            for copy in snapshot["matrices"]:
+                need(isinstance(copy, dict) and set(copy) == {"owner", "actual_bounds", "copy_available", "values"} and type(copy["copy_available"]) is bool, "Actual Gamma copy fields required")
+                bounds = copy["actual_bounds"]
+                need(bounds is None or isinstance(bounds, dict) and set(bounds) == {"lower1", "upper1", "lower2", "upper2", "size"} and all(type(v) is int for v in bounds.values()), "Exact Objexx Gamma bounds required")
+                if not copy["copy_available"]:
+                    need(copy["values"] is None, "Failed Gamma copy must remain null; sibling copies retained"); complete = False; failed = True; continue
+                rows = 3 if copy["owner"] in ["Gamma1", "Gamma2"] else n
+                need(n >= 1 and bounds == {"lower1": 1, "upper1": rows, "lower2": 1, "upper2": n, "size": rows * n} and isinstance(copy["values"], list) and
+                     len(copy["values"]) == rows * n, "Actual rectangular/square row-first Gamma shape differs")
+                for field in copy["values"]: scalar(field)
+                if stage == "Entry" and context["assembly_context_available"]:
+                    if copy["owner"] == "IdenMatrix": actual_values = assembly["snapshot"]["matrices"]["IdenMatrix"]
+                    else:
+                        name = "Exponential" if copy["owner"] == "AExp" else "Inverse"
+                        preceding = predecessors[name].get(ordinal)
+                        need(preceding is not None and preceding["SourceReturn"]["available"] and preceding["observed_assembly_ordinal"] == assembly_ordinal, "Gamma input requires actual matching predecessor return")
+                        actual_values = next(r["values"] for r in preceding["SourceReturn"]["snapshot"]["matrices"] if r["owner"] == copy["owner"])
+                    need([v["value_bits"] for v in copy["values"]] == [v["value_bits"] for v in actual_values], "Actual predecessor-to-Gamma matrix handoff differs")
+                if stage == "SourceReturn" and copy["copy_available"]:
+                    prior_stage = record["Gamma1Final" if copy["owner"] == "Gamma1" else "Gamma2Final"]
+                    need(prior_stage["available"] and [v["value_bits"] for v in copy["values"]] ==
+                         [v["value_bits"] for v in prior_stage["snapshot"]["matrices"][0]["values"]], "Actual final-to-caller Gamma storage handoff differs")
+            need(not snapshot["matrices_available"] or complete, "Available Gamma matrices require all actual copies")
+            if not value["available"]: failed = True
+            bounds = snapshot["BMat_actual_bounds"]
+            need(bounds is None or isinstance(bounds, dict) and set(bounds) == {"lower", "upper", "size"} and all(type(v) is int for v in bounds.values()), "Actual BMat bounds required")
+            if stage == "Entry":
+                if snapshot["BMat_available"]:
+                    need(bounds == {"lower": 1, "upper": 3, "size": 3} and isinstance(snapshot["BMat"], list) and len(snapshot["BMat"]) == 3, "Actual BMat3 shape differs")
+                    for field in snapshot["BMat"]: scalar(field)
+                    if context["assembly_context_available"]: need([v["value_bits"] for v in snapshot["BMat"]] == [v["value_bits"] for v in assembly["snapshot"]["matrices"]["BMat"]], "Original BMat handoff differs")
+                else: need(snapshot["BMat"] is None, "Unavailable BMat cannot fabricate values"); failed = True
+            else: need(snapshot["BMat_available"] is False and snapshot["BMat"] is None and bounds is None, "BMat not observed outside actual entry")
+            caller = snapshot["actual_return_site_caller_context"]
+            if stage == "SourceReturn":
+                need(snapshot["caller_context_available"] is True and isinstance(caller, dict) and set(caller) == {"ErrorsFound", "DoCTFErrorReport", "TimeStepZone"} and
+                     type(caller["ErrorsFound"]) is bool and type(caller["DoCTFErrorReport"]) is bool, "Actual Gamma caller return marker required")
+                scalar(caller["TimeStepZone"])
+                if context["assembly_context_available"]: need(caller == context["earlier_checked_assembly_context"], "Actual Gamma return caller differs")
+            else: need(snapshot["caller_context_available"] is False and caller is None, "Gamma return cannot be inferred before caller site")
+        for i in range(5):
+            retained[i] += reached[i]; actual_sum[i] += actual[i]
+            need(actual[i] >= reached[i], "Gamma callback count cannot omit retained stage")
+        if actual != reached: failed = True
+        need(all(not reached[i] or all(reached[:i]) for i in range(1, 5)), "Actual Gamma stage order differs")
+        if operation["call_outcome"]["status"] == "source_returned": need(all(reached), "Returned whole call with Gamma entry requires real complete Gamma return")
+        if ordinal > 1: counts["gamma_later_unpaired_invocation_count"] += 1
+        elif record["association_available"] and assembly_ordinal == 1 and assembly is not None and assembly["available"] and assembly["snapshot"]["SourceSinkPresent"] is False and assembly["snapshot"]["SolutionDimensions"] == 1:
+            counts["gamma_selected_first_invocation_count"] += 1
+        counts["gamma_actual_return_marker_count"] += reached[4]
+    need(all(callbacks[i] == retained[i] + omitted[i] and actual_sum[i] <= callbacks[i] for i in range(5)) and all(flag_sum[i] <= event_counts[i] for i in range(6)), "All Gamma visits/failures require exact retained or omitted accounting")
+    failed = bool(failed or callbacks != retained)
+    need(ledger["method_copy_integrity_failed"] is failed, "Actual Gamma integrity summary differs")
+    if failed: integrity.append(label + "/Gamma/required-observation-integrity-failed")
+    exp, inv = observed["Exponential"], observed["Inverse"]
+    if not (failed or exp["method_copy_integrity_failed"] or inv["method_copy_integrity_failed"]):
+        need(callbacks[0] <= inv["actual_stage_callback_counts"][6] <= exp["actual_stage_callback_counts"][6] and
+             inv["actual_invocation_count"] <= callbacks[4] + 1, "Actual exponential-before-inverse-before-Gamma return order differs")
+        if operation["call_outcome"]["status"] == "source_returned":
+            need(callbacks[0] == callbacks[4] == inv["actual_invocation_count"], "Normally returned whole call requires each real inverse-to-Gamma visit")
+        for record in ledger["invocations"]:
+            for name in ["Exponential", "Inverse"]:
+                preceding = predecessors[name].get(record["observed_invocation_ordinal"])
+                need(preceding is not None and preceding["SourceReturn"]["reached"] and preceding["observed_assembly_ordinal"] == record["observed_assembly_ordinal"], "Actual Gamma entry requires both matching prior returns")
+    counts["gamma_actual_invocation_count"] += callbacks[0]; counts["gamma_actual_retained_invocation_count"] += len(ledger["invocations"])
+    for i, stage in enumerate(STAGES): counts["gamma_stage_" + stage] += callbacks[i]; counts["gamma_omitted_" + stage] += omitted[i]
+    for i, kind in enumerate(FAILURES): counts["gamma_failure_" + kind] += event_counts[i]
+    counts["gamma_method_copy_integrity_failed"] = bool(counts["gamma_method_copy_integrity_failed"] or failed)
+
+
+def summary(result, counts, need):
+    expected = {"actual_invocation_count": counts["gamma_actual_invocation_count"], "actual_retained_invocation_count": counts["gamma_actual_retained_invocation_count"],
+        "actual_stage_callback_counts": [counts["gamma_stage_" + stage] for stage in STAGES], "stage_records_omitted": [counts["gamma_omitted_" + stage] for stage in STAGES],
+        "failure_event_counts": [counts["gamma_failure_" + kind] for kind in FAILURES], "method_copy_integrity_failed": bool(counts["gamma_method_copy_integrity_failed"]),
+        "complete_method_return_parity_claimed": False, "numerical_PASS_claimed": False}
+    total = result["actual_gamma_observation_counts"]
+    need(isinstance(total, dict) and set(total) == set(expected) and total == expected, "Global Gamma totals differ from all actual records")
+    for key in ["actual_invocation_count", "actual_retained_invocation_count"]: need(type(total[key]) is int, "Typed global Gamma count required")
+    for key, size in [("actual_stage_callback_counts", 5), ("stage_records_omitted", 5), ("failure_event_counts", 6)]:
+        need(isinstance(total[key], list) and len(total[key]) == size and all(type(n) is int and n >= 0 for n in total[key]), "Typed global Gamma count array required")
+    for key in ["method_copy_integrity_failed", "complete_method_return_parity_claimed", "numerical_PASS_claimed"]: need(type(total[key]) is bool, "Typed global Gamma flag required")
+    return {"actual_gamma_observation_counts": expected, **{key: counts[key] for key in ["gamma_whole_call_records", "gamma_uninvoked_whole_call_records", "gamma_selected_first_invocation_count", "gamma_later_unpaired_invocation_count", "gamma_actual_return_marker_count"]}}

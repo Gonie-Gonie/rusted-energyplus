@@ -1,0 +1,100 @@
+# CTF07 existing Original DataQA adaptation
+
+SOURCE ONLY. This package has not imported or executed its readers, project code,
+Native helpers, engines, compilers, tests or formatters. No actual scientific,
+weather or binary payload was read. Root supplies and executes all actual stages.
+The accepted CTF07 predecessor remains immutable in `before/` with exact diffs;
+its accepted CTF06 context remains authenticated through the predecessor manifest.
+This adapts the existing two DataQA invocations; it adds no approval, proof or QA stage.
+
+The eight sources are two readers, their two existing shape validators, unchanged
+initial and method record routines, the existing bounded IO helper, and one shared
+Gamma validator. Each reader authenticates and archives its actual six executed
+sources. Initial record routines and the method `review`/`summary` functions remain
+AST-identical to accepted06; initial `packet` changes only the two current07 freeze
+field spellings described below. The method packet selector reads the explicitly inherited
+06 selection. Current07 and historical05/06 scope authentication resides in the new
+shared validator instead of replaying old after-document identities as live files.
+
+The mandatory runtime arguments for either reader are:
+
+```text
+python -X utf8 -B <review_unit.py|review_production.py>
+  --approved-source-sha256 <actual reviewed reader SHA>
+  --approved-build-review-source-sha256 54b7d43e72ea1d1871520d6408ce088bdcfb71e69bc3f1041355648aef33d6d9
+  --native-execution <actual recorder path#SHA>
+  --results <actual result path#SHA, or exact absent path if no result exists>
+  --freeze-receipt <actual same-lane freeze path#SHA>
+  --freeze-execution <actual freeze recorder path#SHA>
+  --build <actual same-lane build path#SHA>
+  --build-execution <actual compile recorder path#SHA>
+  --build-review <actual same-lane independent PE review path#SHA>
+  --build-review-execution <actual PE recorder path#SHA>
+  --output-dir <fresh contained CTF-07 directory>
+```
+
+Actual output is `review.json` and full typed JSON stdout. Unit schema is
+`ctf07-independent-original-data-review.v1`; production schema is
+`ctf07-production-independent-original-data-review.v1`. Success statuses are
+`pass-actual-original-data-and-provenance-before-Rust` and
+`pass-actual-original-production-data-and-provenance-before-Rust`, respectively.
+Release requires actual Native process0, complete factual ledgers and no observer
+integrity failure; production also requires all real loader records available.
+This does not require a scientifically selected phase to be reached on a genuine
+unused/error/stopped route and does not count that absence as PASS.
+
+Direct report identities retain `reviewed_results`, `reviewed_native_execution`,
+`reviewed_request`, `reviewed_native_admission_contract`, `reviewed_projection`,
+`reviewed_contracts`, actual freeze/build/PE pairs and executed reader archives.
+Fresh current07 `actual_scope_amendment` and its real singular07 check are retained.
+`prior_05_06_authority` separately authenticates the actual same-lane prior06 freeze,
+its full recorder stdout/executed writer archives, the historical05/06 amendment
+and both genuine checks. Historical after-document identities are literal metadata;
+only authentic available archives are bound. They are never rebound to current
+live plan/card bytes. Current07 raw before/after documents are checked against the
+actual07 amendment and current card/plan. No future actual references are invented.
+
+The input arrays remain the exact39 unit models/42 calls and15 production models/
+195 loader phase records, inherited literal members/callers/order and all45 guards.
+Actual Construct, call, attempt and method counts derive only from actual records.
+All existing preprocessing18, initial3, assembly7, exponential7 and inverse2 profiles
+remain separate and unchanged. The three fresh Gamma profiles are literal zero
+atol/rtol with exact class, signed-zero and shape obligations: Gamma1/Gamma2 actual
+3-by-rcmax and ATemp actual rcmax-by-rcmax. The reader never evaluates those formulas.
+
+Gamma validates every actual invocation, all five stage/omission counters, six
+failure counters/first-last events, ordinals and actual assembly association.
+It checks real rectangular/square Objexx bounds, per-slot partial-copy availability,
+binary64 DTO classes/bits, actual BMat3 and real caller-return markers. Source order
+is genuine exponential return, inverse return, Gamma entry and Gamma caller return.
+Same-owner predecessor/final handoff bit equality authenticates copies, without
+computing matrices, identity, nodes, timestep, Gamma values or expected answers.
+Source exceptions, uninvoked calls and unreached stages retain their actual records;
+observer failures/omissions fail integrity. Only first actual ordinal1 joined to
+first assembly/initial619 is selected. Later actual visits remain observed unpaired
+context/noPASS; missing first visits are never replaced. Initial dt is not asserted
+equal to caller timestep. No Rust retry driver or full CTF completion is claimed.
+
+Full scientific observation files retain the prospectively fixed1GiB physical bound.
+Source/auxiliary files retain64MB and small JSON metadata/contracts retain16MB.
+Production output inventory reuses its already authenticated `result_ref` for the
+main observation file, preserving accepted06fresh02's fix against a64MB rebind.
+The existing actual build/provider/preservation, compiled Native8, real PE identity,
+linked Original custody and forward-only07 retention intent checks remain mandatory.
+The reader does not parse or rehash binary payloads or perform removal.
+
+`numerical_PASS_claimed`, scientific recomputation/comparison and gate updates remain
+false. Whole-method outcomes and later coefficients remain independent context.
+Header authored Native06 and the pure/public Gamma07 formula owners; Raw authored
+the new passive/helper07. This is source and factual protocol validation, not an
+independent certificate of Header's own formulas. Root full review and another
+author's full source peer are required before Root's actual DataQA execution.
+
+Fresh02 preserves held01 and Root's actual failed unit DataQA attempt. The only
+validator changes are current routing fields in initial_shape.packet:
+frozen_before_this_CTF07_helper_execution and
+inherited_CTF01_or_CTF06_freeze_claimed_as_fresh_CTF07_freeze. Both are exact keys
+emitted by the already accepted07 freezer; profiles, policies and all actual
+observation validation remain unchanged. Both readers only rebind INITIAL_SHA.
+The other five source bodies are byte-exact01. No Native rerun or policy change
+is introduced, and no actual scientific output was read to prepare this repair.
