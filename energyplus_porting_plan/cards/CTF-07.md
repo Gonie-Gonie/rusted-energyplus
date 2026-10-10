@@ -108,3 +108,7 @@ pending. Full retry, final coefficients, SI19 stores and surface handoff are pen
 - Native 16 later unit invocations and unavailable 105 unit/36 production observations remain unpaired/noPASS.
 - Whole retry orchestration, final coefficients, public SI19 stores, cache handoff and complete integration/production gates remain pending.
 - Fixed six ordinary CLI executions and precise two-Original retirement are recorded separately.
+
+## Actual six ordinary CLI executions
+
+A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exited zero at Source293f3e45. All 45 fixed input hashes remained unchanged. Actual Cargo artifacts were used; compatibility/partial deny/full trace, no hours override, no oracle comparison. [Evidence](../evidence/CTF-07-production-cli/summary.json). Complete integration and production gates remain pending.

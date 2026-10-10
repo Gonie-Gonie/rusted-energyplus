@@ -10875,6 +10875,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-07-unit/summary.json",
         "sha256": "8d653883bcfeb027926ec29194b63ea6947de647c19f8e83c85adf9a69ae39ba",
         "size_bytes": 16561
+      },
+      "actual_fixed6_production_cli": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-production-cli/summary.json",
+        "sha256": "8c44de7b0c271bf2d64e904b6fcc5a9ef3f28a893e3bbbe10bddae43e08d370e",
+        "size_bytes": 4363
       }
     },
     {
