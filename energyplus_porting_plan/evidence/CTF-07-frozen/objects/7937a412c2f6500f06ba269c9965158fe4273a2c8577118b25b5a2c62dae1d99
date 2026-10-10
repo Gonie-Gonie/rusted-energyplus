@@ -1,0 +1,97 @@
+# CTF07 passive Gamma observation source proposal
+
+SOURCE-READY, source preparation only. Root and another author must review the
+complete source package before any execution. This fork adds no helper,
+serializer, freezer, input, QA/comparer, build target or runtime activation.
+Immutable Native06 manifest24ea and all three predecessor sources are copied
+under before/. Their existing phase, matrix, exponential and inverse records,
+counter behavior and function bodies are unchanged after the mechanical rename
+to ctf07_observer / EnergyPlus::CTF07Observation / CTF07_OBSERVER.
+
+Construction.ctf07.cc remains the whole pinned Original translation unit.
+The five new standalone Gamma callbacks are the only additions to the06 fork:
+
+- Entry follows Original1497, before any Gamma local allocation or computation.
+  It copies the actual AExp, IdenMatrix, AInv and BMat inputs and live context.
+- ATempReady follows1530, immediately after the actual AExp-IdenMatrix assignment.
+  It copies the allocated actual square ATemp, without evaluating subtraction.
+- Gamma1Final follows1551, after the real Gamma1 loop and before ATemp.deallocate
+  at1553. It copies actual Gamma1 in its real3-by-rcmax ownership layout.
+- Gamma2Final follows1588, after the real Gamma2 loop and before method close.
+  It copies actual Gamma2, independently of any later caller-return observation.
+- SourceReturn follows caller890, before the later final-coefficient call894.
+  Only this real site marks a Gamma caller return and copies actual Gamma1/2.
+
+Source entry order remains exponential884, inverse887, Gamma890, then later
+coefficients894. The observer never calls these methods. Removing just the five
+new callbacks and reversing the names restores the entire06 TU byte-for-byte.
+Removing all22 declared additions (one include and21 callbacks) restores every
+Original byte, including newline style. No Original line, branch, calculation,
+loop, allocation/deallocation, retry, return or exception handling is changed.
+The three exact06 before/after diffs and the full Original additions diff are
+provided. Use only the new observer with this TU; never link old/new Capture
+implementations together. No current link/provider claim is made.
+
+GammaCapture is independent of the old MethodCapture pair. It records actual
+entry counts, five actual stage counters, ordered invocation records, per-stage
+omissions, six typed failure counters and first/last failure identities. Its
+entry ordinal is checked against the actual post728 assembly ordinal and the
+retained same-construction/current-member association. Actual06 and05 entry and
+caller-return markers must precede the matching Gamma entry. A later Gamma
+entry also checks the previous Gamma's real return marker. Counts and ordinals
+are observed events, never declared expected invocation totals or renumbering.
+Every actual invocation is appended without a cap. Normal Source stages are
+retained independently; absent stages stay unreached. A duplicate value-stage
+callback retains the first real record, counts the extra callback, and records
+an explicit order failure plus omission. No duplicate is silently hidden.
+
+GammaValueSnapshot uses the existing MethodContext for fresh Construction
+members and explicitly checked earlier assembly stack context. NumOfPerpendNodes
+is additionally copied as actual2D control context. The selected future lane
+remains1D/no-source/nonreverse; observing2D context does not expand admission.
+Only the real caller-return site copies actual state identity, ErrorsFound,
+DoCTFErrorReport and TimeStepZone into caller_* fields. Earlier assembly_* fields
+are labelled earlier copies, never invented Gamma parameters. The actual caller
+flags/timestep are checked against that associated earlier assembly context.
+Initial619 dt/history and any later attempt context remain distinct; there is
+no assertion that a caller timestep must equal the initial CTFTimeStep.
+
+ATemp/AExp/IdenMatrix/AInv bounds must be the actual allocated1..rcmax square.
+Gamma1/2 bounds must be actual1..3 by1..rcmax with size3*rcmax; BMat must be the
+actual three-element allocated vector. These are observation shape checks only.
+Square/rectangular sizes use checked integer allocation arithmetic, never CTF
+arithmetic. Copies walk actual first-index outer/second-index inner and memcpy
+binary64 object representations. Signed zero, finite and nonfinite payload bits
+are preserved without any floating-point operation or class repair. The source
+Gamma1/2 numerical formulas, B sparsity and actual zero initialization are never
+reconstructed. No identity, zero entries, matrix products or expected answers
+are produced by the observer.
+
+Only observed_matrix_count owner slots and copy_available values are observed.
+BMat has its own availability flag/bounds; default fixed slots are not operand
+zeros. Matrix views that fail shape/copy checks remain unavailable. Allocation
+or copy exceptions are contained by noexcept and explicit failure metadata;
+Native continuation is unchanged. Entry append failures retain actual entry
+counts and an omitted-entry count; subsequent actual stages retain their own
+counts/omissions. Identity/association/order/shape/copy/append failures block
+future integrity/PASS, without pretending a Native method failed or returned.
+A process fault can prevent all serialization: memory snapshots are not durable
+checkpoints, and missing output/return/outcome cannot be fabricated.
+
+This source package proposes only first actual selected assembly/method ordinal1
+with genuine initial619 provenance as a future pairing boundary. All later real
+Gamma and earlier method visits remain fully observed context/unpaired/noPASS
+until a genuine Rust retry driver exists. No tolerance/profile/input selection
+is frozen here. Earlier04seven,03three,01eighteen and06seven/05two observations
+remain distinct unchanged contexts; this proposal does not close any gate,
+certify downstream coefficients, or claim whole-method/retry integration PASS.
+
+Authorship limits: Raw authored earlier transport and some pure Rust CTF owners;
+Header authored the immutable06 passive fork, pure Gamma02/public Gamma owner
+and earlier helper/QA glue; Base independently peered Gamma and authored other
+selected CTF owners. This
+proposal is not independent formula or scientific-output certification. Only
+ignored source/doc metadata was written. No target/project imports, execution,
+tests, Cargo/compiler/formatter/engine/Git, canonical edits, scientific/weather
+or binary payload reads occurred. Byte/hash/diff/restoration checks only verify
+source artifacts; they do not execute C++ or evaluate any Gamma formula.

@@ -1,0 +1,114 @@
+{
+  "new_gamma_additions": [
+    {
+      "after_original_line": 890,
+      "exact_source": "                EnergyPlus::CTF07Observation::gamma_return(state, *this, ErrorsFound, DoCTFErrorReport,\n                    state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 1497,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma_entry(*this);\n"
+    },
+    {
+      "after_original_line": 1530,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma_ATemp_ready(*this, ATemp);\n"
+    },
+    {
+      "after_original_line": 1551,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma1_final(*this);\n"
+    },
+    {
+      "after_original_line": 1588,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma2_final(*this);\n"
+    }
+  ],
+  "all_declared_passive_additions": [
+    {
+      "after_original_line": 55,
+      "exact_source": "#include \"ctf07_observer.hh\"\n"
+    },
+    {
+      "after_original_line": 309,
+      "exact_source": "    EnergyPlus::CTF07Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,\n        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);\n"
+    },
+    {
+      "after_original_line": 372,
+      "exact_source": "    EnergyPlus::CTF07Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,\n        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);\n"
+    },
+    {
+      "after_original_line": 401,
+      "exact_source": "    EnergyPlus::CTF07Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,\n        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, dyn, rs, cnd);\n"
+    },
+    {
+      "after_original_line": 618,
+      "exact_source": "\n            EnergyPlus::CTF07Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,\n                LayersInConstruct, NumResLayers, Nodes, dx, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 728,
+      "exact_source": "                    EnergyPlus::CTF07Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,\n                                                                       LayersInConstruct, NumResLayers, dl, rk, rho, cp,\n                                                                       lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 884,
+      "exact_source": "                EnergyPlus::CTF07Observation::method_return(EnergyPlus::CTF07Observation::MethodKind::Exponential,\n                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 887,
+      "exact_source": "                EnergyPlus::CTF07Observation::method_return(EnergyPlus::CTF07Observation::MethodKind::Inverse,\n                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 1178,
+      "exact_source": "    EnergyPlus::CTF07Observation::method_entry(EnergyPlus::CTF07Observation::MethodKind::Exponential, *this);\n"
+    },
+    {
+      "after_original_line": 1190,
+      "exact_source": "    EnergyPlus::CTF07Observation::exponential_initialized(*this, AMat1, AMato, AMatN);\n"
+    },
+    {
+      "after_original_line": 1251,
+      "exact_source": "    EnergyPlus::CTF07Observation::exponential_scaled(*this, AMat1, AMatRowNormMax, k, fact, CheckVal, l);\n"
+    },
+    {
+      "after_original_line": 1327,
+      "exact_source": "        EnergyPlus::CTF07Observation::exponential_power_control(*this, i, SigFigLimit);\n"
+    },
+    {
+      "after_original_line": 1361,
+      "exact_source": "        EnergyPlus::CTF07Observation::exponential_square_control(*this, isq, Backup);\n"
+    },
+    {
+      "after_original_line": 1368,
+      "exact_source": "    EnergyPlus::CTF07Observation::exponential_final(*this, AMat1, AMato, AMatN, AMatRowNormMax, k, fact, CheckVal, l, i);\n"
+    },
+    {
+      "after_original_line": 1403,
+      "exact_source": "    EnergyPlus::CTF07Observation::method_entry(EnergyPlus::CTF07Observation::MethodKind::Inverse, *this);\n"
+    },
+    {
+      "after_original_line": 1407,
+      "exact_source": "    EnergyPlus::CTF07Observation::inverse_initialized(*this, AMat1);\n"
+    },
+    {
+      "after_original_line": 1488,
+      "exact_source": "    EnergyPlus::CTF07Observation::inverse_final(*this, AMat1);\n"
+    },
+    {
+      "after_original_line": 890,
+      "exact_source": "                EnergyPlus::CTF07Observation::gamma_return(state, *this, ErrorsFound, DoCTFErrorReport,\n                    state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 1497,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma_entry(*this);\n"
+    },
+    {
+      "after_original_line": 1530,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma_ATemp_ready(*this, ATemp);\n"
+    },
+    {
+      "after_original_line": 1551,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma1_final(*this);\n"
+    },
+    {
+      "after_original_line": 1588,
+      "exact_source": "    EnergyPlus::CTF07Observation::gamma2_final(*this);\n"
+    }
+  ]
+}

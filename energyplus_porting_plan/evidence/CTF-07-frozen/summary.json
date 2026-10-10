@@ -1,0 +1,117 @@
+{
+  "schema": "ctf07-frozen-input-source-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-07-frozen/manifest.json",
+    "sha256": "f46ea6545440b52c31d611e9213a624e321059ea148f5762df696a018d1900fd",
+    "size_bytes": 98200
+  },
+  "actual_source_scope_amendment": {
+    "path": ".runtime/porting/CTF-07/scope-amendment-01/amendment.json",
+    "sha256": "05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423",
+    "size_bytes": 2098
+  },
+  "actual_source_scope_check": {
+    "path": ".runtime/porting/CTF-07/scope-check-command-01/receipt.json",
+    "sha256": "9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8",
+    "size_bytes": 2874
+  },
+  "scope_check_role": "real-CTF-07-check-only; prior05/06-authorities-separate",
+  "lanes": {
+    "unit": {
+      "actual_freeze": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/freeze-receipt.json",
+        "sha256": "fb649258ccdfe96fa0bfa6496a8951d0e50821ed6be4c1031fed6ce265382245",
+        "size_bytes": 35050
+      },
+      "actual_freeze_execution": {
+        "path": ".runtime/porting/CTF-07/freeze-command-01/receipt.json",
+        "sha256": "3a1d4ad80e33c2aaff7e0911b113af366a4ec6caf45ffd925fabfd45afb5f645",
+        "size_bytes": 4796
+      },
+      "requested_counts": {
+        "model_cases": 39,
+        "calculateTransferFunction": 42,
+        "total_operations": 42
+      },
+      "contracts": {
+        "source": {
+          "path": ".runtime/porting/CTF-07/frozen-packet-01/source.json",
+          "sha256": "41432649766c1332df9d95c5527d0b081537ab0db5eea56ab15dc61df1fb21e0",
+          "size_bytes": 24430
+        },
+        "cases": {
+          "path": ".runtime/porting/CTF-07/frozen-packet-01/cases.json",
+          "sha256": "31dc4f8153f031b65376c77d3741156f09533411370371323a7bb8c73b122ddf",
+          "size_bytes": 9271
+        },
+        "tolerances": {
+          "path": ".runtime/porting/CTF-07/frozen-packet-01/tolerances.json",
+          "sha256": "1f86c2463ff98a1d930c69dd5edcd874164f38593fabb9a9431bdcd210d56f41",
+          "size_bytes": 18465
+        }
+      }
+    },
+    "production": {
+      "actual_freeze": {
+        "path": ".runtime/porting/CTF-07/production-frozen-packet-01/freeze-receipt.json",
+        "sha256": "8e9ca51e2680f3ce29b82bbcf2fb913ab18f90545104e3af85160f99a31058f9",
+        "size_bytes": 40801
+      },
+      "actual_freeze_execution": {
+        "path": ".runtime/porting/CTF-07/production-freeze-command-01/receipt.json",
+        "sha256": "668b626b2a288bd1b9d6720f6a8b2129b9030e1b86db18533912a7cd3a1722e2",
+        "size_bytes": 4857
+      },
+      "requested_counts": {
+        "model_cases": 15,
+        "loader_phase_records": 195
+      },
+      "contracts": {
+        "source": {
+          "path": ".runtime/porting/CTF-07/production-frozen-packet-01/source.json",
+          "sha256": "57b07769fa33360acb6ae8b43fd545256e6866cec68aff287b8add429367786f",
+          "size_bytes": 29010
+        },
+        "cases": {
+          "path": ".runtime/porting/CTF-07/production-frozen-packet-01/cases.json",
+          "sha256": "ac3c8298dd83afd53797021b2a1559fe13418cecf408b6337b04fc9e4109693c",
+          "size_bytes": 9292
+        },
+        "tolerances": {
+          "path": ".runtime/porting/CTF-07/production-frozen-packet-01/tolerances.json",
+          "sha256": "d2d1af9a961d848e30c0c4e495da1ddc020dcd8ac4b3cac344ae7c57c4855a6f",
+          "size_bytes": 18487
+        }
+      }
+    }
+  },
+  "fresh_profiles": {
+    "CTF07": 3,
+    "atol": 0.0,
+    "rtol": 0.0,
+    "class_shape_signedzero_exact": true
+  },
+  "inherited_handoff_profiles_remain_separate": {
+    "preprocessing": 18,
+    "initial": 3,
+    "assembly": 7,
+    "exponential": 7,
+    "inverse": 2
+  },
+  "all45_literal_input_guards_unchanged": true,
+  "only_first_method1_assembly1_selected": true,
+  "all_later_Native_visits_retained_unpaired_noPASS": true,
+  "genuine_06_then_05_then_07_Source_order_required": true,
+  "Rust_candidate_applied": false,
+  "actual_Native07_build_or_engine_performed": false,
+  "numerical_PASS_claimed": false,
+  "complete_CTF07_claimed": false,
+  "new_debug_originals_prospectively_declared": true,
+  "Root_FULL_and_other_author_FULL_of_executed_freezer_and_Native_contracts_preceded_freeze": true,
+  "held_comparers_FULL_reviewed_before_any_future_execution": true,
+  "limits": [
+    "Source scope and actual input freeze only; no numeric or remaining-gate PASS.",
+    "OriginalDataQA must precede fresh unchanged Rust06 baseline then candidate application.",
+    "Selected archive excludes binary, weather and scientific outputs; not a full replay closure."
+  ]
+}

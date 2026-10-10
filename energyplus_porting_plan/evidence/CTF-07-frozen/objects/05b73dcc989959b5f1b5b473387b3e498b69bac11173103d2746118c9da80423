@@ -1,0 +1,62 @@
+{
+  "schema": "ctf07-source-scope-amendment.v1",
+  "created_utc": "2026-10-10T19:08:37.479134+00:00",
+  "cards": [
+    "CTF-07"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF07_build_or_engine_execution_performed": false,
+  "native_observer": {
+    "path": ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json",
+    "sha256": "67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c",
+    "size_bytes": 23178
+  },
+  "passive_observer": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+    "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+    "size_bytes": 18141
+  },
+  "gamma_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6",
+    "size_bytes": 19186
+  },
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-07/scope-amendment-01/before-plan.json",
+      "sha256": "4d3388b79b2442c4017ad1e2de15fef3279988cb489b552854f5cc4cf7fdcee7",
+      "size_bytes": 674940
+    },
+    {
+      "path": ".runtime/porting/CTF-07/scope-amendment-01/before-CTF-07.md",
+      "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+      "size_bytes": 2686
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "4410c0eea0a8340dcd1f70c2f43fc21ba1155189d22c9442947473f8351fe66b",
+      "size_bytes": 680228
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-07.md",
+      "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+      "size_bytes": 4515
+    }
+  ],
+  "recorder_role": "real-CTF-07-check-only; prior05/06-authorities-separate",
+  "scope_only_no_numerical_PASS": true
+}

@@ -1,0 +1,99 @@
+# CTF07 input freezer source preparation
+
+SOURCE-READY HELD; no freezer invocation, Native build/run or scientific result read.
+This adapts the accepted CTF05/06 freezer and its 99-line stdlib byte helper.
+The byte helper changes only its output root from CTF-06 to CTF-07.
+Root's full source read, an other-author peer and explicit approved writer SHA
+precede actual freezing. No additional executed source-review stage is introduced.
+
+## Literal input and inherited policy
+
+Unit model/caller/material/construction/operation rows remain the authenticated
+CTF01 literal inputs: 39 models and 42 declared whole calls. Production retains
+all ordered CON15 original IDFs, 13 actual loader phase names / 195 declared phase
+records and all 45 ordered scope guard identities. Actual Construct counts,
+reached methods, exits and numerical values are not prescribed by the freezer.
+Original source inventories stay 7 unit / 21 production files; the prior06 source
+contract/ranges are authenticated and retained alongside eight fresh07 primary
+ranges. Each lane binds the exact held eight-source Native07 inventory.
+
+Preprocessing18, initial3, assembly7, exponential7 and inverse2 profiles remain
+separate, unchanged handoffs. Only `ctf07_gamma_profiles` is new: Gamma1 and Gamma2
+have actual 3-by-rcmax shape, ATemp has actual rcmax-by-rcmax shape. All three have
+float zero atol/rtol and exact class, shape and signed-zero policy. Held helper07
+input/projection proposals supply the identical Gamma policy. There are no
+computed arrays, expected values, expected exits or Native answers supplied to Rust.
+
+Selection remains actual assembly1 / exponential1 / inverse1 and new Gamma1 in the
+same whole call and Construct, using the actual initial619 dt/history association.
+Source order is assembly728 -> exponential884 -> inverse887 -> Gamma890. No initial
+CTFTimeStep == TimeStepZone assertion is introduced. Every later real Native visit
+is retained as unpaired context/noPASS; no Rust retry driver or later coefficient
+claim is made. Required selected absence on one or both sides fails downstream;
+observer copy failures and omissions remain integrity failures.
+
+## Genuine current07 authority and separate historical05/06 authority
+
+The prospective runtime current07 amendment contract is
+`ctf07-source-scope-amendment.v1`, cards `["CTF-07"]`, with scope_review_passed,
+all_other_gates_pending and strict_profiles_settled_before_outputs true and
+actual_CTF07_build_or_engine_execution_performed false. Exact native_observer,
+passive_observer, gamma_policy_source_inventory and both-lane requested_counts
+bind the held07 source package and policies. Exactly two before-document refs and
+two after refs bind the plan and card; the actual current plan/card must match the
+after bytes. The historical CTF07 card in passive02 must match a before archive.
+Root supplies the actual amendment and real check_plan.py --check --card CTF-07
+recorder. The recorder validates Root-authored documents; it does not author them.
+The singular actual_scope_amendment_execution is this real07 check only, with an
+explicit role. No future amendment, validation, card or freeze identity is guessed.
+
+Five separate required historical inputs preserve prior05/06 provenance: the same
+lane's real06 freeze receipt and its recorder, the actual combined05/06 amendment,
+and both actual card checks. Prior freeze stdout must be the full typed receipt,
+stderr empty, exit typed0 and source preservation true; the actual approved06
+writer/own2 archives, command options, output directory, model rows and inherited
+policy contracts are authenticated. The prior freeze must precede this actual07
+freeze. Prior05/06 source/check refs stay literal and independent of real07 check.
+No prior06 numerical PASS or OriginalDataQA release is inferred. Any later actual07
+Original release still needs its genuine build/PE and post-Original DataQA path.
+
+Historical before copies are byte-checked and archived. Prior after documents are
+preserved as historical_path/SHA/size identities from the authenticated amendment
+and freeze; they are never rebound to changed live plan/card paths. Matching old
+document archives in prior reviewed_source_archives are preserved when present;
+absence of such an archive is explicitly limited documentary availability, not a
+current-byte certification. Current07 before/after documents are copied separately.
+The prior authority is carried in source_authorities and request/projection/admission.
+No old frozen claim is relabelled as fresh07.
+
+## Root-only runtime invocation
+
+Use `python -X utf8 -B <this-directory>/freeze_packet.py` with:
+`--lane unit|production --approved-source-sha256 <actual writer SHA>`
+`--source-manifest <this manifest>#<SHA>`
+`--native-source-manifest <held07 helper manifest>#<SHA>`
+`--current-card-07 energyplus_porting_plan/cards/CTF-07.md#<actual SHA>`
+`--actual-scope-amendment <real07 amendment>#<SHA>`
+`--actual-scope-amendment-execution <real07 check receipt>#<SHA>`
+`--prior-06-freeze <real same-lane06 freeze receipt>#<SHA>`
+`--prior-06-freeze-execution <real same-lane06 freeze recorder>#<SHA>`
+`--prior-05-06-scope-amendment <real combined amendment>#<SHA>`
+`--prior-scope-check-05 <real05 check receipt>#<SHA>`
+`--prior-scope-check-06 <real06 check receipt>#<SHA>`
+`--output-dir <fresh repository-contained CTF-07 directory>`.
+All identity arguments require path#SHA; output is an ordinary contained path.
+The source/tolerances -> request -> cases -> projection -> admission -> full-JSON
+freeze receipt DAG retains strict contracts2/3 and `ctf07-` / `ctf07-production-`
+schemas. Frozen flags mean before this07 helper invocation, never before prior06.
+Executed own2 and reviewed sources/authority archives are retained with before/after
+byte rechecks. Metadata stays 16MB; this freezer never opens observation results.
+
+New07 linked Originals carry only prospective-debug-original retention intent.
+The old06 intent remains unchanged historical policy. Both new real files still
+need verification before helper execution; any later removal requires a separate
+Root-authorized actual retention record. No deletion or old-live-ref reinterpretation
+occurs. Scientific execution, numerical PASS, canonical edits and gate updates are false.
+
+Authorship: Raw authored this adapter and Native07 Gamma copy/helper transport.
+Header authored the accepted06 freezer and pure/public Gamma owners; Base supplied
+independent peers. Source/provenance review is not independent own-physics certification.

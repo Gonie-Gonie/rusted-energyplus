@@ -1,0 +1,40 @@
+--- before/ctf06_unit_fields.hh
++++ ctf07_unit_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure copies of actual public members and the separately captured private locals.
+-#ifndef CTF06_UNIT_FIELDS_HH
+-#define CTF06_UNIT_FIELDS_HH
++#ifndef CTF07_UNIT_FIELDS_HH
++#define CTF07_UNIT_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf06_observation_fields.hh"
++#include "ctf07_observation_fields.hh"
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
+@@ -11,7 +11,7 @@
+ #include <EnergyPlus/UtilityRoutines.hh>
+ 
+ namespace Ctf01 {
+-namespace Observation = EnergyPlus::CTF06Observation;
++namespace Observation = EnergyPlus::CTF07Observation;
+ inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool ErrorsFound, bool DoCTFErrorReport)
+ {
+     json materials = json::array(), constructions = json::array();
+@@ -67,7 +67,7 @@
+ inline bool observer_failed(Observation::Capture const &capture)
+ {
+     return capture.binding_error || capture.identity_mismatch || capture.duplicate_phase ||
+-           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture);
++           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma);
+ }
+ inline json observations(Observation::Capture const &capture)
+ {
+@@ -78,6 +78,7 @@
+         {"MatrixAssembly", matrix_observations(capture)},
+         {"Exponential", method_observations(capture.exponential, Observation::MethodKind::Exponential)},
+         {"Inverse", method_observations(capture.inverse, Observation::MethodKind::Inverse)},
++        {"Gamma", gamma_observations(capture.gamma)},
+         {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture)},
+         {"binding_error", capture.binding_error}, {"identity_mismatch", capture.identity_mismatch},
+         {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},

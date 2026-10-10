@@ -10732,140 +10732,29 @@
       "title": "Gamma 행렬 계산",
       "source": "Construction.cc",
       "symbols": "ConstructionProps::calculateGammas",
-      "block": "Construction.cc1496-1589 whole calculateGammas; actual caller890 after exponential884 and inverse887. Selected actual first invocation1/assembly1, massive nonreversed 1D no-source context; actual current dt/history and source produced identity. All genuine later visits retained unpaired/noPASS.",
+      "block": "메서드 전체. 역행렬·상태전이·B 및 시간증분을 외부 계약으로 공급.",
       "dependencies": [
         "CTF-05",
         "CTF-06"
       ],
-      "inputs": "Actual same first assembly IdenMatrix/BMat/rcmax/context and actual first exponential AExp plus actual inverse AInv; borrow actual preceding owners, no replay or reconstructed inputs.",
-      "outputs": "Actual Gamma1/Gamma2 3-by-rcmax and temporary ATemp rcmax-by-rcmax before deallocation; typed exact shapes/classes/signedzero, initialized controls, actual entry and caller-return identities.",
+      "inputs": "A^-1, exp(A·dt), B, dt 및 필요한 작업배열",
+      "outputs": "Gamma 계열 행렬과 변경 작업상태",
       "timing": "계수 생성",
       "unit_tests": "동일 EP 행렬 입력에 대한 원소별 비교; dt 변화",
       "integration_test": "CTF-08 최종 계수에 독립 테스트와 동일 데이터 전달",
-      "rust_candidate": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "rust_candidate": "신규 계수 생성 모듈 제안",
       "assessment": "신규·보완",
       "companion": "Construction.hh",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
-      "scope_review": "통과",
+      "scope_review": "미확인",
       "unit_gate": "미확인",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Source-only scope fixed before any CTF07 helper build/run or scientific output. Preserve original loop/evaluation order and third-row IEEE behavior; no new finite checks or pivots. Real first inverse/exponential ownership is required. Later retries, final coefficient generation, public SI19 stores, cache handoff and complete-card integration/production remain pending.",
+      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
-      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
-      "source_ranges_input_only": [
-        {
-          "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
-          "start_line": 638,
-          "end_line": 660,
-          "range_sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
-          "range_size_bytes": 884,
-          "reason": "actual source Gamma3-by-rcmax and square matrix allocations"
-        },
-        {
-          "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
-          "start_line": 875,
-          "end_line": 894,
-          "range_sha256": "834de83ff09c5196ebd62bf19899e97b70d885a9b2b28442e87eba528b155b48",
-          "range_size_bytes": 1236,
-          "reason": "actual exp884/inverse887/Gamma890 caller order"
-        },
-        {
-          "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
-          "start_line": 1496,
-          "end_line": 1530,
-          "range_sha256": "136082ea855d5c8d1bf4e76d3cf0542bbdec4b39e29f029e64ab474cf7c3fc43",
-          "range_size_bytes": 1338,
-          "reason": "actual Gamma entry/input context and ATemp assignment"
-        },
-        {
-          "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
-          "start_line": 1531,
-          "end_line": 1553,
-          "range_sha256": "c48c88e5c515e21c67bea6214f712db33652f6c9182f11768ece1b8088728d88",
-          "range_size_bytes": 950,
-          "reason": "actual Gamma1 and ATemp deallocation boundary"
-        },
-        {
-          "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
-          "start_line": 1554,
-          "end_line": 1589,
-          "range_sha256": "5d1f73cd57d45a83d78217eeded1cfa6fa0b947108f6ff17e4d702f5633760e6",
-          "range_size_bytes": 2171,
-          "reason": "actual Gamma2 and method close"
-        },
-        {
-          "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
-          "start_line": 304,
-          "end_line": 342,
-          "range_sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
-          "range_size_bytes": 2495,
-          "reason": "actual Construction matrix owners/context and method signatures"
-        },
-        {
-          "source": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh",
-          "start_line": 285,
-          "end_line": 359,
-          "range_sha256": "7ec937f7426dc2d3bd81ac7a09e47925c41627bf2364215eecc7f1cde82a38ba",
-          "range_size_bytes": 2498,
-          "reason": "actual independent Gamma stage/matrix/value/invocation/counter DTOs"
-        },
-        {
-          "source": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
-          "start_line": 720,
-          "end_line": 974,
-          "range_sha256": "a38d890f34fc3a5c388d7a1285652ab8c59f300271c540ada87000bef018d937",
-          "range_size_bytes": 12596,
-          "reason": "actual independent Gamma copy,association,order,omission and caller-return producer"
-        }
-      ],
-      "prospective_exact_arithmetic_profiles": [
-        {
-          "variable": "Gamma1",
-          "atol": 0.0,
-          "rtol": 0.0,
-          "class_exact": true,
-          "shape_exact": true,
-          "signed_zero_exact": true,
-          "required_shape": "actual_3_by_rcmax"
-        },
-        {
-          "variable": "Gamma2",
-          "atol": 0.0,
-          "rtol": 0.0,
-          "class_exact": true,
-          "shape_exact": true,
-          "signed_zero_exact": true,
-          "required_shape": "actual_3_by_rcmax"
-        },
-        {
-          "variable": "ATemp",
-          "atol": 0.0,
-          "rtol": 0.0,
-          "class_exact": true,
-          "shape_exact": true,
-          "signed_zero_exact": true,
-          "required_shape": "actual_rcmax_by_rcmax"
-        }
-      ],
-      "source_gamma_policy_inventory": {
-        "path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
-        "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6",
-        "size_bytes": 19186
-      },
-      "prospective_Original_retention_intent": {
-        "schema": "ctf07-debug-original-retention-intent.v1",
-        "role": "prospective-debug-original",
-        "scope": "new-CTF07-linked-originals-only",
-        "actual_file_identity_required": true,
-        "both_original_and_helper_verified_before_execution": true,
-        "retain_through_PE_validation_and_current_helper_execution": true,
-        "removal_requires_separate_Root_authorized_actual_retention_record": true,
-        "earlier_live_refs_reinterpreted": false,
-        "deletion_performed": false
-      }
+      "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료."
     },
     {
       "id": "CTF-08",

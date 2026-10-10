@@ -1,0 +1,126 @@
+--- before/ctf06_observer.hh
++++ ctf07_observer.hh
+@@ -1,6 +1,6 @@
+ // Output-only observations of actual Construction.cc local storage.
+-#ifndef CTF06_OBSERVER_HH_INCLUDED
+-#define CTF06_OBSERVER_HH_INCLUDED
++#ifndef CTF07_OBSERVER_HH_INCLUDED
++#define CTF07_OBSERVER_HH_INCLUDED
+ 
+ #include <EnergyPlus/Construction.hh>
+ #include <ObjexxFCL/Array1D.hh>
+@@ -12,7 +12,7 @@
+ #include <optional>
+ #include <vector>
+ 
+-namespace EnergyPlus::CTF06Observation {
++namespace EnergyPlus::CTF07Observation {
+ 
+ enum class Phase : std::size_t
+ {
+@@ -283,6 +283,80 @@
+     std::optional<MethodFailure> last_failure;
+ };
+ 
++// Gamma has its own ledgers. Earlier phase/matrix/05/06 counters are untouched.
++enum class GammaStage : std::size_t
++{
++    Entry = 0, ATempReady = 1, Gamma1Final = 2, Gamma2Final = 3, SourceReturn = 4
++};
++
++enum class GammaMatrixOwner : std::size_t
++{
++    AExp = 0, IdenMatrix = 1, AInv = 2, ATemp = 3, Gamma1 = 4, Gamma2 = 5
++};
++
++struct GammaFailure
++{
++    std::size_t observed_invocation_ordinal = 0;
++    std::size_t observed_assembly_ordinal = 0;
++    GammaStage stage = GammaStage::Entry;
++    MethodFailureKind kind = MethodFailureKind::IdentityMismatch;
++};
++
++struct GammaMatrixSnapshot
++{
++    GammaMatrixOwner owner = GammaMatrixOwner::AExp;
++    std::optional<Array2Bounds> bounds;
++    bool copy_available = false;
++    // Actual first-index outer, second-index inner. Rectangles are 3 by rcmax.
++    std::vector<Binary64Copy> values;
++};
++
++struct GammaValueSnapshot
++{
++    bool reached = false;
++    bool matrices_available = false;
++    MethodContext context;
++    // Actual 2D branch control is context-only outside the selected 1D scope.
++    int NumOfPerpendNodes = 0;
++    std::size_t observed_matrix_count = 0;
++    // Only observed_matrix_count slots are owners; default slots are unavailable.
++    std::array<GammaMatrixSnapshot, 3> matrices;
++    // Entry-only actual BMat. Neither the default tail nor absent data is zero.
++    bool BMat_available = false;
++    std::optional<Array1Bounds> BMat_bounds;
++    std::array<Binary64Copy, 3> BMat{};
++    bool caller_context_available = false;
++    bool caller_ErrorsFound = false;
++    bool caller_DoCTFErrorReport = false;
++    std::optional<Binary64Copy> caller_TimeStepZone;
++};
++
++struct GammaInvocationSnapshot
++{
++    std::size_t observed_invocation_ordinal = 0;
++    std::size_t observed_assembly_ordinal = 0;
++    bool association_available = false;
++    std::array<bool, 6> failure_kinds{};
++    std::array<std::size_t, 5> actual_stage_callback_counts{};
++    GammaValueSnapshot entry;
++    GammaValueSnapshot ATemp_ready;
++    GammaValueSnapshot Gamma1_final;
++    GammaValueSnapshot Gamma2_final;
++    GammaValueSnapshot source_return;
++};
++
++struct GammaCapture
++{
++    std::size_t actual_invocation_count = 0;
++    std::array<std::size_t, 5> actual_stage_callback_counts{};
++    std::vector<GammaInvocationSnapshot> invocations;
++    std::array<std::size_t, 5> stage_records_omitted{};
++    bool observer_failure = false;
++    std::array<std::size_t, 6> failure_event_counts{};
++    std::optional<GammaFailure> first_failure;
++    std::optional<GammaFailure> last_failure;
++};
++
+ struct Capture
+ {
+     // Internal identity checks only. A future helper supplies its real owner ID.
+@@ -307,6 +381,7 @@
+     std::optional<MatrixAttemptFailure> last_matrix_failure;
+     MethodCapture exponential;
+     MethodCapture inverse;
++    GammaCapture gamma;
+ };
+ 
+ // A helper binds its explicit actual state/array element before one genuine call.
+@@ -389,6 +464,15 @@
+                    Construction::ConstructionProps const &construction,
+                    bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
+ 
+-} // namespace EnergyPlus::CTF06Observation
++// Gamma callbacks own an independent five-stage ledger; earlier APIs are unchanged.
++void gamma_entry(Construction::ConstructionProps const &construction) noexcept;
++void gamma_ATemp_ready(Construction::ConstructionProps const &construction,
++                       Array2D<Real64> const &ATemp) noexcept;
++void gamma1_final(Construction::ConstructionProps const &construction) noexcept;
++void gamma2_final(Construction::ConstructionProps const &construction) noexcept;
++void gamma_return(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
++                   bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
++
++} // namespace EnergyPlus::CTF07Observation
+ 
+ #endif

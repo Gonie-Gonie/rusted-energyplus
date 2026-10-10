@@ -1,0 +1,451 @@
+{
+  "schema": "ctf07-passive-native-source-preparation.v1",
+  "status": "SOURCE-READY-HELD",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "README": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/README.md",
+    "sha256": "7937a412c2f6500f06ba269c9965158fe4273a2c8577118b25b5a2c62dae1d99",
+    "size_bytes": 6655,
+    "line_count": 97
+  },
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-06/native-observer-prep-01/manifest.json",
+    "sha256": "24ea19879d35d761f0b56c4a08de794c5c71d9b2519e377caf5bda9fd8730d03",
+    "size_bytes": 26224,
+    "line_count": 640
+  },
+  "archived_predecessor_manifest": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/before/manifest.json",
+    "sha256": "24ea19879d35d761f0b56c4a08de794c5c71d9b2519e377caf5bda9fd8730d03",
+    "size_bytes": 26224,
+    "line_count": 640
+  },
+  "archived_predecessor_README": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/before/README.md",
+    "sha256": "6e878cd8f53cb9080a2af501a8489bd5ce6f53fbb1e9fd110f6b8d6837687b67",
+    "size_bytes": 5611,
+    "line_count": 82
+  },
+  "own_sources": [
+    {
+      "role": "passive capture declarations",
+      "source": {
+        "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh",
+        "sha256": "d28ac30443415bbb3df1da9b989cfd429ebaeb01843d80444e4c076a50f96b0d",
+        "size_bytes": 17557,
+        "line_count": 478
+      },
+      "before": {
+        "historical_path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.hh",
+        "archive": {
+          "path": ".runtime/porting/CTF-07/native-observer-prep-02/before/ctf06_observer.hh",
+          "sha256": "5b509aeedb74c7680ad4cadd7d0cd12ccc95f1dd48739a49768d60eaf0e4d804",
+          "size_bytes": 14371,
+          "line_count": 394
+        }
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh.from-ctf06.diff",
+        "sha256": "fcf86b7861c90d37f31524795641fe8594181edb90fd1b84120c49489b04d173",
+        "size_bytes": 4510,
+        "line_count": 126
+      }
+    },
+    {
+      "role": "passive copied-value and integrity ledgers",
+      "source": {
+        "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+        "sha256": "719ab0efcb21fd5a71f121677d6ae129ebcd4aff9053d78177760708833c6442",
+        "size_bytes": 48648,
+        "line_count": 975
+      },
+      "before": {
+        "historical_path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.cc",
+        "archive": {
+          "path": ".runtime/porting/CTF-07/native-observer-prep-02/before/ctf06_observer.cc",
+          "sha256": "e3e9d82bf3bce11b9aa834667931c8a050c2408609cada90c8a83692b2f05056",
+          "size_bytes": 36052,
+          "line_count": 720
+        }
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc.from-ctf06.diff",
+        "sha256": "c14b33ad08d1b03c66d4030f3fd7d508e8f2918617ac9228546959898dce7816",
+        "size_bytes": 13497,
+        "line_count": 277
+      }
+    },
+    {
+      "role": "whole pinned Original translation unit with standalone passive calls",
+      "source": {
+        "path": ".runtime/porting/CTF-07/native-observer-prep-02/Construction.ctf07.cc",
+        "sha256": "82a834d91f30cbfa92fe76e90b41df19aaf37d4121edc3cd264144c3fb653a28",
+        "size_bytes": 113077,
+        "line_count": 2147
+      },
+      "before": {
+        "historical_path": ".runtime/porting/CTF-06/native-observer-prep-01/Construction.ctf06.cc",
+        "archive": {
+          "path": ".runtime/porting/CTF-07/native-observer-prep-02/before/Construction.ctf06.cc",
+          "sha256": "d76eb823d45138a7914cd83090ed2f5eb029ef5f4bc69271ce7c138249840172",
+          "size_bytes": 112689,
+          "line_count": 2141
+        }
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-07/native-observer-prep-02/Construction.ctf07.cc.from-ctf06.diff",
+        "sha256": "636bff2d25ddc3eefa35c6b50ac3fdbf50c6a424acb6d168f9590bcef484992c",
+        "size_bytes": 8887,
+        "line_count": 187
+      }
+    }
+  ],
+  "source_refs": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+      "size_bytes": 22000,
+      "line_count": 1060
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "sha256": "b2a4eab99a6a631083e8598ef1c19ee6e6c6cbe87b6c2ed9a2d2fcff7549afbb",
+      "size_bytes": 25946,
+      "line_count": 1319
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-07.md",
+      "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+      "size_bytes": 2686,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/manifest.json",
+      "sha256": "24ea19879d35d761f0b56c4a08de794c5c71d9b2519e377caf5bda9fd8730d03",
+      "size_bytes": 26224,
+      "line_count": 640
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/README.md",
+      "sha256": "6e878cd8f53cb9080a2af501a8489bd5ce6f53fbb1e9fd110f6b8d6837687b67",
+      "size_bytes": 5611,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.hh",
+      "sha256": "5b509aeedb74c7680ad4cadd7d0cd12ccc95f1dd48739a49768d60eaf0e4d804",
+      "size_bytes": 14371,
+      "line_count": 394
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.cc",
+      "sha256": "e3e9d82bf3bce11b9aa834667931c8a050c2408609cada90c8a83692b2f05056",
+      "size_bytes": 36052,
+      "line_count": 720
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/Construction.ctf06.cc",
+      "sha256": "d76eb823d45138a7914cd83090ed2f5eb029ef5f4bc69271ce7c138249840172",
+      "size_bytes": 112689,
+      "line_count": 2141
+    }
+  ],
+  "primary_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 660,
+      "sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
+      "size_bytes": 884,
+      "purpose": "actual matrix and3-by-rcmax Gamma allocation before the retry loop"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 875,
+      "end_line": 894,
+      "sha256": "834de83ff09c5196ebd62bf19899e97b70d885a9b2b28442e87eba528b155b48",
+      "size_bytes": 1236,
+      "purpose": "whole Original calls exponential884 then inverse887 then Gamma890 then final coefficients894"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1496,
+      "end_line": 1530,
+      "sha256": "136082ea855d5c8d1bf4e76d3cf0542bbdec4b39e29f029e64ab474cf7c3fc43",
+      "size_bytes": 1338,
+      "purpose": "actual Gamma entry and live square ATemp assignment"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1531,
+      "end_line": 1553,
+      "sha256": "c48c88e5c515e21c67bea6214f712db33652f6c9182f11768ece1b8088728d88",
+      "size_bytes": 950,
+      "purpose": "actual Gamma1 loop and ATemp lifetime through pre-deallocation capture"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1554,
+      "end_line": 1589,
+      "sha256": "5d1f73cd57d45a83d78217eeded1cfa6fa0b947108f6ff17e4d702f5633760e6",
+      "size_bytes": 2171,
+      "purpose": "actual Gamma2 loop and final method workspace"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495,
+      "purpose": "public actual array owners,2D control,constructor and method signatures"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 608,
+      "end_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389,
+      "purpose": "actual first-index outer/contiguous second-index element access"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 866,
+      "end_line": 920,
+      "sha256": "3fbe19e6967789b11832fb7c337d51f07d932bf83cf6ea86188cf6a9d1411532",
+      "size_bytes": 596,
+      "purpose": "actual Array2 lower and upper dimension bounds"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "start_line": 516,
+      "end_line": 539,
+      "sha256": "bb110cdb12bb6522961dc7e62d1726cde68b06dfb6cfa63f0ffc3c7cf844c00a",
+      "size_bytes": 371,
+      "purpose": "actual array allocation and deallocation semantics"
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.hh",
+      "start_line": 181,
+      "end_line": 226,
+      "sha256": "85c6fbc48e1275d38a253e737856d839fd2b78aad1d70538b9fc2dabac4936fd",
+      "size_bytes": 1287,
+      "purpose": "existing MethodContext distinguishes checked earlier assembly context"
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.cc",
+      "start_line": 14,
+      "end_line": 22,
+      "sha256": "fc36486c82d5d18fdb83a0f3d8dc9b841388f4273980e878aad64c2a1d9b3ef9",
+      "size_bytes": 238,
+      "purpose": "memcpy object representation copy only"
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.cc",
+      "start_line": 367,
+      "end_line": 424,
+      "sha256": "071c2e167224135155c63b32b96b0da6609fefcccfcdc6ed94a07d4ba64b7e8c",
+      "size_bytes": 3147,
+      "purpose": "actual retained assembly association and readonly member context"
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/ctf06_observer.cc",
+      "start_line": 82,
+      "end_line": 110,
+      "sha256": "2c002f690c7e87f03c5b5b1efa375ec00bed60a3b9950f2090f896a6a2c6b1f9",
+      "size_bytes": 900,
+      "purpose": "existing actual Capture binding lifetime"
+    }
+  ],
+  "original_additions_diff": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/Construction.ctf07.cc.from-original.diff",
+    "sha256": "85e36c6445a243ecf31e8f512f2d0a05b01839e5fc47cb25d1f1b04d9e1de5f6",
+    "size_bytes": 7580,
+    "line_count": 177
+  },
+  "declared_addition_ledger": {
+    "path": ".runtime/porting/CTF-07/native-observer-prep-02/additions.json",
+    "sha256": "67e91d33e4c5522e65d055f2dd4cda4ca46bc50941c692b3e4cc1e7f20d4e27d",
+    "size_bytes": 5222,
+    "line_count": 114
+  },
+  "new_gamma_callback_sites": [
+    {
+      "stage": "Entry",
+      "after_original_line": 1497,
+      "actual_owners": [
+        "AExp",
+        "IdenMatrix",
+        "AInv",
+        "BMat",
+        "Construction context"
+      ],
+      "entry_before_local_allocation": true
+    },
+    {
+      "stage": "ATempReady",
+      "after_original_line": 1530,
+      "actual_owners": [
+        "ATemp"
+      ],
+      "before_source_Gamma1_initialization": true
+    },
+    {
+      "stage": "Gamma1Final",
+      "after_original_line": 1551,
+      "actual_owners": [
+        "Gamma1"
+      ],
+      "before_actual_ATemp_deallocation_1553": true
+    },
+    {
+      "stage": "Gamma2Final",
+      "after_original_line": 1588,
+      "actual_owners": [
+        "Gamma2"
+      ],
+      "before_actual_method_close_1589": true
+    },
+    {
+      "stage": "SourceReturn",
+      "after_original_line": 890,
+      "actual_owners": [
+        "Gamma1",
+        "Gamma2",
+        "actual state and caller flags/TimeStepZone"
+      ],
+      "actual_caller_return_only": true
+    }
+  ],
+  "gamma_record_contract": {
+    "independent_from_old_phase_matrix_exponential_inverse_ledgers": true,
+    "stages": [
+      "Entry",
+      "ATempReady",
+      "Gamma1Final",
+      "Gamma2Final",
+      "SourceReturn"
+    ],
+    "stage_counter_and_omission_slot_count": 5,
+    "failure_kinds": [
+      "IdentityMismatch",
+      "AssociationFailure",
+      "OrderFailure",
+      "MatrixShape",
+      "CopyException",
+      "LedgerAppendException"
+    ],
+    "failure_counter_slot_count": 6,
+    "first_and_last_failure_identity": true,
+    "actual_invocation_count_not_expected_total": true,
+    "actual_entry_ordinal_equals_checked_assembly_ordinal": true,
+    "actual_matching_exponential_and_inverse_return_markers_checked_before_Gamma": true,
+    "previous_Gamma_real_return_checked_before_next_Gamma_entry": true,
+    "all_actual_invocations_retained_without_cap": true,
+    "duplicate_value_callback_counted_as_explicit_failure_and_omission": true,
+    "actual_return_marker_independent_of_private_final_workspace": true,
+    "actual_allocated_bounds_checked": true,
+    "square_owners": [
+      "AExp",
+      "IdenMatrix",
+      "AInv",
+      "ATemp"
+    ],
+    "rectangular_owners": {
+      "Gamma1": "actual1..3 by1..rcmax; size3*rcmax",
+      "Gamma2": "actual1..3 by1..rcmax; size3*rcmax"
+    },
+    "BMat_owner": "actual allocated1..3; copied only atEntry",
+    "copy_order": "first-index outer, second-index inner; no transpose",
+    "scalar_copy": "memcpy binary64 object representation; no floating-point operations",
+    "unused_matrix_slots_and_unavailable_BMat_not_operand_values": true,
+    "assembly_context": "checked earlier actual post728 stack context; explicitly not Gamma parameters",
+    "caller_context": "real post890 state/ErrorsFound/DoCTFErrorReport/TimeStepZone, separately checked",
+    "NumOfPerpendNodes": "fresh actual member;2D context unpaired and not admitted by observation",
+    "required_observer_failure_blocks_future_integrity_PASS": true,
+    "crash_unserialized_snapshots_unknown_no_fabricated_return": true
+  },
+  "prospective_selection_boundary": {
+    "numerical_contract_frozen_here": false,
+    "first_actual_selected_assembly_and_Gamma_invocation_ordinal": 1,
+    "initial619_vs_attempt_context_distinct": true,
+    "caller_timestep_equals_initial_CTFTimeStep_asserted": false,
+    "selected_scope": "existing genuine1D/no-source/nonreverse lane; no expansion",
+    "later_actual_visits": "fully retained context/unpaired/noPASS until genuine Rust retry driver",
+    "earlier_profiles": "unchanged separate04seven/03three/01eighteen/06seven/05two context; no fresh profiles authored"
+  },
+  "inverse_restoration": {
+    "original": {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    "restored_sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+    "exact_original_bytes": true,
+    "original_removed_lines": 0,
+    "all_addition_count_including_include": 22,
+    "standalone_callback_count": 21,
+    "prior_callback_count": 16,
+    "new_Gamma_callback_count": 5,
+    "exact_ctf06_header_body_restoration_after_Gamma_additions_and_name_rename": true,
+    "exact_ctf06_implementation_restoration_after_Gamma_append_and_name_rename": true,
+    "exact_ctf06_TU_restoration_after_Gamma_calls_and_name_rename": true,
+    "exact_old_observation_bodies_and_fields_except_new_gamma_storage_and_name_rename": true
+  },
+  "preparation_boundary": {
+    "source_only": true,
+    "helper_serializer_freezer_QA_comparer_added": false,
+    "build_target_or_runtime_activation_added": false,
+    "project_or_target_imported": false,
+    "tests_or_engine_run": false,
+    "build_Cargo_formatter_Git_invoked": false,
+    "canonical_source_written": false,
+    "scientific_weather_binary_payloads_read": false,
+    "new_QA_proof_execution_framework": false,
+    "metadata_source_bytes_hashes_diffs_restoration_checks_only": true,
+    "Cplusplus_or_Gamma_formula_evaluated": false,
+    "link_or_provider_verified": false,
+    "scientific_or_gate_PASS_claimed": false
+  },
+  "authorship_limits": "Raw authored earlier transports and some pure CTF owners; Header authored passive06 and pure/public Gamma, independently peered by Base. This new passive observation proposal is not independent formula or scientific-output certification.",
+  "fresh_metadata_amendment": {
+    "predecessor_held_manifest": {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-01/manifest.json",
+      "sha256": "af4ccd731a689fbbac29ccb96102ddf1359bbc6f79eb2914ca6e6e8c162a157d",
+      "size_bytes": 16800,
+      "line_count": 423
+    },
+    "archived_predecessor_manifest": {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/before-01/manifest.json",
+      "sha256": "af4ccd731a689fbbac29ccb96102ddf1359bbc6f79eb2914ca6e6e8c162a157d",
+      "size_bytes": 16800,
+      "line_count": 423
+    },
+    "README_before": {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/before-01/README.md",
+      "sha256": "3178c571ab86ed39041777a08edd5a7a198b4aa00239610eca35edda32a0681d",
+      "size_bytes": 6628,
+      "line_count": 96
+    },
+    "README_exact_diff": {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/README.md.from-01.diff",
+      "sha256": "1635dd1464234d2da97a48902d74095634ec87de05b6f8e4361bbbfa77910b30",
+      "size_bytes": 803,
+      "line_count": 14
+    },
+    "change": "Correct only README/manifest Gamma authorship attribution: Header author, Base independent peer.",
+    "three_source_bodies_and_all_source_diffs_byte_identical_to_01": true
+  }
+}

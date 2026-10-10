@@ -68,30 +68,3 @@ CTF-08 최종 계수에 독립 테스트와 동일 데이터 전달
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
-
-## Source-only first Gamma scope fixed before outputs
-
-Pinned Original Construction.cc1496-1589 and caller875-894 are fully reviewed.
-Original executes exponential884, inverse887, then Gamma890. Selected first
-Gamma invocation1 and assembly1 borrow the same actual AExp, AInv, IdenMatrix,
-BMat, rcmax, dt/history and source selector context; no replay or answer input.
-The selected route remains massive nonreversed 1D with no source/sink. Original
-Gamma loops/evaluation order, dt division and third-row IEEE results are retained.
-ATemp is observed before its deallocation; actual Gamma1/Gamma2 return markers
-remain distinct from private checkpoints. Later visits, omissions and copy failures
-are all retained; unavailable or later owners do not count as passing pairs.
-
-Gamma1/Gamma2 (3-by-rcmax) and ATemp (rcmax-by-rcmax) have separate strict profiles:
-atol=0, rtol=0, exact class/shape/signed zero. Prior exponential7/inverse2,
-assembly7, initial3 and preprocessing18 policies remain separate unchanged handoffs.
-Inputs stay literal39 unit models/42 declared whole calls and15 production IDFs/
-195 declared loader phases with45 scope guards; no expected exits or arrays.
-
-Source authority: .runtime/porting/CTF-07/native-helper-prep-01/manifest.json
-SHA256 67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c;
-passive observer02 d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06;
-projection policy4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6.
-Both new linked Originals require actual PE/provider/runtime proof before execution;
-any later removal requires a separate actual retention record. Old retention refs
-remain literal. Scope review alone passes; unit/integration/production remain
-pending. Full retry, final coefficients, SI19 stores and surface handoff are pending.

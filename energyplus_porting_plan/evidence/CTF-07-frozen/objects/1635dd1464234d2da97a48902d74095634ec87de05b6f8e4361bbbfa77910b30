@@ -1,0 +1,14 @@
+--- before-01/README.md
++++ README.md
+@@ -87,8 +87,9 @@
+ certify downstream coefficients, or claim whole-method/retry integration PASS.
+ 
+ Authorship limits: Raw authored earlier transport and some pure Rust CTF owners;
+-Header authored the immutable06 passive fork and earlier helper/QA glue; Base
+-authored the accepted pure Gamma proposal and other selected CTF owners. This
++Header authored the immutable06 passive fork, pure Gamma02/public Gamma owner
++and earlier helper/QA glue; Base independently peered Gamma and authored other
++selected CTF owners. This
+ proposal is not independent formula or scientific-output certification. Only
+ ignored source/doc metadata was written. No target/project imports, execution,
+ tests, Cargo/compiler/formatter/engine/Git, canonical edits, scientific/weather

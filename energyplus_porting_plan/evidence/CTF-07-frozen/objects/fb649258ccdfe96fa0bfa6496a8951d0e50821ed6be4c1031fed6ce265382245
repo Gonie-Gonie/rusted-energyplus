@@ -1,0 +1,831 @@
+{
+  "schema": "ctf07-frozen-packet.v1",
+  "status": "frozen-inherited-input-and-fresh-CTF07-Gamma-policy-before-helper",
+  "lane": "unit",
+  "linked_original_retention_intent": {
+    "schema": "ctf07-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF07-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "frozen_before_this_CTF07_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "started_utc": "2026-10-10T19:09:38.986987+00:00",
+  "finished_utc": "2026-10-10T19:09:39.838379+00:00",
+  "source_preparation_approval": {
+    "approved_writer_sha256": "e06755a97340e7445dcab7f74a2582fcd1be221dc2b43455f481419515ac62e1",
+    "source_manifest": {
+      "path": ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json",
+      "sha256": "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02",
+      "size_bytes": 22729
+    },
+    "reviewed_sources": [
+      {
+        "path": ".runtime/porting/CTF-07/input-writer-prep-01/freeze_packet.py",
+        "sha256": "e06755a97340e7445dcab7f74a2582fcd1be221dc2b43455f481419515ac62e1",
+        "size_bytes": 36002
+      },
+      {
+        "path": ".runtime/porting/CTF-07/input-writer-prep-01/packet_io.py",
+        "sha256": "563d59767cb64a880b0be990fbd73e446af6524a6f491c178214294a1ba8f4a8",
+        "size_bytes": 3523
+      }
+    ]
+  },
+  "source_authorities": {
+    "current_cards": {
+      "CTF-07": {
+        "path": "energyplus_porting_plan/cards/CTF-07.md",
+        "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+        "size_bytes": 4515
+      }
+    },
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/CTF-07/scope-amendment-01/amendment.json",
+      "sha256": "05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423",
+      "size_bytes": 2098
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/CTF-07/scope-check-command-01/receipt.json",
+      "sha256": "9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8",
+      "size_bytes": 2874
+    },
+    "actual_scope_amendment_execution_role": "real-CTF-07-check-only; prior05/06-authorities-separate",
+    "historical_scope_documents": [
+      {
+        "path": ".runtime/porting/CTF-07/scope-amendment-01/before-plan.json",
+        "sha256": "4d3388b79b2442c4017ad1e2de15fef3279988cb489b552854f5cc4cf7fdcee7",
+        "size_bytes": 674940
+      },
+      {
+        "path": ".runtime/porting/CTF-07/scope-amendment-01/before-CTF-07.md",
+        "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+        "size_bytes": 2686
+      }
+    ],
+    "current_scope_documents": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "4410c0eea0a8340dcd1f70c2f43fc21ba1155189d22c9442947473f8351fe66b",
+        "size_bytes": 680228
+      },
+      {
+        "path": "energyplus_porting_plan/cards/CTF-07.md",
+        "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+        "size_bytes": 4515
+      }
+    ],
+    "scope_recorder_role": "validated-Root-authored-documents; did-not-author-amendment",
+    "native_source_manifest": {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json",
+      "sha256": "67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c",
+      "size_bytes": 23178
+    },
+    "passive_observer": {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+      "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+      "size_bytes": 18141
+    },
+    "gamma_policy_source_inventory": {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6",
+      "size_bytes": 19186
+    },
+    "prior_05_06_authority": {
+      "prior_06_freeze": {
+        "path": ".runtime/porting/CTF-06/frozen-packet-01/freeze-receipt.json",
+        "sha256": "0fac594f1a432f764a43589f42c17dee58c7fa87614d7b0a09d17e7f182958b1",
+        "size_bytes": 25166
+      },
+      "prior_06_freeze_execution": {
+        "path": ".runtime/porting/CTF-06/freeze-command-01/receipt.json",
+        "sha256": "d584173df08aaec66f36a46ecc6b7eb635bc47e5d52b9812c55a60a84b5239c9",
+        "size_bytes": 4405
+      },
+      "prior_05_06_scope_amendment": {
+        "path": ".runtime/porting/CTF-06/scope-amendment-01/amendment.json",
+        "sha256": "88ac5d66085f22d0d502862a582539bfd82b61fb89abafc652494e05ba7381bd",
+        "size_bytes": 2533
+      },
+      "prior_scope_checks": {
+        "CTF-05": {
+          "path": ".runtime/porting/CTF-06/scope-check-05-command-01/receipt.json",
+          "sha256": "952c5bc0f8b5884c11629694065a21f3f2c6f156d91e16f4b01428d869894816",
+          "size_bytes": 3107
+        },
+        "CTF-06": {
+          "path": ".runtime/porting/CTF-06/scope-check-06-command-01/receipt.json",
+          "sha256": "d0dbdadc0e90dcde17d331227db7c19cda8e5640393c9018e56824f5d2ab6156",
+          "size_bytes": 3108
+        }
+      },
+      "prior_06_writer_manifest": {
+        "path": ".runtime/porting/CTF-06/input-writer-prep-01/manifest.json",
+        "sha256": "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca",
+        "size_bytes": 28566
+      },
+      "prior_06_source_contract": {
+        "path": ".runtime/porting/CTF-06/frozen-packet-01/source.json",
+        "sha256": "2ec1d9116d8ecc333feaed7ce6f7f5e0a0061411ecbca39e03601962e722e75c",
+        "size_bytes": 17178
+      },
+      "prior_06_selected_primary_ranges": [
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 59,
+          "last_line": 401,
+          "sha256": "4bb1dbc69381557180378d58b3614fd0524df51d294a9845e3e908ac90968d1c",
+          "size_bytes": 18217
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 405,
+          "last_line": 489,
+          "sha256": "87316e8038ff3ea1ba8500350cddeab26fe64c58eab17efc708f512d2c6e5e2b",
+          "size_bytes": 3901
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 490,
+          "last_line": 619,
+          "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+          "size_bytes": 6450
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 638,
+          "last_line": 648,
+          "sha256": "4b9fcfede15577faa9e30fc89058a3a67e4776939dea28aece1a5cee3bfb369d",
+          "size_bytes": 486
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 657,
+          "last_line": 729,
+          "sha256": "6e8f1b65bb10f8615b5b48f1e53449413e99b5c75e7ac777158b07ec5fb0133e",
+          "size_bytes": 4571
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 877,
+          "last_line": 890,
+          "sha256": "6e29649dbec28af3e25cfd8f03a84fed82e28f9a524202b44007faca5b01ab84",
+          "size_bytes": 862
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1105,
+          "last_line": 1373,
+          "sha256": "e2f3f6b271807011ed343e44549bb90202e4c9bf9e0143cf99a1f01fd3c82bdd",
+          "size_bytes": 13237
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1375,
+          "last_line": 1494,
+          "sha256": "f1c13d8e66759602566fc1b4e2492e896198bd57a1b8e8399f70ea41434f5b01",
+          "size_bytes": 5093
+        }
+      ],
+      "historical_before_document_archives": [
+        {
+          "path": ".runtime/porting/CTF-06/scope-amendment-01/before-plan.json",
+          "sha256": "e23dac7d90bbc240f3520a969be588bc31f1f0f546c5f7e4f0a4e6a2196aee97",
+          "size_bytes": 645459
+        },
+        {
+          "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-05.md",
+          "sha256": "07feb3acadd06b6829fe7c2976a196fb859105c39a4c41259c67bdf021a9e9d1",
+          "size_bytes": 2627
+        },
+        {
+          "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-06.md",
+          "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+          "size_bytes": 2659
+        }
+      ],
+      "historical_after_document_identities": [
+        {
+          "historical_path": "energyplus_porting_plan/plan.json",
+          "sha256": "06e2b45fe874af1ebf1eab1211a3954ecfd5ce4dfb0fb086814f1754c0267320",
+          "size_bytes": 672068
+        },
+        {
+          "historical_path": "energyplus_porting_plan/cards/CTF-05.md",
+          "sha256": "c303a87b5f7133f6439206066323a788fe3a7ec31593fb0ce48978ce9eea87b2",
+          "size_bytes": 4378
+        },
+        {
+          "historical_path": "energyplus_porting_plan/cards/CTF-06.md",
+          "sha256": "ace8920255ea2b224ce6f9b67bc7fdfe8978406c1d15502abd2ee461944a6b27",
+          "size_bytes": 4571
+        }
+      ],
+      "available_prior_frozen_document_archives": [],
+      "documentary_limit": "Prior after identities retain historical meaning; only available authentic archives are byte-checked, never current07 plan/card replay",
+      "prior06_numerical_PASS_inferred": false
+    },
+    "inherited_input_only_packet": {
+      "request": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+        "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+        "size_bytes": 103619
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+        "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+        "size_bytes": 15120
+      },
+      "tolerances": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+        "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+        "size_bytes": 5520
+      }
+    }
+  },
+  "helper_request": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/helper-request.json",
+    "sha256": "381fa166e0a4e2aa5fdb1b410548a2df3b23e6225ff19aa5038449a6a8d026ba",
+    "size_bytes": 118929
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/native-admission-contract.json",
+    "sha256": "9ff90ff7978c0c36c4bd3f354020fede4c37439dc356474f949dd3f134abd1b7",
+    "size_bytes": 26945
+  },
+  "projection": {
+    "path": ".runtime/porting/CTF-07/frozen-packet-01/projection.json",
+    "sha256": "3f8c6fa1692f1f1995e58eb1875814cac2d6dd841e3570fbdffe5d00c4e95db5",
+    "size_bytes": 59008
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-07/frozen-packet-01/source.json",
+      "sha256": "41432649766c1332df9d95c5527d0b081537ab0db5eea56ab15dc61df1fb21e0",
+      "size_bytes": 24430
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-07/frozen-packet-01/cases.json",
+      "sha256": "31dc4f8153f031b65376c77d3741156f09533411370371323a7bb8c73b122ddf",
+      "size_bytes": 9271
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-07/frozen-packet-01/tolerances.json",
+      "sha256": "1f86c2463ff98a1d930c69dd5edcd874164f38593fabb9a9431bdcd210d56f41",
+      "size_bytes": 18465
+    }
+  },
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "executed_writer_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-07/input-writer-prep-01/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/000-freeze_packet.py",
+        "sha256": "e06755a97340e7445dcab7f74a2582fcd1be221dc2b43455f481419515ac62e1",
+        "size_bytes": 36002
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/input-writer-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/001-packet_io.py",
+        "sha256": "563d59767cb64a880b0be990fbd73e446af6524a6f491c178214294a1ba8f4a8",
+        "size_bytes": 3523
+      }
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CTF-07/input-writer-prep-01/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/000-freeze_packet.py",
+        "sha256": "e06755a97340e7445dcab7f74a2582fcd1be221dc2b43455f481419515ac62e1",
+        "size_bytes": 36002
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/input-writer-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/001-packet_io.py",
+        "sha256": "563d59767cb64a880b0be990fbd73e446af6524a6f491c178214294a1ba8f4a8",
+        "size_bytes": 3523
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/002-manifest.json",
+        "sha256": "67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c",
+        "size_bytes": 23178
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/003-manifest.json",
+        "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+        "size_bytes": 18141
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/native-helper-prep-01/projection-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/004-projection-policy-proposal.json",
+        "sha256": "3649c701e9a9b2c719ef9fe0ff733d56d1d48fb76915c1f294bba3479f246541",
+        "size_bytes": 14786
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/input-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/005-input-policy-proposal.json",
+        "sha256": "8934e39e0d32f4a4e2200243276c9f16cbd4d5a611d846dbc0423125ce90690c",
+        "size_bytes": 20923
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/006-projection-policy-proposal.json",
+        "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6",
+        "size_bytes": 19186
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/007-helper-request.json",
+        "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+        "size_bytes": 103619
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/008-source.json",
+        "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+        "size_bytes": 15120
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/009-tolerances.json",
+        "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+        "size_bytes": 5520
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/frozen-packet-01/freeze-receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/010-freeze-receipt.json",
+        "sha256": "0fac594f1a432f764a43589f42c17dee58c7fa87614d7b0a09d17e7f182958b1",
+        "size_bytes": 25166
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/freeze-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/011-receipt.json",
+        "sha256": "d584173df08aaec66f36a46ecc6b7eb635bc47e5d52b9812c55a60a84b5239c9",
+        "size_bytes": 4405
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/scope-amendment-01/amendment.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/012-amendment.json",
+        "sha256": "88ac5d66085f22d0d502862a582539bfd82b61fb89abafc652494e05ba7381bd",
+        "size_bytes": 2533
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/scope-check-05-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/013-receipt.json",
+        "sha256": "952c5bc0f8b5884c11629694065a21f3f2c6f156d91e16f4b01428d869894816",
+        "size_bytes": 3107
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/scope-check-06-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/014-receipt.json",
+        "sha256": "d0dbdadc0e90dcde17d331227db7c19cda8e5640393c9018e56824f5d2ab6156",
+        "size_bytes": 3108
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/input-writer-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/015-manifest.json",
+        "sha256": "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca",
+        "size_bytes": 28566
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/frozen-packet-01/source.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/016-source.json",
+        "sha256": "2ec1d9116d8ecc333feaed7ce6f7f5e0a0061411ecbca39e03601962e722e75c",
+        "size_bytes": 17178
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/scope-amendment-01/before-plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/017-before-plan.json",
+        "sha256": "e23dac7d90bbc240f3520a969be588bc31f1f0f546c5f7e4f0a4e6a2196aee97",
+        "size_bytes": 645459
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-05.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/018-before-CTF-05.md",
+        "sha256": "07feb3acadd06b6829fe7c2976a196fb859105c39a4c41259c67bdf021a9e9d1",
+        "size_bytes": 2627
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-06.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/019-before-CTF-06.md",
+        "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+        "size_bytes": 2659
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/scope-amendment-01/amendment.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/020-amendment.json",
+        "sha256": "05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423",
+        "size_bytes": 2098
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/scope-check-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/021-receipt.json",
+        "sha256": "9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8",
+        "size_bytes": 2874
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/scope-amendment-01/before-plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/022-before-plan.json",
+        "sha256": "4d3388b79b2442c4017ad1e2de15fef3279988cb489b552854f5cc4cf7fdcee7",
+        "size_bytes": 674940
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/scope-amendment-01/before-CTF-07.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/023-before-CTF-07.md",
+        "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+        "size_bytes": 2686
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/024-plan.json",
+        "sha256": "4410c0eea0a8340dcd1f70c2f43fc21ba1155189d22c9442947473f8351fe66b",
+        "size_bytes": 680228
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/cards/CTF-07.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/025-CTF-07.md",
+        "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+        "size_bytes": 4515
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/026-Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/027-Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/028-Material.hh",
+        "sha256": "9f59a6937c224b6e0b50dab42d614e190696ee5bf3684b1b159907e6964f7b38",
+        "size_bytes": 43487
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/029-Material.cc",
+        "sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+        "size_bytes": 179008
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataConversions.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/030-DataConversions.hh",
+        "sha256": "5d0064d5f44fa927fc83455a55ab7ab5b5d35f3c31a141dbda5bea0cae829a8e",
+        "size_bytes": 4666
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/031-HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/032-Energy+.idd.in",
+        "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+        "size_bytes": 4504288
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/ctf07_unit_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/033-ctf07_unit_helper.cpp",
+        "sha256": "896960a30722d01ddd9601c9d48f4e9c1554e1a867f439ab34522bfa8e7103fb",
+        "size_bytes": 17331
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/034-ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/ctf07_unit_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/035-ctf07_unit_fields.hh",
+        "sha256": "b58bf80ba7580645412ea8eda89786bc324aa7ec68a91b5d78b342af008cc7d0",
+        "size_bytes": 6322
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/ctf07_unit_admission.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/036-ctf07_unit_admission.hh",
+        "sha256": "58430fc7ed751f8620d683455fdf97aea9a562fe23cc95950ac9dbd7b9f86e4f",
+        "size_bytes": 17112
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/Construction.ctf07.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/037-Construction.ctf07.cc",
+        "sha256": "82a834d91f30cbfa92fe76e90b41df19aaf37d4121edc3cd264144c3fb653a28",
+        "size_bytes": 113077
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/038-ctf07_observer.hh",
+        "sha256": "d28ac30443415bbb3df1da9b989cfd429ebaeb01843d80444e4c076a50f96b0d",
+        "size_bytes": 17557
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/039-ctf07_observer.cc",
+        "sha256": "719ab0efcb21fd5a71f121677d6ae129ebcd4aff9053d78177760708833c6442",
+        "size_bytes": 48648
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/ctf07_observation_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/040-ctf07_observation_fields.hh",
+        "sha256": "8126aacf89925269c6a8f17ca7a0cb46095ed59f68808a0dcff25776998dc157",
+        "size_bytes": 44188
+      }
+    }
+  ],
+  "inherited_CTF01_or_CTF06_freeze_claimed_as_fresh_CTF07_freeze": false,
+  "scientific_operands_evaluated": false,
+  "expected_arrays_or_method_outcomes_generated": false,
+  "numerical_PASS_claimed": false,
+  "canonical_files_updated": false,
+  "gates_updated": false
+}

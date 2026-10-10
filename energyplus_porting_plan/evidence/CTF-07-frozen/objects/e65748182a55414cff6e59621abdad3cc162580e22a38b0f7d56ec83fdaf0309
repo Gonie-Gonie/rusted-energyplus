@@ -1,0 +1,82 @@
+--- before/ctf06_production_admission.hh
++++ ctf07_production_admission.hh
+@@ -1,8 +1,8 @@
+ // Fixed-CON15 raw inputs only; no literal member seeds or expected outcomes.
+-#ifndef CTF06_PRODUCTION_ADMISSION_HH
+-#define CTF06_PRODUCTION_ADMISSION_HH
++#ifndef CTF07_PRODUCTION_ADMISSION_HH
++#define CTF07_PRODUCTION_ADMISSION_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf06_observation_fields.hh"
++#include "ctf07_observation_fields.hh"
+ #include <set>
+ 
+ namespace Ctf01 {
+@@ -19,10 +19,10 @@
+ {
+     ProductionPacket packet; packet.request = read_json(request_path); packet.admission = read_json(admission_path);
+     auto const &request = packet.request; auto const &admission = packet.admission;
+-    require(request.at("schema") == "ctf06-production-helper-cases.v1" && admission.at("schema") == "ctf06-production-native-admission-contract.v1" &&
++    require(request.at("schema") == "ctf07-production-helper-cases.v1" && admission.at("schema") == "ctf07-production-native-admission-contract.v1" &&
+         request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" && admission.at("energyplus_commit") == request.at("energyplus_commit"),
+         "Wrong pinned production source/schema");
+-    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_CTF06_helper_execution") == true &&
++    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_CTF07_helper_execution") == true &&
+         value->at("expected_values_supplied") == false && value->at("expected_exits_supplied") == false &&
+         value->at("scientific_execution_performed") == false, "Production input-only freeze required");
+     for (auto const *key : {"actual_scope_amendment", "actual_scope_amendment_execution"}) {
+@@ -46,8 +46,8 @@
+     packet.contracts = json::object();
+     for (auto const *key : {"source", "cases", "tolerances"}) {
+         auto const path = bound_path(root, admission.at("contracts").at(key)); auto const value = read_json(path);
+-        require(value.at("schema") == std::string("ctf06-production-") + key + "-contract.v1" &&
+-            value.at("frozen_before_this_CTF06_helper_execution") == true, "Production contract schema/freeze differs");
++        require(value.at("schema") == std::string("ctf07-production-") + key + "-contract.v1" &&
++            value.at("frozen_before_this_CTF07_helper_execution") == true, "Production contract schema/freeze differs");
+         if (std::string(key) == "source") {
+             require(value.at("energyplus_commit") == request.at("energyplus_commit"), "Original source identity differs");
+             for (auto const &row : value.at("source_files")) {
+@@ -65,11 +65,11 @@
+     require(admission.at("native_source_files").is_array() && admission.at("native_source_files").size() == 8, "Exact helper4/metadata1/observer3 sources required");
+     std::set<std::string> names;
+     for (auto const &row : admission.at("native_source_files")) require(names.insert(bound_path(root, row).filename().string()).second, "Duplicate Native source filename");
+-    require(names == std::set<std::string>{"ctf06_production_helper.cpp", "ctf01_reference_metadata.hh", "ctf06_production_fields.hh",
+-        "ctf06_production_admission.hh", "Construction.ctf06.cc", "ctf06_observer.hh", "ctf06_observer.cc", "ctf06_observation_fields.hh"}, "Production Native source inventory differs");
++    require(names == std::set<std::string>{"ctf07_production_helper.cpp", "ctf01_reference_metadata.hh", "ctf07_production_fields.hh",
++        "ctf07_production_admission.hh", "Construction.ctf07.cc", "ctf07_observer.hh", "ctf07_observer.cc", "ctf07_observation_fields.hh"}, "Production Native source inventory differs");
+     packet.projection_path = bound_path(root, admission.at("projection")); auto const projection = read_json(packet.projection_path);
+-    require(projection.at("schema") == "ctf06-production-observation-projection.v1" &&
+-        projection.at("frozen_before_this_CTF06_helper_execution") == true && projection.at("helper_request") == admission.at("helper_request") &&
++    require(projection.at("schema") == "ctf07-production-observation-projection.v1" &&
++        projection.at("frozen_before_this_CTF07_helper_execution") == true && projection.at("helper_request") == admission.at("helper_request") &&
+         projection.at("contracts") == admission.at("contracts") && projection.at("native_observation_policy") == request.at("observation_policy"),
+         "Production observation DAG differs");
+     require(request.at("ctf03_initial_observation_policy") == ctf03_initial_policy() &&
+@@ -103,7 +103,7 @@
+     for (auto const *owner : {&request, &admission, &projection, &tolerances}) {
+         require(owner->at("ctf06_exponential_observation_policy") == ctf06_exponential_policy(), "Frozen exponential method policy differs");
+         require(owner->at("ctf05_inverse_observation_policy") == ctf05_inverse_policy(), "Frozen inverse method policy differs");
+-        require(owner->at("linked_original_retention_intent") == ctf06_linked_original_retention_intent(), "New06 original retention intent differs");
++        require(owner->at("linked_original_retention_intent") == ctf07_linked_original_retention_intent(), "New07 original retention intent differs");
+     }
+     std::array<char const *, 7> const exp_variables{{"AExp", "final_AMat1", "final_AMato", "final_AMatN", "AMatRowNormMax", "fact", "CheckVal"}};
+     json const exp_shapes = {"actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "scalar", "scalar", "scalar"};
+@@ -124,6 +124,18 @@
+             profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true &&
+             profile.at("required_shape") == "actual_rcmax_by_rcmax", "Exact inverse profile differs");
+     }
++    for (auto const *owner : {&request, &admission, &projection, &tolerances})
++        require(owner->at("ctf07_gamma_observation_policy") == ctf07_gamma_policy(), "Frozen Gamma method policy differs");
++    std::array<char const *, 3> const gamma_variables{{"Gamma1", "Gamma2", "ATemp"}};
++    json const gamma_shapes = {"actual_3_by_rcmax", "actual_3_by_rcmax", "actual_rcmax_by_rcmax"};
++    auto const &gamma_profiles = tolerances.at("ctf07_gamma_profiles");
++    require(gamma_profiles.is_array() && gamma_profiles.size() == gamma_variables.size(), "Three distinct Gamma profiles required");
++    for (std::size_t i = 0; i < gamma_variables.size(); ++i) {
++        auto const &profile = gamma_profiles.at(i);
++        require(profile.at("variable") == gamma_variables[i] && profile.at("atol") == 0.0 && profile.at("rtol") == 0.0 &&
++            profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true &&
++            profile.at("required_shape") == gamma_shapes.at(i), "Exact Gamma profile differs");
++    }
+     auto const &models = request.at("model_cases"); require(models.is_array() && models.size() == 15, "All and only fixed15 models required");
+     for (std::size_t i = 0; i < models.size(); ++i) {
+         auto const &row = models.at(i); auto const &selected = scope.at("cases").at(i);

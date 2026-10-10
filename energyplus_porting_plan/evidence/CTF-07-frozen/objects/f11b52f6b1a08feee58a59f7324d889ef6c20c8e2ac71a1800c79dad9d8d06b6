@@ -1,0 +1,63 @@
+--- before/ctf06_production_helper.cpp
++++ ctf07_production_helper.cpp
+@@ -1,7 +1,7 @@
+ // Actual fixed-CON IDF loaders, actual use owners, and unchanged whole CTF calls.
+-#include "ctf06_production_fields.hh"
+-#include "ctf06_production_admission.hh"
+-#include "ctf06_observation_fields.hh"
++#include "ctf07_production_fields.hh"
++#include "ctf07_production_admission.hh"
++#include "ctf07_observation_fields.hh"
+ #include <EnergyPlus/DataStringGlobals.hh>
+ #include <EnergyPlus/DataHVACGlobals.hh>
+ #include <EnergyPlus/OutputProcessor.hh>
+@@ -187,14 +187,14 @@
+ {
+     using namespace Ctf01;
+     try {
+-        require(argc == 5, "Usage: ctf06_production_helper <root> <frozen-production-request> <production-admission> <fresh-output>");
++        require(argc == 5, "Usage: ctf07_production_helper <root> <frozen-production-request> <production-admission> <fresh-output>");
+         auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+         auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+-        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-06");
++        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-07");
+         require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF production output required");
+         auto const packet = admit_production(root, request_path, admission_path); fs::create_directories(output);
+         json rows = json::array(), statuses = json::object(), loader_statuses = json::object(), functions = json::object(); std::size_t invoked = 0, skipped = 0, callbacks = 0, unavailable = 0, matrix_callbacks = 0, matrix_retained = 0, matrix_omitted = 0;
+-        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals;
++        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals; GammaTotals gamma_total;
+         for (auto const &row : packet.request.at("model_cases")) rows.push_back(model_case(row, root, output));
+         for (auto const &row : rows) {
+             if (!row.at("loader_ready").get<bool>()) ++unavailable;
+@@ -215,6 +215,7 @@
+                     matrix_omitted += matrix.at("matrix_attempt_records_omitted").get<std::size_t>();
+                     add_method_totals(exponential_totals, operation.at("observations").at("Exponential"));
+                     add_method_totals(inverse_totals, operation.at("observations").at("Inverse"));
++                    add_gamma_totals(gamma_total, operation.at("observations").at("Gamma"));
+                 }
+                 else ++skipped;
+             }
+@@ -223,7 +224,7 @@
+         auto const after = admit_production(root, request_path, admission_path);
+         require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts, "Production packet changed during calls");
+         int const exit = observer_integrity_failed ? 2 : 0;
+-        json const result = {{"schema", "ctf06-production-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
++        json const result = {{"schema", "ctf07-production-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
+             {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+             {"observation_projection", file_ref(packet.projection_path)}, {"contracts", packet.contracts},
+             {"actual_scope_amendment", packet.request.at("actual_scope_amendment")}, {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
+@@ -235,11 +236,13 @@
+             {"actual_helper_exit_code", exit}, {"complete_requested_model_ledger", true}, {"complete_all_phase_observations_claimed", false},
+             {"CTF03_initial_observation_policy", ctf03_initial_policy()}, {"CTF04_matrix_observation_policy", ctf04_matrix_policy()},
+             {"CTF06_exponential_observation_policy", ctf06_exponential_policy()}, {"CTF05_inverse_observation_policy", ctf05_inverse_policy()},
++            {"CTF07_gamma_observation_policy", ctf07_gamma_policy()},
+             {"linked_original_retention_intent", packet.request.at("linked_original_retention_intent")},
+             {"actual_exponential_observation_counts", method_totals(exponential_totals)}, {"actual_inverse_observation_counts", method_totals(inverse_totals)},
++            {"actual_gamma_observation_counts", gamma_totals(gamma_total)},
+             {"actual_matrix_attempt_callback_count", matrix_callbacks}, {"actual_retained_matrix_attempt_count", matrix_retained},
+             {"matrix_attempt_records_omitted", matrix_omitted}, {"complete_matrix_attempt_parity_claimed", false}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
+             {"whole_building_or_CTF02_through_CTF10_certified", false}};
+-        write_text(output / "ctf06-production-helper-results.json", result.dump() + "\n"); return exit;
++        write_text(output / "ctf07-production-helper-results.json", result.dump() + "\n"); return exit;
+     } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+ }

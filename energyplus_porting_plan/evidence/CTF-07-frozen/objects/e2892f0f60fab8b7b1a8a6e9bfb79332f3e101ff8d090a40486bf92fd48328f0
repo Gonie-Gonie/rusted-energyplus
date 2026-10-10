@@ -1,0 +1,255 @@
+--- before/ctf06_observation_fields.hh
++++ ctf07_observation_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure serialization of the actual passive post-619 capture; no node evaluator.
+-#ifndef CTF06_OBSERVATION_FIELDS_HH
+-#define CTF06_OBSERVATION_FIELDS_HH
++#ifndef CTF07_OBSERVATION_FIELDS_HH
++#define CTF07_OBSERVATION_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf06_observer.hh"
++#include "ctf07_observer.hh"
+ #include <limits>
+ 
+ namespace Ctf01 {
+@@ -22,7 +22,7 @@
+         {"required_reached_fields_absent_is_integrity_failure", true},
+         {"unreached_counted_as_PASS", false}, {"branch_or_numeric_answers_reconstructed", false}};
+ }
+-inline json initial_checkpoint(EnergyPlus::CTF06Observation::InitialDiscretizationSnapshot const &source,
++inline json initial_checkpoint(EnergyPlus::CTF07Observation::InitialDiscretizationSnapshot const &source,
+                                std::size_t actual_count)
+ {
+     if (!source.reached) return {{"reached", false}, {"available", false},
+@@ -65,9 +65,9 @@
+         {"missing_attempt_or_copy_integrity_failure_is_required_failure", true},
+         {"unreached_counted_as_PASS", false}, {"retry_driver_or_matrix_answers_reconstructed", false}};
+ }
+-inline json matrix_failure_kind(EnergyPlus::CTF06Observation::MatrixAttemptFailureKind kind)
+-{
+-    using Kind = EnergyPlus::CTF06Observation::MatrixAttemptFailureKind;
++inline json matrix_failure_kind(EnergyPlus::CTF07Observation::MatrixAttemptFailureKind kind)
++{
++    using Kind = EnergyPlus::CTF07Observation::MatrixAttemptFailureKind;
+     switch (kind) {
+     case Kind::IdentityMismatch: return "IdentityMismatch";
+     case Kind::OrderFailure: return "OrderFailure";
+@@ -78,7 +78,7 @@
+     }
+     throw std::runtime_error("Unknown actual matrix failure kind");
+ }
+-inline json matrix_attempt(EnergyPlus::CTF06Observation::MatrixAttemptSnapshot const &source)
++inline json matrix_attempt(EnergyPlus::CTF07Observation::MatrixAttemptSnapshot const &source)
+ {
+     json layers = nullptr, matrices = nullptr;
+     if (source.active_prefix_available) {
+@@ -108,7 +108,7 @@
+     };
+     bool failure = false; json kinds = json::array();
+     for (std::size_t index = 0; index < source.failure_kinds.size(); ++index) {
+-        auto const kind = static_cast<EnergyPlus::CTF06Observation::MatrixAttemptFailureKind>(index);
++        auto const kind = static_cast<EnergyPlus::CTF07Observation::MatrixAttemptFailureKind>(index);
+         kinds.push_back({{"kind", matrix_failure_kind(kind)}, {"failed", source.failure_kinds[index]}});
+         failure = failure || source.failure_kinds[index];
+     }
+@@ -127,7 +127,7 @@
+             {"actual_bounds", {{"AMat", bounds2(source.AMat_bounds)}, {"IdenMatrix", bounds2(source.IdenMatrix_bounds)},
+                 {"BMat", bounds1(source.BMat_bounds)}, {"CMat", bounds1(source.CMat_bounds)}, {"DMat", bounds1(source.DMat_bounds)}}}}}};
+ }
+-inline bool matrix_observer_failed(EnergyPlus::CTF06Observation::Capture const &capture)
++inline bool matrix_observer_failed(EnergyPlus::CTF07Observation::Capture const &capture)
+ {
+     if (capture.matrix_observer_failure || capture.matrix_attempt_records_omitted != 0 ||
+         capture.actual_matrix_attempt_callback_count != capture.matrix_attempts.size()) return true;
+@@ -146,12 +146,12 @@
+     }
+     return false;
+ }
+-inline json matrix_observations(EnergyPlus::CTF06Observation::Capture const &capture)
++inline json matrix_observations(EnergyPlus::CTF07Observation::Capture const &capture)
+ {
+     json attempts = json::array(), failures = json::array();
+     for (auto const &attempt : capture.matrix_attempts) attempts.push_back(matrix_attempt(attempt));
+     for (std::size_t index = 0; index < capture.matrix_failure_event_counts.size(); ++index)
+-        failures.push_back({{"kind", matrix_failure_kind(static_cast<EnergyPlus::CTF06Observation::MatrixAttemptFailureKind>(index))},
++        failures.push_back({{"kind", matrix_failure_kind(static_cast<EnergyPlus::CTF07Observation::MatrixAttemptFailureKind>(index))},
+                             {"actual_event_count", capture.matrix_failure_event_counts[index]}});
+     auto const event = [](auto const &value) -> json {
+         return value ? json{{"observed_attempt_ordinal", value->observed_attempt_ordinal}, {"kind", matrix_failure_kind(value->kind)}} : json(nullptr);
+@@ -178,7 +178,7 @@
+ }
+ 
+ // Actual combined method capture serialization. Unreached/default slots are null.
+-namespace MethodObservation = EnergyPlus::CTF06Observation;
++namespace MethodObservation = EnergyPlus::CTF07Observation;
+ inline char const *method_kind_name(MethodObservation::MethodKind value)
+ {
+     switch (value) {
+@@ -389,5 +389,167 @@
+         {"actual_retained_square_control_count", total.retained_square_control_count}, {"method_copy_integrity_failed", total.copy_integrity_failed},
+         {"complete_method_return_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+ }
++inline json ctf07_gamma_policy()
++{
++    return json::parse(R"CTF07({"protocol":"ctf07-gamma-method-observation.v1","actual_method":"ConstructionProps::calculateGammas","actual_caller_line":890,"actual_method_source_lines":[1496,1589],"actual_stage_names":["Entry","ATempReady","Gamma1Final","Gamma2Final","SourceReturn"],"input_matrices":["AExp","IdenMatrix","AInv"],"actual_input_BMat_shape":[3],"ATemp_ready_matrices":["ATemp"],"Gamma1_final_matrices":["Gamma1"],"Gamma2_final_matrices":["Gamma2"],"return_matrices":["Gamma1","Gamma2"],"matrix_shapes":{"AExp":"actual_rcmax_by_rcmax","IdenMatrix":"actual_rcmax_by_rcmax","AInv":"actual_rcmax_by_rcmax","ATemp":"actual_rcmax_by_rcmax","Gamma1":"actual_3_by_rcmax","Gamma2":"actual_3_by_rcmax"},"actual_caller_source_order":["exponential884","inverse887","Gamma890"],"actual_matching_exponential_and_inverse_returns_precede_Gamma_entry":true,"actual_Gamma1_observed_before_ATemp_deallocation":true,"actual_ATemp_assignment_observed_not_recomputed":true,"selected_invocation_ordinal":1,"selected_assembly_ordinal":1,"selected_first_attempt_uses_actual_initial619_dt_and_history":true,"required_owner_context":{"SourceSinkPresent":false,"SolutionDimensions":1},"NumOfPerpendNodes_for_unselected_2D_is_context_only":true,"actual_source_produced_identity_required":true,"storage_order":"source_i1_outer_i2_inner_row_first","invocation_identity":"one_based_actual_entry_visit_within_bound_whole_call","actual_assembly_association_required":true,"actual_method_return_marker_required_for_return_claim":true,"all_actual_visits_retained":true,"later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,"Rust_retry_driver_available":false,"uninvoked_counted_as_PASS":false,"missing_selected_owner_on_one_or_both_sides_is_required_failure":true,"observer_failure_or_omission_is_integrity_failure":true,"Gamma_or_identity_or_return_or_retry_state_reconstructed":false})CTF07");
++}
++inline json ctf07_linked_original_retention_intent()
++{
++    return json::parse(R"CTF07({"schema":"ctf07-debug-original-retention-intent.v1","role":"prospective-debug-original","scope":"new-CTF07-linked-originals-only","actual_file_identity_required":true,"both_original_and_helper_verified_before_execution":true,"retain_through_PE_validation_and_current_helper_execution":true,"removal_requires_separate_Root_authorized_actual_retention_record":true,"earlier_live_refs_reinterpreted":false,"deletion_performed":false})CTF07");
++}
++
++// Independent Gamma record serialization; no Gamma arithmetic or return inference.
++inline char const *gamma_stage_name(MethodObservation::GammaStage value)
++{
++    using Stage = MethodObservation::GammaStage;
++    switch (value) {
++    case Stage::Entry: return "Entry";
++    case Stage::ATempReady: return "ATempReady";
++    case Stage::Gamma1Final: return "Gamma1Final";
++    case Stage::Gamma2Final: return "Gamma2Final";
++    case Stage::SourceReturn: return "SourceReturn";
++    }
++    throw std::runtime_error("Unknown actual Gamma stage");
++}
++inline char const *gamma_matrix_name(MethodObservation::GammaMatrixOwner value)
++{
++    using Owner = MethodObservation::GammaMatrixOwner;
++    switch (value) {
++    case Owner::AExp: return "AExp";
++    case Owner::IdenMatrix: return "IdenMatrix";
++    case Owner::AInv: return "AInv";
++    case Owner::ATemp: return "ATemp";
++    case Owner::Gamma1: return "Gamma1";
++    case Owner::Gamma2: return "Gamma2";
++    }
++    throw std::runtime_error("Unknown actual Gamma matrix owner");
++}
++inline json gamma_value(MethodObservation::GammaValueSnapshot const &source, bool BMat_required = false)
++{
++    if (!source.reached) return {{"reached", false}, {"available", false}, {"snapshot", nullptr},
++        {"unavailable_reason", "actual_stage_callback_not_retained_or_not_reached"}, {"counted_as_PASS", false}};
++    require(source.observed_matrix_count <= source.matrices.size(), "Observed Gamma matrix count exceeds owner storage");
++    json matrices = json::array(), BMat = nullptr, BMat_bounds = nullptr, caller = nullptr;
++    for (std::size_t index = 0; index < source.observed_matrix_count; ++index) {
++        auto const &copy = source.matrices[index]; json bounds = nullptr, values = nullptr;
++        if (copy.bounds) bounds = {{"lower1", copy.bounds->lower1}, {"upper1", copy.bounds->upper1},
++            {"lower2", copy.bounds->lower2}, {"upper2", copy.bounds->upper2}, {"size", copy.bounds->size}};
++        if (copy.copy_available) {
++            values = json::array();
++            for (auto const &value : copy.values) values.push_back(scalar_bits(value.bits));
++        }
++        matrices.push_back({{"owner", gamma_matrix_name(copy.owner)}, {"actual_bounds", bounds},
++            {"copy_available", copy.copy_available}, {"values", values}});
++    }
++    if (source.BMat_bounds) BMat_bounds = {{"lower", source.BMat_bounds->lower},
++        {"upper", source.BMat_bounds->upper}, {"size", source.BMat_bounds->size}};
++    if (source.BMat_available) {
++        BMat = json::array();
++        for (auto const &value : source.BMat) BMat.push_back(scalar_bits(value.bits));
++    }
++    if (source.caller_context_available) caller = {{"ErrorsFound", source.caller_ErrorsFound},
++        {"DoCTFErrorReport", source.caller_DoCTFErrorReport},
++        {"TimeStepZone", source.caller_TimeStepZone ? scalar_bits(source.caller_TimeStepZone->bits) : json(nullptr)}};
++    bool const available = source.matrices_available && (!BMat_required || source.BMat_available);
++    json context = source.observed_matrix_count != 0 ? method_context(source.context) : json(nullptr);
++    if (!context.is_null()) context["NumOfPerpendNodes"] = source.NumOfPerpendNodes;
++    return {{"reached", true}, {"available", available},
++        {"unavailable_reason", available ? json(nullptr) : json("required_Gamma_owner_copy_unavailable")},
++        {"snapshot", {{"context_available", source.observed_matrix_count != 0}, {"context", context},
++            {"matrices_available", source.matrices_available}, {"observed_matrix_count", source.observed_matrix_count},
++            {"matrices", matrices}, {"BMat_available", source.BMat_available}, {"BMat_actual_bounds", BMat_bounds}, {"BMat", BMat},
++            {"caller_context_available", source.caller_context_available}, {"actual_return_site_caller_context", caller}}},
++        {"counted_as_PASS", false}};
++}
++inline json gamma_failure_event(std::optional<MethodObservation::GammaFailure> const &value)
++{
++    return value ? json{{"invocation_ordinal", value->observed_invocation_ordinal},
++        {"assembly_ordinal", value->observed_assembly_ordinal}, {"stage", gamma_stage_name(value->stage)},
++        {"kind", method_failure_name(value->kind)}} : json(nullptr);
++}
++inline bool gamma_copy_failed(MethodObservation::GammaCapture const &source)
++{
++    if (source.observer_failure || source.actual_invocation_count != source.invocations.size() ||
++        source.first_failure || source.last_failure) return true;
++    for (auto count : source.failure_event_counts) if (count != 0) return true;
++    for (auto count : source.stage_records_omitted) if (count != 0) return true;
++    std::array<std::size_t, 5> retained_counts{};
++    for (std::size_t index = 0; index < source.invocations.size(); ++index) {
++        auto const &record = source.invocations[index];
++        if (record.observed_invocation_ordinal != index + 1 || !record.association_available ||
++            record.observed_assembly_ordinal != record.observed_invocation_ordinal) return true;
++        for (bool failed : record.failure_kinds) if (failed) return true;
++        std::array<std::size_t, 5> const retained{{record.entry.reached ? 1u : 0u, record.ATemp_ready.reached ? 1u : 0u,
++            record.Gamma1_final.reached ? 1u : 0u, record.Gamma2_final.reached ? 1u : 0u, record.source_return.reached ? 1u : 0u}};
++        if (record.actual_stage_callback_counts != retained) return true;
++        for (std::size_t stage = 0; stage < retained.size(); ++stage) retained_counts[stage] += retained[stage];
++        for (auto const *value : {&record.entry, &record.ATemp_ready, &record.Gamma1_final, &record.Gamma2_final, &record.source_return}) {
++            if (!value->reached) continue; // Preserve actual source stops without inventing stages.
++            if (!value->matrices_available || !value->context.assembly_context_available ||
++                value->observed_matrix_count > value->matrices.size()) return true;
++            for (std::size_t matrix = 0; matrix < value->observed_matrix_count; ++matrix)
++                if (!value->matrices[matrix].copy_available) return true;
++        }
++        if (record.entry.reached && !record.entry.BMat_available) return true;
++        if (record.source_return.reached && (!record.source_return.caller_context_available || !record.source_return.caller_TimeStepZone)) return true;
++    }
++    return retained_counts != source.actual_stage_callback_counts;
++}
++inline json gamma_observations(MethodObservation::GammaCapture const &source)
++{
++    json invocations = json::array(), stages = json::array(), failures = json::array();
++    for (auto const &record : source.invocations) {
++        json kinds = json::array();
++        for (std::size_t index = 0; index < record.failure_kinds.size(); ++index)
++            kinds.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))}, {"failed", record.failure_kinds[index]}});
++        invocations.push_back({{"observed_invocation_ordinal", record.observed_invocation_ordinal},
++            {"observed_assembly_ordinal", record.observed_assembly_ordinal}, {"association_available", record.association_available},
++            {"failure_kinds", kinds}, {"actual_stage_callback_counts", record.actual_stage_callback_counts},
++            {"Entry", gamma_value(record.entry, true)}, {"ATempReady", gamma_value(record.ATemp_ready)},
++            {"Gamma1Final", gamma_value(record.Gamma1_final)}, {"Gamma2Final", gamma_value(record.Gamma2_final)},
++            {"SourceReturn", gamma_value(record.source_return)}, {"counted_as_PASS", false}});
++    }
++    for (std::size_t index = 0; index < source.actual_stage_callback_counts.size(); ++index)
++        stages.push_back({{"stage", gamma_stage_name(static_cast<MethodObservation::GammaStage>(index))},
++            {"actual_callback_count", source.actual_stage_callback_counts[index]}, {"records_omitted", source.stage_records_omitted[index]}});
++    for (std::size_t index = 0; index < source.failure_event_counts.size(); ++index)
++        failures.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))},
++            {"actual_event_count", source.failure_event_counts[index]}});
++    return {{"protocol", "ctf07-gamma-method-observation.v1"}, {"method", "Gamma"},
++        {"actual_invocation_count", source.actual_invocation_count}, {"actual_retained_invocation_count", source.invocations.size()},
++        {"actual_stage_callback_counts", source.actual_stage_callback_counts}, {"stage_records_omitted", source.stage_records_omitted},
++        {"stage_ledger", stages}, {"observer_failure", source.observer_failure}, {"method_copy_integrity_failed", gamma_copy_failed(source)},
++        {"failure_event_counts", failures}, {"first_failure", gamma_failure_event(source.first_failure)},
++        {"last_failure", gamma_failure_event(source.last_failure)}, {"invocations", invocations},
++        {"no_actual_entry_observed", source.actual_invocation_count == 0}, {"record_cap", nullptr}, {"deduplicated", false},
++        {"truncated", false}, {"unreached_counted_as_PASS", false}, {"later_attempts_counted_as_PASS", false},
++        {"values_or_identity_or_return_reconstructed", false}, {"old_checkpoint_matrix_05_06_counters_include_Gamma_callbacks", false}};
++}
++struct GammaTotals
++{
++    std::size_t actual_invocation_count = 0, retained_invocation_count = 0;
++    std::array<std::size_t, 5> actual_stage_callback_counts{}, stage_records_omitted{};
++    std::array<std::size_t, 6> failure_event_counts{};
++    bool copy_integrity_failed = false;
++};
++inline void add_gamma_totals(GammaTotals &total, json const &ledger)
++{
++    total.actual_invocation_count += ledger.at("actual_invocation_count").get<std::size_t>();
++    total.retained_invocation_count += ledger.at("actual_retained_invocation_count").get<std::size_t>();
++    total.copy_integrity_failed = total.copy_integrity_failed || ledger.at("method_copy_integrity_failed").get<bool>();
++    for (std::size_t index = 0; index < total.actual_stage_callback_counts.size(); ++index) {
++        total.actual_stage_callback_counts[index] += ledger.at("actual_stage_callback_counts").at(index).get<std::size_t>();
++        total.stage_records_omitted[index] += ledger.at("stage_records_omitted").at(index).get<std::size_t>();
++    }
++    for (std::size_t index = 0; index < total.failure_event_counts.size(); ++index)
++        total.failure_event_counts[index] += ledger.at("failure_event_counts").at(index).at("actual_event_count").get<std::size_t>();
++}
++inline json gamma_totals(GammaTotals const &total)
++{
++    return {{"actual_invocation_count", total.actual_invocation_count}, {"actual_retained_invocation_count", total.retained_invocation_count},
++        {"actual_stage_callback_counts", total.actual_stage_callback_counts}, {"stage_records_omitted", total.stage_records_omitted},
++        {"failure_event_counts", total.failure_event_counts}, {"method_copy_integrity_failed", total.copy_integrity_failed},
++        {"complete_method_return_parity_claimed", false}, {"numerical_PASS_claimed", false}};
++}
+ } // namespace Ctf01
+ #endif
