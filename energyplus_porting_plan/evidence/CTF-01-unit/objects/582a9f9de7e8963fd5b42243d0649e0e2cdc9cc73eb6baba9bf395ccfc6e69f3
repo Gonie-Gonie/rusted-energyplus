@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-01/rust-layer-prep-01/proposed/crates/ep_compiler/src/compiler.rs
++++ .runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_compiler/src/compiler.rs
+@@ -4190,7 +4190,7 @@
+             else {
+                 continue;
+             };
+-            // Material.cc 219?220 stores Resistance after loading all fields.
++            // Material.cc 219-220 stores Resistance after loading all fields.
+             let thermal_resistance_m2_k_per_w = thickness_m / conductivity_w_per_m_k;
+             let Some((id, normalized_name)) =
+                 self.reserve_material_identity(model, OBJECT_TYPE, &name)

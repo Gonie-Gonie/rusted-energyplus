@@ -1,0 +1,350 @@
+{
+  "schema": "ctf01-unit-comparison-source-preparation.v1",
+  "status": "SOURCE-READY-held-source-only-not-executed",
+  "held_utc": "2026-10-10T11:42:15.904648+00:00",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-01/unit-comparer-prep-01/compare_unit.py",
+      "sha256": "4ed497d916fe9b9a460fc864c50ec984680be50f32df8f9325efec9b8c395c2a",
+      "size_bytes": 23838,
+      "line_count": 289
+    },
+    {
+      "path": ".runtime/porting/CTF-01/unit-comparer-prep-01/packet_io.py",
+      "sha256": "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74",
+      "size_bytes": 3523,
+      "line_count": 99
+    }
+  ],
+  "new_source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-01/unit-comparer-prep-01/compare_unit.py.new.diff",
+      "sha256": "01125f8f9b3b6f0cdc9027db762f1d46762732572651544ee69961d9e28abf0a",
+      "size_bytes": 24225,
+      "line_count": 292
+    },
+    {
+      "path": ".runtime/porting/CTF-01/unit-comparer-prep-01/packet_io.py.new.diff",
+      "sha256": "c9eea82b2e42181ee0dc8566a8379fea39bf3818ec6878b19d54ddaa6a2211a2",
+      "size_bytes": 3716,
+      "line_count": 102
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-01/unit-comparer-prep-01/README.md",
+    "sha256": "a73ed15c7a8ee286829469665fbb83de450a60fbac02ae35902406ac2812dfff",
+    "size_bytes": 4315,
+    "line_count": 64
+  },
+  "source_protocol_authorities": [
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/manifest.json",
+      "sha256": "9a4adc90d751af0b4138518225be1743757e30434d3f1595b304c2e698734a3e",
+      "size_bytes": 8179,
+      "line_count": 198
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/review_data.py",
+      "sha256": "4bd6a0b318ceab52bcb83e4fa9605c0d5191daf3883c505c4e14266385b18832",
+      "size_bytes": 15496,
+      "line_count": 184
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/shape.py",
+      "sha256": "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22",
+      "size_bytes": 18201,
+      "line_count": 220
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/packet_io.py",
+      "sha256": "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74",
+      "size_bytes": 3523,
+      "line_count": 99
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-unit-observer-prep-01/manifest.json",
+      "sha256": "7653a43ff1f0c65091df59ee18af6e79ea0523dbd6f9c408b585de9b04e8ec2f",
+      "size_bytes": 12955,
+      "line_count": 330
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-unit-observer-prep-01/ctf01_candidate_unit_observer.rs",
+      "sha256": "8f4a233285cdbb8ae2ba293995521b07fe59553f5f54a072c2f5673355123d5c",
+      "size_bytes": 11814,
+      "line_count": 164
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-unit-observer-prep-01/fields.rs",
+      "sha256": "c096f7df02fdb772b44eb8a4727abb7be4db4d3345f0c2563eb1f36ff3a2d82b",
+      "size_bytes": 4758,
+      "line_count": 79
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_helper.cpp",
+      "sha256": "3235fbdd246544bc3f01e6588efb1d58a32d769abf35f12bfc9f56b2479a905f",
+      "size_bytes": 15543,
+      "line_count": 214
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_fields.hh",
+      "sha256": "27fee0c22aa835953928562e5987d86b198d75ed2ed5e2f52fa56b52f291e6f4",
+      "size_bytes": 5777,
+      "line_count": 83
+    },
+    {
+      "path": ".runtime/porting/CTF-01/rust-layer-prep-02/manifest.json",
+      "sha256": "8bdc24412a991409e9ba5209ef8514a3904b371a42f37d1a5837d9c5a086c9ea",
+      "size_bytes": 26580,
+      "line_count": 681
+    }
+  ],
+  "actual_frozen_input_metadata": [
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+      "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+      "size_bytes": 103619,
+      "line_count": 4007
+    },
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/native-admission-contract.json",
+      "sha256": "192b3595baa0b3efd7ee259074eb0915920ccef61517d538f221f00086c143bd",
+      "size_bytes": 11434,
+      "line_count": 274
+    },
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+      "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+      "size_bytes": 15120,
+      "line_count": 413
+    },
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/cases.json",
+      "sha256": "d18cae0fa5f94b18e240545037271058a1f3f35f9c6c52fa56e6237b2f0dbc98",
+      "size_bytes": 9355,
+      "line_count": 221
+    },
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+      "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+      "size_bytes": 5520,
+      "line_count": 182
+    },
+    {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/projection.json",
+      "sha256": "c974d81c40d52f66a2ffad2191e9af0ca06df3d9e620d6b0a417b526d0e3bcd4",
+      "size_bytes": 16301,
+      "line_count": 368
+    }
+  ],
+  "frozen_numeric_profiles": [
+    {
+      "variable": "PostLoad.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dyn",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "scope": "actual one-dimensional assignment only"
+    },
+    {
+      "variable": "PostConversion.rs",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cnd",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    }
+  ],
+  "source_inventory_paths": {
+    "observer_sources": [
+      "crates/ep_run/examples/ctf01_candidate_unit_observer.rs",
+      "crates/ep_run/examples/ctf01_candidate_unit_support/fields.rs"
+    ],
+    "actual_public_API_sources": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/ids.rs",
+      "crates/ep_runtime/Cargo.toml",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs"
+    ]
+  },
+  "runtime_protocol": {
+    "CLI": [
+      "--approved-source-sha256",
+      "--original-data-review",
+      "--original-data-review-execution",
+      "--Rust-build-execution",
+      "--Rust-execution",
+      "--Rust-results",
+      "--output-dir"
+    ],
+    "references": "genuine future path#SHA operands; no guessed execution/report/binary identities",
+    "schema": "ctf01-unit-comparison.v1",
+    "pass_status": "pass-selected-layer-preprocessing",
+    "fail_status": "fail-selected-layer-preprocessing",
+    "stdout": "full report JSON",
+    "result_filename": "comparison.json",
+    "actual_input_models": 39,
+    "actual_ordered_calls": 42,
+    "numeric_profiles": 18,
+    "mismatch_sample_cap": 1000,
+    "OriginalDataQA_schema": "ctf01-independent-original-data-review.v1",
+    "OriginalDataQA_status": "pass-actual-original-data-and-provenance-before-Rust",
+    "candidate_schema": "ctf01-candidate-unit-observer-results.v1",
+    "new_SourceQA_or_approval_execution_stage": false
+  },
+  "comparison_boundaries": {
+    "independent_actual_data_sides_only": true,
+    "input_copied_member_bits_exact": true,
+    "selected_finite_class_shape_and_zero_error_profiles": true,
+    "required_actual_reached_absence_one_or_both_fails": true,
+    "both_unreached_no_numeric_comparisons_or_PASS": true,
+    "nonfinite_owners_remain_available_but_frozen_numeric_PASS_not_supplied": true,
+    "whole_Native_outcomes_and_DoCTFErrorReport_and_later_coefficients_unpaired": true,
+    "Native_later_shared_flags_may_affect_later_availability_and_differences_are_preserved": true,
+    "Native_flags_never_injected_into_Rust": true,
+    "positive_finite_coverage_required_for_each_frozen_profile": true,
+    "actual_Cargo_target_manifest_binary_and_complete_source_snapshot_authentication": true,
+    "runtime_source_bindings_match_actual_Cargo_and_run_snapshots": true,
+    "declared_context_metadata_not_new_Rust_owner_fields": true,
+    "Native_binary_never_rehashed_or_parsed": true,
+    "Rust_binary_rehashed_at_runtime_for_Cargo_artifact_identity": true,
+    "only_selected_unit_PASS_complete_card_and_fixed15_production_not_certified": true
+  },
+  "authorship_limits": "Raw authored Rust preprocessing and unit observer; source/data comparison is not independent certification of its own formulas. Root and another author must review before Root execution.",
+  "source_only_checks": {
+    "two_AST_parses": true,
+    "IO_equal_accepted_DataQA_utility": true,
+    "profile_variables_order_and_zero_values_match_genuine_frozen_inputs": true,
+    "input_model_call_counts_derived_from_actual_arrays": true,
+    "new_diffs_regenerated": true
+  },
+  "performed": {
+    "target_or_dependency_imports": false,
+    "engines_Cargo_compiler_rustfmt_Git": false,
+    "canonical_edits": false,
+    "actual_Native_or_Rust_scientific_result_or_binary_payload_reads": false,
+    "numerical_comparison_or_PASS": false
+  },
+  "future_execution_gate": "Root only after actual OriginalDataQA0, existing baseline gap, candidate reviewed source application/Cargo capture and actual candidate execution"
+}

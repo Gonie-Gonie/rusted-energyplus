@@ -1,0 +1,77 @@
+{
+  "source_only": true,
+  "changes": [
+    {
+      "path": "crates/ep_model/src/objects/materials.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_model/src/objects/materials.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_model/src/objects/materials.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_model__src__objects__materials.rs.diff",
+      "before_sha256": "ea0769227adb6f000d1e777b74a61829bd458a6bdf52d8d5221e71a1c380bacc",
+      "proposed_sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+      "replacement_count": 1
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_compiler/src/compiler.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_compiler/src/compiler.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_compiler__src__compiler.rs.diff",
+      "before_sha256": "bac1a9c8de1228a67cf5ae9c8c5ac7d4524d6e61882938969c43238217ddbdbc",
+      "proposed_sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+      "replacement_count": 2
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_model/src/model.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_model/src/model.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_model__src__model.rs.diff",
+      "before_sha256": "297b2f7200d76592f0b59276cbb0f4038f2a5e4a1477f2f1beaa923444eadf99",
+      "proposed_sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+      "replacement_count": 1
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/tests/material_variants.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_compiler/src/compiler/tests/material_variants.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_compiler/src/compiler/tests/material_variants.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_compiler__src__compiler__tests__material_variants.rs.diff",
+      "before_sha256": "4b58ad74b3734d690cc2b30aed513da0e32a8653b2a07856a5c9faa5acb7164a",
+      "proposed_sha256": "5ac0d1841dbfc990c6d862e0df1a7e5cf67f9a5b3ff9e19f1e4d7c56a37bcde0",
+      "replacement_count": 1
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_runtime__src__heat_balance__surface_manager.rs.diff",
+      "before_sha256": "80234dc5130ac9fd42b26909aea0775f34f0566a3ea5d3e6da1d32c61186cde4",
+      "proposed_sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+      "replacement_count": 2
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_runtime__src__heat_balance__surface_manager__construction_cache.rs.diff",
+      "before_sha256": "dac632149885383131df32f283a1d4fa5b2fd09ebf3ad6fdcd022825a115ea50",
+      "proposed_sha256": "8497916c4b8d00eb0194673e9be9332102020d4b29c9782f28ddc3dc1759c230",
+      "replacement_count": 8
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_runtime/src/heat_balance/state.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_runtime__src__heat_balance__state.rs.diff",
+      "before_sha256": "ce0fc15586ec35ef4709c24fba8133c2655bbfb8cd323bfbb41bff476c3497a1",
+      "proposed_sha256": "e8c5bdf83d769327fc8734f105de712f10c25cb5af5402b6f2584f1b533fb17e",
+      "replacement_count": 1
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "before": ".runtime/porting/CTF-01/rust-layer-prep-02/before/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "proposed": ".runtime/porting/CTF-01/rust-layer-prep-02/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "diff": ".runtime/porting/CTF-01/rust-layer-prep-02/crates__ep_runtime__src__heat_balance__initialization__state_shell.rs.diff",
+      "before_sha256": "cfbe0e4edb4dd1447430f96fc860042a2fd7f8d4eb6c6486c50f485333295ead",
+      "proposed_sha256": "a930446e8c4fa6d3c24a493fad544c85d0aa8aedec10b1dd16656813a84ad567",
+      "replacement_count": 1
+    }
+  ]
+}

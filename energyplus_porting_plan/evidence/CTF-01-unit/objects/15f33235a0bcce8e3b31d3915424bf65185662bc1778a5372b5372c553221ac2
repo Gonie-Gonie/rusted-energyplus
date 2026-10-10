@@ -1,0 +1,32 @@
+--- .runtime/porting/CTF-01/unit-comparer-prep-01/README.md
++++ .runtime/porting/CTF-01/unit-comparer-prep-02/README.md
+@@ -4,7 +4,7 @@
+ imports, engines, Cargo, formatting, Git, canonical writes, binary or scientific
+ result reads were performed while preparing this source. Runtime references are
+ future actual operands; no future report, binary or execution SHA is guessed.
+-The unchanged 99-line packet_io.py is authenticated before its runtime import.
++The own 105-line packet_io.py is authenticated before its runtime import.
+ 
+ This direct reader compares actual Native result records authenticated by real
+ OriginalDataQA0 against the actual candidate example's output. It is not a layer
+@@ -62,3 +62,20 @@
+ report binds exact executed reader source copies and actual Native/Rust proofs.
+ Selected unit PASS does not certify fixed15 production loading/use, complete
+ CTF-01, later solver behavior, or CTF02-10. No gates are changed.
++
++
++Fresh02 transport-only amendment
++
++Comparer01 and the genuine candidate-unit-comparison-command-01 failure are
++preserved. That command stopped before comparison/report because Rust's actual
++std::fs::canonicalize serialized Windows verbatim drive paths, while the prior
++contained() compared that prefix against an ordinary repository path. This was
++a transport failure; no numerical failure or result payload inspection is
++claimed by this source amendment.
++
++Only an exact Windows verbatim drive-absolute prefix (\\?\X:\) is removed before
++the unchanged resolved repository containment and raw-parent reparse checks.
++Verbatim UNC, device and other unsupported namespace forms are rejected. SHA
++and size checks are unchanged. The main source only rebinds the local IO SHA;
++all numerical profiles, association, availability, provenance and comparison
++logic remain byte-identical. No actual results or binaries were read.

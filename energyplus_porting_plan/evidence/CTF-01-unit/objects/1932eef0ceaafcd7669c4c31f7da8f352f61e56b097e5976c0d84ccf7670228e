@@ -1,0 +1,8 @@
+--- .runtime/porting/CTF-01/rust-layer-prep-01/new/crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs
++++ .runtime/porting/CTF-01/rust-layer-prep-02/new/crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs
+@@ -1,4 +1,4 @@
+-//! Construction.cc 201–401 layer preprocessing; no CTF coefficient solution.
++//! Construction.cc 201-401 layer preprocessing; no CTF coefficient solution.
+ 
+ use ep_model::{ConstructionId, Material, MaterialDefinition, MaterialId};
+ 

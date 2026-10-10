@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-01\unit-comparer-prep-01\compare_unit.py", line 289, in <module>
+    raise SystemExit(run(parser.parse_args()))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-01\unit-comparer-prep-01\compare_unit.py", line 218, in run
+    for key, binding in [("actual_request", qa["reviewed_request"]), ("actual_native_admission", qa["reviewed_native_admission_contract"]), ("projection", qa["reviewed_projection"])]: same(rust[key], binding)
+                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-01\unit-comparer-prep-01\compare_unit.py", line 182, in same
+    m.require(m.contained(a["path"], existing=False) == m.contained(b["path"], existing=False) and a["sha256"] == b["sha256"], "Actual direct identities differ")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-01\unit-comparer-prep-01\packet_io.py", line 22, in contained
+    require(path != ROOT and path.is_relative_to(ROOT), "Repository-contained path required")
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-01\unit-comparer-prep-01\packet_io.py", line 15, in require
+    raise ValueError(message)
+ValueError: Repository-contained path required

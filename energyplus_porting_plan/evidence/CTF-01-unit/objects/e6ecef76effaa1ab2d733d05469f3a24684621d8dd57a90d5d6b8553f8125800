@@ -1,0 +1,1296 @@
+{
+  "schema": "ctf01-unit-comparison.v1",
+  "status": "pass-selected-layer-preprocessing",
+  "started_utc": "2026-10-10T11:57:18.310890+00:00",
+  "finished_utc": "2026-10-10T11:57:19.280853+00:00",
+  "reviewed_Original_data_review": {
+    "path": ".runtime/porting/CTF-01/original-data-review-01/review.json",
+    "sha256": "c6403cc1eddbb607998267984f63710841d9adf7159acc54a892e585f02bd846",
+    "size_bytes": 6220
+  },
+  "reviewed_Original_data_review_execution": {
+    "path": ".runtime/porting/CTF-01/original-data-review-command-01/receipt.json",
+    "sha256": "76390d418f87002cd85d9dba15b852c98ca0c5ea1557d4013f2d268b3fb462a4",
+    "size_bytes": 4237
+  },
+  "reviewed_Native_results": {
+    "path": ".runtime/porting/CTF-01/native-unit-output-01/ctf01-helper-results.json",
+    "sha256": "a090b11096451e2a6388bca8f735dee6b6020883eb4d3d47dc4a665c2067759c",
+    "size_bytes": 1385219
+  },
+  "reviewed_Native_execution": {
+    "path": ".runtime/porting/CTF-01/native-unit-command-01/receipt.json",
+    "sha256": "2fecf8eb554e52fea56dc6cc75fff6504ef659e0eea341630b5a3ae46fd896fc",
+    "size_bytes": 3173
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+    "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+    "size_bytes": 103619
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/projection.json",
+    "sha256": "c974d81c40d52f66a2ffad2191e9af0ca06df3d9e620d6b0a417b526d0e3bcd4",
+    "size_bytes": 16301
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+      "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+      "size_bytes": 15120
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/cases.json",
+      "sha256": "d18cae0fa5f94b18e240545037271058a1f3f35f9c6c52fa56e6237b2f0dbc98",
+      "size_bytes": 9355
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+      "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+      "size_bytes": 5520
+    }
+  },
+  "Rust_results": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-command-01/stdout.log",
+    "sha256": "b592f4d1f8baa18af9059dbddedf52029d28273db124938a30d6fec2f0fa6594",
+    "size_bytes": 696280
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-command-01/receipt.json",
+    "sha256": "54bb13b520194aa0ac395017764d647330b0a1e1bacb73071e518f70499f78fd",
+    "size_bytes": 4640
+  },
+  "Rust_build_execution": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-build-command-01/receipt.json",
+    "sha256": "e11cb5c465d55cc1d1ba96d5526a51bf19b6aea0f60133b9d106f2550b3a7014",
+    "size_bytes": 5844
+  },
+  "actual_Rust_binary": {
+    "historical_path": "target/debug/examples/ctf01_candidate_unit_observer.exe",
+    "sha256": "3a1062a0c33fc4410d468639db76e2362095bbb8ccd044fe38624c471161cc80"
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/7c/7c2840ab74995bfdb5e53a0467ee3bca7785e9136684e646bf7e0e18db438f92",
+    "sha256": "7c2840ab74995bfdb5e53a0467ee3bca7785e9136684e646bf7e0e18db438f92"
+  },
+  "actual_source_inventory": {
+    "schema": "ctf01-candidate-unit-runtime-source-bindings.v1",
+    "observer_sources": [
+      {
+        "path": "crates/ep_run/examples/ctf01_candidate_unit_observer.rs",
+        "sha256": "9831ab30fa95d62ae24c59405b9b8c6de2563d25a1511cb55390ee7b3842fbef",
+        "size_bytes": 13347
+      },
+      {
+        "path": "crates/ep_run/examples/ctf01_candidate_unit_support/fields.rs",
+        "sha256": "3884dd940881ed1d93aef09872b1a99c62209d0954a08d599dc500bea8e83696",
+        "size_bytes": 5000
+      }
+    ],
+    "actual_public_API_sources": [
+      {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524
+      },
+      {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284
+      },
+      {
+        "path": "crates/ep_model/src/ids.rs",
+        "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+        "size_bytes": 2029
+      },
+      {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327
+      },
+      {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "45e6f8b9dfc0d7f85bd854a849cc0092c3ee7739fd4895c543aa73a1ea8bce46",
+        "size_bytes": 1344
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+        "size_bytes": 5815
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+        "size_bytes": 11736
+      },
+      {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172
+      }
+    ]
+  },
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "frozen_numeric_profiles": [
+    {
+      "variable": "PostLoad.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dyn",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "scope": "actual one-dimensional assignment only"
+    },
+    {
+      "variable": "PostConversion.rs",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cnd",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    }
+  ],
+  "actual_Native_observation_counts": {
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 106,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 4754,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33
+    }
+  },
+  "actual_Rust_preprocess_invocations": 42,
+  "Native_whole_method_outcome_context_only": [
+    {
+      "model_id": "active-prefix-01",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-02",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-03",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-04",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-05",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-06",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-07",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-08",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-09",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-10",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "active-prefix-11",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "unused-before-layer-loading",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "single-no-mass",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "two-boundary-no-mass",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "outside-no-mass",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "inside-no-mass",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "interior-no-mass",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "two-adjacent-interior",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "three-adjacent-interior",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "disjoint-adjacent-interiors",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "boundary-neighbor-three-layers",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "boundary-neighbor-four-layers",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "computed-reslayer-not-ronly",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "ordered-resistance-forward",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "ordered-resistance-reversed",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "conductivity-threshold-below",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "thin-metric-threshold-below",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "resistance-minimum-below",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "thickness-maximum-below",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "conductivity-threshold-equal",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "thin-metric-threshold-equal",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "resistance-minimum-equal",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "thickness-maximum-equal",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "conductivity-threshold-above",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "thin-metric-threshold-above",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "resistance-minimum-above",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "thickness-maximum-above",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "shared-error-then-valid-then-unused",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "id": "construction-2",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "id": "construction-3",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "incoming-shared-error-and-report-flag",
+      "operations": [
+        {
+          "id": "construction-1",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "id": "construction-2",
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "numeric_comparisons": 1874,
+    "discrete_comparisons": 4346,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 4346,
+      "numeric_comparisons": 1874
+    },
+    "metrics": {
+      "PostLoad.dl": {
+        "count": 133,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostLoad.rk": {
+        "count": 133,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostLoad.rho": {
+        "count": 133,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostLoad.cp": {
+        "count": 133,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostLoad.lr": {
+        "count": 133,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostMerge.dl": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostMerge.rk": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostMerge.rho": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostMerge.cp": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostMerge.lr": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.dl": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.rk": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.rho": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.cp": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.lr": {
+        "count": 111,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.dyn": {
+        "count": 33,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.rs": {
+        "count": 33,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "PostConversion.cnd": {
+        "count": 33,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "mismatch_samples": [],
+    "mismatch_samples_omitted": 0,
+    "unavailable_observations": [
+      {
+        "path": "unused-before-layer-loading/construction-1/PostLoad",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "unused-before-layer-loading/construction-1/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "unused-before-layer-loading/construction-1/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "thin-metric-threshold-below/construction-1/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "thin-metric-threshold-below/construction-1/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "resistance-minimum-below/construction-1/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "resistance-minimum-below/construction-1/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "thickness-maximum-above/construction-1/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "thickness-maximum-above/construction-1/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-1/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-1/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-2/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-2/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-3/PostLoad",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-3/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-3/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "incoming-shared-error-and-report-flag/construction-1/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "incoming-shared-error-and-report-flag/construction-1/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "incoming-shared-error-and-report-flag/construction-2/PostMerge",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "incoming-shared-error-and-report-flag/construction-2/PostConversion",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "both actual phases unreached; no comparisons or PASS",
+        "counted_as_PASS": false
+      }
+    ],
+    "unavailable_counted_as_PASS": false
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-01/unit-comparer-prep-02/compare_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-01/candidate-unit-comparison-02/000-compare_unit.py",
+        "sha256": "6795c9a7c2ee40c49eea34d799c8af04400e86075bf90624960362140f949132",
+        "size_bytes": 23838
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/unit-comparer-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-01/candidate-unit-comparison-02/001-packet_io.py",
+        "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+        "size_bytes": 3892
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-comparison-02/000-compare_unit.py",
+    "sha256": "6795c9a7c2ee40c49eea34d799c8af04400e86075bf90624960362140f949132",
+    "size_bytes": 23838
+  },
+  "selected_unit_PASS_claimed": true,
+  "complete_CTF01_PASS_claimed": false,
+  "production_fixed15_loader_lane_certified": false,
+  "Native_whole_method_outcomes_DoCTFErrorReport_and_later_coefficients_paired": false,
+  "CTF02_through_CTF10_certified": false,
+  "Native_flags_injected_into_Rust_or_missing_phases_masked": false,
+  "scientific_engine_or_layer_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "declared_caller_and_construction_metadata_not_claimed_as_additional_Rust_owner_fields": true,
+  "gates_updated": false,
+  "authorship_limits": "Raw authored the candidate preprocessing API and observer; this is actual data comparison, not an independent formula certificate."
+}

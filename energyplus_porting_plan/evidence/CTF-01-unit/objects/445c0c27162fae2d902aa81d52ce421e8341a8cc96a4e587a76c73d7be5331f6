@@ -1,0 +1,17 @@
+--- .runtime/porting/CTF-01/unit-comparer-prep-01/packet_io.py
++++ .runtime/porting/CTF-01/unit-comparer-prep-02/packet_io.py
+@@ -16,7 +16,13 @@
+ 
+ 
+ def contained(value, existing=True):
+-    raw = Path(value)
++    raw_text = str(value)
++    if raw_text.startswith("\\\\?\\"):
++        match = re.fullmatch(r"\\\\\?\\([A-Za-z]:\\[^\r\n]*)", raw_text)
++        require(match is not None, "Only verbatim drive-absolute Windows paths are admitted")
++        raw_text = match.group(1)
++    require(not raw_text.startswith(("\\\\", "//", "\\??\\")), "UNC/device paths are not admitted")
++    raw = Path(raw_text)
+     raw = raw if raw.is_absolute() else ROOT / raw
+     path = raw.resolve()
+     require(path != ROOT and path.is_relative_to(ROOT), "Repository-contained path required")

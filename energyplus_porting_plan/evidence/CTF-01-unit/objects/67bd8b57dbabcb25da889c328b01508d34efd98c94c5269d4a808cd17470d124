@@ -1,0 +1,60 @@
+# CTF-01 candidate unit observer source proposal
+
+SOURCE ONLY. These two new example sources are held for Root and other-author
+full review. No project import, formatting, compiler, engine, scientific result
+read, canonical edit, or comparison has been performed. Application and actual
+Cargo/observer execution remain after genuine Original DataQA and legacy gap.
+
+Proposed owners are `crates/ep_run/examples/ctf01_candidate_unit_observer.rs`
+and `crates/ep_run/examples/ctf01_candidate_unit_support/fields.rs`. Existing
+ep_run dependencies suffice; Cargo registration changes are unnecessary.
+The public API is the held rust-layer-prep-02 module, not an observer copy of
+its formula. The included digest module only authenticates input/source bytes.
+
+Future CLI accepts exactly three existing input-only files: frozen Native
+helper-request.json, its native-admission-contract.json, and a Root-approved
+runtime source inventory. Request/admission SHAs are the genuine frozen packet
+identities in this manifest. Counts derive from actual arrays and must be 39
+models and 42 ordered construction calls. Contracts, scope pair, all 45 guards,
+and the source inventory are authenticated before and after public API calls.
+No Native result, binary, callback record, expected answer, or outcome is input.
+
+The runtime source inventory is metadata, not a new approval or execution stage.
+Its exact keys are `schema`, `observer_sources`, `actual_public_API_sources`;
+schema is `ctf01-candidate-unit-runtime-source-bindings.v1`. Both arrays are
+ordered path/SHA references for the paths in fields.rs. Root supplies actual
+formatted byte identities only after application. Runtime source hashing alone
+does not prove compiled identities: the genuine Cargo source capture must match
+those bytes before results are admitted. Manifest API refs describe source
+preparation and distinguish the future module from current baseline sources.
+
+Each explicit-member model constructs actual CtfLayerInput owners once in
+declared material order. Their MaterialId values are zero-based vector indices;
+the output preserves logical-ID to actual typed-ID association and ordered layer
+references. This is an explicit member unit lane, not a Material loader claim.
+Resistance is copied from its own literal bits without d/k reconstruction.
+Neither original layer membership nor material IDs are modified by the observer.
+
+Every declared construction invokes public preprocess_ctf_layers with actual
+typed inputs and declared IsUsedCTF/source-sink/dimensions. Only returned selected
+ErrorsFound carries to the next call, beginning with the frozen caller value.
+The entire Native method has later solver mutations; those are not injected
+into Rust. DoCTFErrorReport remains unavailable/unpaired. Call labels distinguish
+the declared Native operation from the actual Rust API and scope-error returns.
+Panics/process failures are not caught or converted into successful source calls.
+
+PostLoad/PostMerge/PostConversion copy actual returned Option owners, active
+count/NumResLayers/ResLayer and dl/rk/rho/cp/lr. Only actual converted owners
+supply dyn/rs/cnd. An absent Option stays null/unavailable/no PASS, rather than
+zero arrays. No normalized material-ID history, fixed-array tail, per-merge
+event, full Native outcome, coefficient, or downstream solver is fabricated.
+Binary64 output always retains value_bits and finite/NaN/infinity/signed-zero
+class; nonfinite values have null JSON numeric values but remain available.
+
+Meaningful future checks reuse frozen cases: verify copied literal bits and
+typed-ID association, ordered calls/shared selected flag, unused and load-error
+absence, adjacent merge phase counts, and bit/class DTO round trips. Actual
+Native comparison remains necessary; this observer asserts no numerical PASS.
+The required separate fixed15 production loader/use lane and CTF02-10 remain
+uncertified. Source author also authored the preprocessing proposal; peer review
+and actual Original-first evidence cannot be replaced by this source metadata.

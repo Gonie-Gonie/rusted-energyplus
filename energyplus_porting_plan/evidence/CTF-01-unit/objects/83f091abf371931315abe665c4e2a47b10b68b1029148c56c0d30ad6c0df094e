@@ -1,0 +1,13 @@
+--- crates/ep_runtime/src/heat_balance/state.rs
++++ crates/ep_runtime/src/heat_balance/state.rs
+@@ -55,6 +55,10 @@
+     pub(crate) surface_indexes: HeatBalanceSurfaceIndexes,
+     /// Construction coefficient cache hash used to initialize surface state.
+     pub construction_cache_hash: u64,
++    /// Actual ordered CTF-01 preprocessing owners from construction initialization.
++    /// Later coefficient-solver errors and coefficients are outside these records.
++    pub construction_ctf01_layers: Vec<super::surface_manager::ctf_layer_preprocessing::
++        ConstructionCtfLayerPreprocessing>,
+     /// Construction coefficient cache build time in seconds.
+     pub construction_cache_build_wall_seconds: f64,
+     /// Number of construction cache entries.

@@ -1,0 +1,27 @@
+--- crates/ep_compiler/src/compiler.rs
++++ crates/ep_compiler/src/compiler.rs
+@@ -4114,6 +4114,7 @@
+                 conductivity_w_per_m_k: 1.95,
+                 density_kg_per_m3: 2240.0,
+                 specific_heat_j_per_kg_k: 900.0,
++                thermal_resistance_m2_k_per_w: 0.15 / 1.95,
+                 surface: OpaqueSurfaceProperties::default(),
+             }),
+         });
+@@ -4189,6 +4190,8 @@
+             else {
+                 continue;
+             };
++            // Material.cc 219-220 stores Resistance after loading all fields.
++            let thermal_resistance_m2_k_per_w = thickness_m / conductivity_w_per_m_k;
+             let Some((id, normalized_name)) =
+                 self.reserve_material_identity(model, OBJECT_TYPE, &name)
+             else {
+@@ -4204,6 +4207,7 @@
+                     conductivity_w_per_m_k,
+                     density_kg_per_m3,
+                     specific_heat_j_per_kg_k,
++                    thermal_resistance_m2_k_per_w,
+                     surface,
+                 }),
+             });

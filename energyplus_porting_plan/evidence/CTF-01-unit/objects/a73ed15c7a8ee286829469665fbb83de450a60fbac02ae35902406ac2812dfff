@@ -1,0 +1,64 @@
+# CTF-01 selected unit comparison source
+
+SOURCE ONLY, held for Root and other-author full review. No target/dependency
+imports, engines, Cargo, formatting, Git, canonical writes, binary or scientific
+result reads were performed while preparing this source. Runtime references are
+future actual operands; no future report, binary or execution SHA is guessed.
+The unchanged 99-line packet_io.py is authenticated before its runtime import.
+
+This direct reader compares actual Native result records authenticated by real
+OriginalDataQA0 against the actual candidate example's output. It is not a layer
+evaluator, expected-array generator, new SourceQA stage, or complete card gate.
+The author also wrote the Rust preprocessing API and unit observer; actual data
+comparison and external source review are not an independent formula certificate.
+
+Future runtime CLI arguments are `--approved-source-sha256`,
+`--original-data-review`, `--original-data-review-execution`,
+`--Rust-build-execution`, `--Rust-execution`, `--Rust-results`, and `--output-dir`.
+Artifact arguments are genuine path#SHA references. The output directory must be
+fresh and contained. Root alone may execute after actual OriginalDataQA, existing
+Rust baseline gap, candidate source review/application and actual Cargo build.
+
+OriginalDataQA full stdout, archived reader sources and its approved source
+argument must agree. The real request and tolerance identities are the actual
+frozen packet, with exactly 18 ordered class/shape-exact zero tolerance profiles.
+All model/call ledgers have complete lengths and declared order. Logical material
+IDs bind exact ordered actual typed MaterialIds; copied member bits and ROnly
+must match frozen inputs already authenticated in the Native after-seed snapshot.
+Declared caller/construction metadata equality is input provenance, not a claim
+of additional Rust caller fields absent from its actual public preprocessing API.
+
+Cargo's genuine compiler-artifact capture must identify the unique example,
+actual target source and ep_run manifest. Build and run full source snapshots
+must agree, with every actual runtime observer/API source binding matching its
+raw archived bytes. The executable path and SHA must match Cargo's emitted
+artifact; the real run argv must be binary/request/admission/source-inventory.
+Actual full JSON stdout and empty stderr are required. Source/byte guards and
+review/build/run chronology are retained. Runtime hashes only the Rust binary;
+the already authenticated Native binary is not read or rehashed here.
+
+Reached PostLoad/PostMerge/PostConversion owners compare active count,
+NumResLayers, ResLayer, selected ErrorsFound, and actual scalar fields. The 18
+numeric profiles require finite actual observations, exact classes/shapes and
+zero absolute error. Metrics retain real positive counts, max error and RMSE.
+NaN/infinity remain actual available bits/classes; matching class alone has no
+frozen numerical PASS, so such operands block selected PASS. Signed-zero classes
+remain distinct. Input-bit checks are separate from arithmetic-zero comparisons.
+
+Both genuinely unreached phases remain unavailable with zero comparisons/no PASS.
+One-sided phases or required reached missing owners fail; no null equality or
+zero arrays repair them. Every profile needs positive finite coverage. Complete
+Native call outcomes and OS provenance are retained, not forced into Rust API
+return parity. Later Native solver ErrorsFound can change later invocation or
+phase availability: those actual differences are preserved and fail comparison;
+Native flags are never injected into Rust or masked. DoCTFErrorReport and later
+Native coefficients remain unpaired context. Fixed-array tails and merged layer
+material-ID history are excluded by the frozen source projection.
+
+The reader emits `ctf01-unit-comparison.v1` with status
+`pass-selected-layer-preprocessing` or `fail-selected-layer-preprocessing`, full
+JSON stdout and comparison.json. All mismatch categories are counted; at most
+1000 actual mismatch samples are retained with an explicit omitted count. The
+report binds exact executed reader source copies and actual Native/Rust proofs.
+Selected unit PASS does not certify fixed15 production loading/use, complete
+CTF-01, later solver behavior, or CTF02-10. No gates are changed.

@@ -1,0 +1,60 @@
+# CTF-01 Rust layer source proposal
+
+Source-only draft for Root review. Nothing here has been imported, compiled,
+formatted, applied to canonical sources, or compared with scientific outputs.
+Original-first/legacy-gap admission remains required before canonical application.
+
+The new pure module implements Construction.cc 201-401 only: complete original
+layer loading, calculated ResLayer, the sticky loading error return, original
+adjacent-interior merge order, active-prefix conversion, dyn=0, ordered rs, and
+unguarded cnd=1/rs. Its input retains original MaterialIds; merger changes only
+local arrays. No fixed-array tail, original LayerPoint/TotLayers mutation,
+coefficient, matrix, reversed-construction, solver convergence, or later CTF
+error behavior is claimed. SourceSink=true and dimensions other than one are
+explicit scope errors. Unsupported material variants have no substituted values.
+
+Current RegularMaterial has no stored Resistance owner. Its existing guarded
+thermal_resistance accessor derives d/k and cannot stand in for that owner.
+This proposal adds `thermal_resistance_m2_k_per_w` to RegularMaterial and stores
+d/k in the real compiler loader, after loading valid fields, matching Material.cc
+219-220. The generated F/C concrete literal receives the matching original
+Material.cc 246 assignment solely to keep its required struct complete; that
+family remains excluded from CTF-01. The sole model test literal is updated too.
+The new runtime adapter copies stored Regular Resistance without recalculation.
+For NoMass it copies actual resistance/ROnly=true and the source MaterialBase zero
+defaults for its absent mass properties; this is a selected source mapping.
+
+Existing construction initialization owns the runtime ingress. Its actual opaque
+surface construction references determine used IDs; its existing construction
+vector order determines preprocessing order. Unreferenced constructions use the
+!IsUsedCTF early return. Native authority is SurfaceGeometry 9101-9103 (CTF/EMPD
+surface flag) and HeatBalanceManager 6155-6158 (ordered shared flag). This proposal
+is limited to the admitted opaque CTF route: EMPD, other construction users,
+alternate conduction algorithms, and generated constructions are unpaired.
+The actual internal-source declaration is checked; normal dimensions=1 is the
+HeatBalanceManager 1409-1410 default. The new cache records a shared *preprocessing*
+ErrorsFound flag, initialized once and kept sticky through every used ordinary
+construction. No all-cache-rows-used assumption is made.
+
+One boundary remains explicit: the original full coefficient solver can also
+set ErrorsFound at Construction.cc 975/1012 and DoCTFErrorReport at 975. This port
+does not run that solver. The Rust initializer owns only its actual CTF-01 flag;
+it cannot certify the full Native cross-construction error history. Any comparison
+requiring those later mutations must retain unavailable/unpaired status or fail,
+and cannot infer them from these checkpoints. Full Native method observation
+and later source decisions are still required before production completion.
+
+Actual new records are retained in the construction cache and copied once into
+public HeatBalanceState.construction_ctf01_layers at initialization. Old SI R/C,
+existing coefficient selection, thermal history, report arithmetic and cache
+coefficient hash remain unchanged. No later coefficient consumer uses these new
+arrays yet. Downstream reuse must extend invalidation to the new owner inputs
+before consuming them; this proposal does not certify CTF-02 through CTF-10.
+
+Meaningful proposed tests cover genuine compiled stored-R assignment, adapter
+copy versus recomputation, NoMass defaults, classification thresholds, ROnly
+versus ResLayer, boundary air values, three consecutive interior resistive
+layers, original IDs/order preservation, all-layer loading after errors, sticky
+incoming errors, unused early return, ordered conversions, and IEEE zero/NaN
+cnd behavior. These tests have not been executed; they are source-derived tests,
+not Native observations or frozen numerical outcomes.

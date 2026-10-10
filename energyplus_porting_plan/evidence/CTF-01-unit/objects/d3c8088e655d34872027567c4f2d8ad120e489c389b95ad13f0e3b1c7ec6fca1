@@ -1,0 +1,11 @@
+--- crates/ep_compiler/src/compiler/tests/material_variants.rs
++++ crates/ep_compiler/src/compiler/tests/material_variants.rs
+@@ -61,6 +61,8 @@
+     assert_eq!(regular.conductivity_w_per_m_k, 2.0);
+     assert_eq!(regular.density_kg_per_m3, 2000.0);
+     assert_eq!(regular.specific_heat_j_per_kg_k, 100.0);
++    assert_eq!(regular.thermal_resistance_m2_k_per_w.to_bits(),
++        (regular.thickness_m / regular.conductivity_w_per_m_k).to_bits());
+     assert_eq!(regular.surface.thermal_absorptance, 0.9);
+     assert_eq!(regular.surface.solar_absorptance, 0.7);
+     assert_eq!(regular.surface.visible_absorptance, 0.7);

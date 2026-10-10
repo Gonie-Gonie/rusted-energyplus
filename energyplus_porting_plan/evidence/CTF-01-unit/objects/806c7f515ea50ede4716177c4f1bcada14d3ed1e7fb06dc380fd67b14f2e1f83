@@ -1,0 +1,95 @@
+--- crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -1,6 +1,10 @@
+ //! Construction-owned thermal data cached for opaque surface initialization.
+ 
+ use super::{ConstructionCacheInvalidationToken, ConstructionThermalData};
++use super::ctf_layer_preprocessing::{
++    ConstructionCtfLayerPreprocessing, CtfLayerContext, material_layer_inputs,
++    preprocess_ctf_layers,
++};
+ use crate::RuntimeError;
+ use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
+ use crate::heat_balance::id_slot_index::TypedIdSlotIndex;
+@@ -8,7 +12,7 @@
+     Construction, ConstructionId, Material, MaterialId, MaterialSurfaceRoughness,
+     OpaqueMaterialRef, Surface, TypedModel,
+ };
+-use std::collections::BTreeMap;
++use std::collections::{BTreeMap, BTreeSet};
+ use std::hash::{Hash, Hasher};
+ use std::time::Instant;
+ 
+@@ -71,6 +75,11 @@
+             TypedIdSlotIndex::new(model.materials.iter().map(|material| material.id.0));
+         let mut entry_index_by_construction_slot = vec![None; model.constructions.len()];
+ 
++        // This existing initializer constructs opaque CTF surface state. Mark
++        // only actual referenced construction owners, preserving vector order.
++        let used_ctf_constructions = model.surfaces.iter()
++            .map(|surface| surface.construction.0).collect::<BTreeSet<_>>();
++        let mut preprocessing_errors_found = false;
+         for construction in &model.constructions {
+             if !construction.is_ordinary_opaque() {
+                 continue;
+@@ -81,7 +90,18 @@
+                 construction,
+                 entries.len(),
+                 ctf_coefficients_by_construction,
++                CtfLayerContext {
++                    is_used_ctf: used_ctf_constructions.contains(&construction.id.0),
++                    errors_found: preprocessing_errors_found,
++                    source_sink_present: construction.has_internal_heat_source(),
++                    // Normal Construction defaults in HeatBalanceManager1410.
++                    // Internal-source declarations are explicitly rejected.
++                    solution_dimensions: 1,
++                },
+             )?;
++            if let Ok(preprocessing) = &entry.ctf01_layer_preprocessing.result {
++                preprocessing_errors_found = preprocessing.errors_found;
++            }
+             if entry.heat_capacity_j_per_m2_k.is_some() {
+                 massive_ctf_construction_ids.push(entry.construction_id);
+             } else {
+@@ -110,6 +130,10 @@
+             coefficient_cache_hash,
+             build_wall_seconds: build_start.elapsed().as_secs_f64(),
+         })
++    }
++
++    pub(crate) fn layer_preprocessing(&self) -> Vec<ConstructionCtfLayerPreprocessing> {
++        self.entries.iter().map(|entry| entry.ctf01_layer_preprocessing.clone()).collect()
+     }
+ 
+     pub(crate) fn len(&self) -> usize {
+@@ -168,10 +192,22 @@
+     construction: &Construction,
+     cache_index: usize,
+     ctf_coefficients_by_construction: &BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>>,
++    ctf_layer_context: CtfLayerContext,
+ ) -> Result<ConstructionThermalData, RuntimeError> {
+     let layer_ids = construction_layer_stack(construction);
+     let layer_materials = layer_materials(model, material_slots, construction, &layer_ids)?;
+     let opaque_layer_materials = opaque_layer_materials(&layer_materials, construction)?;
++    let ctf01_result = if ctf_layer_context.is_used_ctf {
++        material_layer_inputs(&layer_materials)
++            .and_then(|inputs| preprocess_ctf_layers(&inputs, ctf_layer_context))
++    } else {
++        preprocess_ctf_layers(&[], ctf_layer_context)
++    };
++    let ctf01_layer_preprocessing = ConstructionCtfLayerPreprocessing {
++        construction_id: construction.id,
++        is_used_ctf: ctf_layer_context.is_used_ctf,
++        result: ctf01_result,
++    };
+     let outside_material =
+         layer_materials
+             .first()
+@@ -208,6 +244,7 @@
+         construction_id: construction.id,
+         construction_name: construction.name.0.clone(),
+         material_layer_stack: layer_ids,
++        ctf01_layer_preprocessing,
+         outside_layer_material_id: outside_material.id,
+         outside_layer_material_name: outside_material.name.0.clone(),
+         outside_layer_roughness: outside_opaque_material

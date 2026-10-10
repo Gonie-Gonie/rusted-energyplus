@@ -1,0 +1,10 @@
+--- crates/ep_model/src/model.rs
++++ crates/ep_model/src/model.rs
+@@ -1919,6 +1919,7 @@
+                 conductivity_w_per_m_k: 2.0,
+                 density_kg_per_m3: 2_000.0,
+                 specific_heat_j_per_kg_k: 800.0,
++                thermal_resistance_m2_k_per_w: 0.1 / 2.0,
+                 surface: OpaqueSurfaceProperties {
+                     thermal_absorptance: 0.9,
+                     solar_absorptance: 0.75,

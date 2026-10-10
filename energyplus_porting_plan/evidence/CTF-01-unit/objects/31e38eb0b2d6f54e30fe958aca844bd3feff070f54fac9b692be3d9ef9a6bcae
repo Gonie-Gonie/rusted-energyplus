@@ -1,0 +1,86 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\unit-comparer-prep-01\\compare_unit.py",
+    "--approved-source-sha256",
+    "4ed497d916fe9b9a460fc864c50ec984680be50f32df8f9325efec9b8c395c2a",
+    "--original-data-review",
+    ".runtime/porting/CTF-01/original-data-review-01/review.json#c6403cc1eddbb607998267984f63710841d9adf7159acc54a892e585f02bd846",
+    "--original-data-review-execution",
+    ".runtime/porting/CTF-01/original-data-review-command-01/receipt.json#76390d418f87002cd85d9dba15b852c98ca0c5ea1557d4013f2d268b3fb462a4",
+    "--Rust-build-execution",
+    ".runtime/porting/CTF-01/candidate-unit-build-command-01/receipt.json#e11cb5c465d55cc1d1ba96d5526a51bf19b6aea0f60133b9d106f2550b3a7014",
+    "--Rust-execution",
+    ".runtime/porting/CTF-01/candidate-unit-command-01/receipt.json#54bb13b520194aa0ac395017764d647330b0a1e1bacb73071e518f70499f78fd",
+    "--Rust-results",
+    ".runtime/porting/CTF-01/candidate-unit-command-01/stdout.log#b592f4d1f8baa18af9059dbddedf52029d28273db124938a30d6fec2f0fa6594",
+    "--output-dir",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-comparison-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 1,
+  "launch_error": null,
+  "started_utc": "2026-10-10T11:46:30.472553+00:00",
+  "finished_utc": "2026-10-10T11:46:30.651019+00:00",
+  "elapsed_seconds": 0.17794470000080764,
+  "repository_before": {
+    "head": "382dfb56a1a2aac2101492d90eac216062c9021d",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_compiler/src/compiler.rs\u0000 M crates/ep_compiler/src/compiler/tests/material_variants.rs\u0000 M crates/ep_model/src/model.rs\u0000 M crates/ep_model/src/objects/materials.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf01_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf01_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing/\u0000"
+  },
+  "repository_after": {
+    "head": "382dfb56a1a2aac2101492d90eac216062c9021d",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_compiler/src/compiler.rs\u0000 M crates/ep_compiler/src/compiler/tests/material_variants.rs\u0000 M crates/ep_model/src/model.rs\u0000 M crates/ep_model/src/objects/materials.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf01_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf01_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/7c/7c2840ab74995bfdb5e53a0467ee3bca7785e9136684e646bf7e0e18db438f92",
+    "sha256": "7c2840ab74995bfdb5e53a0467ee3bca7785e9136684e646bf7e0e18db438f92"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-comparison-command-01/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-comparison-command-01/stderr.log",
+    "sha256": "bfc7269623299234184589413b2be41c24bfd7fe66f78c3898205e567b2f3952"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T11:46:30.651019+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

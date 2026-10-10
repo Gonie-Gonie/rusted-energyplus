@@ -9273,17 +9273,17 @@
       "timing": "구성체 초기화",
       "unit_tests": "단층·다층·연속 저항층·저항+유질량 층; 전처리 중간값 비교",
       "integration_test": "CTF-02/03에 전달되는 배열·순서 검증",
-      "rust_candidate": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "rust_candidate": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
       "assessment": "기존 구현 보완",
       "companion": "Construction.hh capacity/constructor/actual owners; Material.hh and Material.cc Regular/NoMass storage; DataConversions.hh58-69; HeatBalanceManager.cc6153-6167 actual shared references and call order; SurfaceGeometry.cc9081-9107 actual CTF-use owner.",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Amended before first Native execution: selected59-401 and companions reviewed; genuine method continuation through1103 retained, not replaced by prefix arithmetic. CTF02-10/source-sink/2D/unselected material families excluded. Four gates pending actual validation.",
+      "source_boundary_note": "Selected59-401 and companions reviewed; genuine whole Native continuation through1103 retained. Selected unit gate passed actual39-model/42-call comparison. Integration and production gates remain pending; later CTF02-10 are not certified.",
       "numeric_policy": "18 separate arithmetic profiles atol=rtol=0 with exact class/shape; copied inputs binary64 bits exact. Literal source constants/order/sqrt/unguarded conductance preserved. Required reached absence fails on either or both sides; unreached/stopped/unknown states never numeric PASS. No tolerance retuning after outputs.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -9357,12 +9357,18 @@
           "size_bytes": 1465
         },
         "native_build_and_PE_verified_before_engine": true,
-        "legacy_missing_owner_inventory_confirmed": true
+        "legacy_missing_owner_inventory_confirmed": true,
+        "candidate_stored_Regular_R_and_normalized_owners_applied": true
       },
       "actual_original_and_existing_baseline": {
         "path": "energyplus_porting_plan/evidence/CTF-01-baseline/summary.json",
         "sha256": "3f6f0cf57229e5b98bc26927855e2c3c9661f5295bcc27c73fb6a7ca5038fabe",
         "size_bytes": 2133
+      },
+      "actual_candidate_unit": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-unit/summary.json",
+        "sha256": "ecbc8f1cd91573cf1bc9dcef813bc45340bcd83f2050fb1e08ff3f7306454428",
+        "size_bytes": 1819
       }
     },
     {

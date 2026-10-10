@@ -1,0 +1,11 @@
+--- crates/ep_model/src/objects/materials.rs
++++ crates/ep_model/src/objects/materials.rs
+@@ -202,6 +202,8 @@
+     pub density_kg_per_m3: f64,
+     /// Specific heat in J/kg-K.
+     pub specific_heat_j_per_kg_k: f64,
++    /// Stored loader resistance in m2-K/W, assigned as thickness/conductivity.
++    pub thermal_resistance_m2_k_per_w: f64,
+     /// Shared opaque surface properties.
+     pub surface: OpaqueSurfaceProperties,
+ }

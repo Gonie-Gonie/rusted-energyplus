@@ -59,7 +59,7 @@ CTF-02/03에 전달되는 배열·순서 검증
 ## 종료 체크
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -88,3 +88,7 @@ CTF-02/03에 전달되는 배열·순서 검증
 ## Actual Original and existing Rust baseline
 
 `evidence/CTF-01-baseline/summary.json` preserves genuine Native39/42 and prior Rust fixed15 owner inventories. OriginalDataQA passed before Rust execution: 42 whole source calls returned, 106 callbacks were recorded, and 20 unreached phases remain unavailable. Existing Rust loader/compiler/initialization returned in all15 fixed cases; stored Regular Resistance and the selected preprocessing owners are absent as recorded. The two different lanes are not a numeric comparison. Scope review is complete; unit/integration/production gates remain pending.
+
+## Actual selected preprocessing unit implementation
+
+`evidence/CTF-01-unit/summary.json` preserves the actual candidate source, Cargo build/run, failed precomparison Windows path attempt, corrected comparer and quality records. The corrected comparison uses the original frozen 18 zero-tolerance profiles: 1,874 numeric and 4,346 discrete comparisons, zero mismatches, maximum absolute error and profile RMSE both zero. Twenty genuinely unreached phases remain unavailable and are not counted PASS. Regular stored Resistance and selected PostLoad/PostMerge/PostConversion owners now follow the actual compiler/cache/initialization path. Workspace tests passed 4,642/4,642; Clippy with warnings denied and formatting passed. Only the selected unit gate passes; fixed15 genuine-loader integration, downstream CTF02/03 handoff and production gates remain pending.

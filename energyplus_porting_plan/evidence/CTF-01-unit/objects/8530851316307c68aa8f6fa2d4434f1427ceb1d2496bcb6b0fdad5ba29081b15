@@ -1,0 +1,19 @@
+--- crates/ep_runtime/src/heat_balance/surface_manager.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager.rs
+@@ -5,6 +5,7 @@
+ use ep_model::{ConstructionId, MaterialId, MaterialSurfaceRoughness};
+ 
+ mod construction_cache;
++pub mod ctf_layer_preprocessing;
+ 
+ pub use construction_cache::ConstructionCtfCoefficientSource;
+ pub(crate) use construction_cache::{ConstructionThermalDataCache, surface_thermal_properties};
+@@ -17,6 +18,8 @@
+     pub(crate) construction_id: ConstructionId,
+     pub(crate) construction_name: String,
+     pub(crate) material_layer_stack: Vec<MaterialId>,
++    pub(crate) ctf01_layer_preprocessing:
++        ctf_layer_preprocessing::ConstructionCtfLayerPreprocessing,
+     pub(crate) outside_layer_material_id: MaterialId,
+     pub(crate) outside_layer_material_name: String,
+     pub(crate) outside_layer_roughness: MaterialSurfaceRoughness,
