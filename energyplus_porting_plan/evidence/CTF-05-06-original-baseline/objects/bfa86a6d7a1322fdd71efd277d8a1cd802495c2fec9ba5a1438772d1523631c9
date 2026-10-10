@@ -1,0 +1,190 @@
+{
+  "schema": "ctf05-ctf06-existing-rust-baseline-gap.v1",
+  "created_utc": "2026-10-10T17:48:41.674512+00:00",
+  "authorship": "Root authored structural metadata from genuine unchanged04 Rust Cargo/source capture and actual production stdout after both06 Original DataQA release; this metadata performs no new target or scientific comparison.",
+  "actual_Original_unit_data_QA": {
+    "path": ".runtime/porting/CTF-06/original-data-review-01/review.json",
+    "sha256": "7c85294dbaa36a5f469822a4ff3d58929fea38085233f9dcdd2f2813d2ca0ef5",
+    "size_bytes": 21363
+  },
+  "actual_Original_production_data_QA": {
+    "path": ".runtime/porting/CTF-06/original-production-data-review-01/review.json",
+    "sha256": "90385177d9386c102b16169696eebd98483a8be986b3976ef6460a2d1dd37b74",
+    "size_bytes": 63584
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-06/existing-production-build-command-01/receipt.json",
+    "sha256": "e75152fd891d3de779e692e10e5d7651970342dda9c460ce341f2f90bac88df4",
+    "size_bytes": 4370
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-06/existing-production-command-01/receipt.json",
+    "sha256": "1604a3f1cb7a834954710d25cd282c661799c61467359237237a9e530ae885ce",
+    "size_bytes": 2928
+  },
+  "actual_results": {
+    "path": ".runtime/porting/CTF-06/existing-production-command-01/stdout.log",
+    "sha256": "1e077c0c07890fbedda7eec7224ba4422565c7e2e459f14e2d401bdfd68d5d47",
+    "size_bytes": 857017
+  },
+  "unchanged_input_only_request": {
+    "path": ".runtime/porting/CTF-06/existing-production-inputs-01/request.json",
+    "sha256": "dd111479c5e6f3a9185ea26d8e42b25c4b973e7a181bf09087fb1923c547644f",
+    "size_bytes": 35763
+  },
+  "inherited_request": {
+    "path": ".runtime/porting/CTF-04/candidate-production-inputs-01/request.json",
+    "sha256": "dd111479c5e6f3a9185ea26d8e42b25c4b973e7a181bf09087fb1923c547644f",
+    "size_bytes": 35763
+  },
+  "actual_full_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/3a/3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d",
+    "sha256": "3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d"
+  },
+  "actual_new_CTF05_CTF06_source_paths_absent": [
+    "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner_tests.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix/tests.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/tests.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner_tests.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs",
+    "crates/ep_run/examples/ctf06_candidate_unit_observer.rs",
+    "crates/ep_run/examples/ctf06_candidate_unit_support/fields.rs",
+    "crates/ep_run/examples/ctf06_candidate_production_observer.rs",
+    "crates/ep_run/examples/ctf06_candidate_production_support/fields.rs",
+    "crates/ep_run/examples/ctf06_candidate_production_support/unit_fields.rs"
+  ],
+  "model_cases": [
+    {
+      "id": "A-24H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 3,
+      "CTF03_owner_rows": 3,
+      "CTF04_owner_rows": 3,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "A-72H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 3,
+      "CTF03_owner_rows": 3,
+      "CTF04_owner_rows": 3,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "A-ANNUAL",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 3,
+      "CTF03_owner_rows": 3,
+      "CTF04_owner_rows": 3,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-NOLIMIT-72H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-NOLIMIT-ANNUAL",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-FLOW-24H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-FLOW-72H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-FLOW-ANNUAL",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-CAPACITY-72H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-CAPACITY-ANNUAL",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-BOTH-24H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-BOTH-72H",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    },
+    {
+      "id": "B-BOTH-ANNUAL",
+      "initialization_status": "source-returned",
+      "CTF01_owner_rows": 1,
+      "CTF03_owner_rows": 1,
+      "CTF04_owner_rows": 1,
+      "CTF05_or_CTF06_observed_owner_keys_present": false
+    }
+  ],
+  "CTF04_owner_rows_total": 21,
+  "all15_initialization_source_returned": true,
+  "gap": "Current committed04 initializer executed same authentic15 input-only converted cases. New inverse/exponential/combined owner/module/observer sources are absent on disk and in full actual Cargo Source snapshot; no05/06 owner values available for comparison. Prior04 packet is inherited literal input provenance, not06answers. Structural unavailability leaves numerical mismatch unknown.",
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "Rust_candidate_applied": false,
+  "gates_updated": false
+}

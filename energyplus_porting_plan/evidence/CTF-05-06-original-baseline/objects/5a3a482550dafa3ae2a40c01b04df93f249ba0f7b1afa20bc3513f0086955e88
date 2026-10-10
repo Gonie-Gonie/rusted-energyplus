@@ -1,0 +1,31 @@
+{
+  "schema": "ctf06-native-runtime-loader-environment.v1",
+  "authorship": "Root recorded actual process environment selection before helper launch; no scientific execution or source modification by this metadata",
+  "observed_utc": "2026-10-10T17:43:39.751974+00:00",
+  "PATH_prepend": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin",
+  "runtime_DLLs": [
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libgcc_s_seh-1.dll",
+      "sha256": "403b4169b307d0bfb27a9cbcccbca491efe634eb0462fc1f3fc5ace373bd2827",
+      "size_bytes": 740183
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libstdc++-6.dll",
+      "sha256": "748b10c9f25828fbc78e8eaf50355e7f178d0ed0438d2c396565b56c5bd4ac0a",
+      "size_bytes": 2304720
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libwinpthread-1.dll",
+      "sha256": "a086938c9612746fda0ab8640b8d21e8d36bc3e53c1e8e70f9896888b41607dd",
+      "size_bytes": 94355
+    }
+  ],
+  "earlier_unit_loader_failure": {
+    "path": ".runtime/porting/CTF-06/native-unit-command-01/receipt.json",
+    "sha256": "c450cce9bfd718f5f47f5baf7758d1b680d8fe0931fcbacf31f52c404a7c9b21",
+    "size_bytes": 3189
+  },
+  "earlier_process_exit_code": 3221225781,
+  "earlier_results_absent": true,
+  "helper_binary_or_inputs_changed": false
+}

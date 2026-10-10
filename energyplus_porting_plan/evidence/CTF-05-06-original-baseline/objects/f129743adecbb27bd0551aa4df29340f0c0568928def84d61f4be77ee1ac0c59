@@ -1,0 +1,350 @@
+{
+  "schema": "validated-debug-derivative.v1",
+  "started_utc": "2026-10-10T17:37:24.095471+00:00",
+  "actual_driver_argv": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    "tools/porting/derive_native_helper.py",
+    "--original",
+    ".runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe",
+    "--original-sha256",
+    "ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f",
+    "--strip-tool",
+    ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+    "--tool-audit",
+    ".runtime/porting/native-efficiency-audit-01/audit.json",
+    "--help-receipt",
+    ".runtime/porting/native-debug-derivative-plan-01/help-receipt.json",
+    "--output-dir",
+    ".runtime/porting/CTF-06/native-build-01/unit/derivation"
+  ],
+  "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "expected_original_sha256": "ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f",
+  "executed_driver": {
+    "historical_path": "tools/porting/derive_native_helper.py",
+    "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+    "matching_archive": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/derive_native_helper.py",
+      "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf"
+    }
+  },
+  "executed_PE_reader": {
+    "historical_path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "matching_archive": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56"
+    }
+  },
+  "original_before": {
+    "historical_path": ".runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe",
+    "sha256": "ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f",
+    "size_bytes": 1299892676,
+    "retention_class": "prospective-debug-original"
+  },
+  "original_after": {
+    "historical_path": ".runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe",
+    "sha256": "ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f",
+    "size_bytes": 1299892676,
+    "retention_class": "prospective-debug-original"
+  },
+  "strip_command": {
+    "schema": "native-strip-command.v1",
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\strip.exe",
+      "--strip-debug",
+      "--preserve-dates",
+      "-o",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-06\\native-build-01\\unit\\derivation\\derived-helper.exe",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\ctf06_unit_helper.exe"
+    ],
+    "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+    "started_utc": "2026-10-10T17:37:33.123964+00:00",
+    "exit_code": 0,
+    "finished_utc": "2026-10-10T17:37:34.754403+00:00",
+    "stdout": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/strip-stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/strip-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "tool_before": {
+    "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+    "sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+  },
+  "tool_after": {
+    "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+    "sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/derived-helper.exe",
+    "sha256": "762418bb7057d2364a82e38b694855011f27ea438c6cefcf9abba201c574ac3f"
+  },
+  "maps": {
+    "original_before": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/original-before-pe.json",
+      "sha256": "79d1a13cf4b1a76b4c4ff01e104861f546483deeee5d4f50ad8e31b7abf67aed"
+    },
+    "original_after": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/original-after-pe.json",
+      "sha256": "79d1a13cf4b1a76b4c4ff01e104861f546483deeee5d4f50ad8e31b7abf67aed"
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/derived-pe.json",
+      "sha256": "2000f6fe763bce32ab63f394279230f987e2c5793cda7462392e94c22b1c7bda"
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/pe-comparison.json",
+      "sha256": "84a975383d613a22c868a7de05d72a0272d9984f529e727d01faad6f1edd3a6e"
+    }
+  },
+  "comparison": {
+    "status": "pass-exact-retained-runtime-sections-and-directories",
+    "retained_section_count": 11,
+    "removed_debug_sections": [
+      {
+        "name": ".debug_aranges",
+        "rva": 71327744,
+        "virtual_size": 7747280,
+        "raw_size": 7747584,
+        "raw_offset": 71247872,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "c85f3da90148df52afb10a1966524ecf109d2192ce4fe4edb32b48ccd449845f"
+      },
+      {
+        "name": ".debug_info",
+        "rva": 79077376,
+        "virtual_size": 1044306404,
+        "raw_size": 1044306432,
+        "raw_offset": 78995456,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "95c66d17773908abefed199f227b96492f3ee443e3450f822066301d833e404a"
+      },
+      {
+        "name": ".debug_abbrev",
+        "rva": 1123385344,
+        "virtual_size": 3894339,
+        "raw_size": 3894784,
+        "raw_offset": 1123301888,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "a33c88f0197badea894eebe2498e92f331bc913f00feaf67a63b1634f262e7f4"
+      },
+      {
+        "name": ".debug_line",
+        "rva": 1127280640,
+        "virtual_size": 39762741,
+        "raw_size": 39762944,
+        "raw_offset": 1127196672,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "30f2ac09792709234227e10a97aa8808ba403ec77738cbdf7aa293c9d443d737"
+      },
+      {
+        "name": ".debug_frame",
+        "rva": 1167044608,
+        "virtual_size": 8813560,
+        "raw_size": 8813568,
+        "raw_offset": 1166959616,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "251a4a4d7238943f78e82dbb7bba036451033fd144af4188d72abda0b067f42b"
+      },
+      {
+        "name": ".debug_str",
+        "rva": 1175859200,
+        "virtual_size": 8577687,
+        "raw_size": 8578048,
+        "raw_offset": 1175773184,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "a36e05fffb6def56a76f41853463e3c318f2079443a7bb60cff4cea98830270e"
+      },
+      {
+        "name": ".debug_line_str",
+        "rva": 1184440320,
+        "virtual_size": 2643098,
+        "raw_size": 2643456,
+        "raw_offset": 1184351232,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "50a93578efd2f5b91e585ce1ca24f871e0631a581bf88cd27ed81c36e5a217a8"
+      },
+      {
+        "name": ".debug_loclists",
+        "rva": 1187086336,
+        "virtual_size": 8573566,
+        "raw_size": 8573952,
+        "raw_offset": 1186994688,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "bade1020579d57ab53f04069b6c70da71c7d4f64c1b6c678d96be9e09c954470"
+      },
+      {
+        "name": ".debug_rnglists",
+        "rva": 1195663360,
+        "virtual_size": 6210033,
+        "raw_size": 6210048,
+        "raw_offset": 1195568640,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "d785c068b086ddd4f1427008252464df61ff8779fd4fb1144707f9c56e65f8ae"
+      }
+    ],
+    "removed_debug_raw_bytes": 1130530816,
+    "initialized_data_accounting": {
+      "retained_initialized_raw_bytes": 71246336,
+      "removed_debug_initialized_raw_bytes": 1130530816,
+      "original_included_debug": false
+    },
+    "raw_file_offset_changes": [
+      {
+        "name": ".text",
+        "before": 1536,
+        "after": 1024
+      },
+      {
+        "name": ".data",
+        "before": 39313408,
+        "after": 39312896
+      },
+      {
+        "name": ".rdata",
+        "before": 39396864,
+        "after": 39396352
+      },
+      {
+        "name": ".eh_frame",
+        "before": 66325504,
+        "after": 66324992
+      },
+      {
+        "name": ".pdata",
+        "before": 66326016,
+        "after": 66325504
+      },
+      {
+        "name": ".xdata",
+        "before": 67960832,
+        "after": 67960320
+      },
+      {
+        "name": ".idata",
+        "before": 70598656,
+        "after": 70598144
+      },
+      {
+        "name": ".CRT",
+        "before": 70632960,
+        "after": 70632448
+      },
+      {
+        "name": ".tls",
+        "before": 70633472,
+        "after": 70632960
+      },
+      {
+        "name": ".reloc",
+        "before": 70633984,
+        "after": 70633472
+      }
+    ],
+    "explained_header_changes": {
+      "section_count": {
+        "before": 20,
+        "after": 11
+      },
+      "symbol_table_offset": {
+        "before": 1201778688,
+        "after": 71247360
+      },
+      "symbol_count": {
+        "before": 1557978,
+        "after": 1328148
+      },
+      "coff_characteristics": {
+        "before": 38,
+        "after": 550
+      },
+      "image_size": {
+        "before": 1201876992,
+        "after": 71327744
+      },
+      "header_size": {
+        "before": 1536,
+        "after": 1024
+      },
+      "checksum": {
+        "before": 1299933956,
+        "after": 151479935
+      }
+    },
+    "code_or_data_masked": false,
+    "scientific_execution_certified": false
+  },
+  "status": "pass-exact-retained-runtime-sections-and-directories",
+  "failure": null,
+  "original_removed": false,
+  "original_removal_authorized": false,
+  "full_original_copied": false,
+  "engines_compilers_Cargo_Git_executed": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false,
+  "tool_authentication": {
+    "audit": {
+      "historical_path": ".runtime/porting/native-efficiency-audit-01/audit.json",
+      "sha256": "5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f",
+      "matching_archive": {
+        "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/tool-audit.json",
+        "sha256": "5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f"
+      }
+    },
+    "help": {
+      "historical_path": ".runtime/porting/native-debug-derivative-plan-01/help-receipt.json",
+      "sha256": "33575e30a7199de605ea8f8db4030a27fdb519d44b28d4fca2010925a519a45a",
+      "matching_archive": {
+        "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/tool-help-receipt.json",
+        "sha256": "33575e30a7199de605ea8f8db4030a27fdb519d44b28d4fca2010925a519a45a"
+      }
+    },
+    "publisher": {
+      "historical_path": ".runtime/porting/reference-energyplus-26.1.0/provenance/winlibs-gcc13-toolchain-receipt.json",
+      "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+      "matching_archive": {
+        "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/tool-publisher-receipt.json",
+        "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9"
+      }
+    },
+    "publisher_archive": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64ucrt-11.0.1-r3.zip",
+      "sha256": "4889a18dd97d601c1d6c2f141865469979472846751e444840532257dfac44b6"
+    },
+    "archive_member": "mingw64/bin/strip.exe",
+    "actual_member_sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+  },
+  "strip_command_receipt": {
+    "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/strip-command.json",
+    "sha256": "8a4b722a8ebde38310be2c2505a6c08a19c2c4f431a2d085a6e40c45097ae6e7"
+  },
+  "accepted_derivative": {
+    "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/derived-helper.exe",
+    "sha256": "762418bb7057d2364a82e38b694855011f27ea438c6cefcf9abba201c574ac3f",
+    "size_bytes": 151415952
+  },
+  "observed_derivative": {
+    "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/derived-helper.exe",
+    "sha256": "762418bb7057d2364a82e38b694855011f27ea438c6cefcf9abba201c574ac3f",
+    "size_bytes": 151415952
+  },
+  "original_bytes_unchanged": true,
+  "source_bytes_match_before_and_after": true,
+  "accepted_derivative_bytes_unchanged": true,
+  "finished_utc": "2026-10-10T17:37:45.810177+00:00"
+}
