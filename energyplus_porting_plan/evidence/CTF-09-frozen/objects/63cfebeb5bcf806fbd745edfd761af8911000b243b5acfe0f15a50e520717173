@@ -1,0 +1,1016 @@
+// Pure serialization of the actual passive post-619 capture; no node evaluator.
+#ifndef CTF09_OBSERVATION_FIELDS_HH
+#define CTF09_OBSERVATION_FIELDS_HH
+#include "ctf01_reference_metadata.hh"
+#include "ctf09_observer.hh"
+#include <limits>
+
+namespace Ctf01 {
+inline json ctf03_initial_policy()
+{
+    return {{"protocol", "ctf03-initial-discretization.v1"},
+        {"phase", "after_original_Construction_cc619_before_matrix_allocation_and_retry"},
+        {"selection", "actual_initial_callback_reached_and_intact_active_prefix"},
+        {"required_owner_context", {{"SourceSinkPresent", false}, {"SolutionDimensions", 1}}},
+        {"active_layer_fields", {"Nodes", "dx"}},
+        {"integer_fields", {"LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"}},
+        {"scalar_fields", {"CTFTimeStep", "TimeStepZone"}},
+        {"initial_state_distinct_from_whole_return_and_retry_state", true},
+        {"PostConversion_layer_handoff_retained", true},
+        {"PostConversion_handoff_fields", {"LayersInConstruct", "NumResLayers", "dl", "rk", "rho", "cp", "lr", "ResLayer"}},
+        {"capacitance_factors_are_actual_rho_and_cp_not_recomputed_products", true},
+        {"required_reached_fields_absent_is_integrity_failure", true},
+        {"unreached_counted_as_PASS", false}, {"branch_or_numeric_answers_reconstructed", false}};
+}
+inline json initial_checkpoint(EnergyPlus::CTF09Observation::InitialDiscretizationSnapshot const &source,
+                               std::size_t actual_count)
+{
+    if (!source.reached) return {{"reached", false}, {"available", false},
+        {"unavailable_reason", "callback_not_reached"}, {"actual_phase_callback_count", actual_count}, {"snapshot", nullptr}};
+    json layers = nullptr;
+    if (source.active_prefix_available) {
+        require(source.copied_layer_count <= source.active_prefix.size(), "Actual initial copied prefix exceeds its capacity");
+        layers = json::array();
+        for (std::size_t i = 0; i < source.copied_layer_count; ++i) {
+            auto const &layer = source.active_prefix[i];
+            layers.push_back({{"Nodes", layer.Nodes}, {"dx", scalar_bits(layer.dx.bits)}});
+        }
+    }
+    return {{"reached", true}, {"available", source.active_prefix_available},
+        {"unavailable_reason", source.active_prefix_available ? json(nullptr) : json("observer_active_prefix_invalid")},
+        {"actual_phase_callback_count", actual_count}, {"snapshot", {
+            {"LayersInConstruct", source.LayersInConstruct}, {"NumResLayers", source.NumResLayers},
+            {"ErrorsFound", source.ErrorsFound}, {"DoCTFErrorReport", source.DoCTFErrorReport},
+            {"active_prefix_available", source.active_prefix_available}, {"copied_layer_count", source.copied_layer_count},
+            {"active_prefix", layers}, {"rcmax", source.rcmax}, {"NodeSource", source.NodeSource},
+            {"NodeUserTemp", source.NodeUserTemp}, {"CTFTimeStep", scalar_bits(source.CTFTimeStep.bits)},
+            {"NumHistories", source.NumHistories}, {"TimeStepZone", scalar_bits(source.TimeStepZone.bits)}}}};
+}
+inline json ctf04_matrix_policy()
+{
+    return {{"protocol", "ctf04-matrix-assembly.v1"},
+        {"phase", "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt"},
+        {"selection", "first_actual_post728_visit_in_selected_no_source_1D_context"},
+        {"selected_attempt_ordinal", 1}, {"later_Native_attempts_paired", false},
+        {"selected_first_attempt_uses_actual_initial619_dt_and_history", true}, {"Rust_retry_driver_available", false},
+        {"required_owner_context", {{"SourceSinkPresent", false}, {"SolutionDimensions", 1}}},
+        {"matrix_fields", {"AMat", "IdenMatrix", "BMat", "CMat", "DMat"}},
+        {"storage_order", "source_i1_outer_i2_inner_row_first"},
+        {"matrix_shapes", {{"AMat", "actual_rcmax_by_rcmax"}, {"IdenMatrix", "actual_rcmax_by_rcmax"},
+                           {"BMat", 3}, {"CMat", 2}, {"DMat", 2}}},
+        {"actual_source_produced_identity_required", true},
+        {"attempt_identity", "one_based_actual_callback_visit_within_bound_whole_call"},
+        {"actual_current_retry_state_fields", {"CTFTimeStep", "NumHistories", "TimeStepZone"}},
+        {"actual_converted_and_initial_handoff_retained", true},
+        {"missing_attempt_or_copy_integrity_failure_is_required_failure", true},
+        {"unreached_counted_as_PASS", false}, {"retry_driver_or_matrix_answers_reconstructed", false}};
+}
+inline json matrix_failure_kind(EnergyPlus::CTF09Observation::MatrixAttemptFailureKind kind)
+{
+    using Kind = EnergyPlus::CTF09Observation::MatrixAttemptFailureKind;
+    switch (kind) {
+    case Kind::IdentityMismatch: return "IdentityMismatch";
+    case Kind::OrderFailure: return "OrderFailure";
+    case Kind::ActivePrefixShape: return "ActivePrefixShape";
+    case Kind::MatrixShape: return "MatrixShape";
+    case Kind::CopyException: return "CopyException";
+    case Kind::LedgerAppendException: return "LedgerAppendException";
+    }
+    throw std::runtime_error("Unknown actual matrix failure kind");
+}
+inline json matrix_attempt(EnergyPlus::CTF09Observation::MatrixAttemptSnapshot const &source)
+{
+    json layers = nullptr, matrices = nullptr;
+    if (source.active_prefix_available) {
+        require(source.copied_layer_count <= source.active_prefix.size(), "Actual matrix layer prefix exceeds capture capacity");
+        layers = json::array();
+        for (std::size_t index = 0; index < source.copied_layer_count; ++index) {
+            auto const &layer = source.active_prefix[index]; auto const &v = layer.converted;
+            layers.push_back({{"dl", scalar_bits(v.dl.bits)}, {"rk", scalar_bits(v.rk.bits)},
+                {"rho", scalar_bits(v.rho.bits)}, {"cp", scalar_bits(v.cp.bits)},
+                {"lr", scalar_bits(v.lr.bits)}, {"ResLayer", v.ResLayer},
+                {"Nodes", layer.Nodes}, {"dx", scalar_bits(layer.dx.bits)}});
+        }
+    }
+    auto const copies = [](auto const &values) {
+        json result = json::array();
+        for (auto const &value : values) result.push_back(scalar_bits(value.bits));
+        return result;
+    };
+    if (source.matrices_available) matrices = {{"AMat", copies(source.AMat)}, {"IdenMatrix", copies(source.IdenMatrix)},
+        {"BMat", copies(source.BMat)}, {"CMat", copies(source.CMat)}, {"DMat", copies(source.DMat)}};
+    auto const bounds1 = [](auto const &value) -> json {
+        return value ? json{{"lower", value->lower}, {"upper", value->upper}, {"size", value->size}} : json(nullptr);
+    };
+    auto const bounds2 = [](auto const &value) -> json {
+        return value ? json{{"lower1", value->lower1}, {"upper1", value->upper1},
+                            {"lower2", value->lower2}, {"upper2", value->upper2}, {"size", value->size}} : json(nullptr);
+    };
+    bool failure = false; json kinds = json::array();
+    for (std::size_t index = 0; index < source.failure_kinds.size(); ++index) {
+        auto const kind = static_cast<EnergyPlus::CTF09Observation::MatrixAttemptFailureKind>(index);
+        kinds.push_back({{"kind", matrix_failure_kind(kind)}, {"failed", source.failure_kinds[index]}});
+        failure = failure || source.failure_kinds[index];
+    }
+    bool const available = source.reached && source.active_prefix_available && source.matrices_available && !failure;
+    return {{"observed_attempt_ordinal", source.observed_attempt_ordinal}, {"reached", source.reached}, {"available", available},
+        {"unavailable_reason", available ? json(nullptr) : json("required_matrix_observer_integrity_failure")}, {"failure_kinds", kinds},
+        {"snapshot", {{"ErrorsFound", source.ErrorsFound}, {"DoCTFErrorReport", source.DoCTFErrorReport},
+            {"IsUsedCTF", source.IsUsedCTF}, {"SourceSinkPresent", source.SourceSinkPresent},
+            {"SolutionDimensions", source.SolutionDimensions}, {"TotLayers", source.TotLayers},
+            {"LayersInConstruct", source.LayersInConstruct}, {"NumResLayers", source.NumResLayers},
+            {"rcmax", source.rcmax}, {"NodeSource", source.NodeSource}, {"NodeUserTemp", source.NodeUserTemp},
+            {"CTFTimeStep", scalar_bits(source.CTFTimeStep.bits)}, {"NumHistories", source.NumHistories},
+            {"TimeStepZone", scalar_bits(source.TimeStepZone.bits)}, {"active_prefix_available", source.active_prefix_available},
+            {"copied_layer_count", source.copied_layer_count}, {"active_prefix", layers},
+            {"matrices_available", source.matrices_available}, {"matrices", matrices},
+            {"actual_bounds", {{"AMat", bounds2(source.AMat_bounds)}, {"IdenMatrix", bounds2(source.IdenMatrix_bounds)},
+                {"BMat", bounds1(source.BMat_bounds)}, {"CMat", bounds1(source.CMat_bounds)}, {"DMat", bounds1(source.DMat_bounds)}}}}}};
+}
+inline bool matrix_observer_failed(EnergyPlus::CTF09Observation::Capture const &capture)
+{
+    if (capture.matrix_observer_failure || capture.matrix_attempt_records_omitted != 0 ||
+        capture.actual_matrix_attempt_callback_count != capture.matrix_attempts.size()) return true;
+    for (auto count : capture.matrix_failure_event_counts) if (count != 0) return true;
+    if (capture.first_matrix_failure || capture.last_matrix_failure) return true;
+    for (std::size_t index = 0; index < capture.matrix_attempts.size(); ++index) {
+        auto const &record = capture.matrix_attempts[index];
+        if (record.observed_attempt_ordinal != index + 1 || !record.reached ||
+            !record.active_prefix_available || !record.matrices_available ||
+            record.LayersInConstruct < 1 || record.LayersInConstruct > EnergyPlus::Construction::MaxLayersInConstruct ||
+            record.copied_layer_count != static_cast<std::size_t>(record.LayersInConstruct) || record.rcmax < 1) return true;
+        for (auto failed : record.failure_kinds) if (failed) return true;
+        auto const count = static_cast<std::size_t>(record.rcmax);
+        if (count > std::numeric_limits<std::size_t>::max() / count ||
+            record.AMat.size() != count * count || record.IdenMatrix.size() != count * count) return true;
+    }
+    return false;
+}
+inline json matrix_observations(EnergyPlus::CTF09Observation::Capture const &capture)
+{
+    json attempts = json::array(), failures = json::array();
+    for (auto const &attempt : capture.matrix_attempts) attempts.push_back(matrix_attempt(attempt));
+    for (std::size_t index = 0; index < capture.matrix_failure_event_counts.size(); ++index)
+        failures.push_back({{"kind", matrix_failure_kind(static_cast<EnergyPlus::CTF09Observation::MatrixAttemptFailureKind>(index))},
+                            {"actual_event_count", capture.matrix_failure_event_counts[index]}});
+    auto const event = [](auto const &value) -> json {
+        return value ? json{{"observed_attempt_ordinal", value->observed_attempt_ordinal}, {"kind", matrix_failure_kind(value->kind)}} : json(nullptr);
+    };
+    return {{"protocol", "ctf04-matrix-assembly.v1"}, {"actual_matrix_attempt_callback_count", capture.actual_matrix_attempt_callback_count},
+        {"actual_retained_attempt_count", capture.matrix_attempts.size()}, {"matrix_attempt_records_omitted", capture.matrix_attempt_records_omitted},
+        {"matrix_observer_failure", capture.matrix_observer_failure}, {"matrix_copy_integrity_failed", matrix_observer_failed(capture)},
+        {"matrix_failure_event_counts", failures}, {"first_matrix_failure", event(capture.first_matrix_failure)},
+        {"last_matrix_failure", event(capture.last_matrix_failure)}, {"attempts", attempts},
+        {"no_callback_reached", capture.actual_matrix_attempt_callback_count == 0}, {"unreached_counted_as_PASS", false},
+        {"matrix_or_identity_or_retry_state_reconstructed", false}, {"old_checkpoint_counters_include_matrix_callbacks", false}};
+}
+inline json ctf06_exponential_policy()
+{
+    return json::parse(R"CTF06({"protocol":"ctf06-exponential-method-observation.v1","actual_method":"ConstructionProps::calculateExponentialMatrix","actual_caller_line":884,"actual_method_source_lines":[1105,1373],"actual_stage_names":["Entry","InitializedInputs","ScalingControls","PowerControl","SquareControl","FinalWorkspace","SourceReturn"],"input_matrices":["AMat","IdenMatrix"],"initialized_matrices":["AMat1","AMato","AMatN","AExp"],"scaled_matrices":["AMat1"],"final_matrices":["AMat1","AMato","AMatN","AExp"],"return_matrices":["AMat","IdenMatrix","AExp"],"scalar_controls":["AMatRowNormMax","fact","CheckVal"],"integer_controls":["k","l","final_i"],"actual_power_controls":["i","SigFigLimit"],"actual_square_controls":["isq","Backup"],"scalar_controls_available_only_at_scaling_and_final":true,"final_i_distinct_from_observed_control_event_count":true,"selected_invocation_ordinal":1,"selected_assembly_ordinal":1,"selected_first_attempt_uses_actual_initial619_dt_and_history":true,"required_owner_context":{"SourceSinkPresent":false,"SolutionDimensions":1},"actual_source_produced_identity_required":true,"storage_order":"source_i1_outer_i2_inner_row_first","invocation_identity":"one_based_actual_entry_visit_within_bound_whole_call","actual_assembly_association_required":true,"actual_method_return_marker_required_for_return_claim":true,"all_actual_visits_and_control_events_retained":true,"later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,"Rust_retry_driver_available":false,"uninvoked_counted_as_PASS":false,"missing_selected_owner_on_one_or_both_sides_is_required_failure":true,"observer_failure_or_omission_is_integrity_failure":true,"method_values_or_identity_or_return_or_retry_state_reconstructed":false})CTF06");
+}
+inline json ctf05_inverse_policy()
+{
+    return json::parse(R"CTF06({"protocol":"ctf05-inverse-method-observation.v1","actual_method":"ConstructionProps::calculateInverseMatrix","actual_caller_line":887,"actual_method_source_lines":[1375,1494],"actual_stage_names":["Entry","InitializedInputs","ScalingControls","PowerControl","SquareControl","FinalWorkspace","SourceReturn"],"input_matrices":["AMat","IdenMatrix"],"initialized_matrices":["AMat1","AInv"],"final_matrices":["AMat1","AInv"],"return_matrices":["AMat","IdenMatrix","AInv"],"actual_exponential_return_precedes_inverse_entry":true,"inverse_inputs_are_original_AMat_and_IdenMatrix_not_AExp":true,"selected_invocation_ordinal":1,"selected_assembly_ordinal":1,"selected_first_attempt_uses_actual_initial619_dt_and_history":true,"required_owner_context":{"SourceSinkPresent":false,"SolutionDimensions":1},"actual_source_produced_identity_required":true,"storage_order":"source_i1_outer_i2_inner_row_first","invocation_identity":"one_based_actual_entry_visit_within_bound_whole_call","actual_assembly_association_required":true,"actual_method_return_marker_required_for_return_claim":true,"all_actual_visits_and_control_events_retained":true,"later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,"Rust_retry_driver_available":false,"uninvoked_counted_as_PASS":false,"missing_selected_owner_on_one_or_both_sides_is_required_failure":true,"observer_failure_or_omission_is_integrity_failure":true,"method_values_or_identity_or_return_or_retry_state_reconstructed":false})CTF06");
+}
+inline json ctf06_linked_original_retention_intent()
+{
+    return json::parse(R"CTF06({"schema":"ctf06-debug-original-retention-intent.v1","role":"prospective-debug-original","scope":"new-CTF06-linked-originals-only","actual_file_identity_required":true,"both_original_and_helper_verified_before_execution":true,"retain_through_PE_validation_and_current_helper_execution":true,"removal_requires_separate_Root_authorized_actual_retention_record":true,"earlier_live_refs_reinterpreted":false,"deletion_performed":false})CTF06");
+}
+
+// Actual combined method capture serialization. Unreached/default slots are null.
+namespace MethodObservation = EnergyPlus::CTF09Observation;
+inline char const *method_kind_name(MethodObservation::MethodKind value)
+{
+    switch (value) {
+    case MethodObservation::MethodKind::Exponential: return "Exponential";
+    case MethodObservation::MethodKind::Inverse: return "Inverse";
+    }
+    throw std::runtime_error("Unknown actual method kind");
+}
+inline char const *method_stage_name(MethodObservation::MethodStage value)
+{
+    using Stage = MethodObservation::MethodStage;
+    switch (value) {
+    case Stage::Entry: return "Entry";
+    case Stage::InitializedInputs: return "InitializedInputs";
+    case Stage::ScalingControls: return "ScalingControls";
+    case Stage::PowerControl: return "PowerControl";
+    case Stage::SquareControl: return "SquareControl";
+    case Stage::FinalWorkspace: return "FinalWorkspace";
+    case Stage::SourceReturn: return "SourceReturn";
+    }
+    throw std::runtime_error("Unknown actual method stage");
+}
+inline char const *method_failure_name(MethodObservation::MethodFailureKind value)
+{
+    using Kind = MethodObservation::MethodFailureKind;
+    switch (value) {
+    case Kind::IdentityMismatch: return "IdentityMismatch";
+    case Kind::AssociationFailure: return "AssociationFailure";
+    case Kind::OrderFailure: return "OrderFailure";
+    case Kind::MatrixShape: return "MatrixShape";
+    case Kind::CopyException: return "CopyException";
+    case Kind::LedgerAppendException: return "LedgerAppendException";
+    }
+    throw std::runtime_error("Unknown actual method failure");
+}
+inline char const *method_matrix_name(MethodObservation::MatrixOwner value)
+{
+    using Owner = MethodObservation::MatrixOwner;
+    switch (value) {
+    case Owner::AMat: return "AMat";
+    case Owner::IdenMatrix: return "IdenMatrix";
+    case Owner::AMat1: return "AMat1";
+    case Owner::AMato: return "AMato";
+    case Owner::AMatN: return "AMatN";
+    case Owner::AExp: return "AExp";
+    case Owner::AInv: return "AInv";
+    }
+    throw std::runtime_error("Unknown actual matrix owner");
+}
+inline json method_context(MethodObservation::MethodContext const &source)
+{
+    json assembly = nullptr;
+    if (source.assembly_context_available) assembly = {{"ErrorsFound", source.assembly_ErrorsFound},
+        {"DoCTFErrorReport", source.assembly_DoCTFErrorReport}, {"TimeStepZone", scalar_bits(source.assembly_TimeStepZone.bits)}};
+    return {{"IsUsedCTF", source.IsUsedCTF}, {"SourceSinkPresent", source.SourceSinkPresent},
+        {"SolutionDimensions", source.SolutionDimensions}, {"TotLayers", source.TotLayers}, {"rcmax", source.rcmax},
+        {"NodeSource", source.NodeSource}, {"NodeUserTemp", source.NodeUserTemp},
+        {"CTFTimeStep", scalar_bits(source.CTFTimeStep.bits)}, {"NumHistories", source.NumHistories},
+        {"assembly_context_available", source.assembly_context_available}, {"earlier_checked_assembly_context", assembly},
+        {"assembly_context_is_fresh_method_stack_context", false}};
+}
+inline json method_value(MethodObservation::MethodValueSnapshot const &source)
+{
+    if (!source.reached) return {{"reached", false}, {"available", false}, {"snapshot", nullptr},
+        {"unavailable_reason", "actual_stage_callback_not_retained_or_not_reached"}, {"counted_as_PASS", false}};
+    require(source.observed_matrix_count <= source.matrices.size(), "Observed method matrix count exceeds actual storage capacity");
+    json matrices = json::array(), controls = nullptr, caller = nullptr;
+    for (std::size_t index = 0; index < source.observed_matrix_count; ++index) {
+        auto const &copy = source.matrices[index]; json bounds = nullptr, values = nullptr;
+        if (copy.bounds) bounds = {{"lower1", copy.bounds->lower1}, {"upper1", copy.bounds->upper1},
+            {"lower2", copy.bounds->lower2}, {"upper2", copy.bounds->upper2}, {"size", copy.bounds->size}};
+        if (copy.copy_available) {
+            values = json::array();
+            for (auto const &value : copy.values) values.push_back(scalar_bits(value.bits));
+        }
+        matrices.push_back({{"owner", method_matrix_name(copy.owner)}, {"actual_bounds", bounds},
+            {"copy_available", copy.copy_available}, {"values", values}});
+    }
+    if (source.exponential_controls) {
+        auto const &copy = *source.exponential_controls;
+        controls = {{"AMatRowNormMax", scalar_bits(copy.AMatRowNormMax.bits)}, {"k", copy.k},
+            {"fact", scalar_bits(copy.fact.bits)}, {"CheckVal", scalar_bits(copy.CheckVal.bits)}, {"l", copy.l},
+            {"final_i", copy.final_i ? json(*copy.final_i) : json(nullptr)}};
+    }
+    if (source.caller_context_available) caller = {{"ErrorsFound", source.caller_ErrorsFound},
+        {"DoCTFErrorReport", source.caller_DoCTFErrorReport},
+        {"TimeStepZone", source.caller_TimeStepZone ? scalar_bits(source.caller_TimeStepZone->bits) : json(nullptr)}};
+    return {{"reached", true}, {"available", source.matrices_available},
+        {"unavailable_reason", source.matrices_available ? json(nullptr) : json("required_method_matrix_copy_unavailable")},
+        {"snapshot", {{"context_available", source.observed_matrix_count != 0},
+            {"context", source.observed_matrix_count != 0 ? method_context(source.context) : json(nullptr)}, {"matrices_available", source.matrices_available},
+            {"observed_matrix_count", source.observed_matrix_count}, {"matrices", matrices},
+            {"exponential_controls", controls}, {"caller_context_available", source.caller_context_available},
+            {"actual_return_site_caller_context", caller}}}, {"counted_as_PASS", false}};
+}
+inline json method_failure_event(std::optional<MethodObservation::MethodFailure> const &value)
+{
+    return value ? json{{"method", method_kind_name(value->method)}, {"invocation_ordinal", value->invocation_ordinal},
+        {"assembly_ordinal", value->assembly_ordinal}, {"stage", method_stage_name(value->stage)},
+        {"kind", method_failure_name(value->kind)}} : json(nullptr);
+}
+inline bool method_copy_failed(MethodObservation::MethodCapture const &source)
+{
+    if (source.observer_failure || source.actual_invocation_count != source.invocations.size() ||
+        source.first_failure || source.last_failure) return true;
+    for (auto count : source.failure_event_counts) if (count != 0) return true;
+    for (auto count : source.stage_records_omitted) if (count != 0) return true;
+    std::array<std::size_t, 7> retained_counts{};
+    for (std::size_t index = 0; index < source.invocations.size(); ++index) {
+        auto const &record = source.invocations[index];
+        if (record.observed_invocation_ordinal != index + 1 || !record.association_available ||
+            record.observed_assembly_ordinal != record.observed_invocation_ordinal) return true;
+        for (bool failed : record.failure_kinds) if (failed) return true;
+        std::array<std::size_t, 7> const retained{{record.entry.reached ? 1u : 0u,
+            record.initialized_inputs.reached ? 1u : 0u, record.scaling_controls.reached ? 1u : 0u,
+            record.power_controls.size(), record.square_controls.size(),
+            record.final_workspace.reached ? 1u : 0u, record.source_return.reached ? 1u : 0u}};
+        if (record.actual_stage_callback_counts != retained) return true;
+        for (std::size_t stage = 0; stage < retained.size(); ++stage) retained_counts[stage] += retained[stage];
+        for (auto const *value : {&record.entry, &record.initialized_inputs, &record.scaling_controls,
+                                 &record.final_workspace, &record.source_return}) {
+            if (!value->reached) continue; // A genuine stop does not invent a missing callback.
+            if (!value->matrices_available || !value->context.assembly_context_available ||
+                value->observed_matrix_count > value->matrices.size()) return true;
+            for (std::size_t matrix = 0; matrix < value->observed_matrix_count; ++matrix)
+                if (!value->matrices[matrix].copy_available) return true;
+        }
+        if (record.source_return.reached && (!record.source_return.caller_context_available ||
+            !record.source_return.caller_TimeStepZone)) return true;
+        for (std::size_t event = 0; event < record.power_controls.size(); ++event)
+            if (record.power_controls[event].observed_event_ordinal != event + 1) return true;
+        for (std::size_t event = 0; event < record.square_controls.size(); ++event)
+            if (record.square_controls[event].observed_event_ordinal != event + 1) return true;
+    }
+    return retained_counts != source.actual_stage_callback_counts;
+}
+inline json method_observations(MethodObservation::MethodCapture const &source, MethodObservation::MethodKind method)
+{
+    json invocations = json::array(), stages = json::array(), failures = json::array();
+    for (auto const &record : source.invocations) {
+        json power = json::array(), square = json::array(), kinds = json::array();
+        for (auto const &event : record.power_controls) power.push_back({{"observed_event_ordinal", event.observed_event_ordinal},
+            {"i", event.i}, {"SigFigLimit", event.SigFigLimit}});
+        for (auto const &event : record.square_controls) square.push_back({{"observed_event_ordinal", event.observed_event_ordinal},
+            {"isq", event.isq}, {"Backup", event.Backup}});
+        for (std::size_t index = 0; index < record.failure_kinds.size(); ++index)
+            kinds.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))}, {"failed", record.failure_kinds[index]}});
+        invocations.push_back({{"observed_invocation_ordinal", record.observed_invocation_ordinal},
+            {"observed_assembly_ordinal", record.observed_assembly_ordinal}, {"association_available", record.association_available},
+            {"failure_kinds", kinds}, {"actual_stage_callback_counts", record.actual_stage_callback_counts},
+            {"Entry", method_value(record.entry)}, {"InitializedInputs", method_value(record.initialized_inputs)},
+            {"ScalingControls", method_value(record.scaling_controls)}, {"PowerControl", power}, {"SquareControl", square},
+            {"FinalWorkspace", method_value(record.final_workspace)}, {"SourceReturn", method_value(record.source_return)},
+            {"actual_retained_power_control_count", record.power_controls.size()},
+            {"actual_retained_square_control_count", record.square_controls.size()}, {"counted_as_PASS", false}});
+    }
+    for (std::size_t index = 0; index < source.actual_stage_callback_counts.size(); ++index)
+        stages.push_back({{"stage", method_stage_name(static_cast<MethodObservation::MethodStage>(index))},
+            {"actual_callback_count", source.actual_stage_callback_counts[index]}, {"records_omitted", source.stage_records_omitted[index]}});
+    for (std::size_t index = 0; index < source.failure_event_counts.size(); ++index)
+        failures.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))},
+            {"actual_event_count", source.failure_event_counts[index]}});
+    return {{"protocol", method == MethodObservation::MethodKind::Exponential ? "ctf06-exponential-method-observation.v1" : "ctf05-inverse-method-observation.v1"},
+        {"method", method_kind_name(method)}, {"actual_invocation_count", source.actual_invocation_count},
+        {"actual_retained_invocation_count", source.invocations.size()}, {"actual_stage_callback_counts", source.actual_stage_callback_counts},
+        {"stage_records_omitted", source.stage_records_omitted}, {"stage_ledger", stages},
+        {"observer_failure", source.observer_failure}, {"method_copy_integrity_failed", method_copy_failed(source)},
+        {"failure_event_counts", failures}, {"first_failure", method_failure_event(source.first_failure)},
+        {"last_failure", method_failure_event(source.last_failure)}, {"invocations", invocations},
+        {"no_actual_entry_observed", source.actual_invocation_count == 0}, {"record_cap", nullptr},
+        {"deduplicated", false}, {"truncated", false}, {"unreached_counted_as_PASS", false},
+        {"later_attempts_counted_as_PASS", false}, {"values_or_identity_or_return_reconstructed", false},
+        {"old_checkpoint_and_matrix_counters_include_method_callbacks", false}};
+}
+inline bool methods_observer_failed(MethodObservation::Capture const &capture)
+{
+    return method_copy_failed(capture.exponential) || method_copy_failed(capture.inverse);
+}
+struct MethodTotals
+{
+    std::size_t actual_invocation_count = 0, retained_invocation_count = 0;
+    std::array<std::size_t, 7> actual_stage_callback_counts{}, stage_records_omitted{};
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::size_t retained_power_control_count = 0, retained_square_control_count = 0;
+    bool copy_integrity_failed = false;
+};
+inline void add_method_totals(MethodTotals &total, json const &ledger)
+{
+    total.actual_invocation_count += ledger.at("actual_invocation_count").get<std::size_t>();
+    total.retained_invocation_count += ledger.at("actual_retained_invocation_count").get<std::size_t>();
+    total.copy_integrity_failed = total.copy_integrity_failed || ledger.at("method_copy_integrity_failed").get<bool>();
+    for (std::size_t index = 0; index < total.actual_stage_callback_counts.size(); ++index) {
+        total.actual_stage_callback_counts[index] += ledger.at("actual_stage_callback_counts").at(index).get<std::size_t>();
+        total.stage_records_omitted[index] += ledger.at("stage_records_omitted").at(index).get<std::size_t>();
+    }
+    for (std::size_t index = 0; index < total.failure_event_counts.size(); ++index)
+        total.failure_event_counts[index] += ledger.at("failure_event_counts").at(index).at("actual_event_count").get<std::size_t>();
+    for (auto const &record : ledger.at("invocations")) {
+        total.retained_power_control_count += record.at("actual_retained_power_control_count").get<std::size_t>();
+        total.retained_square_control_count += record.at("actual_retained_square_control_count").get<std::size_t>();
+    }
+}
+inline json method_totals(MethodTotals const &total)
+{
+    return {{"actual_invocation_count", total.actual_invocation_count}, {"actual_retained_invocation_count", total.retained_invocation_count},
+        {"actual_stage_callback_counts", total.actual_stage_callback_counts}, {"stage_records_omitted", total.stage_records_omitted},
+        {"failure_event_counts", total.failure_event_counts}, {"actual_retained_power_control_count", total.retained_power_control_count},
+        {"actual_retained_square_control_count", total.retained_square_control_count}, {"method_copy_integrity_failed", total.copy_integrity_failed},
+        {"complete_method_return_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+}
+inline json ctf07_gamma_policy()
+{
+    return json::parse(R"CTF07({"protocol":"ctf07-gamma-method-observation.v1","actual_method":"ConstructionProps::calculateGammas","actual_caller_line":890,"actual_method_source_lines":[1496,1589],"actual_stage_names":["Entry","ATempReady","Gamma1Final","Gamma2Final","SourceReturn"],"input_matrices":["AExp","IdenMatrix","AInv"],"actual_input_BMat_shape":[3],"ATemp_ready_matrices":["ATemp"],"Gamma1_final_matrices":["Gamma1"],"Gamma2_final_matrices":["Gamma2"],"return_matrices":["Gamma1","Gamma2"],"matrix_shapes":{"AExp":"actual_rcmax_by_rcmax","IdenMatrix":"actual_rcmax_by_rcmax","AInv":"actual_rcmax_by_rcmax","ATemp":"actual_rcmax_by_rcmax","Gamma1":"actual_3_by_rcmax","Gamma2":"actual_3_by_rcmax"},"actual_caller_source_order":["exponential884","inverse887","Gamma890"],"actual_matching_exponential_and_inverse_returns_precede_Gamma_entry":true,"actual_Gamma1_observed_before_ATemp_deallocation":true,"actual_ATemp_assignment_observed_not_recomputed":true,"selected_invocation_ordinal":1,"selected_assembly_ordinal":1,"selected_first_attempt_uses_actual_initial619_dt_and_history":true,"required_owner_context":{"SourceSinkPresent":false,"SolutionDimensions":1},"NumOfPerpendNodes_for_unselected_2D_is_context_only":true,"actual_source_produced_identity_required":true,"storage_order":"source_i1_outer_i2_inner_row_first","invocation_identity":"one_based_actual_entry_visit_within_bound_whole_call","actual_assembly_association_required":true,"actual_method_return_marker_required_for_return_claim":true,"all_actual_visits_retained":true,"later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,"Rust_retry_driver_available":false,"uninvoked_counted_as_PASS":false,"missing_selected_owner_on_one_or_both_sides_is_required_failure":true,"observer_failure_or_omission_is_integrity_failure":true,"Gamma_or_identity_or_return_or_retry_state_reconstructed":false})CTF07");
+}
+inline json ctf07_linked_original_retention_intent()
+{
+    return json::parse(R"CTF07({"schema":"ctf07-debug-original-retention-intent.v1","role":"prospective-debug-original","scope":"new-CTF07-linked-originals-only","actual_file_identity_required":true,"both_original_and_helper_verified_before_execution":true,"retain_through_PE_validation_and_current_helper_execution":true,"removal_requires_separate_Root_authorized_actual_retention_record":true,"earlier_live_refs_reinterpreted":false,"deletion_performed":false})CTF07");
+}
+
+// Independent Gamma record serialization; no Gamma arithmetic or return inference.
+inline char const *gamma_stage_name(MethodObservation::GammaStage value)
+{
+    using Stage = MethodObservation::GammaStage;
+    switch (value) {
+    case Stage::Entry: return "Entry";
+    case Stage::ATempReady: return "ATempReady";
+    case Stage::Gamma1Final: return "Gamma1Final";
+    case Stage::Gamma2Final: return "Gamma2Final";
+    case Stage::SourceReturn: return "SourceReturn";
+    }
+    throw std::runtime_error("Unknown actual Gamma stage");
+}
+inline char const *gamma_matrix_name(MethodObservation::GammaMatrixOwner value)
+{
+    using Owner = MethodObservation::GammaMatrixOwner;
+    switch (value) {
+    case Owner::AExp: return "AExp";
+    case Owner::IdenMatrix: return "IdenMatrix";
+    case Owner::AInv: return "AInv";
+    case Owner::ATemp: return "ATemp";
+    case Owner::Gamma1: return "Gamma1";
+    case Owner::Gamma2: return "Gamma2";
+    }
+    throw std::runtime_error("Unknown actual Gamma matrix owner");
+}
+inline json gamma_value(MethodObservation::GammaValueSnapshot const &source, bool BMat_required = false)
+{
+    if (!source.reached) return {{"reached", false}, {"available", false}, {"snapshot", nullptr},
+        {"unavailable_reason", "actual_stage_callback_not_retained_or_not_reached"}, {"counted_as_PASS", false}};
+    require(source.observed_matrix_count <= source.matrices.size(), "Observed Gamma matrix count exceeds owner storage");
+    json matrices = json::array(), BMat = nullptr, BMat_bounds = nullptr, caller = nullptr;
+    for (std::size_t index = 0; index < source.observed_matrix_count; ++index) {
+        auto const &copy = source.matrices[index]; json bounds = nullptr, values = nullptr;
+        if (copy.bounds) bounds = {{"lower1", copy.bounds->lower1}, {"upper1", copy.bounds->upper1},
+            {"lower2", copy.bounds->lower2}, {"upper2", copy.bounds->upper2}, {"size", copy.bounds->size}};
+        if (copy.copy_available) {
+            values = json::array();
+            for (auto const &value : copy.values) values.push_back(scalar_bits(value.bits));
+        }
+        matrices.push_back({{"owner", gamma_matrix_name(copy.owner)}, {"actual_bounds", bounds},
+            {"copy_available", copy.copy_available}, {"values", values}});
+    }
+    if (source.BMat_bounds) BMat_bounds = {{"lower", source.BMat_bounds->lower},
+        {"upper", source.BMat_bounds->upper}, {"size", source.BMat_bounds->size}};
+    if (source.BMat_available) {
+        BMat = json::array();
+        for (auto const &value : source.BMat) BMat.push_back(scalar_bits(value.bits));
+    }
+    if (source.caller_context_available) caller = {{"ErrorsFound", source.caller_ErrorsFound},
+        {"DoCTFErrorReport", source.caller_DoCTFErrorReport},
+        {"TimeStepZone", source.caller_TimeStepZone ? scalar_bits(source.caller_TimeStepZone->bits) : json(nullptr)}};
+    bool const available = source.matrices_available && (!BMat_required || source.BMat_available);
+    json context = source.observed_matrix_count != 0 ? method_context(source.context) : json(nullptr);
+    if (!context.is_null()) context["NumOfPerpendNodes"] = source.NumOfPerpendNodes;
+    return {{"reached", true}, {"available", available},
+        {"unavailable_reason", available ? json(nullptr) : json("required_Gamma_owner_copy_unavailable")},
+        {"snapshot", {{"context_available", source.observed_matrix_count != 0}, {"context", context},
+            {"matrices_available", source.matrices_available}, {"observed_matrix_count", source.observed_matrix_count},
+            {"matrices", matrices}, {"BMat_available", source.BMat_available}, {"BMat_actual_bounds", BMat_bounds}, {"BMat", BMat},
+            {"caller_context_available", source.caller_context_available}, {"actual_return_site_caller_context", caller}}},
+        {"counted_as_PASS", false}};
+}
+inline json gamma_failure_event(std::optional<MethodObservation::GammaFailure> const &value)
+{
+    return value ? json{{"invocation_ordinal", value->observed_invocation_ordinal},
+        {"assembly_ordinal", value->observed_assembly_ordinal}, {"stage", gamma_stage_name(value->stage)},
+        {"kind", method_failure_name(value->kind)}} : json(nullptr);
+}
+inline bool gamma_copy_failed(MethodObservation::GammaCapture const &source)
+{
+    if (source.observer_failure || source.actual_invocation_count != source.invocations.size() ||
+        source.first_failure || source.last_failure) return true;
+    for (auto count : source.failure_event_counts) if (count != 0) return true;
+    for (auto count : source.stage_records_omitted) if (count != 0) return true;
+    std::array<std::size_t, 5> retained_counts{};
+    for (std::size_t index = 0; index < source.invocations.size(); ++index) {
+        auto const &record = source.invocations[index];
+        if (record.observed_invocation_ordinal != index + 1 || !record.association_available ||
+            record.observed_assembly_ordinal != record.observed_invocation_ordinal) return true;
+        for (bool failed : record.failure_kinds) if (failed) return true;
+        std::array<std::size_t, 5> const retained{{record.entry.reached ? 1u : 0u, record.ATemp_ready.reached ? 1u : 0u,
+            record.Gamma1_final.reached ? 1u : 0u, record.Gamma2_final.reached ? 1u : 0u, record.source_return.reached ? 1u : 0u}};
+        if (record.actual_stage_callback_counts != retained) return true;
+        for (std::size_t stage = 0; stage < retained.size(); ++stage) retained_counts[stage] += retained[stage];
+        for (auto const *value : {&record.entry, &record.ATemp_ready, &record.Gamma1_final, &record.Gamma2_final, &record.source_return}) {
+            if (!value->reached) continue; // Preserve actual source stops without inventing stages.
+            if (!value->matrices_available || !value->context.assembly_context_available ||
+                value->observed_matrix_count > value->matrices.size()) return true;
+            for (std::size_t matrix = 0; matrix < value->observed_matrix_count; ++matrix)
+                if (!value->matrices[matrix].copy_available) return true;
+        }
+        if (record.entry.reached && !record.entry.BMat_available) return true;
+        if (record.source_return.reached && (!record.source_return.caller_context_available || !record.source_return.caller_TimeStepZone)) return true;
+    }
+    return retained_counts != source.actual_stage_callback_counts;
+}
+inline json gamma_observations(MethodObservation::GammaCapture const &source)
+{
+    json invocations = json::array(), stages = json::array(), failures = json::array();
+    for (auto const &record : source.invocations) {
+        json kinds = json::array();
+        for (std::size_t index = 0; index < record.failure_kinds.size(); ++index)
+            kinds.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))}, {"failed", record.failure_kinds[index]}});
+        invocations.push_back({{"observed_invocation_ordinal", record.observed_invocation_ordinal},
+            {"observed_assembly_ordinal", record.observed_assembly_ordinal}, {"association_available", record.association_available},
+            {"failure_kinds", kinds}, {"actual_stage_callback_counts", record.actual_stage_callback_counts},
+            {"Entry", gamma_value(record.entry, true)}, {"ATempReady", gamma_value(record.ATemp_ready)},
+            {"Gamma1Final", gamma_value(record.Gamma1_final)}, {"Gamma2Final", gamma_value(record.Gamma2_final)},
+            {"SourceReturn", gamma_value(record.source_return)}, {"counted_as_PASS", false}});
+    }
+    for (std::size_t index = 0; index < source.actual_stage_callback_counts.size(); ++index)
+        stages.push_back({{"stage", gamma_stage_name(static_cast<MethodObservation::GammaStage>(index))},
+            {"actual_callback_count", source.actual_stage_callback_counts[index]}, {"records_omitted", source.stage_records_omitted[index]}});
+    for (std::size_t index = 0; index < source.failure_event_counts.size(); ++index)
+        failures.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))},
+            {"actual_event_count", source.failure_event_counts[index]}});
+    return {{"protocol", "ctf07-gamma-method-observation.v1"}, {"method", "Gamma"},
+        {"actual_invocation_count", source.actual_invocation_count}, {"actual_retained_invocation_count", source.invocations.size()},
+        {"actual_stage_callback_counts", source.actual_stage_callback_counts}, {"stage_records_omitted", source.stage_records_omitted},
+        {"stage_ledger", stages}, {"observer_failure", source.observer_failure}, {"method_copy_integrity_failed", gamma_copy_failed(source)},
+        {"failure_event_counts", failures}, {"first_failure", gamma_failure_event(source.first_failure)},
+        {"last_failure", gamma_failure_event(source.last_failure)}, {"invocations", invocations},
+        {"no_actual_entry_observed", source.actual_invocation_count == 0}, {"record_cap", nullptr}, {"deduplicated", false},
+        {"truncated", false}, {"unreached_counted_as_PASS", false}, {"later_attempts_counted_as_PASS", false},
+        {"values_or_identity_or_return_reconstructed", false}, {"old_checkpoint_matrix_05_06_counters_include_Gamma_callbacks", false}};
+}
+struct GammaTotals
+{
+    std::size_t actual_invocation_count = 0, retained_invocation_count = 0;
+    std::array<std::size_t, 5> actual_stage_callback_counts{}, stage_records_omitted{};
+    std::array<std::size_t, 6> failure_event_counts{};
+    bool copy_integrity_failed = false;
+};
+inline void add_gamma_totals(GammaTotals &total, json const &ledger)
+{
+    total.actual_invocation_count += ledger.at("actual_invocation_count").get<std::size_t>();
+    total.retained_invocation_count += ledger.at("actual_retained_invocation_count").get<std::size_t>();
+    total.copy_integrity_failed = total.copy_integrity_failed || ledger.at("method_copy_integrity_failed").get<bool>();
+    for (std::size_t index = 0; index < total.actual_stage_callback_counts.size(); ++index) {
+        total.actual_stage_callback_counts[index] += ledger.at("actual_stage_callback_counts").at(index).get<std::size_t>();
+        total.stage_records_omitted[index] += ledger.at("stage_records_omitted").at(index).get<std::size_t>();
+    }
+    for (std::size_t index = 0; index < total.failure_event_counts.size(); ++index)
+        total.failure_event_counts[index] += ledger.at("failure_event_counts").at(index).at("actual_event_count").get<std::size_t>();
+}
+inline json gamma_totals(GammaTotals const &total)
+{
+    return {{"actual_invocation_count", total.actual_invocation_count}, {"actual_retained_invocation_count", total.retained_invocation_count},
+        {"actual_stage_callback_counts", total.actual_stage_callback_counts}, {"stage_records_omitted", total.stage_records_omitted},
+        {"failure_event_counts", total.failure_event_counts}, {"method_copy_integrity_failed", total.copy_integrity_failed},
+        {"complete_method_return_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+}
+// CTF08 observes live private storage and a distinct actual caller return.
+inline json ctf08_final_coefficient_policy()
+{
+    return json::parse(R"CTF08({"protocol":"ctf08-private-final-coefficient-observation.v1","actual_method":"ConstructionProps::calculateFinalCoefficients","actual_caller_line":894,"actual_method_source_lines":[1591,1906],"actual_stage_names":["Entry","PrivateFinal","SourceReturn"],"actual_capture_boundaries":{"Entry":"after_original1592_before_local_initialization_or_Gamma1_mutation","PrivateFinal":"after_original1902_before_private_workspace_deallocation1903_1905","SourceReturn":"after_actual_caller894_before_convergence_and_retry903"},"entry_matrices":["AExp","IdenMatrix","Gamma1","Gamma2"],"entry_compressed_inputs":["CMat","DMat"],"private_final_matrices":["Gamma1","s0","PhiR0","Rnew","Rold"],"return_matrices":["Gamma1","s0"],"private_final_and_return_history":["s","e","NumCTFTerms"],"private_final_controls":["inum","CTFConvrg"],"discrete_fields_exact":["NumCTFTerms","inum","CTFConvrg"],"private_controls_and_R_workspaces_available_at_SourceReturn":false,"uninitialized_avg_rat_trace_SurfNodeFac_observed":false,"matrix_shapes":{"AExp":"actual_rcmax_by_rcmax","IdenMatrix":"actual_rcmax_by_rcmax","Gamma1":"actual_3_by_rcmax","Gamma2":"actual_3_by_rcmax","s0":[3,4],"s":"actual_3_by_4_by_rcmax","e":"actual_rcmax","PhiR0":"actual_rcmax_by_rcmax","Rnew":"actual_rcmax_by_rcmax","Rold":"actual_rcmax_by_rcmax","CMat":[2],"DMat":[2]},"storage_order":"source_i1_outer_i2_inner_row_first; s_j_outer_k_middle_term_inner","full_allocated_history_including_initialized_tails_retained":true,"NumCTFTerms_does_not_truncate_storage":true,"independent_s_e_and_CMat_DMat_availability":true,"actual_caller_source_order":["exponential884","inverse887","Gamma890","finalCoefficients894"],"actual_matching_Gamma_return_precedes_entry":true,"selected_invocation_ordinal":1,"selected_assembly_ordinal":1,"selected_Gamma_invocation_ordinal":1,"selected_first_attempt_uses_actual_initial619_dt_and_history":true,"required_owner_context":{"SourceSinkPresent":false,"SolutionDimensions":1},"actual_source_produced_identity_required":true,"actual_assembly_and_prior_method_context_association_required":true,"actual_return_marker_required_for_return_claim":true,"all_actual_visits_retained":true,"later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,"Rust_retry_driver_available":false,"uninvoked_counted_as_PASS":false,"missing_selected_owner_on_one_or_both_sides_is_required_failure":true,"observer_failure_or_omission_is_integrity_failure":true,"values_identity_return_private_controls_or_retry_state_reconstructed":false,"caller_convergence_retry_public_SI19_stores_or_complete_coefficient_handoff_certified":false})CTF08");
+}
+inline json ctf08_linked_original_retention_intent()
+{
+    return json::parse(R"CTF08({"schema":"ctf08-debug-original-retention-intent.v1","role":"prospective-debug-original","scope":"new-CTF08-linked-originals-only","actual_file_identity_required":true,"both_original_and_helper_verified_before_execution":true,"retain_through_PE_validation_and_current_helper_execution":true,"removal_requires_separate_Root_authorized_actual_retention_record":true,"earlier_live_refs_reinterpreted":false,"deletion_performed":false})CTF08");
+}
+inline char const *final_coefficient_stage_name(MethodObservation::FinalCoefficientStage value)
+{
+    using Stage = MethodObservation::FinalCoefficientStage;
+    switch (value) {
+    case Stage::Entry: return "Entry";
+    case Stage::PrivateFinal: return "PrivateFinal";
+    case Stage::SourceReturn: return "SourceReturn";
+    }
+    throw std::runtime_error("Unknown actual private final-coefficient stage");
+}
+inline char const *final_coefficient_matrix_name(MethodObservation::FinalCoefficientMatrixOwner value)
+{
+    using Owner = MethodObservation::FinalCoefficientMatrixOwner;
+    switch (value) {
+    case Owner::AExp: return "AExp";
+    case Owner::IdenMatrix: return "IdenMatrix";
+    case Owner::Gamma1: return "Gamma1";
+    case Owner::Gamma2: return "Gamma2";
+    case Owner::s0: return "s0";
+    case Owner::PhiR0: return "PhiR0";
+    case Owner::Rnew: return "Rnew";
+    case Owner::Rold: return "Rold";
+    }
+    throw std::runtime_error("Unknown actual private final-coefficient matrix owner");
+}
+inline json final_coefficient_bounds1(std::optional<MethodObservation::Array1Bounds> const &value)
+{
+    return value ? json{{"lower", value->lower}, {"upper", value->upper}, {"size", value->size}} : json(nullptr);
+}
+inline json final_coefficient_value(MethodObservation::FinalCoefficientValueSnapshot const &source,
+                                   MethodObservation::FinalCoefficientStage stage)
+{
+    if (!source.reached) return {{"reached", false}, {"available", false}, {"snapshot", nullptr},
+        {"unavailable_reason", "actual_stage_callback_not_retained_or_not_reached"}, {"counted_as_PASS", false}};
+    require(source.observed_matrix_count <= source.matrices.size(), "Observed private matrix count exceeds owner storage");
+    auto const copies = [](auto const &values) {
+        json result = json::array();
+        for (auto const &value : values) result.push_back(scalar_bits(value.bits));
+        return result;
+    };
+    json matrices = json::array(), s_bounds = nullptr, caller = nullptr, controls = nullptr;
+    for (std::size_t index = 0; index < source.observed_matrix_count; ++index) {
+        auto const &copy = source.matrices[index]; json bounds = nullptr;
+        if (copy.bounds) bounds = {{"lower1", copy.bounds->lower1}, {"upper1", copy.bounds->upper1},
+            {"lower2", copy.bounds->lower2}, {"upper2", copy.bounds->upper2}, {"size", copy.bounds->size}};
+        matrices.push_back({{"owner", final_coefficient_matrix_name(copy.owner)}, {"actual_bounds", bounds},
+            {"copy_available", copy.copy_available}, {"values", copy.copy_available ? copies(copy.values) : json(nullptr)}});
+    }
+    if (source.s_bounds) {
+        auto const &bounds = *source.s_bounds;
+        s_bounds = {{"lower1", bounds.lower1}, {"upper1", bounds.upper1}, {"lower2", bounds.lower2},
+            {"upper2", bounds.upper2}, {"lower3", bounds.lower3}, {"upper3", bounds.upper3}, {"size", bounds.size}};
+    }
+    if (source.controls) controls = {{"inum", source.controls->inum}, {"CTFConvrg", source.controls->CTFConvrg}};
+    if (source.caller_context_available) caller = {{"ErrorsFound", source.caller_ErrorsFound},
+        {"DoCTFErrorReport", source.caller_DoCTFErrorReport},
+        {"TimeStepZone", source.caller_TimeStepZone ? scalar_bits(source.caller_TimeStepZone->bits) : json(nullptr)}};
+    bool const entry = stage == MethodObservation::FinalCoefficientStage::Entry;
+    bool const private_final = stage == MethodObservation::FinalCoefficientStage::PrivateFinal;
+    bool const available = source.matrices_available &&
+        (entry ? source.CMat_available && source.DMat_available : source.history_available && source.NumCTFTerms.has_value()) &&
+        (!private_final || source.controls.has_value()) &&
+        (stage != MethodObservation::FinalCoefficientStage::SourceReturn ||
+            (source.caller_context_available && source.caller_TimeStepZone.has_value()));
+    json context = source.observed_matrix_count != 0 ? method_context(source.context) : json(nullptr);
+    if (!context.is_null()) context["NumOfPerpendNodes"] = source.NumOfPerpendNodes;
+    return {{"reached", true}, {"available", available},
+        {"unavailable_reason", available ? json(nullptr) : json("required_private_final_owner_copy_unavailable")},
+        {"snapshot", {{"context_available", source.observed_matrix_count != 0}, {"context", context},
+            {"matrices_available", source.matrices_available}, {"observed_matrix_count", source.observed_matrix_count}, {"matrices", matrices},
+            {"CMat_available", source.CMat_available}, {"DMat_available", source.DMat_available},
+            {"CMat_actual_bounds", final_coefficient_bounds1(source.CMat_bounds)},
+            {"DMat_actual_bounds", final_coefficient_bounds1(source.DMat_bounds)},
+            {"CMat", source.CMat_available ? copies(source.CMat) : json(nullptr)},
+            {"DMat", source.DMat_available ? copies(source.DMat) : json(nullptr)},
+            {"history_available", source.history_available}, {"s_available", source.s_available}, {"e_available", source.e_available},
+            {"s_actual_bounds", s_bounds}, {"e_actual_bounds", final_coefficient_bounds1(source.e_bounds)},
+            {"s", source.s_available ? copies(source.s) : json(nullptr)}, {"e", source.e_available ? copies(source.e) : json(nullptr)},
+            {"NumCTFTerms", source.NumCTFTerms ? json(*source.NumCTFTerms) : json(nullptr)}, {"controls", controls},
+            {"caller_context_available", source.caller_context_available}, {"actual_return_site_caller_context", caller}}},
+        {"counted_as_PASS", false}};
+}
+inline json final_coefficient_failure_event(std::optional<MethodObservation::FinalCoefficientFailure> const &value)
+{
+    return value ? json{{"invocation_ordinal", value->observed_invocation_ordinal},
+        {"assembly_ordinal", value->observed_assembly_ordinal}, {"stage", final_coefficient_stage_name(value->stage)},
+        {"kind", method_failure_name(value->kind)}} : json(nullptr);
+}
+inline bool final_coefficient_copy_failed(MethodObservation::FinalCoefficientCapture const &source)
+{
+    if (source.observer_failure || source.actual_invocation_count != source.invocations.size() ||
+        source.first_failure || source.last_failure) return true;
+    for (auto count : source.failure_event_counts) if (count != 0) return true;
+    for (auto count : source.stage_records_omitted) if (count != 0) return true;
+    std::array<std::size_t, 3> retained_counts{};
+    using Owner = MethodObservation::FinalCoefficientMatrixOwner;
+    for (std::size_t index = 0; index < source.invocations.size(); ++index) {
+        auto const &record = source.invocations[index];
+        if (record.observed_invocation_ordinal != index + 1 || !record.association_available ||
+            record.observed_assembly_ordinal != record.observed_invocation_ordinal) return true;
+        for (bool failed : record.failure_kinds) if (failed) return true;
+        std::array<std::size_t, 3> const retained{{record.entry.reached ? 1u : 0u,
+            record.private_final.reached ? 1u : 0u, record.source_return.reached ? 1u : 0u}};
+        if (record.actual_stage_callback_counts != retained || !record.entry.reached ||
+            (record.source_return.reached && !record.private_final.reached)) return true;
+        for (std::size_t stage = 0; stage < retained.size(); ++stage) retained_counts[stage] += retained[stage];
+        std::array<MethodObservation::FinalCoefficientValueSnapshot const *, 3> const values{{
+            &record.entry, &record.private_final, &record.source_return}};
+        std::array<std::vector<Owner>, 3> const owners{{
+            {Owner::AExp, Owner::IdenMatrix, Owner::Gamma1, Owner::Gamma2},
+            {Owner::Gamma1, Owner::s0, Owner::PhiR0, Owner::Rnew, Owner::Rold}, {Owner::Gamma1, Owner::s0}}};
+        for (std::size_t stage = 0; stage < values.size(); ++stage) {
+            auto const &value = *values[stage];
+            if (!value.reached) continue; // Actual source stops do not fabricate stages.
+            if (!value.matrices_available || !value.context.assembly_context_available || value.context.rcmax < 1 ||
+                value.observed_matrix_count != owners[stage].size()) return true;
+            for (std::size_t matrix = 0; matrix < value.observed_matrix_count; ++matrix) {
+                auto const &copy = value.matrices[matrix];
+                if (copy.owner != owners[stage][matrix] || !copy.copy_available || !copy.bounds) return true;
+                auto const n = static_cast<std::size_t>(value.context.rcmax);
+                auto const rows = copy.owner == Owner::Gamma1 || copy.owner == Owner::Gamma2 || copy.owner == Owner::s0 ? 3u : n;
+                auto const columns = copy.owner == Owner::s0 ? 4u : n;
+                if (columns > std::numeric_limits<std::size_t>::max() / rows || copy.values.size() != rows * columns ||
+                    copy.bounds->lower1 != 1 || copy.bounds->upper1 != static_cast<int>(rows) ||
+                    copy.bounds->lower2 != 1 || copy.bounds->upper2 != static_cast<int>(columns) ||
+                    copy.bounds->size != copy.values.size()) return true;
+            }
+            if (stage == 0) {
+                if (!value.CMat_available || !value.DMat_available || !value.CMat_bounds || !value.DMat_bounds ||
+                    value.CMat_bounds->lower != 1 || value.CMat_bounds->upper != 2 || value.CMat_bounds->size != 2 ||
+                    value.DMat_bounds->lower != 1 || value.DMat_bounds->upper != 2 || value.DMat_bounds->size != 2 ||
+                    value.history_available || value.s_available || value.e_available || value.s_bounds || value.e_bounds ||
+                    !value.s.empty() || !value.e.empty() || value.NumCTFTerms || value.controls || value.caller_context_available || value.caller_TimeStepZone) return true;
+            } else {
+                auto const n = static_cast<std::size_t>(value.context.rcmax);
+                if (!value.history_available || !value.s_available || !value.e_available || !value.NumCTFTerms ||
+                    !value.s_bounds || !value.e_bounds || n > std::numeric_limits<std::size_t>::max() / 12 ||
+                    value.s.size() != 12 * n || value.e.size() != n ||
+                    value.s_bounds->lower1 != 1 || value.s_bounds->upper1 != 3 || value.s_bounds->lower2 != 1 || value.s_bounds->upper2 != 4 ||
+                    value.s_bounds->lower3 != 1 || value.s_bounds->upper3 != value.context.rcmax || value.s_bounds->size != value.s.size() ||
+                    value.e_bounds->lower != 1 || value.e_bounds->upper != value.context.rcmax || value.e_bounds->size != value.e.size() ||
+                    value.CMat_available || value.DMat_available || value.CMat_bounds || value.DMat_bounds) return true;
+                if (stage == 1 && (!value.controls || value.caller_context_available || value.caller_TimeStepZone)) return true;
+                if (stage == 2 && (value.controls || !value.caller_context_available || !value.caller_TimeStepZone)) return true;
+            }
+        }
+    }
+    return retained_counts != source.actual_stage_callback_counts;
+}
+inline json final_coefficient_observations(MethodObservation::FinalCoefficientCapture const &source)
+{
+    json invocations = json::array(), stages = json::array(), failures = json::array();
+    for (auto const &record : source.invocations) {
+        json kinds = json::array();
+        for (std::size_t index = 0; index < record.failure_kinds.size(); ++index)
+            kinds.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))}, {"failed", record.failure_kinds[index]}});
+        invocations.push_back({{"observed_invocation_ordinal", record.observed_invocation_ordinal},
+            {"observed_assembly_ordinal", record.observed_assembly_ordinal}, {"association_available", record.association_available},
+            {"failure_kinds", kinds}, {"actual_stage_callback_counts", record.actual_stage_callback_counts},
+            {"Entry", final_coefficient_value(record.entry, MethodObservation::FinalCoefficientStage::Entry)},
+            {"PrivateFinal", final_coefficient_value(record.private_final, MethodObservation::FinalCoefficientStage::PrivateFinal)},
+            {"SourceReturn", final_coefficient_value(record.source_return, MethodObservation::FinalCoefficientStage::SourceReturn)}, {"counted_as_PASS", false}});
+    }
+    for (std::size_t index = 0; index < source.actual_stage_callback_counts.size(); ++index)
+        stages.push_back({{"stage", final_coefficient_stage_name(static_cast<MethodObservation::FinalCoefficientStage>(index))},
+            {"actual_callback_count", source.actual_stage_callback_counts[index]}, {"records_omitted", source.stage_records_omitted[index]}});
+    for (std::size_t index = 0; index < source.failure_event_counts.size(); ++index)
+        failures.push_back({{"kind", method_failure_name(static_cast<MethodObservation::MethodFailureKind>(index))}, {"actual_event_count", source.failure_event_counts[index]}});
+    return {{"protocol", "ctf08-private-final-coefficient-observation.v1"}, {"method", "FinalCoefficients"},
+        {"actual_invocation_count", source.actual_invocation_count}, {"actual_retained_invocation_count", source.invocations.size()},
+        {"actual_stage_callback_counts", source.actual_stage_callback_counts}, {"stage_records_omitted", source.stage_records_omitted},
+        {"stage_ledger", stages}, {"observer_failure", source.observer_failure}, {"method_copy_integrity_failed", final_coefficient_copy_failed(source)},
+        {"failure_event_counts", failures}, {"first_failure", final_coefficient_failure_event(source.first_failure)},
+        {"last_failure", final_coefficient_failure_event(source.last_failure)}, {"invocations", invocations},
+        {"no_actual_entry_observed", source.actual_invocation_count == 0}, {"record_cap", nullptr}, {"deduplicated", false},
+        {"truncated", false}, {"unreached_counted_as_PASS", false}, {"later_attempts_counted_as_PASS", false},
+        {"private_values_controls_identity_or_return_reconstructed", false}, {"old_checkpoint_matrix_05_06_Gamma_counters_include_final_callbacks", false}};
+}
+struct FinalCoefficientTotals
+{
+    std::size_t actual_invocation_count = 0, retained_invocation_count = 0;
+    std::array<std::size_t, 3> actual_stage_callback_counts{}, stage_records_omitted{};
+    std::array<std::size_t, 6> failure_event_counts{};
+    bool copy_integrity_failed = false;
+};
+inline void add_final_coefficient_totals(FinalCoefficientTotals &total, json const &ledger)
+{
+    total.actual_invocation_count += ledger.at("actual_invocation_count").get<std::size_t>();
+    total.retained_invocation_count += ledger.at("actual_retained_invocation_count").get<std::size_t>();
+    total.copy_integrity_failed = total.copy_integrity_failed || ledger.at("method_copy_integrity_failed").get<bool>();
+    for (std::size_t index = 0; index < total.actual_stage_callback_counts.size(); ++index) {
+        total.actual_stage_callback_counts[index] += ledger.at("actual_stage_callback_counts").at(index).get<std::size_t>();
+        total.stage_records_omitted[index] += ledger.at("stage_records_omitted").at(index).get<std::size_t>();
+    }
+    for (std::size_t index = 0; index < total.failure_event_counts.size(); ++index)
+        total.failure_event_counts[index] += ledger.at("failure_event_counts").at(index).at("actual_event_count").get<std::size_t>();
+}
+inline json final_coefficient_totals(FinalCoefficientTotals const &total)
+{
+    return {{"actual_invocation_count", total.actual_invocation_count}, {"actual_retained_invocation_count", total.retained_invocation_count},
+        {"actual_stage_callback_counts", total.actual_stage_callback_counts}, {"stage_records_omitted", total.stage_records_omitted},
+        {"failure_event_counts", total.failure_event_counts}, {"method_copy_integrity_failed", total.copy_integrity_failed},
+        {"complete_method_return_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+}
+inline json ctf09_linked_original_retention_intent()
+{
+    return {{"schema", "ctf09-debug-original-retention-intent.v1"}, {"role", "prospective-debug-original"},
+        {"scope", "new-CTF09-linked-originals-only"}, {"actual_file_identity_required", true},
+        {"both_original_and_helper_verified_before_execution", true},
+        {"retain_through_PE_validation_and_current_helper_execution", true},
+        {"removal_requires_separate_Root_authorized_actual_retention_record", true},
+        {"earlier_live_refs_reinterpreted", false}, {"deletion_performed", false}};
+}
+inline json ctf09_attempt_selection()
+{
+    return {{"protocol", "ctf09-actual-retry-attempt-selection.v1"},
+        {"selection", "all_actual_reached_no_source_1D_attempts_with_same_bound_owner_and_checked_matching_method_ordinals"},
+        {"actual_order", {"pre_assignment661", "assembly728", "exponential884", "inverse887", "Gamma890", "finalCoefficients894", "caller903_981"}},
+        {"first_attempt_association", "actual_initial619_context_and_actual_retained_pre_assignment_storage"},
+        {"later_attempt_association", "actual_previous_LoopTail_false_then_actual_next_pre_assignment_and_post728_context"},
+        {"inherited_first_only_policies_reinterpreted", false},
+        {"inherited_profile_values_reused_as_separate_all_visit_handoffs", true},
+        {"partial_source_outcomes_and_observation_integrity_separate", true},
+        {"Native_attempt_count_dt_history_or_operands_supplied_to_Rust", false},
+        {"missing_required_same_input_owner_on_one_or_both_sides_is_failure", true},
+        {"unreached_unavailable_partial_or_later_SI_stores_counted_as_PASS", false},
+        {"diagnostic_text_versus_Rust_call_intents_numerically_paired", false},
+        {"numerical_PASS_claimed", false}, {"whole_CTF_or_surface_handoff_certified", false}};
+}
+inline json ctf09_retry_policy()
+{
+    return {{"protocol", "ctf09-retry-driver-observation.v1"},
+        {"actual_source_range", {638, 981}}, {"scope", "actual_no_source_1D_retry_visits_within_one_bound_whole_call"},
+        {"pre_assignment", "after_original661_before_repeated_band_assignment_after_actual_BMat3_reset"},
+        {"caller_event_names", {"DecisionEntry", "ExcessiveTermsUpdate", "AssignedSums", "ImbalanceUpdate", "FatalNoCtfs", "SevereEntry", "SevereBreak", "LoopTail", "LoopExit"}},
+        {"actual_assigned_sums", {"assignedAbsSumXi", "assignedAbsSumYi", "assignedAbsSumZi", "BiggestSum"}},
+        {"ratios_recomputed_or_observed", false}, {"skipped_sums_or_unassigned_values_fabricated", false},
+        {"fatal_marker_precedes_actual_Fatal939", true}, {"SevereEntry_precedes_actual_Severe949", true},
+        {"severe_boundary_can_be_reached_when_CTFConvrg_true", true},
+        {"actual_context_before_and_after_update_copied_independently", true},
+        {"LoopExit_is_whole_call_return_or_SI_store_certification", false},
+        {"diagnostics", "actual_global_occupied_message_index_level_and_text_after_successful_original_push; temporal_association_only"},
+        {"all_actual_visits_and_partial_records_retained", true}, {"record_cap", nullptr},
+        {"actual_return_markers_required_for_return_claim", true}, {"observer_failure_or_omission_is_integrity_failure", true},
+        {"old_first_only_policies_changed", false}, {"Native_operands_or_attempt_counts_supplied_to_Rust", false},
+        {"uninvoked_or_unreached_counted_as_PASS", false}, {"scientific_comparison_performed", false},
+        {"numerical_PASS_claimed", false}, {"full_CTF09_or_CTF10_certified", false}};
+}
+inline char const *retry_event_name(MethodObservation::RetryEvent value)
+{
+    switch (value) {
+    case MethodObservation::RetryEvent::DecisionEntry: return "DecisionEntry";
+    case MethodObservation::RetryEvent::ExcessiveTermsUpdate: return "ExcessiveTermsUpdate";
+    case MethodObservation::RetryEvent::AssignedSums: return "AssignedSums";
+    case MethodObservation::RetryEvent::ImbalanceUpdate: return "ImbalanceUpdate";
+    case MethodObservation::RetryEvent::FatalNoCtfs: return "FatalNoCtfs";
+    case MethodObservation::RetryEvent::SevereEntry: return "SevereEntry";
+    case MethodObservation::RetryEvent::SevereBreak: return "SevereBreak";
+    case MethodObservation::RetryEvent::LoopTail: return "LoopTail";
+    case MethodObservation::RetryEvent::LoopExit: return "LoopExit";
+    }
+    throw std::runtime_error("Unknown actual retry event");
+}
+inline char const *retry_site_name(MethodObservation::RetrySite value)
+{
+    switch (value) {
+    case MethodObservation::RetrySite::PreAssignment: return "PreAssignment";
+    case MethodObservation::RetrySite::CallerEvent: return "CallerEvent";
+    case MethodObservation::RetrySite::Diagnostic: return "Diagnostic";
+    }
+    throw std::runtime_error("Unknown actual retry callback site");
+}
+inline char const *retry_failure_name(MethodObservation::RetryFailureKind value)
+{
+    switch (value) {
+    case MethodObservation::RetryFailureKind::IdentityMismatch: return "IdentityMismatch";
+    case MethodObservation::RetryFailureKind::AssociationFailure: return "AssociationFailure";
+    case MethodObservation::RetryFailureKind::OrderFailure: return "OrderFailure";
+    case MethodObservation::RetryFailureKind::OwnerShape: return "OwnerShape";
+    case MethodObservation::RetryFailureKind::CopyException: return "CopyException";
+    case MethodObservation::RetryFailureKind::LedgerAppendException: return "LedgerAppendException";
+    }
+    throw std::runtime_error("Unknown actual retry failure kind");
+}
+inline json retry_context(MethodObservation::RetryContext const &copy)
+{
+    return {{"IsUsedCTF", copy.IsUsedCTF}, {"SourceSinkPresent", copy.SourceSinkPresent},
+        {"SolutionDimensions", copy.SolutionDimensions}, {"TotLayers", copy.TotLayers}, {"rcmax", copy.rcmax},
+        {"NodeSource", copy.NodeSource}, {"NodeUserTemp", copy.NodeUserTemp}, {"NumCTFTerms", copy.NumCTFTerms},
+        {"CTFTimeStep", scalar_bits(copy.CTFTimeStep.bits)}, {"NumHistories", copy.NumHistories},
+        {"TimeStepZone", scalar_bits(copy.TimeStepZone.bits)}, {"ErrorsFound", copy.ErrorsFound},
+        {"DoCTFErrorReport", copy.DoCTFErrorReport}, {"CTFConvrg", copy.CTFConvrg}};
+}
+inline json retry_bounds(std::optional<MethodObservation::Array2Bounds> const &value)
+{
+    return value ? json{{"lower1", value->lower1}, {"upper1", value->upper1}, {"lower2", value->lower2},
+        {"upper2", value->upper2}, {"size", value->size}} : json(nullptr);
+}
+inline json retry_bits(std::vector<MethodObservation::Binary64Copy> const &values)
+{
+    json result = json::array();
+    for (auto const &value : values) result.push_back(scalar_bits(value.bits));
+    return result;
+}
+inline json retry_failure_event(std::optional<MethodObservation::RetryFailure> const &value)
+{
+    return value ? json{{"site", retry_site_name(value->site)}, {"actual_callback_ordinal", value->actual_callback_ordinal},
+        {"pre_assignment_ordinal", value->pre_assignment_ordinal}, {"post_assembly_ordinal", value->post_assembly_ordinal},
+        {"kind", retry_failure_name(value->kind)}} : json(nullptr);
+}
+inline bool retry_copy_failed(MethodObservation::RetryCapture const &source)
+{
+    if (source.observer_failure || source.counter_overflow || source.first_failure || source.last_failure ||
+        source.pre_assignment_records_omitted != 0 || source.diagnostic_records_omitted != 0 ||
+        source.actual_pre_assignment_count != source.pre_assignments.size() ||
+        source.actual_caller_event_count != source.caller_events.size() ||
+        source.actual_diagnostic_count != source.diagnostics.size()) return true;
+    for (auto count : source.failure_event_counts) if (count != 0) return true;
+    for (auto count : source.caller_records_omitted) if (count != 0) return true;
+    for (std::size_t index = 0; index < source.pre_assignments.size(); ++index) {
+        auto const &copy = source.pre_assignments[index];
+        if (copy.observed_pre_assignment_ordinal != index + 1 || !copy.reached || !copy.association_available ||
+            !copy.active_prefix_available || !copy.matrices_available || !copy.AMat_available || !copy.IdenMatrix_available ||
+            !copy.BMat3_after_reset || !copy.AMat_bounds || !copy.IdenMatrix_bounds ||
+            copy.copied_layer_count > copy.active_prefix.size()) return true;
+        for (bool failed : copy.failure_kinds) if (failed) return true;
+    }
+    std::array<std::size_t, 9> retained{};
+    for (std::size_t index = 0; index < source.caller_events.size(); ++index) {
+        auto const &copy = source.caller_events[index]; auto const kind = static_cast<std::size_t>(copy.event);
+        if (kind >= retained.size() || copy.observed_event_ordinal != index + 1 || !copy.reached || !copy.association_available ||
+            (copy.event == MethodObservation::RetryEvent::AssignedSums) != copy.assigned_sums.has_value()) return true;
+        ++retained[kind];
+        for (bool failed : copy.failure_kinds) if (failed) return true;
+    }
+    if (retained != source.actual_caller_event_counts) return true;
+    for (std::size_t index = 0; index < source.diagnostics.size(); ++index) {
+        auto const &copy = source.diagnostics[index];
+        if (copy.observed_diagnostic_ordinal != index + 1 || !copy.copy_available || !copy.temporal_association_only ||
+            (index != 0 && copy.actual_global_message_index <= source.diagnostics[index - 1].actual_global_message_index)) return true;
+        for (bool failed : copy.failure_kinds) if (failed) return true;
+    }
+    return false;
+}
+inline bool retry_diagnostic_join_valid(MethodObservation::RetryCapture const &source, json const &messages)
+{
+    if (!messages.is_array()) return false;
+    for (auto const &copy : source.diagnostics) {
+        if (!copy.copy_available || copy.actual_global_message_index >= messages.size()) return false;
+        auto const &message = messages.at(copy.actual_global_message_index);
+        if (message.at("level") != copy.actual_level || message.at("message") != copy.actual_message) return false;
+    }
+    return true;
+}
+inline json retry_observations(MethodObservation::RetryCapture const &source, json const &messages)
+{
+    json pre = json::array(), events = json::array(), diagnostics = json::array(), failures = json::array();
+    for (auto const &copy : source.pre_assignments) {
+        json prefix = nullptr;
+        if (copy.active_prefix_available) {
+            require(copy.copied_layer_count <= copy.active_prefix.size(), "Retry actual prefix exceeds capture storage");
+            prefix = json::array();
+            for (std::size_t index = 0; index < copy.copied_layer_count; ++index) {
+                auto const &value = copy.active_prefix[index];
+                prefix.push_back({{"dl", scalar_bits(value.converted.dl.bits)}, {"rk", scalar_bits(value.converted.rk.bits)},
+                    {"rho", scalar_bits(value.converted.rho.bits)}, {"cp", scalar_bits(value.converted.cp.bits)},
+                    {"lr", scalar_bits(value.converted.lr.bits)}, {"ResLayer", value.converted.ResLayer},
+                    {"Nodes", value.Nodes}, {"dx", scalar_bits(value.dx.bits)}});
+            }
+        }
+        pre.push_back({{"observed_pre_assignment_ordinal", copy.observed_pre_assignment_ordinal},
+            {"preceding_post_assembly_callback_count", copy.preceding_post_assembly_callback_count},
+            {"reached", copy.reached}, {"association_available", copy.association_available},
+            {"context", copy.reached ? retry_context(copy.context) : json(nullptr)},
+            {"LayersInConstruct", copy.LayersInConstruct}, {"NumResLayers", copy.NumResLayers},
+            {"active_prefix_available", copy.active_prefix_available}, {"copied_layer_count", copy.copied_layer_count}, {"active_prefix", prefix},
+            {"matrices_available", copy.matrices_available}, {"AMat_available", copy.AMat_available}, {"IdenMatrix_available", copy.IdenMatrix_available},
+            {"AMat_actual_bounds", retry_bounds(copy.AMat_bounds)}, {"IdenMatrix_actual_bounds", retry_bounds(copy.IdenMatrix_bounds)},
+            {"AMat", copy.AMat_available ? retry_bits(copy.AMat) : json(nullptr)},
+            {"IdenMatrix", copy.IdenMatrix_available ? retry_bits(copy.IdenMatrix) : json(nullptr)},
+            {"BMat3_after_reset", copy.BMat3_after_reset ? scalar_bits(copy.BMat3_after_reset->bits) : json(nullptr)},
+            {"failure_kinds", copy.failure_kinds}, {"counted_as_PASS", false}});
+    }
+    for (auto const &copy : source.caller_events) {
+        json sums = nullptr;
+        if (copy.assigned_sums) sums = {{"assignedAbsSumXi", scalar_bits((*copy.assigned_sums)[0].bits)},
+            {"assignedAbsSumYi", scalar_bits((*copy.assigned_sums)[1].bits)},
+            {"assignedAbsSumZi", scalar_bits((*copy.assigned_sums)[2].bits)}, {"BiggestSum", scalar_bits((*copy.assigned_sums)[3].bits)}};
+        events.push_back({{"observed_event_ordinal", copy.observed_event_ordinal}, {"event", retry_event_name(copy.event)},
+            {"observed_pre_assignment_ordinal", copy.observed_pre_assignment_ordinal}, {"observed_assembly_ordinal", copy.observed_assembly_ordinal},
+            {"reached", copy.reached}, {"association_available", copy.association_available},
+            {"context", copy.reached ? retry_context(copy.context) : json(nullptr)},
+            {"assigned_sums", sums}, {"ratios", nullptr}, {"failure_kinds", copy.failure_kinds}, {"counted_as_PASS", false}});
+    }
+    for (auto const &copy : source.diagnostics) diagnostics.push_back({
+        {"observed_diagnostic_ordinal", copy.observed_diagnostic_ordinal}, {"actual_global_message_index", copy.actual_global_message_index},
+        {"observed_pre_assignment_ordinal", copy.observed_pre_assignment_ordinal},
+        {"observed_post_assembly_callback_count", copy.observed_post_assembly_callback_count},
+        {"preceding_caller_event_ordinal", copy.preceding_caller_event_ordinal ? json(*copy.preceding_caller_event_ordinal) : json(nullptr)},
+        {"actual_level", copy.actual_level}, {"actual_message", copy.copy_available ? json(copy.actual_message) : json(nullptr)},
+        {"copy_available", copy.copy_available}, {"temporal_association_only", copy.temporal_association_only},
+        {"failure_kinds", copy.failure_kinds}, {"causal_branch_classification_inferred", false}, {"counted_as_PASS", false}});
+    for (std::size_t index = 0; index < source.failure_event_counts.size(); ++index) failures.push_back({
+        {"kind", retry_failure_name(static_cast<MethodObservation::RetryFailureKind>(index))}, {"actual_event_count", source.failure_event_counts[index]}});
+    bool const joined = retry_diagnostic_join_valid(source, messages);
+    return {{"protocol", "ctf09-retry-driver-observation.v1"}, {"pre_assignments", pre}, {"caller_events", events}, {"diagnostics", diagnostics},
+        {"actual_pre_assignment_count", source.actual_pre_assignment_count}, {"actual_retained_pre_assignment_count", source.pre_assignments.size()},
+        {"actual_caller_event_count", source.actual_caller_event_count}, {"actual_retained_caller_event_count", source.caller_events.size()},
+        {"actual_caller_event_counts", source.actual_caller_event_counts},
+        {"actual_diagnostic_count", source.actual_diagnostic_count}, {"actual_retained_diagnostic_count", source.diagnostics.size()},
+        {"pre_assignment_records_omitted", source.pre_assignment_records_omitted}, {"caller_records_omitted", source.caller_records_omitted},
+        {"diagnostic_records_omitted", source.diagnostic_records_omitted}, {"observer_failure", source.observer_failure},
+        {"counter_overflow", source.counter_overflow}, {"failure_event_counts", failures},
+        {"first_failure", retry_failure_event(source.first_failure)}, {"last_failure", retry_failure_event(source.last_failure)},
+        {"actual_global_diagnostic_join_valid", joined}, {"retry_copy_integrity_failed", retry_copy_failed(source) || !joined},
+        {"all_actual_records_retained", source.pre_assignment_records_omitted == 0 && source.diagnostic_records_omitted == 0 && source.actual_pre_assignment_count == source.pre_assignments.size() && source.actual_caller_event_count == source.caller_events.size() && source.actual_diagnostic_count == source.diagnostics.size()}, {"complete_retry_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+}
+struct RetryTotals {
+    std::size_t pre = 0, retained_pre = 0, events = 0, retained_events = 0, diagnostics = 0, retained_diagnostics = 0;
+    std::size_t omitted_pre = 0, omitted_diagnostics = 0;
+    std::array<std::size_t, 9> event_counts{}, omitted_events{};
+    std::array<std::size_t, 6> failures{};
+    bool integrity_failed = false;
+};
+inline void add_retry_totals(RetryTotals &total, json const &ledger)
+{
+    total.pre += ledger.at("actual_pre_assignment_count").get<std::size_t>();
+    total.retained_pre += ledger.at("actual_retained_pre_assignment_count").get<std::size_t>();
+    total.events += ledger.at("actual_caller_event_count").get<std::size_t>();
+    total.retained_events += ledger.at("actual_retained_caller_event_count").get<std::size_t>();
+    total.diagnostics += ledger.at("actual_diagnostic_count").get<std::size_t>();
+    total.retained_diagnostics += ledger.at("actual_retained_diagnostic_count").get<std::size_t>();
+    total.omitted_pre += ledger.at("pre_assignment_records_omitted").get<std::size_t>();
+    total.omitted_diagnostics += ledger.at("diagnostic_records_omitted").get<std::size_t>();
+    total.integrity_failed = total.integrity_failed || ledger.at("retry_copy_integrity_failed").get<bool>();
+    for (std::size_t index = 0; index < total.event_counts.size(); ++index) {
+        total.event_counts[index] += ledger.at("actual_caller_event_counts").at(index).get<std::size_t>();
+        total.omitted_events[index] += ledger.at("caller_records_omitted").at(index).get<std::size_t>();
+    }
+    for (std::size_t index = 0; index < total.failures.size(); ++index)
+        total.failures[index] += ledger.at("failure_event_counts").at(index).at("actual_event_count").get<std::size_t>();
+}
+inline json retry_totals(RetryTotals const &total)
+{
+    return {{"actual_pre_assignment_count", total.pre}, {"actual_retained_pre_assignment_count", total.retained_pre},
+        {"actual_caller_event_count", total.events}, {"actual_retained_caller_event_count", total.retained_events},
+        {"actual_caller_event_counts", total.event_counts}, {"actual_diagnostic_count", total.diagnostics},
+        {"actual_retained_diagnostic_count", total.retained_diagnostics}, {"pre_assignment_records_omitted", total.omitted_pre},
+        {"caller_records_omitted", total.omitted_events}, {"diagnostic_records_omitted", total.omitted_diagnostics},
+        {"failure_event_counts", total.failures}, {"retry_copy_integrity_failed", total.integrity_failed},
+        {"complete_retry_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+}
+} // namespace Ctf01
+#endif

@@ -1,0 +1,18 @@
+--- a/energyplus_porting_plan/cards/CTF-09.md
++++ b/energyplus_porting_plan/cards/CTF-09.md
+@@ -68,3 +68,15 @@
+ 증거 경로:  
+ 최대오차/RMSE/상태 불일치:  
+ 추가 검토할 helper:  
++
++## Prospective selected 1D retry scope (Root amendment pending)
++
++Construction.cc638-981 preserves once-only allocations/Iden construction followed by each actual repeated1D assignment and exponential884 -> inverse887 -> Gamma890 -> finalCoefficients894 -> caller903-981. The initial619 timestep/history remain distinct from caller TimeStepZone; Nodes/dx are not recalculated during retry. One original assembly storage owner is consumed and retained; each Gamma invocation is fresh.
++
++The eight new retry profiles are pre_AMat, pre_IdenMatrix, assignedAbsSumXi, assignedAbsSumYi, assignedAbsSumZi, BiggestSum, pre_CTFTimeStep and post_CTFTimeStep. Every profile has atol=rtol=0 with exact class, shape and signed zero. Actual integer counts/ordinals, owner identities/order, branch flags and reached diagnostic indices/level/text are exact. Existing preprocessing18/initial3/assembly7/exponential7/inverse2/Gamma3/private7 profiles remain literal; the new selection uses separately named all-visit handoffs and does not broaden historical first-only claims.
++
++Sum owners exist only after the actual919-930 branch. The >18 term branch skips those owners; ratio expressions have no stored Native locals and are never observed/recomputed by the collector. Fatal939 is recorded before actual fatal unwinding; the seven-hour severe block948-977 can be reached even when convergence is true. All reached visits, partial records, copy masks, failure and omission ledgers remain required, with no record cap or invented method return.
++
++LoopExit is distinct from whole calculateTransferFunction return. Severe break may continue into public SI stores1024-1077; public19 capacity, SI conversion/stores, reverse/2D/internal-source branches and SUR handoff remain outside this selected retry proposal. No fatal, severe, partial, uninvoked or unavailable branch receives PASS. Actual Native diagnostics remain global occupied message records; Rust selected call intents are not substituted for that backend.
++
++Same literal39 unit models/42 whole calls and fixed15 production models/195 loader phases/45 guards are inherited without new expected outcomes. Current09 amendment/check authority must be real and separate from immutable historical_prior_08_authority, including nested historical07 ancestry. This draft changes no canonical gate and claims no numerical, integration, production or complete-card PASS. Source/full peer, actual amendment/check, fresh freeze, protected build/derive/PE and structural Original review remain Root actions.

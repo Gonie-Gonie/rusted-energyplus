@@ -1,0 +1,78 @@
+enum class RetryEvent : std::size_t {
+    DecisionEntry = 0, ExcessiveTermsUpdate = 1, AssignedSums = 2,
+    ImbalanceUpdate = 3, FatalNoCtfs = 4, SevereEntry = 5,
+    SevereBreak = 6, LoopTail = 7, LoopExit = 8
+};
+struct RetryContext {
+    bool IsUsedCTF = false, SourceSinkPresent = false;
+    int SolutionDimensions = 0, TotLayers = 0, rcmax = 0;
+    int NodeSource = 0, NodeUserTemp = 0, NumCTFTerms = 0;
+    Binary64Copy CTFTimeStep;
+    int NumHistories = 0;
+    Binary64Copy TimeStepZone;
+    bool ErrorsFound = false, DoCTFErrorReport = false, CTFConvrg = false;
+};
+struct PreAssignmentSnapshot {
+    std::size_t observed_pre_assignment_ordinal = 0;
+    std::size_t preceding_post_assembly_callback_count = 0;
+    bool reached = false, association_available = false, matrices_available = false;
+    bool active_prefix_available = false;
+    bool AMat_available = false, IdenMatrix_available = false;
+    RetryContext context;
+    int LayersInConstruct = 0, NumResLayers = 0;
+    std::size_t copied_layer_count = 0;
+    std::array<MatrixLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    std::optional<Array2Bounds> AMat_bounds, IdenMatrix_bounds;
+    std::vector<Binary64Copy> AMat, IdenMatrix;
+    // Original659 has assigned only this B slot before the first 1D band work.
+    std::optional<Binary64Copy> BMat3_after_reset;
+    std::array<bool, 6> failure_kinds{};
+};
+struct RetryCallerSnapshot {
+    std::size_t observed_event_ordinal = 0, observed_pre_assignment_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    RetryEvent event = RetryEvent::DecisionEntry;
+    bool reached = false, association_available = false;
+    RetryContext context;
+    // Present only at the actual after930 callsite. No values read on >18 path.
+    std::optional<std::array<Binary64Copy, 4>> assigned_sums;
+    std::array<bool, 6> failure_kinds{};
+};
+struct RetryDiagnosticSnapshot {
+    std::size_t observed_diagnostic_ordinal = 0;
+    std::size_t actual_global_message_index = 0;
+    std::size_t observed_pre_assignment_ordinal = 0;
+    std::size_t observed_post_assembly_callback_count = 0;
+    std::optional<std::size_t> preceding_caller_event_ordinal;
+    int actual_level = 0;
+    std::string actual_message;
+    bool copy_available = false;
+    std::array<bool, 6> failure_kinds{};
+    bool temporal_association_only = true;
+};
+enum class RetrySite : std::size_t { PreAssignment = 0, CallerEvent = 1, Diagnostic = 2 };
+enum class RetryFailureKind : std::size_t {
+    IdentityMismatch = 0, AssociationFailure = 1, OrderFailure = 2,
+    OwnerShape = 3, CopyException = 4, LedgerAppendException = 5
+};
+struct RetryFailure {
+    RetrySite site = RetrySite::PreAssignment;
+    std::size_t actual_callback_ordinal = 0;
+    std::size_t pre_assignment_ordinal = 0, post_assembly_ordinal = 0;
+    RetryFailureKind kind = RetryFailureKind::IdentityMismatch;
+};
+struct RetryCapture {
+    std::size_t actual_pre_assignment_count = 0;
+    std::size_t actual_caller_event_count = 0;
+    std::size_t actual_diagnostic_count = 0;
+    std::array<std::size_t, 9> actual_caller_event_counts{};
+    std::vector<PreAssignmentSnapshot> pre_assignments;
+    std::vector<RetryCallerSnapshot> caller_events;
+    std::vector<RetryDiagnosticSnapshot> diagnostics;
+    std::size_t pre_assignment_records_omitted = 0, diagnostic_records_omitted = 0;
+    std::array<std::size_t, 9> caller_records_omitted{};
+    bool observer_failure = false, counter_overflow = false;
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::optional<RetryFailure> first_failure, last_failure;
+};
+

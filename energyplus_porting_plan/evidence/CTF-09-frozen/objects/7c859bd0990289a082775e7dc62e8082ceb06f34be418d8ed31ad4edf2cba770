@@ -1,0 +1,79 @@
+--- .runtime/porting/CTF-09/native-helper-prep-01/before/ctf08_unit_admission.hh
++++ .runtime/porting/CTF-09/native-helper-prep-01/ctf09_unit_admission.hh
+@@ -1,8 +1,8 @@
+ // One-way frozen CTF input admission; no expected arrays or source outcomes.
+-#ifndef CTF08_UNIT_ADMISSION_HH
+-#define CTF08_UNIT_ADMISSION_HH
++#ifndef CTF09_UNIT_ADMISSION_HH
++#define CTF09_UNIT_ADMISSION_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf08_observation_fields.hh"
++#include "ctf09_observation_fields.hh"
+ #include <set>
+ 
+ namespace Ctf01 {
+@@ -11,10 +11,10 @@
+ {
+     Packet packet; packet.request = read_json(request_path); packet.admission = read_json(admission_path);
+     auto const &request = packet.request; auto const &admission = packet.admission;
+-    require(request.at("schema") == "ctf08-helper-cases.v1" && admission.at("schema") == "ctf08-native-admission-contract.v1" &&
++    require(request.at("schema") == "ctf09-helper-cases.v1" && admission.at("schema") == "ctf09-native-admission-contract.v1" &&
+         request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" &&
+         admission.at("energyplus_commit") == request.at("energyplus_commit"), "Wrong pinned source/schema");
+-    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_CTF08_helper_execution") == true &&
++    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_CTF09_helper_execution") == true &&
+         value->at("expected_values_supplied") == false && value->at("expected_exits_supplied") == false &&
+         value->at("scientific_execution_performed") == false, "Frozen input-only pre-execution policy required");
+     for (auto const *key : {"actual_scope_amendment", "actual_scope_amendment_execution"}) {
+@@ -35,7 +35,7 @@
+     packet.contracts = json::object();
+     for (auto const *key : {"source", "cases", "tolerances"}) {
+         auto const path = bound_path(root, admission.at("contracts").at(key)); auto const value = read_json(path);
+-        require(value.at("schema") == std::string("ctf08-") + key + "-contract.v1" && value.at("frozen_before_this_CTF08_helper_execution") == true,
++        require(value.at("schema") == std::string("ctf09-") + key + "-contract.v1" && value.at("frozen_before_this_CTF09_helper_execution") == true,
+                 "Contract schema/frozen policy differs");
+         if (std::string(key) == "source") {
+             require(value.at("energyplus_commit") == request.at("energyplus_commit"), "Original source identity differs");
+@@ -57,10 +57,10 @@
+     std::set<std::string> names;
+     for (auto const &row : admission.at("native_source_files"))
+         require(names.insert(bound_path(root, row).filename().string()).second, "Duplicate Native source filename");
+-    require(names == std::set<std::string>{"ctf08_unit_helper.cpp", "ctf01_reference_metadata.hh", "ctf08_unit_fields.hh",
+-        "ctf08_unit_admission.hh", "Construction.ctf08.cc", "ctf08_observer.hh", "ctf08_observer.cc", "ctf08_observation_fields.hh"}, "Native source inventory differs");
++    require(names == std::set<std::string>{"ctf09_unit_helper.cpp", "ctf01_reference_metadata.hh", "ctf09_unit_fields.hh",
++        "ctf09_unit_admission.hh", "Construction.ctf09.cc", "ctf09_observer.hh", "ctf09_observer.cc", "ctf09_observation_fields.hh"}, "Native source inventory differs");
+     packet.projection_path = bound_path(root, admission.at("projection")); auto const projection = read_json(packet.projection_path);
+-    require(projection.at("schema") == "ctf08-observation-projection.v1" && projection.at("frozen_before_this_CTF08_helper_execution") == true &&
++    require(projection.at("schema") == "ctf09-observation-projection.v1" && projection.at("frozen_before_this_CTF09_helper_execution") == true &&
+         projection.at("helper_request") == admission.at("helper_request") && projection.at("contracts") == admission.at("contracts") &&
+         projection.at("native_observation_policy") == request.at("observation_policy"), "Observation DAG differs");
+     require(request.at("ctf03_initial_observation_policy") == ctf03_initial_policy() &&
+@@ -94,7 +94,7 @@
+     for (auto const *owner : {&request, &admission, &projection, &tolerances}) {
+         require(owner->at("ctf06_exponential_observation_policy") == ctf06_exponential_policy(), "Frozen exponential method policy differs");
+         require(owner->at("ctf05_inverse_observation_policy") == ctf05_inverse_policy(), "Frozen inverse method policy differs");
+-        require(owner->at("linked_original_retention_intent") == ctf08_linked_original_retention_intent(), "New08 original retention intent differs");
++        require(owner->at("linked_original_retention_intent") == ctf09_linked_original_retention_intent(), "New09 original retention intent differs");
+     }
+     std::array<char const *, 7> const exp_variables{{"AExp", "final_AMat1", "final_AMato", "final_AMatN", "AMatRowNormMax", "fact", "CheckVal"}};
+     json const exp_shapes = {"actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "scalar", "scalar", "scalar"};
+@@ -139,6 +139,19 @@
+         require(profile.at("variable") == final_variables[i] && profile.at("atol") == 0.0 && profile.at("rtol") == 0.0 &&
+             profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true &&
+             profile.at("required_shape") == final_shapes.at(i), "Exact private final-coefficient profile differs");
++    }
++    for (auto const *owner : {&request, &admission, &projection, &tolerances})
++        require(owner->at("ctf09_retry_observation_policy") == ctf09_retry_policy() &&
++            owner->at("ctf09_attempt_selection") == ctf09_attempt_selection(), "Frozen actual retry observation policy/selection differs");
++    std::array<char const *, 8> const retry_variables{{"pre_AMat", "pre_IdenMatrix", "assignedAbsSumXi", "assignedAbsSumYi", "assignedAbsSumZi", "BiggestSum", "pre_CTFTimeStep", "post_CTFTimeStep"}};
++    json const retry_shapes = {"actual_rcmax_by_rcmax", "actual_rcmax_by_rcmax", "scalar", "scalar", "scalar", "scalar", "scalar", "scalar"};
++    auto const &retry_profiles = tolerances.at("ctf09_retry_profiles");
++    require(retry_profiles.is_array() && retry_profiles.size() == retry_variables.size(), "Eight distinct exact retry profiles required");
++    for (std::size_t i = 0; i < retry_variables.size(); ++i) {
++        auto const &profile = retry_profiles.at(i);
++        require(profile.at("variable") == retry_variables[i] && profile.at("atol") == 0.0 && profile.at("rtol") == 0.0 &&
++            profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true &&
++            profile.at("required_shape") == retry_shapes.at(i), "Exact actual retry profile differs");
+     }
+     auto const &models = request.at("model_cases");
+     require(models.is_array() && !models.empty() && models.size() <= 256, "Bounded nonempty model array required");

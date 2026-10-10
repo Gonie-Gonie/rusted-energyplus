@@ -1,0 +1,49 @@
+--- .runtime/porting/CTF-09/native-helper-prep-01/before/ctf08_unit_fields.hh
++++ .runtime/porting/CTF-09/native-helper-prep-01/ctf09_unit_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure copies of actual public members and the separately captured private locals.
+-#ifndef CTF08_UNIT_FIELDS_HH
+-#define CTF08_UNIT_FIELDS_HH
++#ifndef CTF09_UNIT_FIELDS_HH
++#define CTF09_UNIT_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf08_observation_fields.hh"
++#include "ctf09_observation_fields.hh"
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
+@@ -11,7 +11,7 @@
+ #include <EnergyPlus/UtilityRoutines.hh>
+ 
+ namespace Ctf01 {
+-namespace Observation = EnergyPlus::CTF08Observation;
++namespace Observation = EnergyPlus::CTF09Observation;
+ inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool ErrorsFound, bool DoCTFErrorReport)
+ {
+     json materials = json::array(), constructions = json::array();
+@@ -64,12 +64,12 @@
+             {"active_prefix_available", source.active_prefix_available}, {"copied_layer_count", source.copied_layer_count}, {"active_prefix", layers},
+             {"dyn", optional_scalar(source.dyn)}, {"rs", optional_scalar(source.rs)}, {"cnd", optional_scalar(source.cnd)}}}};
+ }
+-inline bool observer_failed(Observation::Capture const &capture)
++inline bool observer_failed(Observation::Capture const &capture, json const &messages)
+ {
+     return capture.binding_error || capture.identity_mismatch || capture.duplicate_phase ||
+-           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma) || final_coefficient_copy_failed(capture.final_coefficients);
++           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma) || final_coefficient_copy_failed(capture.final_coefficients) || retry_copy_failed(capture.retry_driver) || !retry_diagnostic_join_valid(capture.retry_driver, messages);
+ }
+-inline json observations(Observation::Capture const &capture)
++inline json observations(Observation::Capture const &capture, json const &messages)
+ {
+     return {{"PostLoad", checkpoint(capture.phases[0], capture.actual_phase_callback_counts[0])},
+         {"PostMerge", checkpoint(capture.phases[1], capture.actual_phase_callback_counts[1])},
+@@ -80,7 +80,8 @@
+         {"Inverse", method_observations(capture.inverse, Observation::MethodKind::Inverse)},
+         {"Gamma", gamma_observations(capture.gamma)},
+         {"FinalCoefficients", final_coefficient_observations(capture.final_coefficients)},
+-        {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture)},
++        {"RetryDriver", retry_observations(capture.retry_driver, messages)},
++        {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture, messages)},
+         {"binding_error", capture.binding_error}, {"identity_mismatch", capture.identity_mismatch},
+         {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},
+         {"active_prefix_invalid", capture.active_prefix_invalid}, {"unused_fixed_array_tail_emitted", false}};

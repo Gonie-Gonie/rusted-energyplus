@@ -1,0 +1,861 @@
+{
+  "schema": "ctf09-retry-input-policy-source-proposal.v1",
+  "status": "SOURCE-PROPOSAL-not-frozen-not-executed",
+  "unit_lane": {
+    "inherited_input_only_request": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+      "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+      "size_bytes": 103619
+    },
+    "model_cases": 39,
+    "declared_whole_calls": 42,
+    "selection": "copy exact original model_cases/caller/material/construction/operation rows; no new inputs or expected outputs",
+    "members_are_literal_inputs_not_Material_loader_observations": true
+  },
+  "production_lane": {
+    "inherited_input_only_request": {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/helper-request.json",
+      "sha256": "400beabb42dceafc0db6e0a7f3ebaf14bb54bb9e037b8c8777043e74233e301d",
+      "size_bytes": 22703
+    },
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "actual_whole_calls": "derive from actual loaded Construct owners; no fixed21 expectation",
+    "selection": "same ordered CON15 original IDFs and source-produced timestep4/15/0.25/900; no manual Material/Construct/use seeds"
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "ctf03_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "one_way_packet_DAG": {
+    "request": "source/tolerances + exact inherited models/policies + fresh08 private policy + new08 original intent",
+    "cases": "source/tolerances/request/fixedscope/45guards",
+    "projection": "request/contracts/retained old policies/fresh08 private policy/new08 intent",
+    "admission": "request/projection/contracts/actual08 scope pair/native8/all policies/new08 intent",
+    "receipt": "actual writer/emitted refs only; no admission backref"
+  },
+  "prospective_runtime_freeze_flag": "frozen_before_this_CTF09_helper_execution",
+  "chronology_disclosure": "Exact CTF01 literal models and fixed15 persist. Fresh08 private policy/profiles are prospective before first08 capture; all earlier07/06/05/04/03/01 handoffs and histories keep their separate meanings. No expected values or outcomes.",
+  "pending_actual_refs": [
+    "current09 scope amendment/check",
+    "same-lane prior08 freeze and genuine recorder, if required by Root settled scope",
+    "new09 unit/production freeze and execution",
+    "new09 actual build/derive/PE and helper execution"
+  ],
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "ctf04_matrix_observation_policy": {
+    "protocol": "ctf04-matrix-assembly.v1",
+    "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+    "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+    "selected_attempt_ordinal": 1,
+    "later_Native_attempts_paired": false,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "Rust_retry_driver_available": false,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "matrix_fields": [
+      "AMat",
+      "IdenMatrix",
+      "BMat",
+      "CMat",
+      "DMat"
+    ],
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "matrix_shapes": {
+      "AMat": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "BMat": 3,
+      "CMat": 2,
+      "DMat": 2
+    },
+    "actual_source_produced_identity_required": true,
+    "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+    "actual_current_retry_state_fields": [
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_converted_and_initial_handoff_retained": true,
+    "missing_attempt_or_copy_integrity_failure_is_required_failure": true,
+    "unreached_counted_as_PASS": false,
+    "retry_driver_or_matrix_answers_reconstructed": false
+  },
+  "ctf06_exponential_observation_policy": {
+    "protocol": "ctf06-exponential-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateExponentialMatrix",
+    "actual_caller_line": 884,
+    "actual_method_source_lines": [
+      1105,
+      1373
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "InitializedInputs",
+      "ScalingControls",
+      "PowerControl",
+      "SquareControl",
+      "FinalWorkspace",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AMat",
+      "IdenMatrix"
+    ],
+    "initialized_matrices": [
+      "AMat1",
+      "AMato",
+      "AMatN",
+      "AExp"
+    ],
+    "scaled_matrices": [
+      "AMat1"
+    ],
+    "final_matrices": [
+      "AMat1",
+      "AMato",
+      "AMatN",
+      "AExp"
+    ],
+    "return_matrices": [
+      "AMat",
+      "IdenMatrix",
+      "AExp"
+    ],
+    "scalar_controls": [
+      "AMatRowNormMax",
+      "fact",
+      "CheckVal"
+    ],
+    "integer_controls": [
+      "k",
+      "l",
+      "final_i"
+    ],
+    "actual_power_controls": [
+      "i",
+      "SigFigLimit"
+    ],
+    "actual_square_controls": [
+      "isq",
+      "Backup"
+    ],
+    "scalar_controls_available_only_at_scaling_and_final": true,
+    "final_i_distinct_from_observed_control_event_count": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_and_control_events_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "ctf05_inverse_observation_policy": {
+    "protocol": "ctf05-inverse-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateInverseMatrix",
+    "actual_caller_line": 887,
+    "actual_method_source_lines": [
+      1375,
+      1494
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "InitializedInputs",
+      "ScalingControls",
+      "PowerControl",
+      "SquareControl",
+      "FinalWorkspace",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AMat",
+      "IdenMatrix"
+    ],
+    "initialized_matrices": [
+      "AMat1",
+      "AInv"
+    ],
+    "final_matrices": [
+      "AMat1",
+      "AInv"
+    ],
+    "return_matrices": [
+      "AMat",
+      "IdenMatrix",
+      "AInv"
+    ],
+    "actual_exponential_return_precedes_inverse_entry": true,
+    "inverse_inputs_are_original_AMat_and_IdenMatrix_not_AExp": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_and_control_events_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf09-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF09-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "ctf07_gamma_observation_policy": {
+    "protocol": "ctf07-gamma-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateGammas",
+    "actual_caller_line": 890,
+    "actual_method_source_lines": [
+      1496,
+      1589
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "ATempReady",
+      "Gamma1Final",
+      "Gamma2Final",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AExp",
+      "IdenMatrix",
+      "AInv"
+    ],
+    "actual_input_BMat_shape": [
+      3
+    ],
+    "ATemp_ready_matrices": [
+      "ATemp"
+    ],
+    "Gamma1_final_matrices": [
+      "Gamma1"
+    ],
+    "Gamma2_final_matrices": [
+      "Gamma2"
+    ],
+    "return_matrices": [
+      "Gamma1",
+      "Gamma2"
+    ],
+    "matrix_shapes": {
+      "AExp": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "AInv": "actual_rcmax_by_rcmax",
+      "ATemp": "actual_rcmax_by_rcmax",
+      "Gamma1": "actual_3_by_rcmax",
+      "Gamma2": "actual_3_by_rcmax"
+    },
+    "actual_caller_source_order": [
+      "exponential884",
+      "inverse887",
+      "Gamma890"
+    ],
+    "actual_matching_exponential_and_inverse_returns_precede_Gamma_entry": true,
+    "actual_Gamma1_observed_before_ATemp_deallocation": true,
+    "actual_ATemp_assignment_observed_not_recomputed": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "NumOfPerpendNodes_for_unselected_2D_is_context_only": true,
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "Gamma_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "inherited_linked_original_retention_intent": {
+    "schema": "ctf06-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF06-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "source_or_tolerance_changes_after_CTF07_outputs_for_PASS": false,
+  "inherited_ctf07_linked_original_retention_intent": {
+    "schema": "ctf07-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF07-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "ctf08_final_coefficient_observation_policy": {
+    "protocol": "ctf08-private-final-coefficient-observation.v1",
+    "actual_method": "ConstructionProps::calculateFinalCoefficients",
+    "actual_caller_line": 894,
+    "actual_method_source_lines": [
+      1591,
+      1906
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "PrivateFinal",
+      "SourceReturn"
+    ],
+    "actual_capture_boundaries": {
+      "Entry": "after_original1592_before_local_initialization_or_Gamma1_mutation",
+      "PrivateFinal": "after_original1902_before_private_workspace_deallocation1903_1905",
+      "SourceReturn": "after_actual_caller894_before_convergence_and_retry903"
+    },
+    "entry_matrices": [
+      "AExp",
+      "IdenMatrix",
+      "Gamma1",
+      "Gamma2"
+    ],
+    "entry_compressed_inputs": [
+      "CMat",
+      "DMat"
+    ],
+    "private_final_matrices": [
+      "Gamma1",
+      "s0",
+      "PhiR0",
+      "Rnew",
+      "Rold"
+    ],
+    "return_matrices": [
+      "Gamma1",
+      "s0"
+    ],
+    "private_final_and_return_history": [
+      "s",
+      "e",
+      "NumCTFTerms"
+    ],
+    "private_final_controls": [
+      "inum",
+      "CTFConvrg"
+    ],
+    "private_controls_and_R_workspaces_available_at_SourceReturn": false,
+    "uninitialized_avg_rat_trace_SurfNodeFac_observed": false,
+    "matrix_shapes": {
+      "AExp": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "Gamma1": "actual_3_by_rcmax",
+      "Gamma2": "actual_3_by_rcmax",
+      "s0": [
+        3,
+        4
+      ],
+      "s": "actual_3_by_4_by_rcmax",
+      "e": "actual_rcmax",
+      "PhiR0": "actual_rcmax_by_rcmax",
+      "Rnew": "actual_rcmax_by_rcmax",
+      "Rold": "actual_rcmax_by_rcmax",
+      "CMat": [
+        2
+      ],
+      "DMat": [
+        2
+      ]
+    },
+    "storage_order": "source_i1_outer_i2_inner_row_first; s_j_outer_k_middle_term_inner",
+    "full_allocated_history_including_initialized_tails_retained": true,
+    "NumCTFTerms_does_not_truncate_storage": true,
+    "independent_s_e_and_CMat_DMat_availability": true,
+    "actual_caller_source_order": [
+      "exponential884",
+      "inverse887",
+      "Gamma890",
+      "finalCoefficients894"
+    ],
+    "actual_matching_Gamma_return_precedes_entry": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_Gamma_invocation_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "actual_source_produced_identity_required": true,
+    "actual_assembly_and_prior_method_context_association_required": true,
+    "actual_return_marker_required_for_return_claim": true,
+    "all_actual_visits_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "values_identity_return_private_controls_or_retry_state_reconstructed": false,
+    "caller_convergence_retry_public_SI19_stores_or_complete_coefficient_handoff_certified": false,
+    "discrete_fields_exact": [
+      "NumCTFTerms",
+      "inum",
+      "CTFConvrg"
+    ]
+  },
+  "inherited_required_before_first_CTF07_observation": [
+    "actual CTF07 card/scope amendment and validation recorder",
+    "Root source approval and other-author full source peer",
+    "fresh per-lane input/projection/tolerance packet",
+    "actual freeze before helper invocation",
+    "actual helper build/linkmap/PE identity"
+  ],
+  "required_before_first_CTF08_observation": [
+    "Root and other-author FULL source review of immutable passive/helper source",
+    "Root actual CTF08 scope/check authority with historical prior07 distinct",
+    "fresh actual08 input-only source/cases/tolerances/request/projection/admission freeze",
+    "actual3TU compile/link/PE/preservation before genuine Native call",
+    "actual OriginalDataQA before unchanged Rust baseline"
+  ],
+  "source_or_tolerance_changes_after_CTF08_outputs_for_PASS": false,
+  "inherited_ctf08_linked_original_retention_intent": {
+    "schema": "ctf08-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF08-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "ctf09_retry_observation_policy": {
+    "protocol": "ctf09-retry-driver-observation.v1",
+    "actual_source_range": [
+      638,
+      981
+    ],
+    "scope": "actual_no_source_1D_retry_visits_within_one_bound_whole_call",
+    "pre_assignment": "after_original661_before_repeated_band_assignment_after_actual_BMat3_reset",
+    "caller_event_names": [
+      "DecisionEntry",
+      "ExcessiveTermsUpdate",
+      "AssignedSums",
+      "ImbalanceUpdate",
+      "FatalNoCtfs",
+      "SevereEntry",
+      "SevereBreak",
+      "LoopTail",
+      "LoopExit"
+    ],
+    "actual_assigned_sums": [
+      "assignedAbsSumXi",
+      "assignedAbsSumYi",
+      "assignedAbsSumZi",
+      "BiggestSum"
+    ],
+    "ratios_recomputed_or_observed": false,
+    "skipped_sums_or_unassigned_values_fabricated": false,
+    "fatal_marker_precedes_actual_Fatal939": true,
+    "SevereEntry_precedes_actual_Severe949": true,
+    "severe_boundary_can_be_reached_when_CTFConvrg_true": true,
+    "actual_context_before_and_after_update_copied_independently": true,
+    "LoopExit_is_whole_call_return_or_SI_store_certification": false,
+    "diagnostics": "actual_global_occupied_message_index_level_and_text_after_successful_original_push; temporal_association_only",
+    "all_actual_visits_and_partial_records_retained": true,
+    "record_cap": null,
+    "actual_return_markers_required_for_return_claim": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "old_first_only_policies_changed": false,
+    "Native_operands_or_attempt_counts_supplied_to_Rust": false,
+    "uninvoked_or_unreached_counted_as_PASS": false,
+    "scientific_comparison_performed": false,
+    "numerical_PASS_claimed": false,
+    "full_CTF09_or_CTF10_certified": false
+  },
+  "ctf09_attempt_selection": {
+    "protocol": "ctf09-actual-retry-attempt-selection.v1",
+    "selection": "all_actual_reached_no_source_1D_attempts_with_same_bound_owner_and_checked_matching_method_ordinals",
+    "actual_order": [
+      "pre_assignment661",
+      "assembly728",
+      "exponential884",
+      "inverse887",
+      "Gamma890",
+      "finalCoefficients894",
+      "caller903_981"
+    ],
+    "first_attempt_association": "actual_initial619_context_and_actual_retained_pre_assignment_storage",
+    "later_attempt_association": "actual_previous_LoopTail_false_then_actual_next_pre_assignment_and_post728_context",
+    "inherited_first_only_policies_reinterpreted": false,
+    "inherited_profile_values_reused_as_separate_all_visit_handoffs": true,
+    "partial_source_outcomes_and_observation_integrity_separate": true,
+    "Native_attempt_count_dt_history_or_operands_supplied_to_Rust": false,
+    "missing_required_same_input_owner_on_one_or_both_sides_is_failure": true,
+    "unreached_unavailable_partial_or_later_SI_stores_counted_as_PASS": false,
+    "diagnostic_text_versus_Rust_call_intents_numerically_paired": false,
+    "numerical_PASS_claimed": false,
+    "whole_CTF_or_surface_handoff_certified": false
+  },
+  "ctf09_retry_profiles": [
+    {
+      "variable": "pre_AMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "pre_IdenMatrix",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "assignedAbsSumXi",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "assignedAbsSumYi",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "assignedAbsSumZi",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "BiggestSum",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "pre_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "post_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "required_before_first_CTF09_observation": [
+    "actual Root current09 scope amendment and genuine check recorder",
+    "same input-only39/42 and fixed15/195 freeze with all45 guards",
+    "Root and other-author FULL source review",
+    "actual protected cached build/derived helper/independent PE custody",
+    "frozen eight exact retry profiles and unchanged inherited handoff profiles"
+  ],
+  "ctf09_all_visit_handoff_profile_groups": {},
+  "ctf09_discrete_exact": [
+    "actual owner ID/name/order and bound Construct identity",
+    "attempt/preassignment/method/event ordinals and actual bounds",
+    "NumCTFTerms/NumHistories/CTFConvrg/shared flags",
+    "actual diagnostic occupied global index/level/text, temporal association only",
+    "all failure/omission/copy availability and actual Source outcomes"
+  ],
+  "ctf09_scope_boundary": {
+    "all_actual_visits_observed": true,
+    "new09_pairing_requires_genuine_Rust_retry_owner": true,
+    "old_first_only_policies_remain_historical_scope_literals": true,
+    "initial619_dt_not_assumed_equal_TimeStepZone": true,
+    "no_ratio_expression_observation": true,
+    "loop_exit_distinct_from_whole_return_and_SI_public_stores": true,
+    "private_sums_unavailable_on_excessive_terms_branch": true,
+    "Native_global_diagnostics_not_equated_to_Rust_call_intents": true,
+    "full_card_or_surface_handoff_certified": false
+  }
+}

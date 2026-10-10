@@ -1,0 +1,302 @@
+namespace {
+
+void retry_failure(Capture &capture, RetrySite site, std::size_t ordinal,
+                   RetryFailureKind kind, std::array<bool, 6> *record = nullptr) noexcept
+{
+    auto &ledger = capture.retry_driver;
+    ledger.observer_failure = true;
+    auto const index = static_cast<std::size_t>(kind);
+    if (ledger.failure_event_counts[index] != std::numeric_limits<std::size_t>::max())
+        ++ledger.failure_event_counts[index];
+    else ledger.counter_overflow = true;
+    if (record != nullptr) (*record)[index] = true;
+    RetryFailure const failure{site, ordinal, ledger.actual_pre_assignment_count,
+        capture.actual_matrix_attempt_callback_count, kind};
+    if (!ledger.first_failure) ledger.first_failure = failure;
+    ledger.last_failure = failure;
+}
+
+bool retry_increment(Capture &capture, std::size_t &count,
+                     RetrySite site, std::size_t ordinal) noexcept
+{
+    if (count == std::numeric_limits<std::size_t>::max()) {
+        capture.retry_driver.counter_overflow = true;
+        retry_failure(capture, site, ordinal, RetryFailureKind::OrderFailure);
+        return false;
+    }
+    ++count;
+    return true;
+}
+
+RetryContext retry_context(Construction::ConstructionProps const &construction,
+                           bool ErrorsFound, bool DoCTFErrorReport,
+                           Real64 const &TimeStepZone, bool CTFConvrg) noexcept
+{
+    RetryContext copy;
+    copy.IsUsedCTF = construction.IsUsedCTF;
+    copy.SourceSinkPresent = construction.SourceSinkPresent;
+    copy.SolutionDimensions = construction.SolutionDimensions;
+    copy.TotLayers = construction.TotLayers;
+    copy.rcmax = construction.rcmax;
+    copy.NodeSource = construction.NodeSource;
+    copy.NodeUserTemp = construction.NodeUserTemp;
+    copy.NumCTFTerms = construction.NumCTFTerms;
+    copy.CTFTimeStep = copy_bits(construction.CTFTimeStep);
+    copy.NumHistories = construction.NumHistories;
+    copy.TimeStepZone = copy_bits(TimeStepZone);
+    copy.ErrorsFound = ErrorsFound;
+    copy.DoCTFErrorReport = DoCTFErrorReport;
+    copy.CTFConvrg = CTFConvrg;
+    return copy;
+}
+
+bool retry_static_context(RetryContext const &a, RetryContext const &b) noexcept
+{
+    return a.IsUsedCTF == b.IsUsedCTF && a.SourceSinkPresent == b.SourceSinkPresent &&
+        a.SolutionDimensions == b.SolutionDimensions && a.TotLayers == b.TotLayers &&
+        a.rcmax == b.rcmax && a.NodeSource == b.NodeSource && a.NodeUserTemp == b.NodeUserTemp &&
+        a.TimeStepZone.bits == b.TimeStepZone.bits;
+}
+
+bool retry_prior_final_returned(Capture const &capture, std::size_t ordinal) noexcept
+{
+    auto const &ledger = capture.final_coefficients;
+    auto const returned = static_cast<std::size_t>(FinalCoefficientStage::SourceReturn);
+    if (ledger.actual_invocation_count != ordinal || ledger.invocations.empty() ||
+        ledger.actual_stage_callback_counts[returned] != ordinal) return false;
+    auto const &record = ledger.invocations.back();
+    return record.observed_invocation_ordinal == ordinal && record.observed_assembly_ordinal == ordinal &&
+        record.association_available && record.source_return.reached && record.source_return.caller_context_available;
+}
+
+bool retry_pre_association(Capture const &capture, PreAssignmentSnapshot const &copy) noexcept
+{
+    auto const ordinal = copy.observed_pre_assignment_ordinal;
+    if (capture.actual_callback_count != 4 || !capture.initial_discretization.reached ||
+        capture.actual_phase_callback_counts != std::array<std::size_t, 4>{1, 1, 1, 1} ||
+        copy.context.TimeStepZone.bits != capture.initial_discretization.TimeStepZone.bits ||
+        capture.actual_matrix_attempt_callback_count == std::numeric_limits<std::size_t>::max() ||
+        ordinal != capture.actual_matrix_attempt_callback_count + 1) return false;
+    if (ordinal == 1) return capture.retry_driver.caller_events.empty();
+    auto const &events = capture.retry_driver.caller_events;
+    if (events.empty()) return false;
+    auto const &prior = events.back();
+    return prior.observed_event_ordinal == capture.retry_driver.actual_caller_event_count &&
+        prior.observed_pre_assignment_ordinal == ordinal - 1 &&
+        prior.observed_assembly_ordinal == ordinal - 1 && prior.event == RetryEvent::LoopTail &&
+        !prior.context.CTFConvrg && retry_static_context(copy.context, prior.context) &&
+        copy.context.CTFTimeStep.bits == prior.context.CTFTimeStep.bits &&
+        copy.context.NumHistories == prior.context.NumHistories &&
+        copy.context.ErrorsFound == prior.context.ErrorsFound &&
+        copy.context.DoCTFErrorReport == prior.context.DoCTFErrorReport;
+}
+
+void copy_retry_matrix(Capture &capture, PreAssignmentSnapshot &snapshot,
+                       Array2D<Real64> const &source, std::optional<Array2Bounds> const &bounds,
+                       std::vector<Binary64Copy> &values, bool &available) noexcept
+{
+    int const n = snapshot.context.rcmax;
+    if (n < 1 || static_cast<std::size_t>(n) > std::numeric_limits<std::size_t>::max() / static_cast<std::size_t>(n)) {
+        retry_failure(capture, RetrySite::PreAssignment, snapshot.observed_pre_assignment_ordinal,
+            RetryFailureKind::OwnerShape, &snapshot.failure_kinds);
+        return;
+    }
+    auto const elements = static_cast<std::size_t>(n) * static_cast<std::size_t>(n);
+    if (!exact_square(bounds, n, elements)) {
+        retry_failure(capture, RetrySite::PreAssignment, snapshot.observed_pre_assignment_ordinal,
+            RetryFailureKind::OwnerShape, &snapshot.failure_kinds);
+        return;
+    }
+    try {
+        values.reserve(elements);
+        for (int i1 = 1; i1 <= n; ++i1)
+            for (int i2 = 1; i2 <= n; ++i2) values.push_back(copy_bits(source(i1, i2)));
+        available = values.size() == elements;
+    } catch (...) {
+        retry_failure(capture, RetrySite::PreAssignment, snapshot.observed_pre_assignment_ordinal,
+            RetryFailureKind::CopyException, &snapshot.failure_kinds);
+    }
+}
+
+bool retry_event_order(RetryCapture const &ledger, RetryCallerSnapshot const &copy) noexcept
+{
+    if (ledger.caller_events.size() < 2) return copy.event == RetryEvent::DecisionEntry &&
+        copy.observed_pre_assignment_ordinal == 1;
+    auto const &prior = ledger.caller_events[ledger.caller_events.size() - 2];
+    if (prior.observed_event_ordinal + 1 != copy.observed_event_ordinal) return false;
+    if (copy.event == RetryEvent::DecisionEntry) return
+        prior.event == RetryEvent::LoopTail && !prior.context.CTFConvrg &&
+        prior.observed_pre_assignment_ordinal != std::numeric_limits<std::size_t>::max() &&
+        prior.observed_pre_assignment_ordinal + 1 == copy.observed_pre_assignment_ordinal;
+    if (prior.observed_pre_assignment_ordinal != copy.observed_pre_assignment_ordinal) return false;
+    switch (copy.event) {
+    case RetryEvent::ExcessiveTermsUpdate:
+    case RetryEvent::AssignedSums: return prior.event == RetryEvent::DecisionEntry;
+    case RetryEvent::ImbalanceUpdate:
+    case RetryEvent::FatalNoCtfs: return prior.event == RetryEvent::AssignedSums;
+    case RetryEvent::SevereEntry:
+    case RetryEvent::LoopTail: return prior.event == RetryEvent::ExcessiveTermsUpdate ||
+        prior.event == RetryEvent::AssignedSums || prior.event == RetryEvent::ImbalanceUpdate;
+    case RetryEvent::SevereBreak: return prior.event == RetryEvent::SevereEntry;
+    case RetryEvent::LoopExit: return prior.event == RetryEvent::SevereBreak ||
+        (prior.event == RetryEvent::LoopTail && prior.context.CTFConvrg);
+    case RetryEvent::DecisionEntry: return false;
+    }
+    return false;
+}
+
+RetryCallerSnapshot *retry_event_copy(RetryEvent event, EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept
+{
+    Capture *capture = active_capture;
+    if (capture == nullptr) return nullptr;
+    auto &ledger = capture->retry_driver;
+    auto const index = static_cast<std::size_t>(event);
+    if (index >= ledger.actual_caller_event_counts.size()) {
+        retry_failure(*capture, RetrySite::CallerEvent, ledger.actual_caller_event_count, RetryFailureKind::OrderFailure);
+        return nullptr;
+    }
+    if (!retry_increment(*capture, ledger.actual_caller_event_count, RetrySite::CallerEvent, ledger.actual_caller_event_count)) return nullptr;
+    auto const ordinal = ledger.actual_caller_event_count;
+    if (!retry_increment(*capture, ledger.actual_caller_event_counts[index], RetrySite::CallerEvent, ordinal)) return nullptr;
+    if (capture->bound_state != &state || capture->bound_construction != &construction) {
+        retry_increment(*capture, ledger.caller_records_omitted[index], RetrySite::CallerEvent, ordinal);
+        retry_failure(*capture, RetrySite::CallerEvent, ordinal, RetryFailureKind::IdentityMismatch);
+        return nullptr;
+    }
+    try { ledger.caller_events.emplace_back(); }
+    catch (...) {
+        retry_increment(*capture, ledger.caller_records_omitted[index], RetrySite::CallerEvent, ordinal);
+        retry_failure(*capture, RetrySite::CallerEvent, ordinal, RetryFailureKind::LedgerAppendException);
+        return nullptr;
+    }
+    auto &copy = ledger.caller_events.back();
+    copy.observed_event_ordinal = ordinal;
+    copy.observed_pre_assignment_ordinal = ledger.actual_pre_assignment_count;
+    copy.observed_assembly_ordinal = capture->actual_matrix_attempt_callback_count;
+    copy.event = event; copy.reached = true;
+    copy.context = retry_context(construction, ErrorsFound, DoCTFErrorReport, TimeStepZone, CTFConvrg);
+    bool const retained_pre = !ledger.pre_assignments.empty() &&
+        ledger.pre_assignments.back().observed_pre_assignment_ordinal == ledger.actual_pre_assignment_count;
+    copy.association_available = retained_pre && copy.observed_pre_assignment_ordinal != 0 &&
+        copy.observed_pre_assignment_ordinal == copy.observed_assembly_ordinal &&
+        retry_static_context(copy.context, ledger.pre_assignments.back().context) &&
+        retry_prior_final_returned(*capture, copy.observed_assembly_ordinal);
+    if (!copy.association_available) retry_failure(*capture, RetrySite::CallerEvent, ordinal,
+        RetryFailureKind::AssociationFailure, &copy.failure_kinds);
+    if (!retry_event_order(ledger, copy)) retry_failure(*capture, RetrySite::CallerEvent, ordinal,
+        RetryFailureKind::OrderFailure, &copy.failure_kinds);
+    return &copy;
+}
+
+} // namespace
+
+void pre_matrix_assignment(EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    int LayersInConstruct, int NumResLayers,
+    Array1D<Real64> const &dl, Array1D<Real64> const &rk, Array1D<Real64> const &rho,
+    Array1D<Real64> const &cp, Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+    Array1D_int const &Nodes, Array1D<Real64> const &dx,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept
+{
+    Capture *capture = active_capture;
+    if (capture == nullptr) return;
+    auto &ledger = capture->retry_driver;
+    if (!retry_increment(*capture, ledger.actual_pre_assignment_count, RetrySite::PreAssignment, ledger.actual_pre_assignment_count)) return;
+    auto const ordinal = ledger.actual_pre_assignment_count;
+    if (capture->bound_state != &state || capture->bound_construction != &construction) {
+        retry_increment(*capture, ledger.pre_assignment_records_omitted, RetrySite::PreAssignment, ordinal);
+        retry_failure(*capture, RetrySite::PreAssignment, ordinal, RetryFailureKind::IdentityMismatch);
+        return;
+    }
+    try { ledger.pre_assignments.emplace_back(); }
+    catch (...) {
+        retry_increment(*capture, ledger.pre_assignment_records_omitted, RetrySite::PreAssignment, ordinal);
+        retry_failure(*capture, RetrySite::PreAssignment, ordinal, RetryFailureKind::LedgerAppendException);
+        return;
+    }
+    auto &copy = ledger.pre_assignments.back();
+    copy.observed_pre_assignment_ordinal = ordinal;
+    copy.preceding_post_assembly_callback_count = capture->actual_matrix_attempt_callback_count;
+    copy.reached = true;
+    copy.context = retry_context(construction, ErrorsFound, DoCTFErrorReport, TimeStepZone, CTFConvrg);
+    copy.LayersInConstruct = LayersInConstruct; copy.NumResLayers = NumResLayers;
+    copy.association_available = retry_pre_association(*capture, copy);
+    if (!copy.association_available) retry_failure(*capture, RetrySite::PreAssignment, ordinal,
+        RetryFailureKind::AssociationFailure, &copy.failure_kinds);
+    bool const prefix = LayersInConstruct > 0 && LayersInConstruct <= Construction::MaxLayersInConstruct &&
+        NumResLayers >= 0 && NumResLayers <= LayersInConstruct &&
+        covers_prefix(dl, LayersInConstruct) && covers_prefix(rk, LayersInConstruct) &&
+        covers_prefix(rho, LayersInConstruct) && covers_prefix(cp, LayersInConstruct) &&
+        covers_prefix(lr, LayersInConstruct) && covers_prefix(ResLayer, LayersInConstruct) &&
+        covers_prefix(Nodes, LayersInConstruct) && covers_prefix(dx, LayersInConstruct);
+    if (prefix) {
+        for (int layer = 1; layer <= LayersInConstruct; ++layer) {
+            auto &value = copy.active_prefix[static_cast<std::size_t>(layer - 1)];
+            value.converted.dl = copy_bits(dl(layer)); value.converted.rk = copy_bits(rk(layer));
+            value.converted.rho = copy_bits(rho(layer)); value.converted.cp = copy_bits(cp(layer));
+            value.converted.lr = copy_bits(lr(layer)); value.converted.ResLayer = ResLayer(layer);
+            value.Nodes = Nodes(layer); value.dx = copy_bits(dx(layer));
+        }
+        copy.copied_layer_count = static_cast<std::size_t>(LayersInConstruct);
+        copy.active_prefix_available = true;
+    } else retry_failure(*capture, RetrySite::PreAssignment, ordinal, RetryFailureKind::OwnerShape, &copy.failure_kinds);
+    copy.AMat_bounds = array_bounds(construction.AMat);
+    copy.IdenMatrix_bounds = array_bounds(construction.IdenMatrix);
+    copy_retry_matrix(*capture, copy, construction.AMat, copy.AMat_bounds, copy.AMat, copy.AMat_available);
+    copy_retry_matrix(*capture, copy, construction.IdenMatrix, copy.IdenMatrix_bounds, copy.IdenMatrix, copy.IdenMatrix_available);
+    if (exact_vector(array_bounds(construction.BMat), 3)) copy.BMat3_after_reset = copy_bits(construction.BMat(3));
+    else retry_failure(*capture, RetrySite::PreAssignment, ordinal, RetryFailureKind::OwnerShape, &copy.failure_kinds);
+    copy.matrices_available = copy.AMat_available && copy.IdenMatrix_available;
+}
+
+void retry_caller_event(RetryEvent event, EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept
+{
+    retry_event_copy(event, state, construction, ErrorsFound, DoCTFErrorReport, TimeStepZone, CTFConvrg);
+}
+
+void retry_assigned_sums(EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg,
+    Real64 const &SumXi, Real64 const &SumYi, Real64 const &SumZi, Real64 const &BiggestSum) noexcept
+{
+    auto *copy = retry_event_copy(RetryEvent::AssignedSums, state, construction,
+        ErrorsFound, DoCTFErrorReport, TimeStepZone, CTFConvrg);
+    if (copy != nullptr) copy->assigned_sums = std::array<Binary64Copy, 4>{
+        copy_bits(SumXi), copy_bits(SumYi), copy_bits(SumZi), copy_bits(BiggestSum)};
+}
+
+void retry_diagnostic(EnergyPlusData const &state, std::size_t actual_global_message_index,
+    int actual_level, std::string const &actual_message) noexcept
+{
+    Capture *capture = active_capture;
+    if (capture == nullptr) return; // Loader diagnostics have no bound whole CTF call.
+    auto &ledger = capture->retry_driver;
+    if (!retry_increment(*capture, ledger.actual_diagnostic_count, RetrySite::Diagnostic, ledger.actual_diagnostic_count)) return;
+    auto const ordinal = ledger.actual_diagnostic_count;
+    if (capture->bound_state != &state || capture->bound_construction == nullptr) {
+        retry_increment(*capture, ledger.diagnostic_records_omitted, RetrySite::Diagnostic, ordinal);
+        retry_failure(*capture, RetrySite::Diagnostic, ordinal, RetryFailureKind::IdentityMismatch);
+        return;
+    }
+    try { ledger.diagnostics.emplace_back(); }
+    catch (...) {
+        retry_increment(*capture, ledger.diagnostic_records_omitted, RetrySite::Diagnostic, ordinal);
+        retry_failure(*capture, RetrySite::Diagnostic, ordinal, RetryFailureKind::LedgerAppendException);
+        return;
+    }
+    auto &copy = ledger.diagnostics.back();
+    copy.observed_diagnostic_ordinal = ordinal;
+    copy.actual_global_message_index = actual_global_message_index;
+    copy.observed_pre_assignment_ordinal = ledger.actual_pre_assignment_count;
+    copy.observed_post_assembly_callback_count = capture->actual_matrix_attempt_callback_count;
+    if (!ledger.caller_events.empty() && ledger.caller_events.back().observed_event_ordinal == ledger.actual_caller_event_count)
+        copy.preceding_caller_event_ordinal = ledger.actual_caller_event_count;
+    copy.actual_level = actual_level;
+    try { copy.actual_message = actual_message; copy.copy_available = true; }
+    catch (...) { retry_failure(*capture, RetrySite::Diagnostic, ordinal, RetryFailureKind::CopyException, &copy.failure_kinds); }
+}
+

@@ -1,0 +1,46 @@
+{
+  "schema": "ctf09-actual-pre-output-scope-and-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-09-frozen/manifest.json",
+    "sha256": "918604b28fdf5c0e0a1fbcf184a7718a07050c29d689508eb5961fc8b93cb78c",
+    "size_bytes": 107668
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-09/scope-amendment-01/amendment.json",
+    "sha256": "cf2d45db4be3d1e2d752205f45db1b9796bf6c1a7f7eb6169240e58fe6bb065d",
+    "size_bytes": 2310
+  },
+  "actual_scope_check": {
+    "path": ".runtime/porting/CTF-09/scope-check-command-01/receipt.json",
+    "sha256": "4eae4d1ddd57a216feb5dc7fcfcb0c476d2d271666f4af8e348c27cd94cdd7e2",
+    "size_bytes": 3006
+  },
+  "unit_freeze": {
+    "path": ".runtime/porting/CTF-09/frozen-packet-01/freeze-receipt.json",
+    "sha256": "31dcca2b549a8b0b033b9a9ba8704ef5bcaec6ac097a0248c4b2ec44a9899bbc",
+    "size_bytes": 52273
+  },
+  "unit_freeze_execution": {
+    "path": ".runtime/porting/CTF-09/freeze-command-01/receipt.json",
+    "sha256": "48bab445a84309433bce1c96c139b28326707d45e8e55c350539f71b52e770cf",
+    "size_bytes": 4299
+  },
+  "production_freeze": {
+    "path": ".runtime/porting/CTF-09/production-frozen-packet-01/freeze-receipt.json",
+    "sha256": "7ae88861867aa86a3bce992b4c83c3865040826aee2e4dadcd4c7994cc0af4c5",
+    "size_bytes": 58255
+  },
+  "production_freeze_execution": {
+    "path": ".runtime/porting/CTF-09/production-freeze-command-01/receipt.json",
+    "sha256": "67cf337192baa547b0a183cf8115695effdaa159843e8cc139517672ce553a6b",
+    "size_bytes": 4359
+  },
+  "actual_CTF09_helper_build_or_execution_performed": false,
+  "eight_exact_retry_profiles_settled_before_outputs": true,
+  "all_literal_inputs_and_prior_profiles_unchanged": true,
+  "historical_prior08_authority_rebound_to_current_live_documents": false,
+  "scientific_values_or_expected_arrays_evaluated": false,
+  "numerical_PASS_claimed": false,
+  "unit_integration_production_PASS_claimed": false,
+  "Original_and_unchanged_Rust_baseline_pending": true
+}

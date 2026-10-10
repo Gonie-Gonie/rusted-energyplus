@@ -1,0 +1,141 @@
+--- .runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh
++++ .runtime/porting/CTF-09/native-observer-prep-01/ctf09_observer.hh
+@@ -1,6 +1,6 @@
+ // Output-only observations of actual Construction.cc local storage.
+-#ifndef CTF08_OBSERVER_HH_INCLUDED
+-#define CTF08_OBSERVER_HH_INCLUDED
++#ifndef CTF09_OBSERVER_HH_INCLUDED
++#define CTF09_OBSERVER_HH_INCLUDED
+ 
+ #include <EnergyPlus/Construction.hh>
+ #include <ObjexxFCL/Array1D.hh>
+@@ -11,9 +11,10 @@
+ #include <cstddef>
+ #include <cstdint>
+ #include <optional>
++#include <string>
+ #include <vector>
+ 
+-namespace EnergyPlus::CTF08Observation {
++namespace EnergyPlus::CTF09Observation {
+ 
+ enum class Phase : std::size_t
+ {
+@@ -451,6 +452,84 @@
+     std::optional<FinalCoefficientFailure> last_failure;
+ };
+ 
++enum class RetryEvent : std::size_t {
++    DecisionEntry = 0, ExcessiveTermsUpdate = 1, AssignedSums = 2,
++    ImbalanceUpdate = 3, FatalNoCtfs = 4, SevereEntry = 5,
++    SevereBreak = 6, LoopTail = 7, LoopExit = 8
++};
++struct RetryContext {
++    bool IsUsedCTF = false, SourceSinkPresent = false;
++    int SolutionDimensions = 0, TotLayers = 0, rcmax = 0;
++    int NodeSource = 0, NodeUserTemp = 0, NumCTFTerms = 0;
++    Binary64Copy CTFTimeStep;
++    int NumHistories = 0;
++    Binary64Copy TimeStepZone;
++    bool ErrorsFound = false, DoCTFErrorReport = false, CTFConvrg = false;
++};
++struct PreAssignmentSnapshot {
++    std::size_t observed_pre_assignment_ordinal = 0;
++    std::size_t preceding_post_assembly_callback_count = 0;
++    bool reached = false, association_available = false, matrices_available = false;
++    bool active_prefix_available = false;
++    bool AMat_available = false, IdenMatrix_available = false;
++    RetryContext context;
++    int LayersInConstruct = 0, NumResLayers = 0;
++    std::size_t copied_layer_count = 0;
++    std::array<MatrixLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
++    std::optional<Array2Bounds> AMat_bounds, IdenMatrix_bounds;
++    std::vector<Binary64Copy> AMat, IdenMatrix;
++    // Original659 has assigned only this B slot before the first 1D band work.
++    std::optional<Binary64Copy> BMat3_after_reset;
++    std::array<bool, 6> failure_kinds{};
++};
++struct RetryCallerSnapshot {
++    std::size_t observed_event_ordinal = 0, observed_pre_assignment_ordinal = 0;
++    std::size_t observed_assembly_ordinal = 0;
++    RetryEvent event = RetryEvent::DecisionEntry;
++    bool reached = false, association_available = false;
++    RetryContext context;
++    // Present only at the actual after930 callsite. No values read on >18 path.
++    std::optional<std::array<Binary64Copy, 4>> assigned_sums;
++    std::array<bool, 6> failure_kinds{};
++};
++struct RetryDiagnosticSnapshot {
++    std::size_t observed_diagnostic_ordinal = 0;
++    std::size_t actual_global_message_index = 0;
++    std::size_t observed_pre_assignment_ordinal = 0;
++    std::size_t observed_post_assembly_callback_count = 0;
++    std::optional<std::size_t> preceding_caller_event_ordinal;
++    int actual_level = 0;
++    std::string actual_message;
++    bool copy_available = false;
++    std::array<bool, 6> failure_kinds{};
++    bool temporal_association_only = true;
++};
++enum class RetrySite : std::size_t { PreAssignment = 0, CallerEvent = 1, Diagnostic = 2 };
++enum class RetryFailureKind : std::size_t {
++    IdentityMismatch = 0, AssociationFailure = 1, OrderFailure = 2,
++    OwnerShape = 3, CopyException = 4, LedgerAppendException = 5
++};
++struct RetryFailure {
++    RetrySite site = RetrySite::PreAssignment;
++    std::size_t actual_callback_ordinal = 0;
++    std::size_t pre_assignment_ordinal = 0, post_assembly_ordinal = 0;
++    RetryFailureKind kind = RetryFailureKind::IdentityMismatch;
++};
++struct RetryCapture {
++    std::size_t actual_pre_assignment_count = 0;
++    std::size_t actual_caller_event_count = 0;
++    std::size_t actual_diagnostic_count = 0;
++    std::array<std::size_t, 9> actual_caller_event_counts{};
++    std::vector<PreAssignmentSnapshot> pre_assignments;
++    std::vector<RetryCallerSnapshot> caller_events;
++    std::vector<RetryDiagnosticSnapshot> diagnostics;
++    std::size_t pre_assignment_records_omitted = 0, diagnostic_records_omitted = 0;
++    std::array<std::size_t, 9> caller_records_omitted{};
++    bool observer_failure = false, counter_overflow = false;
++    std::array<std::size_t, 6> failure_event_counts{};
++    std::optional<RetryFailure> first_failure, last_failure;
++};
++
+ struct Capture
+ {
+     // Internal identity checks only. A future helper supplies its real owner ID.
+@@ -477,6 +556,7 @@
+     MethodCapture inverse;
+     GammaCapture gamma;
+     FinalCoefficientCapture final_coefficients;
++    RetryCapture retry_driver;
+ };
+ 
+ // A helper binds its explicit actual state/array element before one genuine call.
+@@ -576,6 +656,23 @@
+ void final_coefficient_return(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                               bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
+ 
+-} // namespace EnergyPlus::CTF08Observation
++void pre_matrix_assignment(EnergyPlusData const &state,
++    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
++    int LayersInConstruct, int NumResLayers,
++    Array1D<Real64> const &dl, Array1D<Real64> const &rk, Array1D<Real64> const &rho,
++    Array1D<Real64> const &cp, Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
++    Array1D_int const &Nodes, Array1D<Real64> const &dx,
++    Real64 const &TimeStepZone, bool CTFConvrg) noexcept;
++void retry_caller_event(RetryEvent event, EnergyPlusData const &state,
++    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
++    Real64 const &TimeStepZone, bool CTFConvrg) noexcept;
++void retry_assigned_sums(EnergyPlusData const &state,
++    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
++    Real64 const &TimeStepZone, bool CTFConvrg,
++    Real64 const &SumXi, Real64 const &SumYi, Real64 const &SumZi, Real64 const &BiggestSum) noexcept;
++void retry_diagnostic(EnergyPlusData const &state, std::size_t actual_global_message_index,
++    int actual_level, std::string const &actual_message) noexcept;
++
++} // namespace EnergyPlus::CTF09Observation
+ 
+ #endif

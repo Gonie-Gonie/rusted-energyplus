@@ -1,0 +1,186 @@
+{
+  "new_retry_additions": [
+    {
+      "after_original_line": 661,
+      "exact_source": "                    CTF09Observation::pre_matrix_assignment(state, *this, ErrorsFound, DoCTFErrorReport,\n                        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, Nodes, dx,\n                        state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 903,
+      "exact_source": "                CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::DecisionEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 911,
+      "exact_source": "                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::ExcessiveTermsUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 930,
+      "exact_source": "                    CTF09Observation::retry_assigned_sums(state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg, SumXi, SumYi, SumZi, BiggestSum);\n"
+    },
+    {
+      "after_original_line": 936,
+      "exact_source": "                            CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::ImbalanceUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 938,
+      "exact_source": "                        CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::FatalNoCtfs, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 948,
+      "exact_source": "                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::SevereEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 976,
+      "exact_source": "                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::SevereBreak, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 979,
+      "exact_source": "                CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::LoopTail, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 981,
+      "exact_source": "            CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::LoopExit, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    }
+  ],
+  "all_declared_passive_additions": [
+    {
+      "after_original_line": 55,
+      "exact_source": "#include \"ctf09_observer.hh\"\n"
+    },
+    {
+      "after_original_line": 309,
+      "exact_source": "    EnergyPlus::CTF09Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,\n        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);\n"
+    },
+    {
+      "after_original_line": 372,
+      "exact_source": "    EnergyPlus::CTF09Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,\n        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);\n"
+    },
+    {
+      "after_original_line": 401,
+      "exact_source": "    EnergyPlus::CTF09Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,\n        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, dyn, rs, cnd);\n"
+    },
+    {
+      "after_original_line": 618,
+      "exact_source": "\n            EnergyPlus::CTF09Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,\n                LayersInConstruct, NumResLayers, Nodes, dx, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 728,
+      "exact_source": "                    EnergyPlus::CTF09Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,\n                                                                       LayersInConstruct, NumResLayers, dl, rk, rho, cp,\n                                                                       lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 884,
+      "exact_source": "                EnergyPlus::CTF09Observation::method_return(EnergyPlus::CTF09Observation::MethodKind::Exponential,\n                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 887,
+      "exact_source": "                EnergyPlus::CTF09Observation::method_return(EnergyPlus::CTF09Observation::MethodKind::Inverse,\n                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 1178,
+      "exact_source": "    EnergyPlus::CTF09Observation::method_entry(EnergyPlus::CTF09Observation::MethodKind::Exponential, *this);\n"
+    },
+    {
+      "after_original_line": 1190,
+      "exact_source": "    EnergyPlus::CTF09Observation::exponential_initialized(*this, AMat1, AMato, AMatN);\n"
+    },
+    {
+      "after_original_line": 1251,
+      "exact_source": "    EnergyPlus::CTF09Observation::exponential_scaled(*this, AMat1, AMatRowNormMax, k, fact, CheckVal, l);\n"
+    },
+    {
+      "after_original_line": 1327,
+      "exact_source": "        EnergyPlus::CTF09Observation::exponential_power_control(*this, i, SigFigLimit);\n"
+    },
+    {
+      "after_original_line": 1361,
+      "exact_source": "        EnergyPlus::CTF09Observation::exponential_square_control(*this, isq, Backup);\n"
+    },
+    {
+      "after_original_line": 1368,
+      "exact_source": "    EnergyPlus::CTF09Observation::exponential_final(*this, AMat1, AMato, AMatN, AMatRowNormMax, k, fact, CheckVal, l, i);\n"
+    },
+    {
+      "after_original_line": 1403,
+      "exact_source": "    EnergyPlus::CTF09Observation::method_entry(EnergyPlus::CTF09Observation::MethodKind::Inverse, *this);\n"
+    },
+    {
+      "after_original_line": 1407,
+      "exact_source": "    EnergyPlus::CTF09Observation::inverse_initialized(*this, AMat1);\n"
+    },
+    {
+      "after_original_line": 1488,
+      "exact_source": "    EnergyPlus::CTF09Observation::inverse_final(*this, AMat1);\n"
+    },
+    {
+      "after_original_line": 890,
+      "exact_source": "                EnergyPlus::CTF09Observation::gamma_return(state, *this, ErrorsFound, DoCTFErrorReport,\n                    state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 1497,
+      "exact_source": "    EnergyPlus::CTF09Observation::gamma_entry(*this);\n"
+    },
+    {
+      "after_original_line": 1530,
+      "exact_source": "    EnergyPlus::CTF09Observation::gamma_ATemp_ready(*this, ATemp);\n"
+    },
+    {
+      "after_original_line": 1551,
+      "exact_source": "    EnergyPlus::CTF09Observation::gamma1_final(*this);\n"
+    },
+    {
+      "after_original_line": 1588,
+      "exact_source": "    EnergyPlus::CTF09Observation::gamma2_final(*this);\n"
+    },
+    {
+      "after_original_line": 894,
+      "exact_source": "                EnergyPlus::CTF09Observation::final_coefficient_return(state, *this, ErrorsFound, DoCTFErrorReport,\n                    state.dataGlobal->TimeStepZone);\n"
+    },
+    {
+      "after_original_line": 1592,
+      "exact_source": "    EnergyPlus::CTF09Observation::final_coefficient_entry(*this);\n"
+    },
+    {
+      "after_original_line": 1902,
+      "exact_source": "    EnergyPlus::CTF09Observation::final_coefficient_private_final(*this, PhiR0, Rnew, Rold, inum, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 661,
+      "exact_source": "                    CTF09Observation::pre_matrix_assignment(state, *this, ErrorsFound, DoCTFErrorReport,\n                        LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, Nodes, dx,\n                        state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 903,
+      "exact_source": "                CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::DecisionEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 911,
+      "exact_source": "                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::ExcessiveTermsUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 930,
+      "exact_source": "                    CTF09Observation::retry_assigned_sums(state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg, SumXi, SumYi, SumZi, BiggestSum);\n"
+    },
+    {
+      "after_original_line": 936,
+      "exact_source": "                            CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::ImbalanceUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 938,
+      "exact_source": "                        CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::FatalNoCtfs, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 948,
+      "exact_source": "                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::SevereEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 976,
+      "exact_source": "                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::SevereBreak, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 979,
+      "exact_source": "                CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::LoopTail, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    },
+    {
+      "after_original_line": 981,
+      "exact_source": "            CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::LoopExit, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);\n"
+    }
+  ]
+}

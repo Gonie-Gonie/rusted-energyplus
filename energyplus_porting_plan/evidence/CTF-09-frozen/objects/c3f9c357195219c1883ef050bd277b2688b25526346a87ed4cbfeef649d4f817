@@ -1,0 +1,64 @@
+# CTF09 literal input freeze source
+
+SOURCE-READY HELD. This adapts the accepted CTF08 stdlib freezer, without executing it.
+Root owns actual current09 scope amendment, genuine check, freeze, Native build and invocation.
+Root and an independent author must review this source before any future execution.
+Existing source holds and prior freeze/engine histories remain immutable.
+
+The two executable source files are freeze_packet.py and packet_io.py.
+The latter changes only its contained output root from CTF08 to CTF09.
+The writer accepts the existing ten option/value pairs (25 argv entries including python -X utf8 -B).
+Required options are --lane unit|production, --approved-source-sha256, --source-manifest,
+--native-source-manifest, --current-card-09, --actual-scope-amendment,
+--actual-scope-amendment-execution, --prior-08-freeze, --prior-08-freeze-execution and --output-dir.
+Every reference operand uses an actual path#SHA256. No future identity is supplied here.
+An actual fresh output directory must be below .runtime/porting/CTF-09 and absent.
+
+Current scope schema is ctf09-source-scope-amendment.v1 with cards [CTF-09].
+Required source/policy keys are native_observer, passive_observer and retry_policy_source_inventory.
+Current scope counts are unit39/42 and production15/195; the unit receipt also retains total_operations42.
+The amendment must state reviewed scope, all other gates pending and strict profiles settled before outputs,
+and actual_CTF09_build_or_engine_execution_performed false.
+Exactly two real before/after documents bind the archived original card, amended current card and plan.
+The actual check recorder must execute python -X utf8 -B tools/porting/check_plan.py --check --card CTF-09,
+with exit0, no launch error, preserved source bytes and empty stderr.
+Its role is real-CTF-09-check-only; it validates Root-authored documents and does not author them.
+
+Original CTF01 frozen input-only source/tolerance/request references remain exact.
+The unit39 models/42 operations and production15 models/13-phase195 requested loader records are copied literally.
+Material scalar bits, explicit stored Resistance, original material/construction/call order and caller flags are not recomputed.
+All45 scope input/weather/metadata descriptors remain ordered and literal; the future writer binds their byte identities.
+Preparation copied weather descriptors only and did not open/hash weather payloads.
+No normalized arrays, R=d/k, classifier, retry evaluator, expected result, expected exit or numerical operand is generated.
+
+The new source policy is ctf09_retry_observation_policy plus ctf09_attempt_selection.
+Eight separate frozen retry profiles use zero atol/rtol and exact class/shape/signed-zero:
+pre_AMat, pre_IdenMatrix, assignedAbsSumXi, assignedAbsSumYi, assignedAbsSumZi, BiggestSum,
+pre_CTFTimeStep and post_CTFTimeStep. Pre matrices retain actual rcmax shape; the other values are scalars.
+Earlier18 preprocessing,3 initial,7 assembly,7 exponential,2 inverse,3 Gamma and7 private-final profiles stay unchanged.
+Their historical first-only selections remain literal. A separate all-visit handoff map copies those actual profile values.
+The current09 all-visit selection does not reinterpret old first-only evidence or claim full CTF09/CTF10 handoff.
+Skipped sums/ratios, missing owners, source stops, OS failures and uninvoked work cannot become PASS.
+
+historical_prior_08_authority contains six genuine refs: prior_08_freeze, prior_08_freeze_execution,
+prior_08_writer_manifest, prior_08_source_contract, prior_08_scope_amendment and prior_08_scope_check_execution.
+prior_08_selected_primary_ranges is a literal typed byte-range list, never a whole-file ref.
+historical_before_document_archives is a direct archive-ref list;
+historical_after_document_identities is documentary; available_prior_frozen_document_archives holds historical_path/archive pairs.
+The real same-lane prior08 writer argv25, own2 archives, stdout freeze, source/request/counts and earlier profiles are authenticated.
+Historical after documents are authenticated against their actual frozen archives, never current live plan/card paths.
+The nested historical_prior_07_authority is exact to the prior08 receipt/source/request.
+The accepted08 prior07 validator is preserved under the name prior_07_authority and revalidates that exact nested value,
+including its authentic prior05/06 authority. No ancestry is fabricated or relabeled as current09 approval.
+
+The DAG is unchanged: source/tolerances -> request -> cases -> projection -> Native admission -> freeze receipt.
+Schemas use ctf09- or ctf09-production- prefixes. Each schema requires frozen_before_this_CTF09_helper_execution.
+The freeze status is frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper.
+The false anti-relabel flag is inherited_CTF01_through_CTF08_freeze_claimed_as_fresh_CTF09_freeze.
+Both lane admissions bind exact held Native8 source files and all policy objects without a new helper stage.
+New debug-original retention intent applies forward only to new09 Originals and authorizes no deletion.
+
+Source snapshots, copied source archives, fresh packet refs and actual timestamps are produced only when Root runs the writer.
+This preparation performed stdlib source packaging and AST/hash/diff checks only, without importing the writer.
+No project imports, builds, tests, engines, scientific/binary/weather reads, canonical/Git or gate changes occurred.
+Base authored earlier transport/passive/matrix source; later independent source review and actual observations remain required.

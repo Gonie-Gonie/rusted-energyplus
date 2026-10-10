@@ -1,0 +1,341 @@
+--- .runtime/porting/CTF-09/native-helper-prep-01/before/ctf08_observation_fields.hh
++++ .runtime/porting/CTF-09/native-helper-prep-01/ctf09_observation_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure serialization of the actual passive post-619 capture; no node evaluator.
+-#ifndef CTF08_OBSERVATION_FIELDS_HH
+-#define CTF08_OBSERVATION_FIELDS_HH
++#ifndef CTF09_OBSERVATION_FIELDS_HH
++#define CTF09_OBSERVATION_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf08_observer.hh"
++#include "ctf09_observer.hh"
+ #include <limits>
+ 
+ namespace Ctf01 {
+@@ -22,7 +22,7 @@
+         {"required_reached_fields_absent_is_integrity_failure", true},
+         {"unreached_counted_as_PASS", false}, {"branch_or_numeric_answers_reconstructed", false}};
+ }
+-inline json initial_checkpoint(EnergyPlus::CTF08Observation::InitialDiscretizationSnapshot const &source,
++inline json initial_checkpoint(EnergyPlus::CTF09Observation::InitialDiscretizationSnapshot const &source,
+                                std::size_t actual_count)
+ {
+     if (!source.reached) return {{"reached", false}, {"available", false},
+@@ -65,9 +65,9 @@
+         {"missing_attempt_or_copy_integrity_failure_is_required_failure", true},
+         {"unreached_counted_as_PASS", false}, {"retry_driver_or_matrix_answers_reconstructed", false}};
+ }
+-inline json matrix_failure_kind(EnergyPlus::CTF08Observation::MatrixAttemptFailureKind kind)
+-{
+-    using Kind = EnergyPlus::CTF08Observation::MatrixAttemptFailureKind;
++inline json matrix_failure_kind(EnergyPlus::CTF09Observation::MatrixAttemptFailureKind kind)
++{
++    using Kind = EnergyPlus::CTF09Observation::MatrixAttemptFailureKind;
+     switch (kind) {
+     case Kind::IdentityMismatch: return "IdentityMismatch";
+     case Kind::OrderFailure: return "OrderFailure";
+@@ -78,7 +78,7 @@
+     }
+     throw std::runtime_error("Unknown actual matrix failure kind");
+ }
+-inline json matrix_attempt(EnergyPlus::CTF08Observation::MatrixAttemptSnapshot const &source)
++inline json matrix_attempt(EnergyPlus::CTF09Observation::MatrixAttemptSnapshot const &source)
+ {
+     json layers = nullptr, matrices = nullptr;
+     if (source.active_prefix_available) {
+@@ -108,7 +108,7 @@
+     };
+     bool failure = false; json kinds = json::array();
+     for (std::size_t index = 0; index < source.failure_kinds.size(); ++index) {
+-        auto const kind = static_cast<EnergyPlus::CTF08Observation::MatrixAttemptFailureKind>(index);
++        auto const kind = static_cast<EnergyPlus::CTF09Observation::MatrixAttemptFailureKind>(index);
+         kinds.push_back({{"kind", matrix_failure_kind(kind)}, {"failed", source.failure_kinds[index]}});
+         failure = failure || source.failure_kinds[index];
+     }
+@@ -127,7 +127,7 @@
+             {"actual_bounds", {{"AMat", bounds2(source.AMat_bounds)}, {"IdenMatrix", bounds2(source.IdenMatrix_bounds)},
+                 {"BMat", bounds1(source.BMat_bounds)}, {"CMat", bounds1(source.CMat_bounds)}, {"DMat", bounds1(source.DMat_bounds)}}}}}};
+ }
+-inline bool matrix_observer_failed(EnergyPlus::CTF08Observation::Capture const &capture)
++inline bool matrix_observer_failed(EnergyPlus::CTF09Observation::Capture const &capture)
+ {
+     if (capture.matrix_observer_failure || capture.matrix_attempt_records_omitted != 0 ||
+         capture.actual_matrix_attempt_callback_count != capture.matrix_attempts.size()) return true;
+@@ -146,12 +146,12 @@
+     }
+     return false;
+ }
+-inline json matrix_observations(EnergyPlus::CTF08Observation::Capture const &capture)
++inline json matrix_observations(EnergyPlus::CTF09Observation::Capture const &capture)
+ {
+     json attempts = json::array(), failures = json::array();
+     for (auto const &attempt : capture.matrix_attempts) attempts.push_back(matrix_attempt(attempt));
+     for (std::size_t index = 0; index < capture.matrix_failure_event_counts.size(); ++index)
+-        failures.push_back({{"kind", matrix_failure_kind(static_cast<EnergyPlus::CTF08Observation::MatrixAttemptFailureKind>(index))},
++        failures.push_back({{"kind", matrix_failure_kind(static_cast<EnergyPlus::CTF09Observation::MatrixAttemptFailureKind>(index))},
+                             {"actual_event_count", capture.matrix_failure_event_counts[index]}});
+     auto const event = [](auto const &value) -> json {
+         return value ? json{{"observed_attempt_ordinal", value->observed_attempt_ordinal}, {"kind", matrix_failure_kind(value->kind)}} : json(nullptr);
+@@ -178,7 +178,7 @@
+ }
+ 
+ // Actual combined method capture serialization. Unreached/default slots are null.
+-namespace MethodObservation = EnergyPlus::CTF08Observation;
++namespace MethodObservation = EnergyPlus::CTF09Observation;
+ inline char const *method_kind_name(MethodObservation::MethodKind value)
+ {
+     switch (value) {
+@@ -764,5 +764,253 @@
+         {"failure_event_counts", total.failure_event_counts}, {"method_copy_integrity_failed", total.copy_integrity_failed},
+         {"complete_method_return_parity_claimed", false}, {"numerical_PASS_claimed", false}};
+ }
++inline json ctf09_linked_original_retention_intent()
++{
++    return {{"schema", "ctf09-debug-original-retention-intent.v1"}, {"role", "prospective-debug-original"},
++        {"scope", "new-CTF09-linked-originals-only"}, {"actual_file_identity_required", true},
++        {"both_original_and_helper_verified_before_execution", true},
++        {"retain_through_PE_validation_and_current_helper_execution", true},
++        {"removal_requires_separate_Root_authorized_actual_retention_record", true},
++        {"earlier_live_refs_reinterpreted", false}, {"deletion_performed", false}};
++}
++inline json ctf09_attempt_selection()
++{
++    return {{"protocol", "ctf09-actual-retry-attempt-selection.v1"},
++        {"selection", "all_actual_reached_no_source_1D_attempts_with_same_bound_owner_and_checked_matching_method_ordinals"},
++        {"actual_order", {"pre_assignment661", "assembly728", "exponential884", "inverse887", "Gamma890", "finalCoefficients894", "caller903_981"}},
++        {"first_attempt_association", "actual_initial619_context_and_actual_retained_pre_assignment_storage"},
++        {"later_attempt_association", "actual_previous_LoopTail_false_then_actual_next_pre_assignment_and_post728_context"},
++        {"inherited_first_only_policies_reinterpreted", false},
++        {"inherited_profile_values_reused_as_separate_all_visit_handoffs", true},
++        {"partial_source_outcomes_and_observation_integrity_separate", true},
++        {"Native_attempt_count_dt_history_or_operands_supplied_to_Rust", false},
++        {"missing_required_same_input_owner_on_one_or_both_sides_is_failure", true},
++        {"unreached_unavailable_partial_or_later_SI_stores_counted_as_PASS", false},
++        {"diagnostic_text_versus_Rust_call_intents_numerically_paired", false},
++        {"numerical_PASS_claimed", false}, {"whole_CTF_or_surface_handoff_certified", false}};
++}
++inline json ctf09_retry_policy()
++{
++    return {{"protocol", "ctf09-retry-driver-observation.v1"},
++        {"actual_source_range", {638, 981}}, {"scope", "actual_no_source_1D_retry_visits_within_one_bound_whole_call"},
++        {"pre_assignment", "after_original661_before_repeated_band_assignment_after_actual_BMat3_reset"},
++        {"caller_event_names", {"DecisionEntry", "ExcessiveTermsUpdate", "AssignedSums", "ImbalanceUpdate", "FatalNoCtfs", "SevereEntry", "SevereBreak", "LoopTail", "LoopExit"}},
++        {"actual_assigned_sums", {"assignedAbsSumXi", "assignedAbsSumYi", "assignedAbsSumZi", "BiggestSum"}},
++        {"ratios_recomputed_or_observed", false}, {"skipped_sums_or_unassigned_values_fabricated", false},
++        {"fatal_marker_precedes_actual_Fatal939", true}, {"SevereEntry_precedes_actual_Severe949", true},
++        {"severe_boundary_can_be_reached_when_CTFConvrg_true", true},
++        {"actual_context_before_and_after_update_copied_independently", true},
++        {"LoopExit_is_whole_call_return_or_SI_store_certification", false},
++        {"diagnostics", "actual_global_occupied_message_index_level_and_text_after_successful_original_push; temporal_association_only"},
++        {"all_actual_visits_and_partial_records_retained", true}, {"record_cap", nullptr},
++        {"actual_return_markers_required_for_return_claim", true}, {"observer_failure_or_omission_is_integrity_failure", true},
++        {"old_first_only_policies_changed", false}, {"Native_operands_or_attempt_counts_supplied_to_Rust", false},
++        {"uninvoked_or_unreached_counted_as_PASS", false}, {"scientific_comparison_performed", false},
++        {"numerical_PASS_claimed", false}, {"full_CTF09_or_CTF10_certified", false}};
++}
++inline char const *retry_event_name(MethodObservation::RetryEvent value)
++{
++    switch (value) {
++    case MethodObservation::RetryEvent::DecisionEntry: return "DecisionEntry";
++    case MethodObservation::RetryEvent::ExcessiveTermsUpdate: return "ExcessiveTermsUpdate";
++    case MethodObservation::RetryEvent::AssignedSums: return "AssignedSums";
++    case MethodObservation::RetryEvent::ImbalanceUpdate: return "ImbalanceUpdate";
++    case MethodObservation::RetryEvent::FatalNoCtfs: return "FatalNoCtfs";
++    case MethodObservation::RetryEvent::SevereEntry: return "SevereEntry";
++    case MethodObservation::RetryEvent::SevereBreak: return "SevereBreak";
++    case MethodObservation::RetryEvent::LoopTail: return "LoopTail";
++    case MethodObservation::RetryEvent::LoopExit: return "LoopExit";
++    }
++    throw std::runtime_error("Unknown actual retry event");
++}
++inline char const *retry_site_name(MethodObservation::RetrySite value)
++{
++    switch (value) {
++    case MethodObservation::RetrySite::PreAssignment: return "PreAssignment";
++    case MethodObservation::RetrySite::CallerEvent: return "CallerEvent";
++    case MethodObservation::RetrySite::Diagnostic: return "Diagnostic";
++    }
++    throw std::runtime_error("Unknown actual retry callback site");
++}
++inline char const *retry_failure_name(MethodObservation::RetryFailureKind value)
++{
++    switch (value) {
++    case MethodObservation::RetryFailureKind::IdentityMismatch: return "IdentityMismatch";
++    case MethodObservation::RetryFailureKind::AssociationFailure: return "AssociationFailure";
++    case MethodObservation::RetryFailureKind::OrderFailure: return "OrderFailure";
++    case MethodObservation::RetryFailureKind::OwnerShape: return "OwnerShape";
++    case MethodObservation::RetryFailureKind::CopyException: return "CopyException";
++    case MethodObservation::RetryFailureKind::LedgerAppendException: return "LedgerAppendException";
++    }
++    throw std::runtime_error("Unknown actual retry failure kind");
++}
++inline json retry_context(MethodObservation::RetryContext const &copy)
++{
++    return {{"IsUsedCTF", copy.IsUsedCTF}, {"SourceSinkPresent", copy.SourceSinkPresent},
++        {"SolutionDimensions", copy.SolutionDimensions}, {"TotLayers", copy.TotLayers}, {"rcmax", copy.rcmax},
++        {"NodeSource", copy.NodeSource}, {"NodeUserTemp", copy.NodeUserTemp}, {"NumCTFTerms", copy.NumCTFTerms},
++        {"CTFTimeStep", scalar_bits(copy.CTFTimeStep.bits)}, {"NumHistories", copy.NumHistories},
++        {"TimeStepZone", scalar_bits(copy.TimeStepZone.bits)}, {"ErrorsFound", copy.ErrorsFound},
++        {"DoCTFErrorReport", copy.DoCTFErrorReport}, {"CTFConvrg", copy.CTFConvrg}};
++}
++inline json retry_bounds(std::optional<MethodObservation::Array2Bounds> const &value)
++{
++    return value ? json{{"lower1", value->lower1}, {"upper1", value->upper1}, {"lower2", value->lower2},
++        {"upper2", value->upper2}, {"size", value->size}} : json(nullptr);
++}
++inline json retry_bits(std::vector<MethodObservation::Binary64Copy> const &values)
++{
++    json result = json::array();
++    for (auto const &value : values) result.push_back(scalar_bits(value.bits));
++    return result;
++}
++inline json retry_failure_event(std::optional<MethodObservation::RetryFailure> const &value)
++{
++    return value ? json{{"site", retry_site_name(value->site)}, {"actual_callback_ordinal", value->actual_callback_ordinal},
++        {"pre_assignment_ordinal", value->pre_assignment_ordinal}, {"post_assembly_ordinal", value->post_assembly_ordinal},
++        {"kind", retry_failure_name(value->kind)}} : json(nullptr);
++}
++inline bool retry_copy_failed(MethodObservation::RetryCapture const &source)
++{
++    if (source.observer_failure || source.counter_overflow || source.first_failure || source.last_failure ||
++        source.pre_assignment_records_omitted != 0 || source.diagnostic_records_omitted != 0 ||
++        source.actual_pre_assignment_count != source.pre_assignments.size() ||
++        source.actual_caller_event_count != source.caller_events.size() ||
++        source.actual_diagnostic_count != source.diagnostics.size()) return true;
++    for (auto count : source.failure_event_counts) if (count != 0) return true;
++    for (auto count : source.caller_records_omitted) if (count != 0) return true;
++    for (std::size_t index = 0; index < source.pre_assignments.size(); ++index) {
++        auto const &copy = source.pre_assignments[index];
++        if (copy.observed_pre_assignment_ordinal != index + 1 || !copy.reached || !copy.association_available ||
++            !copy.active_prefix_available || !copy.matrices_available || !copy.AMat_available || !copy.IdenMatrix_available ||
++            !copy.BMat3_after_reset || !copy.AMat_bounds || !copy.IdenMatrix_bounds ||
++            copy.copied_layer_count > copy.active_prefix.size()) return true;
++        for (bool failed : copy.failure_kinds) if (failed) return true;
++    }
++    std::array<std::size_t, 9> retained{};
++    for (std::size_t index = 0; index < source.caller_events.size(); ++index) {
++        auto const &copy = source.caller_events[index]; auto const kind = static_cast<std::size_t>(copy.event);
++        if (kind >= retained.size() || copy.observed_event_ordinal != index + 1 || !copy.reached || !copy.association_available ||
++            (copy.event == MethodObservation::RetryEvent::AssignedSums) != copy.assigned_sums.has_value()) return true;
++        ++retained[kind];
++        for (bool failed : copy.failure_kinds) if (failed) return true;
++    }
++    if (retained != source.actual_caller_event_counts) return true;
++    for (std::size_t index = 0; index < source.diagnostics.size(); ++index) {
++        auto const &copy = source.diagnostics[index];
++        if (copy.observed_diagnostic_ordinal != index + 1 || !copy.copy_available || !copy.temporal_association_only ||
++            (index != 0 && copy.actual_global_message_index <= source.diagnostics[index - 1].actual_global_message_index)) return true;
++        for (bool failed : copy.failure_kinds) if (failed) return true;
++    }
++    return false;
++}
++inline bool retry_diagnostic_join_valid(MethodObservation::RetryCapture const &source, json const &messages)
++{
++    if (!messages.is_array()) return false;
++    for (auto const &copy : source.diagnostics) {
++        if (!copy.copy_available || copy.actual_global_message_index >= messages.size()) return false;
++        auto const &message = messages.at(copy.actual_global_message_index);
++        if (message.at("level") != copy.actual_level || message.at("message") != copy.actual_message) return false;
++    }
++    return true;
++}
++inline json retry_observations(MethodObservation::RetryCapture const &source, json const &messages)
++{
++    json pre = json::array(), events = json::array(), diagnostics = json::array(), failures = json::array();
++    for (auto const &copy : source.pre_assignments) {
++        json prefix = nullptr;
++        if (copy.active_prefix_available) {
++            require(copy.copied_layer_count <= copy.active_prefix.size(), "Retry actual prefix exceeds capture storage");
++            prefix = json::array();
++            for (std::size_t index = 0; index < copy.copied_layer_count; ++index) {
++                auto const &value = copy.active_prefix[index];
++                prefix.push_back({{"dl", scalar_bits(value.converted.dl.bits)}, {"rk", scalar_bits(value.converted.rk.bits)},
++                    {"rho", scalar_bits(value.converted.rho.bits)}, {"cp", scalar_bits(value.converted.cp.bits)},
++                    {"lr", scalar_bits(value.converted.lr.bits)}, {"ResLayer", value.converted.ResLayer},
++                    {"Nodes", value.Nodes}, {"dx", scalar_bits(value.dx.bits)}});
++            }
++        }
++        pre.push_back({{"observed_pre_assignment_ordinal", copy.observed_pre_assignment_ordinal},
++            {"preceding_post_assembly_callback_count", copy.preceding_post_assembly_callback_count},
++            {"reached", copy.reached}, {"association_available", copy.association_available},
++            {"context", copy.reached ? retry_context(copy.context) : json(nullptr)},
++            {"LayersInConstruct", copy.LayersInConstruct}, {"NumResLayers", copy.NumResLayers},
++            {"active_prefix_available", copy.active_prefix_available}, {"copied_layer_count", copy.copied_layer_count}, {"active_prefix", prefix},
++            {"matrices_available", copy.matrices_available}, {"AMat_available", copy.AMat_available}, {"IdenMatrix_available", copy.IdenMatrix_available},
++            {"AMat_actual_bounds", retry_bounds(copy.AMat_bounds)}, {"IdenMatrix_actual_bounds", retry_bounds(copy.IdenMatrix_bounds)},
++            {"AMat", copy.AMat_available ? retry_bits(copy.AMat) : json(nullptr)},
++            {"IdenMatrix", copy.IdenMatrix_available ? retry_bits(copy.IdenMatrix) : json(nullptr)},
++            {"BMat3_after_reset", copy.BMat3_after_reset ? scalar_bits(copy.BMat3_after_reset->bits) : json(nullptr)},
++            {"failure_kinds", copy.failure_kinds}, {"counted_as_PASS", false}});
++    }
++    for (auto const &copy : source.caller_events) {
++        json sums = nullptr;
++        if (copy.assigned_sums) sums = {{"assignedAbsSumXi", scalar_bits((*copy.assigned_sums)[0].bits)},
++            {"assignedAbsSumYi", scalar_bits((*copy.assigned_sums)[1].bits)},
++            {"assignedAbsSumZi", scalar_bits((*copy.assigned_sums)[2].bits)}, {"BiggestSum", scalar_bits((*copy.assigned_sums)[3].bits)}};
++        events.push_back({{"observed_event_ordinal", copy.observed_event_ordinal}, {"event", retry_event_name(copy.event)},
++            {"observed_pre_assignment_ordinal", copy.observed_pre_assignment_ordinal}, {"observed_assembly_ordinal", copy.observed_assembly_ordinal},
++            {"reached", copy.reached}, {"association_available", copy.association_available},
++            {"context", copy.reached ? retry_context(copy.context) : json(nullptr)},
++            {"assigned_sums", sums}, {"ratios", nullptr}, {"failure_kinds", copy.failure_kinds}, {"counted_as_PASS", false}});
++    }
++    for (auto const &copy : source.diagnostics) diagnostics.push_back({
++        {"observed_diagnostic_ordinal", copy.observed_diagnostic_ordinal}, {"actual_global_message_index", copy.actual_global_message_index},
++        {"observed_pre_assignment_ordinal", copy.observed_pre_assignment_ordinal},
++        {"observed_post_assembly_callback_count", copy.observed_post_assembly_callback_count},
++        {"preceding_caller_event_ordinal", copy.preceding_caller_event_ordinal ? json(*copy.preceding_caller_event_ordinal) : json(nullptr)},
++        {"actual_level", copy.actual_level}, {"actual_message", copy.copy_available ? json(copy.actual_message) : json(nullptr)},
++        {"copy_available", copy.copy_available}, {"temporal_association_only", copy.temporal_association_only},
++        {"failure_kinds", copy.failure_kinds}, {"causal_branch_classification_inferred", false}, {"counted_as_PASS", false}});
++    for (std::size_t index = 0; index < source.failure_event_counts.size(); ++index) failures.push_back({
++        {"kind", retry_failure_name(static_cast<MethodObservation::RetryFailureKind>(index))}, {"actual_event_count", source.failure_event_counts[index]}});
++    bool const joined = retry_diagnostic_join_valid(source, messages);
++    return {{"protocol", "ctf09-retry-driver-observation.v1"}, {"pre_assignments", pre}, {"caller_events", events}, {"diagnostics", diagnostics},
++        {"actual_pre_assignment_count", source.actual_pre_assignment_count}, {"actual_retained_pre_assignment_count", source.pre_assignments.size()},
++        {"actual_caller_event_count", source.actual_caller_event_count}, {"actual_retained_caller_event_count", source.caller_events.size()},
++        {"actual_caller_event_counts", source.actual_caller_event_counts},
++        {"actual_diagnostic_count", source.actual_diagnostic_count}, {"actual_retained_diagnostic_count", source.diagnostics.size()},
++        {"pre_assignment_records_omitted", source.pre_assignment_records_omitted}, {"caller_records_omitted", source.caller_records_omitted},
++        {"diagnostic_records_omitted", source.diagnostic_records_omitted}, {"observer_failure", source.observer_failure},
++        {"counter_overflow", source.counter_overflow}, {"failure_event_counts", failures},
++        {"first_failure", retry_failure_event(source.first_failure)}, {"last_failure", retry_failure_event(source.last_failure)},
++        {"actual_global_diagnostic_join_valid", joined}, {"retry_copy_integrity_failed", retry_copy_failed(source) || !joined},
++        {"all_actual_records_retained", source.pre_assignment_records_omitted == 0 && source.diagnostic_records_omitted == 0 && source.actual_pre_assignment_count == source.pre_assignments.size() && source.actual_caller_event_count == source.caller_events.size() && source.actual_diagnostic_count == source.diagnostics.size()}, {"complete_retry_parity_claimed", false}, {"numerical_PASS_claimed", false}};
++}
++struct RetryTotals {
++    std::size_t pre = 0, retained_pre = 0, events = 0, retained_events = 0, diagnostics = 0, retained_diagnostics = 0;
++    std::size_t omitted_pre = 0, omitted_diagnostics = 0;
++    std::array<std::size_t, 9> event_counts{}, omitted_events{};
++    std::array<std::size_t, 6> failures{};
++    bool integrity_failed = false;
++};
++inline void add_retry_totals(RetryTotals &total, json const &ledger)
++{
++    total.pre += ledger.at("actual_pre_assignment_count").get<std::size_t>();
++    total.retained_pre += ledger.at("actual_retained_pre_assignment_count").get<std::size_t>();
++    total.events += ledger.at("actual_caller_event_count").get<std::size_t>();
++    total.retained_events += ledger.at("actual_retained_caller_event_count").get<std::size_t>();
++    total.diagnostics += ledger.at("actual_diagnostic_count").get<std::size_t>();
++    total.retained_diagnostics += ledger.at("actual_retained_diagnostic_count").get<std::size_t>();
++    total.omitted_pre += ledger.at("pre_assignment_records_omitted").get<std::size_t>();
++    total.omitted_diagnostics += ledger.at("diagnostic_records_omitted").get<std::size_t>();
++    total.integrity_failed = total.integrity_failed || ledger.at("retry_copy_integrity_failed").get<bool>();
++    for (std::size_t index = 0; index < total.event_counts.size(); ++index) {
++        total.event_counts[index] += ledger.at("actual_caller_event_counts").at(index).get<std::size_t>();
++        total.omitted_events[index] += ledger.at("caller_records_omitted").at(index).get<std::size_t>();
++    }
++    for (std::size_t index = 0; index < total.failures.size(); ++index)
++        total.failures[index] += ledger.at("failure_event_counts").at(index).at("actual_event_count").get<std::size_t>();
++}
++inline json retry_totals(RetryTotals const &total)
++{
++    return {{"actual_pre_assignment_count", total.pre}, {"actual_retained_pre_assignment_count", total.retained_pre},
++        {"actual_caller_event_count", total.events}, {"actual_retained_caller_event_count", total.retained_events},
++        {"actual_caller_event_counts", total.event_counts}, {"actual_diagnostic_count", total.diagnostics},
++        {"actual_retained_diagnostic_count", total.retained_diagnostics}, {"pre_assignment_records_omitted", total.omitted_pre},
++        {"caller_records_omitted", total.omitted_events}, {"diagnostic_records_omitted", total.omitted_diagnostics},
++        {"failure_event_counts", total.failures}, {"retry_copy_integrity_failed", total.integrity_failed},
++        {"complete_retry_parity_claimed", false}, {"numerical_PASS_claimed", false}};
++}
+ } // namespace Ctf01
+ #endif

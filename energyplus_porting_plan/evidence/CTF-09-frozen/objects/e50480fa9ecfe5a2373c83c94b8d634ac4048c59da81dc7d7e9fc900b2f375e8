@@ -1,0 +1,85 @@
+--- .runtime/porting/CTF-09/native-helper-prep-01/before/ctf08_unit_helper.cpp
++++ .runtime/porting/CTF-09/native-helper-prep-01/ctf09_unit_helper.cpp
+@@ -1,7 +1,7 @@
+ // Genuine whole public Construction calls with separately captured private locals.
+-#include "ctf08_unit_fields.hh"
+-#include "ctf08_unit_admission.hh"
+-#include "ctf08_observation_fields.hh"
++#include "ctf09_unit_fields.hh"
++#include "ctf09_unit_admission.hh"
++#include "ctf09_observation_fields.hh"
+ #include <iostream>
+ #include <map>
+ #include <memory>
+@@ -53,6 +53,7 @@
+         state->files.audit.open_as_stringstream(); state->files.eso.open_as_stringstream(); state->files.eio.open_as_stringstream();
+         state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &message) {
+             messages.push_back({{"level", static_cast<int>(level)}, {"message", message}});
++            Observation::retry_diagnostic(*state, messages.size() - 1, static_cast<int>(level), message);
+         };
+         auto const before = snapshot(*state, ErrorsFound, DoCTFErrorReport);
+         auto const initialized = invoke([&] { state->init_constant_state(*state); });
+@@ -146,7 +147,7 @@
+                 // Observer metadata failures do not alter or short-circuit source execution.
+                 outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ErrorsFound, DoCTFErrorReport); });
+             }
+-            observed = observations(capture); observer_integrity_failed = observer_integrity_failed || observer_failed(capture);
++            observed = observations(capture, factory.messages); observer_integrity_failed = observer_integrity_failed || observer_failed(capture, factory.messages);
+             if (outcome.at("status") != "source_returned") {
+                 factory.stopped = true; factory.stop_reason = outcome.at("status").get<std::string>();
+             }
+@@ -171,14 +172,14 @@
+ {
+     using namespace Ctf01;
+     try {
+-        require(argc == 5, "Usage: ctf08_unit_helper <root> <frozen-request> <native-admission-contract> <fresh-output>");
++        require(argc == 5, "Usage: ctf09_unit_helper <root> <frozen-request> <native-admission-contract> <fresh-output>");
+         auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+         auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+-        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-08");
+-        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF-08 output directory required");
++        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-09");
++        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF-09 output directory required");
+         auto const packet = admit(root, request_path, admission_path); fs::create_directories(output);
+         json rows = json::array(), statuses = json::object(); std::size_t invoked = 0, skipped = 0, callback_count = 0, matrix_callbacks = 0, matrix_retained = 0, matrix_omitted = 0;
+-        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals; GammaTotals gamma_total; FinalCoefficientTotals final_total;
++        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals; GammaTotals gamma_total; FinalCoefficientTotals final_total; RetryTotals retry_total;
+         for (auto const &row : packet.request.at("model_cases")) rows.push_back(model_case(row, output));
+         for (auto const &row : rows) {
+             observer_integrity_failed = observer_integrity_failed || row.at("observer_integrity_failed").get<bool>();
+@@ -195,6 +196,7 @@
+                     add_method_totals(inverse_totals, operation.at("observations").at("Inverse"));
+                     add_gamma_totals(gamma_total, operation.at("observations").at("Gamma"));
+                     add_final_coefficient_totals(final_total, operation.at("observations").at("FinalCoefficients"));
++                    add_retry_totals(retry_total, operation.at("observations").at("RetryDriver"));
+                 } else ++skipped;
+             }
+         }
+@@ -202,7 +204,7 @@
+         require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts,
+                 "Frozen input/source admission changed during actual calls");
+         int const helper_exit = observer_integrity_failed ? 2 : 0;
+-        json const result = {{"schema", "ctf08-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
++        json const result = {{"schema", "ctf09-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
+             {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+             {"actual_scope_amendment", packet.request.at("actual_scope_amendment")},
+             {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
+@@ -219,14 +221,17 @@
+             {"CTF06_exponential_observation_policy", ctf06_exponential_policy()}, {"CTF05_inverse_observation_policy", ctf05_inverse_policy()},
+             {"CTF07_gamma_observation_policy", ctf07_gamma_policy()},
+             {"CTF08_final_coefficient_observation_policy", ctf08_final_coefficient_policy()},
++             {"CTF09_retry_observation_policy", ctf09_retry_policy()},
++             {"CTF09_attempt_selection", ctf09_attempt_selection()},
+             {"linked_original_retention_intent", packet.request.at("linked_original_retention_intent")},
+             {"actual_exponential_observation_counts", method_totals(exponential_totals)}, {"actual_inverse_observation_counts", method_totals(inverse_totals)},
+             {"actual_gamma_observation_counts", gamma_totals(gamma_total)},
+             {"actual_final_coefficient_observation_counts", final_coefficient_totals(final_total)},
++             {"actual_retry_observation_counts", retry_totals(retry_total)},
+             {"actual_matrix_attempt_callback_count", matrix_callbacks}, {"actual_retained_matrix_attempt_count", matrix_retained},
+             {"matrix_attempt_records_omitted", matrix_omitted}, {"complete_matrix_attempt_parity_claimed", false}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
+             {"Material_loader_or_fixed15_production_certified", false}, {"CTF02_through_CTF10_certified", false}};
+-        write_text(output / "ctf08-helper-results.json", result.dump() + "\n");
++        write_text(output / "ctf09-helper-results.json", result.dump() + "\n");
+         return helper_exit;
+     } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+ }

@@ -1,0 +1,129 @@
+{
+  "schema": "ctf09-prospective-scope-wording-source-draft.v1",
+  "status": "SOURCE-ONLY-HELD-not-applied-not-actual-scope",
+  "files": [
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/amendment-template.json",
+      "sha256": "151a53e22eef982a6c637772623aa7f99c34141a56f4043a37055a4942c749f9",
+      "size_bytes": 1521,
+      "line_count": 46
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/before-CTF-09.md",
+      "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+      "size_bytes": 2765,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/before-plan-row.json",
+      "sha256": "1ba76716c98a986118b7cfacc263301cecda8f71543b634682ffd8b1221d2164",
+      "size_bytes": 2220,
+      "line_count": 29
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/CTF-09.proposed.diff",
+      "sha256": "6831b6e2a49da69657db1d5a2f897c74e033ee8eee5c1c627a37481d91bacbff",
+      "size_bytes": 2739,
+      "line_count": 18
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/CTF-09.proposed.md",
+      "sha256": "69c4bf5ccef66cd7638ee4648ff912623f6cb8679efbe51421862c058312c679",
+      "size_bytes": 5296,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/plan-row.proposed.json",
+      "sha256": "6f500596244e5a9d63066c9b77ed5ef881ca96e3bdb41f66d3a806a84c596fb6",
+      "size_bytes": 14680,
+      "line_count": 306
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/profiles.proposed.json",
+      "sha256": "a835fdf06622542df18e95358949b5a7ff304304c903f6c53415edc024f03868",
+      "size_bytes": 12623,
+      "line_count": 446
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-draft-prep-01/README.md",
+      "sha256": "a8e6257fa21992fb3e5cdca35d6e10e74cc63582ad17923eeb4dccca935138a3",
+      "size_bytes": 1665,
+      "line_count": 23
+    }
+  ],
+  "dependencies": [
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+      "sha256": "b4e15e0986d65b451ba803cb1b6f9a9bc1c8fe8a6caea90ac3c74e581ee4a315",
+      "size_bytes": 26151,
+      "line_count": 658
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+      "sha256": "4934fe49f601a87e1d41016a03b8e10fba6117a79b65a376b949e68e033dd0bf",
+      "size_bytes": 13336,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef",
+      "size_bytes": 39665,
+      "line_count": 1309
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-09.md",
+      "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+      "size_bytes": 2765,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-08/scope-amendment-01/amendment.json",
+      "sha256": "2398bd45495e6dd1f0ddfe0131c97520580572a736f26df319d2dff72c09b9a9",
+      "size_bytes": 2077,
+      "line_count": 62
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 126,
+      "end_line": 144,
+      "sha256": "2b7c87d65021cd233aef40a553edbe42f5596241935cef7146efaf3731981a5b",
+      "size_bytes": 1247,
+      "purpose": "literal .01/7 constants"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 728,
+      "sha256": "2ce6630a39c803e3223017da320d00e44d56d6c02f74f3ee6177e6f01c277913",
+      "size_bytes": 5348,
+      "purpose": "once-only allocation and repeated assignment"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 875,
+      "end_line": 981,
+      "sha256": "5061e7af483ca7dd7f3b8c0637421ee042bb036fdb82a05d6d54e1653dc26120",
+      "size_bytes": 7452,
+      "purpose": "method order and whole selected caller block"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1021,
+      "end_line": 1103,
+      "sha256": "132150df27cfb452884ca9366f40d9120824bcfdc927f926f487aafd36777932",
+      "size_bytes": 3591,
+      "purpose": "excluded public stores and original cleanup"
+    }
+  ],
+  "future_runtime_identities_guessed": false,
+  "canonical_gates_updated": false,
+  "numerical_PASS_claimed": false
+}

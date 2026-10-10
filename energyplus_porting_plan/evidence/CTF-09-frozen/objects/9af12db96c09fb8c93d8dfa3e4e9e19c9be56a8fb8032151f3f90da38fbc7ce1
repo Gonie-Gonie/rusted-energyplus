@@ -1,0 +1,678 @@
+// Output-only observations of actual Construction.cc local storage.
+#ifndef CTF09_OBSERVER_HH_INCLUDED
+#define CTF09_OBSERVER_HH_INCLUDED
+
+#include <EnergyPlus/Construction.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array3D.hh>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <vector>
+
+namespace EnergyPlus::CTF09Observation {
+
+enum class Phase : std::size_t
+{
+    PostLoad = 0,
+    PostMerge = 1,
+    PostConversion = 2,
+    InitialDiscretization = 3
+};
+
+// Object-representation copies preserve signed zero and nonfinite payload bits.
+struct Binary64Copy
+{
+    std::uint64_t bits = 0;
+};
+
+struct LayerSnapshot
+{
+    Binary64Copy dl;
+    Binary64Copy rk;
+    Binary64Copy rho;
+    Binary64Copy cp;
+    Binary64Copy lr;
+    bool ResLayer = false;
+};
+
+struct Snapshot
+{
+    bool reached = false;
+    bool active_prefix_available = false;
+    bool ErrorsFound = false;
+    bool DoCTFErrorReport = false;
+    int LayersInConstruct = 0;
+    int NumResLayers = 0;
+    std::size_t copied_layer_count = 0;
+    // Only [0, copied_layer_count) is an observation. Never emit the tail.
+    std::array<LayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    // Empty until the actual post-401 callback; not invented zero operands.
+    std::optional<Binary64Copy> dyn;
+    std::optional<Binary64Copy> rs;
+    std::optional<Binary64Copy> cnd;
+};
+
+// Actual initial state after original Construction.cc 619, before retries.
+struct InitialLayerSnapshot
+{
+    int Nodes = 0;
+    Binary64Copy dx;
+};
+
+struct InitialDiscretizationSnapshot
+{
+    bool reached = false;
+    bool active_prefix_available = false;
+    bool ErrorsFound = false;
+    bool DoCTFErrorReport = false;
+    int LayersInConstruct = 0;
+    int NumResLayers = 0;
+    std::size_t copied_layer_count = 0;
+    // Only the copied active prefix is observed. Never emit the unused tail.
+    std::array<InitialLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    int rcmax = 0;
+    int NodeSource = 0;
+    int NodeUserTemp = 0;
+    Binary64Copy CTFTimeStep;
+    int NumHistories = 0;
+    Binary64Copy TimeStepZone;
+};
+
+// Matrix storage is observed during one actual selected 1D loop occurrence.
+enum class MatrixAttemptFailureKind : std::size_t
+{
+    IdentityMismatch = 0,
+    OrderFailure = 1,
+    ActivePrefixShape = 2,
+    MatrixShape = 3,
+    CopyException = 4,
+    LedgerAppendException = 5
+};
+
+struct MatrixAttemptFailure
+{
+    std::size_t observed_attempt_ordinal = 0;
+    MatrixAttemptFailureKind kind = MatrixAttemptFailureKind::IdentityMismatch;
+};
+
+struct Array1Bounds
+{
+    int lower = 0;
+    int upper = 0;
+    std::size_t size = 0;
+};
+
+struct Array2Bounds
+{
+    int lower1 = 0;
+    int upper1 = 0;
+    int lower2 = 0;
+    int upper2 = 0;
+    std::size_t size = 0;
+};
+
+struct MatrixLayerSnapshot
+{
+    LayerSnapshot converted;
+    int Nodes = 0;
+    Binary64Copy dx;
+};
+
+struct MatrixAttemptSnapshot
+{
+    // One-based visit to the sole post-728 callsite within the bound whole call.
+    std::size_t observed_attempt_ordinal = 0;
+    bool reached = false;
+    bool active_prefix_available = false;
+    bool matrices_available = false;
+    std::array<bool, 6> failure_kinds{};
+    bool ErrorsFound = false;
+    bool DoCTFErrorReport = false;
+    bool IsUsedCTF = false;
+    bool SourceSinkPresent = false;
+    int SolutionDimensions = 0;
+    int TotLayers = 0;
+    int LayersInConstruct = 0;
+    int NumResLayers = 0;
+    int rcmax = 0;
+    int NodeSource = 0;
+    int NodeUserTemp = 0;
+    Binary64Copy CTFTimeStep;
+    int NumHistories = 0;
+    Binary64Copy TimeStepZone;
+    std::size_t copied_layer_count = 0;
+    std::array<MatrixLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    // Null bounds mean the real owner was not allocated, not zero dimensions.
+    std::optional<Array2Bounds> AMat_bounds;
+    std::optional<Array2Bounds> IdenMatrix_bounds;
+    std::optional<Array1Bounds> BMat_bounds;
+    std::optional<Array1Bounds> CMat_bounds;
+    std::optional<Array1Bounds> DMat_bounds;
+    // Source i1 outer, i2 inner: i2 is contiguous. No identity/zero synthesis.
+    std::vector<Binary64Copy> AMat;
+    std::vector<Binary64Copy> IdenMatrix;
+    std::array<Binary64Copy, 3> BMat{};
+    std::array<Binary64Copy, 2> CMat{};
+    std::array<Binary64Copy, 2> DMat{};
+};
+
+
+// Separate actual method visits; none of these counters modifies the old ledger.
+enum class MethodKind : std::size_t { Exponential = 0, Inverse = 1 };
+enum class MethodStage : std::size_t
+{
+    Entry = 0, InitializedInputs = 1, ScalingControls = 2,
+    PowerControl = 3, SquareControl = 4, FinalWorkspace = 5, SourceReturn = 6
+};
+enum class MethodFailureKind : std::size_t
+{
+    IdentityMismatch = 0, AssociationFailure = 1, OrderFailure = 2,
+    MatrixShape = 3, CopyException = 4, LedgerAppendException = 5
+};
+enum class MatrixOwner : std::size_t
+{
+    AMat = 0, IdenMatrix = 1, AMat1 = 2, AMato = 3,
+    AMatN = 4, AExp = 5, AInv = 6
+};
+
+struct MethodFailure
+{
+    MethodKind method = MethodKind::Exponential;
+    std::size_t invocation_ordinal = 0;
+    std::size_t assembly_ordinal = 0;
+    MethodStage stage = MethodStage::Entry;
+    MethodFailureKind kind = MethodFailureKind::IdentityMismatch;
+};
+
+struct MethodContext
+{
+    // Fresh copies of actual Construction members at this callback.
+    bool IsUsedCTF = false;
+    bool SourceSinkPresent = false;
+    int SolutionDimensions = 0;
+    int TotLayers = 0;
+    int rcmax = 0;
+    int NodeSource = 0;
+    int NodeUserTemp = 0;
+    Binary64Copy CTFTimeStep;
+    int NumHistories = 0;
+    // These are explicitly the checked earlier assembly's actual stack context.
+    bool assembly_context_available = false;
+    bool assembly_ErrorsFound = false;
+    bool assembly_DoCTFErrorReport = false;
+    Binary64Copy assembly_TimeStepZone;
+};
+
+struct MethodMatrixSnapshot
+{
+    MatrixOwner owner = MatrixOwner::AMat;
+    std::optional<Array2Bounds> bounds;
+    bool copy_available = false;
+    std::vector<Binary64Copy> values;
+};
+
+struct ExponentialControls
+{
+    Binary64Copy AMatRowNormMax;
+    int k = 0;
+    Binary64Copy fact;
+    Binary64Copy CheckVal;
+    int l = 0;
+    // Available only at the final boundary; not an iteration count.
+    std::optional<int> final_i;
+};
+
+struct MethodValueSnapshot
+{
+    bool reached = false;
+    bool matrices_available = false;
+    MethodContext context;
+    std::size_t observed_matrix_count = 0;
+    // Only [0, observed_matrix_count) is observed; never serialize unused slots.
+    std::array<MethodMatrixSnapshot, 4> matrices{};
+    std::optional<ExponentialControls> exponential_controls;
+    // Populated only at the actual caller-return site, with actual stack inputs.
+    bool caller_context_available = false;
+    bool caller_ErrorsFound = false;
+    bool caller_DoCTFErrorReport = false;
+    std::optional<Binary64Copy> caller_TimeStepZone;
+};
+
+struct PowerControlSnapshot
+{
+    std::size_t observed_event_ordinal = 0;
+    int i = 0;
+    bool SigFigLimit = false;
+};
+struct SquareControlSnapshot
+{
+    std::size_t observed_event_ordinal = 0;
+    int isq = 0;
+    bool Backup = false;
+};
+
+struct MethodInvocationSnapshot
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    bool association_available = false;
+    std::array<bool, 6> failure_kinds{};
+    std::array<std::size_t, 7> actual_stage_callback_counts{};
+    MethodValueSnapshot entry;
+    MethodValueSnapshot initialized_inputs;
+    MethodValueSnapshot scaling_controls;
+    std::vector<PowerControlSnapshot> power_controls;
+    std::vector<SquareControlSnapshot> square_controls;
+    MethodValueSnapshot final_workspace;
+    MethodValueSnapshot source_return;
+};
+
+struct MethodCapture
+{
+    std::size_t actual_invocation_count = 0;
+    std::array<std::size_t, 7> actual_stage_callback_counts{};
+    std::vector<MethodInvocationSnapshot> invocations;
+    // Every actual callback without its required retained record is counted.
+    std::array<std::size_t, 7> stage_records_omitted{};
+    bool observer_failure = false;
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::optional<MethodFailure> first_failure;
+    std::optional<MethodFailure> last_failure;
+};
+
+// Gamma has its own ledgers. Earlier phase/matrix/05/06 counters are untouched.
+enum class GammaStage : std::size_t
+{
+    Entry = 0, ATempReady = 1, Gamma1Final = 2, Gamma2Final = 3, SourceReturn = 4
+};
+
+enum class GammaMatrixOwner : std::size_t
+{
+    AExp = 0, IdenMatrix = 1, AInv = 2, ATemp = 3, Gamma1 = 4, Gamma2 = 5
+};
+
+struct GammaFailure
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    GammaStage stage = GammaStage::Entry;
+    MethodFailureKind kind = MethodFailureKind::IdentityMismatch;
+};
+
+struct GammaMatrixSnapshot
+{
+    GammaMatrixOwner owner = GammaMatrixOwner::AExp;
+    std::optional<Array2Bounds> bounds;
+    bool copy_available = false;
+    // Actual first-index outer, second-index inner. Rectangles are 3 by rcmax.
+    std::vector<Binary64Copy> values;
+};
+
+struct GammaValueSnapshot
+{
+    bool reached = false;
+    bool matrices_available = false;
+    MethodContext context;
+    // Actual 2D branch control is context-only outside the selected 1D scope.
+    int NumOfPerpendNodes = 0;
+    std::size_t observed_matrix_count = 0;
+    // Only observed_matrix_count slots are owners; default slots are unavailable.
+    std::array<GammaMatrixSnapshot, 3> matrices;
+    // Entry-only actual BMat. Neither the default tail nor absent data is zero.
+    bool BMat_available = false;
+    std::optional<Array1Bounds> BMat_bounds;
+    std::array<Binary64Copy, 3> BMat{};
+    bool caller_context_available = false;
+    bool caller_ErrorsFound = false;
+    bool caller_DoCTFErrorReport = false;
+    std::optional<Binary64Copy> caller_TimeStepZone;
+};
+
+struct GammaInvocationSnapshot
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    bool association_available = false;
+    std::array<bool, 6> failure_kinds{};
+    std::array<std::size_t, 5> actual_stage_callback_counts{};
+    GammaValueSnapshot entry;
+    GammaValueSnapshot ATemp_ready;
+    GammaValueSnapshot Gamma1_final;
+    GammaValueSnapshot Gamma2_final;
+    GammaValueSnapshot source_return;
+};
+
+struct GammaCapture
+{
+    std::size_t actual_invocation_count = 0;
+    std::array<std::size_t, 5> actual_stage_callback_counts{};
+    std::vector<GammaInvocationSnapshot> invocations;
+    std::array<std::size_t, 5> stage_records_omitted{};
+    bool observer_failure = false;
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::optional<GammaFailure> first_failure;
+    std::optional<GammaFailure> last_failure;
+};
+
+// Independent private final-coefficient visits; earlier ledgers stay unchanged.
+enum class FinalCoefficientStage : std::size_t { Entry = 0, PrivateFinal = 1, SourceReturn = 2 };
+enum class FinalCoefficientMatrixOwner : std::size_t
+{
+    AExp = 0, IdenMatrix = 1, Gamma1 = 2, Gamma2 = 3,
+    s0 = 4, PhiR0 = 5, Rnew = 6, Rold = 7
+};
+struct Array3Bounds
+{
+    int lower1 = 0;
+    int upper1 = 0;
+    int lower2 = 0;
+    int upper2 = 0;
+    int lower3 = 0;
+    int upper3 = 0;
+    std::size_t size = 0;
+};
+struct FinalCoefficientFailure
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    FinalCoefficientStage stage = FinalCoefficientStage::Entry;
+    MethodFailureKind kind = MethodFailureKind::IdentityMismatch;
+};
+struct FinalCoefficientMatrixSnapshot
+{
+    FinalCoefficientMatrixOwner owner = FinalCoefficientMatrixOwner::AExp;
+    std::optional<Array2Bounds> bounds;
+    bool copy_available = false;
+    // Actual first-index outer, second-index inner; no transposition.
+    std::vector<Binary64Copy> values;
+};
+struct FinalCoefficientControls
+{
+    // Only copied at the real private-final boundary after both are initialized.
+    int inum = 0;
+    bool CTFConvrg = false;
+};
+struct FinalCoefficientValueSnapshot
+{
+    bool reached = false;
+    bool matrices_available = false;
+    MethodContext context;
+    int NumOfPerpendNodes = 0;
+    std::size_t observed_matrix_count = 0;
+    // Only observed_matrix_count slots represent actual owners.
+    std::array<FinalCoefficientMatrixSnapshot, 5> matrices;
+    // Entry-only actual compressed input owners; unavailable slots are not zeros.
+    bool CMat_available = false;
+    bool DMat_available = false;
+    std::optional<Array1Bounds> CMat_bounds;
+    std::optional<Array1Bounds> DMat_bounds;
+    std::array<Binary64Copy, 2> CMat{};
+    std::array<Binary64Copy, 2> DMat{};
+    // PrivateFinal/SourceReturn only. Entry never reads stale/uninitialized work.
+    bool history_available = false;
+    bool s_available = false;
+    bool e_available = false;
+    std::optional<Array3Bounds> s_bounds;
+    std::optional<Array1Bounds> e_bounds;
+    // s(j,k,term): j outer, k middle, term inner; all3*4*rcmax slots.
+    std::vector<Binary64Copy> s;
+    std::vector<Binary64Copy> e;
+    std::optional<int> NumCTFTerms;
+    std::optional<FinalCoefficientControls> controls;
+    bool caller_context_available = false;
+    bool caller_ErrorsFound = false;
+    bool caller_DoCTFErrorReport = false;
+    std::optional<Binary64Copy> caller_TimeStepZone;
+};
+struct FinalCoefficientInvocationSnapshot
+{
+    std::size_t observed_invocation_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    bool association_available = false;
+    std::array<bool, 6> failure_kinds{};
+    std::array<std::size_t, 3> actual_stage_callback_counts{};
+    FinalCoefficientValueSnapshot entry;
+    FinalCoefficientValueSnapshot private_final;
+    FinalCoefficientValueSnapshot source_return;
+};
+struct FinalCoefficientCapture
+{
+    std::size_t actual_invocation_count = 0;
+    std::array<std::size_t, 3> actual_stage_callback_counts{};
+    std::vector<FinalCoefficientInvocationSnapshot> invocations;
+    std::array<std::size_t, 3> stage_records_omitted{};
+    bool observer_failure = false;
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::optional<FinalCoefficientFailure> first_failure;
+    std::optional<FinalCoefficientFailure> last_failure;
+};
+
+enum class RetryEvent : std::size_t {
+    DecisionEntry = 0, ExcessiveTermsUpdate = 1, AssignedSums = 2,
+    ImbalanceUpdate = 3, FatalNoCtfs = 4, SevereEntry = 5,
+    SevereBreak = 6, LoopTail = 7, LoopExit = 8
+};
+struct RetryContext {
+    bool IsUsedCTF = false, SourceSinkPresent = false;
+    int SolutionDimensions = 0, TotLayers = 0, rcmax = 0;
+    int NodeSource = 0, NodeUserTemp = 0, NumCTFTerms = 0;
+    Binary64Copy CTFTimeStep;
+    int NumHistories = 0;
+    Binary64Copy TimeStepZone;
+    bool ErrorsFound = false, DoCTFErrorReport = false, CTFConvrg = false;
+};
+struct PreAssignmentSnapshot {
+    std::size_t observed_pre_assignment_ordinal = 0;
+    std::size_t preceding_post_assembly_callback_count = 0;
+    bool reached = false, association_available = false, matrices_available = false;
+    bool active_prefix_available = false;
+    bool AMat_available = false, IdenMatrix_available = false;
+    RetryContext context;
+    int LayersInConstruct = 0, NumResLayers = 0;
+    std::size_t copied_layer_count = 0;
+    std::array<MatrixLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
+    std::optional<Array2Bounds> AMat_bounds, IdenMatrix_bounds;
+    std::vector<Binary64Copy> AMat, IdenMatrix;
+    // Original659 has assigned only this B slot before the first 1D band work.
+    std::optional<Binary64Copy> BMat3_after_reset;
+    std::array<bool, 6> failure_kinds{};
+};
+struct RetryCallerSnapshot {
+    std::size_t observed_event_ordinal = 0, observed_pre_assignment_ordinal = 0;
+    std::size_t observed_assembly_ordinal = 0;
+    RetryEvent event = RetryEvent::DecisionEntry;
+    bool reached = false, association_available = false;
+    RetryContext context;
+    // Present only at the actual after930 callsite. No values read on >18 path.
+    std::optional<std::array<Binary64Copy, 4>> assigned_sums;
+    std::array<bool, 6> failure_kinds{};
+};
+struct RetryDiagnosticSnapshot {
+    std::size_t observed_diagnostic_ordinal = 0;
+    std::size_t actual_global_message_index = 0;
+    std::size_t observed_pre_assignment_ordinal = 0;
+    std::size_t observed_post_assembly_callback_count = 0;
+    std::optional<std::size_t> preceding_caller_event_ordinal;
+    int actual_level = 0;
+    std::string actual_message;
+    bool copy_available = false;
+    std::array<bool, 6> failure_kinds{};
+    bool temporal_association_only = true;
+};
+enum class RetrySite : std::size_t { PreAssignment = 0, CallerEvent = 1, Diagnostic = 2 };
+enum class RetryFailureKind : std::size_t {
+    IdentityMismatch = 0, AssociationFailure = 1, OrderFailure = 2,
+    OwnerShape = 3, CopyException = 4, LedgerAppendException = 5
+};
+struct RetryFailure {
+    RetrySite site = RetrySite::PreAssignment;
+    std::size_t actual_callback_ordinal = 0;
+    std::size_t pre_assignment_ordinal = 0, post_assembly_ordinal = 0;
+    RetryFailureKind kind = RetryFailureKind::IdentityMismatch;
+};
+struct RetryCapture {
+    std::size_t actual_pre_assignment_count = 0;
+    std::size_t actual_caller_event_count = 0;
+    std::size_t actual_diagnostic_count = 0;
+    std::array<std::size_t, 9> actual_caller_event_counts{};
+    std::vector<PreAssignmentSnapshot> pre_assignments;
+    std::vector<RetryCallerSnapshot> caller_events;
+    std::vector<RetryDiagnosticSnapshot> diagnostics;
+    std::size_t pre_assignment_records_omitted = 0, diagnostic_records_omitted = 0;
+    std::array<std::size_t, 9> caller_records_omitted{};
+    bool observer_failure = false, counter_overflow = false;
+    std::array<std::size_t, 6> failure_event_counts{};
+    std::optional<RetryFailure> first_failure, last_failure;
+};
+
+struct Capture
+{
+    // Internal identity checks only. A future helper supplies its real owner ID.
+    EnergyPlusData const *bound_state = nullptr;
+    Construction::ConstructionProps const *bound_construction = nullptr;
+    std::array<Snapshot, 3> phases{};
+    InitialDiscretizationSnapshot initial_discretization{};
+    std::array<std::size_t, 4> actual_phase_callback_counts{};
+    std::size_t actual_callback_count = 0;
+    bool binding_error = false;
+    bool identity_mismatch = false;
+    bool duplicate_phase = false;
+    bool phase_order_invalid = false;
+    bool active_prefix_invalid = false;
+    // These counters are separate; the old four checkpoint counters are intact.
+    std::size_t actual_matrix_attempt_callback_count = 0;
+    std::vector<MatrixAttemptSnapshot> matrix_attempts;
+    std::size_t matrix_attempt_records_omitted = 0;
+    bool matrix_observer_failure = false;
+    std::array<std::size_t, 6> matrix_failure_event_counts{};
+    std::optional<MatrixAttemptFailure> first_matrix_failure;
+    std::optional<MatrixAttemptFailure> last_matrix_failure;
+    MethodCapture exponential;
+    MethodCapture inverse;
+    GammaCapture gamma;
+    FinalCoefficientCapture final_coefficients;
+    RetryCapture retry_driver;
+};
+
+// A helper binds its explicit actual state/array element before one genuine call.
+// Nested bindings are rejected as observer metadata; they do not replace a call.
+class Binding
+{
+public:
+    Binding(Capture &capture, EnergyPlusData const &state,
+            Construction::ConstructionProps const &construction) noexcept;
+    ~Binding() noexcept;
+    Binding(Binding const &) = delete;
+    Binding &operator=(Binding const &) = delete;
+    Binding(Binding &&) = delete;
+    Binding &operator=(Binding &&) = delete;
+    [[nodiscard]] bool active() const noexcept { return active_; }
+
+private:
+    Capture *capture_ = nullptr;
+    bool active_ = false;
+};
+
+void post_load(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+               bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+               Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+               Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+               Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept;
+
+void post_merge(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                Array1D<Real64> const &lr, Array1D_bool const &ResLayer) noexcept;
+
+void post_conversion(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                     bool ErrorsFound, bool DoCTFErrorReport, int LayersInConstruct, int NumResLayers,
+                     Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                     Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                     Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                     Real64 const &dyn, Real64 const &rs, Real64 const &cnd) noexcept;
+
+void post_initial_discretization(EnergyPlusData const &state,
+                                 Construction::ConstructionProps const &construction,
+                                 bool ErrorsFound, bool DoCTFErrorReport,
+                                 int LayersInConstruct, int NumResLayers,
+                                 Array1D_int const &Nodes, Array1D<Real64> const &dx,
+                                 Real64 const &TimeStepZone) noexcept;
+
+void post_matrix_assembly(EnergyPlusData const &state,
+                          Construction::ConstructionProps const &construction,
+                          bool ErrorsFound, bool DoCTFErrorReport,
+                          int LayersInConstruct, int NumResLayers,
+                          Array1D<Real64> const &dl, Array1D<Real64> const &rk,
+                          Array1D<Real64> const &rho, Array1D<Real64> const &cp,
+                          Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                          Array1D_int const &Nodes, Array1D<Real64> const &dx,
+                          Real64 const &TimeStepZone) noexcept;
+
+
+// Entry has no invented state/local-work operands. The active real binding is used.
+void method_entry(MethodKind method, Construction::ConstructionProps const &construction) noexcept;
+void exponential_initialized(Construction::ConstructionProps const &construction,
+                             Array2D<Real64> const &AMat1, Array2D<Real64> const &AMato,
+                             Array2D<Real64> const &AMatN) noexcept;
+void exponential_scaled(Construction::ConstructionProps const &construction,
+                        Array2D<Real64> const &AMat1, Real64 const &AMatRowNormMax,
+                        int k, Real64 const &fact, Real64 const &CheckVal, int l) noexcept;
+void exponential_power_control(Construction::ConstructionProps const &construction,
+                               int i, bool SigFigLimit) noexcept;
+void exponential_square_control(Construction::ConstructionProps const &construction,
+                                int isq, bool Backup) noexcept;
+void exponential_final(Construction::ConstructionProps const &construction,
+                       Array2D<Real64> const &AMat1, Array2D<Real64> const &AMato,
+                       Array2D<Real64> const &AMatN, Real64 const &AMatRowNormMax,
+                       int k, Real64 const &fact, Real64 const &CheckVal, int l, int i) noexcept;
+void inverse_initialized(Construction::ConstructionProps const &construction,
+                         Array2D<Real64> const &AMat1) noexcept;
+void inverse_final(Construction::ConstructionProps const &construction,
+                   Array2D<Real64> const &AMat1) noexcept;
+void method_return(MethodKind method, EnergyPlusData const &state,
+                   Construction::ConstructionProps const &construction,
+                   bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
+
+// Gamma callbacks own an independent five-stage ledger; earlier APIs are unchanged.
+void gamma_entry(Construction::ConstructionProps const &construction) noexcept;
+void gamma_ATemp_ready(Construction::ConstructionProps const &construction,
+                       Array2D<Real64> const &ATemp) noexcept;
+void gamma1_final(Construction::ConstructionProps const &construction) noexcept;
+void gamma2_final(Construction::ConstructionProps const &construction) noexcept;
+void gamma_return(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                   bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
+
+// No unassigned avg/rat/trace/SurfNodeFac values are ever passed or read.
+void final_coefficient_entry(Construction::ConstructionProps const &construction) noexcept;
+void final_coefficient_private_final(Construction::ConstructionProps const &construction,
+                                     Array2D<Real64> const &PhiR0, Array2D<Real64> const &Rnew,
+                                     Array2D<Real64> const &Rold, int inum, bool CTFConvrg) noexcept;
+void final_coefficient_return(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
+                              bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
+
+void pre_matrix_assignment(EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    int LayersInConstruct, int NumResLayers,
+    Array1D<Real64> const &dl, Array1D<Real64> const &rk, Array1D<Real64> const &rho,
+    Array1D<Real64> const &cp, Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+    Array1D_int const &Nodes, Array1D<Real64> const &dx,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept;
+void retry_caller_event(RetryEvent event, EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept;
+void retry_assigned_sums(EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg,
+    Real64 const &SumXi, Real64 const &SumYi, Real64 const &SumZi, Real64 const &BiggestSum) noexcept;
+void retry_diagnostic(EnergyPlusData const &state, std::size_t actual_global_message_index,
+    int actual_level, std::string const &actual_message) noexcept;
+
+} // namespace EnergyPlus::CTF09Observation
+
+#endif

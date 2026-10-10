@@ -1,0 +1,16 @@
+void pre_matrix_assignment(EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    int LayersInConstruct, int NumResLayers,
+    Array1D<Real64> const &dl, Array1D<Real64> const &rk, Array1D<Real64> const &rho,
+    Array1D<Real64> const &cp, Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+    Array1D_int const &Nodes, Array1D<Real64> const &dx,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept;
+void retry_caller_event(RetryEvent event, EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg) noexcept;
+void retry_assigned_sums(EnergyPlusData const &state,
+    Construction::ConstructionProps const &construction, bool ErrorsFound, bool DoCTFErrorReport,
+    Real64 const &TimeStepZone, bool CTFConvrg,
+    Real64 const &SumXi, Real64 const &SumYi, Real64 const &SumZi, Real64 const &BiggestSum) noexcept;
+void retry_diagnostic(EnergyPlusData const &state, std::size_t actual_global_message_index,
+    int actual_level, std::string const &actual_message) noexcept;

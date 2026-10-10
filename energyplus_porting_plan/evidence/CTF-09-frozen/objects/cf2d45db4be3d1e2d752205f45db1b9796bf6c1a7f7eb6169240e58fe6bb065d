@@ -1,0 +1,68 @@
+{
+  "schema": "ctf09-source-scope-amendment.v1",
+  "draft_only_not_actual_scope_receipt": false,
+  "created_utc": "2026-10-10T21:48:51.945730+00:00",
+  "cards": [
+    "CTF-09"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF09_build_or_engine_execution_performed": false,
+  "native_observer": {
+    "path": ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+    "sha256": "b4e15e0986d65b451ba803cb1b6f9a9bc1c8fe8a6caea90ac3c74e581ee4a315",
+    "size_bytes": 26151,
+    "line_count": 658
+  },
+  "passive_observer": {
+    "path": ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+    "sha256": "4934fe49f601a87e1d41016a03b8e10fba6117a79b65a376b949e68e033dd0bf",
+    "size_bytes": 13336,
+    "line_count": 346
+  },
+  "retry_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef",
+    "size_bytes": 39665,
+    "line_count": 1309
+  },
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-09/scope-amendment-01/before/plan.json",
+      "sha256": "bede068603f5e8b90d14a401a2728ec68a98307798b947c48fa5079b7de6ddd1",
+      "size_bytes": 689962
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-amendment-01/before/CTF-09.md",
+      "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+      "size_bytes": 2765
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "0650ecab603a0727bbeb2f8a39f7db0f898d62f52c1fa3b3b5e337caa68d61e5",
+      "size_bytes": 703551
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-09.md",
+      "sha256": "69c4bf5ccef66cd7638ee4648ff912623f6cb8679efbe51421862c058312c679",
+      "size_bytes": 5296
+    }
+  ],
+  "recorder_role": "real-CTF-09-check-only",
+  "scope_only_no_numerical_PASS": true,
+  "actual_doc_and_check_refs_supplied_by_Root_later": false,
+  "historical_prior_08_authority_must_remain_archive_only": true
+}
