@@ -7662,12 +7662,12 @@
       "companion": "ScheduleManager.hh; selected InputProcessor IDF/order caller; General date helpers; UtilityRoutines ProcessNumber; actual initialization and storage declarations.",
       "excludes": "All schedule families outside selected Constant/Compact/TypeLimits and all CON-01 excluded production inputs. Diagnostic parser cases do not expand production admission. SCH-02 evaluation/time-update algorithms remain separate.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/ScheduleManager.cc",
-      "scope_review": "미확인",
+      "scope_review": "통과",
       "unit_gate": "미확인",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Literal source ranges are authenticated in the scope amendment. Only listed selected branches and direct helpers are reviewed; no whole ProcessScheduleInput or full-library certification. Four gates remain pending until actual validation.",
+      "source_boundary_note": "Selected source ranges, direct helpers, actual initialization and strict comparison contracts are frozen and reviewed. Scope review passes. Unit/integration/production remain pending because Native unknown cases and unavailable conversions are retained; selected six stored-owner parity does not certify the whole card or SCH-02/03.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -7816,7 +7816,22 @@
         "required_success_absence_both_sides_fails": true,
         "stopped_uninvoked_partial_availability_never_PASS": true,
         "SCH02_arithmetic_certification_claimed": false,
-        "packet_projection_precision_freeze_pending": true
+        "packet_projection_precision_freeze_pending": false
+      },
+      "observed_validation": {
+        "summary": {
+          "path": "energyplus_porting_plan/evidence/SCH-01-corrected/summary.json",
+          "sha256": "1ce6d39879b93d6051fe876e2632eca785572da9975373cb0c75592385244965"
+        },
+        "archive_manifest": {
+          "path": "energyplus_porting_plan/evidence/SCH-01-corrected/manifest.json",
+          "sha256": "936754b3b23e1dc46a2d7b29424021d38b593933d0612e0e99f604fac10a3daf"
+        },
+        "whole_card_complete": false,
+        "selected_six_stored_owner_parity": true,
+        "unit_required_availability_failures": 2,
+        "Native_unknown_models": 2,
+        "conversion_unavailable_models": 3
       }
     },
     {

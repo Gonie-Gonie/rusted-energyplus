@@ -1,0 +1,107 @@
+{
+  "schema": "sch01-corrected-observation-summary.v1",
+  "EnergyPlus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "implementation_commits": [
+    "7047f3e486ee964d983db50d1107a590db69fbe3",
+    "47c0dedbfe296e86075671dc112d9c81bf3956cf",
+    "df865d96a56c36b6dfc3011994c0525c351ecce0"
+  ],
+  "candidate_unit": {
+    "status": "candidate-observed-comparisons-equal-with-incomplete-required-coverage",
+    "numeric_comparison_count": 21508632,
+    "numeric_mismatch_count": 0,
+    "discrete_comparison_count": 716890,
+    "discrete_mismatch_count": 0,
+    "availability_failure_count": 2,
+    "metrics": {
+      "copied_literal_scalars": {
+        "count": 216,
+        "mismatch_count": 0,
+        "max_absolute_error": 0.0,
+        "finite_operand_error_overflow_count": 0
+      },
+      "populated_day_arrays": {
+        "count": 21503232,
+        "mismatch_count": 0,
+        "max_absolute_error": 0.0,
+        "finite_operand_error_overflow_count": 0
+      },
+      "actual_consumer_handoff": {
+        "count": 5184,
+        "mismatch_count": 0,
+        "max_absolute_error": 0.0,
+        "finite_operand_error_overflow_count": 0
+      }
+    }
+  },
+  "selected_production": {
+    "status": "pass-six-carrier-stored-initialization-and-handoff-parity",
+    "numeric_comparison_count": 10119332,
+    "numeric_mismatch_count": 0,
+    "discrete_comparison_count": 316842,
+    "discrete_mismatch_count": 0,
+    "availability_failure_count": 0,
+    "metrics": {
+      "copied_literal_scalars": {
+        "count": 72,
+        "mismatch_count": 0,
+        "max_absolute_error": 0.0,
+        "finite_operand_error_overflow_count": 0
+      },
+      "populated_day_arrays": {
+        "count": 0,
+        "mismatch_count": 0,
+        "max_absolute_error": 0.0,
+        "finite_operand_error_overflow_count": 0
+      },
+      "actual_consumer_handoff": {
+        "count": 10119260,
+        "mismatch_count": 0,
+        "max_absolute_error": 0.0,
+        "finite_operand_error_overflow_count": 0
+      }
+    }
+  },
+  "complete_unit_PASS": false,
+  "Native_unavailable_model_cases": 2,
+  "input_conversion_unavailable_model_cases": 3,
+  "selected_production_ids": [
+    "A-24H",
+    "A-72H",
+    "B-NOLIMIT-24H",
+    "B-FLOW-24H",
+    "B-CAPACITY-24H",
+    "B-BOTH-24H"
+  ],
+  "selected_six_stored_initialization_and_handoff_parity": true,
+  "Dense_sampled_values_numeric_comparison_claimed": false,
+  "per_lookup_timing_certified": false,
+  "nine_unrun_production_carriers_certified": false,
+  "SCH02_or_SCH03_certified": false,
+  "overall_SCH01_card_PASS": false,
+  "RMSE_separately_collected": false,
+  "reference_answers_supplied_to_Rust": false,
+  "numeric_profiles_relaxed": false,
+  "archive_manifest_sha256": "936754b3b23e1dc46a2d7b29424021d38b593933d0612e0e99f604fac10a3daf",
+  "actual_reports": [
+    {
+      "historical_path": ".runtime/porting/SCH-01/candidate-unit-01/candidate-unit.json",
+      "sha256": "7fcf1bd814c328a2159733d692aa60da1b2f811234a331ef6dd6989715117ba6"
+    },
+    {
+      "historical_path": ".runtime/porting/SCH-01/production-comparison-02/production-comparison.json",
+      "sha256": "86d578ade51c1fbc31a17ef0a58b6757ab70a118328c660e10da8eea0a9d7b2f"
+    }
+  ],
+  "actual_comparer_commands": [
+    {
+      "historical_path": ".runtime/porting/SCH-01/production-comparison-command-01/receipt.json",
+      "sha256": "d32dff781a154b2ed2d47daeb85a9f469edba6b091eca02413e315753b5bfed3"
+    },
+    {
+      "historical_path": ".runtime/porting/SCH-01/production-comparison-command-02/receipt.json",
+      "sha256": "29229d92d26bee237e6281076d8285af7adbebb323308033539445755e518d6a"
+    }
+  ],
+  "source_scope_gate_only_updated": true
+}
