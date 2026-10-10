@@ -1,0 +1,292 @@
+{
+  "schema": "ctf02-selected-all-resistive-actual-comparison-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/manifest.json",
+    "sha256": "ec7038f9b1f747cc8dbbe5559c203d0ce3a0a42a03f01c4323338361ecc3ed62",
+    "size_bytes": 81654
+  },
+  "Original_and_existing_Rust_baseline": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-original-baseline/summary.json",
+    "sha256": "1f54f7bc388aa7c50933bfbc8de22d1dfb86de7f9baf0f1d59a4fdba06995915",
+    "size_bytes": 6001
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/e1/e1f64b86889ebf4e945b584c2c0fc104e7aca22627003b13dd83492bc13fb30c",
+    "sha256": "e1f64b86889ebf4e945b584c2c0fc104e7aca22627003b13dd83492bc13fb30c"
+  },
+  "applied_formatted_source_inventory": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/69e56acb8b07cb645408edd694426a8de352aac240d4d29dec7b38fd0678bf99",
+    "sha256": "69e56acb8b07cb645408edd694426a8de352aac240d4d29dec7b38fd0678bf99",
+    "size_bytes": 5046
+  },
+  "actual_Rust_build_used_for_both_observers": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/827bb649e8fab2eaa7c5d6acd39d22723867e1499527301d7dcbed2b187f89a6",
+    "sha256": "827bb649e8fab2eaa7c5d6acd39d22723867e1499527301d7dcbed2b187f89a6",
+    "size_bytes": 7767
+  },
+  "historical_build01_not_used_for_scientific_execution": "Subsequent Cargo tests replaced the example binaries; pre-execution SHA assertion stopped before any candidate execution. Actual build02 after all quality checks supplied both real executions. No failed scientific result was hidden.",
+  "actual_unit_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/06c989f79720f2e6ad7ee21904ee561f7e56cc95f3f866944bed4a928c295c3d",
+    "sha256": "06c989f79720f2e6ad7ee21904ee561f7e56cc95f3f866944bed4a928c295c3d",
+    "size_bytes": 5052
+  },
+  "actual_production_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/ee6e0401448b3cbda9f941ef2b97aa412ececdf58de376515e50184b14137783",
+    "sha256": "ee6e0401448b3cbda9f941ef2b97aa412ececdf58de376515e50184b14137783",
+    "size_bytes": 4719
+  },
+  "actual_unit_comparison_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/09c25695e3853163cb864366ee6c98f978bbc4accc7d10d49abc09f019d7eb98",
+    "sha256": "09c25695e3853163cb864366ee6c98f978bbc4accc7d10d49abc09f019d7eb98",
+    "size_bytes": 5563
+  },
+  "actual_production_comparison_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/e6bab5a40efe4cdb264c980dac9e1dc16190f8266967452d2ff05c34cc51968a",
+    "sha256": "e6bab5a40efe4cdb264c980dac9e1dc16190f8266967452d2ff05c34cc51968a",
+    "size_bytes": 5948
+  },
+  "actual_unit_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/007419cbded2007752f348b508a2f283407470e6c06574f391dcde3316336f2b",
+    "sha256": "007419cbded2007752f348b508a2f283407470e6c06574f391dcde3316336f2b",
+    "size_bytes": 733525
+  },
+  "actual_production_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/76677d6cb3aae8f4e5c1b2760dd5d7f8d70a0ffdf00b16ce8cf1a453fe705020",
+    "sha256": "76677d6cb3aae8f4e5c1b2760dd5d7f8d70a0ffdf00b16ce8cf1a453fe705020",
+    "size_bytes": 122277
+  },
+  "unit": {
+    "requested_models": 39,
+    "requested_whole_calls": 42,
+    "selected_all_resistive_calls": 8,
+    "numeric_comparisons": 624,
+    "discrete_comparisons": 7086,
+    "mismatch_count": 0,
+    "metrics": {
+      "CTFOutside": {
+        "count": 152,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFCross": {
+        "count": 152,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFInside": {
+        "count": 152,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFFlux": {
+        "count": 152,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFTimeStep": {
+        "count": 8,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "UValue": {
+        "count": 8,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "unavailable_context_records_not_PASS": 54
+  },
+  "production": {
+    "fixed_input_models": 15,
+    "actual_loaded_constructions": 21,
+    "selected_all_resistive_calls": 6,
+    "numeric_comparisons": 468,
+    "discrete_comparisons": 3045,
+    "mismatch_count": 0,
+    "metrics": {
+      "CTFOutside": {
+        "count": 114,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFCross": {
+        "count": 114,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFInside": {
+        "count": 114,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFFlux": {
+        "count": 114,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTFTimeStep": {
+        "count": 6,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "UValue": {
+        "count": 6,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "unavailable_context_records_not_PASS": 96
+  },
+  "quality": {
+    "workspace_all_targets_passed": 4650,
+    "failed": 0,
+    "ignored": 0,
+    "test_binaries": 35,
+    "tests": {
+      "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/2508fa57d74be20a132bf7b17b60dbf93d2d9613b9f8909c00a04a827ccee83d",
+      "sha256": "2508fa57d74be20a132bf7b17b60dbf93d2d9613b9f8909c00a04a827ccee83d",
+      "size_bytes": 4442
+    },
+    "clippy": {
+      "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/60db816d871fbb6be6346881c488b99550fd11dc3f8736a1a757ed680a63585f",
+      "sha256": "60db816d871fbb6be6346881c488b99550fd11dc3f8736a1a757ed680a63585f",
+      "size_bytes": 4481
+    },
+    "fmt": {
+      "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/408bac3b12c8ab91b48a1e14fedebf5c2c05e3b57a2fdb754710a0175a124a72",
+      "sha256": "408bac3b12c8ab91b48a1e14fedebf5c2c05e3b57a2fdb754710a0175a124a72",
+      "size_bytes": 4407
+    }
+  },
+  "actual_fixed6_production_CLI": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/1f1c9044cab59310ce0757ebcf50bb116a32bbb1c182376a992173dbe3a33800",
+    "sha256": "1f1c9044cab59310ce0757ebcf50bb116a32bbb1c182376a992173dbe3a33800",
+    "size_bytes": 2757
+  },
+  "actual_production_CLI_run_summaries": [
+    {
+      "id": "A-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-02/production-cli-output-01/A-24H/run-summary.json",
+        "sha256": "62b5b18bc4e1a72736980391965622593068688a35d815420c55748c66245617",
+        "size_bytes": 28690
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "A-72H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-02/production-cli-output-01/A-72H/run-summary.json",
+        "sha256": "a4c787ae32bb84e006f3c2ac50c507640b3d32aba79e19845fcbf0aab3bc191b",
+        "size_bytes": 28692
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-02/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+        "sha256": "f3075dece1e55b1e8565f1a0c465cd84b3c189521e1d16e95f78c89025104109",
+        "size_bytes": 1498420
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-FLOW-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-02/production-cli-output-01/B-FLOW-24H/run-summary.json",
+        "sha256": "2157beda75890b6b75fec7acc8d3e16bddb8d93850ee90a12304c051af2567a8",
+        "size_bytes": 1498308
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-02/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+        "sha256": "ddae86708d482632da2de5d4a7fdb486bd235491d5ad9705482146ced9f9b325",
+        "size_bytes": 1498243
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-BOTH-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-02/production-cli-output-01/B-BOTH-24H/run-summary.json",
+        "sha256": "3473def2e4ac58c1aa86d6fe34434e160cb1296fa6f62f25469ee2aefbe156be",
+        "size_bytes": 1498716
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    }
+  ],
+  "all45_input_guards_unchanged_after": true,
+  "source_review": {
+    "all_resistive_9_sources": "Root FULL plus Raw other-author FULL",
+    "observer_5_sources": "Root FULL plus Header other-author FULL",
+    "comparison_2_mains_and_IO": "Root FULL plus Header other-author FULL",
+    "postformat_sources_reviewed_by_Root": true
+  },
+  "selected_unit_gate_passed": true,
+  "integration_gate_passed": false,
+  "production_gate_passed": false,
+  "complete_CTF02_PASS_claimed": false,
+  "pending": [
+    "CTF01 dependent integration/production completion",
+    "Genuine SUR04/SUR07 Native surface-HB caller, per-iteration operands and report/history handoff",
+    "Massive/source-sink/2D/reverse coefficient generation is outside selected CTF02 route"
+  ]
+}

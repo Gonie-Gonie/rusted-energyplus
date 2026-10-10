@@ -68,6 +68,30 @@ pub(crate) fn steady_surface_ctf_state(
     }
 }
 
+/// Copy actual selected construction storage into the existing surface consumer owner.
+pub(crate) fn all_resistive_surface_ctf_state(
+    coefficients: &super::surface_manager::ctf_all_resistive::CtfAllResistiveCoefficients,
+    initial_temperature_c: f64,
+) -> SurfaceCtfState {
+    let end = coefficients.num_ctf_terms + 1;
+    SurfaceCtfState {
+        outside_0_w_per_m2_k: coefficients.outside[0],
+        cross_0_w_per_m2_k: coefficients.cross[0],
+        inside_0_w_per_m2_k: coefficients.inside[0],
+        flux_0: Some(coefficients.flux[0]),
+        const_in_part_w_per_m2: 0.0,
+        const_out_part_w_per_m2: 0.0,
+        outside_history_w_per_m2_k: coefficients.outside[1..end].to_vec(),
+        cross_history_w_per_m2_k: coefficients.cross[1..end].to_vec(),
+        inside_history_w_per_m2_k: coefficients.inside[1..end].to_vec(),
+        flux_history: coefficients.flux[1..end].to_vec(),
+        outside_temperature_history_c: vec![initial_temperature_c; coefficients.num_ctf_terms],
+        inside_temperature_history_c: vec![initial_temperature_c; coefficients.num_ctf_terms],
+        outside_flux_history_w_per_m2: vec![0.0; coefficients.num_ctf_terms],
+        inside_flux_history_w_per_m2: vec![0.0; coefficients.num_ctf_terms],
+    }
+}
+
 pub(crate) fn construction_ctf_coefficients_by_name(
     coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>> {

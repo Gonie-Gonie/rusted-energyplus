@@ -59,7 +59,7 @@ Six distinct public coefficient/dt/U profiles atol=rtol=0, exact class/shape/sig
 ## 종료 체크
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -76,3 +76,7 @@ Root reviewed the full held Rust proposal and Native unit/production helpers; ot
 ## Actual Original and unchanged Rust baseline (2026-10-10)
 
 Genuine Native unit39/42 and production15/195 completed with actual process exit0. Exact PE/build review and actual OriginalDataQA passed before a fresh unchanged Rust build/run. Unit selected8/public42 and production selected6/public21 are factual observations; all other public records remain unpaired context. Existing Rust initialized all15 models and21 CTF-01 construction owners, with no CTF-02 public owner/API in current source. The actual legacy surface storage is retained as context; no CTF-02 numeric comparison is claimed. Evidence: `energyplus_porting_plan/evidence/CTF-02-original-baseline/summary.json`. Candidate implementation, comparisons, integration and production gates remain pending.
+
+## Actual selected candidate comparisons and production CLI (2026-10-10)
+
+The real Rust preprocessing/assigned English conductance now generates selected all-resistive construction owners and ordinary surface copies. Actual unit39/42 selected8:624 numeric and7086 discrete comparisons, zero mismatch. Actual fixed15 loader lane selected6/public21:468 numeric and3045 discrete comparisons, zero mismatch. All six frozen coefficient/dt/U metrics have maximum absolute error and RMSE0; all19 slots and signed zero/class/shape remain exact. Unselected/unreached context is not PASS. Full workspace all-targets4650/0 failures/0 ignored, Clippy and fmt passed. The fresh-build production CLI ran all six cases with exit0, no oracle comparison or hours override, source-order matches and unchanged45 guards. These CLI runs do not certify numerical whole-building equivalence. Evidence: `energyplus_porting_plan/evidence/CTF-02-unit/summary.json`. Unit gate passed; genuine SUR04/SUR07 Native phase/caller proof, dependent integration and production gates remain pending.

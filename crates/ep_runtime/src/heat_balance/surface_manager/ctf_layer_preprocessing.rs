@@ -11,7 +11,7 @@ const CFV: f64 = CFA * CFL;
 const CFE: f64 = CFC * CFM * CFT / 3.6;
 const CFD: f64 = CFM / CFV;
 const CFK: f64 = CFE / (CFL * CFT);
-const CFU: f64 = CFK / CFL;
+pub(super) const CFU: f64 = CFK / CFL;
 
 /// Actual material members, in original outside-to-inside layer order.
 #[derive(Clone, Copy, Debug, PartialEq)]

@@ -1,0 +1,67 @@
+# CTF02 direct comparers: SOURCE-READY, unexecuted
+
+These three source files adapt accepted CTF01 unit-comparer02 and production-
+comparer01, preserving the Comparison class/IO105 mechanism. No new execution
+framework, engine, evaluator, expected array, source formula or fixture is added.
+Root alone supplies actual runtime path#SHA refs, approved source SHA and fresh
+output directory. Sources must receive full Root and other-author review first.
+
+Shared CLI: --approved-source-sha256 SHA --original-data-review REF
+--original-data-review-execution REF --Rust-build-execution REF --Rust-execution REF
+--Rust-results REF --output-dir FRESH. REF means actual path#SHA256.
+Production adds --conversion-ledger REF --conversion-execution REF; no future
+request, tolerance, conversion, build, QA or result digest is embedded.
+
+Required actual OriginalDataQA0/full typed stdout/empty integrity findings and
+independent archived reader source/CLI precede actual Rust execution. Frozen six
+source/tolerance/request/cases/projection/admission DAG, actual freeze/recorder,
+fixed15/ordered45 guards, Native8 source identities and reviewed public policy are
+bound before comparisons. Runtime source versions are taken from genuine QA.
+QA reader names review_unit.py/review_production.py are checked, not a stale alias.
+Actual Cargo compiler-artifact capture, executable hash, full exact raw-byte
+SourceSnapshot and before/after source guards bind own2/API10 unit and own3/API23
+production. The latter includes compiler/src/compiler/surface_space.rs and the
+new all-resistive module. No historical Rust SHA replay or Native answer enters
+the Rust request. Actual Rust binary is rehashed, Native binaries are not read.
+
+Unit argv must be executable request_path request_sha admission_path admission_sha
+source_inventory_path. Production argv must be executable wrapper_path wrapper_sha.
+Production conversion provenance is validated as fifteen actual same-IDF converter
+records (ledger/outer/source/child/staged/stream/output identities), never fabricated.
+These converters are input-only; no scientific Native result feeds a Rust operand.
+
+Exactly six fresh zero tolerance metrics: CTFOutside/CTFCross/CTFInside/CTFFlux
+all19 slots, CTFTimeStep and UValue. Binary64 class and signed zero are exact;
+NumHistories/NumCTFTerms, selection, owners, caller bits/counts, case/construction/
+material/surface registration and input handoff are exact. Observed nonfinite
+required numerical operands fail/unavailable, never numerical PASS.
+
+Selection is the frozen Native public predicate and actual Rust converted prefix
+plus actual Result. No classification is reconstructed from coefficient numbers.
+Either actual selection makes all six owners required: one-sided AND both-sided
+absence fail. Unknown whole-call stop, unused/loading-error/massive unselected
+storage stays separately unavailable/context/noPASS. Native whole-method outcome,
+DoCTFErrorReport and later solver/shared flags are context, never injected into Rust.
+
+Inherited18 preprocessing profiles are authenticated unchanged against the actual
+inherited tolerance contract. The actual selected_CTF01_owners vector supplies prefix observations; the separate
+selected_CTF02_owners vector supplies coefficients and surface copies. Prefix
+DTO bits/class, active order/shape/flags are
+checked as separate handoff copies, with no CTF02 metric or downstream massive
+PASS claim. Production additionally checks actual Rust construction->surface
+copy slot/history bits and association/cache indexes, without a coefficient formula.
+Surface trimmed history never substitutes for all19 construction slots.
+
+Reports: ctf02-unit-comparison.v1 / ctf02-production-comparison.v1; status
+pass-selected-all-resistive-coefficients or pass-selected-loader-to-all-resistive-
+coefficients (fail-... otherwise). Actual reports include six metric ledgers,
+separate inherited profiles, source/caller/selection ledgers, unavailable/noPASS,
+real Native whole outcomes context and direct actual QA/results/build/execution.
+Mismatch samples (at most1000) are actual compared payloads, not metadata-only.
+Selected observed PASS is not complete CTF02/production CLI6/card completion.
+
+All proposed sources/before copies/full diffs/dependencies are bound in manifest.
+No target import/build/Cargo/engine/result/binary/canonical/Git action occurred.
+Raw adapted Base's production reader and authored preprocessing/observers; Header
+authored Native/QA glue. Root/other-author peer is required and
+this direct comparison is not independent formula certification.

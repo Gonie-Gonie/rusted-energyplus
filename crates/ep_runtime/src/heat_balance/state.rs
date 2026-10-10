@@ -59,6 +59,9 @@ pub struct HeatBalanceState {
     /// Later coefficient-solver errors and coefficients are outside these records.
     pub construction_ctf01_layers:
         Vec<super::surface_manager::ctf_layer_preprocessing::ConstructionCtfLayerPreprocessing>,
+    /// Actual selected CTF-02 storage or explicit unavailable branch, in construction order.
+    pub construction_ctf02_coefficients:
+        Vec<super::surface_manager::ctf_all_resistive::ConstructionCtfAllResistive>,
     /// Construction coefficient cache build time in seconds.
     pub construction_cache_build_wall_seconds: f64,
     /// Number of construction cache entries.

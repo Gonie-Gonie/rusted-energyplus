@@ -1,0 +1,164 @@
+{
+  "schema": "ctf02-direct-comparer-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "changes": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/compare_unit.py",
+        "sha256": "6f16ec352eb1b2337193ecbc7d0888eba5b8b06216028791eb136ba708f4b219",
+        "size_bytes": 37043,
+        "line_count": 458
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/unit-comparer-prep-02/compare_unit.py",
+        "sha256": "6795c9a7c2ee40c49eea34d799c8af04400e86075bf90624960362140f949132",
+        "size_bytes": 23838,
+        "line_count": 289
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/before/compare_unit.py",
+        "sha256": "6795c9a7c2ee40c49eea34d799c8af04400e86075bf90624960362140f949132",
+        "size_bytes": 23838,
+        "line_count": 289
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/compare_unit.py.from-CTF01.diff",
+        "sha256": "b8578f441403b6d408a6f2a0539b12bc79c43734dd3acc4463fb5bd02e3c8521",
+        "size_bytes": 29296,
+        "line_count": 334
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/compare_production.py",
+        "sha256": "e09ab862e032235df000aff263f5ce7fdb760f287e67cbec0c0d1adfcc8bcd69",
+        "size_bytes": 52310,
+        "line_count": 599
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/production-comparer-prep-01/compare_production.py",
+        "sha256": "abf1f7328b3c0adfd2a708f73e32896a200d1a1856217f1718ff564863f4bde7",
+        "size_bytes": 35855,
+        "line_count": 391
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/before/compare_production.py",
+        "sha256": "abf1f7328b3c0adfd2a708f73e32896a200d1a1856217f1718ff564863f4bde7",
+        "size_bytes": 35855,
+        "line_count": 391
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/compare_production.py.from-CTF01.diff",
+        "sha256": "cd6115a7db4e076e0ee42bed825b520c441f8fdb73016a62640ab9cdf7f83a03",
+        "size_bytes": 38252,
+        "line_count": 393
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/packet_io.py",
+        "sha256": "890d94b30f3b843cff24f69a1ae49e9de6821aa7162fd6830aa540f73d1c07d5",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/unit-comparer-prep-02/packet_io.py",
+        "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/before/packet_io.py",
+        "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-02/comparer-prep-01/packet_io.py.from-CTF01.diff",
+        "sha256": "21e4b71eacd3bac2b03add54a71efb1b42c00727e7052e381eaad76f22746597",
+        "size_bytes": 307,
+        "line_count": 11
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-02/candidate-observer-prep-02/manifest.json",
+      "sha256": "1016d8aa87a9a23ffcbdc60875c994d912bc065ac0960358cf4e1da721afcc44",
+      "size_bytes": 17805,
+      "line_count": 458
+    },
+    {
+      "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/manifest.json",
+      "sha256": "cd9cdbd2718eb9f065f4bc04e68f9eaef63e8c6369b4b9b21a207e0821782b9b",
+      "size_bytes": 26906,
+      "line_count": 678
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/manifest.json",
+      "sha256": "b841bb940fa475255677a2ec7c84a43856b53a0ec2d179dd276d18bd434bf24c",
+      "size_bytes": 28362,
+      "line_count": 703
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_public_fields.hh",
+      "sha256": "70408a75d803fea13547e9d094b0f41ea83d7b69906d3edece491ae552c2ef61",
+      "size_bytes": 4598,
+      "line_count": 68
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/projection-policy-proposal.json",
+      "sha256": "d610b96f8640b512a81112cabeed373dc0aa0c56e82569dea2049a7a71e200d5",
+      "size_bytes": 4510,
+      "line_count": 142
+    },
+    {
+      "path": ".runtime/porting/CTF-02/input-writer-prep-01/freeze_packet.py",
+      "sha256": "0bd6b7cc358ac2d8f81c3ba45af997f6f51f129dd96b13e8b9a1ea2eb2b13f8b",
+      "size_bytes": 16245,
+      "line_count": 217
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py",
+      "sha256": "fe0a25ba776c502fd3d6cb2fa6c3c8e3d66565a64176ffeac92aa5ae636009a3",
+      "size_bytes": 22537,
+      "line_count": 256
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_production.py",
+      "sha256": "40cfc6cef7439c991717e7c6ff2991ecb7d4ce6a2d01451f667ae649119b7e98",
+      "size_bytes": 25450,
+      "line_count": 281
+    },
+    {
+      "path": ".runtime/porting/CTF-01/unit-comparer-prep-02/manifest.json",
+      "sha256": "c8629f6cc5bfa626f5ef234ca97a6d7dc32011adabeaca75ac1eace99a50f4e1",
+      "size_bytes": 13628,
+      "line_count": 397
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-comparer-prep-01/manifest.json",
+      "sha256": "aca98b4c61c178565c413d97eef5f1705bf0e42d65c978454cfb7eaf315ae8a0",
+      "size_bytes": 41005,
+      "line_count": 1095
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-02/comparer-prep-01/README.md",
+    "sha256": "dabdb01e2f8a05dddf27822d86e9af7b255ffbe8bb0b75af46fcf374d14957f5",
+    "size_bytes": 4573,
+    "line_count": 67
+  },
+  "future_runtime_refs": null,
+  "scientific_or_binary_payloads_read": false,
+  "target_import_or_execution_performed": false,
+  "canonical_files_changed": false,
+  "new_execution_framework_or_stage_created": false,
+  "numerical_PASS_claimed": false,
+  "self_review_repairs_before_first_hold": [
+    "Separate CTF01 prefix owner from CTF02 coefficients/copies",
+    "Actual observer02 API order including compiler/surface_space path",
+    "Required missing caller/count/array copy sources retain explicit availability failures",
+    "Actual DataQA02 source and full stdout/empty stderr/approved argv binding"
+  ]
+}

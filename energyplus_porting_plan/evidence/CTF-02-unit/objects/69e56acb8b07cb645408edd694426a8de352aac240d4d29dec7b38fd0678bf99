@@ -1,0 +1,91 @@
+{
+  "schema": "ctf02-applied-formatted-source-inventory.v1",
+  "Root_and_other_author_full_Source_review_complete": true,
+  "files": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "99bcee1577e3400ae71dd42ee2e95aa2290413b3114dc0f52d0c79c07967b095",
+      "size_bytes": 5925,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/surface_manager.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "062ef1e4cc4f8175b03e3f88daf54bd34387b8c5e3bfc9f9fabe6602ab4dafab",
+      "size_bytes": 17043,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+      "size_bytes": 29922,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/ctf.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "230a806183db9871b725892e4c413a704d9fb8ee944e94213eca9e0ac5e04e57",
+      "size_bytes": 11491,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/initialization.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "4b1cec732ab81f8f6dc8ebcba70eb043751c3baacfaa5a59d726933fd185564f",
+      "size_bytes": 46440,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/state.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "011b99d4e632e3fb9b3a821bd75013219c04ee890ba57667a113b6833a7a0a49",
+      "size_bytes": 1974,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+      "size_bytes": 4902,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive_tests.rs",
+      "sha256": "f0f9e1240bb62d5b9104b11518f455bce1b06c5022775f9d722c738d1cfdde84",
+      "size_bytes": 10547,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive_tests.rs"
+    },
+    {
+      "path": "crates/ep_run/examples/ctf02_candidate_unit_observer.rs",
+      "sha256": "5b4974ab2756480f424157c8e1c2b3c18493c24ee0e23f0f44e38396c0d7e79c",
+      "size_bytes": 14858,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_run/examples/ctf02_candidate_unit_observer.rs"
+    },
+    {
+      "path": "crates/ep_run/examples/ctf02_candidate_unit_support/fields.rs",
+      "sha256": "d803f7f19f9701cea56ff6d459ace376706695a6426c44154b780db36c82ce6e",
+      "size_bytes": 6428,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_run/examples/ctf02_candidate_unit_support/fields.rs"
+    },
+    {
+      "path": "crates/ep_run/examples/ctf02_candidate_production_observer.rs",
+      "sha256": "79d552c7dd00b8d212635b69d73e025b340a3b66d890f0fe2cccc386403db8c4",
+      "size_bytes": 15402,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_run/examples/ctf02_candidate_production_observer.rs"
+    },
+    {
+      "path": "crates/ep_run/examples/ctf02_candidate_production_support/fields.rs",
+      "sha256": "7e39ffeb2b1d42d3c9f7c3ad2012fe4b39f220f90470e244994b0151a5fea0da",
+      "size_bytes": 10305,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_run/examples/ctf02_candidate_production_support/fields.rs"
+    },
+    {
+      "path": "crates/ep_run/examples/ctf02_candidate_production_support/unit_fields.rs",
+      "sha256": "d803f7f19f9701cea56ff6d459ace376706695a6426c44154b780db36c82ce6e",
+      "size_bytes": 6428,
+      "archive": ".runtime/porting/CTF-02/candidate-applied-source-01/formatted/crates/ep_run/examples/ctf02_candidate_production_support/unit_fields.rs"
+    }
+  ],
+  "scientific_execution_performed": false
+}
