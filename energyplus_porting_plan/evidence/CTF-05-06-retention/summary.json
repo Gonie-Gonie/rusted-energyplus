@@ -1,0 +1,63 @@
+{
+  "schema": "ctf05-ctf06-actual-two-original-retention-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-05-06-retention/manifest.json",
+    "sha256": "c656e3724e4d29922b45765e7432c32befc619e8b021fa2f1b8f8b618577bf0d",
+    "size_bytes": 54053
+  },
+  "actual_retention_plan": {
+    "path": ".runtime/porting/CTF-06/retirement-plan-01/plan.json",
+    "sha256": "e4e152590363b6e12fa912b67bf5ec15f16b6ded3686fc03c971b6885b41e30c",
+    "size_bytes": 184455
+  },
+  "actual_retention_plan_execution": {
+    "path": ".runtime/porting/CTF-06/retirement-plan-command-01/receipt.json",
+    "sha256": "86f394bdcf7ae382cd5a1d33003f1956ff0673533c081084b3248e94d430271d",
+    "size_bytes": 3188
+  },
+  "actual_retirement": {
+    "path": ".runtime/porting/CTF-06/retirement-01/retirement.json",
+    "sha256": "2b18e58ced4ba8f90a3cb7cd12c626ef3d5c17d80553ad99421952b8f8f8da95",
+    "size_bytes": 174361
+  },
+  "actual_retirement_execution": {
+    "path": ".runtime/porting/CTF-06/retirement-command-01/receipt.json",
+    "sha256": "3580512a553fec9c02cda2305614c6918f0b35996a605866c3cbacabd0fa7850",
+    "size_bytes": 3410
+  },
+  "actual_pair_tombstones": {
+    "path": ".runtime/porting/CTF-06/retirement-01/after-retirement.json",
+    "sha256": "1d00f35841a1856cc46a33bdabd438c9fd91deda3f32bf421d983cf3ddc5df13"
+  },
+  "actual_removal_receipts": [
+    {
+      "path": ".runtime/porting/CTF-06/retirement-01/ctf06_unit_helper-removal-receipt.json",
+      "sha256": "8fc27e17723fe68eb33bdd00c5c1a10dcec7b01705a0590fc805b95beb973057"
+    },
+    {
+      "path": ".runtime/porting/CTF-06/retirement-01/ctf06_production_helper-removal-receipt.json",
+      "sha256": "5aeaf9377ca71802f34034f5a31eb6910af033da704adeb3dbf14e5e706cded2"
+    }
+  ],
+  "Root_FULL_and_other_author_FULL_preceded_execution": true,
+  "actual_removed_original_bytes": 2602389838,
+  "both_exact_new_originals_absent": true,
+  "legacy_protected_artifact_count": 38,
+  "retained_CTF06_derivative_count": 2,
+  "present_core_objects": 631,
+  "absent_registered_objects": 12,
+  "prior_metadata_bytes_unchanged": true,
+  "historical_proofs_or_launchers_rewritten": false,
+  "registry_written_or_admitted": false,
+  "full_debug_copy_created": false,
+  "scientific_execution_repeated": false,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "discarded_debug_bytes_recoverable_from_hash_or_map": false,
+  "limits": [
+    "Selected05/06 storage retention only; remaining integration/production and retry/coefficient handoff stay pending.",
+    "Earlier live-original launchers require genuine relinking or fail honestly after separate actual retirement.",
+    "Selected metadata archive excludes binaries/link maps/scientific payloads and is not full replay closure."
+  ]
+}

@@ -1,0 +1,63 @@
+# CTF06 exact-pair Original retirement source proposal
+
+SOURCE ONLY. Root must review these four sources and obtain an other-author full source peer before using them. No retirement plan or action was executed by this preparation. All CTF04 source holds remain unchanged.
+
+This adapts accepted `CTF-04/retirement-plan-prep-02` in the existing retirement stage. It covers only the two prospectively declared CTF06 linked Originals. Selected first exponential/inverse comparison, the fixed six ordinary CLI runs, and archive custody are prerequisites; whole CTF05/CTF06 completion is never inferred.
+
+## Exact eligible pair and preserved files
+
+1. `.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe`: SHA256 `ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f`, 1,299,892,676 bytes.
+2. `.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe`: SHA256 `95dd013e8fed710b9968ec811a6b929a0289a0c1c3e7c1c5a915b769b54deac6`, 1,302,497,162 bytes.
+
+These identities are copied from genuine Root-authored CTF06 build metadata. This preparation did not open or hash either binary. The possible exact-pair removal is 2,602,389,838 bytes; realized savings remain zero until a successful actual action.
+
+The pinned pre06 inventory has 38 prior protected files, 631 present registered core objects and 12 absent registered core paths. Both genuine CTF06 derivatives are added to the live protection set. All 40 retained artifacts and 631 present objects are physically checked when Root executes the scripts. Earlier CTF04 derivatives stay in the original ordered protection inventory. The literal prior CTF04 retirement record/recorder are authenticated, and its two Original paths must remain absent. No prior registry, record, launcher or live-reference policy is rewritten.
+
+## Runtime proof bindings supplied by Root
+
+`--proof-bindings` accepts one actual `path#sha256` JSON, schema `ctf06-two-original-retention-proof-bindings.v1`, scope `selected-CTF05-CTF06-first-exponential-and-inverse-only`, `Root_approved_for_exact_pair:true`, `future_hashes_guessed:false`, and the exact ordered two target names.
+
+`lanes` has exactly `unit` and `production`. Each has exactly `build`, `PE`, `helper`, `DataQA`, `comparison`. Build identities are the fixed actual CTF06 metadata pins in `common.py`; their configure/compile/derivation/core-check recorders and validated derivative/preservation identities are authenticated. The exact prospective Original retention intent must match.
+
+Every other lane role has `report`, `execution`, `Root_semantically_verified:true`, and `Root_checked_metadata`. The latter contains normalized `source_report:{path,sha256}`, actual `schema`/`status`, and these Root-extracted facts:
+
+- PE: lane-specific CTF06 independent build/PE schema, status `pass-exact-retained-PE-runtime-and-actual-build-identity`, `original_and_derivative_verified:true`, and exact build `linked_original`/`helper_binary` identities.
+- Helper: actual `ctf06[-production]-helper-results.v1` schema, `actual_helper_exit_code` integer zero, `preservation_checks_passed:true`. The helper fact status is explicitly Root-normalized actual process/custody evidence, not an invented raw helper status.
+- DataQA: lane-specific CTF06 OriginalDataQA schema and genuine release status, `structural_provenance_release_passed:true`, `numerical_PASS_claimed:false`.
+- Unit comparison: `ctf06-unit-comparison.v1`, `pass-selected-first-exponential-and-inverse`, `selected_unit_PASS_claimed:true`.
+- Production comparison: `ctf06-production-comparison.v1`, `pass-selected-loader-to-first-exponential-and-inverse`, `selected_fixed15_first_matrix_functions_PASS_claimed:true`.
+- Both comparison extractions: integer `comparison.mismatch_count:0`; `complete_CTF04_PASS_claimed`, `complete_CTF05_PASS_claimed`, `complete_CTF06_PASS_claimed` all false.
+
+The scripts authenticate report bytes without parsing scientific report values. Root is the disclosed semantic extraction authority. No report reference or expected result becomes a Rust/Native operand.
+
+`quality` has exactly these five genuine recorder roles: `focused_matrix_functions_tests`, `workspace_tests`, `focused_changed_owner_tests`, `clippy`, `format_check`. Every required receipt must be actual zero and source-guarded. There are no source-quality or structure-quality stages.
+
+`quality_source_transition` has `final_source_manifest`, `test_lint_fix_manifest`, `previous_source_snapshot`, `final_source_snapshot`, `Root_verified_test_only_source_transition:true`. The first two are pinned to actual `applied-final-source-02` (`f0a529c5...`) and `test-lint-fix-prep-01` (`bf773e6d...`). Their genuine one-file test-only correction is checked through metadata. The 93-test matrix-functions and workspace receipts bind the prior snapshot; the six changed-owner tests, successful Clippy and formatting bind the final snapshot. Both selected comparison receipts and six real CLI receipts bind that same final snapshot. The failed Clippy01 receipt remains documentary evidence from the actual lint proposal and is never reclassified as a successful prerequisite. No claim that all quality receipts have one snapshot is made.
+
+`selected_published_summary` has `report`, `Root_semantically_verified:true`, and `Root_checked_metadata:{source_report,selected_unit_and_fixed15_comparisons_passed:true,complete_CTF05_PASS_claimed:false,complete_CTF06_PASS_claimed:false}`. Root binds the genuine published selected unit/fixed15 summary, separately from the CLI summary. This is a direct metadata binding, not another execution stage.
+
+`fixed_six_CLI` uses the same role wrapper. Its Root-checked schema is `ctf06-fixed-six-actual-cli-executions.v1`; `execution_role` is exactly `actual-plan-validation-after-Root-authored-CLI-summary`; `all6_exit0_and_source_unchanged:true`; `all45_input_guards_unchanged_after:true`; and `executions` contains six distinct actual child recorder refs. The wrapper execution validates Root-authored metadata after the six runs; it is not claimed to have authored the summary or driven the engine. All six individual receipts are authenticated and must finish before retirement.
+
+`committed_archive` preserves the accepted mechanism: actual archive `manifest`; actual uncompressed `commit`/`trees` with `{raw_body,git_object_id}`; bounded unique `indexed_files` with `{path,file:{path,sha256,size_bytes},git_blob_oid}`; and `Root_verified_archive_complete_for_selected_CTF06:true`. The scripts authenticate actual commit/tree/path/blob/SHA256 associations offline. Root verifies archive coverage. No Git command, fabricated commit or guessed future object identity is supplied by this preparation.
+
+All supplied successful recorders are `recorded-porting-command.v1`, actual zero, no launch error, unchanged source bytes and HEAD, correct repository cwd, UTC interval, with authenticated streams/source snapshot/recorder source. Streams are byte-checked without interpreting engine payloads.
+
+## Root-only invocation and exact file action
+
+The existing interfaces are unchanged:
+
+`write_plan.py --proof-bindings <actual#sha> --source-manifest <this-manifest#sha> --approved-source-sha256 <reviewed-write-plan-sha> --output-dir <fresh-under-CTF-06>`
+
+The plan emits only a metadata plan and actual source/proof copies. Its compact stdout remains exactly `{plan,status,targets,deletion_performed:false,registry_admission_performed:false}`. Root records this command with the existing recorder.
+
+`retire.py --plan <actual#sha> --plan-execution <actual-recorder#sha> --source-manifest <this-manifest#sha> --approved-source-sha256 <reviewed-retire-sha> --output-dir <fresh-under-CTF-06> --apply --authorize-targets ctf06_unit_helper ctf06_production_helper`
+
+`candidate`, `ps_quote`, and `removal_script` are AST-identical to accepted CTF04. Immediately before each action, exact cwd/Products/leaf/non-reparse/size/SHA256 checks precede native PowerShell `Remove-Item -LiteralPath`. No recursive deletion, glob, directory action, alternate-shell deletion, move or debug copy exists. Both targets are checked before the pair; all preserved artifacts/core absences/proof bytes are rechecked around each individual action.
+
+Each actual action preserves command, script, spawn error, exit, streams, actual absence and preservation failures. A failed first action records its genuine partial attempt and stops; it does not invent a second action. Before/after pair records and separate tombstones are forward-only future evidence. Successful removal does not make old original-first launchers valid, recover discarded debug bytes, admit a registry, or close all four card gates.
+
+## Held source verification and limits
+
+`before-CTF04` contains the accepted four source bodies, README and manifest. Four unified diffs reproduce the exact new sources. The manifest binds the source protocol authorities and actual metadata only; pending runtime proof/CLI/archive bindings are null until Root supplies genuine values.
+
+This preparation used source reads, bounded metadata reads, SHA/size/line checks, Python AST parsing and exact diff checks. It imported or executed none of the reviewed scripts, parsed no scientific report, opened no executable/core object/weather payload, ran no engine/build/test/formatter/Git, and made no canonical edit, plan, deletion, registry or gate write. Root and the other-author peer must review the held source before any plan/action.

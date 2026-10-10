@@ -1,0 +1,181 @@
+"""Root-only --apply: remove the two exact validated CTF06 linked originals."""
+import argparse
+import copy
+import subprocess
+import sys
+from common import *
+from proofs import all_proofs, protected
+from write_plan import candidate, archive_sources
+
+
+def guards(plan):
+    builds, refs, archive = all_proofs(plan['authenticated_proof_bindings_archive'], now())
+    require(refs == plan['evidence'] and archive == plan['committed_archive'], 'Approved actual prerequisite identities changed')
+    kept = protected(builds)
+    require(kept == plan['protected_and_retained_observations'], 'Protected or retained observations differ')
+    unchanged()
+    return kept
+
+
+def ps_quote(value):
+    return "'" + str(value).replace("'", "''") + "'"
+
+
+def removal_script(target):
+    item = TARGETS[target]
+    exact = ROOT / item['historical_path']
+    products = ROOT / '.runtime/ep261-gcc13-o0/Products'
+    # Literal arguments below come only from the source-reviewed fixed TARGETS.
+    return "\n".join([
+        "$ErrorActionPreference = 'Stop'",
+        "$workspacePath = (Get-Location).Path",
+        "if ($workspacePath -ne " + ps_quote(ROOT) + ") { throw 'Exact repository cwd required' }",
+        "$productsPath = (Resolve-Path -LiteralPath " + ps_quote(products) + ").Path",
+        "$productsItem = Get-Item -LiteralPath $productsPath",
+        "if ($productsPath -ne " + ps_quote(products) + " -or ($productsItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Exact non-reparse Products directory required' }",
+        "$targetPath = (Resolve-Path -LiteralPath " + ps_quote(exact) + ").Path",
+        "$targetItem = Get-Item -LiteralPath $targetPath",
+        "if ($targetItem.PSIsContainer -or ($targetItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Regular non-reparse file required' }",
+        "if ([IO.Path]::GetDirectoryName($targetPath) -ne $productsPath -or $targetItem.Name -ne " + ps_quote(target + '.exe') + ") { throw 'Target outside exact Products file' }",
+        "if ($targetItem.Length -ne " + str(item['size_bytes']) + " -or (Get-FileHash -LiteralPath $targetPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne " + ps_quote(item['sha256']) + ") { throw 'Actual pre-action file identity differs' }",
+        "Remove-Item -LiteralPath $targetPath -Force",
+        "if (Test-Path -LiteralPath " + ps_quote(exact) + ") { throw 'Original still present' }",
+        "Write-Output " + ps_quote('Removed exact validated new ' + target + ' debug original; actual absence verified.'),
+        '',
+    ])
+
+
+def single_action(output, target, plan, entries):
+    original = TARGETS[target]
+    require(candidate(target) == plan['only_candidates'][target], 'Frozen precise target identity changed')
+    before = guards(plan)
+    script = output / ('remove-' + target + '.ps1')
+    with script.open('xb') as stream:
+        stream.write(removal_script(target).encode('utf8'))
+    argv = ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', str(script)]
+    started = now()
+    stdout = output / (target + '-stdout.log')
+    stderr = output / (target + '-stderr.log')
+    spawn_error = None
+    code = None
+    with stdout.open('xb') as out, stderr.open('xb') as err:
+        try:
+            completed = subprocess.run(argv, cwd=ROOT, stdout=out, stderr=err, check=False)
+            code = completed.returncode
+        except OSError as error:
+            spawn_error = str(error)
+            err.write(spawn_error.encode('utf8'))
+    finished = now()
+    exact = ROOT / original['historical_path']
+    absence_error = None
+    try:
+        original_absent = absent(original['historical_path'])
+    except Exception as error:
+        original_absent = None
+        absence_error = str(error)
+    guard_failure = None
+    after = None
+    try:
+        after = guards(plan)
+        require(before == after, 'Protected before/after observations differ')
+    except Exception as error:
+        guard_failure = str(error)
+    success = type(code) is int and code == 0 and spawn_error is None and original_absent is True and guard_failure is None
+    entry = next(row for row in entries if row['target'] == target)
+    receipt = {
+        'schema': 'native-new-target-removal-receipt.v1', 'target': target,
+        'action_started_utc': started, 'action_completed_utc': finished,
+        'historical_original': original, 'resolved_target': str(exact.resolve()),
+        'resolved_products_directory': str(exact.parent.resolve()),
+        'actual_native_command': argv, 'executed_script': ref(script), 'cwd': str(ROOT),
+        'actual_command_exit_code': code, 'spawn_error': spawn_error,
+        'stdout': ref(stdout), 'stderr': ref(stderr), 'actual_original_absence': original_absent,
+        'original_absence_check_error': absence_error, 'retained_derivative': entry['retained_derivative'],
+        'protected_before': before, 'protected_after': after, 'preservation_guard_failure': guard_failure,
+        'prior_metadata_bytes_unchanged': guard_failure is None, 'actual_retirement_accepted': success,
+        'realized_removed_bytes': original['size_bytes'] if success else 0,
+        'no_full_debug_copy_created': True, 'engines_or_scientific_comparers_executed': False,
+    }
+    binding = write(output, target + '-removal-receipt.json', receipt)
+    entry.update({'removal_receipt': binding, 'actual_removal_observed': original_absent,
+                  'status': 'retained-derivative-original-retired' if success else 'retirement-action-failed-or-unverified'})
+    state = write(output, target + '-pair-attempt.json', {'schema': 'ctf06-exact-pair-retirement-attempt.v1', 'entries': entries})
+    require(success, 'Actual precise retirement failed; preserved action receipt/attempt: ' + state['path'])
+    return binding, receipt
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['plan', 'plan-execution', 'source-manifest', 'approved-source-sha256', 'output-dir']:
+        parser.add_argument('--' + key, required=True)
+    parser.add_argument('--apply', action='store_true', required=True)
+    parser.add_argument('--authorize-targets', nargs=2, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT and args.apply is True and args.authorize_targets == list(TARGETS),
+            'Root explicit --apply and exact ordered pair authorization required')
+    output = fresh_output(args.output_dir)
+    started = now()
+    source_manifest = approved_sources(pin(args.source_manifest), args.approved_source_sha256, 'retire.py')
+    plan_ref, command_ref = pin(args.plan), pin(args.plan_execution)
+    plan = read(plan_ref)
+    command = recorded(command_ref)
+    require(plan['schema'] == 'ctf06-two-original-retention-removal-plan.v1'
+            and plan['status'] == 'pass-selected06-prerequisites-removal-not-performed'
+            and plan['registry_admission_performed'] is False and plan['deletion_or_move_performed'] is False
+            and plan['complete_CTF04_PASS_claimed'] is False and plan['complete_CTF05_PASS_claimed'] is False and plan['complete_CTF06_PASS_claimed'] is False and plan['all_four_card_gates_claimed'] is False,
+            'Actual accepted exact-pair metadata plan required')
+    require(read(command['stdout']) == {'plan': plan_ref, 'status': plan['status'], 'targets': list(TARGETS),
+            'deletion_performed': False, 'registry_admission_performed': False}, 'Actual compact plan stdout differs')
+    require(plan['approved_source_manifest'] == source_manifest and list(plan['only_candidates']) == list(TARGETS),
+            'Same approved source manifest and exact ordered pair required')
+    require(time_of(command['finished_utc']) <= time_of(started), 'Actual metadata plan must precede action')
+    require(len(plan['executed_source_archives']) == len(NAMES), 'Four actual plan source copies required')
+    for name, row in zip(NAMES, plan['executed_source_archives']):
+        source = Path(__file__).parent / name
+        require(row['historical_path'] == source.relative_to(ROOT).as_posix()
+                and bound(row['archive'])['sha256'] == ref(source)['sha256'], 'Plan/retirement exact source identity differs')
+    before = guards(plan)
+    for target in TARGETS:
+        require(candidate(target) == plan['only_candidates'][target], 'Actual pre-action target changed')
+    pins = read(plan['authenticated_proof_bindings_archive'])
+    entries = [{'target': target, 'original_link': copy.deepcopy(TARGETS[target]),
+                'retained_derivative': read(pins['lanes'][lane]['build'])['helper_binary'],
+                'status': 'live-original-pending-separate-actual-action', 'removal_receipt': None,
+                'actual_removal_observed': False}
+               for lane, target in zip(['unit', 'production'], TARGETS)]
+    output.mkdir()
+    archives = archive_sources(output)
+    write(output, 'before-retirement.json', {'schema': 'ctf06-exact-pair-before-retirement.v1',
+          'started_utc': started, 'retention_plan': plan_ref, 'retention_plan_execution': command_ref,
+          'only_candidates': plan['only_candidates'], 'entries': entries, 'protected_before': before,
+          'deletion_performed_by_this_before_record': False})
+    removals, actual = [], []
+    for target in TARGETS:
+        binding, receipt = single_action(output, target, plan, entries)
+        removals.append(binding)
+        actual.append(receipt)
+    final_guards = guards(plan)
+    require(all(absent(row['historical_path']) for row in TARGETS.values()), 'Both exact originals must be absent without stub')
+    final = write(output, 'after-retirement.json', {'schema': 'ctf06-exact-pair-after-retirement.v1',
+                  'completed_utc': now(), 'entries': entries, 'protected_after': final_guards})
+    result = {
+        'schema': 'ctf06-two-original-native-helper-retirement.v1',
+        'status': 'pass-precise-pair-removal-and-retained-artifact-guards',
+        'started_utc': started, 'completed_utc': now(), 'actual_writer_command': list(sys.orig_argv), 'cwd': str(ROOT),
+        'retention_plan': plan_ref, 'retention_plan_execution': command_ref, 'approved_source_manifest': source_manifest,
+        'actual_removal_receipts': removals, 'actual_pair_tombstone_record': final,
+        'both_exact_new_originals_absent': True, 'realized_removed_bytes': sum(row['realized_removed_bytes'] for row in actual),
+        'protected_and_retained_after': final_guards, 'executed_source_archives': archives,
+        'prior_metadata_bytes_unchanged': True, 'historical_proofs_or_launchers_rewritten': False,
+        'registry_written_or_admitted': False, 'full_debug_copy_created': False,
+        'canonical_files_or_gates_written': False, 'scientific_execution_repeated': False,
+        'complete_CTF04_PASS_claimed': False, 'complete_CTF05_PASS_claimed': False, 'complete_CTF06_PASS_claimed': False, 'all_four_card_gates_claimed': False,
+        'discarded_debug_bytes_recoverable_from_hash_or_map': False, 'deterministic_relink_recovery_claimed': False,
+    }
+    unchanged()
+    write(output, 'retirement.json', result)
+    print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

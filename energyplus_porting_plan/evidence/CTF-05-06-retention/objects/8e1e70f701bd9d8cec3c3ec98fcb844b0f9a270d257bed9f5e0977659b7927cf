@@ -1,0 +1,6 @@
+tree cf190712a3da723961a06767641813706a5b5713
+parent 8741288a5c93c76efb4a3ca4a297e9918f2941e3
+author Hyeong-Gon Jo <hg221089@gmail.com> 1791657933 +0900
+committer Hyeong-Gon Jo <hg221089@gmail.com> 1791657933 +0900
+
+test(ctf): record six CLI runs after matrix function ports

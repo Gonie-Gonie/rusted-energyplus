@@ -1,0 +1,43 @@
+{
+  "schema": "ctf06-exact-pair-retirement-attempt.v1",
+  "entries": [
+    {
+      "target": "ctf06_unit_helper",
+      "original_link": {
+        "historical_path": ".runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe",
+        "sha256": "ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f",
+        "size_bytes": 1299892676
+      },
+      "retained_derivative": {
+        "path": ".runtime/porting/CTF-06/native-build-01/unit/derivation/derived-helper.exe",
+        "sha256": "762418bb7057d2364a82e38b694855011f27ea438c6cefcf9abba201c574ac3f",
+        "size_bytes": 151415952
+      },
+      "status": "retained-derivative-original-retired",
+      "removal_receipt": {
+        "path": ".runtime/porting/CTF-06/retirement-01/ctf06_unit_helper-removal-receipt.json",
+        "sha256": "8fc27e17723fe68eb33bdd00c5c1a10dcec7b01705a0590fc805b95beb973057"
+      },
+      "actual_removal_observed": true
+    },
+    {
+      "target": "ctf06_production_helper",
+      "original_link": {
+        "historical_path": ".runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe",
+        "sha256": "95dd013e8fed710b9968ec811a6b929a0289a0c1c3e7c1c5a915b769b54deac6",
+        "size_bytes": 1302497162
+      },
+      "retained_derivative": {
+        "path": ".runtime/porting/CTF-06/native-build-01/production/derivation/derived-helper.exe",
+        "sha256": "c464eda4e5dfb18fafe8f9acfc635b9c70d5b2f241e02b339da775afe564a84e",
+        "size_bytes": 151731213
+      },
+      "status": "retained-derivative-original-retired",
+      "removal_receipt": {
+        "path": ".runtime/porting/CTF-06/retirement-01/ctf06_production_helper-removal-receipt.json",
+        "sha256": "5aeaf9377ca71802f34034f5a31eb6910af033da704adeb3dbf14e5e706cded2"
+      },
+      "actual_removal_observed": true
+    }
+  ]
+}

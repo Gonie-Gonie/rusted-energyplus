@@ -1,0 +1,68 @@
+--- CTF04/common.py
++++ CTF06/common.py
+@@ -1,4 +1,4 @@
+-"""Byte guards for Root's exact two-original CTF04 retention action."""
++"""Byte guards for Root's exact two-original CTF06 retention action."""
+ from __future__ import annotations
+ from datetime import datetime, timezone
+ import hashlib
+@@ -8,28 +8,38 @@
+ import stat
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-BASE = '.runtime/porting/CTF-04/'
++BASE = '.runtime/porting/CTF-06/'
+ NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+ TARGETS = {
+-    'ctf04_unit_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe',
+-        'sha256': '290026e0d0400830764980d5dd21d2d19ea6932ab328b461e3b28753a0fc1aa7',
+-        'size_bytes': 1298472674,
++    'ctf06_unit_helper': {
++        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe',
++        'sha256': 'ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f',
++        'size_bytes': 1299892676,
+     },
+-    'ctf04_production_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe',
+-        'sha256': '18e56cfecef4f05fa8f5b9853cadb4e9d7fc4afce3644be88bffa60b10c85819',
+-        'size_bytes': 1301364881,
++    'ctf06_production_helper': {
++        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe',
++        'sha256': '95dd013e8fed710b9968ec811a6b929a0289a0c1c3e7c1c5a915b769b54deac6',
++        'size_bytes': 1302497162,
+     },
+ }
+ BUILDS = {
+     'unit': {'path': BASE + 'native-build-01/unit/native-build.json',
+-             'sha256': 'fb773fe193f071299e4f26c3d9cb956b7c724f2420c8f6589105979cff931263'},
++             'sha256': 'b2cf10f2b9e32c837c77e8f1d7f666d352b44393bfee5fe30c607389537791b1'},
+     'production': {'path': BASE + 'native-build-01/production/native-build.json',
+-                   'sha256': '89fa7509735b765fd85d03134ff35e957c661c3c09b5f8099e9bd16dabd76678'},
++                   'sha256': '5167cbdde90f97d9e3d421a84967cfbd54fafdeea31a176b3506abf3339a5beb'},
+ }
+ BEFORE = {'path': BASE + 'native-build-01/before/preservation.json',
+-          'sha256': '28b54abc8b8861d5de3e2895a673304e7ab77faf69e8b3a166f0bb2ced2c8ee7'}
++          'sha256': '3c39dff0e9027d792cc733b819d5e176e68ae260d560f6a8a4b71687ea766be5'}
++QUALITY_SOURCE_METADATA = {
++    'final_source_manifest': {'path': BASE + 'applied-final-source-02/manifest.json',
++                              'sha256': 'f0a529c58db5483369b1337a2a10a4d790b7459b3704b5abd82e638ef215b963'},
++    'test_lint_fix_manifest': {'path': BASE + 'test-lint-fix-prep-01/manifest.json',
++                              'sha256': 'bf773e6dd21919ba054ef464054f4baf25221b0383021ee91a8ffc8c41e7f427'},
++}
++PRIOR_RETIRED_CTF04_ORIGINAL_PATHS = [
++    '.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe',
++    '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe',
++]
+ SEEN = {}
+ 
+ 
+@@ -189,7 +199,7 @@
+ 
+ def approved_sources(manifest_ref, approved_sha, entry):
+     manifest = read(manifest_ref)
+-    require(manifest['schema'] == 'ctf04-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
++    require(manifest['schema'] == 'ctf06-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
+     rows = manifest['own_sources']
+     require([Path(row['path']).name for row in rows] == NAMES, 'Exactly four ordered source files required')
+     for name, row in zip(NAMES, rows):
