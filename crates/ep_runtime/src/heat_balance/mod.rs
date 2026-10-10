@@ -19,6 +19,7 @@ pub mod ctf_first_gamma_owner;
 pub mod ctf_first_inverse_owner;
 pub mod ctf_first_matrix_owner;
 pub mod ctf_initial_owner;
+pub mod ctf_public_initialization;
 pub mod ctf_retry_driver;
 pub mod ctf_retry_initialization;
 pub(crate) mod id_slot_index;

@@ -1,0 +1,27 @@
+{
+  "schema": "ctf10-clippy-test-borrow-repair.v1",
+  "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs",
+  "before": {
+    "path": ".runtime/porting/CTF-10/clippy-repair-prep-01/before.rs",
+    "sha256": "4dd8db59cc73555739edfad47f89eb3c29cdc6c4b70119a3b9decc936ea34911",
+    "size_bytes": 13149
+  },
+  "proposed": {
+    "path": ".runtime/porting/CTF-10/clippy-repair-prep-01/new.rs",
+    "sha256": "6d941cc5d175541447d9d311389edc267a4d433c167b8da30b47d728080450df",
+    "size_bytes": 13161
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-10/clippy-repair-prep-01/exact.diff",
+    "sha256": "f8727e0ca71d22b2f7c81a2d06ef8f541780210ae8ca1a6f48bfd31913fc8a19",
+    "size_bytes": 422
+  },
+  "actual_failure": {
+    "path": ".runtime/porting/CTF-10/quality-clippy-command-01/receipt.json",
+    "sha256": "7f4d06c399a7b1dd42e490ee877c92c29fe0407093a4fb441753562aa81ebe31",
+    "size_bytes": 4627
+  },
+  "reason": "Actual Clippy cloned_ref_to_slice_refs diagnostic; test-only one-element borrowed slice avoids unnecessary clone; assertions and scientific production source unchanged.",
+  "Root_FULL_review": true,
+  "peer_FULL_review_pending": true
+}

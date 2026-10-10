@@ -1,0 +1,410 @@
+use super::*;
+use crate::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
+use crate::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+use crate::heat_balance::ctf_retry_initialization::initialize_construction_ctf_retry;
+use crate::heat_balance::surface_manager::ctf_all_resistive::generate_all_resistive_ctf;
+use crate::heat_balance::surface_manager::ctf_caller_stability::CtfCallerDiagnosticNames;
+use crate::heat_balance::surface_manager::ctf_layer_preprocessing::{
+    CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+};
+use ep_model::{ConstructionKind, NormalizedName};
+use std::collections::BTreeSet;
+
+type TestResult<T = ()> = Result<T, String>;
+
+fn construction(id: u32, material_ids: &[u32]) -> Construction {
+    Construction {
+        id: ConstructionId(id),
+        name: NormalizedName(format!("C{id}")),
+        kind: ConstructionKind::Opaque,
+        outside_layer: material_ids.first().copied().map(MaterialId),
+        layers: material_ids.iter().copied().map(MaterialId).collect(),
+        thermochromic_master: None,
+        ground_factor: None,
+        air_boundary: None,
+        complex_fenestration: None,
+        window_equivalent_layer: None,
+        internal_heat_source: None,
+    }
+}
+
+fn material(id: u32, resistance_only: bool, resistance: f64) -> CtfLayerInput {
+    CtfLayerInput {
+        material_id: MaterialId(id),
+        thickness: if resistance_only { 0.0 } else { 0.1 },
+        conductivity: if resistance_only { 0.0 } else { 0.5 },
+        density: if resistance_only { 0.0 } else { 1000.0 },
+        specific_heat: if resistance_only { 0.0 } else { 900.0 },
+        resistance,
+        resistance_only,
+    }
+}
+
+struct Owners {
+    preprocessing: ConstructionCtfLayerPreprocessing,
+    initial: ConstructionCtfInitialDiscretization,
+    all_resistive: ConstructionCtfAllResistive,
+    retry: ConstructionCtfRetryInitialization,
+}
+
+fn owners(
+    current: &Construction,
+    previous: &[Construction],
+    used: &BTreeSet<u32>,
+    layers: &[CtfLayerInput],
+    context: CtfLayerContext,
+) -> TestResult<Owners> {
+    let phases =
+        preprocess_ctf_layers(layers, context).map_err(|error| format!("preprocess: {error:?}"))?;
+    let flags = CtfCallerSharedFlags {
+        errors_found: phases.errors_found,
+        do_ctf_error_report: false,
+    };
+    let all_resistive = ConstructionCtfAllResistive {
+        construction_id: current.id,
+        result: generate_all_resistive_ctf(&phases, 0.25),
+    };
+    let preprocessing = ConstructionCtfLayerPreprocessing {
+        construction_id: current.id,
+        is_used_ctf: context.is_used_ctf,
+        result: Ok(phases),
+    };
+    let initial =
+        initialize_construction_ctf_initial(current, previous, used, &preprocessing, context, 0.25);
+    let first = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
+    let original_names = vec!["LITERAL MATERIAL"; current.effective_layers().len()];
+    let retry = initialize_construction_ctf_retry(
+        first,
+        flags,
+        CtfCallerDiagnosticNames {
+            construction_name: current.name.0.as_str(),
+            original_tot_layers: i32::try_from(original_names.len())
+                .map_err(|error| format!("fixture original count: {error}"))?,
+            original_layer_material_names: &original_names,
+        },
+    );
+    Ok(Owners {
+        preprocessing,
+        initial,
+        all_resistive,
+        retry,
+    })
+}
+
+fn context(used: bool, errors: bool) -> CtfLayerContext {
+    CtfLayerContext {
+        is_used_ctf: used,
+        errors_found: errors,
+        source_sink_present: false,
+        solution_dimensions: 1,
+    }
+}
+
+fn record(state: &mut OrderedCtfPublicInitialization, current: &Construction, owners: &Owners) {
+    state.record_ordinary(
+        state.constructions.len(),
+        current,
+        &owners.preprocessing,
+        Some(&owners.initial),
+        &owners.all_resistive,
+        &owners.retry,
+    );
+}
+
+fn returned(
+    state: &OrderedCtfPublicInitialization,
+    index: usize,
+) -> TestResult<&CtfPublicConstructionReturn> {
+    state
+        .constructions
+        .get(index)
+        .ok_or_else(|| "missing declared row".to_string())?
+        .result
+        .as_ref()
+        .map_err(|error| format!("public suffix: {error:?}"))
+}
+
+#[test]
+fn unused_and_loading_error_have_distinct_real_reset_timestep_owners() -> TestResult {
+    let unused = construction(2, &[1]);
+    let a = owners(&unused, &[], &BTreeSet::new(), &[], context(false, true))?;
+    let used = construction(5, &[1]);
+    let b = owners(
+        &used,
+        &[unused.clone()],
+        &BTreeSet::from([5]),
+        &[material(1, true, 0.0001)],
+        context(true, false),
+    )?;
+    let mut state = OrderedCtfPublicInitialization::begin(true, 0);
+    record(&mut state, &unused, &a);
+    record(&mut state, &used, &b);
+    assert_eq!(
+        returned(&state, 0)?.route,
+        CtfPublicReturnRoute::UnusedReset
+    );
+    assert_eq!(returned(&state, 0)?.storage.ctf_time_step.to_bits(), 0);
+    assert_eq!(
+        returned(&state, 1)?.route,
+        CtfPublicReturnRoute::LoadingErrorReset
+    );
+    assert_eq!(
+        returned(&state, 1)?.storage.ctf_time_step.to_bits(),
+        0.25_f64.to_bits()
+    );
+    assert_eq!(
+        state.aggregate_after_returned_calls.returned_constructions,
+        2
+    );
+    assert_eq!(state.aggregate_after_returned_calls.max_ctf_terms, 0);
+    assert!(
+        state.constructions[1]
+            .retry_flags_on_return
+            .is_some_and(|flags| flags.errors_found)
+    );
+    state.finish_declared_loop(2);
+    assert!(state.selected_declared_loop_completed);
+    Ok(())
+}
+
+#[test]
+fn actual_all_resistive_owner_is_borrowed_once_and_updates_postreturn_aggregate() -> TestResult {
+    let current = construction(3, &[1]);
+    let actual = owners(
+        &current,
+        &[],
+        &BTreeSet::from([3]),
+        &[material(1, true, 2.0)],
+        context(true, false),
+    )?;
+    let before = actual.all_resistive;
+    let mut state = OrderedCtfPublicInitialization::begin(false, 7);
+    record(&mut state, &current, &actual);
+    let storage = &returned(&state, 0)?.storage;
+    assert_eq!(
+        returned(&state, 0)?.route,
+        CtfPublicReturnRoute::AllResistive
+    );
+    assert_eq!(storage.flux[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(
+        state.aggregate_after_returned_calls,
+        CtfPublicInitAggregate {
+            simple_ctf_only: false,
+            max_ctf_terms: 7,
+            returned_constructions: 1
+        }
+    );
+    assert_eq!(actual.all_resistive, before);
+    assert!(
+        actual
+            .retry
+            .result
+            .as_ref()
+            .is_ok_and(|driver| driver.attempts.is_empty())
+    );
+    Ok(())
+}
+
+#[test]
+fn real_massive_chain_and_original_id_reverse_reuse_keep_one_driver_allocation() -> TestResult {
+    let first = construction(3, &[1, 2]);
+    let used = BTreeSet::from([3, 9]);
+    let actual = owners(
+        &first,
+        &[],
+        &used,
+        &[material(1, false, 0.2), material(2, true, 0.5)],
+        context(true, false),
+    )?;
+    let driver = actual
+        .retry
+        .result
+        .as_ref()
+        .map_err(|error| format!("retry: {error:?}"))?;
+    let pointers = driver
+        .retained_assembly
+        .as_ref()
+        .map(|a| (a.a_mat.as_ptr(), a.iden_matrix.as_ptr()));
+    let mut state = OrderedCtfPublicInitialization::begin(true, 0);
+    record(&mut state, &first, &actual);
+    let prior = returned(&state, 0)?.storage.clone();
+    let current = construction(9, &[2, 1]);
+    let reverse = owners(
+        &current,
+        &[first],
+        &used,
+        &[material(2, true, 0.5), material(1, false, 0.2)],
+        context(true, false),
+    )?;
+    assert_eq!(
+        reverse.initial.result,
+        Err(CtfInitialUnavailable::ReverseConstruction {
+            construction_id: ConstructionId(3)
+        })
+    );
+    record(&mut state, &current, &reverse);
+    let row = returned(&state, 1)?;
+    assert_eq!(
+        row.route,
+        CtfPublicReturnRoute::Reversed {
+            construction_id: ConstructionId(3),
+            declared_index: 0
+        }
+    );
+    assert_eq!(
+        row.storage.outside.map(f64::to_bits),
+        prior.inside.map(f64::to_bits)
+    );
+    assert_eq!(
+        row.storage.inside.map(f64::to_bits),
+        prior.outside.map(f64::to_bits)
+    );
+    assert_eq!(
+        row.storage.ctf_time_step.to_bits(),
+        prior.ctf_time_step.to_bits()
+    );
+    assert_eq!(
+        pointers,
+        driver
+            .retained_assembly
+            .as_ref()
+            .map(|a| (a.a_mat.as_ptr(), a.iden_matrix.as_ptr()))
+    );
+    assert!(
+        reverse
+            .retry
+            .result
+            .as_ref()
+            .is_ok_and(|driver| driver.attempts.is_empty())
+    );
+    Ok(())
+}
+
+#[test]
+fn missing_reverse_provider_halts_selected_aggregate_without_fabricating_coefficients() -> TestResult
+{
+    let prior = construction(3, &[1, 2]);
+    let current = construction(9, &[2, 1]);
+    let actual = owners(
+        &current,
+        &[prior],
+        &BTreeSet::from([3, 9]),
+        &[material(2, true, 0.5), material(1, false, 0.2)],
+        context(true, false),
+    )?;
+    let mut state = OrderedCtfPublicInitialization::begin(true, 0);
+    record(&mut state, &current, &actual);
+    assert_eq!(
+        state.constructions[0].result,
+        Err(CtfPublicInitializationUnavailable::ReverseProvider(
+            ConstructionId(3)
+        ))
+    );
+    assert_eq!(
+        state.selected_stop,
+        Some(CtfPublicInitStop::Scope {
+            construction_id: current.id
+        })
+    );
+    assert_eq!(
+        state.aggregate_after_returned_calls.returned_constructions,
+        0
+    );
+    state.finish_declared_loop(1);
+    assert!(!state.selected_declared_loop_completed);
+    Ok(())
+}
+
+#[test]
+fn fatal_and_unrepresentability_are_distinct_typed_stops_not_native_backend_outcomes() {
+    // Literal Rust return-contract rows, not manufactured Native physics fixtures.
+    for (error, expected) in [
+        (
+            CtfPublicInitializationUnavailable::FatalNoCtfs,
+            CtfPublicInitStop::Fatal {
+                construction_id: ConstructionId(2),
+            },
+        ),
+        (
+            CtfPublicInitializationUnavailable::Storage(
+                CtfPublicStorageUnavailable::PublicCapacity(19),
+            ),
+            CtfPublicInitStop::Unrepresentable {
+                construction_id: ConstructionId(2),
+                num_ctf_terms: 19,
+            },
+        ),
+    ] {
+        let mut state = OrderedCtfPublicInitialization::begin(false, 8);
+        state.append(ConstructionCtfPublicInitialization {
+            construction_id: ConstructionId(2),
+            declared_index: 0,
+            original_material_ids: vec![MaterialId(1)],
+            is_used_ctf: true,
+            public_initializer_invoked: true,
+            retry_flags_on_entry: None,
+            retry_flags_on_return: None,
+            result: Err(error),
+        });
+        assert_eq!(state.selected_stop, Some(expected));
+        let later = construction(7, &[1]);
+        state.record_excluded(1, &later, true);
+        assert_eq!(
+            state.constructions[1].result,
+            Err(CtfPublicInitializationUnavailable::PriorSelectedStop(
+                expected
+            ))
+        );
+        assert!(!state.constructions[1].public_initializer_invoked);
+        assert_eq!(
+            state.aggregate_after_returned_calls,
+            CtfPublicInitAggregate {
+                simple_ctf_only: false,
+                max_ctf_terms: 8,
+                returned_constructions: 0
+            }
+        );
+    }
+}
+
+#[test]
+fn excluded_families_retain_real_order_and_use_without_claiming_whole_init_completion() {
+    let mut state = OrderedCtfPublicInitialization::begin(true, 0);
+    let current = construction(9, &[1]);
+    state.record_excluded(0, &current, true);
+    assert!(state.constructions[0].is_used_ctf);
+    assert_eq!(state.constructions[0].declared_index, 0);
+    assert_eq!(
+        state.constructions[0].result,
+        Err(CtfPublicInitializationUnavailable::ExcludedConstruction)
+    );
+    state.finish_declared_loop(1);
+    assert!(!state.selected_declared_loop_completed);
+}
+
+#[test]
+fn exact_context_association_preserves_signed_zero_and_nan_payload_bits() {
+    use crate::heat_balance::surface_manager::ctf_state_space_assembly::{
+        CtfAssemblyContext, CtfAssemblyRoute,
+    };
+    let context = CtfAssemblyContext {
+        construction_id: ConstructionId(1),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 1,
+        time_step_zone: -0.0,
+        ctf_time_step: f64::from_bits(0x7ff8_0000_0000_0042),
+        num_histories: 1,
+    };
+    assert!(same_context_bits(context, context));
+    assert!(!same_context_bits(
+        context,
+        CtfAssemblyContext {
+            time_step_zone: 0.0,
+            ..context
+        }
+    ));
+}

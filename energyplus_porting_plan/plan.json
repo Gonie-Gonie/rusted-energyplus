@@ -11800,6 +11800,16 @@
         "Native_expected_values_or_outcomes_supplied": false,
         "gates_updated": false,
         "numerical_PASS_claimed": false
+      },
+      "actual_Original_and_unchanged_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-original-baseline/summary.json",
+        "sha256": "68f690bc418d0338f1b5cf2cd6d9cc535424e42c4f169438854a7568ec9a3d7d",
+        "size_bytes": 22013
+      },
+      "actual_selected_public_storage_comparisons": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-unit/summary.json",
+        "sha256": "bee1e3dd25be7fcff7944b3166da9cc7d651968132ff3e2c337df9091547cdb9",
+        "size_bytes": 95897
       }
     },
     {

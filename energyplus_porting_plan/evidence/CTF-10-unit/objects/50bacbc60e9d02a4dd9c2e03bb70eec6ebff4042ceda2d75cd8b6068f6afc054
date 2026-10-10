@@ -1,0 +1,48 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs
+@@ -1,6 +1,6 @@
+ //! Construction.cc 146-161,460-475,1024-1077: no-source public storage only.
+ 
+-use super::ctf_all_resistive::{CtfAllResistiveCoefficients, CTF_COEFFICIENT_SLOTS};
++use super::ctf_all_resistive::{CTF_COEFFICIENT_SLOTS, CtfAllResistiveCoefficients};
+ use super::ctf_final_coefficients::CtfFinalCoefficients;
+ use super::ctf_layer_preprocessing::CFU;
+ use super::ctf_state_space_assembly::{CtfAssemblyContext, CtfAssemblyRoute};
+@@ -87,8 +87,8 @@
+ }
+ 
+ fn within_public_capacity(terms: i32) -> Result<usize, CtfPublicStorageUnavailable> {
+-    let count = usize::try_from(terms)
+-        .map_err(|_| CtfPublicStorageUnavailable::HistoryTermCount(terms))?;
++    let count =
++        usize::try_from(terms).map_err(|_| CtfPublicStorageUnavailable::HistoryTermCount(terms))?;
+     if count >= CTF_COEFFICIENT_SLOTS {
+         return Err(CtfPublicStorageUnavailable::PublicCapacity(terms));
+     }
+@@ -107,9 +107,12 @@
+     use CtfPublicStorageUnavailable as Error;
+     let method = private.context;
+     for context in [method, postcheck] {
+-        if context.route != CtfAssemblyRoute::Assemble || context.source_sink_present
+-            || context.solution_dimensions != 1 || context.node_source != 0
+-            || context.node_user_temp != 0 || context.attempt_ordinal == 0
++        if context.route != CtfAssemblyRoute::Assemble
++            || context.source_sink_present
++            || context.solution_dimensions != 1
++            || context.node_source != 0
++            || context.node_user_temp != 0
++            || context.attempt_ordinal == 0
+         {
+             return Err(Error::UnsupportedScope);
+         }
+@@ -122,7 +125,9 @@
+     }
+     let terms = within_public_capacity(private.num_ctf_terms)?;
+     let size = usize::try_from(private.rcmax).map_err(|_| Error::PrivateHistoryShape)?;
+-    if size == 0 || terms > size || size.checked_mul(12) != Some(private.s.len())
++    if size == 0
++        || terms > size
++        || size.checked_mul(12) != Some(private.s.len())
+         || private.e.len() != size
+     {
+         return Err(Error::PrivateHistoryShape);

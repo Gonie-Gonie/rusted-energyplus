@@ -13,6 +13,7 @@ pub mod ctf_gamma_matrix;
 pub mod ctf_initial_discretization;
 pub mod ctf_inverse_matrix;
 pub mod ctf_layer_preprocessing;
+pub mod ctf_public_storage;
 pub mod ctf_state_space_assembly;
 
 pub use construction_cache::ConstructionCtfCoefficientSource;

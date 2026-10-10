@@ -1,0 +1,233 @@
+"""Emit ignored CTF10 comparer source from accepted source metadata only."""
+from pathlib import Path
+import argparse
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-09/comparer-prep-04"
+OBSERVER = ROOT / ".runtime/porting/CTF-10/rust-observer-prep-01/manifest.json"
+SUPPORTS = ["initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "retry_shape.py", "public_shape.py"]
+
+
+def read(path):
+    return path.read_bytes().decode("utf-8")
+
+
+def emit(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.encode("utf-8"))
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def once(text, old, new):
+    assert text.count(old) == 1, (old, text.count(old))
+    return text.replace(old, new, 1)
+
+
+def assignment(text, name, value):
+    pattern = r"^" + name + r" = .*?$"
+    assert len(re.findall(pattern, text, re.M)) == 1, name
+    return re.sub(pattern, name + " = " + repr(value), text, count=1, flags=re.M)
+
+
+def node_source(text, name):
+    node = next(node for node in ast.parse(text).body if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name == name)
+    return "".join(text.splitlines(True)[node.lineno - 1:node.end_lineno])
+
+
+def source_inventories():
+    return {key: ref(ROOT / path) for key, path in [
+        ("reviewed_native_source_inventory", ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json"),
+        ("reviewed_passive_source_inventory", ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json"),
+        ("reviewed_freezer_source_inventory", ".runtime/porting/CTF-10/input-writer-prep-01/manifest.json"),
+        ("reviewed_PE_source_inventory", ".runtime/porting/CTF-10/native-build-review-prep-01/manifest.json")]}
+
+
+def packet(text):
+    text = text.replace('prefix = "ctf09-"', 'prefix = "ctf10-"')
+    text = text.replace('frozen_before_this_CTF09_helper_execution', 'frozen_before_this_CTF10_helper_execution')
+    text = text.replace('frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper',
+                        'frozen-inherited-input-and-fresh-CTF10-public-storage-policy-before-helper')
+    text = text.replace('len(admission["native_source_files"]) == 8', 'len(admission["native_source_files"]) == 9')
+    text = text.replace('Exact lane Native8 source inventory required', 'Exact lane Native9 source inventory required')
+    text = text.replace('"retry_shape.py", "packet_io.py"', '"retry_shape.py", "public_shape.py", "packet_io.py"')
+    text = text.replace('== 8, "Exact accepted DataQA lane eight-source closure required"', '== 9, "Exact accepted DataQA lane nine-source closure required"')
+    text = text.replace('len(by_owner) == 8', 'len(by_owner) == 9')
+    text = text.replace('"historical_prior_08_authority"', '"historical_prior_09_authority"')
+    text = once(text, 'def packet_policy(m, qa, request, policy, same, recorded, lane, initial, methods, gamma, coefficients, retry):',
+                'def packet_policy(m, qa, request, policy, same, recorded, lane, initial, methods, gamma, coefficients, retry, public):')
+    text = once(text, '    retry.packet(freeze, request, admission, projection, policy, m.require)',
+                '    retry.packet(freeze, request, admission, projection, policy, m.require)\n'
+                '    public.packet(freeze, request, admission, projection, policy, m.require)')
+    # The actual reviewed10 public scope owns current10 plus archive-only prior09 custody.
+    # This call is finalized against the immutable QA10 source, never a WIP signature.
+    old = '    retry.scope(m, same, preceding, freeze, request, admission, projection,\n                m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane, coefficients)'
+    new = '    public.scope(m, same, preceding, freeze, request, admission, projection,\n                 m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane, coefficients, retry)'
+    text = once(text, old, new)
+    text = once(text, '    return profiles,inherited,initial_policy,initial_profiles',
+        '    same(qa["reviewed_public_policy_contract"], qa["reviewed_contracts"]["tolerances"])\n'
+        '    m.require(qa["reviewed_public_storage_observation_policy"] == public.POLICY and\n'
+        '              qa["reviewed_public_execution_lane_policy"] == public.EXECUTION_POLICY and\n'
+        '              qa["complete_actual_public_storage_records"] is True and\n'
+        '              qa["Native_whole_Init_admitted"] is (lane == "production") and\n'
+        '              (qa["complete_actual_Init_records"] is True if lane == "production" else qa["complete_actual_Init_records"] is None),\n'
+        '              "Actual reviewed public/Init records and declared lane policy required")\n'
+        '    return profiles,inherited,initial_policy,initial_profiles')
+    return text
+
+
+def adapt_main(text, lane, qa, closure):
+    text = text.replace('"ctf09-', '"ctf10-').replace('"ctf09_candidate', '"ctf10_candidate')
+    text = text.replace('historical_prior_08_authority', 'historical_prior_09_authority')
+    text = text.replace('current09 and separately historical08', 'current10 and separately historical09')
+    text = text.replace('new-CTF09-linked-originals-only', 'new-CTF10-linked-originals-only')
+    text = text.replace("Raw authored retry caller/driver, Rust09 transports and some prior pure06; Header authored09 Native/assembly/ingress and Base DataQA. This pairs actual owners and provenance, not independent certification of own formulas.",
+                        "Raw authored Native10 passive/helper, Rust10 observer/comparer and prior retry/pure code; Header authored public10 owner/freezer/DataQA. Base independently peered source. This pairs actual owners and provenance, not independent certification of authors' formulas.")
+    text = text.replace('Genuine input-only CTF09 request with separate historical08 authority required',
+                        'Genuine input-only CTF10 request with separate historical09 authority required')
+    text = text.replace('Actual successful fresh CTF09 freeze/full stdout required', 'Actual successful fresh CTF10 freeze/full stdout required')
+    parsed = ast.parse(read(OUT / 'initial_shape.py'))
+    retention = next(ast.literal_eval(node.value) for node in parsed.body if isinstance(node, ast.Assign) and
+                     any(isinstance(target, ast.Name) and target.id == 'RETENTION_INTENT' for target in node.targets))
+    text = assignment(text, 'RETENTION_INTENT', retention)
+    text = assignment(text, "DATAQA_SOURCE_INVENTORY", ref(qa))
+    text = assignment(text, "SOURCE_INVENTORIES", source_inventories())
+    text = assignment(text, "OBSERVER_PATHS", closure["ordered_own_paths"])
+    text = assignment(text, "API_PATHS", closure["ordered_API_paths"])
+    for constant, filename in [("IO_SHA", "packet_io.py"), ("INITIAL_SHAPE_SHA", "initial_shape.py"),
+                               ("METHOD_SHA", "method_shape.py"), ("GAMMA_SHAPE_SHA", "gamma_shape.py"),
+                               ("COEFFICIENT_SHAPE_SHA", "coefficient_shape.py"), ("RETRY_SHAPE_SHA", "retry_shape.py"),
+                               ("RETRY_PAIR_SHA", "retry_compare.py")]:
+        text = assignment(text, constant, ref(OUT / filename)["sha256"])
+    text = once(text, "class Comparison:", 'PUBLIC_VARIABLES = ' + repr(["CTF10." + key for key in
+        ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFTimeStep", "UValue"]]) +
+        '\nPUBLIC_SHAPE_SHA = ' + repr(ref(OUT / "public_shape.py")["sha256"]) +
+        '\nPUBLIC_PAIR_SHA = ' + repr(ref(OUT / "public_compare.py")["sha256"]) + '\n\nclass Comparison:')
+    text = once(text, "for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES + RETRY_VARIABLES}",
+        "for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES + RETRY_VARIABLES + PUBLIC_VARIABLES}")
+    old_packet = node_source(text, "packet_policy")
+    text = once(text, old_packet, packet(old_packet))
+    text = once(text, '    retry_pairing = boot("ctf09_retry_pairing", "retry_compare.py", RETRY_PAIR_SHA)',
+        '    retry_pairing = boot("ctf09_retry_pairing", "retry_compare.py", RETRY_PAIR_SHA)\n'
+        '    public = boot("ctf10_public_structure", "public_shape.py", PUBLIC_SHAPE_SHA)\n'
+        '    public_pairing = boot("ctf10_public_pairing", "public_compare.py", PUBLIC_PAIR_SHA)')
+    text = once(text, 'packet_policy(m,qa,request,policy,same,recorded,"' + lane + '",initial,methods,gamma,coefficients,retry)',
+        'packet_policy(m,qa,request,policy,same,recorded,"' + lane + '",initial,methods,gamma,coefficients,retry,public)')
+    # Production functions consume separately authenticated real public/Init owners.
+    if lane == "production":
+        text = once(text, 'c.need(len(left["operations"]) == left["actual_Construct_array_size"] == len(ncon), "Dynamic actual Construct call ledger required")',
+            'c.need(len(left["operations"]) <= left["actual_Construct_array_size"] == len(ncon) and\n'
+            '               len(left["operations"]) == left["actual_CTF_call_checkpoint_count"], "Actual retained Init call prefix and declared Construct owner required")')
+        text = once(text, "def compare_initial_models(native, rust, request, c):", "def compare_initial_models(native, rust, request, c, public_pairing):")
+        before = '''                observed=operation.get("before")
+                c.need(isinstance(observed,dict) and observed.get("available") is True and
+                       isinstance(observed.get("snapshot"),dict),"Actual invoked Native before snapshot required")
+                before=observed["snapshot"];index=operation["actual_construction_index"]
+                c.need(type(index) is int and 1<=index<=len(before["constructions"]),"Actual Native construction identity required")
+                owner=before["constructions"][index-1]
+                context={"is_used_ctf":owner["IsUsedCTF"],"errors_found":before["ErrorsFound"],
+                         "source_sink_present":owner["SourceSinkPresent"],"solution_dimensions":owner["SolutionDimensions"]}
+                caller=before["TimeStepZone"]'''
+        text = once(text, before, '                context,caller=public_pairing.production_context(c,left,operation,path+"/"+name)')
+        text = once(text, "initial_ledger = compare_initial_models(native,rust,request,comparison)",
+            "initial_ledger = compare_initial_models(native,rust,request,comparison,public_pairing)")
+    marker = '    comparison = Comparison(m.require)'
+    custody = '''    for key in ["ctf10_public_storage_observation_policy", "ctf10_execution_lane_policy", "ctf10_public_profiles"]:
+        m.require(rust[key] == request[key], "Actual Rust public policy metadata differs from the frozen request")
+    m.require(native["CTF10_public_storage_observation_policy"] == public.POLICY == request["ctf10_public_storage_observation_policy"] and
+              native["CTF10_execution_lane_policy"] == request["ctf10_execution_lane_policy"],
+              "Actual Native public policy/lane differs from the pre-output scope")
+'''
+    text = once(text, marker, custody + marker)
+    marker = '    retry_ledger = retry_pairing.compare_' + lane
+    line = next(line for line in text.splitlines() if line.startswith(marker))
+    if lane == "unit":
+        addition = '''    public_ledger = public_pairing.compare_unit(comparison,native,rust,request,public.POLICY)
+    public_prefix_ledger = []'''
+    else:
+        addition = '''    public_ledger,public_prefix_ledger = public_pairing.compare_production(comparison,native,rust,request,public.POLICY,normalized,owners)'''
+    text = once(text, line, line + "\n" + addition)
+    counts_line = next(row for row in text.splitlines() if row.startswith('    actual_counts = retry_pairing.validate_all'))
+    text = once(text, counts_line, counts_line + '\n    public_counts = public_pairing.validate_all(comparison,native,qa,public,production=' +
+                ('True' if lane == 'production' else 'False') + ')')
+    text = text.replace('comparison.counts["retry_selected_attempt_owner_pairs"] > 0', 'comparison.counts["public_selected_returned_owner_pairs"] > 0')
+    text = once(text, '    m.recheck(); m.require(binary_sha() == binary["sha256"],',
+        '    result["retry_handoff_metrics"] = {key:result["metrics"].pop(key) for key in RETRY_VARIABLES}\n'
+        '    m.recheck(); m.require(binary_sha() == binary["sha256"],')
+    text = text.replace('"frozen_numeric_profiles": {"CTF09":policy["ctf09_retry_profiles"]}',
+        '"frozen_numeric_profiles": {"CTF10":policy["ctf10_public_profiles"]},"inherited_retry_handoff_profiles":policy["ctf09_retry_profiles"]')
+    text = text.replace('PREP / "retry_compare.py"]', 'PREP / "retry_compare.py", PREP / "public_shape.py", PREP / "public_compare.py"]')
+    text = once(text, '"actual_retry_owner_ledger":retry_ledger,',
+        '"actual_public_storage_owner_ledger":public_ledger,"actual_public_Init_prefix_ledger":public_prefix_ledger,\n'
+        '               "actual_public_storage_count_proof":public_counts,"reviewed_public_storage_observation_policy":public.POLICY,\n'
+        '               "reviewed_public_execution_lane_policy":public.EXECUTION_POLICY,"reviewed_public_policy_contract":qa["reviewed_public_policy_contract"],\n'
+        '               "Native_whole_Init_admitted":qa["Native_whole_Init_admitted"],"actual_whole_Init_records_structurally_validated_only":qa["complete_actual_Init_records"],\n'
+        '               "actual_retry_owner_ledger":retry_ledger,')
+    text = text.replace('"complete_CTF09_PASS_claimed": False,',
+        '"complete_CTF09_PASS_claimed": False, "complete_CTF10_PASS_claimed": False,\n'
+        '        "whole_Init_reporting_final_fatal_backend_or_surface_handoff_certified":False,')
+    text = text.replace('pass-selected-actual-retry-visits', 'pass-selected-public-storage').replace('fail-selected-actual-retry-visits', 'fail-selected-public-storage')
+    text = text.replace('pass-selected-loader-to-actual-retry-visits', 'pass-selected-loader-to-public-storage').replace('fail-selected-loader-to-actual-retry-visits', 'fail-selected-loader-to-public-storage')
+    text = text.replace('"selected_fixed15_retry_visits_PASS_claimed": passed', '"selected_fixed15_public_storage_PASS_claimed": passed')
+    text = text.replace('"selected_unit_PASS_claimed": passed', '"selected_unit_public_storage_PASS_claimed": passed')
+    return text
+
+
+def main(args):
+    assert not (OUT / "manifest.json").exists(), "Held source is immutable"
+    qa = ROOT / args.qa_manifest
+    q = json.loads(read(qa))
+    qa_sources = {Path(row["path"]).name: row for row in q["own_sources"]}
+    observer = json.loads(read(OBSERVER))
+    old = json.loads(read(OLD / "manifest.json"))
+    for row in old["own_sources"]:
+        path = ROOT / row["source"]["path"]
+        assert ref(path)["sha256"] == row["source"]["sha256"]
+        emit(OUT / "before" / path.name, read(path))
+    for filename in SUPPORTS:
+        binding = qa_sources[filename]; path = ROOT / binding["path"]
+        assert ref(path)["sha256"] == binding["sha256"]
+        emit(OUT / filename, read(path))
+    emit(OUT / "method_compare.py", read(OLD / "method_compare.py"))
+    emit(OUT / "packet_io.py", read(OLD / "packet_io.py").replace('porting/CTF-09', 'porting/CTF-10'))
+    retry = read(OLD / "retry_compare.py")
+    retry = once(retry, 'owner = operation["after"]["snapshot"] if production else operation["after"]',
+        'owner = model["initialized_owners"]["snapshot"] if production else operation["after"]')
+    emit(OUT / "retry_compare.py", retry)
+    for lane in ["unit", "production"]:
+        filename = "compare_" + lane + ".py"
+        before = read(OLD / filename)
+        after = adapt_main(before, lane, qa, observer["runtime_source_closures"][lane])
+        ast.parse(after)
+        old_number = next(node for node in ast.parse(before).body if isinstance(node, ast.ClassDef) and node.name == "Comparison")
+        new_number = next(node for node in ast.parse(after).body if isinstance(node, ast.ClassDef) and node.name == "Comparison")
+        for name in ["failure", "exact", "absence", "dto", "number", "handoff", "initial_handoff", "report"]:
+            a = next(node for node in old_number.body if isinstance(node, ast.FunctionDef) and node.name == name)
+            b = next(node for node in new_number.body if isinstance(node, ast.FunctionDef) and node.name == name)
+            assert ast.dump(a, include_attributes=False) == ast.dump(b, include_attributes=False), name
+        emit(OUT / filename, after)
+    for path in OUT.glob("*.py"):
+        ast.parse(read(path))
+        if path.name.startswith("prepare_"):
+            continue
+        before = OUT / "before" / path.name
+        delta = "".join(difflib.unified_diff(read(before).splitlines(True) if before.exists() else [], read(path).splitlines(True),
+            fromfile="accepted09/" + path.name if before.exists() else "/dev/null", tofile="proposed10/" + path.name))
+        emit(OUT / "diffs" / (path.name + ".from-09.diff"), delta)
+    print("WIP comparer sources emitted; no target import/execution or immutable manifest yet")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--qa-manifest", required=True)
+    main(parser.parse_args())

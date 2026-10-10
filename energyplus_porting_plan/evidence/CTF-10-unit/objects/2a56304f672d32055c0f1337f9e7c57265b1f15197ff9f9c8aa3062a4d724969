@@ -1,0 +1,1679 @@
+{
+  "schema": "ctf09-strict-retry-comparer-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+  "own_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_unit.py",
+        "sha256": "955b31f1aa3fdab51d5e31eda2bdcd9f61ce8d36b07c71a360344ff97c995f54",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/diffs/compare_unit.py.from-ctf08.diff",
+        "sha256": "be1f7426685288c721f3a3edecffc61f030a64784d975628074a0d604988d210",
+        "size_bytes": 41633,
+        "line_count": 329
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/compare_unit.py",
+        "sha256": "d237851be057fb8cbcbe81843af0e9bafba614822707c631c4d798c427b8bc41",
+        "size_bytes": 78470,
+        "line_count": 851
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/compare_unit.py",
+        "sha256": "d237851be057fb8cbcbe81843af0e9bafba614822707c631c4d798c427b8bc41",
+        "size_bytes": 78470,
+        "line_count": 851
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_production.py",
+        "sha256": "bd28cfb35f74c2a3dd8f53d795be71c3c29d5ebb398be5f9b8dbaf0f81645f5c",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/diffs/compare_production.py.from-ctf08.diff",
+        "sha256": "fbd6572de292b4b6f7b879e81bf6bae42e7aca2a81dde6f6287b94120cf81bf7",
+        "size_bytes": 42910,
+        "line_count": 298
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/compare_production.py",
+        "sha256": "d977f7127d882a9f59b704bda578b68ca40ec3af925ac589ddd017539dc1cc29",
+        "size_bytes": 92502,
+        "line_count": 976
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/compare_production.py",
+        "sha256": "d977f7127d882a9f59b704bda578b68ca40ec3af925ac589ddd017539dc1cc29",
+        "size_bytes": 92502,
+        "line_count": 976
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/packet_io.py.from-ctf08.diff",
+        "sha256": "e0a3c9c8c64a7496eecc6a96fd3f58e02d4a9e7207fc337ca5e4cc3f9f45e5c1",
+        "size_bytes": 267,
+        "line_count": 11
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/packet_io.py",
+        "sha256": "dde2f4ce6d767be2432ff20df5199f3bc8db70d7a11a4404aa8f5629614a6e80",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/packet_io.py",
+        "sha256": "dde2f4ce6d767be2432ff20df5199f3bc8db70d7a11a4404aa8f5629614a6e80",
+        "size_bytes": 4723,
+        "line_count": 120
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/method_compare.py.from-ctf08.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/initial_shape.py.from-ctf08.diff",
+        "sha256": "aeeddb8284d7eb9dcdb1435b2f726be38c2f3dfc59afb1333e524059255926b3",
+        "size_bytes": 27003,
+        "line_count": 312
+      },
+      "new_source": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/method_shape.py.from-ctf08.diff",
+        "sha256": "e873238379d76cdefdd08adc55571cd1ca5ad3d4ff84d506bff286dc29cc263c",
+        "size_bytes": 5304,
+        "line_count": 11
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/method_shape.py",
+        "sha256": "e4515854300e3aea1fa26c75b23121afe5c6cf6eff936357786c45f46a0320ab",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/method_shape.py",
+        "sha256": "e4515854300e3aea1fa26c75b23121afe5c6cf6eff936357786c45f46a0320ab",
+        "size_bytes": 30929,
+        "line_count": 284
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/gamma_shape.py.from-ctf08.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/coefficient_shape.py.from-ctf08.diff",
+        "sha256": "9c1b9850a123880371bed44ce665db19f188b3545941834a5a6d3d28f1ca3884",
+        "size_bytes": 5497,
+        "line_count": 62
+      },
+      "new_source": false,
+      "accepted_CTF08_source": {
+        "path": ".runtime/porting/CTF-08/comparer-prep-04/coefficient_shape.py",
+        "sha256": "9c32c62094cf6a08fa3680291b2dc9d6678231f6892a25ceced33e4a4604e1ef",
+        "size_bytes": 50449,
+        "line_count": 515
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before/coefficient_shape.py",
+        "sha256": "9c32c62094cf6a08fa3680291b2dc9d6678231f6892a25ceced33e4a4604e1ef",
+        "size_bytes": 50449,
+        "line_count": 515
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/diffs/retry_shape.py.from-ctf08.diff",
+        "sha256": "2d3b48086f87365750e2c6a051a7af429d6c1b2ea2fe98eaa2dfce519bd68c8e",
+        "size_bytes": 45590,
+        "line_count": 410
+      },
+      "new_source": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_compare.py",
+        "sha256": "80a4fecec35bd345cb301b72aef6be8952fe01b9ef2a17327f7f9a4eb3a91355",
+        "size_bytes": 38478,
+        "line_count": 479
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/diffs/retry_compare.py.from-ctf08.diff",
+        "sha256": "28e5db3e2c47589ca63600520a0e8c3709c76de19ce5a25263b8f9e0ee3ed673",
+        "size_bytes": 39025,
+        "line_count": 482
+      },
+      "new_source": true
+    }
+  ],
+  "owned_Python_body_count": 10,
+  "executed_sources_per_lane": 9,
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-08/comparer-prep-04/manifest.json",
+    "sha256": "8dacc178148c00188c035894d5200c44d9c571d0b07516abf1dff3f2b4b1e21c",
+    "size_bytes": 23830,
+    "line_count": 656
+  },
+  "before_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-02/before/manifest.json",
+    "sha256": "8dacc178148c00188c035894d5200c44d9c571d0b07516abf1dff3f2b4b1e21c",
+    "size_bytes": 23830,
+    "line_count": 656
+  },
+  "before_README": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-02/before/README.md",
+    "sha256": "a17e3c276316727a0ba11035cf1af7adf6cce50662705c8f690f2175573f6dd7",
+    "size_bytes": 8133,
+    "line_count": 137
+  },
+  "unused_historical_pairing_before_archives": [
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/before/gamma_compare.py",
+      "sha256": "56f2c6aa8d4c344f955b161cb63fbd2f01214f3b2d4ddbe4be8fc73f60cc7995",
+      "size_bytes": 14971,
+      "line_count": 186
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/before/coefficient_compare.py",
+      "sha256": "3424a22b80dbf5ee3b04ed7d2e4974d7b1cdd6deb267f3ea6a8ab81ba370b0de",
+      "size_bytes": 17204,
+      "line_count": 206
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-04/README.md",
+    "sha256": "c0244a0e9b3770bd9cee0a611188069730299e9cc522ac543c856ee6794484ba",
+    "size_bytes": 7821,
+    "line_count": 115
+  },
+  "authoring_sources": [
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-01/prepare_sources.py",
+      "sha256": "707a9cded5cf0277646f97787e57e83947d09c45b6896d2636ac066b92e92ef6",
+      "size_bytes": 19112,
+      "line_count": 226
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-01/prepare_manifest.py",
+      "sha256": "aab2f9c2b9d87703a092c618ec4b31a598c92ddc5731b21e71d45bf9815e428e",
+      "size_bytes": 10655,
+      "line_count": 178
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/prepare_metadata.py",
+      "sha256": "897ff0522d7d277129e15098d4e8f207049dec95150ecc70fb63726d8e718b6f",
+      "size_bytes": 4687,
+      "line_count": 91
+    }
+  ],
+  "accepted_dependency_manifests": [
+    {
+      "path": ".runtime/porting/CTF-08/comparer-prep-04/manifest.json",
+      "sha256": "8dacc178148c00188c035894d5200c44d9c571d0b07516abf1dff3f2b4b1e21c",
+      "size_bytes": 23830,
+      "line_count": 656
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/manifest.json",
+      "sha256": "3d40a7bcc6ce4d9f8a116f1d7bcb71d4b4ec42d43895a78debc9439028aeeb17",
+      "size_bytes": 44308,
+      "line_count": 992
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+      "sha256": "b4e15e0986d65b451ba803cb1b6f9a9bc1c8fe8a6caea90ac3c74e581ee4a315",
+      "size_bytes": 26151,
+      "line_count": 658
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+      "sha256": "4934fe49f601a87e1d41016a03b8e10fba6117a79b65a376b949e68e033dd0bf",
+      "size_bytes": 13336,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
+      "sha256": "4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd",
+      "size_bytes": 37991,
+      "line_count": 972
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-review-prep-01/manifest.json",
+      "sha256": "f64af5687b90af4e5f2ae318c3fce63e99492baff068537300f9fe4cf72aa841",
+      "size_bytes": 5641,
+      "line_count": 150
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/manifest.json",
+      "sha256": "67fb01fdc37f3ccebdaef17139466916c993db0f62f5079a79a1b11c739b3df7",
+      "size_bytes": 53844,
+      "line_count": 1352
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retry-driver-prep-02/manifest.json",
+      "sha256": "cda605d3760c77146593f09321dc5822218ff0fafa886d65ef3867417fc2bcfa",
+      "size_bytes": 22406,
+      "line_count": 533
+    },
+    {
+      "path": ".runtime/porting/CTF-09/assembly-reassignment-prep-02/manifest.json",
+      "sha256": "d8abb7a215434455c8b6c80bcb1854cda58883fb0e8e5ff152477b2136b3f1ad",
+      "size_bytes": 12124,
+      "line_count": 310
+    },
+    {
+      "path": ".runtime/porting/CTF-09/caller-stability-prep-01/manifest.json",
+      "sha256": "742e9810c9d815ee3142e1f45c1ef6abc93c7cc396e199e3e606be75c3ce52d2",
+      "size_bytes": 12291,
+      "line_count": 318
+    },
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/manifest.json",
+      "sha256": "e371060479853b4a9945a753e9d3baf3a7ae505c5f40432d79f2ece2a9ad77d2",
+      "size_bytes": 29796,
+      "line_count": 689
+    }
+  ],
+  "producer_interface_sources": [
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/ctf09_candidate_unit_observer.rs",
+      "sha256": "3c4f4938ebb85bc6514eabec895ca2d0f7ce40d21e52108e4b2c8d8bdb9c3f36",
+      "size_bytes": 27357,
+      "line_count": 519
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/unit_fields.rs",
+      "sha256": "21176b80a39158a8523749c9f33969fb621410e6a68d8654049602c1c19ec2e5",
+      "size_bytes": 32496,
+      "line_count": 520
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/ctf09_candidate_production_observer.rs",
+      "sha256": "b341602b7d74031376417a8893892df1497eb2b2f0ac4b6ba0a69df00e083a8e",
+      "size_bytes": 20831,
+      "line_count": 459
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/production_fields.rs",
+      "sha256": "427084e74450f8502787aa0862731a44653a4b6a0f8f4d65294932868af49055",
+      "size_bytes": 16255,
+      "line_count": 230
+    },
+    {
+      "path": ".runtime/porting/CTF-09/rust-observer-prep-01/production_unit_fields.rs",
+      "sha256": "21176b80a39158a8523749c9f33969fb621410e6a68d8654049602c1c19ec2e5",
+      "size_bytes": 32496,
+      "line_count": 520
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_observation_fields.hh",
+      "sha256": "63cfebeb5bcf806fbd745edfd761af8911000b243b5acfe0f15a50e520717173",
+      "size_bytes": 82493,
+      "line_count": 1016
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_unit_helper.cpp",
+      "sha256": "2115559d0230142d60133bdd6d2cdb01cbf2fbd7bc156b68365cf61b237f121e",
+      "size_bytes": 18161,
+      "line_count": 237
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_unit_fields.hh",
+      "sha256": "63d6795c21f353244562c9135f8d2835434f2a7f6f2e4f06d29587470723b16d",
+      "size_bytes": 6712,
+      "line_count": 90
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_unit_admission.hh",
+      "sha256": "720e013f10ddd6e643a055800a1cef886e33dd4ad72866e24064bf8876314bea",
+      "size_bytes": 19726,
+      "line_count": 216
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_production_helper.cpp",
+      "sha256": "c5d526dc14417c7f622db02adacb1314368d2de0f161a28f12dc5c2ec37b96a6",
+      "size_bytes": 20926,
+      "line_count": 256
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_production_fields.hh",
+      "sha256": "9fee74b518e9184ee3d43db9f506195361030cc24eec48a8b0cc3ecc45af2e9e",
+      "size_bytes": 9327,
+      "line_count": 124
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_production_admission.hh",
+      "sha256": "f67e05d63e20cf6def0e332f277368c048202f483182654f74c12892bf7aea4b",
+      "size_bytes": 16729,
+      "line_count": 183
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_reference.cmake",
+      "sha256": "671f2fe052386fc9b1ae2ff923e3d96bbb512021fa9c851dcc61e45024678391",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/review_unit.py",
+      "sha256": "95871f47e4976b4af59a40a981b6973c835167b554f6673a6c598d4b3343098d",
+      "size_bytes": 29829,
+      "line_count": 321
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/review_production.py",
+      "sha256": "bcc053348384fe79ace5acb3fe22b792201389f1fba7d05760aeb29c9719e971",
+      "size_bytes": 32496,
+      "line_count": 343
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/unit_shape.py",
+      "sha256": "77736457bb13f70b62bed722a291520e9b1c2a190096c12eed499897a5a1feab",
+      "size_bytes": 20438,
+      "line_count": 234
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/production_shape.py",
+      "sha256": "68cb01f05febe4528f31a376ffb5916ea80a499b7ee1160a27a028a9185e5a9e",
+      "size_bytes": 21974,
+      "line_count": 249
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/initial_shape.py",
+      "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+      "size_bytes": 26626,
+      "line_count": 309
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/method_shape.py",
+      "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+      "size_bytes": 30929,
+      "line_count": 284
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/packet_io.py",
+      "sha256": "dafe5c098bd6548574eb3d3870229483c197f7a16aa274e9c3bbea716451a934",
+      "size_bytes": 4665,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/gamma_shape.py",
+      "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+      "size_bytes": 34636,
+      "line_count": 316
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/coefficient_shape.py",
+      "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+      "size_bytes": 50650,
+      "line_count": 516
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/retry_shape.py",
+      "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+      "size_bytes": 45117,
+      "line_count": 407
+    }
+  ],
+  "selected_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/new/ctf_retry_initialization.rs",
+      "start_line": 12,
+      "end_line": 129,
+      "sha256": "f00b6ff0f87a5c88568d70c163312122a591f6b229cc9ab6739bedf7fd6add4d",
+      "size_bytes": 6071,
+      "purpose": "actual wrapper/stop/result routing and readonly original names"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/surface_manager/construction_cache.rs",
+      "start_line": 117,
+      "end_line": 187,
+      "sha256": "8cc41b1333efdd76a2bb029d53ba9e340a712d0353efe20f195e0639dcb9bd39",
+      "size_bytes": 3604,
+      "purpose": "ordinary selected shared flags/genuine first move/stop ledger"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/cache-ingress-prep-02/proposed/initialization/state_shell.rs",
+      "start_line": 14,
+      "end_line": 47,
+      "sha256": "a21bf7cd095b44a7fc6df236f8a156e47d602cdd9c7159384971cf07f9107f2a",
+      "size_bytes": 2094,
+      "purpose": "actual state vector custody handoff"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver.rs",
+      "start_line": 85,
+      "end_line": 164,
+      "sha256": "d4f07047bb8fdb01ed3e1fe16cfa05d9d6a37b701cfecd23c06e65ac26580433",
+      "size_bytes": 4099,
+      "purpose": "public actual visit/reassignment/terminal/checkpoint owners"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retry-driver-prep-02/new/ctf_retry_driver.rs",
+      "start_line": 196,
+      "end_line": 385,
+      "sha256": "924dd893768ce30cdc6a69502da2cc59a695e1fadc8fd5087d49d5bde6dc5508",
+      "size_bytes": 8874,
+      "purpose": "actual method calls and selected retry order"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/assembly-reassignment-prep-02/proposed/ctf_state_space_assembly.rs",
+      "start_line": 95,
+      "end_line": 136,
+      "sha256": "b1509ceabda23aef527dca281017d96743812d565d3f56e7f0c3afd3aea23fc8",
+      "size_bytes": 1825,
+      "purpose": "genuine producer checkpoint owner"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/caller-stability-prep-01/new/ctf_caller_stability.rs",
+      "start_line": 87,
+      "end_line": 125,
+      "sha256": "d2083485e972bee1366ccb6ef7ffe49211f1a0eb6ecf8be4f8aaf11defa254c9",
+      "size_bytes": 1930,
+      "purpose": "actual caller decision/sums/optional expression bookkeeping owners"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/freeze_packet.py",
+      "start_line": 229,
+      "end_line": 331,
+      "sha256": "93c640b0807e096582d54439578802f9378affd43af23e34a21c63550d262026",
+      "size_bytes": 9075,
+      "purpose": "separate historical08 typed refs/ranges/archive-only ancestry"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/input-writer-prep-01/freeze_packet.py",
+      "start_line": 549,
+      "end_line": 602,
+      "sha256": "0b59ede82da461daef5a88f5036ce6343d3c4c73591648dc57add66a044a9dc0",
+      "size_bytes": 5352,
+      "purpose": "current09 source and inherited separate profile contract"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 728,
+      "sha256": "2ce6630a39c803e3223017da320d00e44d56d6c02f74f3ee6177e6f01c277913",
+      "size_bytes": 5348,
+      "purpose": "once allocation/identity/preband and repeated band source boundary"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 875,
+      "end_line": 981,
+      "sha256": "5061e7af483ca7dd7f3b8c0637421ee042bb036fdb82a05d6d54e1653dc26120",
+      "size_bytes": 7452,
+      "purpose": "actual method/caller sum/fatal/severe/retry ordering"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 6153,
+      "end_line": 6165,
+      "sha256": "db131b40f59d9054b7cdc86fc6b15c9b027734ba834601ec97a9d6520f205d8e",
+      "size_bytes": 633,
+      "purpose": "genuine construction order and shared flags"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 126,
+      "last_line": 144,
+      "sha256": "2b7c87d65021cd233aef40a553edbe42f5596241935cef7146efaf3731981a5b",
+      "size_bytes": 1247,
+      "purpose": "actual caller constants"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 167,
+      "last_line": 199,
+      "sha256": "22092fc3948c1af7038546578a557bb475b35185cc9172d8239c4253e890e2cf",
+      "size_bytes": 2481,
+      "purpose": "unassigned locals/actual members"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 490,
+      "last_line": 619,
+      "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+      "size_bytes": 6450,
+      "purpose": "initial nodal owner"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 633,
+      "last_line": 729,
+      "sha256": "c756cfa68300a1e1f4e7dfd1d88bc383538823c22280d7bd449268269078b1b8",
+      "size_bytes": 5526,
+      "purpose": "once storage/repeated1D assignments"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 875,
+      "last_line": 982,
+      "sha256": "7fcc15ac650ccf35f2591b1633926f8770d17b14130f18b0c80d37db3eb1771f",
+      "size_bytes": 7453,
+      "purpose": "actual helper/caller/diagnostic order"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1079,
+      "last_line": 1103,
+      "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+      "size_bytes": 580,
+      "purpose": "whole-call cleanup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1181,
+      "last_line": 1191,
+      "sha256": "fccf15ab45847f495b1a298950a0bd616d062365c25cf557b91e95f156d5f638",
+      "size_bytes": 309,
+      "purpose": "exponential source AMat localcopy"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1362,
+      "last_line": 1373,
+      "sha256": "a92250f96d80db766dd800e9a63ce2b5e93fc9ae05fae323930ce6025a25bda5",
+      "size_bytes": 286,
+      "purpose": "Backup AExp and local cleanup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1400,
+      "last_line": 1407,
+      "sha256": "c0972a2ca9b8adeb45d1f77d84630878519ddb20687b87a4c3a1b1d84214e8ae",
+      "size_bytes": 366,
+      "purpose": "inverse source AMat localcopy"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1487,
+      "last_line": 1494,
+      "sha256": "83f830e397de7413225dd081b539f1b56f8627adfe861585bd6671a3e8023ea3",
+      "size_bytes": 197,
+      "purpose": "inverse local cleanup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1496,
+      "last_line": 1589,
+      "sha256": "738f643d12eaf6f333ceed15e0fd65db8508f8bfbdefac5f8eb8a76ef19379cb",
+      "size_bytes": 4459,
+      "purpose": "whole Gamma resets/endpoints"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1591,
+      "last_line": 1906,
+      "sha256": "e1bb975a9b50ae7bdbca34fabd94dc2f1bc23b3e13cf9537f743c4d14d3530ee",
+      "size_bytes": 15474,
+      "purpose": "whole final resets/private owner lifetimes"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 660,
+      "sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
+      "size_bytes": 884,
+      "purpose": "actual once identity/square/Gamma/history owner allocations"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 875,
+      "end_line": 936,
+      "sha256": "0b9935e2e9a2c7e9bf653f0377fca2d2030400b7d9ffbe21cf03140430d21e88",
+      "size_bytes": 3596,
+      "purpose": "actual exp/inverse/Gamma/final caller order and later convergence/retry custody"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1591,
+      "end_line": 1638,
+      "sha256": "e324e5baf282e9dcfc64d5e7bbba4314eaca30d5791169f9dabf74d169696790",
+      "size_bytes": 2432,
+      "purpose": "actual final method entry, local initialization boundaries and no stale workspace copy"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1639,
+      "end_line": 1715,
+      "sha256": "a7dbf8cf2e19fa92a8858fb837c8753603d432e2f1785e9dd0d24de557c6197a",
+      "size_bytes": 3697,
+      "purpose": "actual Gamma mutation/s0 storage/history controls initialized"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1716,
+      "end_line": 1830,
+      "sha256": "fd1c0ff5a0b5aacac7e4978a928e7ad0976091a84860001fe7b2e7857b52c2e2",
+      "size_bytes": 5634,
+      "purpose": "actual history loop storage and live controls"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1831,
+      "end_line": 1906,
+      "sha256": "a442de75a8c5b39d3e83c8272d9ff83d596926ea3c4d173444595e137470c7c5",
+      "size_bytes": 3711,
+      "purpose": "actual last-history final storage/private workspace cleanup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495,
+      "purpose": "actual private matrix/history/context member ownership"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh",
+      "start_line": 361,
+      "end_line": 480,
+      "sha256": "6ada2b04aff024b65e4cf287603677c488275fdf3d6b53f3095df27791649632",
+      "size_bytes": 4655,
+      "purpose": "actual new independent final-coefficient DTO owner/masks/counts"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+      "start_line": 975,
+      "end_line": 1190,
+      "sha256": "4b78acfd631a4a35ca5e8282085972724d81a5523d9f043106e122487d584006",
+      "size_bytes": 11378,
+      "purpose": "actual failure/association/copy/history producer with independent masks"
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+      "start_line": 1191,
+      "end_line": 1286,
+      "sha256": "bdaee004d91eb73305598f11b0646545b245e2c07e2896959f20480356aecee7",
+      "size_bytes": 6313,
+      "purpose": "actual entry/privatefinal/return lifetimes"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/unit_shape.py",
+      "start_line": 149,
+      "end_line": 177,
+      "sha256": "5de5b39e0c9cdf876f42dd7fc6053259584189d12b595eb9ea58d911d0819899",
+      "size_bytes": 3286,
+      "purpose": "Accepted QA unit validators receive actual operation after owner"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/production_shape.py",
+      "start_line": 179,
+      "end_line": 211,
+      "sha256": "e7dc1cd44c492ea2b8128199e3b8811d81efad183073bb41313d889b00754e73",
+      "size_bytes": 3256,
+      "purpose": "Accepted QA production validators receive actual operation after owner"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/initial_shape.py",
+      "start_line": 275,
+      "end_line": 279,
+      "sha256": "83f3b7fbae439b0b6d2249b4ccb74d1e4c5d61962918b92e8057d577fc62d060",
+      "size_bytes": 556,
+      "purpose": "Reached matrix requires actual construction and caller owner"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/production_shape.py",
+      "start_line": 38,
+      "end_line": 82,
+      "sha256": "416fee8aeb82d888a21ebf43f352356c36bafd2aca1235feb6afa7f711a1d090",
+      "size_bytes": 4019,
+      "purpose": "Actual production availability wrapper normalizes to its inner snapshot or genuine None"
+    }
+  ],
+  "source_correspondence": {
+    "unit": {
+      "Comparison_methods_except_metric_inventory_AST_exact": [
+        "failure",
+        "exact",
+        "absence",
+        "dto",
+        "number",
+        "handoff",
+        "initial_handoff",
+        "report"
+      ],
+      "Comparison_number_text_exact": true,
+      "unused_historical_first_assembly_functions": [
+        "first_assembly_storage",
+        "matrix_count_proof",
+        "compare_matrix_models"
+      ]
+    },
+    "production": {
+      "Comparison_methods_except_metric_inventory_AST_exact": [
+        "failure",
+        "exact",
+        "absence",
+        "dto",
+        "number",
+        "handoff",
+        "initial_handoff",
+        "report"
+      ],
+      "Comparison_number_text_exact": true,
+      "unused_historical_first_assembly_functions": [
+        "first_assembly_storage",
+        "matrix_count_proof",
+        "compare_matrix_models"
+      ]
+    },
+    "method_compare_byte_exact_CTF08": true,
+    "only_method_compare_functions_called": [
+      "copied",
+      "values",
+      "matrix_map"
+    ],
+    "structural_validator_files_byte_exact_final_OriginalDataQA02": [
+      "initial_shape.py",
+      "method_shape.py",
+      "gamma_shape.py",
+      "coefficient_shape.py",
+      "retry_shape.py"
+    ],
+    "packet_io_only_CTF_root_literal_changed": true
+  },
+  "runtime_interfaces": {
+    "common_required_CLI": [
+      "approved-source-sha256",
+      "original-data-review",
+      "original-data-review-execution",
+      "Rust-build-execution",
+      "Rust-execution",
+      "Rust-results",
+      "output-dir"
+    ],
+    "production_extra_CLI": [
+      "conversion-ledger",
+      "conversion-execution"
+    ],
+    "runtime_reference_syntax": "actual path#SHA256 supplied by Root; no future values",
+    "actual_Cargo_source_snapshot_and_unique_compiler_artifact_required": true,
+    "observer_own_source_counts": {
+      "unit": 2,
+      "production": 3
+    },
+    "observer_API_source_counts": {
+      "unit": 28,
+      "production": 41
+    },
+    "actual_QA_executed_source_archives_per_lane": 8,
+    "observation_file_bound_bytes": 1073741824,
+    "metadata_file_bound_bytes": 16000000
+  },
+  "selected_pairing": {
+    "new_primary_profile_group": "ctf09_retry_profiles",
+    "new_primary_profile_count": 8,
+    "historical_handoff_groups": [
+      "ctf01_preprocessing_profiles",
+      "ctf03_initial_profiles",
+      "arithmetic_profiles_by_variable",
+      "ctf06_exponential_profiles",
+      "ctf05_inverse_profiles",
+      "ctf07_gamma_profiles",
+      "ctf08_final_coefficient_profiles"
+    ],
+    "all_genuine_no_source_1D_actual_visits_required": true,
+    "first_pre_assignment_from_actual_producer_required": true,
+    "first_BMat3_after_reset_class_and_bits_required": true,
+    "later_pre_call_BMat3_not_after_reset_owner": true,
+    "old_first_wrapper05_through08_DTOs_remain_uninvoked_context": true,
+    "Native_global_diagnostic_temporal_owners_not_equated_to_Rust_intents": true,
+    "selected_PASS_requires_observed_complete_attempt_owner_pair_and_zero_mismatches": true,
+    "missing_required_one_or_both_sides_fails": true,
+    "nonfinite_required_values_not_PASS": true,
+    "current09_and_historical08_authorities_separate": true,
+    "historical_after_documents_not_replayed_as_current_live_files": true,
+    "whole_Original_return_SI19_store_and_full_CTF09_certified": false
+  },
+  "preparation_boundary": {
+    "targets_imported_or_executed": false,
+    "scientific_weather_binary_payloads_read": false,
+    "canonical_or_Git_modified": false,
+    "new_QA_proof_or_execution_framework": false,
+    "arithmetic_or_retry_evaluator": false,
+    "numerical_PASS_claimed": false,
+    "gates_updated": false
+  },
+  "authorship_limits": "Raw authored caller/driver/Rust09 transport and some pure06. Header authored Native09/assembly/ingress; Base authored DataQA. This is actual owner/provenance pairing, not independent certification of the authors' formulas.",
+  "accepted_CTF09_01_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-01/manifest.json",
+    "sha256": "e43bd107183bd376d9775a7a339dfc614d0cb66a8898015e6d7a762ac35f3d71",
+    "size_bytes": 34272,
+    "line_count": 891
+  },
+  "before_01_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/manifest.json",
+    "sha256": "e43bd107183bd376d9775a7a339dfc614d0cb66a8898015e6d7a762ac35f3d71",
+    "size_bytes": 34272,
+    "line_count": 891
+  },
+  "before_01_README": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/README.md",
+    "sha256": "a7ca0cc58a53dc136a7d535fcf2315a9d116b39ddb5ad6eef5e39d28956a2d67",
+    "size_bytes": 6150,
+    "line_count": 91
+  },
+  "README_delta_from_01": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/README.md.diff",
+    "sha256": "82f069ee085735e245aa923fb39fdec9ebe9ab50a112c1f53be5819f1060a4e1",
+    "size_bytes": 640,
+    "line_count": 11
+  },
+  "accepted_CTF09_02_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-02/manifest.json",
+    "sha256": "fc34398dfe82b992145a5d11e8f999671c549ab3e840e3c430722041a469d84d",
+    "size_bytes": 43897,
+    "line_count": 1141
+  },
+  "before_02_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/manifest.json",
+    "sha256": "fc34398dfe82b992145a5d11e8f999671c549ab3e840e3c430722041a469d84d",
+    "size_bytes": 43897,
+    "line_count": 1141
+  },
+  "before_02_README": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/README.md",
+    "sha256": "51d807dca334bd66d4b0f6e77fb37844ba2a863ea4314cf12cbca1272418eeed",
+    "size_bytes": 6169,
+    "line_count": 91
+  },
+  "historical_fresh02_source_correspondence": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/compare_unit.py",
+        "sha256": "04ac2faecb1177a107c871a4f5b02e15b98433ad1768bdf3a634c6f6bb829dba",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/compare_unit.py",
+        "sha256": "04ac2faecb1177a107c871a4f5b02e15b98433ad1768bdf3a634c6f6bb829dba",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/compare_unit.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/compare_production.py",
+        "sha256": "491aced377247a7b93da924ae30439b8db656b54338b0936aacb367a4c7baa5b",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/compare_production.py",
+        "sha256": "491aced377247a7b93da924ae30439b8db656b54338b0936aacb367a4c7baa5b",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/compare_production.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/packet_io.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/method_compare.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/initial_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/method_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/gamma_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/coefficient_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/retry_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/retry_compare.py",
+        "sha256": "965b062fd76958f83a5c52ea77c61a577529f7ec33170a7210e69897406914a8",
+        "size_bytes": 38384,
+        "line_count": 478
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/before-01/retry_compare.py",
+        "sha256": "965b062fd76958f83a5c52ea77c61a577529f7ec33170a7210e69897406914a8",
+        "size_bytes": 38384,
+        "line_count": 478
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-02/from-01/retry_compare.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted01": true
+    }
+  ],
+  "historical_fresh02_change": {
+    "metadata_only": true,
+    "exact_unchanged_packet_io_load_metadata_bound_bytes": 16000000,
+    "README_and_runtime_interfaces_bound_corrected": true,
+    "all_ten_executable_bodies_byte_exact_accepted01": true,
+    "observation_1GiB_bound_unchanged": true,
+    "science_profiles_Comparison_methods_and_target_imports_changed": false
+  },
+  "README_delta_from_02": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/README.md.diff",
+    "sha256": "1dbc730745b86d25abcdd3fa1ec3777a5410ad8d15b88571ea76f6495ea09e76",
+    "size_bytes": 1203,
+    "line_count": 19
+  },
+  "held_CTF09_03_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-03/manifest.json",
+    "sha256": "d5e29fe2b353d2286b5c25530be115b11e48f4bcaab9587a80d5033f1cc6a907",
+    "size_bytes": 54811,
+    "line_count": 1418
+  },
+  "before_03_manifest": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/manifest.json",
+    "sha256": "d5e29fe2b353d2286b5c25530be115b11e48f4bcaab9587a80d5033f1cc6a907",
+    "size_bytes": 54811,
+    "line_count": 1418
+  },
+  "before_03_README": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/README.md",
+    "sha256": "78f4ddaf73b7bf2f1e654671f041018c29e2ae3a6b4cb718f61ac34352167675",
+    "size_bytes": 7035,
+    "line_count": 104
+  },
+  "historical_fresh03_source_correspondence": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_unit.py",
+        "sha256": "75695f6264e8eca33906706980aa4697f7fb5f5a51c849def259d7300d966f2e",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/compare_unit.py",
+        "sha256": "04ac2faecb1177a107c871a4f5b02e15b98433ad1768bdf3a634c6f6bb829dba",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/compare_unit.py.diff",
+        "sha256": "9c5f28d644a5425a238fa441bf7941a06bea1cfd4755baaa2859673ddf5a6bf8",
+        "size_bytes": 672,
+        "line_count": 11
+      },
+      "byte_exact_accepted02": false
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/compare_production.py",
+        "sha256": "ca931b635bb1213a6c795bdc88778073035e1b7abd0dcb2859061ea2609bf347",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/compare_production.py",
+        "sha256": "491aced377247a7b93da924ae30439b8db656b54338b0936aacb367a4c7baa5b",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/compare_production.py.diff",
+        "sha256": "17476daf29caf70df4770271e594dc3c1582fe6ce497206a950734b227375edd",
+        "size_bytes": 684,
+        "line_count": 11
+      },
+      "byte_exact_accepted02": false
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/packet_io.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/method_compare.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/initial_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/method_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/gamma_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/coefficient_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/retry_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_accepted02": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/retry_compare.py",
+        "sha256": "f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519",
+        "size_bytes": 38428,
+        "line_count": 479
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/before-02/retry_compare.py",
+        "sha256": "965b062fd76958f83a5c52ea77c61a577529f7ec33170a7210e69897406914a8",
+        "size_bytes": 38384,
+        "line_count": 478
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-03/from-02/retry_compare.py.diff",
+        "sha256": "d50ec9635a92eec2df8bd9973b15aea10cb253fa428ba3f061842f686f1313d1",
+        "size_bytes": 1566,
+        "line_count": 20
+      },
+      "byte_exact_accepted02": false
+    }
+  ],
+  "historical_fresh03_change": {
+    "source_only_owner_snapshot_wiring": true,
+    "changed_executable_files": [
+      "compare_unit.py",
+      "compare_production.py",
+      "retry_compare.py"
+    ],
+    "actual_owner_expression": "operation[\"after\"]",
+    "all_five_validators_receive_same_actual_owner": true,
+    "both_main_changes_only_RETRY_PAIR_SHA": true,
+    "other_seven_executable_bodies_byte_exact02": true,
+    "final_OriginalDataQA02_inventory_unchanged": true,
+    "Comparison_science_pairing_profiles_counts_absence_selection_source_guards_changed": false,
+    "held02_and_actual_failed_invocation_preserved": true,
+    "target_import_execution_or_scientific_payload_reads_performed": false,
+    "metadata_authoring": "Inline stdlib copy/SHA/difflib/AST only; no new executable preparation stage."
+  },
+  "narrow_source_correspondence": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_unit.py",
+        "sha256": "955b31f1aa3fdab51d5e31eda2bdcd9f61ce8d36b07c71a360344ff97c995f54",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/compare_unit.py",
+        "sha256": "75695f6264e8eca33906706980aa4697f7fb5f5a51c849def259d7300d966f2e",
+        "size_bytes": 80804,
+        "line_count": 871
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/compare_unit.py.diff",
+        "sha256": "422aebaa917b2e84ee82311b0c2b64324e152a59a6cd0ef3a421d4011061dabd",
+        "size_bytes": 668,
+        "line_count": 11
+      },
+      "byte_exact_held03": false
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/compare_production.py",
+        "sha256": "bd28cfb35f74c2a3dd8f53d795be71c3c29d5ebb398be5f9b8dbaf0f81645f5c",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/compare_production.py",
+        "sha256": "ca931b635bb1213a6c795bdc88778073035e1b7abd0dcb2859061ea2609bf347",
+        "size_bytes": 93945,
+        "line_count": 986
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/compare_production.py.diff",
+        "sha256": "f597cac24e779be7a7db565cbb5278a0a3b325c465a1f2664bdfb175c368c086",
+        "size_bytes": 680,
+        "line_count": 11
+      },
+      "byte_exact_held03": false
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/packet_io.py",
+        "sha256": "8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93",
+        "size_bytes": 4723,
+        "line_count": 120
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/packet_io.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937,
+        "line_count": 282
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/method_compare.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/initial_shape.py",
+        "sha256": "13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc",
+        "size_bytes": 26626,
+        "line_count": 309
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/initial_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/method_shape.py",
+        "sha256": "571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f",
+        "size_bytes": 30929,
+        "line_count": 284
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/method_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636,
+        "line_count": 316
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/gamma_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650,
+        "line_count": 516
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/coefficient_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/retry_shape.py",
+        "sha256": "c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a",
+        "size_bytes": 45117,
+        "line_count": 407
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/retry_shape.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "byte_exact_held03": true
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/retry_compare.py",
+        "sha256": "80a4fecec35bd345cb301b72aef6be8952fe01b9ef2a17327f7f9a4eb3a91355",
+        "size_bytes": 38478,
+        "line_count": 479
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/before-03/retry_compare.py",
+        "sha256": "f91bf13601ed294d6fc2d51b4309671aa76efc0a069708db9e318fd22e28f519",
+        "size_bytes": 38428,
+        "line_count": 479
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/retry_compare.py.diff",
+        "sha256": "ac6bb0000dae933f4e08dc3a3785f93717934113f976f3374e8e151cc81309c2",
+        "size_bytes": 698,
+        "line_count": 11
+      },
+      "byte_exact_held03": false
+    }
+  ],
+  "README_delta_from_03": {
+    "path": ".runtime/porting/CTF-09/comparer-prep-04/from-03/README.md.diff",
+    "sha256": "ee7abddc9f1bfd05e0a651897e613e8b421c36d2dc17662b0dc74c5ba22c6fbb",
+    "size_bytes": 1113,
+    "line_count": 17
+  },
+  "fresh04_change": {
+    "source_only_actual_lane_owner_wiring": true,
+    "changed_executable_files": [
+      "compare_unit.py",
+      "compare_production.py",
+      "retry_compare.py"
+    ],
+    "actual_owner_expression": "operation[\"after\"][\"snapshot\"] if production else operation[\"after\"]",
+    "production_unavailable_snapshot_None_preserved": true,
+    "all_five_validators_receive_same_actual_owner": true,
+    "both_main_changes_only_RETRY_PAIR_SHA": true,
+    "seven_other_executable_bodies_byte_exact_02_and03": true,
+    "final_OriginalDataQA02_inventory_unchanged": true,
+    "Comparison_science_pairing_profiles_counts_absence_selection_source_guards_changed": false,
+    "held03_preserved_not_executed": true,
+    "target_import_execution_or_scientific_payload_reads_performed": false
+  }
+}

@@ -1,0 +1,2759 @@
+{
+  "schema": "ctf10-actual-selected-public-storage-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-unit/manifest.json",
+    "sha256": "651132e10cce9c1f46288106c6e0d71cdc77c52d48050d7c6f1f36d3dbb59d10",
+    "size_bytes": 593563
+  },
+  "prior_actual_Original_and_unchanged_Rust_baseline": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-original-baseline/summary.json",
+    "sha256": "68f690bc418d0338f1b5cf2cd6d9cc535424e42c4f169438854a7568ec9a3d7d",
+    "size_bytes": 22013
+  },
+  "actual_applied_source": {
+    "path": ".runtime/porting/CTF-10/applied-final-source-02/manifest.json",
+    "sha256": "7b1dbbec2084e09bbc29bb1cde37bcc3fd539c6bb452e4a01d596753d2b1ea0c",
+    "size_bytes": 26984
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/88/88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb",
+    "sha256": "88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb"
+  },
+  "actual_Cargo_build": {
+    "path": ".runtime/porting/CTF-10/candidate-build-command-01/receipt.json",
+    "sha256": "0c806c1602813a0bf5c59eba5603f95ea047333144380eb61f5356d7ade2abd5",
+    "size_bytes": 7913
+  },
+  "unit": {
+    "status": "pass-selected-public-storage",
+    "numeric_comparisons": 948290,
+    "discrete_comparisons": 3874496,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 3874496,
+      "preprocessing_handoff_scalar_copies": 1874,
+      "initial_handoff_scalar_copies": 148,
+      "numeric_comparisons": 948290,
+      "retry_selected_attempt_owner_pairs": 41,
+      "public_selected_returned_owner_pairs": 42
+    },
+    "primary_public_metrics": {
+      "CTF10.CTFOutside": {
+        "count": 798,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFCross": {
+        "count": 798,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFInside": {
+        "count": 798,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFFlux": {
+        "count": 798,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFTimeStep": {
+        "count": 42,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.UValue": {
+        "count": 42,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "assembly_handoff_metrics": {
+      "AMat": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "IdenMatrix": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "BMat": {
+        "count": 123,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CMat": {
+        "count": 82,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "DMat": {
+        "count": 82,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "assembly_CTFTimeStep": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "method_handoff_metrics": {
+      "CTF06.AExp": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMat1": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMato": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMatN": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.AMatRowNormMax": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.fact": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.CheckVal": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.AInv": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.final_AMat1": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "Gamma_handoff_metrics": {
+      "CTF07.Gamma1": {
+        "count": 4155,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.Gamma2": {
+        "count": 4155,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.ATemp": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "private_final_handoff_metrics": {
+      "CTF08.s0": {
+        "count": 492,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.s": {
+        "count": 16620,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.e": {
+        "count": 1385,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.mutated_Gamma1": {
+        "count": 4155,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.PhiR0": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.Rnew": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.Rold": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "retry_handoff_metrics": {
+      "CTF09.pre_AMat": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.pre_IdenMatrix": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumXi": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumYi": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumZi": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.BiggestSum": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.pre_CTFTimeStep": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.post_CTFTimeStep": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "actual_public_storage_owner_ledger": [
+      {
+        "path": "active-prefix-01/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-02/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-03/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-04/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-05/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-06/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-07/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-08/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-09/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-10/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "active-prefix-11/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "unused-before-layer-loading/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "UnusedReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "single-no-mass/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "two-boundary-no-mass/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "outside-no-mass/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "inside-no-mass/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "interior-no-mass/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "two-adjacent-interior/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "three-adjacent-interior/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "disjoint-adjacent-interiors/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "boundary-neighbor-three-layers/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "boundary-neighbor-four-layers/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "computed-reslayer-not-ronly/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "ordered-resistance-forward/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "ordered-resistance-reversed/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "conductivity-threshold-below/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "thin-metric-threshold-below/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "resistance-minimum-below/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "thickness-maximum-below/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveSevereBreak",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "conductivity-threshold-equal/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "thin-metric-threshold-equal/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "resistance-minimum-equal/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "thickness-maximum-equal/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveSevereBreak",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "conductivity-threshold-above/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "thin-metric-threshold-above/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "resistance-minimum-above/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "thickness-maximum-above/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-2",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "shared-error-then-valid-then-unused/construction-3",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "UnusedReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "incoming-shared-error-and-report-flag/construction-1",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "incoming-shared-error-and-report-flag/construction-2",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "LoadingErrorReset",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      }
+    ],
+    "actual_public_Init_prefix_ledger": [],
+    "actual_public_storage_count_proof": {
+      "actual_public_storage_observation_counts": {
+        "actual_site_counts": [
+          42,
+          42,
+          0,
+          0,
+          42,
+          42
+        ],
+        "actual_whole_call_records": 42,
+        "failure_kind_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "numerical_PASS_claimed": false,
+        "public_copy_integrity_failed": false
+      },
+      "actual_public_copy_integrity_failed_records": 0
+    },
+    "unavailable_observation_count": 108,
+    "unavailable_counted_as_PASS": false
+  },
+  "fixed15_production": {
+    "status": "pass-selected-loader-to-public-storage",
+    "numeric_comparisons": 8988,
+    "discrete_comparisons": 57532,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 57532,
+      "preprocessing_handoff_scalar_copies": 378,
+      "initial_handoff_scalar_copies": 45,
+      "numeric_comparisons": 8988,
+      "retry_selected_attempt_owner_pairs": 15,
+      "public_selected_returned_owner_pairs": 21
+    },
+    "primary_public_metrics": {
+      "CTF10.CTFOutside": {
+        "count": 399,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFCross": {
+        "count": 399,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFInside": {
+        "count": 399,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFFlux": {
+        "count": 399,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.CTFTimeStep": {
+        "count": 21,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF10.UValue": {
+        "count": 21,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "assembly_handoff_metrics": {
+      "AMat": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "IdenMatrix": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "BMat": {
+        "count": 45,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CMat": {
+        "count": 30,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "DMat": {
+        "count": 30,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "assembly_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "method_handoff_metrics": {
+      "CTF06.AExp": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMat1": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMato": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMatN": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.AMatRowNormMax": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.fact": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.CheckVal": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.AInv": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.final_AMat1": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "Gamma_handoff_metrics": {
+      "CTF07.Gamma1": {
+        "count": 225,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.Gamma2": {
+        "count": 225,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.ATemp": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "private_final_handoff_metrics": {
+      "CTF08.s0": {
+        "count": 180,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.s": {
+        "count": 900,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.e": {
+        "count": 75,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.mutated_Gamma1": {
+        "count": 225,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.PhiR0": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.Rnew": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.Rold": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "retry_handoff_metrics": {
+      "CTF09.pre_AMat": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.pre_IdenMatrix": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumXi": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumYi": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumZi": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.BiggestSum": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.pre_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.post_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "actual_public_storage_owner_ledger": [
+      {
+        "path": "A-24H/R13WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-24H/FLOOR",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-24H/ROOF31",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-72H/R13WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-72H/FLOOR",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-72H/ROOF31",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-ANNUAL/R13WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-ANNUAL/FLOOR",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "A-ANNUAL/ROOF31",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "AllResistive",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-NOLIMIT-24H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-NOLIMIT-72H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-NOLIMIT-ANNUAL/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-FLOW-24H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-FLOW-72H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-FLOW-ANNUAL/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-CAPACITY-24H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-CAPACITY-72H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-CAPACITY-ANNUAL/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-BOTH-24H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-BOTH-72H/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      },
+      {
+        "path": "B-BOTH-ANNUAL/WALL",
+        "actual_public_storage_owner_pair": true,
+        "counted_as_PASS": false,
+        "Native_whole_call_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_public_route": "MassiveConverged",
+        "excluded_or_unavailable_reason": null,
+        "Native_actual_return_reached": true,
+        "Native_selected_no_source_1D": true,
+        "Native_fixed_capacity_representable": true
+      }
+    ],
+    "actual_public_Init_prefix_ledger": [
+      {
+        "model_id": "A-24H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 1,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587331409792,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          },
+          {
+            "actual_event_ordinal": 7,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587331445288,
+              "actual_construction_index": 2,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          },
+          {
+            "actual_event_ordinal": 10,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587331480784,
+              "actual_construction_index": 3,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 3
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "A-72H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 1,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587339780160,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          },
+          {
+            "actual_event_ordinal": 7,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587339815656,
+              "actual_construction_index": 2,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          },
+          {
+            "actual_event_ordinal": 10,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587339851152,
+              "actual_construction_index": 3,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 3
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "A-ANNUAL",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 1,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587327852608,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          },
+          {
+            "actual_event_ordinal": 7,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587327888104,
+              "actual_construction_index": 2,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          },
+          {
+            "actual_event_ordinal": 10,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": true,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 3,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587327923600,
+              "actual_construction_index": 3,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 3
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-NOLIMIT-24H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587336011840,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-NOLIMIT-72H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587336011840,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-NOLIMIT-ANNUAL",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587331055680,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-FLOW-24H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587331055680,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-FLOW-72H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587308257600,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-FLOW-ANNUAL",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587308257600,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-CAPACITY-24H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587308257600,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-CAPACITY-72H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587340345408,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-CAPACITY-ANNUAL",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587340345408,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-BOTH-24H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587492745280,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-BOTH-72H",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587492991872,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      },
+      {
+        "model_id": "B-BOTH-ANNUAL",
+        "actual_Native_aggregate_events": [
+          {
+            "actual_event_ordinal": 4,
+            "copy_available": true,
+            "counted_as_PASS": false,
+            "event": "PostConstructionAggregate",
+            "snapshot": {
+              "AnyInternalHeatSourceInInput": false,
+              "Constructions": false,
+              "DoCTFErrorReport": false,
+              "ErrorsFound": false,
+              "GetReportInput": false,
+              "InitCTFDoReport": null,
+              "MaxCTFTerms": 5,
+              "SimpleCTFOnly": true,
+              "actual_Construct_array_size": 1,
+              "actual_TimeStepZone": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000",
+                "value_class": "finite"
+              },
+              "actual_cCounter": 0,
+              "actual_construction_address": 2587492991872,
+              "actual_construction_index": 1,
+              "actual_opaque_layer_column_count": 10,
+              "actual_predefined_table_entry_count": 6
+            }
+          }
+        ],
+        "Rust_actual_aggregate_prefix": {
+          "MaxCTFTerms": 5,
+          "SimpleCTFOnly": true,
+          "returned_constructions": 1
+        },
+        "Native_whole_Init_outcome_context_only": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        },
+        "Rust_selected_stop": null,
+        "whole_Init_or_report_PASS_claimed": false,
+        "intermediate_Native_aggregate_snapshots_paired": false
+      }
+    ],
+    "actual_public_storage_count_proof": {
+      "actual_public_storage_observation_counts": {
+        "actual_site_counts": [
+          21,
+          21,
+          0,
+          0,
+          21,
+          21
+        ],
+        "actual_whole_call_records": 21,
+        "failure_kind_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "numerical_PASS_claimed": false,
+        "public_copy_integrity_failed": false
+      },
+      "actual_public_copy_integrity_failed_records": 0,
+      "actual_whole_Init_invocations": 15,
+      "actual_Init_event_count": 216,
+      "actual_Init_construction_call_count": 21,
+      "actual_retained_Init_call_records": 21,
+      "actual_Init_diagnostic_count": 0,
+      "Init_copy_integrity_failed_records": 0,
+      "unreturned_Init_call_records": 0,
+      "actual_whole_Init_status_counts": {
+        "source_returned": 15
+      }
+    },
+    "unavailable_observation_count": 123,
+    "unavailable_counted_as_PASS": false
+  },
+  "quality": {
+    "focused_coefficient_tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/coefficient-tests-command-01/receipt.json",
+        "sha256": "9d80b7db2dc6a3652527b57adad514d85a943b2ff6ff0727d43a9109641b63fd",
+        "size_bytes": 4606
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/88/88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb",
+        "sha256": "88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb"
+      },
+      "actual_test_result_totals": {
+        "passed": 177,
+        "failed": 0,
+        "ignored": 0
+      },
+      "actual_test_result_row_count": 1
+    },
+    "workspace_tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/quality-tests-command-01/receipt.json",
+        "sha256": "2fc73af66c0fb4c4852eb8bdcee70047c878449ea0f0b8c14c3a57b8b84517e3",
+        "size_bytes": 4586
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/88/88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb",
+        "sha256": "88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb"
+      },
+      "actual_test_result_totals": {
+        "passed": 4797,
+        "failed": 0,
+        "ignored": 0
+      },
+      "actual_test_result_row_count": 49
+    },
+    "clippy": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/quality-clippy-command-02/receipt.json",
+        "sha256": "34f31225c06f2968d34caf7d3ce25ec372d76f0f51d2ab355137b13ec9189ca2",
+        "size_bytes": 4625
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/88/88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb",
+        "sha256": "88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb"
+      }
+    },
+    "format_check": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/quality-fmt-command-01/receipt.json",
+        "sha256": "8fbd580d67477d7fc38c347915ea891cfba847ab994a5e7c057ac5f950b33362",
+        "size_bytes": 4428
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/88/88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb",
+        "sha256": "88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb"
+      }
+    }
+  },
+  "source_review": {
+    "Root_and_other_author_FULL_before_application": true,
+    "Root_and_Raw_FULL_formatter_correspondence": true,
+    "Root_and_Base_FULL_comparer02": true,
+    "Root_and_Base_FULL_test_borrow_repair": true,
+    "mathematical_operands_order_changed": false,
+    "frozen_profiles_or_required_absence_rules_changed": false
+  },
+  "selected_unit_and_fixed15_comparisons_passed": true,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "complete_CTF09_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "unavailable_partial_or_uninvoked_observations_counted_as_PASS": false,
+  "whole_Init_reporting_final_fatal_backend_or_surface_handoff_certified": false,
+  "cache_invalidation_and_surface_history_activation_certified": false,
+  "unit_integration_and_production_gates_updated": false,
+  "fixed6_CLI_evidence_published_here": false,
+  "integration_or_production_gate_PASS_claimed": false,
+  "Originals_retained_pending_separate_actual_retention_record": true,
+  "Root_authored_summary_is_not_a_command_recorder": true,
+  "full_Native_and_Rust_scientific_bytes_roundtrip_preserved": true,
+  "actual_unit_execution": {
+    "path": ".runtime/porting/CTF-10/candidate-unit-command-01/receipt.json",
+    "sha256": "b35a1780c5c6339065e8c5a502eee00f86eb18536cc27414887c763c6fa55876",
+    "size_bytes": 5062
+  },
+  "actual_unit_comparison": {
+    "path": ".runtime/porting/CTF-10/unit-comparison-01/comparison.json",
+    "sha256": "df39f639801bb954ba0a4f56a1bd47bca19150a633d29dff316603b1288e5958",
+    "size_bytes": 1065024
+  },
+  "actual_unit_comparison_execution": {
+    "path": ".runtime/porting/CTF-10/unit-comparison-command-01/receipt.json",
+    "sha256": "ed9dcba53321bb1154daa0fcaa91e6b37132a4cd578d2b863467014721501a30",
+    "size_bytes": 5482
+  },
+  "actual_production_execution": {
+    "path": ".runtime/porting/CTF-10/candidate-production-command-01/receipt.json",
+    "sha256": "2c1592d29ca01e47b5827b2ce72301483c71c22a7064dd97ea7ded275ebde65c",
+    "size_bytes": 4730
+  },
+  "actual_production_comparison": {
+    "path": ".runtime/porting/CTF-10/production-comparison-01/comparison.json",
+    "sha256": "e3901dd7c8bb7773f8ad962c6cb403f68de3498e45fb28850fedab157f5d10e7",
+    "size_bytes": 545476
+  },
+  "actual_production_comparison_execution": {
+    "path": ".runtime/porting/CTF-10/production-comparison-command-01/receipt.json",
+    "sha256": "ecc14cb8a121818ddcc44458520d1fe9f6a81468f11e142462e3e00d6661a2f6",
+    "size_bytes": 5866
+  }
+}

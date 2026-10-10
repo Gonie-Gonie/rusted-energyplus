@@ -1,0 +1,11 @@
+--- crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs
++++ proposed/crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs
+@@ -131,7 +131,7 @@
+     let used = construction(5, &[1]);
+     let b = owners(
+         &used,
+-        &[unused.clone()],
++        std::slice::from_ref(&unused),
+         &BTreeSet::from([5]),
+         &[material(1, true, 0.0001)],
+         context(true, false),

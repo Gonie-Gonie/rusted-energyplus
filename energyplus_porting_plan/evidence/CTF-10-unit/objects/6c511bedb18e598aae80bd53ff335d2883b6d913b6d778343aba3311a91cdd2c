@@ -1,0 +1,178 @@
+--- actual-final09/ctf10_candidate_unit_observer.rs
++++ proposed10/ctf10_candidate_unit_observer.rs
+@@ -2,10 +2,14 @@
+ #![recursion_limit = "256"]
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf09_candidate_unit_support/fields.rs"]
++#[path = "ctf10_candidate_unit_support/fields.rs"]
+ mod fields;
+ 
+ use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
++use ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization;
++use ep_runtime::heat_balance::surface_manager::ctf_all_resistive::{
++    ConstructionCtfAllResistive, CtfAllResistiveUnavailable, generate_all_resistive_ctf,
++};
+ use ep_runtime::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
+ use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+ use ep_runtime::heat_balance::ctf_retry_initialization::{
+@@ -89,7 +93,7 @@
+ }
+ fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+     require(
+-        inventory["schema"] == "ctf09-candidate-unit-runtime-source-bindings.v1"
++        inventory["schema"] == "ctf10-candidate-unit-runtime-source-bindings.v1"
+             && inventory
+                 .as_object()
+                 .is_some_and(|object| object.len() == 3),
+@@ -182,6 +186,8 @@
+     };
+     let mut prior_stop = None;
+     let mut observed = Vec::new();
++    // This direct-unit Rust API prefix is not an actual Native whole Init call.
++    let mut public_initialization = OrderedCtfPublicInitialization::begin(true, 0);
+     for (index, ((declaration, construction), operation)) in declarations
+         .iter()
+         .zip(&constructions)
+@@ -230,6 +236,8 @@
+                 "CTF07_first_gammas":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_gammas",construction.id.0),
+                 "CTF08_first_private_coefficients":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_final_coefficients",construction.id.0),
+                 "CTF09_retry_initialization":fields::retry_initialization(&skipped),
++                "CTF10_public":fields::public_unavailable("prior actual selected retry chain stop; no public suffix prerequisites fabricated"),
++                "actual_Rust_public_record_ordinary_API_invoked":false,"actual_Rust_all_resistive_API_invoked":false,
+                 "actual_Rust_retry_driver_API_invoked":false,"actual_Rust_combined_API_invoked":false,
+                 "Native_fatal_exception_method_phase_or_OS_status_inferred":false}));
+             continue;
+@@ -265,6 +273,12 @@
+         }
+         let after_preprocessing = selected_flags;
+         let time_step_zone = scalar(&model["caller"]["TimeStepZone"])?;
++        let all_resistive = ConstructionCtfAllResistive {
++            construction_id: construction.id,
++            result: preprocessing.result.as_ref()
++                .map_err(|reason| CtfAllResistiveUnavailable::PreprocessingScope(*reason))
++                .and_then(|actual| generate_all_resistive_ctf(actual, time_step_zone)),
++        };
+         let initial = initialize_construction_ctf_initial(
+             construction,
+             &constructions[..index],
+@@ -283,6 +297,11 @@
+         let retry = initialize_construction_ctf_retry(first_assembly, selected_flags, names);
+         selected_flags = retry.flags_on_return;
+         prior_stop = retry.selected_chain_stop;
++        public_initialization.record_ordinary(index, construction, &preprocessing, Some(&initial), &all_resistive, &retry);
++        let public_copy = public_initialization.constructions.last()
++            .filter(|actual| actual.construction_id == construction.id)
++            .map(fields::public_construction)
++            .ok_or("actual ordered public owner absent")?;
+         observed.push(json!({"id":operation["id"],"declared_native_operation_kind":operation["kind"],
+             "logical_construction_id":declaration["id"],"actual_Rust_API":"preprocess_ctf_layers",
+             "actual_source_invoked":true,"selected_flags_before":fields::flags(before),
+@@ -299,6 +318,8 @@
+             "CTF07_first_gammas":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_gammas",construction.id.0),
+             "CTF08_first_private_coefficients":fields::first_wrapper_uninvoked("initialize_construction_ctf_first_final_coefficients",construction.id.0),
+             "CTF09_retry_initialization":fields::retry_initialization(&retry),
++            "CTF10_public":public_copy,
++            "actual_Rust_public_record_ordinary_API_invoked":true,"actual_Rust_all_resistive_API_invoked":preprocessing.result.is_ok(),
+             "actual_Rust_retry_driver_API_invoked":true,"actual_Rust_combined_API_invoked":false,
+             "predecessor_owners_reexecuted_for_method_observation":false,
+             "actual_Rust_CTF03_API":"initialize_construction_ctf_initial","actual_Rust_CTF03_API_invoked":true,
+@@ -310,6 +331,7 @@
+             "preprocessing_reexecuted_for_initial_owner":false,"observer_reverse_classifier_duplicated":false,
+             "Native_whole_method_outcome_or_later_flags_inferred":false}));
+     }
++    public_initialization.finish_declared_loop(constructions.len());
+     Ok(
+         json!({"id":model["id"],"lane":model["lane"],"declared_caller":model["caller"],
+         "materials":material_declarations.iter().zip(&typed).map(|(declared,actual)|json!({
+@@ -319,7 +341,9 @@
+         "final_selected_ErrorsFound":selected_flags.errors_found,
+         "final_selected_DoCTFErrorReport":selected_flags.do_ctf_error_report,
+         "selected_chain_stop":prior_stop.as_ref().map(|stop|format!("{stop:?}")),
+-        "explicit_member_input_not_Material_loader_observation":true}),
++        "explicit_member_input_not_Material_loader_observation":true,
++        "CTF10_public_initialization":fields::public_initialization(&public_initialization),
++        "Native_unit_whole_Init_invoked":false,"unit_aggregate_context_is_Rust_API_only":true}),
+     )
+ }
+ fn main() {
+@@ -383,9 +407,9 @@
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     let sources: Value = serde_json::from_slice(&sources_bytes)?;
+     require(
+-        request["schema"] == "ctf09-helper-cases.v1"
+-            && admission["schema"] == "ctf09-native-admission-contract.v1"
+-            && request["frozen_before_this_CTF09_helper_execution"] == true
++        request["schema"] == "ctf10-helper-cases.v1"
++            && admission["schema"] == "ctf10-native-admission-contract.v1"
++            && request["frozen_before_this_CTF10_helper_execution"] == true
+             && request["expected_values_supplied"] == false
+             && request["expected_exits_supplied"] == false
+             && request["scientific_execution_performed"] == false,
+@@ -412,16 +436,34 @@
+         bindings.push(request[key].clone());
+     }
+     require(
+-        request["actual_scope_amendment_execution_role"] == "real-CTF-09-check-only"
++        request["actual_scope_amendment_execution_role"] == "real-CTF-10-check-only"
+             && admission["actual_scope_amendment_execution_role"]
+                 == request["actual_scope_amendment_execution_role"]
+-            && admission["historical_prior_08_authority"]
+-                == request["historical_prior_08_authority"]
++            && admission["historical_prior_09_authority"]
++                == request["historical_prior_09_authority"]
+             && admission["current_cards"] == request["current_cards"],
+-        "current09 authority or separate historical prior08 authority differs",
+-    )?;
+-    bindings.push(request["current_cards"]["CTF-09"].clone());
+-    let prior08 = &request["historical_prior_08_authority"];
++        "current10 authority or separate historical prior09 authority differs",
++    )?;
++    bindings.push(request["current_cards"]["CTF-10"].clone());
++    for key in ["ctf10_public_storage_observation_policy", "ctf10_execution_lane_policy", "ctf10_public_profiles"] {
++        require(admission[key] == request[key] && !request[key].is_null(), "Current10 policy custody differs")?;
++    }
++
++    let prior09 = &request["historical_prior_09_authority"];
++    require(prior09["prior09_numerical_PASS_inferred"] == false,
++        "historical prior09 authority must infer no numerical PASS")?;
++    for key in ["prior_09_freeze", "prior_09_freeze_execution", "prior_09_writer_manifest",
++        "prior_09_source_contract", "prior_09_scope_amendment", "prior_09_scope_check_execution"] {
++        bindings.push(prior09[key].clone());
++    }
++    let (_, source09_bytes) = bound(&root, &prior09["prior_09_source_contract"])?;
++    let source09: Value = serde_json::from_slice(&source09_bytes)?;
++    require(prior09["prior_09_selected_primary_ranges"] == source09["ctf09_selected_primary_ranges"]
++        && prior09["historical_prior_08_authority"] == source09["source_authorities"]["historical_prior_08_authority"],
++        "historical prior09 ranges or nested prior08 literal ancestry differs")?;
++    for binding in rows(&prior09["historical_before_document_archives"])? { bindings.push(binding.clone()); }
++    for binding in rows(&prior09["available_prior_frozen_document_archives"])? { bindings.push(binding["archive"].clone()); }
++    let prior08 = &prior09["historical_prior_08_authority"];
+     require(
+         prior08["prior08_numerical_PASS_inferred"] == false,
+         "historical prior08 authority must infer no numerical PASS",
+@@ -562,12 +604,12 @@
+     )?;
+     println!(
+         "{}",
+-        serde_json::to_string(&json!({"schema":"ctf09-candidate-unit-observer-results.v1",
++        serde_json::to_string(&json!({"schema":"ctf10-candidate-unit-observer-results.v1",
+         "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admission_bytes)},
+         "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+         "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+         "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],
+-        "historical_prior_08_authority":request["historical_prior_08_authority"],"current_cards":request["current_cards"],
++        "historical_prior_09_authority":request["historical_prior_09_authority"],"current_cards":request["current_cards"],
+         "actual_scope_amendment_execution_role":request["actual_scope_amendment_execution_role"],
+         "runtime_source_bindings":{"path":sources_path,"sha256":digest::sha256(&sources_bytes)},"authenticated_source_inventory":sources,
+         "ctf03_initial_observation_policy":request["ctf03_initial_observation_policy"],
+@@ -578,6 +620,9 @@
+         "ctf08_final_coefficient_observation_policy":request["ctf08_final_coefficient_observation_policy"],
+         "ctf09_retry_observation_policy":request["ctf09_retry_observation_policy"],
+         "ctf09_attempt_selection":request["ctf09_attempt_selection"],
++        "ctf10_public_storage_observation_policy":request["ctf10_public_storage_observation_policy"],
++        "ctf10_execution_lane_policy":request["ctf10_execution_lane_policy"],
++        "ctf10_public_profiles":request["ctf10_public_profiles"],
+         "actual_Rust_combined_API_invocations":0,
+         "actual_Rust_retry_driver_API_invocations":actual_calls("actual_Rust_retry_driver_API_invoked")?,
+         "actual_Rust_CTF04_API_invocations":actual_calls("actual_Rust_CTF04_API_invoked")?,"Rust_retry_driver_available":true,

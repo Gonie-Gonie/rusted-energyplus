@@ -85,6 +85,10 @@ pub struct HeatBalanceState {
     /// First assembly/method views are actual driver visit1, not replayed wrappers.
     pub construction_ctf09_retry_driver:
         Vec<super::ctf_retry_initialization::ConstructionCtfRetryInitialization>,
+    /// Actual selected ordered public storage/aggregate prefix, moved once from cache.
+    /// Reports, final fatal backend and legacy surface activation remain separate.
+    pub construction_ctf10_public_initialization:
+        Option<super::ctf_public_initialization::OrderedCtfPublicInitialization>,
     /// Construction coefficient cache build time in seconds.
     pub construction_cache_build_wall_seconds: f64,
     /// Number of construction cache entries.

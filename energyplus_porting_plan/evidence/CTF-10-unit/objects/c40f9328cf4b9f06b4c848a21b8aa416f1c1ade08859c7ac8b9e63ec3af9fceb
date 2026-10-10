@@ -1,0 +1,158 @@
+"""Emit ignored Rust10 observer proposals from actual final09 Source archives only."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+FINAL = ROOT / ".runtime/porting/CTF-09/applied-final-source-04"
+MAPPING = {
+    "ctf10_candidate_unit_observer.rs": "crates/ep_run/examples/ctf09_candidate_unit_observer.rs",
+    "unit_fields.rs": "crates/ep_run/examples/ctf09_candidate_unit_support/fields.rs",
+    "ctf10_candidate_production_observer.rs": "crates/ep_run/examples/ctf09_candidate_production_observer.rs",
+    "production_fields.rs": "crates/ep_run/examples/ctf09_candidate_production_support/fields.rs",
+    "production_unit_fields.rs": "crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs",
+}
+
+
+def read(path): return path.read_bytes().decode("utf-8")
+
+
+def emit(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.encode("utf-8"))
+
+
+def once(text, old, new):
+    assert text.count(old) == 1, (old, text.count(old))
+    return text.replace(old, new, 1)
+
+
+def adapt_authority(text, operand):
+    text = text.replace('"real-CTF-09-check-only"', '"real-CTF-10-check-only"')
+    text = text.replace('"historical_prior_08_authority":', '"historical_prior_09_authority":')
+    text = text.replace('admission["historical_prior_08_authority"]', 'admission["historical_prior_09_authority"]')
+    text = text.replace(operand + '["historical_prior_08_authority"]', operand + '["historical_prior_09_authority"]')
+    text = text.replace(operand + '["current_cards"]["CTF-09"]', operand + '["current_cards"]["CTF-10"]')
+    anchor = '    let prior08 = &' + operand + '["historical_prior_09_authority"];'
+    addition = """    let prior09 = &OPERAND["historical_prior_09_authority"];
+    require(prior09["prior09_numerical_PASS_inferred"] == false,
+        "historical prior09 authority must infer no numerical PASS")?;
+    for key in ["prior_09_freeze", "prior_09_freeze_execution", "prior_09_writer_manifest",
+        "prior_09_source_contract", "prior_09_scope_amendment", "prior_09_scope_check_execution"] {
+        bindings.push(prior09[key].clone());
+    }
+    let (_, source09_bytes) = bound(&root, &prior09["prior_09_source_contract"])?;
+    let source09: Value = serde_json::from_slice(&source09_bytes)?;
+    require(prior09["prior_09_selected_primary_ranges"] == source09["ctf09_selected_primary_ranges"]
+        && prior09["historical_prior_08_authority"] == source09["source_authorities"]["historical_prior_08_authority"],
+        "historical prior09 ranges or nested prior08 literal ancestry differs")?;
+    for binding in rows(&prior09["historical_before_document_archives"])? { bindings.push(binding.clone()); }
+    for binding in rows(&prior09["available_prior_frozen_document_archives"])? { bindings.push(binding["archive"].clone()); }
+    let prior08 = &prior09["historical_prior_08_authority"];
+""".replace("OPERAND", operand)
+    text = once(text, anchor + "\n", addition)
+    marker = '    bindings.push(' + operand + '["current_cards"]["CTF-10"].clone());'
+    checks = """
+    for key in ["ctf10_public_storage_observation_policy", "ctf10_execution_lane_policy", "ctf10_public_profiles"] {
+        require(admission[key] == OPERAND[key] && !OPERAND[key].is_null(), "Current10 policy custody differs")?;
+    }
+""".replace("OPERAND", operand)
+    return once(text, marker, marker + checks).replace("current09 authority or separate historical prior08 authority differs", "current10 authority or separate historical prior09 authority differs")
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Held source already exists"
+    final = json.loads(read(FINAL / "manifest.json"))
+    actual = {row["canonical_path"]: row["actual_final_source"] for row in final["actual_sources"]}
+    source = {}
+    for name, canonical in MAPPING.items():
+        row = actual[canonical]; data = (ROOT / row["path"]).read_bytes()
+        assert hashlib.sha256(data).hexdigest() == row["sha256"]
+        assert (ROOT / canonical).read_bytes() == data, canonical
+        (OUT / "before").mkdir(exist_ok=True)
+        (OUT / "before" / name).write_bytes(data)
+        source[name] = data.decode("utf-8").replace("ctf09_candidate", "ctf10_candidate")
+    shared = source["unit_fields.rs"] + "\n" + read(OUT / "public_fields_additions.txt")
+    for extra in ["crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+                  "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+                  "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs"]:
+        shared = once(shared, '    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",\n',
+            '    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",\n    "' + extra + '",\n')
+    source["unit_fields.rs"] = shared
+    source["production_unit_fields.rs"] = shared
+    production_fields = source["production_fields.rs"]
+    for extra in ["crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+                  "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs"]:
+        production_fields = once(production_fields, '    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",\n',
+            '    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",\n    "' + extra + '",\n')
+    production_fields += """
+pub(super) fn ctf10_unavailable() -> Value {
+    unit_fields::public_unavailable("ordinary initializer has not returned an actual HeatBalanceState/public owner")
+}
+pub(super) fn ctf10_selected(source: &HeatBalanceState) -> Value {
+    match source.construction_ctf10_public_initialization.as_ref() {
+        Some(actual) => unit_fields::public_initialization(actual),
+        None => unit_fields::public_unavailable("actual initialized State has no selected public initialization owner"),
+    }
+}
+"""
+    source["production_fields.rs"] = production_fields
+    unit = source["ctf10_candidate_unit_observer.rs"]
+    unit = once(unit, "use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};",
+        """use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
+use ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization;
+use ep_runtime::heat_balance::surface_manager::ctf_all_resistive::{
+    ConstructionCtfAllResistive, CtfAllResistiveUnavailable, generate_all_resistive_ctf,
+};""")
+    unit = once(unit, "    let mut observed = Vec::new();", """    let mut observed = Vec::new();
+    // This direct-unit Rust API prefix is not an actual Native whole Init call.
+    let mut public_initialization = OrderedCtfPublicInitialization::begin(true, 0);""")
+    unit = once(unit, '                "CTF09_retry_initialization":fields::retry_initialization(&skipped),',
+        '                "CTF09_retry_initialization":fields::retry_initialization(&skipped),\n                "CTF10_public":fields::public_unavailable("prior actual selected retry chain stop; no public suffix prerequisites fabricated"),\n                "actual_Rust_public_record_ordinary_API_invoked":false,"actual_Rust_all_resistive_API_invoked":false,')
+    unit = once(unit, '        let time_step_zone = scalar(&model["caller"]["TimeStepZone"])?;', """        let time_step_zone = scalar(&model["caller"]["TimeStepZone"])?;
+        let all_resistive = ConstructionCtfAllResistive {
+            construction_id: construction.id,
+            result: preprocessing.result.as_ref()
+                .map_err(|reason| CtfAllResistiveUnavailable::PreprocessingScope(*reason))
+                .and_then(|actual| generate_all_resistive_ctf(actual, time_step_zone)),
+        };""")
+    unit = once(unit, "        prior_stop = retry.selected_chain_stop;", """        prior_stop = retry.selected_chain_stop;
+        public_initialization.record_ordinary(index, construction, &preprocessing, Some(&initial), &all_resistive, &retry);
+        let public_copy = public_initialization.constructions.last()
+            .filter(|actual| actual.construction_id == construction.id)
+            .map(fields::public_construction)
+            .ok_or("actual ordered public owner absent")?;""")
+    unit = once(unit, '            "CTF09_retry_initialization":fields::retry_initialization(&retry),',
+        '            "CTF09_retry_initialization":fields::retry_initialization(&retry),\n            "CTF10_public":public_copy,\n            "actual_Rust_public_record_ordinary_API_invoked":true,"actual_Rust_all_resistive_API_invoked":preprocessing.result.is_ok(),')
+    unit = once(unit, "    Ok(\n        json!", "    public_initialization.finish_declared_loop(constructions.len());\n    Ok(\n        json!")
+    unit = once(unit, '        "explicit_member_input_not_Material_loader_observation":true}',
+        '        "explicit_member_input_not_Material_loader_observation":true,\n        "CTF10_public_initialization":fields::public_initialization(&public_initialization),\n        "Native_unit_whole_Init_invoked":false,"unit_aggregate_context_is_Rust_API_only":true}')
+    unit = unit.replace('"ctf09-', '"ctf10-').replace('frozen_before_this_CTF09_helper_execution', 'frozen_before_this_CTF10_helper_execution')
+    unit = adapt_authority(unit, "request")
+    unit = once(unit, '        "ctf09_attempt_selection":request["ctf09_attempt_selection"],',
+        '        "ctf09_attempt_selection":request["ctf09_attempt_selection"],\n        "ctf10_public_storage_observation_policy":request["ctf10_public_storage_observation_policy"],\n        "ctf10_execution_lane_policy":request["ctf10_execution_lane_policy"],\n        "ctf10_public_profiles":request["ctf10_public_profiles"],')
+    source["ctf10_candidate_unit_observer.rs"] = unit
+    production = source["ctf10_candidate_production_observer.rs"]
+    production = once(production, '        "selected_CTF09_owners":fields::ctf09_unavailable(),',
+        '        "selected_CTF09_owners":fields::ctf09_unavailable(),\n        "selected_CTF10_owners":fields::ctf10_unavailable(),')
+    production = once(production, '            out["selected_CTF09_owners"] = fields::ctf09_selected(&state);',
+        '            out["selected_CTF09_owners"] = fields::ctf09_selected(&state);\n            out["selected_CTF10_owners"] = fields::ctf10_selected(&state);')
+    production = production.replace('"ctf09-', '"ctf10-').replace('frozen_before_this_CTF09_helper_execution', 'frozen_before_this_CTF10_helper_execution')
+    production = adapt_authority(production, "native")
+    production = once(production, '        "ctf09_attempt_selection":native["ctf09_attempt_selection"],',
+        '        "ctf09_attempt_selection":native["ctf09_attempt_selection"],\n         "ctf10_public_storage_observation_policy":native["ctf10_public_storage_observation_policy"],\n         "ctf10_execution_lane_policy":native["ctf10_execution_lane_policy"],\n         "ctf10_public_profiles":native["ctf10_public_profiles"],')
+    source["ctf10_candidate_production_observer.rs"] = production
+    for name, text in source.items():
+        emit(OUT / name, text)
+        before = read(OUT / "before" / name)
+        delta = "".join(difflib.unified_diff(before.splitlines(True), text.splitlines(True),
+            fromfile="actual-final09/" + name, tofile="proposed10/" + name))
+        emit(OUT / (name + ".from-09.diff"), delta)
+    ast.parse(read(Path(__file__)))
+    print("WIP Sources emitted; no immutable manifest yet")
+
+
+if __name__ == "__main__": main()

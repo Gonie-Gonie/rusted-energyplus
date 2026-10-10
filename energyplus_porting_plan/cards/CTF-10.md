@@ -96,3 +96,11 @@ remain pending separate reviewed work. No gate or execution outcome is changed.
 ## Actual pre-output source scope
 
 Root and another author reviewed held native-helper1aca57d1, passivea2765a61, public03/9adaabdf and readiness profilesfac618d6. Unit39/42 remain direct calls; fixed15 production retains13 loaders/45 guards and calls the true whole Init once. Per-call full-model before/after are unavailable; actual public snapshots and reached Init events own IDs, timestep and shared flags. Missing return remains unknown, with the actual outer Init owning exception outcome. Six public profiles are exact zero/class/shape/signed-zero; all12 arrays retain19 slots and source reset bits remain positive zero. Scope review only; unit/integration/production and complete-card gates remain unconfirmed until their actual evidence.
+
+## Actual selected public storage comparison
+
+Unit numeric948290/discrete3874496; fixed15 loader numeric8988/discrete57532; all mismatch0. Six public profiles and inherited handoffs have maximum absolute error/RMSE0. Actual returned owners, original IDs/order/use, reverse providers, reset arrays and final matching Init prefix are paired. Missing, unreturned, unavailable and unrepresentable observations receive no PASS.
+
+Actual Clippy/fmt checks0; focused177 and workspace4797 tests passed with0 failed. Candidate/quality/comparison recorders bind Source88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb. The first actual Clippy test clone warning is preserved; the accepted correction uses a borrowed one-element slice. Held comparer01 was never executed; fresh02 corrects the shared-error stage to genuine PostLoad for used constructions. Profiles, scientific arithmetic and required absence rules remain unchanged. Full actual observations and command/source identities are retained in evidence/CTF-10-unit/{manifest,summary}.json.
+
+Selected public storage verification does not complete the unit gate: generated-cache invalidation remains pending. Surface/history activation, whole Init reporting/final-fatal backend and integration/production/full-card gates remain pending. Fixed6 ordinary CLI and precise Original retirement will be recorded separately.

@@ -1,0 +1,216 @@
+"""Inventory this ignored source proposal; never import or run reviewed targets."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+FINAL = ROOT / ".runtime/porting/CTF-09/applied-final-source-04/manifest.json"
+PUBLIC = ROOT / ".runtime/porting/CTF-10/public-initialization-prep-03/manifest.json"
+MAPPING = {
+    "ctf10_candidate_unit_observer.rs": "crates/ep_run/examples/ctf09_candidate_unit_observer.rs",
+    "unit_fields.rs": "crates/ep_run/examples/ctf09_candidate_unit_support/fields.rs",
+    "ctf10_candidate_production_observer.rs": "crates/ep_run/examples/ctf09_candidate_production_observer.rs",
+    "production_fields.rs": "crates/ep_run/examples/ctf09_candidate_production_support/fields.rs",
+    "production_unit_fields.rs": "crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs",
+}
+DESTINATIONS = {
+    "ctf10_candidate_unit_observer.rs": "crates/ep_run/examples/ctf10_candidate_unit_observer.rs",
+    "unit_fields.rs": "crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs",
+    "ctf10_candidate_production_observer.rs": "crates/ep_run/examples/ctf10_candidate_production_observer.rs",
+    "production_fields.rs": "crates/ep_run/examples/ctf10_candidate_production_support/fields.rs",
+    "production_unit_fields.rs": "crates/ep_run/examples/ctf10_candidate_production_support/unit_fields.rs",
+}
+
+
+def read(path):
+    return path.read_bytes().decode("utf-8")
+
+
+def ref(path):
+    path = Path(path)
+    if not path.is_absolute():
+        path = ROOT / path
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def authenticate(binding):
+    actual = ref(binding["path"])
+    for key in ("sha256", "size_bytes", "line_count"):
+        if key in binding:
+            assert actual[key] == binding[key], (binding["path"], key)
+    return actual
+
+
+def emit_json(path, value):
+    path.write_bytes((json.dumps(value, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+
+
+def strings(text, name):
+    match = re.search(r"pub\(super\) const " + name + r":\s*&\[&str\]\s*=\s*&\[(.*?)\];", text, re.S)
+    assert match, name
+    return re.findall(r'"([^"]+)"', match.group(1))
+
+
+def selected(path, start, end, purpose):
+    data = path.read_bytes().splitlines(keepends=True)
+    assert 1 <= start <= end <= len(data)
+    raw = b"".join(data[start - 1:end])
+    return {"path": path.relative_to(ROOT).as_posix(), "start_line": start, "end_line": end,
+            "sha256": hashlib.sha256(raw).hexdigest(), "size_bytes": len(raw), "purpose": purpose}
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Held proposal is immutable"
+    final = json.loads(read(FINAL))
+    public = json.loads(read(PUBLIC))
+    actual = {row["canonical_path"]: row["actual_final_source"] for row in final["actual_sources"]}
+    public_changes = {row["destination"]: row for row in public["changes"]}
+    own = []
+    for name, canonical in MAPPING.items():
+        archived = authenticate(actual[canonical])
+        before = ref(OUT / "before" / name)
+        assert before["sha256"] == archived["sha256"]
+        assert (ROOT / canonical).read_bytes() == (ROOT / archived["path"]).read_bytes(), canonical
+        assert not (ROOT / DESTINATIONS[name]).exists(), DESTINATIONS[name]
+        proposed = ref(OUT / name)
+        delta = "".join(difflib.unified_diff(read(OUT / "before" / name).splitlines(True),
+            read(OUT / name).splitlines(True), fromfile="actual-final09/" + name, tofile="proposed10/" + name))
+        assert (OUT / (name + ".from-09.diff")).read_bytes() == delta.encode("utf-8")
+        own.append({"destination": DESTINATIONS[name], "proposed": proposed,
+                    "before_actual09_destination": canonical, "before_actual09_source": archived,
+                    "before": before, "exact_diff": ref(OUT / (name + ".from-09.diff")),
+                    "canonical_new_destination_absent_at_source_preparation": True})
+    assert (OUT / "unit_fields.rs").read_bytes() == (OUT / "production_unit_fields.rs").read_bytes()
+    # The complete old serializer remains literal except its source path inventories.
+    old = read(OUT / "before/unit_fields.rs").replace("ctf09_candidate", "ctf10_candidate")
+    prefix = read(OUT / "unit_fields.rs").split("\n// Copy accepted CTF10 owners only.", 1)[0]
+    for path in ["crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+                 "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+                 "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs"]:
+        prefix = prefix.replace('    "' + path + '",\n', "")
+    assert prefix == old
+    closures = {}
+    for lane, field_name, expected_api, expected_own in [
+        ("unit", "unit_fields.rs", 31, 2), ("production", "production_fields.rs", 43, 3)]:
+        text = read(OUT / field_name)
+        api_paths = strings(text, "API_PATHS")
+        observer_paths = strings(text, "OBSERVER_PATHS")
+        assert len(api_paths) == expected_api and len(set(api_paths)) == expected_api
+        assert len(observer_paths) == expected_own
+        api_bindings = []
+        for canonical in api_paths:
+            change = public_changes.get(canonical)
+            current = ref(ROOT / canonical) if (ROOT / canonical).is_file() else None
+            if change:
+                proposed = authenticate(change["proposed"])
+                if change["before"] is None:
+                    assert current is None
+                else:
+                    before = authenticate(change["before_source"])
+                    assert current["sha256"] == before["sha256"]
+                role = "prospective-accepted-public03-source-not-future-formatted-identity"
+            else:
+                assert current is not None, canonical
+                proposed = current
+                role = "actual-current-source-observed-only"
+            api_bindings.append({"canonical_path": canonical, "source_role": role,
+                                 "source": proposed, "observed_current_before": current})
+        assert observer_paths == [DESTINATIONS[name] for name in (
+            ["ctf10_candidate_unit_observer.rs", "unit_fields.rs"] if lane == "unit" else
+            ["ctf10_candidate_production_observer.rs", "production_fields.rs", "production_unit_fields.rs"])]
+        closures[lane] = {"own_count": expected_own, "API_count": expected_api,
+                          "ordered_own_paths": observer_paths, "ordered_API_paths": api_paths,
+                          "API_source_inventory": api_bindings,
+                          "future_actual_formatted_Cargo_full_snapshot_and_runtime_bindings_required": True}
+    parent_rows = []
+    for change in public["changes"]:
+        proposed = authenticate(change["proposed"])
+        if change["before"] is None:
+            assert not (ROOT / change["destination"]).exists()
+            before = None
+        else:
+            before = authenticate(change["before_source"])
+            assert ref(ROOT / change["destination"])["sha256"] == before["sha256"]
+        parent_rows.append({"destination": change["destination"], "actual_before": before,
+                            "accepted_proposed": proposed, "exact_diff": authenticate(change["exact_diff"]),
+                            "new_destination_absent": before is None})
+    checklist = {
+        "schema": "ctf10-Rust-observer-application-readiness.v1", "source_only": True,
+        "actual09_source_authority": ref(FINAL), "accepted_public03_source_authority": ref(PUBLIC),
+        "public_source_application": parent_rows, "new_observer_application": own,
+        "runtime_source_closures": closures,
+        "before_identity_observation": "Actual canonical source bytes matched the pinned final09/public03 before archives during preparation; later apply must reauthenticate.",
+        "Root_application_sequence": [
+            "Retain genuine Native10/OriginalDataQA and unchanged prior-Rust baseline gates before applying this candidate.",
+            "Apply the accepted public03 nine changes and these five new observer files to their exact destinations.",
+            "Format under the actual workspace edition, archive literal and final bytes and review exact formatter correspondence.",
+            "Run existing appropriate quality checks on final source; retain genuine failure and success receipts.",
+            "Capture actual full Cargo SourceSnapshot and current own/API source references in the declared order.",
+            "Create fresh runtime source bindings and converted-input request references from actual final identities; never replay these prospective proposal SHAs as formatted runtime SHAs.",
+            "Execute only after Root and another author have accepted all required source proposals and actual gates."
+        ],
+        "no_actual_apply_format_quality_Cargo_or_observer_execution_claimed": True,
+        "no_new_proof_or_execution_stage": True,
+    }
+    emit_json(OUT / "application-readiness.json", checklist)
+    source_ranges = []
+    for name, purpose in [("unit_fields.rs", "new actual public-owner bit-copy DTOs"),
+                          ("production_fields.rs", "new actual State Option public-owner borrow")]:
+        text = read(OUT / name)
+        marker = "// Copy accepted CTF10 owners only." if name == "unit_fields.rs" else "pub(super) fn ctf10_unavailable()"
+        start = text[:text.index(marker)].count("\n") + 1
+        source_ranges.append(selected(OUT / name, start, len(text.splitlines()), purpose))
+    for destination, purpose in [
+        ("crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs", "accepted ordered suffix invocation/aggregate/stop authority"),
+        ("crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs", "accepted fixed12-by19 actual public storage authority")]:
+        path = ROOT / public_changes[destination]["proposed"]["path"]
+        source_ranges.append(selected(path, 1, len(path.read_bytes().splitlines()), purpose))
+    ast_rows = []
+    for name in ["prepare_sources.py", "prepare_manifest.py"]:
+        tree = ast.parse(read(OUT / name))
+        ast_rows.append({"source": ref(OUT / name), "AST_parsed": True,
+                         "AST_sha256": hashlib.sha256(ast.dump(tree, include_attributes=False).encode()).hexdigest(),
+                         "only_own_source_metadata_emitter_executed": True})
+    manifest = {
+        "schema": "ctf10-held-Rust-observer-source-preparation.v1", "status": "SOURCE-READY-held-no-target-execution",
+        "author": "Raw", "README": ref(OUT / "README.md"), "own_sources": own,
+        "actual09_predecessor_source_authority": ref(FINAL),
+        "accepted_public_initialization_source_authority": ref(PUBLIC),
+        "accepted_Native_helper_source_authority": ref(".runtime/porting/CTF-10/native-helper-prep-01/manifest.json"),
+        "accepted_Native_passive_source_authority": ref(".runtime/porting/CTF-10/native-observer-prep-01/manifest.json"),
+        "prospective_profile_authority": ref(".runtime/porting/CTF-10/readiness-audit-01/profiles.proposed.json"),
+        "application_readiness": ref(OUT / "application-readiness.json"),
+        "runtime_source_closures": closures, "selected_source_ranges": source_ranges,
+        "authoring_source": ast_rows, "literal_public_serializer_additions": ref(OUT / "public_fields_additions.txt"),
+        "shared_serializers_byte_exact": True,
+        "old_shared_serializer_functions_and_scalar_DTO_byte_exact_except_source_path_inventories": True,
+        "scientific_input_boundary": {"unit_models": 39, "unit_declared_operations": 42,
+            "production_models": 15, "production_loader_phases_per_model": 13,
+            "all_input_guards": 45, "inputs_and_Native_values_or_counts_not_changed_or_injected": True},
+        "output_protocol": {"schema_unit": "ctf10-candidate-unit-observer-results.v1",
+            "schema_production": "ctf10-candidate-production-observer-results.v1",
+            "public_owner_protocol": "ctf10-selected-Rust-public-initialization.v1",
+            "unit_operation_key": "CTF10_public", "unit_model_key": "CTF10_public_initialization",
+            "production_model_key": "selected_CTF10_owners", "fixed_public_arrays": 12, "fixed_slots_each": 19,
+            "scalar_DTO_unchanged": True, "actual_Native_event_counts_or_outcomes_inferred": False,
+            "current_scope_role": "real-CTF-10-check-only", "historical_authority_key": "historical_prior_09_authority"},
+        "source_only_boundary": {"canonical_mutated": False, "reviewed_targets_imported_or_executed": False,
+            "Cargo_build_format_test_engine_Git_performed": False, "scientific_weather_binary_payloads_read": False,
+            "future_runtime_hashes_or_PASS_outcomes_supplied": False, "new_QA_or_execution_framework": False},
+        "authorship_limit": "Raw authored this transport and portions of earlier pure/driver/Native sources; other-author review is required and this proposal is no numerical certification.",
+    }
+    emit_json(OUT / "manifest.json", manifest)
+    print(json.dumps({"manifest": ref(OUT / "manifest.json"), "source_count": len(own),
+                      "source_lines": sum(row["proposed"]["line_count"] for row in own),
+                      "diff_lines": sum(row["exact_diff"]["line_count"] for row in own),
+                      "API_counts": {lane: value["API_count"] for lane, value in closures.items()}}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

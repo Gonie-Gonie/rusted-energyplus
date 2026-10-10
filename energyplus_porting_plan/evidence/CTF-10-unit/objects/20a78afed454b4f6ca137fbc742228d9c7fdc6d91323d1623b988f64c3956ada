@@ -1,0 +1,168 @@
+"""Emit only this ignored source successor; do not import any reviewed target."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = Path(__file__).resolve().parent
+OLD = PREP.with_name("comparer-prep-01")
+
+
+def identity(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def delta(before, after, target, first, last):
+    text = "".join(difflib.unified_diff(before.splitlines(True), after.splitlines(True),
+                                        fromfile=first, tofile=last))
+    write(target, text)
+    return identity(target)
+
+
+def main():
+    assert not (PREP / "manifest.json").exists(), "Held successors are immutable"
+    previous = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+    assert identity(OLD / "manifest.json")["sha256"] == "0eb32fd4501112bb0cee90618d896bd0be0ff80b1491dd664510a74c7684c116"
+    names = [Path(row["source"]["path"]).name for row in previous["own_sources"]]
+    for directory in ["before", "before-01", "diffs", "from-01-diffs"]:
+        (PREP / directory).mkdir(exist_ok=True)
+    for source in (OLD / "before").iterdir():
+        assert source.is_file()
+        (PREP / "before" / source.name).write_bytes(source.read_bytes())
+    for name in names + ["manifest.json", "README.md"]:
+        (PREP / "before-01" / name).write_bytes((OLD / name).read_bytes())
+    for name in names:
+        (PREP / name).write_bytes((OLD / name).read_bytes())
+    path = PREP / "public_compare.py"
+    old = path.read_text(encoding="utf-8")
+    before = '''    for stage, native in [("entry", before), ("return", returned)]:
+        flags = actual.get("actual_retry_flags_on_" + stage)
+        c.need(isinstance(flags, dict), "Actual selected shared flags required for returned public suffix")
+        for key in ["ErrorsFound", "DoCTFErrorReport"]:
+            c.exact(path + "/flags/" + stage + "/" + key, native[key], flags[key])
+'''
+    after = '''    # Rust retry entry follows preprocessing; unused Source calls return before loading.
+    entry_errors = before["ErrorsFound"]
+    if before["IsUsedCTF"]:
+        postload = operation["observations"]["PostLoad"]
+        c.need(isinstance(postload, dict) and postload.get("available") is True and
+               isinstance(postload.get("snapshot"), dict),
+               "Used returned public owner requires actual PostLoad shared errors")
+        entry_errors = postload["snapshot"]["ErrorsFound"]
+    for stage, native in [("entry", before), ("return", returned)]:
+        flags = actual.get("actual_retry_flags_on_" + stage)
+        c.need(isinstance(flags, dict), "Actual selected shared flags required for returned public suffix")
+        c.exact(path + "/flags/" + stage + "/ErrorsFound",
+                entry_errors if stage == "entry" else native["ErrorsFound"], flags["ErrorsFound"])
+        c.exact(path + "/flags/" + stage + "/DoCTFErrorReport",
+                native["DoCTFErrorReport"], flags["DoCTFErrorReport"])
+'''
+    assert old.count(before) == 1
+    write(path, old.replace(before, after))
+    pair_sha = identity(path)["sha256"]
+    for name in ["compare_unit.py", "compare_production.py"]:
+        path = PREP / name
+        text = path.read_text(encoding="utf-8")
+        original = "PUBLIC_PAIR_SHA = '665948ee959e35561479027c5a8a6c45b0a78f8f27646187511c259bca384340'"
+        assert text.count(original) == 1
+        write(path, text.replace(original, "PUBLIC_PAIR_SHA = '" + pair_sha + "'"))
+    readme = (OLD / "README.md").read_text(encoding="utf-8") + '''
+
+Fresh02 corrects only the shared-flag stage association found before execution.
+For an actual used, eligible returned construction, Rust retry-entry ErrorsFound
+is compared with the genuine available Native PostLoad snapshot after original
+Construction.cc309. That Rust entry follows actual preprocessing. Its entry
+DoCTFErrorReport still uses public.before_reset, because loading does not assign
+that flag. Unused Source calls return before loading, so both entry flags retain
+the actual before_reset owner. Both return flags still use actual_caller_return.
+No Native flag is supplied to Rust or reconstructed; missing required PostLoad
+fails structural admission. Routes, selection, six profiles, reset bits, absence,
+provider custody and every numerical/comparison rule are unchanged.
+
+Only public_compare.pair_operation and the two PUBLIC_PAIR_SHA literals change.
+All nine other Python bodies are byte-exact01; six validators remain byte-exact
+accepted DataQA10. before-01 and exact from-01 patches preserve the predecessor;
+cumulative accepted09 patches and original before archives remain included.
+The held01 package is unchanged and was not executed. This successor has also
+not imported or executed any reviewed source or scientific implementation.
+'''
+    write(PREP / "README.md", readme)
+    report = copy.deepcopy(previous)
+    rows, narrow = [], []
+    for row in previous["own_sources"]:
+        name = Path(row["source"]["path"]).name
+        source = PREP / name
+        current = source.read_text(encoding="utf-8")
+        ast.parse(current)
+        old_text = (OLD / name).read_text(encoding="utf-8")
+        narrow.append({"before_archive": identity(PREP / "before-01" / name),
+                       "source": identity(source),
+                       "exact_diff": delta(old_text, current, PREP / "from-01-diffs" / (name + ".diff"),
+                                           "held01/" + name, "proposed02/" + name)})
+        updated = copy.deepcopy(row)
+        updated["source"] = identity(source)
+        a = (PREP / "before" / name).read_text(encoding="utf-8") if not row["new_source"] else ""
+        updated["exact_diff"] = delta(a, current, PREP / "diffs" / (name + ".from-09.diff"),
+                                      "accepted09/" + name if not row["new_source"] else "/dev/null", "proposed10/" + name)
+        if not row["new_source"]:
+            updated["before_archive"] = identity(PREP / "before" / name)
+        rows.append(updated)
+        if name not in ["public_compare.py", "compare_unit.py", "compare_production.py"]:
+            assert source.read_bytes() == (OLD / name).read_bytes()
+        if name in ["compare_unit.py", "compare_production.py"]:
+            tree = ast.parse(current)
+            prior = ast.parse(old_text)
+            def without_pin(node):
+                node.body = [item for item in node.body if not (isinstance(item, ast.Assign) and
+                             any(isinstance(target, ast.Name) and target.id == "PUBLIC_PAIR_SHA" for target in item.targets))]
+                return ast.dump(node, include_attributes=False)
+            assert without_pin(tree) == without_pin(prior)
+        if name == "public_compare.py":
+            def function_nodes(text):
+                return {node.name: ast.dump(node, include_attributes=False) for node in ast.parse(text).body
+                        if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+            a_nodes, b_nodes = function_nodes(old_text), function_nodes(current)
+            assert a_nodes.keys() == b_nodes.keys()
+            assert all(a_nodes[key] == b_nodes[key] for key in a_nodes if key != "pair_operation")
+            assert current.replace(after, before) == old_text
+    report["own_sources"] = rows
+    report["before_manifest"] = identity(PREP / "before/manifest.json")
+    report["before_README"] = identity(PREP / "before/README.md")
+    report["README"] = identity(PREP / "README.md")
+    report["predecessor_authoring_sources"] = report["authoring_sources"]
+    report["authoring_sources"] = [identity(PREP / "prepare_successor.py")]
+    report["narrow_correction_from_01"] = {
+        "predecessor_manifest": identity(OLD / "manifest.json"),
+        "before_manifest": identity(PREP / "before-01/manifest.json"),
+        "before_README": identity(PREP / "before-01/README.md"),
+        "source_deltas": narrow,
+        "README_delta": delta((OLD / "README.md").read_text(encoding="utf-8"), readme,
+                              PREP / "from-01-diffs/README.md.diff", "held01/README.md", "proposed02/README.md"),
+        "only_function_changed": "public_compare.pair_operation",
+        "only_main_changes": "PUBLIC_PAIR_SHA literals",
+        "other_nine_Python_bodies_byte_exact_01": True,
+        "Native_used_retry_entry_ErrorsFound_owner": "actual available PostLoad.snapshot after original309",
+        "Native_unused_retry_entry_both_flags_owner": "actual PublicStorage.before_reset before unused return163",
+        "Native_entry_DoCTFErrorReport_owner": "actual PublicStorage.before_reset",
+        "Native_return_both_flags_owner": "actual PublicStorage.actual_caller_return",
+        "selection_profiles_numeric_and_availability_rules_unchanged": True,
+        "held01_preserved_not_executed": True,
+    }
+    write(PREP / "manifest.json", json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2) + "\n")
+    print(json.dumps({"manifest": identity(PREP / "manifest.json"),
+                      "changed_sources": [row["source"] for row in narrow if row["exact_diff"]["size_bytes"]],
+                      "narrow_diff_lines": sum(row["exact_diff"]["line_count"] for row in narrow)}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

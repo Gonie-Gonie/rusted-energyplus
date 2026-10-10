@@ -1,0 +1,48 @@
+--- accepted-literal/crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs
++++ actual-formatted/crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs
+@@ -624,7 +624,9 @@
+ ];
+ 
+ // Copy accepted CTF10 owners only. These are not Native phase/return events.
+-pub(super) fn public_storage(source: &ep_runtime::heat_balance::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage) -> Value {
++pub(super) fn public_storage(
++    source: &ep_runtime::heat_balance::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage,
++) -> Value {
+     let values = |source: &[f64]| source.iter().copied().map(scalar).collect::<Vec<_>>();
+     json!({"CTFOutside":values(&source.outside),"CTFCross":values(&source.cross),
+         "CTFInside":values(&source.inside),"CTFFlux":values(&source.flux),
+@@ -641,10 +643,20 @@
+     json!({"owner_available":false,"actual_public_initializer_invoked":false,"snapshot":null,
+         "unavailable_reason":reason,"Native_return_or_reset_inferred":false,"counted_as_PASS":false})
+ }
+-pub(super) fn public_construction(source: &ep_runtime::heat_balance::ctf_public_initialization::ConstructionCtfPublicInitialization) -> Value {
++pub(super) fn public_construction(
++    source: &ep_runtime::heat_balance::ctf_public_initialization::ConstructionCtfPublicInitialization,
++) -> Value {
+     let (available, returned, error) = match &source.result {
+-        Ok(actual) => (true,json!({"actual_Rust_route":format!("{:?}",actual.route),"public_storage":public_storage(&actual.storage)}),Value::Null),
+-        Err(reason) => (false,Value::Null,json!({"actual_Rust_unavailable":format!("{reason:?}")})),
++        Ok(actual) => (
++            true,
++            json!({"actual_Rust_route":format!("{:?}",actual.route),"public_storage":public_storage(&actual.storage)}),
++            Value::Null,
++        ),
++        Err(reason) => (
++            false,
++            Value::Null,
++            json!({"actual_Rust_unavailable":format!("{reason:?}")}),
++        ),
+     };
+     json!({"construction_id":source.construction_id.0,"declared_index":source.declared_index,
+         "original_material_ids":source.original_material_ids.iter().map(|id|id.0).collect::<Vec<_>>(),
+@@ -654,7 +666,9 @@
+         "owner_available":available,"snapshot":returned,"unavailable":error,
+         "Native_whole_call_outcome_or_public_checkpoint_inferred":false,"counted_as_PASS":false})
+ }
+-pub(super) fn public_initialization(source: &ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization) -> Value {
++pub(super) fn public_initialization(
++    source: &ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization,
++) -> Value {
+     json!({"protocol":"ctf10-selected-Rust-public-initialization.v1","owner_available":true,
+         "constructions":source.constructions.iter().map(public_construction).collect::<Vec<_>>(),
+         "actual_owner_count":source.constructions.len(),

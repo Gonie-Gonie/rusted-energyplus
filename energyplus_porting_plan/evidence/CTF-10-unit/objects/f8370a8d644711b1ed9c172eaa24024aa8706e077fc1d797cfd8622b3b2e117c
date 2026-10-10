@@ -1,0 +1,20 @@
+--- accepted-literal/crates/ep_run/examples/ctf10_candidate_production_support/fields.rs
++++ actual-formatted/crates/ep_run/examples/ctf10_candidate_production_support/fields.rs
+@@ -261,11 +261,15 @@
+ ];
+ 
+ pub(super) fn ctf10_unavailable() -> Value {
+-    unit_fields::public_unavailable("ordinary initializer has not returned an actual HeatBalanceState/public owner")
++    unit_fields::public_unavailable(
++        "ordinary initializer has not returned an actual HeatBalanceState/public owner",
++    )
+ }
+ pub(super) fn ctf10_selected(source: &HeatBalanceState) -> Value {
+     match source.construction_ctf10_public_initialization.as_ref() {
+         Some(actual) => unit_fields::public_initialization(actual),
+-        None => unit_fields::public_unavailable("actual initialized State has no selected public initialization owner"),
++        None => unit_fields::public_unavailable(
++            "actual initialized State has no selected public initialization owner",
++        ),
+     }
+ }

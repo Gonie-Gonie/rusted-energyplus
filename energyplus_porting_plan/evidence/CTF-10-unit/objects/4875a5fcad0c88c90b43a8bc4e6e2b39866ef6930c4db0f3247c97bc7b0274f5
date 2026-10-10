@@ -1,0 +1,282 @@
+--- accepted09/compare_unit.py
++++ proposed10/compare_unit.py
+@@ -15,9 +15,9 @@
+ GAMMA_SHAPE_SHA = '45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101'
+ GAMMA_VARIABLES = ["CTF07.Gamma1", "CTF07.Gamma2", "CTF07.ATemp"]
+ PAIR_SHA = '5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97'
+-METHOD_SHA = '571232468ee57b3e5f24d35b2f6eff4cb3c1874442fb967f71840a1e4f535c6f'
++METHOD_SHA = '0990f10316263894bbf42cc53f25d18c5cf79947286d99b6279e55b37eae9801'
+ METHOD_VARIABLES = ['CTF06.AExp', 'CTF06.final_AMat1', 'CTF06.final_AMato', 'CTF06.final_AMatN', 'CTF06.AMatRowNormMax', 'CTF06.fact', 'CTF06.CheckVal', 'CTF05.AInv', 'CTF05.final_AMat1']
+-IO_SHA = '8e0a71e1e9b25390e43ba9b41bfd8e6391a7723afc1efe0957ea853338a03a93'
++IO_SHA = 'd0a9f164fd27acd4300d4ab9dff1a1e2166e68323efe2821927c14b57dd09e4f'
+ PHASES = ["PostLoad", "PostMerge", "PostConversion"]
+ PREFIX_VARIABLES = [phase + "." + name for phase in PHASES for name in ["dl", "rk", "rho", "cp", "lr"]] + [
+     "PostConversion.dyn", "PostConversion.rs", "PostConversion.cnd"]
+@@ -25,21 +25,25 @@
+ VARIABLES = ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat', 'assembly_CTFTimeStep', 'caller_TimeStepZone']
+ INITIAL_POLICY = {'protocol': 'ctf03-initial-discretization.v1', 'phase': 'after_original_Construction_cc619_before_matrix_allocation_and_retry', 'selection': 'actual_initial_callback_reached_and_intact_active_prefix', 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'active_layer_fields': ['Nodes', 'dx'], 'integer_fields': ['LayersInConstruct', 'NumResLayers', 'rcmax', 'NodeSource', 'NodeUserTemp', 'NumHistories'], 'scalar_fields': ['CTFTimeStep', 'TimeStepZone'], 'initial_state_distinct_from_whole_return_and_retry_state': True, 'PostConversion_layer_handoff_retained': True, 'PostConversion_handoff_fields': ['LayersInConstruct', 'NumResLayers', 'dl', 'rk', 'rho', 'cp', 'lr', 'ResLayer'], 'capacitance_factors_are_actual_rho_and_cp_not_recomputed_products': True, 'required_reached_fields_absent_is_integrity_failure': True, 'unreached_counted_as_PASS': False, 'branch_or_numeric_answers_reconstructed': False}
+ MATRIX_POLICY = {'protocol': 'ctf04-matrix-assembly.v1', 'phase': 'after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt', 'selection': 'first_actual_post728_visit_in_selected_no_source_1D_context', 'selected_attempt_ordinal': 1, 'later_Native_attempts_paired': False, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'Rust_retry_driver_available': False, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'matrix_fields': ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat'], 'storage_order': 'source_i1_outer_i2_inner_row_first', 'matrix_shapes': {'AMat': 'actual_rcmax_by_rcmax', 'IdenMatrix': 'actual_rcmax_by_rcmax', 'BMat': 3, 'CMat': 2, 'DMat': 2}, 'actual_source_produced_identity_required': True, 'attempt_identity': 'one_based_actual_callback_visit_within_bound_whole_call', 'actual_current_retry_state_fields': ['CTFTimeStep', 'NumHistories', 'TimeStepZone'], 'actual_converted_and_initial_handoff_retained': True, 'missing_attempt_or_copy_integrity_failure_is_required_failure': True, 'unreached_counted_as_PASS': False, 'retry_driver_or_matrix_answers_reconstructed': False}
+-RETENTION_INTENT = {'schema': 'ctf09-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF09-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
++RETENTION_INTENT = {'schema': 'ctf10-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF10-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+ MATRIX_SHAPES = ['actual_rcmax_by_rcmax', 'actual_rcmax_by_rcmax', [3], [2], [2], 'scalar', 'scalar']
+ MATRIX_FIELDS = ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat']
+ MATRIX_FIXED_SHAPES = {'BMat': 3, 'CMat': 2, 'DMat': 2}
+ FAILURE_KINDS = ['IdentityMismatch', 'OrderFailure', 'ActivePrefixShape', 'MatrixShape', 'CopyException', 'LedgerAppendException']
+-DATAQA_SOURCE_INVENTORY = {'path': '.runtime/porting/CTF-09/original-data-review-prep-02/manifest.json', 'sha256': '67fb01fdc37f3ccebdaef17139466916c993db0f62f5079a79a1b11c739b3df7', 'size_bytes': 53844, 'line_count': 1352}
+-SOURCE_INVENTORIES = {'reviewed_native_source_inventory': {'path': '.runtime/porting/CTF-09/native-helper-prep-01/manifest.json', 'sha256': 'b4e15e0986d65b451ba803cb1b6f9a9bc1c8fe8a6caea90ac3c74e581ee4a315', 'size_bytes': 26151, 'line_count': 658}, 'reviewed_passive_source_inventory': {'path': '.runtime/porting/CTF-09/native-observer-prep-01/manifest.json', 'sha256': '4934fe49f601a87e1d41016a03b8e10fba6117a79b65a376b949e68e033dd0bf', 'size_bytes': 13336, 'line_count': 346}, 'reviewed_freezer_source_inventory': {'path': '.runtime/porting/CTF-09/input-writer-prep-01/manifest.json', 'sha256': '4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd', 'size_bytes': 37991, 'line_count': 972}, 'reviewed_PE_source_inventory': {'path': '.runtime/porting/CTF-09/native-build-review-prep-01/manifest.json', 'sha256': 'f64af5687b90af4e5f2ae318c3fce63e99492baff068537300f9fe4cf72aa841', 'size_bytes': 5641, 'line_count': 150}}
+-
+-OBSERVER_PATHS = ['crates/ep_run/examples/ctf09_candidate_unit_observer.rs', 'crates/ep_run/examples/ctf09_candidate_unit_support/fields.rs']
+-API_PATHS = ['crates/ep_run/Cargo.toml', 'crates/ep_model/src/lib.rs', 'crates/ep_model/src/ids.rs', 'crates/ep_runtime/Cargo.toml', 'crates/ep_runtime/src/lib.rs', 'crates/ep_runtime/src/heat_balance/mod.rs', 'crates/ep_runtime/src/heat_balance/surface_manager.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs', 'crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs', 'crates/ep_model/src/objects/construction.rs', 'crates/ep_runtime/examples/clk02_probe_support/digest.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs', 'crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs', 'crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs']
+-
+-INITIAL_SHAPE_SHA = '13cd04724c8b712a8d04b4cec4d6d8558bc8ed0e3f6037ab6c10b9cf89f3bdcc'
+-RETRY_SHAPE_SHA = 'c3101c4d780d050054f091788c10d5426496bee0de6624a3361454e09d0a663a'
+-RETRY_PAIR_SHA = '80a4fecec35bd345cb301b72aef6be8952fe01b9ef2a17327f7f9a4eb3a91355'
++DATAQA_SOURCE_INVENTORY = {'path': '.runtime/porting/CTF-10/original-data-review-prep-01/manifest.json', 'sha256': 'f5ab4cf6dd7d135326c3d5b2dfa16e746c7859dd18e6adcf4c41054bceedd012', 'size_bytes': 50395, 'line_count': 1301}
++SOURCE_INVENTORIES = {'reviewed_native_source_inventory': {'path': '.runtime/porting/CTF-10/native-helper-prep-01/manifest.json', 'sha256': '1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63', 'size_bytes': 37974, 'line_count': 971}, 'reviewed_passive_source_inventory': {'path': '.runtime/porting/CTF-10/native-observer-prep-01/manifest.json', 'sha256': 'a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d', 'size_bytes': 22328, 'line_count': 591}, 'reviewed_freezer_source_inventory': {'path': '.runtime/porting/CTF-10/input-writer-prep-01/manifest.json', 'sha256': '839495c10e16c647851f783531e58314746ed70e8c1ac0ff9c15297fd0bad1b2', 'size_bytes': 40510, 'line_count': 1057}, 'reviewed_PE_source_inventory': {'path': '.runtime/porting/CTF-10/native-build-review-prep-01/manifest.json', 'sha256': '4ba85e024746836e861a7161215f791c2980fcb8603d5f04fbcc3606344c2eee', 'size_bytes': 3124, 'line_count': 89}}
++
++OBSERVER_PATHS = ['crates/ep_run/examples/ctf10_candidate_unit_observer.rs', 'crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs']
++API_PATHS = ['crates/ep_run/Cargo.toml', 'crates/ep_model/src/lib.rs', 'crates/ep_model/src/ids.rs', 'crates/ep_runtime/Cargo.toml', 'crates/ep_runtime/src/lib.rs', 'crates/ep_runtime/src/heat_balance/mod.rs', 'crates/ep_runtime/src/heat_balance/surface_manager.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs', 'crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs', 'crates/ep_model/src/objects/construction.rs', 'crates/ep_runtime/examples/clk02_probe_support/digest.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs', 'crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs', 'crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs', 'crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs', 'crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs']
++
++INITIAL_SHAPE_SHA = 'ab0fdc69412d939bd9bb3bd025a43719defde08e36400f9a6f199b82e6737de8'
++RETRY_SHAPE_SHA = 'e8615423cdd570c98c97c07b5eb58b2f9a736154a9b0b6a5150d09551898b4a7'
++RETRY_PAIR_SHA = '1ac70f9e5ed7589f5fa25b629fd4adea9c1e75b30272d2c02153ad47ab36e3d1'
+ RETRY_VARIABLES = ['CTF09.pre_AMat', 'CTF09.pre_IdenMatrix', 'CTF09.assignedAbsSumXi', 'CTF09.assignedAbsSumYi', 'CTF09.assignedAbsSumZi', 'CTF09.BiggestSum', 'CTF09.pre_CTFTimeStep', 'CTF09.post_CTFTimeStep']
++
++PUBLIC_VARIABLES = ['CTF10.CTFOutside', 'CTF10.CTFCross', 'CTF10.CTFInside', 'CTF10.CTFFlux', 'CTF10.CTFTimeStep', 'CTF10.UValue']
++PUBLIC_SHAPE_SHA = '8a772dc521cb8f99a7d3f51c1bbc61a3b1f9e0019ee3d22cb9f28fc6132fc669'
++PUBLIC_PAIR_SHA = 'bb9b048809fd037f8c6f1119a30426d1b8c8c39b5d6f6927055adbe0d070288e'
+ 
+ class Comparison:
+     def __init__(self, need):
+@@ -48,7 +52,7 @@
+         self.samples = []
+         self.unavailable = []
+         self.metrics = {key: {"count": 0, "maximum_absolute_error": 0.0, "norm": 0.0,
+-                              "nonfinite_error_count": 0} for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES + RETRY_VARIABLES}
++                              "nonfinite_error_count": 0} for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES + COEFFICIENT_VARIABLES + RETRY_VARIABLES + PUBLIC_VARIABLES}
+ 
+     def failure(self, path, category, native, rust):
+         self.counts["mismatches"] += 1
+@@ -319,17 +323,17 @@
+     return True
+ 
+ 
+-def packet_policy(m, qa, request, policy, same, recorded, lane, initial, methods, gamma, coefficients, retry):
+-    prefix = "ctf09-" + ("production-" if lane == "production" else "")
++def packet_policy(m, qa, request, policy, same, recorded, lane, initial, methods, gamma, coefficients, retry, public):
++    prefix = "ctf10-" + ("production-" if lane == "production" else "")
+     m.require(request["schema"] == prefix + "helper-cases.v1" and
+-              request["frozen_before_this_CTF09_helper_execution"] is True and
++              request["frozen_before_this_CTF10_helper_execution"] is True and
+               request["expected_values_supplied"] is False and request["expected_exits_supplied"] is False and
+-              request["scientific_execution_performed"] is False, "Genuine input-only CTF09 request with separate historical08 authority required")
++              request["scientific_execution_performed"] is False, "Genuine input-only CTF10 request with separate historical09 authority required")
+     freeze, execution = m.load(qa["actual_packet_freeze"]), recorded(qa["actual_packet_freeze_execution"])
+     m.require(freeze["schema"] == prefix + "frozen-packet.v1" and freeze["lane"] == lane and
+-              freeze["status"] == "frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper" and
++              freeze["status"] == "frozen-inherited-input-and-fresh-CTF10-public-storage-policy-before-helper" and
+               m.load(execution["stdout"]) == freeze and m.contained(execution["stderr"]["path"]).stat().st_size == 0,
+-              "Actual successful fresh CTF09 freeze/full stdout required")
++              "Actual successful fresh CTF10 freeze/full stdout required")
+     for key, binding in [("helper_request",qa["reviewed_request"]),("native_admission_contract",qa["reviewed_native_admission_contract"]),
+                          ("projection",qa["reviewed_projection"])]: same(freeze[key],binding)
+     for key in ["source","cases","tolerances"]: same(freeze["contracts"][key],qa["reviewed_contracts"][key])
+@@ -368,7 +372,7 @@
+     for binding in guards: m.bind(binding)
+     for key in ["actual_scope_amendment","actual_scope_amendment_execution"]:
+         m.require(request[key] == admission[key] == projection[key], "Actual pre-output scope pair differs"); m.bind(request[key])
+-    m.require(len(admission["native_source_files"]) == 8, "Exact lane Native8 source inventory required")
++    m.require(len(admission["native_source_files"]) == 9, "Exact lane Native9 source inventory required")
+     for binding in admission["native_source_files"]: m.bind(binding)
+     same(qa["reviewed_matrix_policy_contract"], qa["reviewed_contracts"]["tolerances"])
+     m.require(qa["reviewed_matrix_observation_policy"] == MATRIX_POLICY == request["ctf04_matrix_observation_policy"] ==
+@@ -392,11 +396,11 @@
+         same(qa[key], expected); m.bind(expected)
+     source_inventory = m.load(DATAQA_SOURCE_INVENTORY)
+     expected_readers = [row for row in source_inventory["own_sources"] if Path(row["path"]).name in
+-        (["review_unit.py", "unit_shape.py", "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "retry_shape.py", "packet_io.py"] if lane == "unit" else
+-         ["review_production.py", "production_shape.py", "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "retry_shape.py", "packet_io.py"])]
+-    m.require(len(expected_readers) == len(qa["executed_reader_sources"]) == 8, "Exact accepted DataQA lane eight-source closure required")
++        (["review_unit.py", "unit_shape.py", "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "retry_shape.py", "public_shape.py", "packet_io.py"] if lane == "unit" else
++         ["review_production.py", "production_shape.py", "initial_shape.py", "method_shape.py", "gamma_shape.py", "coefficient_shape.py", "retry_shape.py", "public_shape.py", "packet_io.py"])]
++    m.require(len(expected_readers) == len(qa["executed_reader_sources"]) == 9, "Exact accepted DataQA lane nine-source closure required")
+     by_owner = {row["historical_path"]: row["archive"] for row in qa["executed_reader_sources"]}
+-    m.require(len(by_owner) == 8, "No duplicate DataQA source owner")
++    m.require(len(by_owner) == 9, "No duplicate DataQA source owner")
+     for source_ref in expected_readers:
+         m.require(source_ref["path"] in by_owner and source_ref["sha256"] == by_owner[source_ref["path"]]["sha256"],
+                   "Actual DataQA executed archive differs from accepted source inventory")
+@@ -406,21 +410,22 @@
+     gamma.packet(freeze, request, admission, projection, policy, m.require)
+     coefficients.packet(freeze, request, admission, projection, policy, m.require)
+     retry.packet(freeze, request, admission, projection, policy, m.require)
++    public.packet(freeze, request, admission, projection, policy, m.require)
+     def preceding(ref, before):
+         command = recorded(ref)
+         m.require(datetime.fromisoformat(command["finished_utc"].replace("Z", "+00:00")) <=
+                   datetime.fromisoformat(before.replace("Z", "+00:00")), "Both scope checks must precede actual freeze")
+         return command
+-    retry.scope(m, same, preceding, freeze, request, admission, projection,
+-                m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane, coefficients)
++    public.scope(m, same, preceding, freeze, request, admission, projection,
++                 m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane, coefficients, retry)
+     same(qa["reviewed_method_policy_contract"], qa["reviewed_contracts"]["tolerances"])
+     m.require(qa["reviewed_method_observation_policies"] == methods.POLICIES and
+               qa["selected_method_invocation_ordinals"] == {"assembly": 1, "exponential": 1, "inverse": 1, "Gamma": 1, "FinalCoefficients": 1} and
+               qa["later_actual_method_visits_observed_unpaired_noPASS"] is True and qa["actual_method_counts_unknown"] is False and
+               qa["scientific_observation_physical_bound_bytes"] == 1024 * 1024 * 1024, "Actual complete first-method scope and bounds required")
+-    for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "historical_prior_08_authority",
++    for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "historical_prior_09_authority",
+                 "actual_scope_amendment_execution_role", "current_cards"]:
+-        m.require(qa[key] == freeze["source_authorities"][key], "Actual DataQA current09 and separately historical08 provenance differs")
++        m.require(qa[key] == freeze["source_authorities"][key], "Actual DataQA current10 and separately historical09 provenance differs")
+     m.require(qa["reviewed_Gamma_observation_policy"] == gamma.POLICY and qa["complete_actual_Gamma_records"] is True,
+               "Actual complete reviewed Gamma ledger and frozen policy required")
+     same(qa["reviewed_final_coefficient_policy_contract"], qa["reviewed_contracts"]["tolerances"])
+@@ -431,6 +436,13 @@
+     m.require(qa["reviewed_retry_observation_policy"] == retry.POLICY and
+               qa["reviewed_retry_attempt_selection"] == retry.SELECTION and qa["complete_actual_retry_records"] is True and
+               qa["retry_loop_exit_certifies_whole_return_or_SI_store"] is False,"Actual reviewed all-visit retry policy required")
++    same(qa["reviewed_public_policy_contract"], qa["reviewed_contracts"]["tolerances"])
++    m.require(qa["reviewed_public_storage_observation_policy"] == public.POLICY and
++              qa["reviewed_public_execution_lane_policy"] == public.EXECUTION_POLICY and
++              qa["complete_actual_public_storage_records"] is True and
++              qa["Native_whole_Init_admitted"] is (lane == "production") and
++              (qa["complete_actual_Init_records"] is True if lane == "production" else qa["complete_actual_Init_records"] is None),
++              "Actual reviewed public/Init records and declared lane policy required")
+     return profiles,inherited,initial_policy,initial_profiles
+ 
+ 
+@@ -701,6 +713,8 @@
+     initial = boot("ctf09_initial_matrix_structure", "initial_shape.py", INITIAL_SHAPE_SHA)
+     retry = boot("ctf09_retry_structure", "retry_shape.py", RETRY_SHAPE_SHA)
+     retry_pairing = boot("ctf09_retry_pairing", "retry_compare.py", RETRY_PAIR_SHA)
++    public = boot("ctf10_public_structure", "public_shape.py", PUBLIC_SHAPE_SHA)
++    public_pairing = boot("ctf10_public_pairing", "public_compare.py", PUBLIC_PAIR_SHA)
+ 
+     def same(a, b):
+         m.require(m.contained(a["path"], existing=False) == m.contained(b["path"], existing=False) and a["sha256"] == b["sha256"], "Actual direct identities differ")
+@@ -723,7 +737,7 @@
+     refs = {name: m.argument(getattr(args, name.replace("-", "_")), observation=(name == "Rust-results")) for name in [
+         "original-data-review", "original-data-review-execution", "Rust-build-execution", "Rust-execution", "Rust-results"]}
+     qa, qc = m.load(refs["original-data-review"]), recorded(refs["original-data-review-execution"])
+-    m.require(qa["schema"] == "ctf09-independent-original-data-review.v1" and qa["status"] == "pass-actual-original-data-and-provenance-before-Rust"
++    m.require(qa["schema"] == "ctf10-independent-original-data-review.v1" and qa["status"] == "pass-actual-original-data-and-provenance-before-Rust"
+               and qa["Rust_baseline_released"] is True and qa["complete_requested_record_ledger_validated"] is True and
+               qa["actual_native_process_exit_code"] == 0 and qa["actual_native_launch_error"] is None and not qa["observation_integrity_failures"] and
+               qa["numerical_PASS_claimed"] is False and m.load(qc["stdout"]) == qa, "Genuine preceding Original DataQA0/full stdout required")
+@@ -741,9 +755,9 @@
+                           parse_constant=lambda value: m.require(False,"Nonfinite JSON literal: " + value))
+     request = m.load(qa["reviewed_request"]); native = observations(qa["reviewed_results"]); rust = observations(refs["Rust-results"])
+     policy = m.load(qa["reviewed_contracts"]["tolerances"])
+-    profiles,inherited,initial_policy,initial_profiles = packet_policy(m,qa,request,policy,same,recorded,"unit",initial,methods,gamma,coefficients,retry)
+-    m.require(native["schema"] == "ctf09-helper-results.v1" and native["complete_requested_record_ledger"] is True, "Complete actual Native unit ledger required")
+-    m.require(rust["schema"] == "ctf09-candidate-unit-observer-results.v1" and rust["all_bound_inputs_and_sources_unchanged"] is True and
++    profiles,inherited,initial_policy,initial_profiles = packet_policy(m,qa,request,policy,same,recorded,"unit",initial,methods,gamma,coefficients,retry,public)
++    m.require(native["schema"] == "ctf10-helper-results.v1" and native["complete_requested_record_ledger"] is True, "Complete actual Native unit ledger required")
++    m.require(rust["schema"] == "ctf10-candidate-unit-observer-results.v1" and rust["all_bound_inputs_and_sources_unchanged"] is True and
+               rust["numerical_PASS_claimed"] is False and rust["Native_result_or_expected_values_read"] is False, "Actual candidate-only source results required")
+     for key, binding in [("actual_request", qa["reviewed_request"]), ("actual_native_admission", qa["reviewed_native_admission_contract"]), ("projection", qa["reviewed_projection"])]: same(rust[key], binding)
+     for key in ["source", "cases", "tolerances"]: same(rust["contracts"][key], qa["reviewed_contracts"][key])
+@@ -753,7 +767,7 @@
+     capture = build["cargo_compiler_artifacts_capture"]
+     m.require(build["command"][:2] == ["cargo", "build"] and capture["requested"] is True and capture["status"] == "pass" and capture["error"] is None, "Actual Cargo compiler-artifact capture required")
+     m.require(instant(build["finished_utc"]) <= instant(capture["captured_utc"]) <= instant(executed["started_utc"]), "Actual captured artifact must precede Rust execution")
+-    rows = [row for row in capture["rows"] if row["cargo_message"]["target"]["name"] == "ctf09_candidate_unit_observer" and "example" in row["cargo_message"]["target"]["kind"]]
++    rows = [row for row in capture["rows"] if row["cargo_message"]["target"]["name"] == "ctf10_candidate_unit_observer" and "example" in row["cargo_message"]["target"]["kind"]]
+     m.require(len(rows) == 1, "Unique actual candidate example artifact required")
+     artifact = rows[0]; binary = artifact["executable"]
+     binary_path = m.contained(binary["historical_path"])
+@@ -770,7 +784,7 @@
+     available = {row["historical_path"]: row["archive"] for row in snapshot["files"]}
+     m.require(len(available) == len(snapshot["files"]), "Complete source snapshot must not contain duplicate owners")
+     inventory = m.load(rust["runtime_source_bindings"])
+-    m.require(inventory == rust["authenticated_source_inventory"] and inventory["schema"] == "ctf09-candidate-unit-runtime-source-bindings.v1", "Actual runtime source inventory differs")
++    m.require(inventory == rust["authenticated_source_inventory"] and inventory["schema"] == "ctf10-candidate-unit-runtime-source-bindings.v1", "Actual runtime source inventory differs")
+     for key, paths in [("observer_sources", OBSERVER_PATHS), ("actual_public_API_sources", API_PATHS)]:
+         m.require([row["path"] for row in inventory[key]] == paths, "Actual source inventory paths/order differ")
+         for binding in inventory[key]:
+@@ -805,8 +819,8 @@
+         native_key = "CTF06_exponential_observation_policy" if key.startswith("ctf06") else "CTF05_inverse_observation_policy"
+         m.require(rust[key] == native[native_key] == expected, "Actual method policy differs from frozen source policy")
+     for key in ["actual_scope_amendment", "actual_scope_amendment_execution"]: same(rust[key], request[key])
+-    for key in ["historical_prior_08_authority", "actual_scope_amendment_execution_role", "current_cards"]:
+-        m.require(rust[key] == request[key], "Actual Rust current09 and separately historical08 provenance differs")
++    for key in ["historical_prior_09_authority", "actual_scope_amendment_execution_role", "current_cards"]:
++        m.require(rust[key] == request[key], "Actual Rust current10 and separately historical09 provenance differs")
+     m.require(rust["ctf07_gamma_observation_policy"] == native["CTF07_gamma_observation_policy"] == gamma.POLICY,
+               "Actual Gamma source policy differs from frozen packet")
+     m.require(rust["ctf08_final_coefficient_observation_policy"] == native["CTF08_final_coefficient_observation_policy"] == coefficients.POLICY,
+@@ -814,37 +828,50 @@
+     m.require(rust["ctf09_retry_observation_policy"] == native["CTF09_retry_observation_policy"] == retry.POLICY and
+               rust["ctf09_attempt_selection"] == native["CTF09_attempt_selection"] == retry.SELECTION,
+               "Actual separate all-visit retry policy/selection differs")
++    for key in ["ctf10_public_storage_observation_policy", "ctf10_execution_lane_policy", "ctf10_public_profiles"]:
++        m.require(rust[key] == request[key], "Actual Rust public policy metadata differs from the frozen request")
++    m.require(native["CTF10_public_storage_observation_policy"] == public.POLICY == request["ctf10_public_storage_observation_policy"] and
++              native["CTF10_execution_lane_policy"] == request["ctf10_execution_lane_policy"],
++              "Actual Native public policy/lane differs from the pre-output scope")
+     comparison = Comparison(m.require)
+     actual_counts = retry_pairing.validate_all(comparison,native,qa,initial,methods,gamma,coefficients,retry)
++    public_counts = public_pairing.validate_all(comparison,native,qa,public,production=False)
+     compare_models(native,rust,request,comparison)
+     initial_ledger = compare_initial_models(native,rust,request,comparison)
+     retry_ledger = retry_pairing.compare_unit(comparison,native,rust,request,pairing)
++    public_ledger = public_pairing.compare_unit(comparison,native,rust,request,public.POLICY)
++    public_prefix_ledger = []
+     result = comparison.report()
+     result["assembly_handoff_metrics"] = {key: result["metrics"].pop(key) for key in VARIABLES}
+     result["method_handoff_metrics"] = {key: result["metrics"].pop(key) for key in METHOD_VARIABLES}
+     result["Gamma_handoff_metrics"] = {key: result["metrics"].pop(key) for key in GAMMA_VARIABLES}
+     result["private_final_handoff_metrics"] = {key:result["metrics"].pop(key) for key in COEFFICIENT_VARIABLES}
+-    passed = result["mismatch_count"] == 0 and comparison.counts["retry_selected_attempt_owner_pairs"] > 0
++    passed = result["mismatch_count"] == 0 and comparison.counts["public_selected_returned_owner_pairs"] > 0
++    result["retry_handoff_metrics"] = {key:result["metrics"].pop(key) for key in RETRY_VARIABLES}
+     m.recheck(); m.require(binary_sha() == binary["sha256"], "Actual Rust binary changed during comparison")
+     output = m.contained(args.output_dir, existing=False)
+     m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh contained unit comparison output required")
+     output.mkdir(parents=True, exist_ok=False)
+-    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate([Path(__file__), PREP / "packet_io.py", PREP / "method_compare.py", PREP / "method_shape.py", PREP / "gamma_shape.py", PREP / "coefficient_shape.py", PREP / "initial_shape.py", PREP / "retry_shape.py", PREP / "retry_compare.py"])]
+-    report = {"schema": "ctf09-unit-comparison.v1", "status": "pass-selected-actual-retry-visits" if passed else "fail-selected-actual-retry-visits",
++    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate([Path(__file__), PREP / "packet_io.py", PREP / "method_compare.py", PREP / "method_shape.py", PREP / "gamma_shape.py", PREP / "coefficient_shape.py", PREP / "initial_shape.py", PREP / "retry_shape.py", PREP / "retry_compare.py", PREP / "public_shape.py", PREP / "public_compare.py"])]
++    report = {"schema": "ctf10-unit-comparison.v1", "status": "pass-selected-public-storage" if passed else "fail-selected-public-storage",
+               "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(), "reviewed_Original_data_review": refs["original-data-review"],
+               "reviewed_Original_data_review_execution": refs["original-data-review-execution"], "reviewed_Native_results": qa["reviewed_results"],
+               "reviewed_Native_execution": qa["reviewed_native_execution"], "reviewed_request": qa["reviewed_request"], "reviewed_projection": qa["reviewed_projection"],
+               "reviewed_contracts": qa["reviewed_contracts"], "Rust_results": refs["Rust-results"], "Rust_execution": refs["Rust-execution"],
+               "Rust_build_execution": refs["Rust-build-execution"], "actual_Rust_binary": binary, "actual_source_snapshot": build["source_snapshot"],
+-              "actual_source_inventory": inventory, "requested_counts": request["requested_counts"], "inherited_assembly_handoff_profiles": profiles, "frozen_numeric_profiles": {"CTF09":policy["ctf09_retry_profiles"]},"inherited_private_final_handoff_profiles":policy["ctf08_final_coefficient_profiles"],"all_visit_handoff_profile_groups":policy["ctf09_all_visit_handoff_profile_groups"], "inherited_Gamma_handoff_profiles": policy["ctf07_gamma_profiles"], "inherited_method_handoff_profiles": {"CTF06": policy["ctf06_exponential_profiles"], "CTF05": policy["ctf05_inverse_profiles"]}, "inherited_preprocessing_handoff_profiles": inherited,
++              "actual_source_inventory": inventory, "requested_counts": request["requested_counts"], "inherited_assembly_handoff_profiles": profiles, "frozen_numeric_profiles": {"CTF10":policy["ctf10_public_profiles"]},"inherited_retry_handoff_profiles":policy["ctf09_retry_profiles"],"inherited_private_final_handoff_profiles":policy["ctf08_final_coefficient_profiles"],"all_visit_handoff_profile_groups":policy["ctf09_all_visit_handoff_profile_groups"], "inherited_Gamma_handoff_profiles": policy["ctf07_gamma_profiles"], "inherited_method_handoff_profiles": {"CTF06": policy["ctf06_exponential_profiles"], "CTF05": policy["ctf05_inverse_profiles"]}, "inherited_preprocessing_handoff_profiles": inherited,
+               "reviewed_initial_observation_policy":initial_policy,"actual_initial_owner_ledger":initial_ledger,
+               "inherited_initial_handoff_profiles":initial_profiles,"reviewed_matrix_observation_policy":MATRIX_POLICY,
+-              "actual_retry_owner_ledger":retry_ledger,"actual_all_visit_observation_counts":actual_counts,
++              "actual_public_storage_owner_ledger":public_ledger,"actual_public_Init_prefix_ledger":public_prefix_ledger,
++               "actual_public_storage_count_proof":public_counts,"reviewed_public_storage_observation_policy":public.POLICY,
++               "reviewed_public_execution_lane_policy":public.EXECUTION_POLICY,"reviewed_public_policy_contract":qa["reviewed_public_policy_contract"],
++               "Native_whole_Init_admitted":qa["Native_whole_Init_admitted"],"actual_whole_Init_records_structurally_validated_only":qa["complete_actual_Init_records"],
++               "actual_retry_owner_ledger":retry_ledger,"actual_all_visit_observation_counts":actual_counts,
+                "reviewed_method_observation_policies":methods.POLICIES,"inherited_first_only_method_selection":coefficients.SELECTION,
+                "reviewed_final_coefficient_observation_policy":coefficients.POLICY,
+                "historical_first_wrapper_pairing_performed":False,
+                "reviewed_Gamma_observation_policy":gamma.POLICY,"reviewed_retry_observation_policy":retry.POLICY,"reviewed_retry_attempt_selection":retry.SELECTION,
+-               "all_actual_retry_visits_selected_by_separate09policy":True,"historical_prior_08_authority":qa["historical_prior_08_authority"],
++               "all_actual_retry_visits_selected_by_separate09policy":True,"historical_prior_09_authority":qa["historical_prior_09_authority"],
+                "actual_scope_amendment_execution_role":qa["actual_scope_amendment_execution_role"],"actual_scope_amendment":qa["actual_scope_amendment"],
+                "actual_scope_amendment_execution":qa["actual_scope_amendment_execution"],"current_cards":qa["current_cards"],"partial_or_uninvoked_retry_visits_counted_as_PASS":False,
+               "Rust_retry_driver_available":True,"linked_original_retention_intent":RETENTION_INTENT,
+@@ -853,12 +880,13 @@
+                   {"id": operation["id"], "actual_source_invoked": operation["actual_source_invoked"], "call_outcome": operation["call_outcome"]}
+                   for operation in model["operations"]]} for model in native["model_cases"]],
+               "comparison": result, "executed_reader_sources": sources, "executed_reader_source_archive": sources[0]["archive"],
+-              "selected_unit_PASS_claimed": passed, "complete_CTF04_PASS_claimed": False, "complete_CTF05_PASS_claimed": False, "complete_CTF06_PASS_claimed": False, "complete_CTF07_PASS_claimed": False, "complete_CTF08_PASS_claimed": False, "complete_CTF09_PASS_claimed": False, "production_fixed15_loader_lane_certified": False,
++              "selected_unit_public_storage_PASS_claimed": passed, "complete_CTF04_PASS_claimed": False, "complete_CTF05_PASS_claimed": False, "complete_CTF06_PASS_claimed": False, "complete_CTF07_PASS_claimed": False, "complete_CTF08_PASS_claimed": False, "complete_CTF09_PASS_claimed": False, "complete_CTF10_PASS_claimed": False,
++        "whole_Init_reporting_final_fatal_backend_or_surface_handoff_certified":False, "production_fixed15_loader_lane_certified": False,
+               "Native_whole_method_outcomes_DoCTFErrorReport_and_massive_coefficients_paired": False, "CTF04_through_CTF10_certified": False,
+               "Native_flags_injected_into_Rust_or_missing_phases_masked": False, "scientific_engine_or_layer_evaluator_invoked": False,
+               "Rust_binary_payload_rehashed": True, "Native_binary_payloads_read_or_rehashed": False,
+               "declared_caller_and_construction_metadata_not_claimed_as_additional_Rust_owner_fields": True,
+-              "gates_updated": False, "authorship_limits": "Raw authored retry caller/driver, Rust09 transports and some prior pure06; Header authored09 Native/assembly/ingress and Base DataQA. This pairs actual owners and provenance, not independent certification of own formulas."}
++              "gates_updated": False, "authorship_limits": "Raw authored Native10 passive/helper, Rust10 observer/comparer and prior retry/pure code; Header authored public10 owner/freezer/DataQA. Base independently peered source. This pairs actual owners and provenance, not independent certification of authors' formulas."}
+     m.recheck(); m.emit(output / "comparison.json", report); m.recheck()
+     print(json.dumps(report, allow_nan=False, indent=2))
+     return 0 if passed else 1

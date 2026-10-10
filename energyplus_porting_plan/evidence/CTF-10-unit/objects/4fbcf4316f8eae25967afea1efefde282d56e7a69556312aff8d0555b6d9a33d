@@ -1,0 +1,185 @@
+-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/conversion.json",
+        "sha256": "445d64f53bcf361edb307c06c05d3e95b0cb9e5d9e5a61d02d4f8b600b2f4da5",
+        "size_bytes": 2819
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/conversion.json",
+        "sha256": "7a7123c9f7d90e33c35343b4a007b9ca49c79d09dcad92fcc487ecf532d92364",
+        "size_bytes": 2742
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/conversion.json",
+        "sha256": "ae5fb503177874316afc5a71ac1ba3c5b37318740fa6f0e7e1466a80cc3764e7",
+        "size_bytes": 2742
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/conversion.json",
+        "sha256": "072ced0051d32351ddd185b68874e92281f03b75b90537fafb346ea8a78fab27",
+        "size_bytes": 2775
+      }
+    }
+  ],
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/compare_production.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/000-compare_production.py",
+        "sha256": "87ff8863771371674c379eab703c6a1a98f04b62d0780b37cac768064f3d8e12",
+        "size_bytes": 96525
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/001-packet_io.py",
+        "sha256": "d0a9f164fd27acd4300d4ab9dff1a1e2166e68323efe2821927c14b57dd09e4f",
+        "size_bytes": 4723
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/method_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/002-method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/method_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/003-method_shape.py",
+        "sha256": "0990f10316263894bbf42cc53f25d18c5cf79947286d99b6279e55b37eae9801",
+        "size_bytes": 30929
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/gamma_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/004-gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/coefficient_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/005-coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/006-initial_shape.py",
+        "sha256": "ab0fdc69412d939bd9bb3bd025a43719defde08e36400f9a6f199b82e6737de8",
+        "size_bytes": 26626
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/retry_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/007-retry_shape.py",
+        "sha256": "e8615423cdd570c98c97c07b5eb58b2f9a736154a9b0b6a5150d09551898b4a7",
+        "size_bytes": 45988
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/retry_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/008-retry_compare.py",
+        "sha256": "1ac70f9e5ed7589f5fa25b629fd4adea9c1e75b30272d2c02153ad47ab36e3d1",
+        "size_bytes": 38487
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/public_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/009-public_shape.py",
+        "sha256": "8a772dc521cb8f99a7d3f51c1bbc61a3b1f9e0019ee3d22cb9f28fc6132fc669",
+        "size_bytes": 45307
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/public_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/production-comparison-01/010-public_compare.py",
+        "sha256": "bb9b048809fd037f8c6f1119a30426d1b8c8c39b5d6f6927055adbe0d070288e",
+        "size_bytes": 23488
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-10/production-comparison-01/000-compare_production.py",
+    "sha256": "87ff8863771371674c379eab703c6a1a98f04b62d0780b37cac768064f3d8e12",
+    "size_bytes": 96525
+  },
+  "selected_fixed15_public_storage_PASS_claimed": true,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "complete_CTF09_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "whole_Init_reporting_final_fatal_backend_or_surface_handoff_certified": false,
+  "production_CLI6_or_downstream_coefficient_handoff_certified": false,
+  "CTF04_through_CTF10_certified": false,
+  "Native_whole_final_ErrorsFound_DoCTFErrorReport_massive_coefficients_paired": false,
+  "Native_flags_injected_or_missing_required_owners_masked": false,
+  "scientific_engine_or_layer_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "gates_updated": false,
+  "authorship_limits": "Raw authored Native10 passive/helper, Rust10 observer/comparer and prior retry/pure code; Header authored public10 owner/freezer/DataQA. Base independently peered source. This pairs actual owners and provenance, not independent certification of authors' formulas."
+}
+{"receipt": {"path": ".runtime/porting/CTF-10/production-comparison-command-01/receipt.json", "sha256": "ecc14cb8a121818ddcc44458520d1fe9f6a81468f11e142462e3e00d6661a2f6"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

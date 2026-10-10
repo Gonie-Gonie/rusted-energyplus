@@ -1,0 +1,52 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -10,7 +10,6 @@
+ };
+ use super::{ConstructionCacheInvalidationToken, ConstructionThermalData};
+ use crate::RuntimeError;
+-use crate::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization;
+ use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
+ use crate::heat_balance::ctf_first_assembly_owner::{
+     ConstructionCtfFirstAssembly, initialize_construction_ctf_first_assembly,
+@@ -22,6 +21,7 @@
+ use crate::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+ };
++use crate::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization;
+ use crate::heat_balance::ctf_retry_initialization::{
+     ConstructionCtfRetryInitialization, initialize_construction_ctf_retry,
+     skip_construction_ctf_retry,
+@@ -130,8 +130,11 @@
+         let mut public_initialization = OrderedCtfPublicInitialization::begin(true, 0);
+         for (construction_index, construction) in model.constructions.iter().enumerate() {
+             if !construction.is_ordinary_opaque() {
+-                public_initialization.record_excluded(construction_index, construction,
+-                    used_ctf_constructions.contains(&construction.id.0));
++                public_initialization.record_excluded(
++                    construction_index,
++                    construction,
++                    used_ctf_constructions.contains(&construction.id.0),
++                );
+                 continue;
+             }
+             let context = CtfLayerContext {
+@@ -194,10 +197,16 @@
+             shared_flags = retry.flags_on_return;
+             selected_chain_stop = retry.selected_chain_stop;
+             // Borrow the real09 return before moving it. No preprocessor/method replay.
+-            public_initialization.record_ordinary(construction_index, construction,
+-                &entry.ctf01_layer_preprocessing, initial_discretizations.last()
++            public_initialization.record_ordinary(
++                construction_index,
++                construction,
++                &entry.ctf01_layer_preprocessing,
++                initial_discretizations
++                    .last()
+                     .filter(|owner| owner.construction_id == construction.id),
+-                &entry.ctf02_coefficients, &retry);
++                &entry.ctf02_coefficients,
++                &retry,
++            );
+             retry_initializations.push(retry);
+             if entry.heat_capacity_j_per_m2_k.is_some() {
+                 massive_ctf_construction_ids.push(entry.construction_id);

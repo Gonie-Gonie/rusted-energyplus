@@ -1,0 +1,318 @@
+"""Compare actual public owners and reached Init prefixes; no store evaluator."""
+import re
+from collections import Counter
+
+VARIABLES = ["CTF10." + key for key in
+             ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFTimeStep", "UValue"]]
+ARRAYS = ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFSourceIn", "CTFSourceOut",
+          "CTFTSourceOut", "CTFTSourceIn", "CTFTSourceQ", "CTFTUserOut", "CTFTUserIn", "CTFTUserSource"]
+RESET_ARRAYS = ARRAYS[4:]
+ROUTES = ["UnusedReset", "LoadingErrorReset", "AllResistive", "MassiveConverged", "MassiveSevereBreak"]
+
+
+def validate_all(c, native, qa, public, *, production=False):
+    """Recheck all copied owners/counts before selecting any numerical pair."""
+    counts, integrity = Counter(), []
+    for model in native["model_cases"]:
+        if production:
+            initialized = model["initialized_owners"]["snapshot"]
+            public.whole_init(model, initialized, c.need, c.dto, counts, integrity,
+                              model["id"], model["loader_unavailable_reason"])
+        for operation in model["operations"]:
+            label = model["id"] + "/" + (str(operation["actual_construction_index"]) if production else operation["id"])
+            owner = initialized if production else operation["after"]
+            public.review(operation, owner, c.need, c.dto, counts, integrity, label)
+    actual = public.summary(native, counts, c.need)
+    if production:
+        for key in ["actual_whole_Init_invocations", "actual_Init_event_count", "actual_Init_construction_call_count",
+                    "actual_retained_Init_call_records", "actual_Init_diagnostic_count", "Init_copy_integrity_failed_records",
+                    "unreturned_Init_call_records"]:
+            actual[key] = counts[key]
+        actual["actual_whole_Init_status_counts"] = {
+            key.removeprefix("whole_Init_status_"): value for key, value in counts.items()
+            if key.startswith("whole_Init_status_")}
+    for key, value in actual.items():
+        c.exact("DataQA_public_and_Init_counts/" + key, qa["actual_observation_counts"][key], value)
+        c.need(value == qa["actual_observation_counts"][key], "Actual DataQA public/Init count proof differs")
+    c.need(not integrity, "Actual public/Init copy, omission or association failure prevents pairing")
+    return actual
+
+
+def snapshot(c, row, path):
+    c.need(isinstance(row, dict) and type(row.get("reached")) is bool and
+           type(row.get("copy_available")) is bool, "Actual reached/copy public record required")
+    available = row["reached"] and row["copy_available"]
+    c.need(available is isinstance(row.get("snapshot"), dict), "Actual public copy/null custody differs")
+    if row["reached"] and not row["copy_available"]:
+        c.absence(path, False, False, True, "Reached required public copy failed; no unavailable-route masking")
+    return row.get("snapshot")
+
+
+def production_context(c, model, operation, path):
+    """Borrow distinct real owners without fabricating a per-call model snapshot."""
+    c.need(operation.get("before") is None and operation.get("after") is None and
+           operation.get("manual_full_model_before_after_unavailable") is True,
+           "True Init per-call manual snapshots must stay unavailable")
+    public = operation["observations"]["PublicStorage"]
+    before = snapshot(c, public["before_reset"], path + "/public_before_reset")
+    whole = model.get("whole_Init")
+    c.need(isinstance(whole, dict) and whole.get("actual_source_invoked") is True and
+           whole.get("manual_Construction_loop_performed") is False,
+           "Actual whole Init owns the real construction loop")
+    observed = whole.get("observations")
+    c.need(isinstance(observed, dict), "Actual reached whole Init observation owner required")
+    ordinal = operation["actual_Init_call_ordinal"]
+    entries = [event for event in observed["events"] if event["event"] == "ConstructionEntry" and
+               isinstance(event.get("snapshot"), dict) and
+               event["snapshot"]["actual_construction_index"] == operation["actual_construction_index"]]
+    c.need(len(entries) == 1, "One genuine reached Init ConstructionEntry owner required")
+    event = entries[0]
+    c.need(event["copy_available"] is True and before is not None,
+           "Reached Init event and real public input copy required")
+    value = event["snapshot"]
+    for key in ["actual_construction_index", "actual_construction_address", "ErrorsFound", "DoCTFErrorReport"]:
+        c.exact(path + "/Init_public_input_join/" + key, value[key], before[key])
+    c.exact(path + "/actual_call_ordinal", ordinal, operation["actual_construction_index"])
+    state_row = model["initialized_owners"]
+    c.need(state_row.get("available") is True and isinstance(state_row.get("snapshot"), dict),
+           "Actual pre-Init loader owners required independently of public flags")
+    state = state_row["snapshot"]
+    matches = [row for row in state["constructions"] if
+               row["array_index"] == operation["actual_construction_index"]]
+    c.need(len(matches) == 1, "Actual declared initialized construction must uniquely join this retained call")
+    declared = matches[0]
+    for key in ["Name", "IsUsedCTF", "SourceSinkPresent", "SolutionDimensions", "TotLayers"]:
+        c.exact(path + "/declared_public_input_join/" + key,
+                declared[key], before["actual_Name" if key == "Name" else key])
+    c.exact(path + "/declared_public_membership", declared["LayerPoint_active"], before["original_LayerPoint"])
+    context = {"is_used_ctf": before["IsUsedCTF"], "errors_found": before["ErrorsFound"],
+               "source_sink_present": before["SourceSinkPresent"], "solution_dimensions": before["SolutionDimensions"]}
+    return context, value["actual_TimeStepZone"]
+
+
+def rust_initialization(c, row, path):
+    c.need(isinstance(row, dict) and row.get("protocol") == "ctf10-selected-Rust-public-initialization.v1" and
+           row.get("owner_available") is True and isinstance(row.get("constructions"), list),
+           "Actual selected Rust ordered public owner required")
+    for key in ["actual_AnyInternalHeatSource_postloop_invoked", "actual_ScanForReports_invoked",
+                "actual_reportLayers_or_reportTransferFunction_invoked", "actual_final_fatal_backend_invoked",
+                "Native_true_whole_Init_outcome_or_event_ledger_inferred",
+                "surface_public_coefficient_activation_certified", "counted_as_PASS"]:
+        c.need(row.get(key) is False, "Selected Rust prefix cannot impersonate Native reporting/whole outcomes")
+    rows = row["constructions"]
+    c.exact(path + "/actual_public_owner_count", len(rows), row.get("actual_owner_count"))
+    c.exact(path + "/actual_public_initializer_invocations",
+            sum(item.get("actual_public_initializer_invoked") is True for item in rows),
+            row.get("actual_public_initializer_invocations"))
+    c.need(len({item["construction_id"] for item in rows}) == len(rows), "Unique ordered actual public IDs required")
+    for index, item in enumerate(rows):
+        c.exact(path + "/declared_index/" + str(index), index, item.get("declared_index"))
+    return rows
+
+
+def pair_operation(c, path, operation, actual, cid, material_ids, used, prior_rows, policy):
+    record = {"path": path, "actual_public_storage_owner_pair": False, "counted_as_PASS": False,
+              "Native_whole_call_outcome_context_only": operation["call_outcome"],
+              "Rust_public_route": None, "excluded_or_unavailable_reason": None}
+    if not operation["actual_source_invoked"]:
+        c.absence(path + "/public_not_invoked", False, isinstance(actual, dict), False,
+                  "Declared Native source call not invoked; public outcome is unknown/noPASS")
+        record["excluded_or_unavailable_reason"] = "Native_whole_call_not_invoked"
+        return record
+    observed = operation["observations"]["PublicStorage"]
+    before = snapshot(c, observed["before_reset"], path + "/before_reset")
+    returned = snapshot(c, observed["actual_caller_return"], path + "/actual_caller_return")
+    c.need(before is not None, "An actual invoked public call requires its real input owner")
+    c.exact(path + "/original_LayerPoint_ID_offset", [value + 1 for value in material_ids], before["original_LayerPoint"])
+    c.exact(path + "/original_TotLayers", len(material_ids), before["TotLayers"])
+    c.exact(path + "/Native_is_used_ctf", before["IsUsedCTF"], used)
+    if isinstance(actual, dict) and "construction_id" in actual:
+        c.exact(path + "/construction_id", cid, actual["construction_id"])
+        c.exact(path + "/original_material_ids", material_ids, actual.get("original_material_ids"))
+        c.exact(path + "/actual_is_used_ctf", used, actual.get("actual_Rust_is_used_ctf"))
+    selected_context = before["SourceSinkPresent"] is False and before["SolutionDimensions"] == 1
+    capacity = returned is not None and type(returned["NumCTFTerms"]) is int and 0 <= returned["NumCTFTerms"] <= 18
+    eligible = selected_context and returned is not None and capacity
+    record["Native_actual_return_reached"] = observed["actual_caller_return"]["reached"]
+    record["Native_selected_no_source_1D"] = selected_context
+    record["Native_fixed_capacity_representable"] = capacity
+    if not eligible:
+        reason = "outside_selected_no_source_1D" if not selected_context else (
+            "actual_Source_return_not_observed" if returned is None else "actual_public_capacity_unrepresentable")
+        c.absence(path + "/public_selection", returned is not None,
+                  isinstance(actual, dict) and actual.get("owner_available") is True, False,
+                  reason + "; no numeric PASS or Native safe-store/fatal outcome inferred")
+        record["excluded_or_unavailable_reason"] = reason
+        record["Rust_actual_unavailable"] = actual.get("unavailable") if isinstance(actual, dict) else None
+        return record
+    available = isinstance(actual, dict) and actual.get("owner_available") is True and isinstance(actual.get("snapshot"), dict)
+    if not available:
+        c.absence(path + "/required_returned_public_owner", True, False, True,
+                  "Eligible returned Native owner requires actual Rust public storage; one/both missing cannot pass")
+        return record
+    c.need(actual.get("actual_public_initializer_invoked") is True and actual.get("unavailable") is None and
+           actual.get("Native_whole_call_outcome_or_public_checkpoint_inferred") is False and actual.get("counted_as_PASS") is False,
+           "Actual invoked Rust suffix Result required without reconstructed Native checkpoints")
+    for stage, native in [("entry", before), ("return", returned)]:
+        flags = actual.get("actual_retry_flags_on_" + stage)
+        c.need(isinstance(flags, dict), "Actual selected shared flags required for returned public suffix")
+        for key in ["ErrorsFound", "DoCTFErrorReport"]:
+            c.exact(path + "/flags/" + stage + "/" + key, native[key], flags[key])
+    route = actual["snapshot"].get("actual_Rust_route")
+    storage = actual["snapshot"].get("public_storage")
+    c.need(isinstance(route, str) and isinstance(storage, dict), "Actual typed public route/storage required")
+    reverse = re.fullmatch(r"Reversed \{ construction_id: ConstructionId\((\d+)\), declared_index: (\d+) \}", route)
+    c.need(route in ROUTES or reverse is not None, "Actual known public return route required")
+    record["Rust_public_route"] = route
+    initial = operation["observations"]["InitialDiscretization"]
+    converted = operation["observations"]["PostConversion"]
+    if reverse:
+        entry, complete = observed["reverse_entry"], observed["reverse_completed"]
+        c.need(entry["reached"] is True and complete["reached"] is True,
+               "Reverse Rust route requires actual original provider callbacks")
+        provider = snapshot(c, complete["actual_provider"], path + "/reverse_provider")
+        entry_provider = snapshot(c, entry["actual_provider"], path + "/reverse_provider_entry")
+        c.need(provider is not None and entry_provider is not None, "Real earlier public provider owners required")
+        provider_id, provider_index = map(int, reverse.groups())
+        c.exact(path + "/reverse_provider_ID_offset", provider["actual_construction_index"], provider_id + 1)
+        c.exact(path + "/reverse_provider_declared_index", provider["actual_construction_index"] - 1, provider_index)
+        c.need(provider_index < actual["declared_index"] and provider_index < len(prior_rows),
+               "Actual reverse provider must be earlier in retained Rust declared order")
+        previous = prior_rows[provider_index]
+        c.exact(path + "/reverse_provider_ID", provider_id, previous["construction_id"])
+        c.need(previous["owner_available"] is True and previous["actual_Rust_is_used_ctf"] is True,
+               "Actual selected earlier public provider storage/use required")
+        c.exact(path + "/reverse_provider_identity_stable", entry_provider["actual_construction_address"], provider["actual_construction_address"])
+        for key in ARRAYS + ["CTFTimeStep", "UValue", "NumHistories", "NumCTFTerms"]:
+            c.exact(path + "/actual_provider_custody/" + key, provider[key], previous["snapshot"]["public_storage"][key])
+    else:
+        c.exact(path + "/no_reverse_entry", False, observed["reverse_entry"]["reached"])
+        c.exact(path + "/no_reverse_completed", False, observed["reverse_completed"]["reached"])
+        if route == "UnusedReset":
+            c.exact(path + "/unused_route", False, before["IsUsedCTF"])
+        elif route == "LoadingErrorReset":
+            postload = operation["observations"]["PostLoad"]
+            c.need(postload["available"] is True and postload["snapshot"]["ErrorsFound"] is True,
+                   "Loading-error reset requires actual reached loading error owner")
+        elif route == "AllResistive":
+            c.need(converted["available"] is True and converted["snapshot"]["LayersInConstruct"] == converted["snapshot"]["NumResLayers"] and
+                   initial["reached"] is False, "All-resistive route requires actual converted branch evidence")
+        else:
+            events = operation["observations"]["RetryDriver"]["caller_events"]
+            required = "SevereBreak" if route == "MassiveSevereBreak" else "LoopExit"
+            c.need(any(event["event"] == required for event in events),
+                   "Actual massive terminal route requires its real reached caller marker")
+    c.exact(path + "/fixed_array_count", 12, storage.get("fixed_array_count"))
+    c.exact(path + "/fixed_slots_per_array", 19, storage.get("actual_slots_per_array"))
+    c.need(storage.get("coefficients_recomputed_by_observer") is False and storage.get("counted_as_PASS") is False,
+           "Observer public storage must be copied, not reconstructed")
+    for key in ARRAYS:
+        left, right = returned[key], storage.get(key)
+        c.need(isinstance(left, list) and isinstance(right, list), "Both actual public arrays required")
+        c.exact(path + "/shape/" + key, 19, len(left)); c.exact(path + "/Rust_shape/" + key, 19, len(right))
+        if len(left) != 19 or len(right) != 19:
+            continue
+        for index, (a, b) in enumerate(zip(left, right)):
+            p = path + "/" + key + "/" + str(index)
+            if key in RESET_ARRAYS:
+                c.dto(a); c.dto(b)
+                for label, value in [("Native", a), ("Rust", b)]:
+                    c.exact(p + "/" + label + "/reset_bits", policy["reset_source_arrays"]["required_value_bits"], value["value_bits"])
+                    c.exact(p + "/" + label + "/reset_class", "positive_zero", value["value_class"])
+            else:
+                c.number(p, "CTF10." + key, a, b)
+    for key in ["CTFTimeStep", "UValue"]:
+        c.number(path + "/" + key, "CTF10." + key, returned[key], storage.get(key))
+    for key in ["NumHistories", "NumCTFTerms"]:
+        c.exact(path + "/" + key, returned[key], storage.get(key))
+    c.counts["public_selected_returned_owner_pairs"] += 1
+    record["actual_public_storage_owner_pair"] = True
+    return record
+
+
+def compare_unit(c, native, rust, request, policy):
+    records = []
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        path = expected["id"]
+        c.need(right.get("Native_unit_whole_Init_invoked") is False and
+               right.get("unit_aggregate_context_is_Rust_API_only") is True,
+               "Direct unit prefix cannot claim actual Native whole Init")
+        rows = rust_initialization(c, right["CTF10_public_initialization"], path)
+        material_ids = {item["id"]: index for index, item in enumerate(expected["materials"])}
+        for index, (construction, operation, actual) in enumerate(zip(expected["constructions"], left["operations"], right["operations"])):
+            public = actual.get("CTF10_public")
+            if isinstance(public, dict) and public.get("declared_index") is not None:
+                c.need(index < len(rows) and public == rows[index], "Unit per-call public copy must be the actual model owner row")
+            records.append(pair_operation(c, path + "/" + operation["id"], operation, public, index,
+                [material_ids[key] for key in construction["layer_material_ids"]], construction["IsUsedCTF"], rows, policy))
+        c.absence(path + "/whole_Init_and_reports", False, False, False,
+                  "Direct unit Init/report prerequisites excluded before outputs; no whole Init PASS")
+    return records
+
+
+def compare_production(c, native, rust, request, policy, normalized, owners):
+    records, prefixes = [], []
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        path = expected["id"]
+        actual = right.get("selected_CTF10_owners")
+        if not isinstance(actual, dict) or actual.get("owner_available") is not True:
+            c.absence(path + "/public_initialization", left["loader_ready"], False, left["loader_ready"],
+                      "Actual ordinary initialized public owner absent; no prefix or storage fabricated")
+            continue
+        rows = rust_initialization(c, actual, path)
+        typed = right["typed_owners"]["constructions"]
+        c.exact(path + "/public_declared_order", [row["id"] for row in typed], [row["construction_id"] for row in rows])
+        by_name, by_id = owners(typed, "name", c), {row["construction_id"]: row for row in rows}
+        for operation in left["operations"]:
+            name = normalized(operation["actual_construction_Name"], c)
+            construction = by_name.get(name)
+            if construction is None:
+                c.absence(path + "/" + name + "/construction", True, False, True, "Actual same-input typed construction absent")
+                continue
+            cid = construction["id"]
+            public = by_id.get(cid)
+            records.append(pair_operation(c, path + "/" + name, operation, public, cid,
+                construction["effective_layer_ids"],
+                operation["observations"]["PublicStorage"]["before_reset"]["snapshot"]["IsUsedCTF"], rows, policy))
+        observed_names = {normalized(operation["actual_construction_Name"], c) for operation in left["operations"]}
+        for construction in typed:
+            if normalized(construction["name"], c) not in observed_names:
+                c.absence(path + "/" + construction["name"] + "/unreached_original_Init_call", False,
+                          by_id.get(construction["id"], {}).get("owner_available") is True, False,
+                          "Actual whole Init did not retain a call for this declared construction; no later outcome fabricated")
+                records.append({"path": path + "/" + construction["name"],
+                    "actual_public_storage_owner_pair": False, "counted_as_PASS": False,
+                    "excluded_or_unavailable_reason": "actual_Original_Init_call_not_reached_or_retained"})
+        whole = left["whole_Init"]
+        observations = whole.get("observations")
+        if not isinstance(observations, dict):
+            c.absence(path + "/actual_Init_prefix", False, True, False, "Native whole Init unavailable; no prefix PASS")
+            continue
+        aggregates = [row for row in observations["events"] if row["event"] == "PostConstructionAggregate"]
+        returned = [row for row in rows if row["owner_available"] is True]
+        prefix = {"model_id": path, "actual_Native_aggregate_events": aggregates,
+                  "Rust_actual_aggregate_prefix": actual["aggregate_after_returned_calls"],
+                  "Native_whole_Init_outcome_context_only": whole["call_outcome"],
+                  "Rust_selected_stop": actual["selected_stop"], "whole_Init_or_report_PASS_claimed": False}
+        c.exact(path + "/actual_postreturn_aggregate_order",
+                [row["actual_construction_index"] for row in left["operations"] if row["postaggregate_reached"]],
+                [row["snapshot"]["actual_construction_index"] for row in aggregates])
+        prefix["intermediate_Native_aggregate_snapshots_paired"] = False
+        # Pair only the source-owned prefix that both actually returned.
+        if len(aggregates) == len(returned) and all(row["owner_available"] for row in rows):
+            c.exact(path + "/aggregate/returned_count", len(aggregates), actual["aggregate_after_returned_calls"]["returned_constructions"])
+            c.exact(path + "/selected_declared_loop_completed", len(aggregates) == len(typed), actual["selected_declared_loop_completed"])
+            c.exact(path + "/selected_returned_prefix_stop", None, actual["selected_stop"])
+            if aggregates:
+                value = aggregates[-1]["snapshot"]
+                for key in ["SimpleCTFOnly", "MaxCTFTerms"]:
+                    c.exact(path + "/aggregate/" + key, value[key], actual["aggregate_after_returned_calls"][key])
+        else:
+            c.absence(path + "/complete_returned_aggregate_prefix", len(aggregates) == len(rows),
+                      len(returned) == len(rows), False, "Source/selected stop leaves incomplete aggregate prefix unavailable/noPASS")
+        for stage in ["AfterAllAggregates", "ReportLayersEntry", "ScanEntry", "ReportHeaders", "ReportTransferEntry", "FinalFatalBoundary", "FunctionEnd"]:
+            c.absence(path + "/unpaired_whole_Init_stage/" + stage,
+                      any(row["event"] == stage for row in observations["events"]), False, False,
+                      "Actual Native whole Init/report stage retained separately; selected Rust prefix did not invoke it")
+        prefixes.append(prefix)
+    return records, prefixes

@@ -1,0 +1,26 @@
+--- held01/public_compare.py
++++ proposed02/public_compare.py
+@@ -153,11 +153,21 @@
+     c.need(actual.get("actual_public_initializer_invoked") is True and actual.get("unavailable") is None and
+            actual.get("Native_whole_call_outcome_or_public_checkpoint_inferred") is False and actual.get("counted_as_PASS") is False,
+            "Actual invoked Rust suffix Result required without reconstructed Native checkpoints")
++    # Rust retry entry follows preprocessing; unused Source calls return before loading.
++    entry_errors = before["ErrorsFound"]
++    if before["IsUsedCTF"]:
++        postload = operation["observations"]["PostLoad"]
++        c.need(isinstance(postload, dict) and postload.get("available") is True and
++               isinstance(postload.get("snapshot"), dict),
++               "Used returned public owner requires actual PostLoad shared errors")
++        entry_errors = postload["snapshot"]["ErrorsFound"]
+     for stage, native in [("entry", before), ("return", returned)]:
+         flags = actual.get("actual_retry_flags_on_" + stage)
+         c.need(isinstance(flags, dict), "Actual selected shared flags required for returned public suffix")
+-        for key in ["ErrorsFound", "DoCTFErrorReport"]:
+-            c.exact(path + "/flags/" + stage + "/" + key, native[key], flags[key])
++        c.exact(path + "/flags/" + stage + "/ErrorsFound",
++                entry_errors if stage == "entry" else native["ErrorsFound"], flags["ErrorsFound"])
++        c.exact(path + "/flags/" + stage + "/DoCTFErrorReport",
++                native["DoCTFErrorReport"], flags["DoCTFErrorReport"])
+     route = actual["snapshot"].get("actual_Rust_route")
+     storage = actual["snapshot"].get("public_storage")
+     c.need(isinstance(route, str) and isinstance(storage, dict), "Actual typed public route/storage required")

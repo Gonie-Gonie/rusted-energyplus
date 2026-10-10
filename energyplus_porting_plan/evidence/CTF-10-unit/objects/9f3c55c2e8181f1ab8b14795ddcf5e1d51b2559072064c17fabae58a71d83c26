@@ -1,0 +1,217 @@
+6620,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.e": {
+        "count": 1385,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.mutated_Gamma1": {
+        "count": 4155,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.PhiR0": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.Rnew": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF08.Rold": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "retry_handoff_metrics": {
+      "CTF09.pre_AMat": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.pre_IdenMatrix": {
+        "count": 65241,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumXi": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumYi": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.assignedAbsSumZi": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.BiggestSum": {
+        "count": 26,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.pre_CTFTimeStep": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF09.post_CTFTimeStep": {
+        "count": 41,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    }
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/compare_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/000-compare_unit.py",
+        "sha256": "23ddb825b828cda63ed066e4e087175321dc783b68b56321c4525670751985db",
+        "size_bytes": 84017
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/001-packet_io.py",
+        "sha256": "d0a9f164fd27acd4300d4ab9dff1a1e2166e68323efe2821927c14b57dd09e4f",
+        "size_bytes": 4723
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/method_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/002-method_compare.py",
+        "sha256": "5fbb314b161dff42920fd90add0f6b9a1601bab434f2ca1f0df28c2ff5490c97",
+        "size_bytes": 22937
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/method_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/003-method_shape.py",
+        "sha256": "0990f10316263894bbf42cc53f25d18c5cf79947286d99b6279e55b37eae9801",
+        "size_bytes": 30929
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/gamma_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/004-gamma_shape.py",
+        "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+        "size_bytes": 34636
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/coefficient_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/005-coefficient_shape.py",
+        "sha256": "707779c0a7af90cad92da873bb7876f01b0d8d04b061bea6669d2ddb93798560",
+        "size_bytes": 50650
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/006-initial_shape.py",
+        "sha256": "ab0fdc69412d939bd9bb3bd025a43719defde08e36400f9a6f199b82e6737de8",
+        "size_bytes": 26626
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/retry_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/007-retry_shape.py",
+        "sha256": "e8615423cdd570c98c97c07b5eb58b2f9a736154a9b0b6a5150d09551898b4a7",
+        "size_bytes": 45988
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/retry_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/008-retry_compare.py",
+        "sha256": "1ac70f9e5ed7589f5fa25b629fd4adea9c1e75b30272d2c02153ad47ab36e3d1",
+        "size_bytes": 38487
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/public_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/009-public_shape.py",
+        "sha256": "8a772dc521cb8f99a7d3f51c1bbc61a3b1f9e0019ee3d22cb9f28fc6132fc669",
+        "size_bytes": 45307
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/comparer-prep-02/public_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/unit-comparison-01/010-public_compare.py",
+        "sha256": "bb9b048809fd037f8c6f1119a30426d1b8c8c39b5d6f6927055adbe0d070288e",
+        "size_bytes": 23488
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-10/unit-comparison-01/000-compare_unit.py",
+    "sha256": "23ddb825b828cda63ed066e4e087175321dc783b68b56321c4525670751985db",
+    "size_bytes": 84017
+  },
+  "selected_unit_public_storage_PASS_claimed": true,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "complete_CTF09_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "whole_Init_reporting_final_fatal_backend_or_surface_handoff_certified": false,
+  "production_fixed15_loader_lane_certified": false,
+  "Native_whole_method_outcomes_DoCTFErrorReport_and_massive_coefficients_paired": false,
+  "CTF04_through_CTF10_certified": false,
+  "Native_flags_injected_into_Rust_or_missing_phases_masked": false,
+  "scientific_engine_or_layer_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "declared_caller_and_construction_metadata_not_claimed_as_additional_Rust_owner_fields": true,
+  "gates_updated": false,
+  "authorship_limits": "Raw authored Native10 passive/helper, Rust10 observer/comparer and prior retry/pure code; Header authored public10 owner/freezer/DataQA. Base independently peered source. This pairs actual owners and provenance, not independent certification of authors' formulas."
+}
+{"receipt": {"path": ".runtime/porting/CTF-10/unit-comparison-command-01/receipt.json", "sha256": "ed9dcba53321bb1154daa0fcaa91e6b37132a4cd578d2b863467014721501a30"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

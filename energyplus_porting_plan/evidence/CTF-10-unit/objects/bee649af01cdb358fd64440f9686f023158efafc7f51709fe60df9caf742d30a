@@ -1,0 +1,26 @@
+{
+  "schema": "ctf10-actual-formatted-candidate-input-custody.v1",
+  "Root_authored_record_not_command_recorder": true,
+  "actual_formatted_source": {
+    "path": ".runtime/porting/CTF-10/applied-final-source-02/manifest.json",
+    "sha256": "7b1dbbec2084e09bbc29bb1cde37bcc3fd539c6bb452e4a01d596753d2b1ea0c",
+    "size_bytes": 26984
+  },
+  "actual_unit_bindings": {
+    "path": ".runtime/porting/CTF-10/candidate-unit-inputs-01/source-bindings.json",
+    "sha256": "36928f5b6a162ac1ee42b3fb0beef0b2660bd3682339d43848684ec339d81b57",
+    "size_bytes": 6691
+  },
+  "actual_production_request": {
+    "path": ".runtime/porting/CTF-10/candidate-production-inputs-01/request.json",
+    "sha256": "10fda19a9c3bb626642f9df80fea428f84d395ab93af57226415e67536dcbbdd",
+    "size_bytes": 39078
+  },
+  "literal_prior15_model_rows_conversion_refs_temperature_and_fixed_scope_unchanged": true,
+  "unit39_42_real10_Native_frozen_request_used": {
+    "path": ".runtime/porting/CTF-10/frozen-packet-01/helper-request.json",
+    "sha256": "3009353f4c26df8340a421ffb22c012d80ad620872949dfb53570674b60cd577",
+    "size_bytes": 159722
+  },
+  "Native_values_expected_arrays_attempt_counts_or_exit_answers_supplied_to_Rust": false
+}

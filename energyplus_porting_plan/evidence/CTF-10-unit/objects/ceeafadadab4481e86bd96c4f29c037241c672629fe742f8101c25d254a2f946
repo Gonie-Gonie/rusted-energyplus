@@ -1,0 +1,46 @@
+// Copy accepted CTF10 owners only. These are not Native phase/return events.
+pub(super) fn public_storage(source: &ep_runtime::heat_balance::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage) -> Value {
+    let values = |source: &[f64]| source.iter().copied().map(scalar).collect::<Vec<_>>();
+    json!({"CTFOutside":values(&source.outside),"CTFCross":values(&source.cross),
+        "CTFInside":values(&source.inside),"CTFFlux":values(&source.flux),
+        "CTFSourceIn":values(&source.source_in),"CTFSourceOut":values(&source.source_out),
+        "CTFTSourceOut":values(&source.temperature_source_out),"CTFTSourceIn":values(&source.temperature_source_in),
+        "CTFTSourceQ":values(&source.temperature_source_q),"CTFTUserOut":values(&source.temperature_user_out),
+        "CTFTUserIn":values(&source.temperature_user_in),"CTFTUserSource":values(&source.temperature_user_source),
+        "CTFTimeStep":scalar(source.ctf_time_step),"UValue":scalar(source.u_value),
+        "NumHistories":source.num_histories,"NumCTFTerms":source.num_ctf_terms,
+        "fixed_array_count":12,"actual_slots_per_array":source.outside.len(),
+        "coefficients_recomputed_by_observer":false,"counted_as_PASS":false})
+}
+pub(super) fn public_unavailable(reason: &str) -> Value {
+    json!({"owner_available":false,"actual_public_initializer_invoked":false,"snapshot":null,
+        "unavailable_reason":reason,"Native_return_or_reset_inferred":false,"counted_as_PASS":false})
+}
+pub(super) fn public_construction(source: &ep_runtime::heat_balance::ctf_public_initialization::ConstructionCtfPublicInitialization) -> Value {
+    let (available, returned, error) = match &source.result {
+        Ok(actual) => (true,json!({"actual_Rust_route":format!("{:?}",actual.route),"public_storage":public_storage(&actual.storage)}),Value::Null),
+        Err(reason) => (false,Value::Null,json!({"actual_Rust_unavailable":format!("{reason:?}")})),
+    };
+    json!({"construction_id":source.construction_id.0,"declared_index":source.declared_index,
+        "original_material_ids":source.original_material_ids.iter().map(|id|id.0).collect::<Vec<_>>(),
+        "actual_Rust_is_used_ctf":source.is_used_ctf,"actual_public_initializer_invoked":source.public_initializer_invoked,
+        "actual_retry_flags_on_entry":source.retry_flags_on_entry.map(flags),
+        "actual_retry_flags_on_return":source.retry_flags_on_return.map(flags),
+        "owner_available":available,"snapshot":returned,"unavailable":error,
+        "Native_whole_call_outcome_or_public_checkpoint_inferred":false,"counted_as_PASS":false})
+}
+pub(super) fn public_initialization(source: &ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization) -> Value {
+    json!({"protocol":"ctf10-selected-Rust-public-initialization.v1","owner_available":true,
+        "constructions":source.constructions.iter().map(public_construction).collect::<Vec<_>>(),
+        "actual_owner_count":source.constructions.len(),
+        "actual_public_initializer_invocations":source.constructions.iter().filter(|row|row.public_initializer_invoked).count(),
+        "aggregate_after_returned_calls":{"SimpleCTFOnly":source.aggregate_after_returned_calls.simple_ctf_only,
+            "MaxCTFTerms":source.aggregate_after_returned_calls.max_ctf_terms,
+            "returned_constructions":source.aggregate_after_returned_calls.returned_constructions},
+        "selected_stop":source.selected_stop.as_ref().map(|reason|format!("{reason:?}")),
+        "selected_declared_loop_completed":source.selected_declared_loop_completed,
+        "actual_AnyInternalHeatSource_postloop_invoked":false,"actual_ScanForReports_invoked":false,
+        "actual_reportLayers_or_reportTransferFunction_invoked":false,"actual_final_fatal_backend_invoked":false,
+        "Native_true_whole_Init_outcome_or_event_ledger_inferred":false,
+        "surface_public_coefficient_activation_certified":false,"counted_as_PASS":false})
+}

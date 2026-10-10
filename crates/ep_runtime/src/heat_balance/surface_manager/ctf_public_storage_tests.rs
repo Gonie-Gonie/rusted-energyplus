@@ -1,0 +1,276 @@
+use super::*;
+use ep_model::ConstructionId;
+
+fn context() -> CtfAssemblyContext {
+    CtfAssemblyContext {
+        construction_id: ConstructionId(3),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 2,
+        time_step_zone: 0.25,
+        ctf_time_step: 0.5,
+        num_histories: 2,
+    }
+}
+
+// Literal source-store operands, not Native observations or production inputs.
+fn private(terms: i32, size: usize) -> CtfFinalCoefficients {
+    let mut s0 = [0.0; 12];
+    s0[0] = 2.0;
+    s0[1] = 3.0;
+    s0[5] = -4.0;
+    CtfFinalCoefficients {
+        context: context(),
+        rcmax: size as i32,
+        gamma1_minus_gamma2: vec![0.0; 3 * size],
+        s0,
+        s: vec![0.0; 12 * size],
+        e: vec![0.0; size],
+        num_ctf_terms: terms,
+        history_loop_converged: false,
+        next_history_term: terms,
+        phi_r0: vec![0.0; size],
+        rnew: vec![0.0; size * size],
+        rold: vec![0.0; size * size],
+    }
+}
+
+fn all_arrays(storage: &CtfPublicCoefficientStorage) -> [&[f64; CTF_COEFFICIENT_SLOTS]; 12] {
+    [
+        &storage.outside,
+        &storage.cross,
+        &storage.inside,
+        &storage.flux,
+        &storage.source_in,
+        &storage.source_out,
+        &storage.temperature_source_out,
+        &storage.temperature_source_in,
+        &storage.temperature_source_q,
+        &storage.temperature_user_out,
+        &storage.temperature_user_in,
+        &storage.temperature_user_source,
+    ]
+}
+
+#[test]
+fn reset_is_positive_zero_without_claiming_a_generated_owner() {
+    let actual = CtfPublicCoefficientStorage::reset();
+    assert!(
+        all_arrays(&actual)
+            .iter()
+            .flat_map(|a| a.iter())
+            .all(|v| v.to_bits() == 0)
+    );
+    assert_eq!((actual.num_histories, actual.num_ctf_terms), (0, 0));
+    assert_eq!(
+        (actual.ctf_time_step.to_bits(), actual.u_value.to_bits()),
+        (0, 0)
+    );
+}
+
+#[test]
+fn common_stores_keep_postcheck_stamp_and_literal_signs() -> Result<(), String> {
+    let mut source = private(1, 2);
+    source.s[0] = -0.0;
+    source.s[2] = 5.0;
+    source.s[10] = 0.0;
+    source.e[0] = 0.0;
+    let before = (
+        source.s0.map(f64::to_bits),
+        source.s.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+    );
+    let postcheck = CtfAssemblyContext {
+        ctf_time_step: 0.75,
+        num_histories: 3,
+        ..context()
+    };
+    let actual = store_selected_massive_public_coefficients(&source, postcheck, 7.0)
+        .map_err(|e| format!("store: {e:?}"))?;
+    assert_eq!(actual.ctf_time_step.to_bits(), 0.75_f64.to_bits());
+    assert_eq!(actual.num_histories, 3);
+    assert_eq!(actual.outside[0].to_bits(), (2.0 * CFU).to_bits());
+    assert_eq!(actual.cross[0].to_bits(), (3.0 * CFU).to_bits());
+    assert_eq!(actual.inside[0].to_bits(), (4.0 * CFU).to_bits());
+    assert_eq!(actual.cross[1].to_bits(), (5.0 * CFU).to_bits());
+    assert_eq!(actual.outside[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(actual.inside[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(actual.flux[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(actual.flux[0].to_bits(), 0);
+    assert!(
+        all_arrays(&actual)
+            .iter()
+            .all(|a| a[2..].iter().all(|v| v.to_bits() == 0))
+    );
+    assert_eq!(actual.u_value.to_bits(), (7.0 * CFU).to_bits());
+    assert_eq!(before.0, source.s0.map(f64::to_bits));
+    assert_eq!(
+        before.1,
+        source.s.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
+    );
+    Ok(())
+}
+
+#[test]
+fn final_representable_history_slot_is_written_without_tail_truncation() -> Result<(), String> {
+    let mut source = private(18, 18);
+    source.s[17] = 2.0;
+    source.s[35] = 3.0;
+    source.s[107] = -4.0;
+    source.e[17] = -5.0;
+    let actual = store_selected_massive_public_coefficients(&source, context(), 1.0)
+        .map_err(|e| format!("slot18: {e:?}"))?;
+    assert_eq!(actual.num_ctf_terms, 18);
+    assert_eq!(actual.outside[18].to_bits(), (2.0 * CFU).to_bits());
+    assert_eq!(actual.cross[18].to_bits(), (3.0 * CFU).to_bits());
+    assert_eq!(actual.inside[18].to_bits(), (4.0 * CFU).to_bits());
+    assert_eq!(actual.flux[18].to_bits(), 5.0_f64.to_bits());
+    Ok(())
+}
+
+#[test]
+fn unrepresentable_count_is_a_rust_contract_result_not_a_native_outcome() {
+    assert_eq!(
+        store_selected_massive_public_coefficients(&private(19, 19), context(), 1.0),
+        Err(CtfPublicStorageUnavailable::PublicCapacity(19))
+    );
+    assert_eq!(
+        store_selected_massive_public_coefficients(&private(-1, 1), context(), 1.0),
+        Err(CtfPublicStorageUnavailable::HistoryTermCount(-1))
+    );
+    assert_eq!(
+        store_selected_massive_public_coefficients(&private(2, 1), context(), 1.0),
+        Err(CtfPublicStorageUnavailable::PrivateHistoryShape)
+    );
+}
+
+#[test]
+fn same_attempt_and_original_identity_are_required_but_dt_is_not_rederived() {
+    let source = private(1, 1);
+    let wrong = CtfAssemblyContext {
+        construction_id: ConstructionId(4),
+        ..context()
+    };
+    assert_eq!(
+        store_selected_massive_public_coefficients(&source, wrong, 1.0),
+        Err(CtfPublicStorageUnavailable::ContextAssociation)
+    );
+    let wrong = CtfAssemblyContext {
+        attempt_ordinal: 3,
+        ..context()
+    };
+    assert_eq!(
+        store_selected_massive_public_coefficients(&source, wrong, 1.0),
+        Err(CtfPublicStorageUnavailable::ContextAssociation)
+    );
+    let excluded = CtfAssemblyContext {
+        source_sink_present: true,
+        ..context()
+    };
+    assert_eq!(
+        store_selected_massive_public_coefficients(&source, excluded, 1.0),
+        Err(CtfPublicStorageUnavailable::UnsupportedScope)
+    );
+}
+
+#[test]
+fn all_resistive_adapter_copies_the_actual_existing_owner_bits() -> Result<(), String> {
+    use super::super::ctf_all_resistive::generate_all_resistive_ctf;
+    use super::super::ctf_layer_preprocessing::{
+        CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+    };
+    use ep_model::MaterialId;
+    let prefix = preprocess_ctf_layers(
+        &[CtfLayerInput {
+            material_id: MaterialId(1),
+            thickness: 0.0,
+            conductivity: 0.0,
+            density: 0.0,
+            specific_heat: 0.0,
+            resistance: 2.0,
+            resistance_only: true,
+        }],
+        CtfLayerContext {
+            is_used_ctf: true,
+            errors_found: false,
+            source_sink_present: false,
+            solution_dimensions: 1,
+        },
+    )
+    .map_err(|e| format!("prefix: {e:?}"))?;
+    let original = generate_all_resistive_ctf(&prefix, 0.25).map_err(|e| format!("allR: {e:?}"))?;
+    let actual =
+        copy_all_resistive_public_coefficients(&original).map_err(|e| format!("copy: {e:?}"))?;
+    for (a, b) in [
+        (&actual.outside, &original.outside),
+        (&actual.cross, &original.cross),
+        (&actual.inside, &original.inside),
+        (&actual.flux, &original.flux),
+    ] {
+        assert_eq!(a.map(f64::to_bits), b.map(f64::to_bits));
+    }
+    assert_eq!(actual.inside[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(actual.flux[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!((actual.num_ctf_terms, actual.num_histories), (1, 1));
+    assert_eq!(
+        actual.ctf_time_step.to_bits(),
+        original.ctf_time_step.to_bits()
+    );
+    assert_eq!(actual.u_value.to_bits(), original.u_value.to_bits());
+    Ok(())
+}
+
+#[test]
+fn reverse_uses_prior_public_storage_and_current_conductance() -> Result<(), String> {
+    let mut earlier = CtfPublicCoefficientStorage::reset();
+    earlier.num_ctf_terms = 1;
+    earlier.num_histories = 4;
+    earlier.ctf_time_step = 1.0;
+    earlier.outside[0] = 2.0;
+    earlier.inside[0] = 3.0;
+    earlier.cross[0] = -0.0;
+    earlier.flux[0] = 123.0;
+    earlier.outside[1] = 5.0;
+    earlier.inside[1] = 7.0;
+    earlier.cross[1] = 11.0;
+    earlier.flux[1] = -0.0;
+    earlier.u_value = 999.0;
+    let actual =
+        copy_reversed_public_coefficients(&earlier, 13.0).map_err(|e| format!("reverse: {e:?}"))?;
+    assert_eq!((actual.outside[0], actual.inside[0]), (3.0, 2.0));
+    assert_eq!(
+        (actual.outside[1], actual.inside[1], actual.cross[1]),
+        (7.0, 5.0, 11.0)
+    );
+    assert_eq!(actual.cross[0].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(actual.flux[0].to_bits(), 0);
+    assert_eq!(actual.flux[1].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(actual.u_value.to_bits(), (13.0 * CFU).to_bits());
+    assert_eq!((actual.num_histories, actual.ctf_time_step), (4, 1.0));
+    assert!(
+        all_arrays(&actual)
+            .iter()
+            .all(|a| a[2..].iter().all(|v| v.to_bits() == 0))
+    );
+    assert_eq!(earlier.flux[0], 123.0);
+    Ok(())
+}
+
+#[test]
+fn stores_preserve_ieee_math_without_finite_or_conductance_guards() -> Result<(), String> {
+    let mut source = private(1, 1);
+    source.s0[0] = f64::INFINITY;
+    source.s0[1] = f64::NEG_INFINITY;
+    source.s0[5] = f64::NAN;
+    source.e[0] = f64::INFINITY;
+    let actual = store_selected_massive_public_coefficients(&source, context(), -0.0)
+        .map_err(|e| format!("IEEE: {e:?}"))?;
+    assert_eq!(actual.outside[0], f64::INFINITY);
+    assert_eq!(actual.cross[0], f64::NEG_INFINITY);
+    assert!(actual.inside[0].is_nan());
+    assert_eq!(actual.flux[1], f64::NEG_INFINITY);
+    assert_eq!(actual.u_value.to_bits(), (-0.0_f64).to_bits());
+    Ok(())
+}

@@ -1,0 +1,27 @@
+--- actual-final09/production_fields.rs
++++ proposed10/production_fields.rs
+@@ -251,9 +251,21 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf09_candidate_production_observer.rs",
+-    "crates/ep_run/examples/ctf09_candidate_production_support/fields.rs",
+-    "crates/ep_run/examples/ctf09_candidate_production_support/unit_fields.rs",
++    "crates/ep_run/examples/ctf10_candidate_production_observer.rs",
++    "crates/ep_run/examples/ctf10_candidate_production_support/fields.rs",
++    "crates/ep_run/examples/ctf10_candidate_production_support/unit_fields.rs",
+ ];
++
++pub(super) fn ctf10_unavailable() -> Value {
++    unit_fields::public_unavailable("ordinary initializer has not returned an actual HeatBalanceState/public owner")
++}
++pub(super) fn ctf10_selected(source: &HeatBalanceState) -> Value {
++    match source.construction_ctf10_public_initialization.as_ref() {
++        Some(actual) => unit_fields::public_initialization(actual),
++        None => unit_fields::public_unavailable("actual initialized State has no selected public initialization owner"),
++    }
++}

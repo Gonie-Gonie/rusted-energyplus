@@ -1,0 +1,14 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error: this call to `clone` can be replaced with `std::slice::from_ref`
+   --> crates\ep_runtime\src\heat_balance\ctf_public_initialization_tests.rs:134:9
+    |
+134 |         &[unused.clone()],
+    |         ^^^^^^^^^^^^^^^^^ help: try: `std::slice::from_ref(&unused)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#cloned_ref_to_slice_refs
+    = note: `-D clippy::cloned-ref-to-slice-refs` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::cloned_ref_to_slice_refs)]`
+
+    Checking ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Checking ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+error: could not compile `ep_runtime` (lib test) due to 1 previous error

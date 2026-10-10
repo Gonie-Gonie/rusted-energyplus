@@ -1,0 +1,282 @@
+"""Pair actual first method owners; no matrix/control/identity evaluator."""
+from collections import Counter
+
+EXP_VARIABLES = ["AExp", "final_AMat1", "final_AMato", "final_AMatN", "AMatRowNormMax", "fact", "CheckVal"]
+INV_VARIABLES = ["AInv", "final_AMat1"]
+VARIABLES = ["CTF06." + key for key in EXP_VARIABLES] + ["CTF05." + key for key in INV_VARIABLES]
+ORDER = "source_i1_outer_i2_inner_row_first"
+
+
+def copied(c, path, native, rust):
+    if native is None or rust is None:
+        c.absence(path, native is not None, rust is not None, True, "required actual method handoff scalar absent")
+        return
+    c.dto(native); c.dto(rust)
+    c.exact(path + "/class", native["value_class"], rust["value_class"])
+    c.exact(path + "/bits", native["value_bits"], rust["value_bits"])
+    if native["value_class"] in ["nan", "positive_infinity", "negative_infinity"] or rust["value_class"] in ["nan", "positive_infinity", "negative_infinity"]:
+        c.absence(path, True, True, True, "required observed nonfinite handoff has no numerical PASS")
+
+
+def values(c, path, native, rust, size, profile=None):
+    a = isinstance(native, list) and len(native) == size
+    b = isinstance(rust, list) and len(rust) == size
+    if not a or not b:
+        c.absence(path + "/shape", a, b, True, "required exact rcmax-square actual method owner absent/different")
+        return
+    for index, (left, right) in enumerate(zip(native, rust)):
+        location = path + "/" + str(index)
+        if left is None or right is None:
+            c.absence(location, left is not None, right is not None, True, "required method scalar absent")
+        elif profile is None:
+            copied(c, location, left, right)
+        else:
+            c.number(location, profile, left, right)
+
+
+def rust_route(c, path, row, method, construction_id):
+    if not isinstance(row, dict):
+        c.absence(path + "/Rust_route_record", True, False, True, "required actual public Result ledger absent")
+        return None
+    exponential = method == "Exponential"
+    c.need(row.get("protocol") == ("ctf06-first-exponential.v1" if exponential else "ctf05-first-inverse-after-exponential.v1") and
+           row.get("actual_public_API") == ("initialize_construction_ctf_first_exponential" if exponential else "initialize_construction_ctf_first_inverse") and
+           type(row.get("owner_available")) is bool and type(row.get("actual_public_API_invoked")) is bool and
+           row.get("only_first_Rust_method_invocation_owned") is True and row.get("counted_as_PASS") is False and
+           all(row.get(key) is False for key in ["retry_driver_available", "later_Native_method_visits_paired",
+               "later_Native_method_visits_counted_as_PASS", "Native_stage_callback_or_return_counts_inferred",
+               "observer_matrix_control_or_timestep_arithmetic_performed" if exponential else "observer_inverse_or_timestep_arithmetic_performed"]),
+           "Actual first-only public method ledger without inferred Native returns/controls required")
+    c.exact(path + "/construction_id", construction_id, row.get("construction_id"))
+    selected = "selected_first_exponential_operands" if exponential else "selected_first_inverse_operands"
+    c.need(type(row.get(selected)) is bool, "Typed actual public method selection required")
+    c.exact(path + "/selection_copy", row["owner_available"], row[selected])
+    if exponential:
+        c.need(row["actual_public_API_invoked"] is True, "Real public exponential API invocation required")
+        errors = ["FirstAssemblyUnavailable", "AssemblyUnavailable", "ConstructionIdentityMismatch", "AssemblyRouteMismatch",
+                  "NotFirstAttempt", "ExponentialScope", "ExponentialUnavailable"]
+    else:
+        c.need(row.get("inverse_input_is_original_AMat_and_IdenMatrix") is True and row.get("AExp_supplied_as_inverse_input") is False and
+               row.get("not_invoked_after_prior_exponential_unavailable") is (not row["actual_public_API_invoked"]),
+               "Actual original assembly input and explicit inverse non-invocation required")
+        errors = ["FirstAssemblyUnavailable", "AssemblyRouteUnavailable", "ConstructionIdentityMismatch", "NonFirstAttempt",
+                  "AssemblyContext", "InverseScope"] if row["actual_public_API_invoked"] else ["PriorExponentialError", "PriorExponentialRouteUnavailable"]
+    if row["owner_available"]:
+        c.need(row["actual_public_API_invoked"] is True and row.get("actual_source_route") == ("FirstExponentialReturned" if exponential else "FirstInverseReturned") and
+               row.get("unavailable_reason") is None and isinstance(row.get("snapshot"), dict), "Actual successful public method owner required")
+    else:
+        c.need(row.get("snapshot") is None and row.get("actual_source_route") in errors and
+               isinstance(row.get("unavailable_reason"), str) and row["unavailable_reason"], "Actual unavailable reason/route/null snapshot required")
+    return row
+
+
+def context(c, path, native, rust, construction_id, initial):
+    c.need(isinstance(native, dict) and isinstance(rust, dict), "Actual method context copies required")
+    c.exact(path + "/construction_id", construction_id, rust.get("construction_id"))
+    c.exact(path + "/route", "Assemble", rust.get("route"))
+    c.exact(path + "/attempt_ordinal", 1, rust.get("attempt_ordinal"))
+    for key in ["SourceSinkPresent", "SolutionDimensions", "NodeSource", "NodeUserTemp", "NumHistories"]:
+        c.exact(path + "/" + key, native[key], rust.get(key))
+    copied(c, path + "/CTFTimeStep", native["CTFTimeStep"], rust.get("CTFTimeStep"))
+    earlier = native.get("earlier_checked_assembly_context")
+    c.need(native.get("assembly_context_available") is True and isinstance(earlier, dict), "Actual earlier checked assembly context required")
+    copied(c, path + "/TimeStepZone", earlier["TimeStepZone"], rust.get("TimeStepZone"))
+    c.need(isinstance(initial, dict) and initial.get("reached") is True and initial.get("available") is True,
+           "Selected first method must retain genuine initial619 association")
+    c.exact(path + "/initial619_NumHistories", initial["snapshot"]["NumHistories"], rust.get("NumHistories"))
+    copied(c, path + "/initial619_CTFTimeStep", initial["snapshot"]["CTFTimeStep"], rust.get("CTFTimeStep"))
+
+
+def matrix_map(c, stage):
+    c.need(stage.get("reached") is True and stage.get("available") is True and isinstance(stage.get("snapshot"), dict),
+           "Required actual reached intact method stage absent")
+    result = {row["owner"]: row["values"] for row in stage["snapshot"]["matrices"]}
+    c.need(len(result) == len(stage["snapshot"]["matrices"]) and all(row["copy_available"] is True for row in stage["snapshot"]["matrices"]),
+           "Required matrix copy failure cannot be optional")
+    return result
+
+
+def original_handoff(c, path, method_row, assembly, entry, construction_id):
+    handoff = method_row.get("original_first_assembly")
+    c.need(isinstance(handoff, dict) and handoff.get("owner_available") is True and handoff.get("unavailable_reason") is None and
+           handoff.get("storage_order") == ORDER and handoff.get("counted_as_PASS") is False and isinstance(handoff.get("snapshot"), dict),
+           "Actual matching original first-assembly handoff required")
+    c.exact(path + "/construction_id", construction_id, handoff.get("construction_id"))
+    source, actual = assembly["snapshot"], handoff["snapshot"]
+    c.exact(path + "/rcmax", source["rcmax"], actual.get("rcmax"))
+    n = source["rcmax"]
+    c.need(type(actual.get("rcmax")) is int and actual["rcmax"] > 0 and isinstance(actual.get("context"), dict), "Actual original matrix shape/context required")
+    for key in ["construction_id", "route", "SourceSinkPresent", "SolutionDimensions", "NodeSource", "NodeUserTemp", "attempt_ordinal", "NumHistories"]:
+        expected = construction_id if key == "construction_id" else "Assemble" if key == "route" else source[key]
+        c.exact(path + "/context/" + key, expected, actual["context"].get(key))
+    for key in ["CTFTimeStep", "TimeStepZone"]: copied(c, path + "/context/" + key, source[key], actual["context"].get(key))
+    for key in ["AMat", "IdenMatrix"]:
+        c.exact(path + "/actual_" + key + "_value_count", n * n, actual.get("actual_" + key + "_value_count"))
+        values(c, path + "/Rust_original/" + key, source["matrices"][key], actual.get(key), n * n)
+        values(c, path + "/Native_entry/" + key, entry[key], actual.get(key), n * n)
+
+
+def pair_operation(c, path, operation, exponential, inverse, assembly, construction_id, methods, counts, integrity):
+    methods.review(operation, None, c.need, c.dto, counts, integrity, path)
+    exp = rust_route(c, path + "/CTF06", exponential, "Exponential", construction_id)
+    inv = rust_route(c, path + "/CTF05", inverse, "Inverse", construction_id)
+    record = {"path": path, "actual_native_whole_outcome_context_only": operation["call_outcome"],
+              "actual_source_invoked": operation["actual_source_invoked"], "methods": {}, "counted_as_PASS": False}
+    if exp is not None and inv is not None:
+        c.exact(path + "/actual06_before05_invocation", exp["owner_available"], inv["actual_public_API_invoked"])
+    if not operation["actual_source_invoked"]:
+        c.absence(path + "/method_observations", False, bool(exp and exp["owner_available"]), False,
+                  "whole source uninvoked after genuine stop; no Native phase or invocation inferred/noPASS")
+        return record
+    observed = operation["observations"]
+    c.need(isinstance(observed, dict), "Actual invoked source observation record required")
+    attempts = observed["MatrixAssembly"]["attempts"]
+    native_first = attempts[0] if attempts else None
+    native_selected = bool(native_first and native_first["available"] and native_first["snapshot"]["SourceSinkPresent"] is False and native_first["snapshot"]["SolutionDimensions"] == 1)
+    rust_selected = isinstance(assembly, dict) and assembly.get("owner_available") is True
+    required = native_selected or rust_selected
+    for method, rust in [("Exponential", exp), ("Inverse", inv)]:
+        ledger = observed[method]
+        visits = ledger["invocations"]
+        first = visits[0] if visits and visits[0]["observed_invocation_ordinal"] == 1 else None
+        actual = {"actual_invocation_count": ledger["actual_invocation_count"],
+                  "actual_stage_callback_counts": ledger["actual_stage_callback_counts"],
+                  "actual_retained_invocation_count": ledger["actual_retained_invocation_count"],
+                  "stage_records_omitted": ledger["stage_records_omitted"], "failure_event_counts": ledger["failure_event_counts"],
+                  "actual_visits": [{"observed_invocation_ordinal": row["observed_invocation_ordinal"],
+                      "observed_assembly_ordinal": row["observed_assembly_ordinal"], "actual_stage_callback_counts": row["actual_stage_callback_counts"],
+                      "actual_source_return_marker_reached": row["SourceReturn"]["reached"], "paired": False,
+                      "later_context_only": row["observed_invocation_ordinal"] > 1, "counted_as_PASS": False} for row in visits],
+                  "Rust_actual_public_API_invoked": rust["actual_public_API_invoked"] if rust else None,
+                  "Rust_actual_source_route": rust["actual_source_route"] if rust else None,
+                  "selected_operands_paired": False, "later_actual_visits_paired": False, "counted_as_PASS": False}
+        record["methods"][method] = actual
+        if not required:
+            c.absence(path + "/" + method, False, bool(rust and rust["owner_available"]), False,
+                      "actual assembly unselected/unreached and Rust explicit unavailable; no numeric PASS")
+            continue
+        native_available = bool(native_selected and first and first["association_available"] and first["observed_assembly_ordinal"] == 1 and
+                                all(first[stage]["reached"] and first[stage]["available"] for stage in ["Entry", "InitializedInputs", "FinalWorkspace", "SourceReturn"]) and
+                                (method == "Inverse" or first["ScalingControls"]["reached"] and first["ScalingControls"]["available"]))
+        rust_available = bool(rust and rust["owner_available"])
+        if not native_available or not rust_available:
+            c.absence(path + "/" + method, native_available, rust_available, True,
+                      "required selected first method owner absent on one or both sides; later visits cannot replace first1/noPASS")
+            continue
+        c.need(rust_selected, "Actual same Rust first assembly owner required")
+        snapshot = rust["snapshot"]
+        c.need(snapshot.get("storage_order") == ORDER and isinstance(snapshot.get("context"), dict) and
+               type(snapshot.get("rcmax")) is int and snapshot["rcmax"] > 0, "Actual Rust method row-first owner/context required")
+        final, returned = first["FinalWorkspace"]["snapshot"], first["SourceReturn"]["snapshot"]
+        c.exact(path + "/" + method + "/rcmax", final["context"]["rcmax"], snapshot["rcmax"])
+        context(c, path + "/" + method + "/context", final["context"], snapshot["context"], construction_id, observed["InitialDiscretization"])
+        context(c, path + "/" + method + "/return_context", returned["context"], snapshot["context"], construction_id, observed["InitialDiscretization"])
+        original_handoff(c, path + "/" + method + "/original_first_assembly", rust, assembly, matrix_map(c, first["Entry"]), construction_id)
+        n = snapshot["rcmax"]; matrices = snapshot.get("matrices"); copied_counts = snapshot.get("actual_matrix_value_counts")
+        fields = ["AExp", "AMat1", "AMato", "AMatN"] if method == "Exponential" else ["AInv", "AMat1"]
+        c.need(isinstance(matrices, dict) and set(matrices) == set(fields) and isinstance(copied_counts, dict) and set(copied_counts) == set(fields),
+               "All actual method workspace owners and count fields required")
+        final_matrices, return_matrices = matrix_map(c, first["FinalWorkspace"]), matrix_map(c, first["SourceReturn"])
+        for field in fields:
+            c.need(type(copied_counts[field]) is int, "Actual copied matrix count must be integer")
+            c.exact(path + "/" + method + "/count/" + field, n * n, copied_counts[field])
+            profile = ("CTF06." if method == "Exponential" else "CTF05.") + (field if field in ["AExp", "AInv"] else "final_" + field)
+            values(c, path + "/" + method + "/" + field, final_matrices[field], matrices[field], n * n, profile)
+        output_field = "AExp" if method == "Exponential" else "AInv"
+        values(c, path + "/" + method + "/actual_return_handoff", final_matrices[output_field], return_matrices[output_field], n * n)
+        if method == "Exponential":
+            controls = final["exponential_controls"]
+            for field in ["AMatRowNormMax", "fact", "CheckVal"]:
+                if snapshot.get(field) is None: c.absence(path + "/CTF06/" + field, True, False, True, "required actual scalar control absent")
+                else: c.number(path + "/CTF06/" + field, "CTF06." + field, controls[field], snapshot[field])
+            for field in ["k", "l", "final_i"]:
+                c.need(type(snapshot.get(field)) is int, "Actual signed exponential control integer required")
+                c.exact(path + "/CTF06/" + field, controls[field], snapshot[field])
+            for stage, count_key, names in [("PowerControl", "actual_power_control_count", ["i", "SigFigLimit"]),
+                                            ("SquareControl", "actual_square_control_count", ["isq", "Backup"])]:
+                events = snapshot.get(stage)
+                c.need(isinstance(events, list) and type(snapshot.get(count_key)) is int and snapshot[count_key] == len(events),
+                       "Actual Rust control vector/count required")
+                for event in events:
+                    c.need(isinstance(event, dict) and set(event) == set(names) and type(event[names[0]]) is int and type(event[names[1]]) is bool,
+                           "Actual Rust control event must preserve typed locals")
+                c.exact(path + "/CTF06/" + stage, [{name: event[name] for name in names} for event in first[stage]], events)
+        else:
+            c.exact(path + "/CTF05/public_owner_construction_id", construction_id, rust.get("actual_public_owner_construction_id"))
+            c.exact(path + "/CTF05/snapshot_owner_construction_id", construction_id, snapshot.get("actual_public_owner_construction_id"))
+            c.need(isinstance(rust.get("actual_orchestration_assembly_context"), dict), "Actual inverse orchestration context required")
+            c.exact(path + "/CTF05/orchestration_context", snapshot["context"], rust["actual_orchestration_assembly_context"])
+        actual["selected_operands_paired"] = True
+        actual["actual_visits"][0]["paired"] = True
+        c.counts[method.lower() + "_selected_first_owner_pairs"] += 1
+    return record
+
+
+def finish(c, native, qa, methods, counts, integrity):
+    actual = methods.summary(native, counts, c.need)
+    for key, value in actual.items(): c.exact("DataQA_method_counts/" + key, qa["actual_observation_counts"][key], value)
+    c.need(not integrity, "Any method copy/order/association/failure/omission integrity fault is required failure")
+    return actual
+
+
+def compare_unit(c, native, rust, request, qa, methods):
+    counts, integrity, records = Counter(), [], []
+    calls = 0
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        for index, (declared, operation, observed) in enumerate(zip(expected["operations"], left["operations"], right["operations"])):
+            path = expected["id"] + "/" + declared["id"]
+            c.need(observed.get("actual_Rust_combined_API") == "initialize_construction_ctf_first_matrix_with_final_coefficients" and
+                   observed.get("actual_Rust_combined_API_invoked") is True and observed.get("predecessor_owners_reexecuted_for_method_observation") is False,
+                   "Actual same-owner combined API call without predecessor reevaluation required")
+            calls += 1
+            records.append(pair_operation(c, path, operation, observed.get("CTF06_first_exponential"), observed.get("CTF05_first_inverse"),
+                                          observed.get("CTF04_first_assembly"), index, methods, counts, integrity))
+    c.need(type(rust.get("actual_Rust_combined_API_invocations")) is int and rust["actual_Rust_combined_API_invocations"] == calls,
+           "Actual combined API invocation total differs")
+    return records, finish(c, native, qa, methods, counts, integrity)
+
+
+def compare_production(c, native, rust, request, qa, methods, normalized, owners):
+    counts, integrity, records = Counter(), [], []
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        path = expected["id"]
+        typed = right.get("typed_owners")
+        constructions = typed.get("constructions") if isinstance(typed, dict) else None
+        if not isinstance(constructions, list):
+            c.absence(path + "/required_initialized_method_owners", left["loader_ready"], False, True,
+                      "required actual typed construction/method owner ledger unavailable")
+            for operation in left["operations"]:
+                records.append(pair_operation(c, path + "/" + operation["id"], operation, None, None, None, None, methods, counts, integrity))
+            continue
+        ids = [row["id"] for row in constructions]; by_name = owners(constructions, "name", c)
+        assembly_owner = right.get("selected_CTF04_owners")
+        assembly_rows = assembly_owner.get("construction_first_assembly", []) if isinstance(assembly_owner, dict) else []
+        assemblies = {row["construction_id"]: row["result"] for row in assembly_rows}
+        methods_by_id = {}
+        for card, field in [("CTF06", "construction_first_exponential"), ("CTF05", "construction_first_inverse")]:
+            selected = right.get("selected_" + card + "_owners")
+            if not isinstance(selected, dict) or selected.get("owner_available") is not True:
+                c.absence(path + "/" + card + "/initialized_owner", left["loader_ready"], False, True,
+                          "required actual initialized method Result ledger unavailable")
+                methods_by_id[card] = {}
+                continue
+            c.need(isinstance(selected, dict) and selected.get("owner_available") is True and selected.get("actual_CTF06_then_CTF05_order_is_producer_owned") is True and
+                   selected.get("only_first_Rust_method_invocation_owned") is True and selected.get("Native_whole_solver_flags_unpaired") is True and
+                   all(selected.get(key) is False for key in ["retry_driver_available", "later_Native_method_visits_paired", "later_Native_method_visits_counted_as_PASS", "numerical_PASS_claimed",
+                       "preprocessing_initial_assembly_or_exponential_reexecuted_by_observer" if card == "CTF06" else "preprocessing_initial_assembly_exponential_or_inverse_reexecuted_by_observer"]),
+                   "Actual borrowed ordered initialized method owners required")
+            if card == "CTF05": c.need(selected.get("inverse_input_is_original_AMat_and_IdenMatrix") is True and selected.get("AExp_supplied_as_inverse_input") is False,
+                                        "Inverse must borrow original source-owned assembly inputs")
+            rows = selected.get(field)
+            c.need(isinstance(rows, list) and len({row["construction_id"] for row in rows}) == len(rows) and type(selected.get("actual_owner_count")) is int,
+                   "Unique actual ordered method construction IDs/count required")
+            c.exact(path + "/" + card + "/owner_order", ids, [row["construction_id"] for row in rows])
+            c.exact(path + "/" + card + "/owner_count", len(rows), selected["actual_owner_count"])
+            for index, row in enumerate(rows): c.exact(path + "/" + card + "/state_vector_index/" + str(index), index, row["state_vector_index"])
+            methods_by_id[card] = {row["construction_id"]: row["result"] for row in rows}
+        for operation in left["operations"]:
+            name = normalized(operation["actual_construction_Name"], c); construction = by_name.get(name)
+            cid = construction["id"] if construction else None
+            records.append(pair_operation(c, path + "/" + name, operation, methods_by_id["CTF06"].get(cid), methods_by_id["CTF05"].get(cid),
+                                          assemblies.get(cid), cid, methods, counts, integrity))
+    return records, finish(c, native, qa, methods, counts, integrity)

@@ -1,0 +1,11 @@
+--- held01/compare_production.py
++++ proposed02/compare_production.py
+@@ -43,7 +43,7 @@
+ 
+ PUBLIC_VARIABLES = ['CTF10.CTFOutside', 'CTF10.CTFCross', 'CTF10.CTFInside', 'CTF10.CTFFlux', 'CTF10.CTFTimeStep', 'CTF10.UValue']
+ PUBLIC_SHAPE_SHA = '8a772dc521cb8f99a7d3f51c1bbc61a3b1f9e0019ee3d22cb9f28fc6132fc669'
+-PUBLIC_PAIR_SHA = '665948ee959e35561479027c5a8a6c45b0a78f8f27646187511c259bca384340'
++PUBLIC_PAIR_SHA = 'bb9b048809fd037f8c6f1119a30426d1b8c8c39b5d6f6927055adbe0d070288e'
+ 
+ class Comparison:
+     def __init__(self, need):
