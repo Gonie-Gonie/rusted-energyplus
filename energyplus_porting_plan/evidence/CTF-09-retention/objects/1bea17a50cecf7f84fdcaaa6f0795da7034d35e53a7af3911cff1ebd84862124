@@ -1,0 +1,6 @@
+tree 9158f167a97e515d2325e39832561bdb681238d6
+parent 6e7fa9145f8a76fdaa1ea92b97d313abe6b04e3d
+author Hyeong-Gon Jo <hg221089@gmail.com> 1791673396 +0900
+committer Hyeong-Gon Jo <hg221089@gmail.com> 1791673396 +0900
+
+test(ctf): record six actual CLI regressions for retry driver

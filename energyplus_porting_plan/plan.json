@@ -11429,6 +11429,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-09-production-cli/summary.json",
         "sha256": "866724ac382d0d0531a74ac41e5a7fa2f3fe3658757f0b5654fd2df4eb2dab16",
         "size_bytes": 4445
+      },
+      "actual_two_original_retention": {
+        "path": "energyplus_porting_plan/evidence/CTF-09-retention/summary.json",
+        "sha256": "f1302a5ae2efb51585c58406897d5285db865b2d783c4995d64cb7918d536900",
+        "size_bytes": 2564
       }
     },
     {

@@ -1,0 +1,15 @@
+--- held01/proofs.py
++++ fresh02/proofs.py
+@@ -3,9 +3,9 @@
+ 
+ QUALITY = ['focused_coefficient_tests', 'workspace_tests', 'clippy', 'format_check']
+ QUALITY_COMMANDS = {
+-    'focused_coefficient_tests': ['test', '--locked', '-p', 'ep_runtime', '--lib', 'ctf_'],
+-    'workspace_tests': ['test', '--locked', '--workspace', '--all-targets'],
+-    'clippy': ['clippy', '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
++    'focused_coefficient_tests': ['test', '--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false', '--locked', '-p', 'ep_runtime', '--lib', 'ctf_'],
++    'workspace_tests': ['test', '--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false', '--locked', '--workspace', '--all-targets'],
++    'clippy': ['clippy', '--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false', '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
+     'format_check': ['fmt', '--all', '--', '--check'],
+ }
+ ROLES = ['PE', 'helper', 'DataQA', 'comparison']

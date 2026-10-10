@@ -1,0 +1,62 @@
+--- acceptedCTF08/retire.py
++++ proposedCTF09/retire.py
+@@ -1,4 +1,4 @@
+-"""Root-only --apply: remove the two exact validated CTF08 linked originals."""
++"""Root-only --apply: remove the two exact validated CTF09 linked originals."""
+ import argparse
+ import copy
+ import subprocess
+@@ -99,7 +99,7 @@
+     binding = write(output, target + '-removal-receipt.json', receipt)
+     entry.update({'removal_receipt': binding, 'actual_removal_observed': original_absent,
+                   'status': 'retained-derivative-original-retired' if success else 'retirement-action-failed-or-unverified'})
+-    state = write(output, target + '-pair-attempt.json', {'schema': 'ctf08-exact-pair-retirement-attempt.v1', 'entries': entries})
++    state = write(output, target + '-pair-attempt.json', {'schema': 'ctf09-exact-pair-retirement-attempt.v1', 'entries': entries})
+     require(success, 'Actual precise retirement failed; preserved action receipt/attempt: ' + state['path'])
+     return binding, receipt
+ 
+@@ -119,10 +119,10 @@
+     plan_ref, command_ref = pin(args.plan), pin(args.plan_execution)
+     plan = read(plan_ref)
+     command = recorded(command_ref)
+-    require(plan['schema'] == 'ctf08-two-original-retention-removal-plan.v1'
+-            and plan['status'] == 'pass-selected08-prerequisites-removal-not-performed'
++    require(plan['schema'] == 'ctf09-two-original-retention-removal-plan.v1'
++            and plan['status'] == 'pass-selected09-prerequisites-removal-not-performed'
+             and plan['registry_admission_performed'] is False and plan['deletion_or_move_performed'] is False
+-            and plan['complete_CTF04_PASS_claimed'] is False and plan['complete_CTF05_PASS_claimed'] is False and plan['complete_CTF06_PASS_claimed'] is False and plan['complete_CTF07_PASS_claimed'] is False and plan['complete_CTF08_PASS_claimed'] is False and plan['all_four_card_gates_claimed'] is False,
++            and plan['complete_CTF04_PASS_claimed'] is False and plan['complete_CTF05_PASS_claimed'] is False and plan['complete_CTF06_PASS_claimed'] is False and plan['complete_CTF07_PASS_claimed'] is False and plan['complete_CTF08_PASS_claimed'] is False and plan['complete_CTF09_PASS_claimed'] is False and plan['all_four_card_gates_claimed'] is False,
+             'Actual accepted exact-pair metadata plan required')
+     require(read(command['stdout']) == {'plan': plan_ref, 'status': plan['status'], 'targets': list(TARGETS),
+             'deletion_performed': False, 'registry_admission_performed': False}, 'Actual compact plan stdout differs')
+@@ -145,7 +145,7 @@
+                for lane, target in zip(['unit', 'production'], TARGETS)]
+     output.mkdir()
+     archives = archive_sources(output)
+-    write(output, 'before-retirement.json', {'schema': 'ctf08-exact-pair-before-retirement.v1',
++    write(output, 'before-retirement.json', {'schema': 'ctf09-exact-pair-before-retirement.v1',
+           'started_utc': started, 'retention_plan': plan_ref, 'retention_plan_execution': command_ref,
+           'only_candidates': plan['only_candidates'], 'entries': entries, 'protected_before': before,
+           'deletion_performed_by_this_before_record': False})
+@@ -156,10 +156,10 @@
+         actual.append(receipt)
+     final_guards = guards(plan)
+     require(all(absent(row['historical_path']) for row in TARGETS.values()), 'Both exact originals must be absent without stub')
+-    final = write(output, 'after-retirement.json', {'schema': 'ctf08-exact-pair-after-retirement.v1',
++    final = write(output, 'after-retirement.json', {'schema': 'ctf09-exact-pair-after-retirement.v1',
+                   'completed_utc': now(), 'entries': entries, 'protected_after': final_guards})
+     result = {
+-        'schema': 'ctf08-two-original-native-helper-retirement.v1',
++        'schema': 'ctf09-two-original-native-helper-retirement.v1',
+         'status': 'pass-precise-pair-removal-and-retained-artifact-guards',
+         'started_utc': started, 'completed_utc': now(), 'actual_writer_command': list(sys.orig_argv), 'cwd': str(ROOT),
+         'retention_plan': plan_ref, 'retention_plan_execution': command_ref, 'approved_source_manifest': source_manifest,
+@@ -169,7 +169,7 @@
+         'prior_metadata_bytes_unchanged': True, 'historical_proofs_or_launchers_rewritten': False,
+         'registry_written_or_admitted': False, 'full_debug_copy_created': False,
+         'canonical_files_or_gates_written': False, 'scientific_execution_repeated': False,
+-        'complete_CTF04_PASS_claimed': False, 'complete_CTF05_PASS_claimed': False, 'complete_CTF06_PASS_claimed': False, 'complete_CTF07_PASS_claimed': False, 'complete_CTF08_PASS_claimed': False, 'all_four_card_gates_claimed': False,
++        'complete_CTF04_PASS_claimed': False, 'complete_CTF05_PASS_claimed': False, 'complete_CTF06_PASS_claimed': False, 'complete_CTF07_PASS_claimed': False, 'complete_CTF08_PASS_claimed': False, 'complete_CTF09_PASS_claimed': False, 'all_four_card_gates_claimed': False,
+         'discarded_debug_bytes_recoverable_from_hash_or_map': False, 'deterministic_relink_recovery_claimed': False,
+     }
+     unchanged()

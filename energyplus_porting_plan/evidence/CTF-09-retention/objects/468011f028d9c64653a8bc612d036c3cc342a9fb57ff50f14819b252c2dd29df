@@ -1,0 +1,441 @@
+{
+  "schema": "ctf09-two-original-retention-source-proposal.v1",
+  "status": "SOURCE-ONLY-held-awaiting-Root-and-other-author-full-review",
+  "predecessor": {
+    "path": ".runtime/porting/CTF-08/retirement-plan-prep-01/manifest.json",
+    "sha256": "9ac0f29411caa2c49a24007203cc46e126c6acbc23d73abfe23ded6e70d10c0c",
+    "size_bytes": 14860,
+    "line_count": 393
+  },
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/common.py",
+      "sha256": "0952bbe0d8e737cae41d4e33a9d6673d428457a207e3fedf2fe7bd2aaefc2f78",
+      "size_bytes": 9809,
+      "line_count": 213
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/proofs.py",
+      "sha256": "8ddb2a72bc70bb0952fba9b375e8e858840df16ba97cd6d520902b03a5b0695d",
+      "size_bytes": 25720,
+      "line_count": 355
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/write_plan.py",
+      "sha256": "70eb5ac4d4bf12a70556c4b0f6fbcd61aa5b463d9912f443363ae944d4c9cbbc",
+      "size_bytes": 5452,
+      "line_count": 91
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/retire.py",
+      "sha256": "1d7ca595fe058541d274b8349d6e0646309a82f68089eaba8f64140b17b8034c",
+      "size_bytes": 11471,
+      "line_count": 181
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/README.md",
+    "sha256": "b0d41e7437e791c0f28889ef391d55a7fbc75c85bf24632c87d5e68cdb050f79",
+    "size_bytes": 10460,
+    "line_count": 65
+  },
+  "exact_CTF08_before_copies": [
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/before-CTF08/common.py",
+      "sha256": "4c51e32c05d5fb87d876671b69be8d53345395f2199db9017eb05d4b72fd2cac",
+      "size_bytes": 9434,
+      "line_count": 209
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/before-CTF08/proofs.py",
+      "sha256": "07b9a91a93c37c56e736a6863d528cd365a39e2a1f396578177f826fb2d9450b",
+      "size_bytes": 22551,
+      "line_count": 324
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/before-CTF08/write_plan.py",
+      "sha256": "a9230200879a52bd03aa531d77a344b5e4f6f66cdae415bbc5301763085761c8",
+      "size_bytes": 5413,
+      "line_count": 91
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/before-CTF08/retire.py",
+      "sha256": "b1f88f68adb2a20f561b6bb395fb7380e63f2607cd3171fd5ebaaaf082b80fe8",
+      "size_bytes": 11384,
+      "line_count": 181
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/before-CTF08/README.md",
+      "sha256": "c7a3908d174a2d21be2c0afbbf7090297d25c759d1f77a0f1fa076739486db63",
+      "size_bytes": 9889,
+      "line_count": 63
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/before-CTF08/manifest.json",
+      "sha256": "9ac0f29411caa2c49a24007203cc46e126c6acbc23d73abfe23ded6e70d10c0c",
+      "size_bytes": 14860,
+      "line_count": 393
+    }
+  ],
+  "exact_from_CTF08_diffs": [
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/common.py.from-CTF08.diff",
+      "sha256": "f23b0eb604d091d1d29e705b5646f67ea170e0800454f03a43f6312c18e17eec",
+      "size_bytes": 6321,
+      "line_count": 87
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/proofs.py.from-CTF08.diff",
+      "sha256": "06968f987e98ab6581be5d80d80eafcfc69f02f515e25426d402607e07f21a1a",
+      "size_bytes": 26155,
+      "line_count": 310
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/write_plan.py.from-CTF08.diff",
+      "sha256": "3206cefa67e4e86e9d73fcc2985e9c745e436a83ba27139af62e6d5c3793de95",
+      "size_bytes": 3084,
+      "line_count": 32
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-01/retire.py.from-CTF08.diff",
+      "sha256": "c47ed7a8c99f1db54add7fa7d13da4faaba7402c71df808c92ad94c08c9fe7f5",
+      "size_bytes": 5120,
+      "line_count": 62
+    }
+  ],
+  "source_and_protocol_authorities": [
+    {
+      "path": ".runtime/porting/CTF-08/retirement-plan-prep-01/manifest.json",
+      "sha256": "9ac0f29411caa2c49a24007203cc46e126c6acbc23d73abfe23ded6e70d10c0c",
+      "size_bytes": 14860,
+      "line_count": 393
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/manifest.json",
+      "sha256": "fc34398dfe82b992145a5d11e8f999671c549ab3e840e3c430722041a469d84d",
+      "size_bytes": 43897,
+      "line_count": 1141
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/compare_unit.py",
+      "sha256": "04ac2faecb1177a107c871a4f5b02e15b98433ad1768bdf3a634c6f6bb829dba",
+      "size_bytes": 80804,
+      "line_count": 871
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/compare_production.py",
+      "sha256": "491aced377247a7b93da924ae30439b8db656b54338b0936aacb367a4c7baa5b",
+      "size_bytes": 93945,
+      "line_count": 986
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/retry_compare.py",
+      "sha256": "965b062fd76958f83a5c52ea77c61a577529f7ec33170a7210e69897406914a8",
+      "size_bytes": 38384,
+      "line_count": 478
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/manifest.json",
+      "sha256": "67fb01fdc37f3ccebdaef17139466916c993db0f62f5079a79a1b11c739b3df7",
+      "size_bytes": 53844,
+      "line_count": 1352
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/review_unit.py",
+      "sha256": "95871f47e4976b4af59a40a981b6973c835167b554f6673a6c598d4b3343098d",
+      "size_bytes": 29829,
+      "line_count": 321
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/review_production.py",
+      "sha256": "bcc053348384fe79ace5acb3fe22b792201389f1fba7d05760aeb29c9719e971",
+      "size_bytes": 32496,
+      "line_count": 343
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-review-prep-01/manifest.json",
+      "sha256": "f64af5687b90af4e5f2ae318c3fce63e99492baff068537300f9fe4cf72aa841",
+      "size_bytes": 5641,
+      "line_count": 150
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-review-prep-01/review_build.py",
+      "sha256": "5d89146327cb503a774510c1fc6333b56e1436aca4664360127c1575544c51b1",
+      "size_bytes": 6214,
+      "line_count": 109
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef",
+      "size_bytes": 39665,
+      "line_count": 1309
+    },
+    {
+      "path": ".runtime/porting/CTF-09/applied-final-source-04/manifest.json",
+      "sha256": "9cc9af5e0728317a61e2b906bf9b669f48debce7ac13df47d8f83667632dab44",
+      "size_bytes": 31900,
+      "line_count": 619
+    },
+    {
+      "path": ".runtime/porting/CTF-09/applied-final-source-01/manifest.json",
+      "sha256": "2100d5ad11678207df87044417159574547ca446ad9c289ba79f14b6ed057582",
+      "size_bytes": 29886,
+      "line_count": 588
+    },
+    {
+      "path": ".runtime/porting/CTF-09/applied-final-source-03/manifest.json",
+      "sha256": "88daf0fb431343b29b417ac16cbe8fd982370e4843f1762ea2d7a789f64ee0d1",
+      "size_bytes": 31446,
+      "line_count": 612
+    },
+    {
+      "path": ".runtime/porting/CTF-09/quality-doc-fix-prep-01/manifest.json",
+      "sha256": "8aecf3d97ead423751ed583a09d3923f23d0cd43bff4e47996797ffc593e323f",
+      "size_bytes": 2204,
+      "line_count": 50
+    },
+    {
+      "path": ".runtime/porting/CTF-09/quality-macro-limit-prep-01/manifest.json",
+      "sha256": "77880b621b604dfa74ecd2e742a30ec501c4dee6dd01bf87016233f1f2ce95e7",
+      "size_bytes": 1338,
+      "line_count": 32
+    },
+    {
+      "path": ".runtime/porting/CTF-09/applied-source-01/manifest.json",
+      "sha256": "b49768d7432dfa93f6e463252debdbeb77601e50bf2adbe4bd2821be875841bf",
+      "size_bytes": 17578,
+      "line_count": 369
+    },
+    {
+      "path": ".runtime/porting/CTF-09/source-format-command-01/receipt.json",
+      "sha256": "cfbc524c275f6a278730f39906eedd4d98f0fbaf64d2f85d3edff3615ef01c65",
+      "size_bytes": 5334,
+      "line_count": 70
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-08/retirement-plan-prep-01/common.py",
+      "first_line": 1,
+      "last_line": 209,
+      "sha256": "4c51e32c05d5fb87d876671b69be8d53345395f2199db9017eb05d4b72fd2cac",
+      "size_bytes": 9434
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-plan-prep-01/proofs.py",
+      "first_line": 1,
+      "last_line": 324,
+      "sha256": "07b9a91a93c37c56e736a6863d528cd365a39e2a1f396578177f826fb2d9450b",
+      "size_bytes": 22551
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-plan-prep-01/write_plan.py",
+      "first_line": 1,
+      "last_line": 91,
+      "sha256": "a9230200879a52bd03aa531d77a344b5e4f6f66cdae415bbc5301763085761c8",
+      "size_bytes": 5413
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-plan-prep-01/retire.py",
+      "first_line": 1,
+      "last_line": 181,
+      "sha256": "b1f88f68adb2a20f561b6bb395fb7380e63f2607cd3171fd5ebaaaf082b80fe8",
+      "size_bytes": 11384
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/compare_unit.py",
+      "first_line": 817,
+      "last_line": 864,
+      "sha256": "8fb7d7ef3b9f27c749a3cc5d9be1c373a22106af9955b7c7c760370e009a45a3",
+      "size_bytes": 6414
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/compare_production.py",
+      "first_line": 950,
+      "last_line": 980,
+      "sha256": "1bf28f96d30f1a9361cb3b61fe423d968842a46325d24d0d6ab6c1a983d477fd",
+      "size_bytes": 5837
+    },
+    {
+      "path": ".runtime/porting/CTF-09/comparer-prep-02/retry_compare.py",
+      "first_line": 265,
+      "last_line": 378,
+      "sha256": "9aff46e6968687ad56c40346e53771ec6416ac9a6be8cad987274bdddb5e30e5",
+      "size_bytes": 10066
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/review_unit.py",
+      "first_line": 265,
+      "last_line": 314,
+      "sha256": "145f07c9ce4282106f07ff479ed3cdb2795093e38495997bfc4b3437cbf1f462",
+      "size_bytes": 5796
+    },
+    {
+      "path": ".runtime/porting/CTF-09/original-data-review-prep-02/review_production.py",
+      "first_line": 285,
+      "last_line": 336,
+      "sha256": "62cd399b59164cc6b597d6cdf0276ab3c52f3a1a5fabfe670756341db947f4a2",
+      "size_bytes": 6049
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-review-prep-01/review_build.py",
+      "first_line": 95,
+      "last_line": 109,
+      "sha256": "d6fc8139f84012cb97518e81fad7d7d9036bbcd879b4ad78b52002ec081c7b44",
+      "size_bytes": 1110
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "first_line": 67,
+      "last_line": 90,
+      "sha256": "3bf8252b3e3f19ced893a39d41b2a59d27bb7206af145b77da24dd3de9aa6abf",
+      "size_bytes": 987
+    }
+  ],
+  "actual_build_and_preservation_metadata_only_refs": [
+    {
+      "path": ".runtime/porting/CTF-09/native-build-01/unit/native-build.json",
+      "sha256": "d5a4536610c71fbd97e0eb8bb73106e4ba4cef012e8fe501ab99904a970cc615",
+      "size_bytes": 5386,
+      "line_count": 123
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-01/production/native-build.json",
+      "sha256": "9213aa14384f31124d1d40d00058c7926fbceaa9ab5a68d2e57434c25d299fc8",
+      "size_bytes": 5452,
+      "line_count": 123
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-01/before/preservation.json",
+      "sha256": "01c14bfbc4334e15db8b793233b5f6c723e877f711b78838a14bf478bae0444a",
+      "size_bytes": 165145,
+      "line_count": 3424
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-amendment-01/amendment.json",
+      "sha256": "cf2d45db4be3d1e2d752205f45db1b9796bf6c1a7f7eb6169240e58fe6bb065d",
+      "size_bytes": 2310,
+      "line_count": 68
+    },
+    {
+      "path": ".runtime/porting/CTF-09/scope-check-command-01/receipt.json",
+      "sha256": "4eae4d1ddd57a216feb5dc7fcfcb0c476d2d271666f4af8e348c27cd94cdd7e2",
+      "size_bytes": 3006,
+      "line_count": 75
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-01/retirement.json",
+      "sha256": "1601a0fcc296ecfd73ce8ffaf59c14401dff88e8beb207fe0234edfd643b11c9",
+      "size_bytes": 176930,
+      "line_count": 3543
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-command-01/receipt.json",
+      "sha256": "fc3630b3c512e6a91ddc57b7baf22f1fc4d0c7a0722d57bab2b1c9a4f1af2d54",
+      "size_bytes": 3401,
+      "line_count": 86
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-01/after-retirement.json",
+      "sha256": "e2186e553b194dc1c52b2991519d382e06c0735c45228c26a8cc90167c06e5b9",
+      "size_bytes": 174457,
+      "line_count": 3485
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-01/unit/derivation/receipt.json",
+      "sha256": "220671bf3992960d77d6c7f9a7bd9958482b9e3030468c182edd1b6ddd74f2bb",
+      "size_bytes": 12699,
+      "line_count": 350
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-build-01/production/derivation/receipt.json",
+      "sha256": "48d12501c87ab2f7c0b7cc5ec6edb7cff57ebb24b482bbb77bac64147d132e20",
+      "size_bytes": 12825,
+      "line_count": 350
+    }
+  ],
+  "eligible_exact_targets_copied_from_actual_build_metadata": {
+    "unit": {
+      "path": ".runtime/ep261-gcc13-o0/Products/ctf09_unit_helper.exe",
+      "sha256": "705d572419f0e4941315cd747522068138084c921d3b6f08b9cfa6a349d8fe9c",
+      "size_bytes": 1302384418
+    },
+    "production": {
+      "path": ".runtime/ep261-gcc13-o0/Products/ctf09_production_helper.exe",
+      "sha256": "00119c18cca3a2df3874508d2655d1f802b59f62c7c4c5abe7116b76de4af692",
+      "size_bytes": 1304803868
+    }
+  },
+  "unchanged_exact_file_mechanics": {
+    "candidate_AST_exact_CTF08": true,
+    "ps_quote_AST_exact_CTF08": true,
+    "removal_script_AST_exact_CTF08": true,
+    "Git_index_limit": 1000,
+    "fifteen_shared_byte_path_guard_functions_AST_exact_CTF08": true
+  },
+  "Root_supplied_runtime_proof_contract": {
+    "schema": "ctf09-two-original-retention-proof-bindings.v1",
+    "scope": "selected-CTF09-actual-retry-visits-only",
+    "quality_roles": [
+      "focused_coefficient_tests",
+      "workspace_tests",
+      "clippy",
+      "format_check"
+    ],
+    "focused_role_spelling_preserved_while_ctf_filter_includes_retry": true,
+    "CLI_schema": "ctf09-fixed-six-actual-cli-executions.v1",
+    "all_runtime_scientific_or_quality_outcomes_supplied_by_Root": true,
+    "future_quality_comparison_CLI_archive_refs": null,
+    "quality_source_final_manifest": {
+      "path": ".runtime/porting/CTF-09/applied-final-source-04/manifest.json",
+      "sha256": "9cc9af5e0728317a61e2b906bf9b669f48debce7ac13df47d8f83667632dab44",
+      "size_bytes": 31900
+    },
+    "one_actual_final_snapshot_for_all_required_quality_comparison_and_CLI": true,
+    "comparison_implementations_are_runtime_receipts_not_historical_comparer02_hardcoded_execution_requirements": true,
+    "selected_retry_report_status_flags_profiles_and_positive_dynamic_counters_required": true,
+    "complete_CTF04_CTF05_CTF06_CTF07_CTF08_CTF09_claims_permitted": false
+  },
+  "protection_counts": {
+    "prior_protected": 44,
+    "retained_new_derivatives": 2,
+    "current_live_artifacts": 46,
+    "core_registered": 643,
+    "core_present": 631,
+    "core_absent": 12
+  },
+  "literal_prior_retirement_history": {
+    "CTF04_CTF06_CTF07_refs_via_actual_CTF08_final_preservation": true,
+    "CTF08_refs_direct_actual_before_inventory": true,
+    "all_eight_old_Original_paths_required_absent": true,
+    "legacy_registry_rewritten": false,
+    "pre09_hash_custody_explicitly_reuses_genuine_immediately_preceding08_final_guard": true,
+    "actual_retention_execution_freshly_hashes_all_live_protected_and_core_files": true
+  },
+  "derivative_size_authority": "actual validated_derivative accepted_derivative == observed_derivative; exact same build helper path/SHA; no binary opened in preparation",
+  "candidate_count": 2,
+  "potential_exact_original_bytes": 2607188286,
+  "source_validation": {
+    "AST_parsed": [
+      "common.py",
+      "proofs.py",
+      "write_plan.py",
+      "retire.py"
+    ],
+    "exact_diffs_regenerated": true,
+    "reviewed_targets_imported_or_executed": false
+  },
+  "no_new_SourceQA_or_quality_execution_stage": true,
+  "deletion_or_move_performed": false,
+  "target_modules_imported_or_executed": false,
+  "scientific_or_weather_payloads_read": false,
+  "executable_or_core_object_bytes_read_or_hashed": false,
+  "canonical_files_Git_builds_engines_tests_or_formatter_touched": false,
+  "authorship_limits": "Header authored earlier Native09/assembly/ingress and public10 source. This proposal concerns exact source transport/custody/action only, not independent own-formula certification. Root and other-author FULL source review required."
+}
