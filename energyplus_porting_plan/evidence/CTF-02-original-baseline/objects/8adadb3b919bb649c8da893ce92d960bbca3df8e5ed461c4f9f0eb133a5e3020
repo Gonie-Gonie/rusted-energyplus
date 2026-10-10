@@ -1,0 +1,78 @@
+--- .runtime/porting/CTF-01/production-independent-native-build-review-01/review_build.py
++++ .runtime/porting/CTF-02/native-build-review-prep-01/review_build.py
+@@ -1,13 +1,19 @@
+-"""Independent actual CTF build/PE inspection; no engine is invoked."""
++"""Independent actual CTF02 build/PE inspection; no engine is invoked."""
+ from pathlib import Path
++import argparse
+ import datetime
+ import hashlib
+ import importlib.util
+ import json
+ 
+ ROOT = Path.cwd().resolve()
+-BASE = ROOT / '.runtime/porting/CTF-01'
+-OUT = Path(__file__).resolve().parent
++parser = argparse.ArgumentParser()
++parser.add_argument('--lane', choices=('unit', 'production'), required=True)
++parser.add_argument('--build', required=True, help='Actual build manifest path#sha256')
++parser.add_argument('--output-dir', required=True)
++args = parser.parse_args()
++OUT = (ROOT / args.output_dir).resolve()
++assert OUT.is_relative_to(ROOT) and not OUT.exists()
+ 
+ 
+ def ref(path):
+@@ -34,9 +40,14 @@
+     path.write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+ 
+ 
+-build_path = BASE / 'production-native-build-01/native-build.json'
++build_name, separator, build_sha = args.build.rpartition('#')
++assert separator and len(build_sha) == 64 and all(c in '0123456789abcdef' for c in build_sha)
++build_path = bound({'path': build_name, 'sha256': build_sha})
+ build = json.loads(build_path.read_text(encoding='utf-8'))
+-assert build['schema'] == 'ctf01-production-native-build.v1'
++prefix = 'ctf02' if args.lane == 'unit' else 'ctf02-production'
++target = 'ctf02_' + args.lane + '_helper'
++assert build['schema'] == prefix + '-native-build.v1'
++assert build['target'] == target
+ assert build['status'] == 'pass-actual-3TU-link-and-preservation'
+ for key in ('configure_execution', 'compile_execution', 'derivation_execution'):
+     receipt = json.loads(bound(build[key]).read_text(encoding='utf-8'))
+@@ -47,14 +58,14 @@
+             'protected_artifacts_and_present_core_objects_unchanged', 'link_provider_verified'):
+     assert build[key] is True
+ assert (build['previous_compile_rows'], build['current_compile_rows'],
+-        build['core_registered'], build['core_present'], build['core_absent']) == (664, 667, 643, 631, 12)
+-assert len(build['native_source_files']) == 7
++        build['core_registered'], build['core_present'], build['core_absent']) == (667, 673, 643, 631, 12)
++assert len(build['native_source_files']) == 8
+ for binding in build['native_source_files']:
+     bound(binding)
+ preservation = json.loads(bound(build['preservation']).read_text(encoding='utf-8'))
+ assert preservation['selected_core_Construction_object_hits'] == 0
+ assert 'Construction.ctf01.cc.obj' in preservation['derived_provider']['section_provider']['text']
+-assert len(preservation['present_objects']) == 631 and len(preservation['protected_refs']) == 26
++assert len(preservation['present_objects']) == 631 and len(preservation['protected_refs']) == 28
+ derivation = json.loads(bound(build['validated_derivative']).read_text(encoding='utf-8'))
+ assert derivation['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+ reader = ROOT / 'tools/porting/native_pe.py'
+@@ -67,14 +78,16 @@
+ assert comparison['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+ assert original == json.loads(bound(derivation['maps']['original_before']).read_text(encoding='utf-8'))
+ assert derived == json.loads(bound(derivation['maps']['derived']).read_text(encoding='utf-8'))
++OUT.mkdir(parents=True)
+ maps = {}
+ for name, value in (('original', original), ('derived', derived), ('comparison', comparison)):
+     path = OUT / (name + '-pe.json')
+     write(path, value)
+     maps[name] = ref(path)
+-report = {'schema': 'ctf01-production-independent-build-PE-review.v1',
++report = {'schema': prefix + '-independent-build-PE-review.v1',
+           'status': 'pass-exact-retained-PE-runtime-and-actual-build-identity',
+           'observed_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
++          'lane': args.lane, 'target': target,
+           'build': ref(build_path), 'helper_binary': build['helper_binary'],
+           'linked_original': build['linked_original'], 'validated_derivative': build['validated_derivative'],
+           'native_pe_source': ref(reader), 'executed_reader': ref(Path(__file__).resolve()),

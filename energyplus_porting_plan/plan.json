@@ -9524,10 +9524,15 @@
         "production_input_models": 15,
         "production_loader_phase_records": 195,
         "strict_profiles_settled_before_outputs": true,
-        "actual_CTF02_build_or_engine_execution_performed": false,
+        "actual_CTF02_build_or_engine_execution_performed": true,
         "native_public_arrays_copied_after_unchanged_whole_method_return": true,
         "private_s0_e_s_not_observed_or_reconstructed": true,
         "CTF01_dependency_and_other_three_gates_pending": true
+      },
+      "actual_Original_and_existing_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-02-original-baseline/summary.json",
+        "sha256": "1f54f7bc388aa7c50933bfbc8de22d1dfb86de7f9baf0f1d59a4fdba06995915",
+        "size_bytes": 6001
       }
     },
     {

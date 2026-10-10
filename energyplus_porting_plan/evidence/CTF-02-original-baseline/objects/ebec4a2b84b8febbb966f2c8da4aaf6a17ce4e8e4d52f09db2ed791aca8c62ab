@@ -1,0 +1,8 @@
+--- .runtime/porting/CTF-02/original-data-review-prep-01/README.md
++++ .runtime/porting/CTF-02/original-data-review-prep-02/README.md
+@@ -76,3 +76,5 @@
+ Header authored the Native helper/public copier and this adaptation; this work
+ does not independently certify its own formulas. Root and another author's
+ source review precede actual use.
++
++Fresh preparation 02 preserves held 01. The two mains now authenticate the actual accepted PE-reader command: 11 arguments, exact lane/build/output flags, authenticated build path#SHA and the actual review directory. The four shared modules are byte-identical to 01. No reader, target or engine was invoked during this source-only repair.

@@ -9,10 +9,10 @@
 
 ## 읽을 원본 코드
 
-파일: `src/EnergyPlus/Construction.cc`  
-심벌: `ConstructionProps::calculateTransferFunction`  
-대상 블록: Construction.cc985-1103 selected all-resistive branch and public storage; literal dispatch at405 and else985, resets146-164, preprocessor error return263-315. Unchanged whole Native call returns before public observation. Massive/source-sink/2D/reverse paths are separate.  
-함께 읽을 선언/호출자: Construction.hh  
+파일: `src/EnergyPlus/Construction.cc`
+심벌: `ConstructionProps::calculateTransferFunction`
+대상 블록: Construction.cc985-1103 selected all-resistive branch and public storage; literal dispatch at405 and else985, resets146-164, preprocessor error return263-315. Unchanged whole Native call returns before public observation. Massive/source-sink/2D/reverse paths are separate.
+함께 읽을 선언/호출자: Construction.hh
 출처: https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc
 
 파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.
@@ -63,12 +63,16 @@ Six distinct public coefficient/dt/U profiles atol=rtol=0, exact class/shape/sig
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+구현 커밋:
+시험 명령:
+증거 경로:
+최대오차/RMSE/상태 불일치:
+추가 검토할 helper:
 
 ## Source amendment before CTF-02 outputs (2026-10-10)
 
 Root reviewed the full held Rust proposal and Native unit/production helpers; other-author full source peers accepted them. Original public arrays are copied only after the unchanged whole method returns. Selection is the literal source predicate from captured operands, not an invented branch flag. Private s0/e/s are neither read nor reconstructed. Unit39/42 and production15/195 are inherited input-only rows; production construction calls remain dynamic. Fresh CTF-02 coefficient policies must be frozen before its first helper execution. Actual Native data QA, existing Rust baseline, candidate comparisons, SUR-04/SUR-07 and production gates remain pending. Historical CTF-01 outputs are not CTF-02 coefficient evidence.
+
+## Actual Original and unchanged Rust baseline (2026-10-10)
+
+Genuine Native unit39/42 and production15/195 completed with actual process exit0. Exact PE/build review and actual OriginalDataQA passed before a fresh unchanged Rust build/run. Unit selected8/public42 and production selected6/public21 are factual observations; all other public records remain unpaired context. Existing Rust initialized all15 models and21 CTF-01 construction owners, with no CTF-02 public owner/API in current source. The actual legacy surface storage is retained as context; no CTF-02 numeric comparison is claimed. Evidence: `energyplus_porting_plan/evidence/CTF-02-original-baseline/summary.json`. Candidate implementation, comparisons, integration and production gates remain pending.

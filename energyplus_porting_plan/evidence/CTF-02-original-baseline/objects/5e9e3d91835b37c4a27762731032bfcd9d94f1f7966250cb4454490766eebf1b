@@ -1,0 +1,34 @@
+--- .runtime/porting/CTF-01/production-original-data-review-prep-01/shape.py
++++ .runtime/porting/CTF-02/original-data-review-prep-02/production_shape.py
+@@ -8,7 +8,7 @@
+ MATERIAL_SCALARS = ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]
+ 
+ 
+-def review(result, request, need, bind):
++def review(result, request, need, bind, public):
+     counts = Counter()
+     statuses, ctor_statuses, loader_statuses, phases, functions = (Counter() for _ in range(5))
+     integrity = []
+@@ -193,7 +193,8 @@
+                 need(len(before["constructions"]) == model["actual_Construct_array_size"] and before["constructions"][index - 1]["Name"] == operation["actual_construction_Name"], "Actual whole-call construction association differs")
+             invoked = operation["actual_source_invoked"]
+             stop = outcome(operation["call_outcome"], invoked, stop)
+-            snapshot(operation["after"], label + "/CTF" + str(index) + "/after")
++            after = snapshot(operation["after"], label + "/CTF" + str(index) + "/after")
++            public.review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
+             statuses[operation["call_outcome"]["status"]] += 1
+             counts["operation_records"] += 1; counts["actual_CTF_invocations" if invoked else "actual_CTF_skipped_construct_rows"] += 1
+             begin, end = operation["diagnostic_message_begin"], operation["diagnostic_message_end"]
+@@ -224,9 +225,11 @@
+     unknown = result["unknown_whole_call_obligations_for_unavailable_loaders"]
+     need((type(unknown) is int and unknown == 0) if counts["loader_unavailable_model_cases"] == 0 else unknown is None,
+          "Unavailable loader obligations must remain unknown")
++    need(counts["public_record_count"] == counts["operation_records"] == counts["public_owner_copy_count"] + counts["unavailable_public_owner_count"] and
++         counts["public_owner_copy_count"] == counts["selected_public_owner_count"] + counts["unselected_public_context_count"], "Actual public ledger counts differ")
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Actual global observer integrity summary differs")
+-    return {**{name: counts[name] for name in ["model_cases", "loader_phase_records", "operation_records", "actual_CTF_invocations",
++    return {**{name: counts[name] for name in public.COUNTS}, **{name: counts[name] for name in ["model_cases", "loader_phase_records", "operation_records", "actual_CTF_invocations",
+             "actual_CTF_skipped_construct_rows", "loader_unavailable_model_cases", "actual_phase_callback_count", "unreached_phase_records",
+             "scalar_DTO_visits", "snapshot_visits", "unavailable_snapshot_records"]},
+             "actual_source_function_counts": dict(functions), "actual_CTF_status_counts": dict(statuses),

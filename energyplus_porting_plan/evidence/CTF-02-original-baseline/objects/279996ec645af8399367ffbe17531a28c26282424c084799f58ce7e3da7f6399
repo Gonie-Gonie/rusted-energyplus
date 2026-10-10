@@ -1,0 +1,64 @@
+# CTF02 candidate observers: SOURCE-READY, unexecuted
+
+These five source proposals adapt the accepted CTF01 unit and production observers.
+They depend on the held, unapplied rust-all-resistive-prep-01 proposal. Root must
+complete genuine OriginalDataQA and existing Rust baseline gap before application.
+No canonical source, Cargo, engine, binary, or scientific result is read or changed.
+
+Unit example CLI, after Root application/format/actual Cargo capture:
+`ctf02_candidate_unit_observer REQUEST_PATH REQUEST_SHA ADMISSION_PATH ADMISSION_SHA SOURCES_PATH`
+The first four operands bind the actual CTF02 unit frozen input packet dynamically.
+SOURCES_PATH schema is ctf02-candidate-unit-runtime-source-bindings.v1, with exactly
+observer_sources and actual_public_API_sources arrays in the source's literal order.
+There are two observer sources and ten public API/source paths. All SHA identities
+must subsequently match the genuine full Cargo SourceSnapshot; the observer does
+not self-certify compiler provenance. No future source/request SHA is embedded.
+
+Unit output schema: ctf02-candidate-unit-observer-results.v1. Same39 models/42 calls,
+exact input member bits/order/MaterialId association, actual preprocessing once,
+selected shared ErrorsFound carry only. It calls generate_all_resistive_ctf on the
+actual returned owner and literal caller.TimeStepZone, never an expected cnd or array.
+Each operation adds CTF02_all_resistive with actual Result availability and all19
+array slots, CTFTimeStep, UValue, NumHistories and NumCTFTerms. Scope/unselected/
+unreached cases retain null snapshot and reason, no fabricated zeros or PASS.
+
+Production example CLI: `ctf02_candidate_production_observer REQUEST_PATH REQUEST_SHA`.
+Wrapper schema: ctf02-candidate-production-observer-request.v1. It retains the ten
+CTF01 wrapper keys and adds native_helper_request and native_admission_contract
+refs for the actual CTF02 production frozen packet. Case keys stay id,input,
+conversion_available,epjson_input,conversion_unavailable_reason,conversion_proof_bindings.
+Root supplies actual input-only converter provenance and runtime source identities;
+this observer validates bytes, while the downstream reader authenticates proof semantics.
+There are three observer sources and exactly23 public API/source paths: old21 plus
+ctf_all_resistive.rs and compiler/src/compiler/surface_space.rs. Full Cargo capture remains required.
+
+Production output schema: ctf02-candidate-production-observer-results.v1. Fixed15
+original IDFs and ordered45 guards remain bound. Same genuine IDF-order epJSON
+loader, public compiler, SimulationModel, ordinary heat-balance initializer (no
+external CTF rows). Compiler/init failure keeps owners unavailable. Successful
+state adds selected_CTF02_owners: actual construction_ctf02_coefficients in stored
+order and separately actual surface coefficient/history copies and cache indexes. Surface
+selection is associated only by the actual construction ID and its returned Result;
+unselected fallback storage stays context-only, without numeric classification.
+No observer coefficient formula, timestep division, preprocessing rerun, private
+cache access, coefficient-source inference from numeric values, or Native whole
+solver flag injection. Existing CTF01 snapshots and typed materials/constructions/
+surface order/timestep are retained. Surface storage is not substituted for the
+required19-slot construction owner; old SI R/C and mass fallback remain context.
+
+Scalar DTOs preserve exact binary64 bits, signed zero, finite/null value and class.
+NaN/Inf storage is copied faithfully; this observer grants no numerical acceptance.
+Selected required missing owners (one or both sides) must fail downstream. Genuine
+unselected/unreached branches are unavailable/noPASS under the frozen policy.
+Native later solver outcomes/flags stay separate. No gate/PASS or CTF03-10 claim.
+
+Each manifest row includes accepted predecessor, exact before bytes, canonical
+destination, proposed bytes and complete unified diff. Runtime API identities are
+not guessed: current baseline identities and held future-owner dependencies are
+recorded separately below. Source-only inspection is not an actual Cargo result.
+
+Fresh02 source-only repair: the production public API path is the existing
+crates/ep_compiler/src/compiler/surface_space.rs owner. Held01 used a nonexistent
+path; its erroneous proposed-owner descriptor is replaced by the actual current
+source identity. The other four Rust source bodies are byte-exact01. No behavior,
+input schema, profiles, counts or selection changed; old01 remains immutable.

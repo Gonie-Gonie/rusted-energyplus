@@ -1,0 +1,500 @@
+{
+  "schema": "ctf02-original-data-review-source-preparation.v1",
+  "status": "SOURCE-READY-HELD",
+  "prepared_utc": "2026-10-10T13:32:26.474250+00:00",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py",
+      "sha256": "fe0a25ba776c502fd3d6cb2fa6c3c8e3d66565a64176ffeac92aa5ae636009a3",
+      "size_bytes": 22537,
+      "line_count": 256
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_production.py",
+      "sha256": "40cfc6cef7439c991717e7c6ff2991ecb7d4ce6a2d01451f667ae649119b7e98",
+      "size_bytes": 25450,
+      "line_count": 281
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/unit_shape.py",
+      "sha256": "d207608487cc98988bc4102995a872e51fc52251ff32bc86cbe51a4fb30f3c10",
+      "size_bytes": 18733,
+      "line_count": 224
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/production_shape.py",
+      "sha256": "63801d35ede054551fd0922ce50a902a73248fdbd3c3af952aeeccdbefd3f67b",
+      "size_bytes": 20332,
+      "line_count": 239
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/public_shape.py",
+      "sha256": "fbf894ae670fdce9a13cdc4c2f078b153b641906f674c282933bbdb291916938",
+      "size_bytes": 9402,
+      "line_count": 116
+    },
+    {
+      "path": ".runtime/porting/CTF-02/original-data-review-prep-02/packet_io.py",
+      "sha256": "890d94b30f3b843cff24f69a1ae49e9de6821aa7162fd6830aa540f73d1c07d5",
+      "size_bytes": 3892,
+      "line_count": 105
+    }
+  ],
+  "changes": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py",
+        "sha256": "fe0a25ba776c502fd3d6cb2fa6c3c8e3d66565a64176ffeac92aa5ae636009a3",
+        "size_bytes": 22537,
+        "line_count": 256
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/original-data-review-prep-02/review_data.py",
+        "sha256": "4bd6a0b318ceab52bcb83e4fa9605c0d5191daf3883c505c4e14266385b18832",
+        "size_bytes": 15496,
+        "line_count": 184
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/before/review_unit.py",
+        "sha256": "4bd6a0b318ceab52bcb83e4fa9605c0d5191daf3883c505c4e14266385b18832",
+        "size_bytes": 15496,
+        "line_count": 184
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py.from-CTF01.diff",
+        "sha256": "808ec3277bf427cd1bae6c90cbbfde2c2758539d4d1ff6414bd045e21acd36dc",
+        "size_bytes": 21472,
+        "line_count": 229
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_production.py",
+        "sha256": "40cfc6cef7439c991717e7c6ff2991ecb7d4ce6a2d01451f667ae649119b7e98",
+        "size_bytes": 25450,
+        "line_count": 281
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/production-original-data-review-prep-01/review_data.py",
+        "sha256": "4f1e0bcf9cea03bf06d763af7437deab33390a5db73f4815b606c0b74976ec72",
+        "size_bytes": 21422,
+        "line_count": 240
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/before/review_production.py",
+        "sha256": "4f1e0bcf9cea03bf06d763af7437deab33390a5db73f4815b606c0b74976ec72",
+        "size_bytes": 21422,
+        "line_count": 240
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_production.py.from-CTF01.diff",
+        "sha256": "01e8e930d0585b7d07786077f5e87d7148cbdd789ad86930d991caae350e7135",
+        "size_bytes": 25373,
+        "line_count": 263
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/unit_shape.py",
+        "sha256": "d207608487cc98988bc4102995a872e51fc52251ff32bc86cbe51a4fb30f3c10",
+        "size_bytes": 18733,
+        "line_count": 224
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/original-data-review-prep-02/shape.py",
+        "sha256": "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22",
+        "size_bytes": 18201,
+        "line_count": 220
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/before/unit_shape.py",
+        "sha256": "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22",
+        "size_bytes": 18201,
+        "line_count": 220
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/unit_shape.py.from-CTF01.diff",
+        "sha256": "4b3fdc62e414beb76294162a7bf7f600be72d76b4913b81b5013c940e45c6af0",
+        "size_bytes": 3520,
+        "line_count": 38
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/production_shape.py",
+        "sha256": "63801d35ede054551fd0922ce50a902a73248fdbd3c3af952aeeccdbefd3f67b",
+        "size_bytes": 20332,
+        "line_count": 239
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/production-original-data-review-prep-01/shape.py",
+        "sha256": "2a970b84dfba58d440d96483e42cee647e3a1942f0dd90e6de886e1ac89debe2",
+        "size_bytes": 19839,
+        "line_count": 236
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/before/production_shape.py",
+        "sha256": "2a970b84dfba58d440d96483e42cee647e3a1942f0dd90e6de886e1ac89debe2",
+        "size_bytes": 19839,
+        "line_count": 236
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/production_shape.py.from-CTF01.diff",
+        "sha256": "5e9e3d91835b37c4a27762731032bfcd9d94f1f7966250cb4454490766eebf1b",
+        "size_bytes": 2888,
+        "line_count": 34
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/public_shape.py",
+        "sha256": "fbf894ae670fdce9a13cdc4c2f078b153b641906f674c282933bbdb291916938",
+        "size_bytes": 9402,
+        "line_count": 116
+      },
+      "predecessor": null,
+      "before_archive": null,
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/public_shape.py.from-CTF01.diff",
+        "sha256": "b05918f3517c1be79c8c55abf6ff2f319cd7518426ade67734bb988303139128",
+        "size_bytes": 9623,
+        "line_count": 119
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/packet_io.py",
+        "sha256": "890d94b30f3b843cff24f69a1ae49e9de6821aa7162fd6830aa540f73d1c07d5",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "predecessor": {
+        "path": ".runtime/porting/CTF-01/production-original-data-review-prep-01/packet_io.py",
+        "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/before/packet_io.py",
+        "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+        "size_bytes": 3892,
+        "line_count": 105
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/packet_io.py.from-CTF01.diff",
+        "sha256": "e697f7be00887f15a1fef2aadc8f51c70c093ecc1d5530ef306b3d9991424a07",
+        "size_bytes": 337,
+        "line_count": 11
+      }
+    }
+  ],
+  "reviewed_source_contexts": [
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/packet_io.py",
+      "sha256": "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74",
+      "size_bytes": 3523,
+      "line_count": 99
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/manifest.json",
+      "sha256": "b841bb940fa475255677a2ec7c84a43856b53a0ec2d179dd276d18bd434bf24c",
+      "size_bytes": 28362,
+      "line_count": 703
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_public_fields.hh",
+      "sha256": "70408a75d803fea13547e9d094b0f41ea83d7b69906d3edece491ae552c2ef61",
+      "size_bytes": 4598,
+      "line_count": 68
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_unit_helper.cpp",
+      "sha256": "5a4e6d62827d5eb59d67793637a0c722e8413f13b33972914680bbe273e27d0a",
+      "size_bytes": 16301,
+      "line_count": 224
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_helper.cpp",
+      "sha256": "726b7e4509f7b269d726f0c87fb5184399d57068718924fb00db19428a6bf9a5",
+      "size_bytes": 18997,
+      "line_count": 241
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_unit_admission.hh",
+      "sha256": "72da0c5ccc1834f687ab8c292e1187000f401d39dd54951c242b0034856e294b",
+      "size_bytes": 12142,
+      "line_count": 136
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_admission.hh",
+      "sha256": "7bae21b879d8b443176fd6568dcf187d9d5ca8b069fce5b503d590f6f2dd0a4a",
+      "size_bytes": 9585,
+      "line_count": 108
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/projection-policy-proposal.json",
+      "sha256": "d610b96f8640b512a81112cabeed373dc0aa0c56e82569dea2049a7a71e200d5",
+      "size_bytes": 4510,
+      "line_count": 142
+    },
+    {
+      "path": ".runtime/porting/CTF-02/input-writer-prep-01/manifest.json",
+      "sha256": "620f4c1998d2f02ac8e5b8f2beb9bdd311eecfaa391fab77c5482a4873847142",
+      "size_bytes": 25130,
+      "line_count": 642
+    },
+    {
+      "path": ".runtime/porting/CTF-02/input-writer-prep-01/freeze_packet.py",
+      "sha256": "0bd6b7cc358ac2d8f81c3ba45af997f6f51f129dd96b13e8b9a1ea2eb2b13f8b",
+      "size_bytes": 16245,
+      "line_count": 217
+    },
+    {
+      "path": ".runtime/porting/CTF-02/input-writer-prep-01/packet_io.py",
+      "sha256": "c5e6943ef2c249e093be697520f82662d5b1dacf64942820b66358dbf0f859dd",
+      "size_bytes": 3523,
+      "line_count": 99
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-build-review-prep-01/review_build.py",
+      "sha256": "776b0a2fdae777a73386355f63734e60f42e4068cbaf55ddfcf2590ba3658104",
+      "size_bytes": 4905,
+      "line_count": 97
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_public_fields.hh",
+      "start_line": 1,
+      "end_line": 68,
+      "sha256": "70408a75d803fea13547e9d094b0f41ea83d7b69906d3edece491ae552c2ef61",
+      "size_bytes": 4598,
+      "role": "actual public policy, absence and postreturn pure-copy definition"
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_unit_helper.cpp",
+      "start_line": 128,
+      "end_line": 175,
+      "sha256": "28950b460b7c62069646f64c7fdf4072b9a418f0e389625d99793f714d39e77d",
+      "size_bytes": 3915,
+      "role": "actual unit source invoke/public-copy/observer-integrity placement"
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_helper.cpp",
+      "start_line": 151,
+      "end_line": 191,
+      "sha256": "ec9bb4a057f8160cae48554802ec658af0babc444e281d9c0cb82153de4ffa71",
+      "size_bytes": 3529,
+      "role": "actual production dynamic Construct invoke/public-copy placement"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 146,
+      "end_line": 164,
+      "sha256": "cc70feed41510aecfd590050324b0ae720c38ddd1f83c84cd1d9f9a2af301cfa",
+      "size_bytes": 545,
+      "role": "actual array/scalar reset and unused return"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 985,
+      "end_line": 1103,
+      "sha256": "c9886c174321442770544382b0de45cbb4c2bffcfc56b2ea21604d0b98243f4e",
+      "size_bytes": 5032,
+      "role": "all-resistive branch/public stores and local destruction"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 159,
+      "end_line": 187,
+      "sha256": "9d2d3bb4115c072d8d7c216f4920f63ad2f58b07362c75ff2ecaae651e47a93e",
+      "size_bytes": 2482,
+      "role": "actual public arrays and scalar/count owners"
+    }
+  ],
+  "actual_frozen_input_only_metadata": [
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/freeze-receipt.json",
+      "sha256": "cb944917c7610e6ac6aa71133c9b3052b3a988073b7220cb89306c9e2dbc2df4",
+      "size_bytes": 22050,
+      "line_count": 522
+    },
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/helper-request.json",
+      "sha256": "96bd341a909b9222366bff9d12aef0d4439e9c8a577191fe55cc7a67c2fc9f0d",
+      "size_bytes": 104352,
+      "line_count": 4031
+    },
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/native-admission-contract.json",
+      "sha256": "3fb86cb986d20a86671c166c12fc32ec80a2ac470110efacd6a32297375d494d",
+      "size_bytes": 12371,
+      "line_count": 303
+    },
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/projection.json",
+      "sha256": "e85b41feb71f93e498ddb0f67e17d88bd32452c6045d24481751671fae48064c",
+      "size_bytes": 22356,
+      "line_count": 546
+    },
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/source.json",
+      "sha256": "ac5a07205ea111ae0dbde236122f95b10a460ad33eb0123ffd2ceabe2549b6fb",
+      "size_bytes": 16844,
+      "line_count": 447
+    },
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/cases.json",
+      "sha256": "a5895e2084f360b4d647c1b5e4b9b7ee3e4fb3f75ee4714dec2afd79366740ff",
+      "size_bytes": 9270,
+      "line_count": 220
+    },
+    {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/tolerances.json",
+      "sha256": "1e76c86996725acb9334e8418a6d98f0e8941214f8489d37a11b9a3cf337f306",
+      "size_bytes": 6035,
+      "line_count": 254
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/freeze-receipt.json",
+      "sha256": "a861222d5362786603e4ccf3c0c3e8eae7e7d731d2d1032167dac83ffe9c0ff4",
+      "size_bytes": 27530,
+      "line_count": 633
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/helper-request.json",
+      "sha256": "5e295d51c009077e6b1e4e23ee7599dfd9ab0bc0b3d65da7b791fd59ae632662",
+      "size_bytes": 22801,
+      "line_count": 622
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/native-admission-contract.json",
+      "sha256": "dc30094d5db361976b42ca29ee4547d94ab363e86319cc14c8e11865e6bf1733",
+      "size_bytes": 13034,
+      "line_count": 317
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/projection.json",
+      "sha256": "26b26ebe6005a3f3a4b4e6c7ec4e5bd3229bd86c4d567e535fef937d1b89b4ee",
+      "size_bytes": 22453,
+      "line_count": 546
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/source.json",
+      "sha256": "00c263245755b77edf71a6c007f44b4e90cb2d04621ba576f1acb522545dbdf9",
+      "size_bytes": 21391,
+      "line_count": 621
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/cases.json",
+      "sha256": "2d98c7fee9bf04a358401187c41ba86523ce140bf0d6fba7819bca6f0f6617b8",
+      "size_bytes": 9291,
+      "line_count": 219
+    },
+    {
+      "path": ".runtime/porting/CTF-02/production-frozen-packet-01/tolerances.json",
+      "sha256": "0f956e5d043be07349972f69438d661fa388f66114b5772f45fe1784fc5a50a3",
+      "size_bytes": 6057,
+      "line_count": 254
+    }
+  ],
+  "readme": {
+    "path": ".runtime/porting/CTF-02/original-data-review-prep-02/README.md",
+    "sha256": "b48e7a407574672bbf35a83bf4aae6c8673a80ce9a292fd33d789131b2727c20",
+    "size_bytes": 5013,
+    "line_count": 80
+  },
+  "protocol": {
+    "unit_review_schema": "ctf02-independent-original-data-review.v1",
+    "production_review_schema": "ctf02-production-independent-original-data-review.v1",
+    "executed_sources_per_lane": [
+      "actual main",
+      "actual lane shape",
+      "public_shape.py",
+      "packet_io.py"
+    ],
+    "executed_reader_source_archive": "actual main archive",
+    "new_argument": "approved-build-review-source-sha256",
+    "actual_native_sources_per_lane": 8,
+    "public_array_slots": 19,
+    "numeric_comparison_count": null,
+    "numerical_PASS_claimed": false
+  },
+  "limitations": {
+    "no_new_execution_stage": true,
+    "target_imported_or_executed": false,
+    "compiler_formatter_Cargo_Git_or_engine_invoked": false,
+    "scientific_result_weather_contents_or_binary_payloads_read": false,
+    "canonical_modified": false,
+    "future_build_PE_or_Native_hashes_supplied": false,
+    "formula_certification_claimed": false
+  },
+  "authorship_limits": "Header authored Native helper/public copies and this factual adaptation; other-author review is of source/provenance/serialization, not independent self-formula certification.",
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-02/original-data-review-prep-01/manifest.json",
+    "sha256": "1c4406bd0f97ac8e088f4f0550a2eec87531c85855ff48d954f13a18e380e67b",
+    "size_bytes": 17291,
+    "line_count": 439
+  },
+  "fresh_protocol_repair": "Actual accepted PE-reader argv11 lane/build/output binding; no scientific or policy change.",
+  "from_01_deltas": [
+    {
+      "predecessor": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-01/review_unit.py",
+        "sha256": "5e21e317c3e2bda487b5f7eb011c3adf49c3ac677af703ab4b32765b43f3d04c",
+        "size_bytes": 22146,
+        "line_count": 251
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py",
+        "sha256": "fe0a25ba776c502fd3d6cb2fa6c3c8e3d66565a64176ffeac92aa5ae636009a3",
+        "size_bytes": 22537,
+        "line_count": 256
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py.from-01.diff",
+        "sha256": "c53e37832d7bb17137da8d336c4197d79df001275d1619ee5913826872e6074c",
+        "size_bytes": 1746,
+        "line_count": 20
+      }
+    },
+    {
+      "predecessor": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-01/review_production.py",
+        "sha256": "50edf1cf3c02171fb2bb19869d281d66a7926b51b4c574bf3a51e252f0c93f70",
+        "size_bytes": 25059,
+        "line_count": 276
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_production.py",
+        "sha256": "40cfc6cef7439c991717e7c6ff2991ecb7d4ce6a2d01451f667ae649119b7e98",
+        "size_bytes": 25450,
+        "line_count": 281
+      },
+      "source_diff": {
+        "path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_production.py.from-01.diff",
+        "sha256": "fe13620065e3d700ed5ec27a44fd68b747b96817b398ac29cfa5146be85bd24b",
+        "size_bytes": 1758,
+        "line_count": 20
+      }
+    }
+  ],
+  "readme_from_01_diff": {
+    "path": ".runtime/porting/CTF-02/original-data-review-prep-02/README.md.from-01.diff",
+    "sha256": "ebec4a2b84b8febbb966f2c8da4aaf6a17ce4e8e4d52f09db2ed791aca8c62ab",
+    "size_bytes": 685,
+    "line_count": 8
+  }
+}

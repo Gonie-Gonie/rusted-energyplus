@@ -1,0 +1,20 @@
+--- .runtime/porting/CTF-02/original-data-review-prep-01/review_unit.py
++++ .runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py
+@@ -163,10 +163,15 @@
+     same(peer["build"], refs["build"])
+     peer_reader = m.bind(peer["executed_reader"])
+     m.require(peer_reader["sha256"] == args.approved_build_review_source_sha256 and
+-              re.fullmatch("[0-9a-f]{64}", args.approved_build_review_source_sha256) and len(peer_command["command"]) == 5 and
++              re.fullmatch("[0-9a-f]{64}", args.approved_build_review_source_sha256) and len(peer_command["command"]) == 11 and
+               Path(peer_command["command"][0]).name.lower() in ["python", "python.exe"] and
+               peer_command["command"][1:4] == ["-X", "utf8", "-B"] and
+-              m.contained(peer_command["command"][4]) == m.contained(peer_reader["path"]), "Actual approved PE reader command/source differs")
++              m.contained(peer_command["command"][4]) == m.contained(peer_reader["path"]) and
++              peer_command["command"][5:8] == ["--lane", LANE, "--build"] and
++              peer_command["command"][9] == "--output-dir", "Actual approved PE reader command/source differs")
++    same(m.argument(peer_command["command"][8]), refs["build"])
++    m.require(m.contained(peer_command["command"][10], existing=False) == m.contained(refs["build-review"]["path"]).parent,
++              "Actual approved PE output directory differs")
+     peer_stdout = m.load(peer_command["stdout"])
+     m.require(set(peer_stdout) == {"review", "status"} and peer_stdout["status"] == peer["status"], "Actual PE stdout must be its exact compact two-key summary")
+     same(peer_stdout["review"], refs["build-review"]); m.bind(peer_stdout["review"])

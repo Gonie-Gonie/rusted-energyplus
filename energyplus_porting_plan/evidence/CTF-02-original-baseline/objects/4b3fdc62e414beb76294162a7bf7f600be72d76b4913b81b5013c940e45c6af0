@@ -1,0 +1,38 @@
+--- .runtime/porting/CTF-01/original-data-review-prep-02/shape.py
++++ .runtime/porting/CTF-02/original-data-review-prep-02/unit_shape.py
+@@ -8,7 +8,7 @@
+ MATERIAL_SCALARS = ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]
+ 
+ 
+-def review(result, request, need, bind):
++def review(result, request, need, bind, public):
+     counts = Counter()
+     statuses, ctor_statuses, init_statuses, phases = Counter(), Counter(), Counter(), Counter()
+     integrity = []
+@@ -160,6 +160,8 @@
+             snapshot(operation["before"]); snapshot(operation["after"])
+             begin, end = operation["diagnostic_message_begin"], operation["diagnostic_message_end"]
+             integer(begin, previous_end, len(diagnostics["messages"])); integer(end, begin, len(diagnostics["messages"])); previous_end = end
++            public.review(operation, operation["after"], need, scalar, counts, integrity,
++                          model["id"] + "/" + operation["id"])
+             observed = operation["observations"]
+             if not invoked:
+                 need(observed is None, "Uninvoked source has fabricated phase observations"); continue
+@@ -205,6 +207,8 @@
+         need(model["observer_integrity_failed"] is (len(integrity) > model_integrity_start), "Model observer integrity summary differs")
+         need(model["later_CTF_coefficients_or_thermal_results_paired"] is False, "Later solver context must remain unpaired")
+         counts["model_cases"] += 1
++    need(counts["public_record_count"] == counts["operation_records"] == counts["public_owner_copy_count"] + counts["unavailable_public_owner_count"] and
++         counts["public_owner_copy_count"] == counts["selected_public_owner_count"] + counts["unselected_public_context_count"], "Actual public ledger counts differ")
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Global observer integrity summary differs")
+     for key in ["actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count"]:
+@@ -214,7 +218,7 @@
+     need(result["actual_operation_invocations"] == counts["actual_operation_invocations"] and result["actual_operations_skipped"] == counts["actual_operations_skipped"] and
+          result["actual_source_function_counts"] == {"calculateTransferFunction": counts["actual_operation_invocations"]} and
+          result["actual_source_status_counts"] == dict(statuses) and result["actual_phase_callback_count"] == counts["actual_phase_callback_count"], "Reported actual counts differ from genuine records")
+-    return {**{key: counts[key] for key in ["model_cases", "operation_records", "actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count", "unreached_phase_records", "scalar_DTO_visits", "snapshot_visits"]},
++    return {**{name: counts[name] for name in public.COUNTS}, **{key: counts[key] for key in ["model_cases", "operation_records", "actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count", "unreached_phase_records", "scalar_DTO_visits", "snapshot_visits"]},
+             "actual_source_function_counts": {"calculateTransferFunction": counts["actual_operation_invocations"]},
+             "actual_source_status_counts": dict(statuses), "actual_constructor_status_counts": dict(ctor_statuses),
+             "actual_initialization_status_counts": dict(init_statuses), "actual_phase_callback_counts": {phase: phases[phase] for phase in PHASES}}, integrity

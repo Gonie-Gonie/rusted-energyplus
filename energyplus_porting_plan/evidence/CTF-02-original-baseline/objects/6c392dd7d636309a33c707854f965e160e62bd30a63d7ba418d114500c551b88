@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-02/candidate-observer-prep-01/production_fields.rs
++++ .runtime/porting/CTF-02/candidate-observer-prep-02/production_fields.rs
+@@ -137,7 +137,7 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+     "crates/ep_model/src/objects/building.rs",
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+-    "crates/ep_compiler/src/surface_space.rs",
++    "crates/ep_compiler/src/compiler/surface_space.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+     "crates/ep_run/examples/ctf02_candidate_production_observer.rs",

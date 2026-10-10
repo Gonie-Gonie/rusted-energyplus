@@ -1,0 +1,101 @@
+//! Pure copies of actual public preprocessing return owners; no CTF arithmetic.
+use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+    CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing, CtfLayerScopeError,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_all_resistive::{
+    CtfAllResistiveCoefficients, CtfAllResistiveUnavailable,
+};
+use serde_json::{Value,json};
+
+pub(super) fn scalar(value: f64) -> Value {
+    let class = if value.is_nan() { "nan" } else if value.is_infinite() {
+        if value.is_sign_negative() { "negative_infinity" } else { "positive_infinity" }
+    } else if value == 0.0 {
+        if value.is_sign_negative() { "negative_zero" } else { "positive_zero" }
+    } else { "finite" };
+    json!({"value":if value.is_finite() { Some(value) } else { None },
+        "value_bits":format!("{:016x}",value.to_bits()),"value_class":class})
+}
+pub(super) fn unpaired_later_flag() -> Value {
+    json!({"owner_available":false,"value":null,"counted_as_PASS":false,
+        "reason":"Native whole-method DoCTFErrorReport/solver mutations are outside the selected Rust API"})
+}
+pub(super) fn input(source: &CtfLayerInput) -> Value {
+    json!({"material_id":source.material_id.0,"Thickness":scalar(source.thickness),
+        "Conductivity":scalar(source.conductivity),"Density":scalar(source.density),
+        "SpecHeat":scalar(source.specific_heat),"Resistance":scalar(source.resistance),"ROnly":source.resistance_only})
+}
+fn checkpoint(source: Option<&CtfLayerCheckpoint>, errors: bool, reason: &str) -> Value {
+    let Some(actual) = source else {
+        return json!({"reached":false,"available":false,"snapshot":null,
+            "unavailable_reason":reason,"counted_as_PASS":false});
+    };
+    json!({"reached":true,"available":true,"unavailable_reason":null,"snapshot":{
+        "LayersInConstruct":actual.layers.len(),"NumResLayers":actual.num_res_layers,
+        "ErrorsFound":errors,"DoCTFErrorReport":null,"DoCTFErrorReport_paired":false,
+        "active_prefix_available":true,"copied_layer_count":actual.layers.len(),
+        "active_prefix":actual.layers.iter().map(|v|json!({"dl":scalar(v.dl),"rk":scalar(v.rk),
+            "rho":scalar(v.rho),"cp":scalar(v.cp),"lr":scalar(v.lr),"ResLayer":v.res_layer})).collect::<Vec<_>>(),
+        "dyn":null,"rs":null,"cnd":null}})
+}
+pub(super) fn result(source: &std::result::Result<CtfLayerPreprocessing,CtfLayerScopeError>) -> Value {
+    match source {
+        Err(error) => json!({"status":"scope-error-returned","actual_scope_error":format!("{error:?}"),
+            "returned_preprocessing_owner":null,"observations":null,"counted_as_PASS":false,
+            "selected_ErrorsFound_mutation_available":false,"Native_fatal_or_exception_inferred":false}),
+        Ok(actual) => {
+            let reason = if actual.skipped_unused { "actual API returned unused without a checkpoint" }
+                else { "actual API returned before this checkpoint" };
+            let mut converted = checkpoint(actual.after_conversion.as_ref().map(|v|&v.active),actual.errors_found,reason);
+            if let Some(value) = &actual.after_conversion {
+                converted["snapshot"]["dyn"] = scalar(value.dyn_spacing);
+                converted["snapshot"]["rs"] = scalar(value.total_resistance);
+                converted["snapshot"]["cnd"] = scalar(value.conductance);
+            }
+            json!({"status":"source-returned","skipped_unused":actual.skipped_unused,
+                "selected_ErrorsFound":actual.errors_found,"issues_in_actual_order":format!("{:?}",actual.issues),
+                "observations":{"PostLoad":checkpoint(actual.after_load.as_ref(),actual.errors_found,reason),
+                    "PostMerge":checkpoint(actual.after_merge.as_ref(),actual.errors_found,reason),
+                    "PostConversion":converted,"unused_fixed_array_tail_emitted":false,
+                    "normalized_layer_material_IDs_fabricated":false},
+                "Native_whole_method_or_coefficients_observed":false,"numerical_PASS_claimed":false})
+        }
+    }
+}
+
+pub(super) fn coefficients(source: &std::result::Result<CtfAllResistiveCoefficients,CtfAllResistiveUnavailable>) -> Value {
+    match source {
+        Err(reason) => json!({"owner_available":false,"selected_all_resistive_operands":false,
+            "snapshot":null,"unavailable_reason":format!("{reason:?}"),"counted_as_PASS":false,
+            "unselected_storage_fabricated":false}),
+        Ok(actual) => json!({"owner_available":true,"selected_all_resistive_operands":true,
+            "unavailable_reason":null,"snapshot":{
+                "CTFOutside":actual.outside.iter().copied().map(scalar).collect::<Vec<_>>(),
+                "CTFCross":actual.cross.iter().copied().map(scalar).collect::<Vec<_>>(),
+                "CTFInside":actual.inside.iter().copied().map(scalar).collect::<Vec<_>>(),
+                "CTFFlux":actual.flux.iter().copied().map(scalar).collect::<Vec<_>>(),
+                "CTFTimeStep":scalar(actual.ctf_time_step),"UValue":scalar(actual.u_value),
+                "NumHistories":actual.num_histories,"NumCTFTerms":actual.num_ctf_terms},
+            "all_19_slots_copied":true,"observer_coefficient_arithmetic_performed":false,
+            "counted_as_PASS":false}),
+    }
+}
+
+pub(super) const OBSERVER_PATHS: &[&str] = &[
+    "crates/ep_run/examples/ctf02_candidate_unit_observer.rs",
+    "crates/ep_run/examples/ctf02_candidate_unit_support/fields.rs",
+];
+// Exact path inventory; approved formatted SHAs are runtime operands and must
+// also match Root's actual Cargo source capture before results are admitted.
+pub(super) const API_PATHS: &[&str] = &[
+    "crates/ep_run/Cargo.toml",
+    "crates/ep_model/src/lib.rs",
+    "crates/ep_model/src/ids.rs",
+    "crates/ep_runtime/Cargo.toml",
+    "crates/ep_runtime/src/lib.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+    "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+];

@@ -1,0 +1,119 @@
+--- /dev/null
++++ .runtime/porting/CTF-02/original-data-review-prep-01/public_shape.py
+@@ -0,0 +1,116 @@
++"""Pure validation of actual public-owner copies; no coefficient evaluator."""
++
++ARRAYS = ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux"]
++VARIABLES = ARRAYS + ["CTFTimeStep", "UValue"]
++COUNTS = ["public_record_count", "public_owner_copy_count", "selected_public_owner_count",
++          "unselected_public_context_count", "unavailable_public_owner_count", "public_copy_failure_count"]
++POLICY = {
++    "protocol": "ctf02-postreturn-regular-storage.v1",
++    "phase": "after_actual_whole_source_return",
++    "selection": "actual_used_no_source_1D_and_PostConversion_reached_and_not_layers_greater_than_num_res_layers",
++    "public_arrays": ARRAYS, "array_slots": 19,
++    "scalar_fields": ["CTFTimeStep", "UValue"], "integer_fields": ["NumHistories", "NumCTFTerms"],
++    "all_19_slots_required_for_selected_return": True, "unselected_massive_storage_paired": False,
++    "unreached_counted_as_PASS": False, "private_s0_e_s_or_unassigned_locals_read": False,
++}
++
++
++def packet(freeze, request, admission, projection, tolerances, inherited_tolerances, need):
++    """Authenticate the frozen policy, without evaluating its arithmetic operands."""
++    for item in [freeze, request, admission, projection, tolerances]:
++        need(item["frozen_before_this_CTF02_helper_execution"] is True and item["expected_values_supplied"] is False and
++             item["expected_exits_supplied"] is False and item["scientific_execution_performed"] is False, "Fresh input-only policy differs")
++    for item in [request, admission, projection, tolerances]:
++        need(item["ctf02_public_observation_policy"] == POLICY, "Exact fresh public-storage policy required")
++    profiles = tolerances["arithmetic_profiles_by_variable"]
++    need(isinstance(profiles, list) and [row["variable"] for row in profiles] == VARIABLES,
++         "Six separate public-storage profiles required")
++    for index, row in enumerate(profiles):
++        need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
++             row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
++             row["required_shape"] == ([19] if index < 4 else "scalar"), "Frozen zero/class/shape/signedzero profile differs")
++    need(tolerances["ctf01_preprocessing_profiles"] == inherited_tolerances["arithmetic_profiles_by_variable"] and
++         len(tolerances["ctf01_preprocessing_profiles"]) == 18 and
++         tolerances["tolerance_changes_after_output_inspection_permitted"] is False,
++         "Inherited18 context must stay separate and unchanged")
++    need(freeze["inherited_CTF01_freeze_claimed_as_fresh_CTF02_freeze"] is False,
++         "Historical CTF01 freeze cannot stand for the fresh CTF02 freeze")
++
++
++def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
++    """Check serialization, Boolean source selection and absence, never CTF values."""
++    row = operation["CTF02_public_postreturn"]
++    need(isinstance(row, dict) and row["protocol"] == POLICY["protocol"] and row["counted_as_PASS"] is False,
++         "Actual public-copy record and explicit noPASS required")
++    for field in ["public_owner_available", "selected_all_resistive_operands"]:
++        need(type(row[field]) is bool, "Typed public-owner availability/selection required")
++    counts["public_record_count"] += 1
++    invoked = operation["actual_source_invoked"]
++    returned = invoked and operation["call_outcome"]["status"] == "source_returned"
++    if not row["public_owner_available"]:
++        need(row["selected_all_resistive_operands"] is False and row["snapshot"] is None,
++             "Absent public owner cannot fabricate a selected snapshot")
++        reason = row["unavailable_reason"]
++        need(set(row) == {"protocol", "public_owner_available", "selected_all_resistive_operands", "unavailable_reason", "snapshot", "counted_as_PASS"} |
++             ({"observer_exception_message"} if reason == "observer_public_storage_copy_failed" else set()), "Exact absent public-copy shape required")
++        if not invoked:
++            need(reason == "actual_source_not_invoked", "Uninvoked public copy reason differs")
++        elif reason == "observer_public_storage_copy_failed":
++            need(isinstance(row["observer_exception_message"], str), "Actual public-copy exception text required")
++            integrity.append(label + "/observer-public-storage-copy-failed")
++            counts["public_copy_failure_count"] += 1
++        else:
++            need(not returned and reason == "whole_source_call_did_not_return",
++                 "Returned source public storage is required; source stop cannot be invented")
++        counts["unavailable_public_owner_count"] += 1
++        return
++    need(set(row) == {"protocol", "public_owner_available", "selected_all_resistive_operands", "selection_reason",
++         "selection_is_source_predicate_from_captured_operands_not_invented_branch_flag", "actual_construction_index", "actual_construction_Name",
++         "actual_IsUsedCTF", "actual_SourceSinkPresent", "actual_SolutionDimensions", "PostConversion_available", "actual_LayersInConstruct",
++         "actual_NumResLayers", "snapshot", "copied_after_actual_whole_return", "private_locals_or_solver_buffers_read",
++         "unselected_storage_is_unpaired_context_only", "counted_as_PASS"}, "Exact returned public-copy shape required")
++    need(returned and isinstance(owner_snapshot, dict), "Available copy requires an actual returned source owner")
++    index = operation["actual_construction_index"]
++    need(type(index) is int and 1 <= index <= len(owner_snapshot["constructions"]), "Actual public owner index differs")
++    owner = owner_snapshot["constructions"][index - 1]
++    need(row["actual_construction_index"] == index and row["actual_construction_Name"] == owner["Name"],
++         "Actual public copy construction association differs")
++    if "actual_construction_Name" in operation:
++        need(row["actual_construction_Name"] == operation["actual_construction_Name"], "Operation name differs from actual public owner")
++    for source, copied in [("IsUsedCTF", "actual_IsUsedCTF"), ("SourceSinkPresent", "actual_SourceSinkPresent")]:
++        need(type(row[copied]) is bool and row[copied] is owner[source], "Actual public owner flag copy differs")
++    need(type(row["actual_SolutionDimensions"]) is int and row["actual_SolutionDimensions"] == owner["SolutionDimensions"],
++         "Actual public owner dimension copy differs")
++    observed = operation["observations"]
++    phase = observed["PostConversion"]
++    intact = not any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase",
++                                               "phase_order_invalid", "active_prefix_invalid"])
++    converted = intact and phase["reached"] and phase["available"] and phase["actual_phase_callback_count"] == 1
++    need(type(row["PostConversion_available"]) is bool and row["PostConversion_available"] is converted,
++         "Actual conversion availability/callback identity differs")
++    state = phase["snapshot"] if converted else None
++    for key in ["LayersInConstruct", "NumResLayers"]:
++        need(row["actual_" + key] == (state[key] if converted else None) and
++             (not converted or type(row["actual_" + key]) is int), "Captured selection counter copy differs")
++    predicate = converted and not (state["LayersInConstruct"] > state["NumResLayers"])
++    selected = predicate and owner["IsUsedCTF"] and not owner["SourceSinkPresent"] and owner["SolutionDimensions"] == 1 and not state["ErrorsFound"]
++    reason = ("selected_all_resistive_postreturn_storage" if selected else "observer_integrity_failed" if not intact else
++              "source_unused_return" if not owner["IsUsedCTF"] else "PostConversion_unavailable" if not converted else
++              "outside_selected_no_source_1D_scope" if owner["SourceSinkPresent"] or owner["SolutionDimensions"] != 1 else
++              "source_shared_preprocessing_error" if state["ErrorsFound"] else "unselected_massive_branch")
++    need(row["selected_all_resistive_operands"] is selected and row["selection_reason"] == reason and
++         row["selection_is_source_predicate_from_captured_operands_not_invented_branch_flag"] is True and
++         row["copied_after_actual_whole_return"] is True and row["private_locals_or_solver_buffers_read"] is False and
++         row["unselected_storage_is_unpaired_context_only"] is (not selected), "Exact Boolean source selection/context differs")
++    snapshot = row["snapshot"]
++    need(isinstance(snapshot, dict) and set(snapshot) == set(VARIABLES + ["NumHistories", "NumCTFTerms", "actual_caller_TimeStepZone"]),
++         "Complete actual public storage shape required")
++    for name in ARRAYS:
++        need(isinstance(snapshot[name], list) and len(snapshot[name]) == 19, "All19 actual array slots required")
++        for value in snapshot[name]: scalar(value)
++    for name in ["CTFTimeStep", "UValue", "actual_caller_TimeStepZone"]: scalar(snapshot[name])
++    need(snapshot["actual_caller_TimeStepZone"] == owner_snapshot["TimeStepZone"], "Actual caller timestep copy differs")
++    for name in ["NumHistories", "NumCTFTerms"]:
++        need(type(snapshot[name]) is int, "Actual public integer owner required")
++    counts["public_owner_copy_count"] += 1
++    counts["selected_public_owner_count" if selected else "unselected_public_context_count"] += 1

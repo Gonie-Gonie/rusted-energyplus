@@ -1,0 +1,200 @@
+{
+  "schema": "ctf02-independent-original-data-review.v1",
+  "status": "pass-actual-original-data-and-provenance-before-Rust",
+  "started_utc": "2026-10-10T13:40:25.321371+00:00",
+  "finished_utc": "2026-10-10T13:40:25.915595+00:00",
+  "reviewed_results": {
+    "path": ".runtime/porting/CTF-02/native-unit-output-01/ctf02-helper-results.json",
+    "sha256": "51003eddcee7d4131e068f94fdd6e9fec1c11a12cfbbf867db4fec2504e458ee",
+    "size_bytes": 2015523
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CTF-02/native-unit-command-01/receipt.json",
+    "sha256": "01aed3fff0f6fcb1f7e8d24d9149321ec90f10ba32ee7d4ba9702cfe2198a0de",
+    "size_bytes": 3179
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-02/frozen-packet-01/helper-request.json",
+    "sha256": "96bd341a909b9222366bff9d12aef0d4439e9c8a577191fe55cc7a67c2fc9f0d",
+    "size_bytes": 104352
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CTF-02/frozen-packet-01/native-admission-contract.json",
+    "sha256": "3fb86cb986d20a86671c166c12fc32ec80a2ac470110efacd6a32297375d494d",
+    "size_bytes": 12371
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-02/frozen-packet-01/projection.json",
+    "sha256": "e85b41feb71f93e498ddb0f67e17d88bd32452c6045d24481751671fae48064c",
+    "size_bytes": 22356
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/source.json",
+      "sha256": "ac5a07205ea111ae0dbde236122f95b10a460ad33eb0123ffd2ceabe2549b6fb",
+      "size_bytes": 16844
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/cases.json",
+      "sha256": "a5895e2084f360b4d647c1b5e4b9b7ee3e4fb3f75ee4714dec2afd79366740ff",
+      "size_bytes": 9270
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-02/frozen-packet-01/tolerances.json",
+      "sha256": "1e76c86996725acb9334e8418a6d98f0e8941214f8489d37a11b9a3cf337f306",
+      "size_bytes": 6035
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CTF-02/native-build-01/unit/native-build.json",
+    "sha256": "75611d1a55f5b6b4539b152ff444e26ef7411b929d6c56b2332524099f7037f3",
+    "size_bytes": 4422
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-02/native-compile-command-01/receipt.json",
+    "sha256": "6029e08ef706924d17786c17c0746562b5e14f5a2b58a53b24aff082bfd70d90",
+    "size_bytes": 3263
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-02/native-unit-build-review-01/review.json",
+    "sha256": "138a56df7d9612b8c5f67321b65198ae89fd6f82b72dae7c2c0042a28a2da684",
+    "size_bytes": 2352
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-02/native-unit-build-review-command-01/receipt.json",
+    "sha256": "95143f1630cb73de5cfba008ecfc16d56c1ae24f218d60d33202c0a33e392a3e",
+    "size_bytes": 3035
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-02/frozen-packet-01/freeze-receipt.json",
+    "sha256": "cb944917c7610e6ac6aa71133c9b3052b3a988073b7220cb89306c9e2dbc2df4",
+    "size_bytes": 22050
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/CTF-02/freeze-command-01/receipt.json",
+    "sha256": "8d28b8f583cd9cabd9d2e67d44493ccfd9a18ba6893be6fdc9d4c4b8465a329f",
+    "size_bytes": 3982
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": true,
+  "reviewed_public_observation_policy": {
+    "protocol": "ctf02-postreturn-regular-storage.v1",
+    "phase": "after_actual_whole_source_return",
+    "selection": "actual_used_no_source_1D_and_PostConversion_reached_and_not_layers_greater_than_num_res_layers",
+    "public_arrays": [
+      "CTFOutside",
+      "CTFCross",
+      "CTFInside",
+      "CTFFlux"
+    ],
+    "array_slots": 19,
+    "scalar_fields": [
+      "CTFTimeStep",
+      "UValue"
+    ],
+    "integer_fields": [
+      "NumHistories",
+      "NumCTFTerms"
+    ],
+    "all_19_slots_required_for_selected_return": true,
+    "unselected_massive_storage_paired": false,
+    "unreached_counted_as_PASS": false,
+    "private_s0_e_s_or_unassigned_locals_read": false
+  },
+  "reviewed_public_policy_contract": {
+    "path": ".runtime/porting/CTF-02/frozen-packet-01/tolerances.json",
+    "sha256": "1e76c86996725acb9334e8418a6d98f0e8941214f8489d37a11b9a3cf337f306",
+    "size_bytes": 6035
+  },
+  "actual_observation_counts": {
+    "public_record_count": 42,
+    "public_owner_copy_count": 42,
+    "selected_public_owner_count": 8,
+    "unselected_public_context_count": 34,
+    "unavailable_public_owner_count": 0,
+    "public_copy_failure_count": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 106,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 8072,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33
+    }
+  },
+  "actual_method_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-02/original-data-review-prep-02/review_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-01/000-review_unit.py",
+        "sha256": "fe0a25ba776c502fd3d6cb2fa6c3c8e3d66565a64176ffeac92aa5ae636009a3",
+        "size_bytes": 22537
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-02/original-data-review-prep-02/unit_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-01/001-unit_shape.py",
+        "sha256": "d207608487cc98988bc4102995a872e51fc52251ff32bc86cbe51a4fb30f3c10",
+        "size_bytes": 18733
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-02/original-data-review-prep-02/public_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-01/002-public_shape.py",
+        "sha256": "fbf894ae670fdce9a13cdc4c2f078b153b641906f674c282933bbdb291916938",
+        "size_bytes": 9402
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-02/original-data-review-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-02/original-data-review-01/003-packet_io.py",
+        "sha256": "890d94b30f3b843cff24f69a1ae49e9de6821aa7162fd6830aa540f73d1c07d5",
+        "size_bytes": 3892
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-02/original-data-review-01/000-review_unit.py",
+    "sha256": "fe0a25ba776c502fd3d6cb2fa6c3c8e3d66565a64176ffeac92aa5ae636009a3",
+    "size_bytes": 22537
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored Native public-copy/helper and this factual adaptation. It does not independently certify its own formulas; Root and other-author source review are required."
+}

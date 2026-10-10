@@ -1,0 +1,152 @@
+{
+  "schema": "ctf02-original-and-existing-Rust-baseline.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-original-baseline/manifest.json",
+    "sha256": "f4ca0d4e4d7e7baf7545cc46c1e37d93a992beeb94aa3f4d7d8ed3e89e357909",
+    "size_bytes": 295649
+  },
+  "actual_unit_native_execution": {
+    "path": ".runtime/porting/CTF-02/native-unit-command-01/receipt.json",
+    "sha256": "01aed3fff0f6fcb1f7e8d24d9149321ec90f10ba32ee7d4ba9702cfe2198a0de",
+    "size_bytes": 3179
+  },
+  "actual_production_native_execution": {
+    "path": ".runtime/porting/CTF-02/production-native-command-01/receipt.json",
+    "sha256": "e040bb59574286280e047531a53c8bfa09b85e2ba153fe74bc0b09a3b16a6522",
+    "size_bytes": 3224
+  },
+  "actual_unit_original_data_QA": {
+    "path": ".runtime/porting/CTF-02/original-data-review-01/review.json",
+    "sha256": "da1df333cdaa0a5e420e9653c5d49f89e437fab4136438ce316e0f84cac65807",
+    "size_bytes": 7783
+  },
+  "actual_unit_original_data_QA_execution": {
+    "path": ".runtime/porting/CTF-02/original-data-review-command-01/receipt.json",
+    "sha256": "3415c5ccb3d31dacf3e1eb66ca72d9a5c54fa1f9184b7856a71593b51a8cb9ff",
+    "size_bytes": 4346
+  },
+  "actual_production_original_data_QA": {
+    "path": ".runtime/porting/CTF-02/original-production-data-review-01/review.json",
+    "sha256": "44a87bd8687508f2dad67625f6adcf9493fc4de63471201ad27099f917bab776",
+    "size_bytes": 49979
+  },
+  "actual_production_original_data_QA_execution": {
+    "path": ".runtime/porting/CTF-02/original-production-data-review-command-01/receipt.json",
+    "sha256": "6255e7818506c31bafae43da90ed8b3bd973ff4563a3f5966bdb3c6b86cd586d",
+    "size_bytes": 4447
+  },
+  "actual_existing_Rust_baseline_gap": {
+    "path": ".runtime/porting/CTF-02/existing-production-inputs-01/baseline-gap.json",
+    "sha256": "4ed8f8b9fa9805c61c6ff4d91024d70fc7fdb476a9a4f1a4b761c60b66455c29",
+    "size_bytes": 3870
+  },
+  "actual_existing_Rust_build": {
+    "path": ".runtime/porting/CTF-02/existing-production-build-command-01/receipt.json",
+    "sha256": "c00f08b74c00915e36f970f3b3027b6cf38f92d7050e08a149190a4831ee02a8",
+    "size_bytes": 4370
+  },
+  "actual_existing_Rust_execution": {
+    "path": ".runtime/porting/CTF-02/existing-production-command-01/receipt.json",
+    "sha256": "4c548217e9099357e7d831478e226e441c2034f8d7d061d87682e3ca987c8de9",
+    "size_bytes": 2857
+  },
+  "unit_actual_observation_counts": {
+    "public_record_count": 42,
+    "public_owner_copy_count": 42,
+    "selected_public_owner_count": 8,
+    "unselected_public_context_count": 34,
+    "unavailable_public_owner_count": 0,
+    "public_copy_failure_count": 0,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 106,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 8072,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33
+    }
+  },
+  "production_actual_observation_counts": {
+    "public_record_count": 21,
+    "public_owner_copy_count": 21,
+    "selected_public_owner_count": 6,
+    "unselected_public_context_count": 15,
+    "unavailable_public_owner_count": 0,
+    "public_copy_failure_count": 0,
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "operation_records": 21,
+    "actual_CTF_invocations": 21,
+    "actual_CTF_skipped_construct_rows": 0,
+    "loader_unavailable_model_cases": 0,
+    "actual_phase_callback_count": 63,
+    "unreached_phase_records": 0,
+    "scalar_DTO_visits": 4269,
+    "snapshot_visits": 462,
+    "unavailable_snapshot_records": 0,
+    "actual_source_function_counts": {
+      "InputProcessor::processInput": 15,
+      "SimulationManager::PostIPProcessing": 15,
+      "EnergyPlusData::init_constant_state": 15,
+      "EnergyPlusData::init_state": 15,
+      "OutputReportPredefined::SetPredefinedTables": 15,
+      "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+      "OutputProcessor::SetupTimePointers(Zone)": 15,
+      "OutputProcessor::SetupTimePointers(System)": 15,
+      "HeatBalanceManager::GetProjectControlData": 15,
+      "HeatBalanceManager::GetSiteAtmosphereData": 15,
+      "Material::GetMaterialData": 15,
+      "HeatBalanceManager::GetConstructData": 15,
+      "HeatBalanceManager::GetBuildingData": 15,
+      "calculateTransferFunction": 21
+    },
+    "actual_CTF_status_counts": {
+      "source_returned": 21
+    },
+    "actual_loader_status_counts": {
+      "source_returned": 195
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 15
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 21,
+      "PostMerge": 21,
+      "PostConversion": 21
+    },
+    "unknown_whole_call_obligations_for_unavailable_loaders": 0
+  },
+  "Original_data_QA_completed_before_existing_Rust_build": true,
+  "all_actual_process_exit_codes": 0,
+  "unchanged_full_Rust_source_snapshot_sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+  "source_review": {
+    "Rust_owner9": "Root FULL and Raw FULL accepted; unapplied at capture",
+    "candidate_observers5": "Root FULL and Header FULL accepted fresh02; held01 path defect retained unexecuted",
+    "Original_data_QA6": "Root FULL and Base FULL accepted fresh02; held01 PE argv defect retained unexecuted"
+  },
+  "Rust_CTF02_candidate_applied": false,
+  "numerical_comparison_count": null,
+  "numerical_PASS_claimed": false,
+  "pending": [
+    "candidate implementation and genuine unit/production comparisons",
+    "SUR-04/SUR-07 integration and full production handoff",
+    "CTF-01 dependency and final four gates"
+  ]
+}

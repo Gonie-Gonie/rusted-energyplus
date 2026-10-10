@@ -1,0 +1,80 @@
+# CTF02 factual Original data-review adaptation
+
+This ignored, source-only package forks the accepted CTF01 unit and production
+readers. It adds one shared pure validator for the actual public-postreturn
+record. It is neither a coefficient evaluator nor another execution stage.
+The predecessor files remain unchanged, with exact before copies and diffs here.
+
+Run `review_unit.py` or `review_production.py` only through Root's real recorder,
+after the corresponding fresh freeze, actual build/PE review and Native call.
+Both scripts take the same explicit arguments:
+
+```
+--approved-source-sha256 <actual approved main SHA>
+--approved-build-review-source-sha256 <actual approved PE reader SHA>
+--native-execution <actual recorder path#SHA>
+--results <actual result path#SHA, or missing result path>
+--freeze-receipt <actual fresh lane receipt path#SHA>
+--freeze-execution <actual fresh freeze recorder path#SHA>
+--build <actual lane Native build metadata path#SHA>
+--build-execution <actual compile recorder path#SHA>
+--build-review <actual lane PE review path#SHA>
+--build-review-execution <actual PE recorder path#SHA>
+--output-dir <fresh contained CTF-02 directory>
+```
+
+The added PE SHA argument replaces the old hardcoded CTF01 reader hash. Root
+supplies the actual source identity after review. It creates no new source-QA
+report, receipt or approval execution requirement. No future hash is assumed.
+
+The unit packet/result schemas have the `ctf02-` prefix; production uses
+`ctf02-production-`. Fresh freezes require status
+`frozen-inherited-input-and-fresh-CTF02-policy-before-helper` and the true
+`frozen_before_this_CTF02_helper_execution` flag. Both lanes use the exact
+`numerical_PASS_claimed` spelling. Native inventories have eight actual sources.
+The frozen39 models/42 calls and fixed15 models/195 loader records are inherited
+input rows. Dynamic production Construct/call counts are never assumed to be21.
+
+Build metadata retains the existing flat fields and status
+`pass-actual-3TU-link-and-preservation`. Lane schemas are
+`ctf02-native-build.v1` / `ctf02-production-native-build.v1` and the analogous
+`ctf02[-production]-independent-build-PE-review.v1`. PE status remains
+`pass-exact-retained-PE-runtime-and-actual-build-identity`; actual PE stdout is
+exactly `{review,status}`. Registered643, actual present/absent counts, protected
+refs, command preservation and Construction provider facts are cross-bound to
+the actual preservation metadata. No binary or protected-object hashing occurs
+in these readers, and no future compile/protected total is guessed.
+
+The existing constructor, lifecycle13, real loader ownership, shared flags,
+source outcomes, diagnostics, three callbacks and absence validation remain.
+The unit public-record check runs before the skipped-operation continue.
+Every returned public copy contains four arrays with all19 scalar DTOs, actual
+dt/U/counts and actual caller timestep. Bits/class/decimal serialization and
+owner/index/name copies are checked. The validator authenticates only the
+literal Boolean selection from captured operands, including
+`!(LayersInConstruct > NumResLayers)`; it performs no coefficient arithmetic.
+Selected storage is required. Massive/unreached/uninvoked storage stays
+separate unpaired context or explicit absence, always with noPASS. Public-copy
+exceptions extend the existing observer-integrity ledger and helper exit2 rule.
+
+The six fresh zero/class/shape/signedzero profiles and all19 obligations are
+authenticated independently from the unchanged eighteen CTF01 context profiles.
+Public record/copy/selected/context/unavailable/copy-failure counts are derived
+from actual rows. No expected output, source exit or coefficient is generated.
+
+Output review schemas are `ctf02-independent-original-data-review.v1` and
+`ctf02-production-independent-original-data-review.v1`. Existing lane statuses,
+direct provenance refs and release logic remain. Each actual reader archives
+exactly its main, lane shape, shared public shape and shared IO, and emits
+`executed_reader_sources` plus `executed_reader_source_archive`. Numerical
+comparison/mismatch counts remain null; numerical_PASS_claimed is false.
+
+Source checks here used only stdlib source/AST/hash/diff handling and frozen
+input metadata. No target was imported or executed; compiler, formatter, Cargo,
+Git, engine, scientific results, weather contents and binary payloads were not
+used. The IO105 fork changes only its contained output root to CTF-02.
+Header authored the Native helper/public copier and this adaptation; this work
+does not independently certify its own formulas. Root and another author's
+source review precede actual use.
+
+Fresh preparation 02 preserves held 01. The two mains now authenticate the actual accepted PE-reader command: 11 arguments, exact lane/build/output flags, authenticated build path#SHA and the actual review directory. The four shared modules are byte-identical to 01. No reader, target or engine was invoked during this source-only repair.

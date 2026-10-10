@@ -1,0 +1,118 @@
+--- .runtime/porting/CTF-01/candidate-unit-observer-prep-01/ctf01_candidate_unit_observer.rs
++++ crates/ep_run/examples/ctf02_candidate_unit_observer.rs
+@@ -1,19 +1,20 @@
+-//! Explicit-member unit calls to the actual public CTF-01 preprocessing API.
++//! Explicit-member unit calls to the actual public CTF-01 prefix and CTF-02 all-resistive API.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf01_candidate_unit_support/fields.rs"]
++#[path = "ctf02_candidate_unit_support/fields.rs"]
+ mod fields;
+ 
+ use ep_model::MaterialId;
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+ };
++use ep_runtime::heat_balance::surface_manager::ctf_all_resistive::{
++    CtfAllResistiveUnavailable, generate_all_resistive_ctf,
++};
+ use serde_json::{Value, json};
+ use std::collections::BTreeMap;
+ use std::path::{Path, PathBuf};
+ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+-const REQUEST_SHA: &str = "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57";
+-const ADMISSION_SHA: &str = "192b3595baa0b3efd7ee259074eb0915920ccef61517d538f221f00086c143bd";
+ 
+ fn require(ok: bool, message: &str) -> Result<()> {
+     if ok { Ok(()) } else { Err(message.to_owned().into()) }
+@@ -47,7 +48,7 @@
+     Ok((path,bytes))
+ }
+ fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+-    require(inventory["schema"] == "ctf01-candidate-unit-runtime-source-bindings.v1"
++    require(inventory["schema"] == "ctf02-candidate-unit-runtime-source-bindings.v1"
+         && inventory.as_object().is_some_and(|object| object.len() == 3), "source bindings schema/fields differ")?;
+     for (key, paths) in [("observer_sources",fields::OBSERVER_PATHS),("actual_public_API_sources",fields::API_PATHS)] {
+         let supplied = rows(&inventory[key])?;
+@@ -86,12 +87,22 @@
+             source_sink_present:flag(&construction["SourceSinkPresent"])?,
+             solution_dimensions:i32::try_from(construction["SolutionDimensions"].as_i64().ok_or("typed dimensions required")?)? };
+         let result = preprocess_ctf_layers(&layers,context);
++        let time_step_zone = scalar(&model["caller"]["TimeStepZone"])?;
++        let coefficients = match &result {
++            Ok(actual) => generate_all_resistive_ctf(actual,time_step_zone),
++            Err(error) => Err(CtfAllResistiveUnavailable::PreprocessingScope(*error)),
++        };
+         if let Ok(actual) = &result { selected_errors = actual.errors_found; }
+         observed.push(json!({"id":operation["id"],"declared_native_operation_kind":operation["kind"],
+             "logical_construction_id":construction["id"],"actual_Rust_API":"preprocess_ctf_layers",
+             "actual_source_invoked":true,"selected_ErrorsFound_before":before,
+             "selected_ErrorsFound_after":selected_errors,"actual_layer_material_ids":layers.iter().map(|v|v.material_id.0).collect::<Vec<_>>(),
+             "original_layer_membership":construction["layer_material_ids"],"result":fields::result(&result),
++            "CTF02_all_resistive":fields::coefficients(&coefficients),
++            "actual_Rust_CTF02_API":"generate_all_resistive_ctf",
++            "actual_Rust_CTF02_API_invoked":result.is_ok(),
++            "actual_caller_TimeStepZone":fields::scalar(time_step_zone),
++            "preprocessing_reexecuted_for_coefficients":false,
+             "Native_whole_method_outcome_or_later_flags_inferred":false}));
+     }
+     Ok(json!({"id":model["id"],"lane":model["lane"],"declared_caller":model["caller"],
+@@ -107,9 +118,11 @@
+ fn run() -> Result<()> {
+     let mut args = std::env::args_os().skip(1);
+     let request_path = PathBuf::from(args.next().ok_or("frozen Native request required")?).canonicalize()?;
++    let request_sha = args.next().ok_or("runtime frozen request SHA required")?.into_string().map_err(|_| "UTF-8 request SHA required")?;
+     let admission_path = PathBuf::from(args.next().ok_or("frozen Native admission required")?).canonicalize()?;
++    let admission_sha = args.next().ok_or("runtime frozen admission SHA required")?.into_string().map_err(|_| "UTF-8 admission SHA required")?;
+     let sources_path = PathBuf::from(args.next().ok_or("Root-approved runtime source bindings required")?).canonicalize()?;
+-    require(args.next().is_none(), "exactly three input-only arguments required")?;
++    require(args.next().is_none(), "exactly five input-only arguments required")?;
+     let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().and_then(Path::parent).ok_or("repository root unavailable")?.canonicalize()?;
+     require([&request_path,&admission_path,&sources_path].iter().all(|path|path.starts_with(&root)), "contained metadata paths required")?;
+     for path in [&request_path,&admission_path,&sources_path] {
+@@ -118,13 +131,13 @@
+     }
+     let request_bytes = std::fs::read(&request_path)?; let admission_bytes = std::fs::read(&admission_path)?;
+     let sources_bytes = std::fs::read(&sources_path)?;
+-    require(digest::sha256(&request_bytes) == REQUEST_SHA && digest::sha256(&admission_bytes) == ADMISSION_SHA,
++    require(digest::sha256(&request_bytes) == request_sha && digest::sha256(&admission_bytes) == admission_sha,
+         "actual frozen 39-model request/admission differs")?;
+     let request: Value = serde_json::from_slice(&request_bytes)?;
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     let sources: Value = serde_json::from_slice(&sources_bytes)?;
+-    require(request["schema"] == "ctf01-helper-cases.v1" && admission["schema"] == "ctf01-native-admission-contract.v1"
+-        && request["frozen_before_numerical_execution"] == true && request["expected_values_supplied"] == false
++    require(request["schema"] == "ctf02-helper-cases.v1" && admission["schema"] == "ctf02-native-admission-contract.v1"
++        && request["frozen_before_this_CTF02_helper_execution"] == true && request["expected_values_supplied"] == false
+         && request["expected_exits_supplied"] == false && request["scientific_execution_performed"] == false,
+         "unchanged one-way input-only Native packet required")?;
+     let (bound_request,_) = bound(&root,&admission["helper_request"])?;
+@@ -145,20 +158,25 @@
+     require(cases.len() == 39 && calls == 42 && request["requested_counts"] == json!({
+         "model_cases":cases.len(),"calculateTransferFunction":calls,"total_operations":calls}), "frozen counts differ")?;
+     let models = cases.iter().map(model_case).collect::<Result<Vec<_>>>()?;
++    let coefficient_calls = models.iter().map(|model| rows(&model["operations"]).map(|operations|
++        operations.iter().filter(|operation|operation["actual_Rust_CTF02_API_invoked"] == true).count()))
++        .collect::<Result<Vec<_>>>()?.into_iter().sum::<usize>();
+     for binding in &bindings { bound(&root,binding)?; }
+     source_pins(&root,&sources)?;
+     require(std::fs::read(&request_path)? == request_bytes && std::fs::read(&admission_path)? == admission_bytes
+         && std::fs::read(&sources_path)? == sources_bytes, "input/source bindings changed during public calls")?;
+-    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf01-candidate-unit-observer-results.v1",
++    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf02-candidate-unit-observer-results.v1",
+         "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admission_bytes)},
+         "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+         "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+         "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],
+         "runtime_source_bindings":{"path":sources_path,"sha256":digest::sha256(&sources_bytes)},"authenticated_source_inventory":sources,
+-        "actual_Rust_preprocess_invocations":calls,"model_cases":models,"all_bound_inputs_and_sources_unchanged":true,
++        "ctf02_public_observation_policy":request["ctf02_public_observation_policy"],
++        "actual_Rust_preprocess_invocations":calls,"actual_Rust_CTF02_API_invocations":coefficient_calls,
++        "model_cases":models,"all_bound_inputs_and_sources_unchanged":true,
+         "shared_flag_scope":"selected preprocessing ErrorsFound only; no whole Native solver carry injected",
+         "compiled_source_identity_independently_certified":false,"actual_Cargo_source_capture_required":true,
+         "Native_result_or_expected_values_read":false,"scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+-        "production_loader_lane_certified":false,"CTF02_through_CTF10_certified":false,"gates_updated":false}))?);
++        "production_loader_lane_certified":false,"CTF03_through_CTF10_certified":false,"gates_updated":false}))?);
+     Ok(())
+ }

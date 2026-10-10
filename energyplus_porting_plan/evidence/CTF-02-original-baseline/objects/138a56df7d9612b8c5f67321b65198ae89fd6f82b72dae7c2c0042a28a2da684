@@ -1,0 +1,58 @@
+{
+  "schema": "ctf02-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-10T13:29:28.337024+00:00",
+  "lane": "unit",
+  "target": "ctf02_unit_helper",
+  "build": {
+    "path": ".runtime/porting/CTF-02/native-build-01/unit/native-build.json",
+    "sha256": "75611d1a55f5b6b4539b152ff444e26ef7411b929d6c56b2332524099f7037f3",
+    "size_bytes": 4422
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-02/native-build-01/unit/derivation/derived-helper.exe",
+    "sha256": "2d6d4f633afbd2fdc92d4cb34fd9817839adce4c83beaaa04c8f1d0b85aadf57",
+    "size_bytes": 150362215
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf02_unit_helper.exe",
+    "sha256": "5510d289139f4addbe107a0fcdcfb4b3cc1b564da74eae33fdc3a6920aa74095",
+    "size_bytes": 1297364847
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-02/native-build-01/unit/derivation/receipt.json",
+    "sha256": "f6531739d8ca26519687e713397937b425367bff9356063df77376b4afe37264",
+    "size_bytes": 12895
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/CTF-02/native-build-review-prep-01/review_build.py",
+    "sha256": "776b0a2fdae777a73386355f63734e60f42e4068cbaf55ddfcf2590ba3658104",
+    "size_bytes": 4905
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-02/native-unit-build-review-01/original-pe.json",
+      "sha256": "e7a707844cd6684e451279c29f0e6c229a7d8f1089fb075350125296fa236548",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-02/native-unit-build-review-01/derived-pe.json",
+      "sha256": "b914ceb826eca925c4406b591879196cc901007b8376dfa32a85acd99c4fef15",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-02/native-unit-build-review-01/comparison-pe.json",
+      "sha256": "e99ce6a4e79e83d38f1ce0603a291eb6875ab5d01f9e94d1fe139c254f628110",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

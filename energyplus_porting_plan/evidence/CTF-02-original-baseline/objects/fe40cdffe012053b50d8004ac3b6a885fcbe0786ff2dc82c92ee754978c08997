@@ -1,0 +1,26 @@
+--- crates/ep_runtime/src/heat_balance/initialization.rs
++++ crates/ep_runtime/src/heat_balance/initialization.rs
+@@ -13,7 +13,8 @@
+ use crate::error::RuntimeError;
+ use crate::geometry::zone_geometry_properties;
+ use crate::heat_balance::ctf::{
+-    ConstructionCtfCoefficientOverride, construction_ctf_coefficients_by_name,
++    ConstructionCtfCoefficientOverride, all_resistive_surface_ctf_state,
++    construction_ctf_coefficients_by_name,
+     steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
+     surface_ctf_state_from_coefficient_rows,
+ };
+@@ -124,7 +125,12 @@
+                 initial_zone_air_temperature_c,
+             )
+             .unwrap_or_else(|| {
+-                steady_surface_ctf_state(steady_ctf_w_per_m2_k, initial_zone_air_temperature_c)
++                match (thermal.ctf_coefficients.is_empty(), &thermal.ctf02_coefficients.result) {
++                    (true, Ok(coefficients)) => {
++                        all_resistive_surface_ctf_state(coefficients, initial_zone_air_temperature_c)
++                    }
++                    _ => steady_surface_ctf_state(steady_ctf_w_per_m2_k, initial_zone_air_temperature_c),
++                }
+             });
+ 
+             Ok(SurfaceHeatBalanceState {

@@ -1,0 +1,70 @@
+--- .runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs
++++ crates/ep_run/examples/ctf02_candidate_production_support/fields.rs
+@@ -28,6 +28,32 @@
+         "selected_ErrorsFound_observed_only_in_actual_results":true,
+         "preprocessing_reexecuted_by_observer":false,"numerical_PASS_claimed":false})
+ }
++pub(super) fn ctf02_unavailable() -> Value {
++    json!({"owner_available":false,"construction_coefficients":null,"surface_coefficient_copies":null,
++        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
++}
++pub(super) fn ctf02_selected(source: &HeatBalanceState) -> Value {
++    json!({"owner_available":true,"construction_coefficients":source.construction_ctf02_coefficients.iter()
++        .enumerate().map(|(index,actual)|json!({"state_vector_index":index,
++            "construction_id":actual.construction_id.0,"result":unit_fields::coefficients(&actual.result)})).collect::<Vec<_>>(),
++        "actual_owner_count":source.construction_ctf02_coefficients.len(),
++        "surface_coefficient_copies":source.surfaces.iter().enumerate().map(|(index,surface)| {
++            let associated = source.construction_ctf02_coefficients.iter().enumerate()
++                .find(|(_,owner)|owner.construction_id == surface.construction_id);
++            let selected = associated.is_some_and(|(_,owner)|owner.result.is_ok());
++            json!({
++            "state_vector_index":index,"surface_id":surface.surface_id.0,"surface_name":surface.surface_name,
++            "construction_id":surface.construction_id.0,"construction_name":surface.construction_name,
++            "actual_cache_index_copy":surface.construction_thermal_data_index,
++            "actual_construction_owner_index":associated.map(|(index,_)|index),
++            "selected_construction_owner_available":selected,
++            "snapshot":ctf(&surface.ctf,!selected),"copied_from_actual_surface_owner":true,
++            "construction_branch_selection_not_inferred_from_surface_numbers":true,
++            "counted_as_PASS":false})}).collect::<Vec<_>>(),
++        "preprocessing_or_coefficients_reexecuted_by_observer":false,
++        "external_CTF_rows_supplied_to_initializer":false,
++        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
++}
+ pub(super) fn typed(model: &TypedModel) -> Value {
+     let materials = model.materials.iter().enumerate().map(|(index,material)| {
+         let payload = match material.definition {
+@@ -57,8 +83,8 @@
+         "model_vector_index":index,"id":source.id.0,"name":source.name.0,"construction_id":source.construction.0
+     })).collect::<Vec<_>>()})
+ }
+-fn ctf(source: &SurfaceCtfState) -> Value {
+-    json!({"context_only_unpaired":true,"outside_0":scalar(source.outside_0_w_per_m2_k),
++fn ctf(source: &SurfaceCtfState, context_only_unpaired: bool) -> Value {
++    json!({"context_only_unpaired":context_only_unpaired,"outside_0":scalar(source.outside_0_w_per_m2_k),
+         "cross_0":scalar(source.cross_0_w_per_m2_k),"inside_0":scalar(source.inside_0_w_per_m2_k),
+         "flux_0":source.flux_0.map(scalar),"const_in_part":scalar(source.const_in_part_w_per_m2),
+         "const_out_part":scalar(source.const_out_part_w_per_m2),
+@@ -82,7 +108,7 @@
+             "outside_layer_material_id":s.outside_layer_material_id.0,
+             "outside_layer_material_name":s.outside_layer_material_name,
+             "SI_resistance_context":scalar(s.thermal_resistance_m2_k_per_w),
+-            "SI_heat_capacity_context":s.heat_capacity_j_per_m2_k.map(scalar),"ctf_context":ctf(&s.ctf)
++            "SI_heat_capacity_context":s.heat_capacity_j_per_m2_k.map(scalar),"ctf_context":ctf(&s.ctf,true)
+         })).collect::<Vec<_>>()})
+ }
+ 
+@@ -110,9 +136,11 @@
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+     "crates/ep_model/src/objects/building.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
++    "crates/ep_compiler/src/compiler/surface_space.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf01_candidate_production_observer.rs",
+-    "crates/ep_run/examples/ctf01_candidate_production_support/fields.rs",
+-    "crates/ep_run/examples/ctf01_candidate_production_support/unit_fields.rs",
++    "crates/ep_run/examples/ctf02_candidate_production_observer.rs",
++    "crates/ep_run/examples/ctf02_candidate_production_support/fields.rs",
++    "crates/ep_run/examples/ctf02_candidate_production_support/unit_fields.rs",
+ ];

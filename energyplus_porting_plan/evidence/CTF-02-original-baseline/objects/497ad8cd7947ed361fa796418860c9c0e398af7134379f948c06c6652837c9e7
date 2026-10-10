@@ -1,0 +1,67 @@
+# CTF-02 selected all-resistive source proposal
+
+SOURCE ONLY. The adjacent manifest holds two new source files and seven exact
+existing-owner replacement proposals. No canonical source has been edited; no
+formatter, compiler, Cargo command, project import, engine, or test has run.
+No scientific, weather, or binary payload has been read. This preparation is
+not a CTF-01/02 release, comparison result, or completed-card claim.
+
+The public `surface_manager::ctf_all_resistive::generate_all_resistive_ctf`
+consumes the actual CTF-01 preprocessing owner and the supplied zone timestep.
+It uses the literal Construction.cc405 predicate: a layer count greater than
+NumResLayers selects the massive branch; the else branch selects all-resistive
+storage. It does not tighten the source predicate to equality. The earlier held
+readiness audit's equality shorthand is superseded by this literal predicate.
+
+Unused construction, sticky loading error, missing conversion, preprocessing
+scope error, and the unselected massive branch remain distinct unavailable
+owners. No zero coefficient result is fabricated for these cases. The accepted
+preprocessing API excludes SourceSinkPresent and dimensions other than one;
+this source does not implement source/sink coefficients or later mass solvers.
+
+The selected result preserves the four actual 19-slot regular coefficient
+arrays, NumHistories=1, NumCTFTerms=1, assigned CTFTimeStep, and UValue. It uses the
+already assigned English-unit cnd, the exact existing CFU expression, and the
+source s0/store order. It does not sum SI resistance, evaluate 1/SI-R, clamp or
+check area/R/finite values. History index one has positive-zero Outside/Cross
+and negative-zero Inside/Flux. Flux index zero and untouched tails remain
+positive zero. Other source/sink arrays and the unassigned s0 cells are outside
+this selected regular-array owner.
+
+CFU receives visibility-only `pub(super)` sharing; its arithmetic is unchanged.
+The actual construction cache calls the selected function once per initialized
+ordinary opaque construction, after its existing preprocessing call. Its caller
+uses the typed number_of_timesteps_per_hour through the same literal
+1.0/f64(count) assignment as SimulationManager.cc878. Fixed-CON callers are
+already admitted with actual count four. Broader invalid-input normalization by
+Native GetProjectData is not claimed here. The pure function itself copies the
+supplied timestep bits and adds no extra timestep guard.
+
+The construction cache retains available/unavailable CTF-02 results in typed
+construction order. HeatBalanceState exposes copies of those actual owners.
+The existing surface initializer copies the generated current/history terms
+through `all_resistive_surface_ctf_state`; it does not recalculate them. Existing
+diagnostic EIO rows retain priority, including their existing missing-zero-row
+fallback. Only empty-EIO, available all-resistive entries acquire the new
+`rust-generated-all-resistive` origin. Massive or unavailable entries keep their
+existing fallback behavior, whose source parity is not claimed by CTF-02.
+
+The cache hash includes the actual selected storage/timestep bits and counts.
+Massive/unavailable and EIO paths retain the existing hash inputs and order.
+Surface temperature/flux-history initialization follows the existing consumer
+shape; no later conduction/history timing, coefficient recursion, or CTF-03..10
+certification follows from this proposal.
+
+Six unexecuted focused tests cover signed-zero/full-tail storage, computed
+classification rather than the input ROnly marker, distinct unavailable states,
+assigned-cnd consumption, fresh reset and surface bit copies, and genuine cache
+ingress with typed timestep and EIO precedence. The assigned-cnd dependency
+canary deliberately alters a later copied lr owner after preprocessing; it is
+not a production input or a Native expected result. The cache test supplies a
+minimal typed surface association and exercises actual cache construction only,
+without claiming a geometry or zone solve.
+
+Root must read and obtain another-author source peer before any application.
+Actual formatting, tests, Native observation, frozen comparison criteria, and
+production validation remain Root work. No new approval/QA execution framework
+or stage is introduced by this source inventory.

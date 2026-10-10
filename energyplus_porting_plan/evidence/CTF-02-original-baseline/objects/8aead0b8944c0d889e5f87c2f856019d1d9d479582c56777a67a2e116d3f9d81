@@ -1,0 +1,49 @@
+--- .runtime/porting/CTF-01/candidate-unit-observer-prep-01/fields.rs
++++ crates/ep_run/examples/ctf02_candidate_unit_support/fields.rs
+@@ -1,6 +1,9 @@
+ //! Pure copies of actual public preprocessing return owners; no CTF arithmetic.
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing, CtfLayerScopeError,
++};
++use ep_runtime::heat_balance::surface_manager::ctf_all_resistive::{
++    CtfAllResistiveCoefficients, CtfAllResistiveUnavailable,
+ };
+ use serde_json::{Value,json};
+ 
+@@ -60,9 +63,27 @@
+     }
+ }
+ 
++pub(super) fn coefficients(source: &std::result::Result<CtfAllResistiveCoefficients,CtfAllResistiveUnavailable>) -> Value {
++    match source {
++        Err(reason) => json!({"owner_available":false,"selected_all_resistive_operands":false,
++            "snapshot":null,"unavailable_reason":format!("{reason:?}"),"counted_as_PASS":false,
++            "unselected_storage_fabricated":false}),
++        Ok(actual) => json!({"owner_available":true,"selected_all_resistive_operands":true,
++            "unavailable_reason":null,"snapshot":{
++                "CTFOutside":actual.outside.iter().copied().map(scalar).collect::<Vec<_>>(),
++                "CTFCross":actual.cross.iter().copied().map(scalar).collect::<Vec<_>>(),
++                "CTFInside":actual.inside.iter().copied().map(scalar).collect::<Vec<_>>(),
++                "CTFFlux":actual.flux.iter().copied().map(scalar).collect::<Vec<_>>(),
++                "CTFTimeStep":scalar(actual.ctf_time_step),"UValue":scalar(actual.u_value),
++                "NumHistories":actual.num_histories,"NumCTFTerms":actual.num_ctf_terms},
++            "all_19_slots_copied":true,"observer_coefficient_arithmetic_performed":false,
++            "counted_as_PASS":false}),
++    }
++}
++
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf01_candidate_unit_observer.rs",
+-    "crates/ep_run/examples/ctf01_candidate_unit_support/fields.rs",
++    "crates/ep_run/examples/ctf02_candidate_unit_observer.rs",
++    "crates/ep_run/examples/ctf02_candidate_unit_support/fields.rs",
+ ];
+ // Exact path inventory; approved formatted SHAs are runtime operands and must
+ // also match Root's actual Cargo source capture before results are admitted.
+@@ -75,5 +96,6 @@
+     "crates/ep_runtime/src/heat_balance/mod.rs",
+     "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+ ];

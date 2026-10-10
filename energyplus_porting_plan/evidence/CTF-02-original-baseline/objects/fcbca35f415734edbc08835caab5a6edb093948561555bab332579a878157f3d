@@ -1,0 +1,54 @@
+# CTF-02 actual native build and PE reader source
+
+This is a bounded adaptation of the existing CTF-01 production 84-line reader
+at `.runtime/porting/CTF-01/production-independent-native-build-review-01/review_build.py`.
+The original is preserved byte-for-byte in `before/review_build.py`. No existing
+reader, build, PE report, binary or canonical source is modified.
+
+Root will supply the actual build manifest and choose the actual lane:
+
+```text
+python -X utf8 -B <held review_build.py> --lane unit|production --build <actual-manifest-path>#<actual-sha256> --output-dir <fresh-output-directory>
+```
+
+The reader accepts no future build identity or successful outcome in advance.
+Its literal build schemas are `ctf02-native-build.v1` for unit and
+`ctf02-production-native-build.v1` for production. The actual manifest must
+declare target `ctf02_unit_helper` or `ctf02_production_helper` respectively,
+and status `pass-actual-3TU-link-and-preservation`.
+
+The existing configure/compile/derivation receipt checks, full stream byte
+bindings, source identity checks, preserved provider assertion and strict
+retained-runtime PE inspection mechanism are unchanged. The selected source
+count changes from seven to eight; the real CTF-02 targets each compile three
+translation units. The combined configuration retains all 667 previous rows
+and adds six, requiring 673 total. Core registration/present/absent counts
+remain 643/631/12, and the original Construction object must not be selected.
+The actual provider text must identify the inherited derived Construction TU.
+
+The protection count changes from 26 to 28 to include the actual CTF-01
+production linked original and its retained derivative. Root's actual build
+preservation records remain the authority for the complete protected identity
+set and unchanged core object facts. No new retention or proof stage is added.
+
+At future authorized execution the existing PE primitive reads the actual
+original and derived binaries, checks exact retained runtime sections and
+directories, and requires its maps to equal the actual derivation maps.
+This source-preparation task did not read either binary or actual build/PE
+outputs, and did not import or run the primitive or this reader.
+
+Output files are the same three PE maps and `review.json`. Report schemas are
+`ctf02-independent-build-PE-review.v1` and
+`ctf02-production-independent-build-PE-review.v1`, with unchanged status
+`pass-exact-retained-PE-runtime-and-actual-build-identity`. Report fields retain
+build/binary/derivation/source identities and add the selected lane/target.
+Stdout remains exactly the compact `{review,status}` binding. Root's real
+recorder will capture that command, its source and streams; the reader does
+not claim it authored the Root build manifest.
+
+This package is source-ready, not a built or executed review. Root must fully
+read it and obtain the normal other-author source peer before actual use.
+No engine, formatter, compiler, Cargo, Git, scientific result or weather file
+was used. This is the existing build/PE review mechanism, not a new framework.
+CTF-02 Original data integrity, element comparisons and integration gates
+remain separate actual work; no numerical PASS is claimed by this source.

@@ -1,0 +1,88 @@
+{
+  "schema": "ctf02-actual-existing-Rust-production-baseline.v1",
+  "created_utc": "2026-10-10T13:43:59.905649+00:00",
+  "actual_Original_unit_data_QA": {
+    "path": ".runtime/porting/CTF-02/original-data-review-01/review.json",
+    "sha256": "da1df333cdaa0a5e420e9653c5d49f89e437fab4136438ce316e0f84cac65807",
+    "size_bytes": 7783
+  },
+  "actual_Original_production_data_QA": {
+    "path": ".runtime/porting/CTF-02/original-production-data-review-01/review.json",
+    "sha256": "44a87bd8687508f2dad67625f6adcf9493fc4de63471201ad27099f917bab776",
+    "size_bytes": 49979
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-02/existing-production-build-command-01/receipt.json",
+    "sha256": "c00f08b74c00915e36f970f3b3027b6cf38f92d7050e08a149190a4831ee02a8",
+    "size_bytes": 4370
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-02/existing-production-command-01/receipt.json",
+    "sha256": "4c548217e9099357e7d831478e226e441c2034f8d7d061d87682e3ca987c8de9",
+    "size_bytes": 2857
+  },
+  "actual_results": {
+    "path": ".runtime/porting/CTF-02/existing-production-command-01/stdout.log",
+    "sha256": "69038aac9a94da6a2d40853dc990ebdc35c432f1a64216363f697c27a3dbd6af"
+  },
+  "unchanged_input_only_request": {
+    "path": ".runtime/porting/CTF-02/existing-production-inputs-01/request.json",
+    "sha256": "16a1684e19246a47175f0736216c98ea2eb904aca7064093c74647f9938b0f5a",
+    "size_bytes": 34057
+  },
+  "actual_full_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/9e/9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+    "sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390"
+  },
+  "actual_existing_owners": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+      "size_bytes": 11736
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+      "size_bytes": 5815
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+      "size_bytes": 15063
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "b79c21fd3126a460c17cd54ec5f66d37e723e0348ac6b6af9e9fedd9e78ea3ec",
+      "size_bytes": 28663
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "ba68a33bd1c42a6b63b3fb317e68017f5c196d6a95eb15a3ea305d265ba4db34",
+      "size_bytes": 11004
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "e04b95dbb47eed514647bfdaf9332b6538e49cbfbb30625e4e02acd50a071448",
+      "size_bytes": 46220
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "a930446e8c4fa6d3c24a493fad544c85d0aa8aedec10b1dd16656813a84ad567",
+      "size_bytes": 1877
+    }
+  ],
+  "actual_new_CTF02_source_paths_absent": [
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive_tests.rs"
+  ],
+  "model_cases": 15,
+  "actual_initialization_returned_models": 15,
+  "actual_CTF01_construction_owner_rows": 21,
+  "CTF02_public_construction_owner_available": false,
+  "existing_legacy_surface_storage_preserved_in_actual_results": true,
+  "gap": "Current source has no CTF02 all-resistive owner/API; initialized public surface coefficients are existing implementation context. No CTF02 numeric comparison has been performed.",
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "Rust_candidate_applied": false,
+  "gates_updated": false
+}
