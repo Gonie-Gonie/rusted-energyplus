@@ -1,0 +1,21 @@
+EnergyPlus-RS Run Diagnostics
+exit_status: success (0)
+counts: errors=0, warnings=16, info=1
+
+info [InputResolved] input: input kind idf staged; IDF conversion wall seconds 0.218695300
+warning [UnsupportedObjectIgnored] support: Exterior:Lights is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects
+warning [UnsupportedObjectIgnored] support: HeatBalanceAlgorithm is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects
+warning [UnsupportedObjectIgnored] support: Output:Constructions is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:Diagnostics is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:Meter:MeterFileOnly is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:Surfaces:Drawing is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:Table:SummaryReports is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:Variable is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:VariableDictionary is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: OutputControl:Table:Style is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: SimulationControl is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects
+warning [UnsupportedObjectIgnored] support: SizingPeriod:DesignDay is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects
+warning [UnsupportedAlgorithmIgnored] support: Exterior:Lights is recorded but not currently evaluated by the Rust arbitrary runtime
+warning [UnsupportedAlgorithmIgnored] support: HeatBalanceAlgorithm is recorded but not currently evaluated by the Rust arbitrary runtime
+warning [UnsupportedAlgorithmIgnored] support: SimulationControl is recorded but not currently evaluated by the Rust arbitrary runtime
+warning [UnsupportedAlgorithmIgnored] support: SizingPeriod:DesignDay is recorded but not currently evaluated by the Rust arbitrary runtime

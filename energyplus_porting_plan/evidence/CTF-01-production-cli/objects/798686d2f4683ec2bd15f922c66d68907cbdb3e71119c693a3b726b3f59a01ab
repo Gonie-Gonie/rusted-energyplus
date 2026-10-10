@@ -1,0 +1,58 @@
+# Support Assessment
+
+status: supported-compatibility
+run_result_state: supported_compatibility_run
+run_result_label: Supported compatibility run
+runtime_class: one-zone-heat-balance-compatibility
+runtime_selection_note: selected runtime 'one-zone-heat-balance-compatibility' executes the matched capability boundary; conformance_claim remains false for arbitrary runs
+mode: compatibility
+partial_policy: deny
+capability_registry: specs/capabilities.toml
+capability_registry_loaded: true
+conformance_claim: false
+
+## Top Blocked Reasons
+
+No blocking support reasons were emitted.
+
+Detailed support assessment data is recorded in support-assessment.json.
+
+## Matched Capabilities
+
+| id | domain | support_level | run_state | claim_boundary |
+| --- | --- | --- | --- | --- |
+| official_1zone_uncontrolled_declared_heat_balance | heat_balance | compatibility | supported_compatibility_run | Official 1ZoneUncontrolled compatibility only for declared variables and tolerances. |
+
+## Ignored Raw-Only Objects
+
+| object_type | count | note |
+| --- | ---: | --- |
+| Exterior:Lights | 1 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| HeatBalanceAlgorithm | 1 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| Output:Constructions | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Diagnostics | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Meter:MeterFileOnly | 3 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Surfaces:Drawing | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Table:SummaryReports | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Variable | 55 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:VariableDictionary | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| OutputControl:Table:Style | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| SimulationControl | 1 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| SizingPeriod:DesignDay | 2 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+
+## Diagnostic Summary
+
+| severity | code | stage | blocking | message |
+| --- | --- | --- | --- | --- |
+| warning | UnsupportedObjectIgnored | support | false | Exterior:Lights is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects |
+| warning | UnsupportedObjectIgnored | support | false | HeatBalanceAlgorithm is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Constructions is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Diagnostics is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Meter:MeterFileOnly is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Surfaces:Drawing is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Table:SummaryReports is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Variable is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:VariableDictionary is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | OutputControl:Table:Style is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+
+_6 more diagnostic(s) are available in support-assessment.json and diagnostics.json._

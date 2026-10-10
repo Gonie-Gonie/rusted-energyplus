@@ -1,0 +1,647 @@
+{
+  "schema": "ctf01-actual-six-production-cli-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-production-cli/manifest.json",
+    "sha256": "7cc66286a4ef87d440ea1fc42260cd7d47c6c1b9d2dbacd7b85b4bda32c0322a",
+    "size_bytes": 34507
+  },
+  "actual_execution_summary": {
+    "path": ".runtime/porting/CTF-01/production-cli-inputs-01/execution-summary.json",
+    "sha256": "115376610244af6c30bfc8d373fb273baf63bf9223bb9a99ff9a0cdbb05d4298",
+    "size_bytes": 2757
+  },
+  "actual_build_and_executions": [
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-build-command-01/receipt.json",
+      "sha256": "cfa5d0aa6987e0cb8747d0a009a05faf4171178e3121416829126025cf937f07",
+      "size_bytes": 4121
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-command-01/A-24H/receipt.json",
+      "sha256": "894078b89c6f5f0c5ac6ebb7890ea261df7d8189c1487f8b2d9504af168bf3ec",
+      "size_bytes": 3249
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-command-01/A-72H/receipt.json",
+      "sha256": "ce51668f75772964a1ec77526d44d21e129928a7da4fffc167c069b39a6f6f30",
+      "size_bytes": 3249
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-command-01/B-NOLIMIT-24H/receipt.json",
+      "sha256": "66231dba65a85044ba6a2d111f97fbbc4dd8127ad005303393aa87a62533a370",
+      "size_bytes": 3281
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-command-01/B-FLOW-24H/receipt.json",
+      "sha256": "4deb1de7f15b79b8fd7fe3847d36ba8d9af4d40b8b26b1ad7407a49da0a2934f",
+      "size_bytes": 3269
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-command-01/B-CAPACITY-24H/receipt.json",
+      "sha256": "922cb6b836e7e270116c5ad1437ff6d7d054047c7ce8057464554e8a0602b9ae",
+      "size_bytes": 3286
+    },
+    {
+      "path": ".runtime/porting/CTF-01/production-cli-command-01/B-BOTH-24H/receipt.json",
+      "sha256": "212b256c6ecfe93ce8706068711b01e9a5a4186727d1753a63fe2d6dd66ea6c0",
+      "size_bytes": 3269
+    }
+  ],
+  "actual_Cargo_binary": {
+    "historical_path": "target/debug/eplus-rs.exe",
+    "sha256": "9f0310d7205892ad992403c869e54e7cfe39baae6bfa8c1733f6a113043ad1ab"
+  },
+  "same_actual_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/9e/9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+    "sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390"
+  },
+  "all45_input_guards_unchanged_after": true,
+  "actual_runs": [
+    {
+      "id": "A-24H",
+      "status": "success",
+      "exit_code": 0,
+      "fixture_demand_injection_used_actual_field": null,
+      "oracle_requested": false,
+      "hours_override": null,
+      "source_order_matches": true,
+      "run_summary": {
+        "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/run-summary.json",
+        "sha256": "4b032c8385a5d2f6157620e6fd57ca2b4471ba9553e3691b23a250e7a1582e73",
+        "size_bytes": 28692
+      },
+      "top_level_output_inventory_without_payload_read": [
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/clk02-weather-production-trace.json",
+          "size_bytes": 92107
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/clk03-weather-day-production-trace.json",
+          "size_bytes": 105957615
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/clk06_sky_transport_trace.json",
+          "size_bytes": 1948916
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/clock-calls.json",
+          "size_bytes": 27056
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/compiled-geometry.json",
+          "size_bytes": 19420
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/diagnostics.json",
+          "size_bytes": 7496
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/eplusrs.err",
+          "size_bytes": 2492
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/geo02-geometry-operands.json",
+          "size_bytes": 883225
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/geo02-geometry.json",
+          "size_bytes": 17701
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/geo03-zone-volume.json",
+          "size_bytes": 11227
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/geometry-consumers.json",
+          "size_bytes": 19851
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/porting_scope.json",
+          "size_bytes": 14336
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/psy02-calls.json",
+          "size_bytes": 1211327
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/psychrometrics-calls.json",
+          "size_bytes": 350364
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/run-summary.json",
+          "size_bytes": 28692
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/sch01_compiled_schedules.json",
+          "size_bytes": 4742
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/sch01_schedule_cache_trace.json",
+          "size_bytes": 2156
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/support-assessment.json",
+          "size_bytes": 15585
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/support-report.md",
+          "size_bytes": 4365
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-24H/zon01-initialization.json",
+          "size_bytes": 20855
+        }
+      ]
+    },
+    {
+      "id": "A-72H",
+      "status": "success",
+      "exit_code": 0,
+      "fixture_demand_injection_used_actual_field": null,
+      "oracle_requested": false,
+      "hours_override": null,
+      "source_order_matches": true,
+      "run_summary": {
+        "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/run-summary.json",
+        "sha256": "b0cc292e0257b25c9809d2e767b67e96fdc859dfc07be1a67db0061c55f475e9",
+        "size_bytes": 28692
+      },
+      "top_level_output_inventory_without_payload_read": [
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/clk02-weather-production-trace.json",
+          "size_bytes": 268633
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/clk03-weather-day-production-trace.json",
+          "size_bytes": 316599591
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/clk06_sky_transport_trace.json",
+          "size_bytes": 6440561
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/clock-calls.json",
+          "size_bytes": 79717
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/compiled-geometry.json",
+          "size_bytes": 19420
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/diagnostics.json",
+          "size_bytes": 7496
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/eplusrs.err",
+          "size_bytes": 2492
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/geo02-geometry-operands.json",
+          "size_bytes": 3240633
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/geo02-geometry.json",
+          "size_bytes": 17702
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/geo03-zone-volume.json",
+          "size_bytes": 11227
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/geometry-consumers.json",
+          "size_bytes": 19853
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/porting_scope.json",
+          "size_bytes": 19151
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/psy02-calls.json",
+          "size_bytes": 3675140
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/psychrometrics-calls.json",
+          "size_bytes": 1038905
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/run-summary.json",
+          "size_bytes": 28692
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/sch01_compiled_schedules.json",
+          "size_bytes": 4742
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/sch01_schedule_cache_trace.json",
+          "size_bytes": 2156
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/support-assessment.json",
+          "size_bytes": 15585
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/support-report.md",
+          "size_bytes": 4365
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/A-72H/zon01-initialization.json",
+          "size_bytes": 20857
+        }
+      ]
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "status": "success",
+      "exit_code": 0,
+      "fixture_demand_injection_used_actual_field": false,
+      "oracle_requested": false,
+      "hours_override": null,
+      "source_order_matches": true,
+      "run_summary": {
+        "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+        "sha256": "2f8e5a5631398921e7cf1733c10eedd8cd67a021f3e165615653f6849836bac7",
+        "size_bytes": 1498420
+      },
+      "top_level_output_inventory_without_payload_read": [
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/clk02-weather-production-trace.json",
+          "size_bytes": 92107
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/clk03-weather-day-production-trace.json",
+          "size_bytes": 105957615
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/clk06_sky_transport_trace.json",
+          "size_bytes": 1480357
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/clock-calls.json",
+          "size_bytes": 59323
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/compiled-geometry.json",
+          "size_bytes": 18956
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/diagnostics.json",
+          "size_bytes": 3042
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/eplusrs.err",
+          "size_bytes": 1040
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/geo02-geometry-operands.json",
+          "size_bytes": 1530184
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/geo02-geometry.json",
+          "size_bytes": 17469
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/geo03-zone-volume.json",
+          "size_bytes": 11037
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/geometry-consumers.json",
+          "size_bytes": 19539
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/porting_scope.json",
+          "size_bytes": 21577
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/psy02-calls.json",
+          "size_bytes": 1977579
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/psychrometrics-calls.json",
+          "size_bytes": 11166208
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+          "size_bytes": 1498420
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/sch01_compiled_schedules.json",
+          "size_bytes": 10584
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/sch01_schedule_cache_trace.json",
+          "size_bytes": 84413
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/support-assessment.json",
+          "size_bytes": 24521
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/support-report.md",
+          "size_bytes": 16930
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-NOLIMIT-24H/zon01-initialization.json",
+          "size_bytes": 21171
+        }
+      ]
+    },
+    {
+      "id": "B-FLOW-24H",
+      "status": "success",
+      "exit_code": 0,
+      "fixture_demand_injection_used_actual_field": false,
+      "oracle_requested": false,
+      "hours_override": null,
+      "source_order_matches": true,
+      "run_summary": {
+        "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/run-summary.json",
+        "sha256": "0a8b19d84227a42d6fd6f84b14e3890ab29f9421edd568307f1f75206713a98e",
+        "size_bytes": 1498307
+      },
+      "top_level_output_inventory_without_payload_read": [
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/clk02-weather-production-trace.json",
+          "size_bytes": 92107
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/clk03-weather-day-production-trace.json",
+          "size_bytes": 105957615
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/clk06_sky_transport_trace.json",
+          "size_bytes": 1480357
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/clock-calls.json",
+          "size_bytes": 59323
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/compiled-geometry.json",
+          "size_bytes": 18947
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/diagnostics.json",
+          "size_bytes": 3042
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/eplusrs.err",
+          "size_bytes": 1040
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/geo02-geometry-operands.json",
+          "size_bytes": 1530184
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/geo02-geometry.json",
+          "size_bytes": 17469
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/geo03-zone-volume.json",
+          "size_bytes": 11037
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/geometry-consumers.json",
+          "size_bytes": 19539
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/porting_scope.json",
+          "size_bytes": 21586
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/psy02-calls.json",
+          "size_bytes": 1969243
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/psychrometrics-calls.json",
+          "size_bytes": 11164846
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/run-summary.json",
+          "size_bytes": 1498307
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/sch01_compiled_schedules.json",
+          "size_bytes": 10581
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/sch01_schedule_cache_trace.json",
+          "size_bytes": 84410
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/support-assessment.json",
+          "size_bytes": 24113
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/support-report.md",
+          "size_bytes": 16865
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-FLOW-24H/zon01-initialization.json",
+          "size_bytes": 21171
+        }
+      ]
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "status": "success",
+      "exit_code": 0,
+      "fixture_demand_injection_used_actual_field": false,
+      "oracle_requested": false,
+      "hours_override": null,
+      "source_order_matches": true,
+      "run_summary": {
+        "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+        "sha256": "5a0398d5ba15a7b6d600e6473c422e4a11f2091728fde03bfba0a40c7ef1d83c",
+        "size_bytes": 1498242
+      },
+      "top_level_output_inventory_without_payload_read": [
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/clk02-weather-production-trace.json",
+          "size_bytes": 92107
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/clk03-weather-day-production-trace.json",
+          "size_bytes": 105957615
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/clk06_sky_transport_trace.json",
+          "size_bytes": 1480357
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/clock-calls.json",
+          "size_bytes": 59323
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/compiled-geometry.json",
+          "size_bytes": 18959
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/diagnostics.json",
+          "size_bytes": 3042
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/eplusrs.err",
+          "size_bytes": 1040
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/geo02-geometry-operands.json",
+          "size_bytes": 1530184
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/geo02-geometry.json",
+          "size_bytes": 17469
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/geo03-zone-volume.json",
+          "size_bytes": 11037
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/geometry-consumers.json",
+          "size_bytes": 19539
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/porting_scope.json",
+          "size_bytes": 21592
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/psy02-calls.json",
+          "size_bytes": 2019232
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/psychrometrics-calls.json",
+          "size_bytes": 44530831
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+          "size_bytes": 1498242
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/sch01_compiled_schedules.json",
+          "size_bytes": 10585
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/sch01_schedule_cache_trace.json",
+          "size_bytes": 84414
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/support-assessment.json",
+          "size_bytes": 24113
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/support-report.md",
+          "size_bytes": 16865
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-CAPACITY-24H/zon01-initialization.json",
+          "size_bytes": 21171
+        }
+      ]
+    },
+    {
+      "id": "B-BOTH-24H",
+      "status": "success",
+      "exit_code": 0,
+      "fixture_demand_injection_used_actual_field": false,
+      "oracle_requested": false,
+      "hours_override": null,
+      "source_order_matches": true,
+      "run_summary": {
+        "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/run-summary.json",
+        "sha256": "5c1c9028442963a555e433808f7ac1a3a0631f1b18d3c2f53f64b89c913a6f0a",
+        "size_bytes": 1498712
+      },
+      "top_level_output_inventory_without_payload_read": [
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/clk02-weather-production-trace.json",
+          "size_bytes": 92107
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/clk03-weather-day-production-trace.json",
+          "size_bytes": 105957615
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/clk06_sky_transport_trace.json",
+          "size_bytes": 1480357
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/clock-calls.json",
+          "size_bytes": 59323
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/compiled-geometry.json",
+          "size_bytes": 18947
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/diagnostics.json",
+          "size_bytes": 3042
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/eplusrs.err",
+          "size_bytes": 1040
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/geo02-geometry-operands.json",
+          "size_bytes": 1530184
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/geo02-geometry.json",
+          "size_bytes": 17469
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/geo03-zone-volume.json",
+          "size_bytes": 11037
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/geometry-consumers.json",
+          "size_bytes": 19539
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/porting_scope.json",
+          "size_bytes": 21616
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/psy02-calls.json",
+          "size_bytes": 2019274
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/psychrometrics-calls.json",
+          "size_bytes": 44524367
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/run-summary.json",
+          "size_bytes": 1498712
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/sch01_compiled_schedules.json",
+          "size_bytes": 10581
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/sch01_schedule_cache_trace.json",
+          "size_bytes": 84410
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/support-assessment.json",
+          "size_bytes": 24113
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/support-report.md",
+          "size_bytes": 16865
+        },
+        {
+          "path": ".runtime/porting/CTF-01/production-cli-output-01/B-BOTH-24H/zon01-initialization.json",
+          "size_bytes": 21171
+        }
+      ]
+    }
+  ],
+  "actual_fixed6_exit0_and_source_unchanged": true,
+  "A_fixture_metadata_is_null_not_false": true,
+  "A_null_meaning": "No HVAC demand metadata in A; actual A production weather simulation call is pipeline.rs3593-3598. Earlier source audit establishes empty CTF override and no fixture reader. Null is not interpreted as a numeric or boolean PASS.",
+  "B_actual_fixture_demand_injection_used_false": true,
+  "numerical_equivalence_certified_by_these_cli_runs": false,
+  "complete_CTF01_PASS": false,
+  "pending": [
+    "genuine downstream CTF02/03 preprocessing handoff",
+    "complete integration and production gate prerequisites"
+  ]
+}

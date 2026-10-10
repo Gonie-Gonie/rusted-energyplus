@@ -1,0 +1,112 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "-p",
+    "ep_cli",
+    "--message-format=json-render-diagnostics"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T12:50:08.897504+00:00",
+  "finished_utc": "2026-10-10T12:50:28.033789+00:00",
+  "elapsed_seconds": 19.13675209999201,
+  "repository_before": {
+    "head": "5e67e931b87c6b2ff42074b986efb55916391257",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "5e67e931b87c6b2ff42074b986efb55916391257",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/9e/9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390",
+    "sha256": "9ef6e46bcb6c250f2f60cbf2cdbf0b7df872424c45259d1e3736dbc1a049e390"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-01/production-cli-build-command-01/stdout.log",
+    "sha256": "71210848267b535ebce6df944fda46caf3521e4f9cc29921572c1945488706a9"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-01/production-cli-build-command-01/stderr.log",
+    "sha256": "eebe737d321b596350a59f57285bbf9749554a888587e44ab66c6bc31ccdd80b"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": true,
+    "captured_utc": "2026-10-10T12:50:28.033789+00:00",
+    "status": "pass",
+    "rows": [
+      {
+        "cargo_message": {
+          "reason": "compiler-artifact",
+          "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_cli#0.1.0",
+          "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_cli\\Cargo.toml",
+          "target": {
+            "kind": [
+              "bin"
+            ],
+            "crate_types": [
+              "bin"
+            ],
+            "name": "eplus-rs",
+            "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_cli\\src\\main.rs",
+            "edition": "2024",
+            "doc": true,
+            "doctest": false,
+            "test": true
+          },
+          "profile": {
+            "opt_level": "0",
+            "debuginfo": 2,
+            "debug_assertions": true,
+            "overflow_checks": true,
+            "test": false
+          },
+          "features": [],
+          "filenames": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe"
+          ],
+          "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+          "fresh": false
+        },
+        "executable": {
+          "historical_path": "target/debug/eplus-rs.exe",
+          "sha256": "9f0310d7205892ad992403c869e54e7cfe39baae6bfa8c1733f6a113043ad1ab"
+        }
+      }
+    ],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

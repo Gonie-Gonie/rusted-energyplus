@@ -1,0 +1,478 @@
+{
+  "schema_version": 1,
+  "status": "SupportedCompatibility",
+  "run_result_state": "supported_compatibility_run",
+  "runtime_class": "one-zone-heat-balance-compatibility",
+  "selected_algorithm_lane": {
+    "id": "compatibility-source-order",
+    "diagnostic_probe_used": false,
+    "conformance_promotion_allowed": true
+  },
+  "runtime_selection_note": "selected runtime 'one-zone-heat-balance-compatibility' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
+  "matched_capability_ids": [
+    "official_1zone_uncontrolled_declared_heat_balance"
+  ],
+  "matched_capabilities": [
+    {
+      "id": "official_1zone_uncontrolled_declared_heat_balance",
+      "domain": "heat_balance",
+      "support_level": "compatibility",
+      "run_state": "supported_compatibility_run",
+      "required_objects": [
+        "Zone",
+        "BuildingSurface:Detailed",
+        "Construction",
+        "Material",
+        "Material:NoMass",
+        "RunPeriod",
+        "Timestep"
+      ],
+      "forbidden_active_features": [
+        "AirLoopHVAC",
+        "PlantLoop",
+        "EMS",
+        "PythonPlugin",
+        "AirflowNetwork",
+        "Daylighting",
+        "FenestrationSurface",
+        "Autosizing"
+      ],
+      "algorithms": [
+        "heat_balance_manager_source_order",
+        "heat_balance_surface_manager_source_order",
+        "heat_balance_air_manager_source_order",
+        "zone_temp_predictor_corrector_source_order",
+        "official_dynamic_heat_balance_compat_candidate"
+      ],
+      "evidence_cases": [
+        "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+      ],
+      "claim_boundary": "Official 1ZoneUncontrolled compatibility only for declared variables and tolerances."
+    }
+  ],
+  "failed_capability_ids": [],
+  "active_ideal_loads_branches": [],
+  "inactive_ideal_loads_branches": [
+    "no_oa_sensible",
+    "finite_capacity",
+    "finite_flow",
+    "flow_and_capacity",
+    "constant_shr",
+    "constant_supply_humidity_cooling",
+    "constant_supply_humidity_heating",
+    "humidistat_dehumidification",
+    "humidistat_humidification"
+  ],
+  "mode": "compatibility",
+  "partial_policy": "deny",
+  "output_format": "rust-native",
+  "trace_level": "full",
+  "capability_registry": "specs/capabilities.toml",
+  "capability_registry_loaded": true,
+  "claim_boundary": {
+    "conformance_claim": false,
+    "release_evidence": false,
+    "statement": "Ad-hoc arbitrary runs do not become release conformance evidence automatically; compare reports are diagnostic unless promoted by a reviewed release manifest."
+  },
+  "typed_objects": [
+    {
+      "object_type": "Building",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "BuildingSurface:Detailed",
+      "count": 6,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Construction",
+      "count": 3,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "GlobalGeometryRules",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Material",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Material:NoMass",
+      "count": 2,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "OtherEquipment",
+      "count": 2,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "RunPeriod",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Schedule:Constant",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "ScheduleTypeLimits",
+      "count": 2,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Site:Location",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "SurfaceConvectionAlgorithm:Inside",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "SurfaceConvectionAlgorithm:Outside",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Timestep",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Version",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    },
+    {
+      "object_type": "Zone",
+      "count": 1,
+      "status": "typed",
+      "note": "compiled into the current TypedModel subset"
+    }
+  ],
+  "ignored_raw_only_objects": [
+    {
+      "object_type": "Exterior:Lights",
+      "count": 1,
+      "status": "inactive_or_unused_raw_objects",
+      "note": "Preserved for diagnostics or staging when inactive for the current runtime subset."
+    },
+    {
+      "object_type": "HeatBalanceAlgorithm",
+      "count": 1,
+      "status": "inactive_or_unused_raw_objects",
+      "note": "Preserved for diagnostics or staging when inactive for the current runtime subset."
+    },
+    {
+      "object_type": "Output:Constructions",
+      "count": 1,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "Output:Diagnostics",
+      "count": 1,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "Output:Meter:MeterFileOnly",
+      "count": 3,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "Output:Surfaces:Drawing",
+      "count": 1,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "Output:Table:SummaryReports",
+      "count": 1,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "Output:Variable",
+      "count": 55,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "Output:VariableDictionary",
+      "count": 1,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "OutputControl:Table:Style",
+      "count": 1,
+      "status": "ignored_reporting_objects",
+      "note": "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+    },
+    {
+      "object_type": "SimulationControl",
+      "count": 1,
+      "status": "inactive_or_unused_raw_objects",
+      "note": "Preserved for diagnostics or staging when inactive for the current runtime subset."
+    },
+    {
+      "object_type": "SizingPeriod:DesignDay",
+      "count": 2,
+      "status": "inactive_or_unused_raw_objects",
+      "note": "Preserved for diagnostics or staging when inactive for the current runtime subset."
+    }
+  ],
+  "unsupported_objects": [],
+  "diagnostics": {
+    "diagnostics": [
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Exterior:Lights",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Exterior:Lights is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "HeatBalanceAlgorithm",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "HeatBalanceAlgorithm is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:Constructions",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:Constructions is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:Diagnostics",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:Diagnostics is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:Meter:MeterFileOnly",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:Meter:MeterFileOnly is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:Surfaces:Drawing",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:Surfaces:Drawing is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:Table:SummaryReports",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:Table:SummaryReports is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:Variable",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:Variable is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "Output:VariableDictionary",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Output:VariableDictionary is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "OutputControl:Table:Style",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "OutputControl:Table:Style is preserved in RawModel and ignored by partial rule ignored_reporting_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "SimulationControl",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "SimulationControl is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedObjectIgnored",
+        "stage": "support",
+        "object_type": "SizingPeriod:DesignDay",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "SizingPeriod:DesignDay is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedAlgorithmIgnored",
+        "stage": "support",
+        "object_type": "Exterior:Lights",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "Exterior:Lights is recorded but not currently evaluated by the Rust arbitrary runtime",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedAlgorithmIgnored",
+        "stage": "support",
+        "object_type": "HeatBalanceAlgorithm",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "HeatBalanceAlgorithm is recorded but not currently evaluated by the Rust arbitrary runtime",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedAlgorithmIgnored",
+        "stage": "support",
+        "object_type": "SimulationControl",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "SimulationControl is recorded but not currently evaluated by the Rust arbitrary runtime",
+        "blocking": false
+      },
+      {
+        "severity": "warning",
+        "code": "UnsupportedAlgorithmIgnored",
+        "stage": "support",
+        "object_type": "SizingPeriod:DesignDay",
+        "object_name": null,
+        "field": null,
+        "surface": null,
+        "zone": null,
+        "timestep": null,
+        "output_handle": null,
+        "message": "SizingPeriod:DesignDay is recorded but not currently evaluated by the Rust arbitrary runtime",
+        "blocking": false
+      }
+    ]
+  }
+}

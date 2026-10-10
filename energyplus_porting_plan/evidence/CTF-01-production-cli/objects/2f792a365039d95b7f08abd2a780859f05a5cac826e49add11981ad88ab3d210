@@ -1,0 +1,11 @@
+EnergyPlus-RS Run Diagnostics
+exit_status: success (0)
+counts: errors=0, warnings=6, info=1
+
+info [InputResolved] input: input kind idf staged; IDF conversion wall seconds 0.227142900
+warning [UnsupportedObjectIgnored] support: HeatBalanceAlgorithm is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects
+warning [UnsupportedObjectIgnored] support: Output:Variable is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: Output:VariableDictionary is preserved in RawModel and ignored by partial rule ignored_reporting_objects
+warning [UnsupportedObjectIgnored] support: SimulationControl is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects
+warning [UnsupportedAlgorithmIgnored] support: HeatBalanceAlgorithm is recorded but not currently evaluated by the Rust arbitrary runtime
+warning [UnsupportedAlgorithmIgnored] support: SimulationControl is recorded but not currently evaluated by the Rust arbitrary runtime

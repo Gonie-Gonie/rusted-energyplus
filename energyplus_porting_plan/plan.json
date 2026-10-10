@@ -9346,7 +9346,7 @@
         "literal_unit_models": 39,
         "declared_whole_calls": 42,
         "strict_profiles_settled_before_outputs": true,
-        "actual_production_loader_lane_pending": true,
+        "actual_production_loader_lane_pending": false,
         "existing_Rust_stored_Regular_R_and_normalized_owners_absent": true,
         "later_solver_flags_and_coefficients_unpaired": true,
         "full_CTF_method_math_certified": false,
@@ -9361,7 +9361,8 @@
         "candidate_stored_Regular_R_and_normalized_owners_applied": true,
         "actual_production_loader_lane_executed": true,
         "actual_production_surface_order_discrete_mismatches": 84,
-        "surface_order_discrete_mismatches_after_source_repair": 0
+        "surface_order_discrete_mismatches_after_source_repair": 0,
+        "actual_fixed6_production_cli_executed": true
       },
       "actual_original_and_existing_baseline": {
         "path": "energyplus_porting_plan/evidence/CTF-01-baseline/summary.json",
@@ -9382,6 +9383,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-01-loader-fixed/summary.json",
         "sha256": "d9a6af84f304fa9cfadfd05e8f1a5553e93c1f1014925353be823bf1dfd24bbd",
         "size_bytes": 3684
+      },
+      "actual_fixed6_production_cli": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-production-cli/summary.json",
+        "sha256": "eb8a4187fbb2bd7f87e571fc36a35b2a8ce6a6991f6c77c76f89e1c6c31b847c",
+        "size_bytes": 25192
       }
     },
     {
